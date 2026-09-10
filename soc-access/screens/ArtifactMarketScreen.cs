@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.Menu;
 using SongsOfConquest.Common.Details;
@@ -80,6 +80,13 @@ namespace SongsOfConquestAccess.Screens
         // controls of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
+        // This column's slot nodes, kept for as long as the adapter hands back the same slot list.
+        // The nodes are closures that read the game when they are READ, so rebuilding them every
+        // frame bought nothing but the allocation; the contributor owns the key and the rule
+        // (ui/ArtifactSlotNodes.cs, Column). It is a field on the SCREEN because an adapter may hold
+        // no graph concepts.
+        private readonly ArtifactSlotNodes.Column _column = new ArtifactSlotNodes.Column();
+
         /// <summary>The one artifact market the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<ArtifactMarketMenu> _source =
             ScreenSource<ArtifactMarketMenu>.FromScene(LoadedScenes.AdventureScene);
@@ -139,10 +146,10 @@ namespace SongsOfConquestAccess.Screens
             BuildSell(builder);
 
             builder.BeginStop(EquipmentStop);
-            ArtifactSlotNodes.Equipment(builder, Live, KeyPrefix, AddSlotHints);
+            ArtifactSlotNodes.Equipment(builder, Live, KeyPrefix, AddSlotHints, _column);
 
             builder.BeginStop(InventoryStop);
-            ArtifactSlotNodes.Inventory(builder, Live, KeyPrefix, AddSlotHints, Marker("auto-arrange"));
+            ArtifactSlotNodes.Inventory(builder, Live, KeyPrefix, AddSlotHints, Marker("auto-arrange"), _column);
 
             builder.BeginStop(CloseStop);
             BuildClose(builder);

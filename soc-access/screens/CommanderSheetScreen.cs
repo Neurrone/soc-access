@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Common.Details;
@@ -71,6 +71,13 @@ namespace SongsOfConquestAccess.Screens
         // cursor on the same one: the auto-arrange button and the read-only lines are not drawn as
         // controls of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
+
+        // This column's slot nodes, kept for as long as the adapter hands back the same slot list.
+        // The nodes are closures that read the game when they are READ, so rebuilding them every
+        // frame bought nothing but the allocation; the contributor owns the key and the rule
+        // (ui/ArtifactSlotNodes.cs, Column). It is a field on the SCREEN because an adapter may hold
+        // no graph concepts.
+        private readonly ArtifactSlotNodes.Column _column = new ArtifactSlotNodes.Column();
 
         /// <summary>The commander HUD's settings hold the sheet (<see cref="HudSources"/>).</summary>
         private readonly ScreenSource<CommanderSheet> _source =
@@ -225,12 +232,12 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildEquipment(GraphBuilder builder)
         {
-            ArtifactSlotNodes.Equipment(builder, Live, "commander-sheet", AddSlotHints);
+            ArtifactSlotNodes.Equipment(builder, Live, "commander-sheet", AddSlotHints, _column);
         }
 
         private void BuildInventory(GraphBuilder builder)
         {
-            ArtifactSlotNodes.Inventory(builder, Live, "commander-sheet", AddSlotHints, Marker("auto-arrange"));
+            ArtifactSlotNodes.Inventory(builder, Live, "commander-sheet", AddSlotHints, Marker("auto-arrange"), _column);
         }
 
         /// <summary>The three gestures an occupied slot has, in the order they are said: what the right

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure.UI.Trading;
@@ -70,6 +70,15 @@ namespace SongsOfConquestAccess.Screens
         // controls of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
+        // Each side's slot nodes, kept for as long as the adapter hands back the same slot list.
+        // The nodes are closures that read the game when they are READ, so rebuilding them every
+        // frame bought nothing but the allocation; the contributor owns the key and the rule
+        // (ui/ArtifactSlotNodes.cs, Column). It is a field on the SCREEN because an adapter may hold
+        // no graph concepts.
+        private readonly ArtifactSlotNodes.Column _leftColumn = new ArtifactSlotNodes.Column();
+
+        private readonly ArtifactSlotNodes.Column _rightColumn = new ArtifactSlotNodes.Column();
+
         /// <summary>The one trading window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<ITradingMenu> _source =
             ScreenSource<ITradingMenu>.FromScene(LoadedScenes.AdventureScene);
@@ -137,16 +146,16 @@ namespace SongsOfConquestAccess.Screens
             BuildWielder(builder, RightWielderStop, RightKey, Live.Right);
 
             builder.BeginStop(LeftEquipmentStop);
-            ArtifactSlotNodes.Equipment(builder, Live.Left, LeftKey, AddSlotHints, Section(Live.Left, Live.Left.EquipmentLabel));
+            ArtifactSlotNodes.Equipment(builder, Live.Left, LeftKey, AddSlotHints, _leftColumn, Section(Live.Left, Live.Left.EquipmentLabel));
 
             builder.BeginStop(LeftInventoryStop);
-            ArtifactSlotNodes.Inventory(builder, Live.Left, LeftKey, AddSlotHints, Marker("left/auto-arrange"), Section(Live.Left, Live.Left.InventoryLabel));
+            ArtifactSlotNodes.Inventory(builder, Live.Left, LeftKey, AddSlotHints, Marker("left/auto-arrange"), _leftColumn, Section(Live.Left, Live.Left.InventoryLabel));
 
             builder.BeginStop(RightEquipmentStop);
-            ArtifactSlotNodes.Equipment(builder, Live.Right, RightKey, AddSlotHints, Section(Live.Right, Live.Right.EquipmentLabel));
+            ArtifactSlotNodes.Equipment(builder, Live.Right, RightKey, AddSlotHints, _rightColumn, Section(Live.Right, Live.Right.EquipmentLabel));
 
             builder.BeginStop(RightInventoryStop);
-            ArtifactSlotNodes.Inventory(builder, Live.Right, RightKey, AddSlotHints, Marker("right/auto-arrange"), Section(Live.Right, Live.Right.InventoryLabel));
+            ArtifactSlotNodes.Inventory(builder, Live.Right, RightKey, AddSlotHints, Marker("right/auto-arrange"), _rightColumn, Section(Live.Right, Live.Right.InventoryLabel));
 
             builder.BeginStop(CloseStop);
             BuildClose(builder);

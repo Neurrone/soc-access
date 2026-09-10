@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Common;
@@ -48,6 +48,67 @@ namespace SongsOfConquestAccess.UI
         /// screen writes them because only it knows what the game's two clicks mean on it.</summary>
         public delegate void SlotHints(NodeVtable vtable, InventorySlotInfo slot);
 
+        /// <summary>
+        /// One wielder column's nodes, held between builds by the SCREEN that draws the column - a
+        /// page with two wielders on it owns two of these. Adapters may not hold graph concepts, so
+        /// this is the screen's field and is passed in.
+        ///
+        /// A slot's node is a vtable, five closures, a key string and, on an occupied slot, its usage
+        /// hints; every one of them reads the game when it is READ, so rebuilding them for a column
+        /// whose slots have not moved bought nothing but the allocation. The adapter already answers
+        /// with the same list while the game's own inventory is unchanged
+        /// (<see cref="SlotSnapshot"/>), so that list's identity is the key - plus, for the equipment,
+        /// the two-hander answer, because it decides whether the two hands are one node or two.
+        ///
+        /// On a hit the contributor re-adds the same declarations: the context, the row and the
+        /// positions are the builder's business and still run every frame.
+        /// </summary>
+        public sealed class Column
+        {
+            private object _equipmentSlots;
+
+            private bool _equipmentMerged;
+
+            private List<NodeDeclaration> _equipmentNodes;
+
+            private object _inventorySlots;
+
+            private List<NodeDeclaration> _inventoryNodes;
+
+            /// <summary>The equipment nodes built for exactly this slot list and this two-hander
+            /// answer, or null where either has changed since.</summary>
+            public List<NodeDeclaration> EquipmentNodes(IReadOnlyList<InventorySlotInfo> slots, bool merged)
+            {
+                return _equipmentNodes != null && ReferenceEquals(_equipmentSlots, slots) && _equipmentMerged == merged
+                    ? _equipmentNodes
+                    : null;
+            }
+
+            /// <summary>Hold these equipment nodes for that list and that answer.</summary>
+            public void KeepEquipment(IReadOnlyList<InventorySlotInfo> slots, bool merged, List<NodeDeclaration> nodes)
+            {
+                _equipmentSlots = slots;
+                _equipmentMerged = merged;
+                _equipmentNodes = nodes;
+            }
+
+            /// <summary>The backpack nodes built for exactly this cell list, or null where it has
+            /// changed since.</summary>
+            public List<NodeDeclaration> InventoryNodes(IReadOnlyList<InventorySlotInfo> cells)
+            {
+                return _inventoryNodes != null && ReferenceEquals(_inventorySlots, cells)
+                    ? _inventoryNodes
+                    : null;
+            }
+
+            /// <summary>Hold these backpack nodes for that list.</summary>
+            public void KeepInventory(IReadOnlyList<InventorySlotInfo> cells, List<NodeDeclaration> nodes)
+            {
+                _inventorySlots = cells;
+                _inventoryNodes = nodes;
+            }
+        }
+
         /// <summary>The game's own drag noise, for the keyboard's carry. Called on every build: the
         /// registration is a delegate over this load and must not outlive it.</summary>
         public static void RegisterSounds()
@@ -63,6 +124,7 @@ namespace SongsOfConquestAccess.UI
             IArtifactSlots slots,
             string keyPrefix,
             SlotHints hints,
+            Column column,
             string caption = null)
         {
             IReadOnlyList<InventorySlotInfo> drawn = slots == null ? null : slots.GetEquipmentSlots();
@@ -72,27 +134,41 @@ namespace SongsOfConquestAccess.UI
             }
 
             bool merged = slots.IsMainHandTwoHanded();
-            InventorySlotInfo mainHand = Find(drawn, InventorySlot.MainHand);
-            InventorySlotInfo offHand = Find(drawn, InventorySlot.OffHand);
+            List<NodeDeclaration> nodes = column == null ? null : column.EquipmentNodes(drawn, merged);
+            if (nodes == null)
+            {
+                nodes = new List<NodeDeclaration>(drawn.Count);
+                InventorySlotInfo mainHand = Find(drawn, InventorySlot.MainHand);
+                InventorySlotInfo offHand = Find(drawn, InventorySlot.OffHand);
+                for (int i = 0; i < drawn.Count; i++)
+                {
+                    InventorySlotInfo slot = drawn[i];
+                    if (merged && slot.Slot == InventorySlot.OffHand)
+                    {
+                        // The game draws a ghost of the two-hander here; the one node below stands
+                        // for both hands.
+                        continue;
+                    }
+
+                    if (merged && slot.Slot == InventorySlot.MainHand)
+                    {
+                        AddSlot(nodes, slots, mainHand, keyPrefix + ":equipment/both-hands", slots.BothHandsSlotName, offHand, hints);
+                        continue;
+                    }
+
+                    AddSlot(nodes, slots, slot, keyPrefix + ":equipment/" + slot.Slot, slot.SlotName, null, hints);
+                }
+
+                if (column != null)
+                {
+                    column.KeepEquipment(drawn, merged, nodes);
+                }
+            }
 
             builder.PushContext(caption ?? slots.EquipmentLabel);
-            for (int i = 0; i < drawn.Count; i++)
+            for (int i = 0; i < nodes.Count; i++)
             {
-                InventorySlotInfo slot = drawn[i];
-                if (merged && slot.Slot == InventorySlot.OffHand)
-                {
-                    // The game draws a ghost of the two-hander here; the one node below stands for
-                    // both hands.
-                    continue;
-                }
-
-                if (merged && slot.Slot == InventorySlot.MainHand)
-                {
-                    AddSlot(builder, slots, mainHand, keyPrefix + ":equipment/both-hands", slots.BothHandsSlotName, offHand, hints);
-                    continue;
-                }
-
-                AddSlot(builder, slots, slot, keyPrefix + ":equipment/" + slot.Slot, slot.SlotName, null, hints);
+                builder.AddItem(nodes[i]);
             }
 
             builder.PopContext();
@@ -106,6 +182,7 @@ namespace SongsOfConquestAccess.UI
             string keyPrefix,
             SlotHints hints,
             object autoArrangeMarker,
+            Column column,
             string caption = null)
         {
             IReadOnlyList<InventorySlotInfo> cells = slots == null ? null : slots.GetBackpackSlots();
@@ -114,11 +191,26 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
+            List<NodeDeclaration> nodes = column == null ? null : column.InventoryNodes(cells);
+            if (nodes == null)
+            {
+                nodes = new List<NodeDeclaration>(cells.Count);
+                for (int i = 0; i < cells.Count; i++)
+                {
+                    AddSlot(nodes, slots, cells[i], keyPrefix + ":inventory/" + i, null, null, hints);
+                }
+
+                if (column != null)
+                {
+                    column.KeepInventory(cells, nodes);
+                }
+            }
+
             builder.PushContext(caption ?? slots.InventoryLabel);
             AddAutoArrange(builder, slots, keyPrefix, autoArrangeMarker);
-            for (int i = 0; i < cells.Count; i++)
+            for (int i = 0; i < nodes.Count; i++)
             {
-                AddSlot(builder, slots, cells[i], keyPrefix + ":inventory/" + i, null, null, hints);
+                builder.AddItem(nodes[i]);
             }
 
             builder.PopContext();
@@ -156,9 +248,17 @@ namespace SongsOfConquestAccess.UI
         ///
         /// <paramref name="dropInstead"/> is the off hand of a merged two-hander node: the one slot
         /// whose drop may land somewhere other than the node the player is standing on.
+        ///
+        /// THE NODE IS BUILT ONCE PER SLOT LIST, not once per frame (<see cref="Column"/>), so this
+        /// runs exactly once for each node the player then walks over and over. Everything it writes
+        /// must therefore be either a closure that reads the game when it is read - which the label,
+        /// the two clicks, the drop and the pick-up all are - or a fact that cannot change while the
+        /// slot list does not. The usage hints are the second kind, and they are also the reason a
+        /// cached vtable must never be passed through here twice: <c>NodeHints.Add</c> APPENDS, so a
+        /// second pass would say every gesture twice.
         /// </summary>
         private static void AddSlot(
-            GraphBuilder builder,
+            List<NodeDeclaration> into,
             IArtifactSlots slots,
             InventorySlotInfo slot,
             string key,
@@ -202,7 +302,7 @@ namespace SongsOfConquestAccess.UI
 
             object drawnBy = it.Movable != null ? (object)it.Movable : it.NativeSlot;
             ControlId id = ControlId.Structural(key);
-            builder.AddItem(drawnBy == null
+            into.Add(drawnBy == null
                 ? (NodeDeclaration)new SyntheticNode(id, vtable)
                 : new DrawnNode(id, vtable, drawnBy));
         }
