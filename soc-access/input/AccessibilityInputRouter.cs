@@ -115,6 +115,19 @@ namespace SongsOfConquestAccess.Input
                 return null;
             }
 
+            // The characters were queued under whatever screen was focused when they were typed
+            // (_screenTyped, set the last time ForgetTypedAcrossScreens ran). The letter that OPENS a
+            // page is delivered while the old screen is still up, then the game makes the new page
+            // current in the same frame - before ForgetTypedAcrossScreens gets to clear the queue -
+            // and the new page's type-ahead tick would otherwise search for the letter that summoned
+            // it (c opens the wielder sheet, v the spellbook). If the focused screen has moved on
+            // since these were typed, they are not this screen's to search with.
+            if (!ReferenceEquals(_screenManager == null ? null : _screenManager.Current, _screenTyped))
+            {
+                _typed.Length = 0;
+                return null;
+            }
+
             string typed = _typed.ToString();
             _typed.Length = 0;
             return typed;
