@@ -54,6 +54,19 @@ namespace SongsOfConquestAccess.UI
             get { return _owner != null; }
         }
 
+        /// <summary>Whether an editor has handed a field the keyboard - the mod's OWN word on it,
+        /// which the stand-down (<c>GameTextFocus.IsTyping</c>) asks before it asks the engine. TMP
+        /// reports the field focused only from the LateUpdate after the handover, so for the rest of
+        /// the handover frame the engine's answer is "no" while the keyboard is already the field's;
+        /// a letter arriving in that frame was otherwise the mod's to search with (measured on the
+        /// mod.io email box, 2026-09-10: Enter released and a letter pressed in the same frame).
+        /// Bounded: an edit whose field never takes the keyboard is let go of after
+        /// <see cref="FramesToWaitForFocus"/>.</summary>
+        public static bool AnyEditing
+        {
+            get { return _owner != null && _owner._editing != null; }
+        }
+
         private static GameTextEditor _owner;
 
         // Whether the end of the edit is spoken. The chat box keeps quiet: its Enter SENDS, the line
@@ -191,6 +204,13 @@ namespace SongsOfConquestAccess.UI
         {
             if (field == null || !field.Interactable)
             {
+                // Nothing was begun, so nothing is owned: left set, the ownership would keep the
+                // type-ahead and the arrival release off until the screen was left.
+                if (ReferenceEquals(_owner, this))
+                {
+                    _owner = null;
+                }
+
                 return;
             }
 

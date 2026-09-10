@@ -216,7 +216,13 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            return _screen.AllowsTypeahead && !_screen.CapturesRawInput;
+            // An editor asked for or live anywhere disarms the search outright, whatever the screen
+            // says: the screen's CapturesRawInput is the pending half only, and a letter queued in
+            // the frame the handover lands (typed as Enter came up) would otherwise be searched with
+            // after the field had the keyboard, the landing taking the selection the field was about
+            // to get. The dev server's /type route reaches here without the router's stand-down, so
+            // the gate lives here and not there.
+            return _screen.AllowsTypeahead && !_screen.CapturesRawInput && !GameTextEditor.Owned;
         }
 
         // The dev server's characters first - it queued them for exactly this - then the keyboard.

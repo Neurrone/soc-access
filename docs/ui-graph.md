@@ -130,7 +130,7 @@ screen answers it, so an unclaimed key still reaches the game.
 | `ui_clear_search` (Backspace) | a search is live | ends the search, "Search cleared" |
 | `ui_right_click` (Backslash) | node has `OnContextual` | `OnContextual`, the right-click command |
 | `ui_back` | something is being carried, `Screen.ConsumesBack`, or a search is live | cancel the carry, else `Screen.Back()`; in a search, "Search cleared" |
-| letters, Space mid-search | `AllowsTypeahead && !CapturesRawInput`, no Ctrl or Alt held, no game box focused | type-ahead over the focused stop plus the fully-open build |
+| letters, Space mid-search | `AllowsTypeahead && !CapturesRawInput && !GameTextEditor.Owned`, no Ctrl or Alt held, no game box focused | type-ahead over the focused stop plus the fully-open build |
 
 A mode's keys (`GraphScreen.ModeClaims`) are asked before this whole table and run through
 `OnAction`; anything else a screen takes (`ClaimsAction`) is asked after it. `troop_split_1..10`

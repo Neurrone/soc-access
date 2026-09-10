@@ -23,6 +23,15 @@ namespace SongsOfConquestAccess.Input
     {
         public static bool IsTyping()
         {
+            // The mod's own editor first: from the frame it hands a field the keyboard, every key is
+            // that field's, whether or not TMP has got round to saying so (it does in that frame's
+            // LateUpdate, after the keys of the frame were routed). The engine's answers below cover
+            // a field the GAME or a mouse click focused, which no editor of the mod's knows about.
+            if (SongsOfConquestAccess.UI.GameTextEditor.AnyEditing)
+            {
+                return true;
+            }
+
             // The field the mod's own editor handed the keyboard to, asked beside the selection: the
             // mod.io browser drives its own selection and can leave the event system pointing
             // elsewhere while its box is focused, and a letter typed then must not become a search.

@@ -30,6 +30,14 @@
       <HintPath>$(GameManagedDir)\UnityEngine.CoreModule.dll</HintPath>
       <Private>true</Private>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(GameManagedDir)\UnityEngine.UI.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(GameManagedDir)\Unity.TextMeshPro.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
     <Reference Include="0Harmony">
       <HintPath>$(BepInExCoreDir)\0Harmony.dll</HintPath>
       <Private>true</Private>
