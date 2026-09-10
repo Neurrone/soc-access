@@ -2434,6 +2434,11 @@ msgctxt "Screens.CustomCategoryNameTaken"
 msgid "{0} is already the name of a category"
 msgstr ""
 
+#. Screens.CustomCategoryNameTakenTitle
+msgctxt "Screens.CustomCategoryNameTakenTitle"
+msgid "Name already in use"
+msgstr ""
+
 #. Screens.DeleteCustomCategory
 msgctxt "Screens.DeleteCustomCategory"
 msgid "Delete this custom category"

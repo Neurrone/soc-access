@@ -3610,6 +3610,11 @@ msgctxt "Screens.CustomCategoryNameTaken"
 msgid "{0} is already the name of a category"
 msgstr "{0}은(는) 이미 범주 이름입니다"
 
+#. Screens.CustomCategoryNameTakenTitle
+msgctxt "Screens.CustomCategoryNameTakenTitle"
+msgid "Name already in use"
+msgstr "이미 사용 중인 이름"
+
 #. Scanner.NoCustomCategoryOnKey
 msgctxt "Scanner.NoCustomCategoryOnKey"
 msgid "No custom category on {0}"

@@ -3640,6 +3640,11 @@ msgctxt "Screens.CustomCategoryNameTaken"
 msgid "{0} is already the name of a category"
 msgstr "{0} já é o nome de uma categoria"
 
+#. Screens.CustomCategoryNameTakenTitle
+msgctxt "Screens.CustomCategoryNameTakenTitle"
+msgid "Name already in use"
+msgstr "Nome já em uso"
+
 #. Scanner.NoCustomCategoryOnKey
 msgctxt "Scanner.NoCustomCategoryOnKey"
 msgid "No custom category on {0}"

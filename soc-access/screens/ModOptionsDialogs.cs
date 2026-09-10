@@ -431,8 +431,10 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>
         /// Two categories under one name are one name in speech, which is the only way the category
-        /// cycle is ever read, so a name already spoken for is refused and said so. The box keeps
-        /// what was typed, so a near miss is edited rather than typed out again.
+        /// cycle is ever read, so a name already spoken for is refused. The refusal is a dialog of
+        /// its own stacked over the editor, so it is read on arrival and has to be dismissed rather
+        /// than passing by as one spoken line; the editor is left open underneath with what was
+        /// typed still in the box, so a near miss is edited rather than typed out again.
         /// </summary>
         private static bool Rename(ScannerTaxonomy taxonomy, int id, string name)
         {
@@ -442,12 +444,34 @@ namespace SongsOfConquestAccess.Screens
                     ModSettings.GetScannerCustomCategories(taxonomy.Key),
                     id))
             {
-                Speak(ModText.Get(ModStrings.Screens.CustomCategoryNameTaken, name));
+                OpenNameTaken(name);
                 return false;
             }
 
             ModSettings.RenameScannerCustomCategory(taxonomy.Key, id, name);
             return true;
+        }
+
+        /// <summary>
+        /// The refusal itself: a title, the message, and the one button that leaves. The message is
+        /// a text row heading the button, so it is the button's region and is read both on arrival
+        /// and on every return to the cursor - "Pickups is already the name of a category, OK,
+        /// button". OK, the window's close button and Escape are all the same way out, and none of
+        /// them changes anything.
+        /// </summary>
+        private static void OpenNameTaken(string name)
+        {
+            ModDialogScreen.Open(
+                "mod-category-name-taken",
+                ModText.Get(ModStrings.Screens.CustomCategoryNameTakenTitle),
+                screen =>
+                {
+                    ModDialog dialog = screen.Dialog;
+                    dialog.AddText(ModText.Get(ModStrings.Screens.CustomCategoryNameTaken, name));
+                    dialog.AddButton(
+                        GameText.Get("Common/Ok", ModText.Get(ModStrings.Screens.Ok)),
+                        () => screen.Close());
+                });
         }
 
         /// <summary>
