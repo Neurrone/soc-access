@@ -78,6 +78,14 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FrameSweep<CommanderSheetSummaryEntry> _modifierEntries =
             new FrameSweep<CommanderSheetSummaryEntry>("commander sheet modifiers", inactiveToo: false);
 
+        // The wielder's two artifact lists, kept while the game's own inventory is unchanged. The
+        // key is read off the game every frame (the wielder the sheet shows, the HUD, the pooled
+        // cells and what is in each of them), so an equip, an unequip, a move and an auto-arrange
+        // all rebuild with nothing having to say so (AGENTS.md, Screen Resolution).
+        private readonly SlotSnapshot _equipment = new SlotSnapshot();
+
+        private readonly SlotSnapshot _backpack = new SlotSnapshot();
+
         private readonly CommanderSheet _sheet;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
@@ -455,10 +463,31 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<InventorySlotInfo> GetEquipmentSlots()
         {
+            InventorySlot[] slots = InventorySlotInfo.DrawnEquipmentSlots;
+            int commanderId = CommanderId;
+            List<int> key = _equipment.BeginKey();
+            key.Add(commanderId);
+            key.Add(InstanceId(_inventory));
+            for (int i = 0; i < slots.Length; i++)
+            {
+                InventoryHUDSlot keySlot = _inventory != null ? _inventory.GetSlot(slots[i]) : null;
+                IArtifactState keyArtifact = GetDisplayArtifactForEquipmentSlot(slots[i]);
+                key.Add(InstanceId(keySlot));
+                key.Add(InstanceId(keySlot != null ? keySlot.TryGetArtifact(0) : null));
+                key.Add(keyArtifact != null ? keyArtifact.Id : 0);
+                key.Add(keyArtifact != null ? (int)keyArtifact.EquippedInSlot : -1);
+                key.Add(keyArtifact != null ? keyArtifact.PositionIndex : -1);
+            }
+
+            IReadOnlyList<InventorySlotInfo> unchanged = _equipment.Unchanged();
+            if (unchanged != null)
+            {
+                return unchanged;
+            }
+
             List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
             string ownerName = GetCommanderName();
             string inventoryLabel = GetInventoryLabel();
-            InventorySlot[] slots = InventorySlotInfo.DrawnEquipmentSlots;
             for (int i = 0; i < slots.Length; i++)
             {
                 InventorySlot slot = slots[i];
@@ -476,7 +505,7 @@ namespace SongsOfConquestAccess.Adapters
                         ? artifactMovable.GetSelectable()
                         : GetEquipmentSlotSelectable(capturedSlot);
                 slotsInfo.Add(new InventorySlotInfo(
-                    CommanderId,
+                    commanderId,
                     ownerName,
                     slot,
                     0,
@@ -490,40 +519,48 @@ namespace SongsOfConquestAccess.Adapters
                     () => SelectInventoryCell(capturedNativeSlot, capturedMovable, 0)));
             }
 
-            return slotsInfo;
+            return _equipment.Keep(slotsInfo);
         }
 
         public IReadOnlyList<InventorySlotInfo> GetBackpackSlots()
         {
-            List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
             InventoryHUDSlot nativeSlot = _inventory != null ? _inventory.GetSlot(InventorySlot.None) : null;
+            int commanderId = CommanderId;
+            int cellCount = nativeSlot != null ? nativeSlot.CellsCount : 0;
+            List<int> key = _backpack.BeginKey();
+            key.Add(commanderId);
+            key.Add(InstanceId(nativeSlot));
+            for (int i = 0; i < cellCount; i++)
+            {
+                InventoryArtifactMovable keyMovable = nativeSlot.TryGetArtifact(i);
+                key.Add(InstanceId(keyMovable));
+                key.Add(keyMovable != null && keyMovable.State != null ? keyMovable.State.Id : 0);
+            }
+
+            IReadOnlyList<InventorySlotInfo> unchanged = _backpack.Unchanged();
+            if (unchanged != null)
+            {
+                return unchanged;
+            }
+
+            List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
             string ownerName = GetCommanderName();
             string inventoryLabel = GetInventoryLabel();
 
-            // What the backpack holds, read once and laid out by cell: asking cell by cell re-queried
-            // the owner's whole artifact list per cell.
-            Dictionary<int, IArtifactState> carried = new Dictionary<int, IArtifactState>();
-            foreach (IArtifactState held in GetArtifactsForSlot(InventorySlot.None))
-            {
-                if (held != null && !carried.ContainsKey(held.PositionIndex))
-                {
-                    carried.Add(held.PositionIndex, held);
-                }
-            }
-
-            int cellCount = nativeSlot != null ? nativeSlot.CellsCount : 0;
+            // What the backpack holds is read off the DRAWN cell, which already knows, rather than
+            // out of the owner's whole artifact list: the same source the key above is read from,
+            // and the two must agree. They did not while the list came from the facade - a move
+            // within the backpack reaches the HUD a frame before it reaches the facade, so a key
+            // that had already changed froze a list built from the position the artifact had just
+            // left (measured in-game 2026-09-10: HUD cell 5, facade position 9, for one frame).
             for (int i = 0; i < cellCount; i++)
             {
-                IArtifactState artifact;
-                if (!carried.TryGetValue(i, out artifact))
-                {
-                    artifact = null;
-                }
-                InventoryArtifactMovable movable = GetArtifactMovable(artifact);
+                InventoryArtifactMovable movable = nativeSlot.TryGetArtifact(i);
+                IArtifactState artifact = movable != null ? movable.State : null;
                 int capturedIndex = i;
                 InventoryArtifactMovable capturedMovable = movable;
                 slotsInfo.Add(new InventorySlotInfo(
-                    CommanderId,
+                    commanderId,
                     ownerName,
                     InventorySlot.None,
                     i,
@@ -537,7 +574,7 @@ namespace SongsOfConquestAccess.Adapters
                     () => SelectInventoryCell(nativeSlot, capturedMovable, capturedIndex)));
             }
 
-            return slotsInfo;
+            return _backpack.Keep(slotsInfo);
         }
 
         private void SelectInventoryCell(InventoryHUDSlot nativeSlot, InventoryArtifactMovable movable, int positionIndex)
@@ -553,6 +590,13 @@ namespace SongsOfConquestAccess.Adapters
             {
                 NativeSelectionUtility.Select(selectable);
             }
+        }
+
+        /// <summary>What a game object is, as a number a key can hold: zero for one the game has not
+        /// made or has destroyed, which Unity's own null answers for.</summary>
+        private static int InstanceId(Component component)
+        {
+            return component == null ? 0 : component.GetInstanceID();
         }
 
         private Selectable GetEquipmentSlotSelectable(InventorySlot slot)
