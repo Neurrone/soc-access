@@ -233,6 +233,7 @@ namespace SongsOfConquestAccess.UI
             Field field = _editing;
             string before = _snapshot;
             _echo.Stop();
+            field?.RestoreVirtualKeyboardCoadjutant();
             _editing = null;
             CurrentInput = null;
             if (ReferenceEquals(_owner, this) && _requested == null)
@@ -387,8 +388,65 @@ namespace SongsOfConquestAccess.UI
 
                 if (_input != null)
                 {
+                    // Before selecting, not after: the coadjutant acts in OnSelect, so it must be
+                    // disabled by the time Select() fires the event.
+                    SuppressVirtualKeyboardCoadjutant();
                     _input.Select();
                     _input.ActivateInputField();
+                }
+            }
+
+            // mod.io hangs an InputFieldCoadjutant on each of its text boxes. On a standalone build
+            // (its UiSettings ships StandaloneUsesVKDelegate = true) that component's OnSelect starts
+            // a coroutine that DeactivateInputField()s the box at the end of the frame, meaning to
+            // hand the player a platform virtual keyboard instead - but this game never assigns
+            // Browser.OpenVirtualKeyboard, so selecting the box only un-focuses it and the mod's echo
+            // never sees a keystroke (diagnosed 2026-09-11: the box stayed selected with isFocused
+            // false for every wait frame). Disabling that one component for the life of the edit lets
+            // the box hold the keyboard and take typing directly; OnSelect never fires while it is
+            // off, so no de-focusing coroutine starts. It is restored when the edit ends. The game's
+            // own fields (_game) do not carry it, so this is the mod.io path only.
+            private const string CoadjutantTypeName = "ModIOBrowser.Implementation.InputFieldCoadjutant";
+            private UnityEngine.MonoBehaviour _suppressedCoadjutant;
+
+            private void SuppressVirtualKeyboardCoadjutant()
+            {
+                try
+                {
+                    if (_input == null)
+                    {
+                        return;
+                    }
+
+                    UnityEngine.MonoBehaviour[] behaviours = _input.GetComponents<UnityEngine.MonoBehaviour>();
+                    for (int i = 0; i < behaviours.Length; i++)
+                    {
+                        UnityEngine.MonoBehaviour behaviour = behaviours[i];
+                        if (behaviour != null && behaviour.enabled && behaviour.GetType().FullName == CoadjutantTypeName)
+                        {
+                            behaviour.enabled = false;
+                            _suppressedCoadjutant = behaviour;
+                            return;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+
+            public void RestoreVirtualKeyboardCoadjutant()
+            {
+                try
+                {
+                    if (_suppressedCoadjutant != null)
+                    {
+                        _suppressedCoadjutant.enabled = true;
+                        _suppressedCoadjutant = null;
+                    }
+                }
+                catch (Exception)
+                {
                 }
             }
 
