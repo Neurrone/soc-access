@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Audio;
+using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech.Spatial;
@@ -30,7 +31,12 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string TabsStop = "mod-options-tabs";
         private const string RowsStop = "mod-options-rows";
+        private const string KeybindsStop = "mod-options-keybinds";
         private const string ButtonsStop = "mod-options-buttons";
+
+        /// <summary>The index of the Keybinds tab in <see cref="TabLabels"/> - the one page whose rows
+        /// are the mod's own gestures rather than game controls.</summary>
+        private const int KeybindsTab = 6;
 
         /// <summary>The window this screen reads, or null when it is not open. Written by
         /// <see cref="Open"/>: the screen is registered once and lives for the whole mod load.
@@ -107,6 +113,9 @@ namespace SongsOfConquestAccess.Screens
 
         public bool Close()
         {
+            // A capture armed on the Keybinds tab must not outlive the window; the player has no
+            // cancel, so the window closing is the only way out of an armed-but-unwanted capture.
+            ModKeyCapture.Cancel();
             ModDialog dialog = _dialog;
             _dialog = null;
             if (dialog != null)
@@ -148,6 +157,15 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(RowsStop);
             _rows.BuildRows(builder, _dialog.Rows);
+
+            // The Keybinds tab draws no game controls but its own reset-all button; its rows are the
+            // mod's gestures, a table of their own after that button, the way the Options window's
+            // Controls page puts its rebind table after its reset-all.
+            if (IsTabSelected(KeybindsTab))
+            {
+                builder.BeginStop(KeybindsStop);
+                BuildKeybinds(builder);
+            }
 
             builder.BeginStop(ButtonsStop);
             _rows.AddWindowButton(
@@ -191,7 +209,8 @@ namespace SongsOfConquestAccess.Screens
             ModStrings.Screens.AdventureMap,
             ModStrings.Screens.TroopDeployment,
             ModStrings.Screens.Combat,
-            ModStrings.Screens.Audio
+            ModStrings.Screens.Audio,
+            ModStrings.Screens.Keybinds
         };
 
         /// <summary>Draw one category. Every row is a real game control and every callback writes
@@ -217,6 +236,9 @@ namespace SongsOfConquestAccess.Screens
                     break;
                 case 5:
                     DrawAudio();
+                    break;
+                case KeybindsTab:
+                    DrawKeybinds();
                     break;
             }
         }
@@ -294,6 +316,114 @@ namespace SongsOfConquestAccess.Screens
                 ModSettings.TileCuesEnabled,
                 ModSettings.SetTileCuesEnabled);
             _dialog.AddButton(ModText.Get(ModStrings.Screens.AudioGlossary), ModOptionsDialogs.OpenAudioGlossary);
+        }
+
+        /// <summary>The Keybinds tab. The only game control it draws is the reset-all button; the
+        /// gestures themselves are a table built in <see cref="BuildKeybinds"/>, since the mod's
+        /// gestures are not game input actions the cloned factory could draw as key-binding widgets.
+        /// </summary>
+        private void DrawKeybinds()
+        {
+            _dialog.AddButton(
+                ModText.Get(ModStrings.Screens.ResetAllToDefaults),
+                ModSettings.ClearAllKeybindOverrides);
+        }
+
+        private bool IsTabSelected(int index)
+        {
+            IReadOnlyList<ModDialog.Tab> tabs = _dialog != null ? _dialog.Tabs : null;
+            ModDialog.Tab tab = tabs != null && index >= 0 && index < tabs.Count ? tabs[index] : null;
+            return tab != null && tab.IsSelected();
+        }
+
+        /// <summary>
+        /// The mod's own gestures as the same three-column table the Options window's Controls page
+        /// uses: one region per catalog group, one row per gesture with a name cell, a binding chip
+        /// and a "+". The chip reads the current hotkey (or "unbound") and, where the gesture is
+        /// overridden, is a button that restores the default; the "+" starts the mod's own capture.
+        /// The reading and the cell shapes mirror <see cref="MenuFormNodes.BuildKeyBindingSheet"/> -
+        /// only the capture and clear are the mod's rather than the game's.
+        /// </summary>
+        private void BuildKeybinds(GraphBuilder builder)
+        {
+            GraphSheet sheet = new GraphSheet(builder, "mod-options:keybind:");
+            IReadOnlyList<ModGestureCatalog.Group> groups = ModGestureCatalog.Groups;
+            for (int g = 0; g < groups.Count; g++)
+            {
+                ModGestureCatalog.Group group = groups[g];
+                sheet.Region(ModText.Get(group.Caption), new string[3]);
+                IReadOnlyList<InputAction> actions = group.Actions;
+                for (int i = 0; i < actions.Count; i++)
+                {
+                    AddKeybindRow(sheet, actions[i]);
+                }
+            }
+
+            sheet.Finish();
+            if (sheet.FirstRow != null)
+            {
+                builder.LandStopOn(sheet.FirstRow);
+            }
+        }
+
+        private static void AddKeybindRow(GraphSheet sheet, InputAction action)
+        {
+            NodeVtable name = GraphNodes.Text(() => action.Label);
+            List<GraphSheet.SheetCell> cells = new List<GraphSheet.SheetCell>
+            {
+                new GraphSheet.SheetCell(1, 0, ChipCell(action)),
+                new GraphSheet.SheetCell(2, 0, PlusCell(action)),
+            };
+            // Keyed on the action itself - a stable identity for the whole mod load - so the cursor
+            // holds its row across rebuilds. No drawn widget: these rows are the mod's, not the game's.
+            sheet.RowAt(name, action, cells);
+        }
+
+        /// <summary>The binding chip: the gesture's current chord, or "unbound". A BUTTON that clears
+        /// the override where the gesture has one - a plain read-only cell otherwise - with its text
+        /// watched live so a rebind or clear is spoken with no polling.</summary>
+        private static NodeVtable ChipCell(InputAction action)
+        {
+            Func<string> text = () => KeyBindingText.Display(
+                CurrentChord(action), ModText.Get(ModStrings.Screens.KeybindUnbound));
+
+            NodeVtable vtable;
+            if (action.HasOverride)
+            {
+                vtable = GraphNodes.Button(text, () => ModSettings.ClearKeybindOverride(action.Key));
+                NodeHints.Add(vtable, ModStrings.Screens.KeyBindingClearHint, AccessibilityActions.UiLeftClick.Key, 0);
+            }
+            else
+            {
+                vtable = GraphNodes.Text(text);
+            }
+
+            if (vtable.Announcements != null && vtable.Announcements.Count > 0)
+            {
+                vtable.Announcements[0].Live = true;
+            }
+
+            vtable.SearchText = () => action.Label;
+            return vtable;
+        }
+
+        /// <summary>The "+" cell: arms the mod's capture for this gesture.</summary>
+        private static NodeVtable PlusCell(InputAction action)
+        {
+            NodeVtable vtable = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.KeybindRebind),
+                () => ModKeyCapture.Rebind(action));
+            NodeHints.Add(vtable, ModStrings.Screens.KeyBindingSetHint, AccessibilityActions.UiLeftClick.Key, 0);
+            vtable.SearchText = () => action.Label;
+            return vtable;
+        }
+
+        /// <summary>The chord the gesture's first effective binding reads as, or null when it has
+        /// none - the primary hotkey the chip shows.</summary>
+        private static string CurrentChord(InputAction action)
+        {
+            IReadOnlyList<InputBinding> bindings = action.Bindings;
+            return bindings != null && bindings.Count > 0 ? ChordNames.Of(bindings[0]) : null;
         }
 
         private void AddAnnouncementOrder(ModString label, AnnouncementGroupDefinition group)
