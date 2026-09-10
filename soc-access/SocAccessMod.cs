@@ -89,6 +89,9 @@ namespace SongsOfConquestAccess
             Adapters.ModOptionsEntries.Open = OpenModOptions;
             _inputRouter = new AccessibilityInputRouter(_screenManager);
             _navigator.TypedCharacters = _inputRouter.TakeTypedCharacters;
+            // Warn, both ways, when a mod gesture and a game hotkey land on the same chord. Reads the
+            // game's own input manager; a Stop step drops the subscription.
+            ModKeybindConflicts.Start();
             // Before the ready line, so /speech carries it: the routes install the speech tap.
             _modRoutes = new ModRoutes(_host, _screenManager, _inputRouter, this);
             _modRoutes.Register();
@@ -139,6 +142,7 @@ namespace SongsOfConquestAccess
             _harmony = null;
             Step("input", () => _inputRouter?.Dispose());
             _inputRouter = null;
+            Step("keybind conflicts", ModKeybindConflicts.Stop);
             Step("localization events", () =>
             {
                 if (_localizationHandler != null)

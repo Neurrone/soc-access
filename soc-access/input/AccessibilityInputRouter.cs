@@ -365,6 +365,25 @@ namespace SongsOfConquestAccess.Input
                 return false;
             }
 
+            // THE MOD'S OWN CAPTURE grabs the next key while it is armed - the reverse of the
+            // stand-down above. A pure modifier keydown is not a binding, so it is swallowed and the
+            // capture waits; the first real key becomes the gesture's chord, with no cancel, matching
+            // the game's own rebind. No text field is up to catch these keys, which is why the router
+            // has to.
+            if (ModKeyCapture.IsArmed)
+            {
+                Key captureKey = keyControl.keyCode;
+                if (IsModifierKey(captureKey))
+                {
+                    return true;
+                }
+
+                KeyboardStateSnapshot captureState = KeyboardStateSnapshot.Capture();
+                ModKeyCapture.Complete(new KeyboardBinding(
+                    captureKey, captureState.Ctrl, captureState.Shift, captureState.Alt));
+                return true;
+            }
+
             Key key = keyControl.keyCode;
             ActiveBindingState activeForKey = FindActiveBindingForKey(key);
             if (activeForKey != null)
@@ -415,6 +434,28 @@ namespace SongsOfConquestAccess.Input
             }
 
             return false;
+        }
+
+        // A modifier pressed on its own is not a binding: the mod's capture ignores it and waits for
+        // the key it modifies. AltGr and the platform (Windows/Command) keys are included so a chord
+        // that leans on them is never mistaken for a bare modifier press.
+        private static bool IsModifierKey(Key key)
+        {
+            switch (key)
+            {
+                case Key.LeftShift:
+                case Key.RightShift:
+                case Key.LeftCtrl:
+                case Key.RightCtrl:
+                case Key.LeftAlt:
+                case Key.RightAlt:
+                case Key.LeftMeta:
+                case Key.RightMeta:
+                case Key.None:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         private ActiveBindingState FindActiveBindingForKey(Key key)
