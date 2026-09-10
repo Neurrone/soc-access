@@ -334,7 +334,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public string InventoryButtonLabel
         {
-            get { return Localize("Adventure/HUD/InventoryButton", "Inventory"); }
+            // The button's own tooltip is the same words with the hotkey ("Wielder Sheet (C)"); use
+            // it as the label so the readout is not "Wielder Sheet, button, Wielder Sheet (C)" - the
+            // tooltip's first line, now identical to the label, drops from the readout. Fall back to
+            // the plain game label when the tooltip has not been drawn.
+            get
+            {
+                string label = TooltipLines.First(InventoryButtonTooltip);
+                return string.IsNullOrWhiteSpace(label)
+                    ? Localize("Adventure/HUD/InventoryButton", "Inventory")
+                    : label;
+            }
         }
 
         public void FocusInventoryButton()
@@ -394,7 +404,15 @@ namespace SongsOfConquestAccess.Adapters
 
         public string SpellbookButtonLabel
         {
-            get { return Localize("Common/HUD/SpellbookButton", "Spellbook"); }
+            // As with the wielder-sheet button: take the label from the tooltip so its hotkey-bearing
+            // first line ("Spells (V)") is not read twice.
+            get
+            {
+                string label = TooltipLines.First(SpellbookButtonTooltip);
+                return string.IsNullOrWhiteSpace(label)
+                    ? Localize("Common/HUD/SpellbookButton", "Spellbook")
+                    : label;
+            }
         }
 
         public void FocusSpellbookButton()
