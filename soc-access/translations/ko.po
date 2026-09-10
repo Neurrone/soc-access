@@ -3765,3 +3765,13 @@ msgstr "지정 안 됨"
 msgctxt "Screens.KeybindShadowed"
 msgid "While the mod's {0} is active, the game's {1} will not fire."
 msgstr "모드의 {0}이(가) 활성화된 동안에는 게임의 {1}이(가) 작동하지 않습니다."
+
+#. Screens.BugReportSending
+msgctxt "Screens.BugReportSending"
+msgid "Sending report..."
+msgstr "보고서를 보내는 중..."
+
+#. Screens.BugReportSearchResult
+msgctxt "Screens.BugReportSearchResult"
+msgid "{0}, {1}, {2}"
+msgstr "{0}, {1}, {2}"

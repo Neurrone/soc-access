@@ -2324,6 +2324,16 @@ msgctxt "Screens.Battle"
 msgid "Battle"
 msgstr ""
 
+#. Screens.BugReportSending
+msgctxt "Screens.BugReportSending"
+msgid "Sending report..."
+msgstr ""
+
+#. Screens.BugReportSearchResult
+msgctxt "Screens.BugReportSearchResult"
+msgid "{0}, {1}, {2}"
+msgstr ""
+
 #. Screens.BuyArtifact
 msgctxt "Screens.BuyArtifact"
 msgid "Buy"

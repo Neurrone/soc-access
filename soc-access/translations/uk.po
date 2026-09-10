@@ -3825,3 +3825,13 @@ msgstr "не призначено"
 msgctxt "Screens.KeybindShadowed"
 msgid "While the mod's {0} is active, the game's {1} will not fire."
 msgstr "Поки діє «{0}» мода, «{1}» гри не спрацює."
+
+#. Screens.BugReportSending
+msgctxt "Screens.BugReportSending"
+msgid "Sending report..."
+msgstr "Надсилання звіту..."
+
+#. Screens.BugReportSearchResult
+msgctxt "Screens.BugReportSearchResult"
+msgid "{0}, {1}, {2}"
+msgstr "{0}, {1}, {2}"

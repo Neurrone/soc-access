@@ -19,6 +19,8 @@ soc-access/screens/AdventureMapScreen.cs | 1 | private bool _isTopScreen; | base
 soc-access/screens/AdventureMapScreen.cs | 1 | private bool _tileRead; | cursor
 soc-access/screens/AdventureMapScreen.cs | 1 | private bool _tooltipRead; | cursor
 
+soc-access/screens/BugReportScreen.cs | 1 | private BugReportWindow _lastWindow = BugReportWindow.None; | baseline
+
 soc-access/screens/CampaignMapSelectScreen.cs | 1 | private bool _focusDifficultyAfterNextRebuild; | cursor
 
 soc-access/screens/CombatScreen.cs | 1 | private CombatAdapter _battleStateAdapter; | cursor

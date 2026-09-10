@@ -533,6 +533,11 @@
             public static readonly ModString Ballista = new ModString("Screens.Ballista", "Ballista");
             public static readonly ModString BattleLog = new ModString("Screens.BattleLog", "Battle log");
             public static readonly ModString Battle = new ModString("Screens.Battle", "Battle");
+            /// <summary>The bug reporter's loading window, which has no text of its own.</summary>
+            public static readonly ModString BugReportSending = new ModString("Screens.BugReportSending", "Sending report...");
+            /// <summary>A search-result row in the bug reporter: the issue's title, its state, and its
+            /// upvote count, all read from the game.</summary>
+            public static readonly ModString BugReportSearchResult = new ModString("Screens.BugReportSearchResult", "{0}, {1}, {2}");
             public static readonly ModString BuyArtifact = new ModString("Screens.BuyArtifact", "Buy");
             public static readonly ModString Categories = new ModString("Screens.Categories", "Categories");
             public static readonly ModString Chat = new ModString("Screens.Chat", "Chat");

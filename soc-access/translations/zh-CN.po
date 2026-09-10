@@ -3765,3 +3765,13 @@ msgstr "未绑定"
 msgctxt "Screens.KeybindShadowed"
 msgid "While the mod's {0} is active, the game's {1} will not fire."
 msgstr "当模组的 {0} 处于活动状态时，游戏的 {1} 将不会触发。"
+
+#. Screens.BugReportSending
+msgctxt "Screens.BugReportSending"
+msgid "Sending report..."
+msgstr "正在发送报告..."
+
+#. Screens.BugReportSearchResult
+msgctxt "Screens.BugReportSearchResult"
+msgid "{0}, {1}, {2}"
+msgstr "{0}，{1}，{2}"

@@ -3795,3 +3795,13 @@ msgstr "non assegnato"
 msgctxt "Screens.KeybindShadowed"
 msgid "While the mod's {0} is active, the game's {1} will not fire."
 msgstr "Mentre {0} della mod è attivo, {1} del gioco non verrà attivato."
+
+#. Screens.BugReportSending
+msgctxt "Screens.BugReportSending"
+msgid "Sending report..."
+msgstr "Invio della segnalazione..."
+
+#. Screens.BugReportSearchResult
+msgctxt "Screens.BugReportSearchResult"
+msgid "{0}, {1}, {2}"
+msgstr "{0}, {1}, {2}"

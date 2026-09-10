@@ -270,6 +270,7 @@ namespace SongsOfConquestAccess
             screens.Register(new CodexScreen());
 
             screens.Register(new MessageDialogScreen());
+            screens.Register(new BugReportScreen());
             screens.Register(new QuitToDesktopPopupScreen());
             screens.Register(new StoryTextScreen());
             screens.Register(new LoadingCompleteScreen());
