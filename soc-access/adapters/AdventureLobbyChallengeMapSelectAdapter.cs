@@ -270,7 +270,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    public sealed class AdventureLobbyChallengeMapRowAdapter
+    public sealed class AdventureLobbyChallengeMapRowAdapter : ILobbyMapRow
     {
         private static readonly AccessTools.FieldRef<LobbyChallengeMapEntry, GameObject> PlayedContainerRef =
             AccessTools.FieldRefAccess<LobbyChallengeMapEntry, GameObject>("_playedContainer");
@@ -322,16 +322,10 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                IReadOnlyList<string> labels = GetWinConditionLabels();
-                UIImage[] icons = _entry != null ? WinConditionIconsRef(_entry) : null;
-                List<Tooltip> tooltips = new List<Tooltip>(labels.Count);
-                for (int i = 0; i < labels.Count; i++)
-                {
-                    UIImage icon = icons != null && i < icons.Length ? icons[i] : null;
-                    tooltips.Add(HasTooltip(icon) ? Tooltip.ForComponent(icon, _localization) : null);
-                }
-
-                return tooltips;
+                return LobbyMapRow.WinConditionTooltips(
+                    GetWinConditionLabels(),
+                    _entry != null ? WinConditionIconsRef(_entry) : null,
+                    _localization);
             }
         }
 
@@ -393,116 +387,19 @@ namespace SongsOfConquestAccess.Adapters
 
         private IReadOnlyList<string> GetWinConditionLabels()
         {
-            MapFormat.AdventureMapMetadata metadata = _entry != null ? _entry.MapMetadata : null;
-            if (metadata == null || metadata.WinConditions == null)
-            {
-                return new string[0];
-            }
-
-            List<string> parts = new List<string>();
-            for (int i = 0; i < metadata.WinConditions.Length; i++)
-            {
-                AdventureWinCondition condition = metadata.WinConditions[i];
-                AddIfNotEmpty(parts, GetLocalizedText("GameModes/" + condition + "/Name", condition.ToString()));
-            }
-
-            return parts;
+            return LobbyMapRow.WinConditionLabels(_entry != null ? _entry.MapMetadata : null, _localization);
         }
 
         private Tooltip GetWinConditionTooltip()
         {
-            UIImage[] icons = _entry != null ? WinConditionIconsRef(_entry) : null;
-            if (icons == null || icons.Length == 0)
-            {
-                return null;
-            }
-
-            List<Component> components = new List<Component>();
-            for (int i = 0; i < icons.Length; i++)
-            {
-                UIImage icon = icons[i];
-                if (HasTooltip(icon))
-                {
-                    components.Add(icon);
-                }
-            }
-
-            if (components.Count == 0)
-            {
-                return null;
-            }
-
-            return new Tooltip(
-                () => GetCombinedTooltipLines(components),
-                VisualTooltipMetadata.ForComponent(components[0]));
-        }
-
-        private bool HasTooltip(Component component)
-        {
-            return IsVisible(component)
-                && NativeTooltipUtility.GetTooltipLinesForComponent(component, _localization).Count > 0;
-        }
-
-        private IReadOnlyList<string> GetCombinedTooltipLines(IReadOnlyList<Component> components)
-        {
-            List<string> lines = new List<string>();
-            if (components == null)
-            {
-                return lines;
-            }
-
-            for (int i = 0; i < components.Count; i++)
-            {
-                IReadOnlyList<string> componentLines = NativeTooltipUtility.GetTooltipLinesForComponent(components[i], _localization);
-                for (int j = 0; j < componentLines.Count; j++)
-                {
-                    AddIfNotDuplicate(lines, componentLines[j]);
-                }
-            }
-
-            return lines;
+            return LobbyMapRow.WinConditionTooltip(
+                _entry != null ? WinConditionIconsRef(_entry) : null,
+                _localization);
         }
 
         private string GetLocalizedText(string key, string fallback)
         {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                return string.Empty;
-            }
-
-            return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
-        }
-
-        private static bool IsVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static void AddIfNotEmpty(List<string> parts, string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                parts.Add(value);
-            }
-        }
-
-        private static void AddIfNotDuplicate(List<string> lines, string line)
-        {
-            if (string.IsNullOrWhiteSpace(line))
-            {
-                return;
-            }
-
-            string normalized = line.Trim();
-            for (int i = 0; i < lines.Count; i++)
-            {
-                if (string.Equals(lines[i]?.Trim(), normalized, StringComparison.OrdinalIgnoreCase))
-                {
-                    return;
-                }
-            }
-
-            lines.Add(line);
+            return LobbyMapRow.LocalizedText(_localization, key, fallback);
         }
     }
 }
