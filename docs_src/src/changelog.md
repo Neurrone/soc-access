@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+### UI
+
+Rewrote the UI to modern mod standards to provide the following features:
+
+- Screens are modelled as panels that can be navigated with the arrow keys. Panels may be divided into regions, use `Alt+Up` and `Alt+Down` to move between regions. Use `Tab` and `Shift+tab` to move between tab stops. The redesign reduces the number of tab stops significantly especially for screens like the options dialog
+- Some elements are now groups and can be expanded with `Right` to show child controls. This should make recruitment and upgrade of troops more intuitive
+- Where possible, all screens support typeahead to move focus to the next thing that matches the typed search term. This is disabled in the adventure map and combat screens as well as the battlefield deployment grid due to conflict with game or other mod keys
+- The tooltip actions menu has been replaced with usage hints that read what hotkey performs the corresponding action. Info about available actions is in the buffer, but that requires checking the buffer to find it. Reading of usage hints can be disabled in mod settings
+- The inventory, equipment, trade and army exchange widgets have been simplified by using multiple tab stops. Drag and drop still works in the same way
+- The mod's own options dialog is now a real visible game window, accessed from the main or pause menus. The `Ctrl+m` hotkey has been removed
+- Tooltips are now automatically read. Added a new setting to control automatic reading of long tooltips such as troop and wielder information; enabled by default
+
+### Game Screens
+
+- As part of the UI rewrite, the mod now uses an immediate instead of a retained tree. This means the presence or absence of screens is no longer determined by method hooking which was fragile and caused bugs like being stuck on the post-combat screen when attacked while your wielder was defending a settlement
+- The loading screen now reads Tips and progress information
+- Technologies in the research screen are now buttons that when activated, perform the research action
+- The marketplace screen uses a table to more accurately convey what the game draws
+- In game options, adjusting keybinds is now supported
+
+### Controls
+
+- Added support for rebinding mod actions in the mod options dialog
+- Fixed long-standing bug where `Shift+Tab` would activate multiple times even when only pressed once
+- Commands now respond to either the normal or numpad variants for numeric keys (0-9) and enter
+
+### Adventure map and scanner
+
 - Road tiles now name the neighbouring tiles the road carries on into, so a road reads as `Dirt road, e w` and can be followed a step at a time instead of leaving you to guess where it went. The directions are a `Road directions` element in `Tile announcements` on the adventure map tab, so they can be turned off, reordered, or given a suffix like any other element, and the shift+arrow keys stop on a road fork while they are on. The adventure map tab also has a `Long road directions` setting to spell the directions out
 - Scanner results are now grouped into items and copies of an item. `Page Up` and `Page Down` step between different things, and the new `Alt+Page Up` and `Alt+Page Down` walk the copies of the thing you are on, so a map with a dozen chests costs one stop in the list instead of a dozen
 - Scanner readouts now describe the thing that was scanned instead of everything else on its tile. On the adventure map they still say whether the selected wielder can reach it, which you can turn off like any other announcement element
@@ -22,15 +50,15 @@
 - Setting a destination on something the wielder acts on now names the action after the route, for example `Cost: 5.5 this turn. Aurelia will move 2n, ne and Claim Gold Mine.`, and names it on its own when the wielder is already standing next to it, which used to fall back to the destination tile because there was nothing to walk. What the interaction costs is now counted in the movement cost, and another wielder is named as an attack or a trade
 - Movement costs are now read to two decimal places wherever they are spoken. A cost of 15.5 used to be read as `16` on the adventure map cursor and in the scanner, and anything above 100 was read in exponential form such as `1.2e+02`. A tile costing less than half a point is also no longer read as costing nothing
 
-## V1.0.0
+### Sounds
 
 - Added a procedural sound system: moving the accessibility cursor now plays a short cue for every tile, on the adventure map (roads, open ground, sand, water, trees, impassable and unexplored tiles) and on the battlefield and troop deployment grids (empty hexes, elevation levels 1 to 3, obstacles, and troops)
-  - Things on the map play a two-part gesture instead of their terrain sound: a category sound for wielders, settlements, resource deposits, and pickups, followed by an `Ally` or `Enemy` marker. Neutral things play the category sound alone, keeping ally and enemy easy to pick out
-  - Added a sonar sweep on `P`: every entity the scanner can see within the look around radius plays its gesture from west to east, positioned by direction and quieter with distance, giving the shape of your surroundings in a few seconds
-  - Moving through scanner results now plays each result's sound positioned relative to the cursor. This replaces the "Scanner plays directional beep" setting and its sound file
-  - Added an audio glossary, reachable from the new Audio tab in mod settings: play any cue on demand to learn it, and tune each cue's volume, pitch, and duration or disable it
-  - A refused move, such as bumping the map edge or a skip that finds nothing, now plays a falling bonk sound
-  - Added an [Audio chapter](audio.md) to the documentation consolidating all sound features in one place
+- Things on the map play a two-part gesture instead of their terrain sound: a category sound for wielders, settlements, resource deposits, and pickups, followed by an `Ally` or `Enemy` marker. Neutral things play the category sound alone, keeping ally and enemy easy to pick out
+- Added a sonar sweep on `P`: every entity the scanner can see within the look around radius plays its gesture from west to east, positioned by direction and quieter with distance, giving the shape of your surroundings in a few seconds
+- Moving through scanner results now plays each result's sound positioned relative to the cursor. This replaces the "Scanner plays directional beep" setting and its sound file
+- Added an audio glossary, reachable from the new Audio tab in mod settings: play any cue on demand to learn it, and tune each cue's volume, pitch, and duration or disable it
+- A refused move, such as bumping the map edge or a skip that finds nothing, now plays a falling bonk sound
+- Added an [Audio chapter](audio.md) to the documentation consolidating all sound features in one place
 
 ## V0.7.4
 
