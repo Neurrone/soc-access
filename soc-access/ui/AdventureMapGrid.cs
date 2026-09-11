@@ -702,7 +702,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             string search = ModText.Get(ModStrings.Scanner.Search);
-            string cancel = GameText.Get(_adapter.LocalizationHandler, "Common/Cancel", "Cancel");
+            string cancel = GameText.Get(_adapter.LocalizationHandler, "Common/Cancel", string.Empty);
             systemPopups
                 .AskForInput(
                     search,
