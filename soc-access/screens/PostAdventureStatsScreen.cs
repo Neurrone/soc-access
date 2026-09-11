@@ -1,7 +1,5 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
@@ -48,7 +46,6 @@ namespace SongsOfConquestAccess.Screens
         private const string CloseStop = "post-adventure-stats-close";
         private const string SheetKey = "post-adventure-stats:";
 
-        private static readonly FieldInfo StatsMenuField = AccessTools.Field(typeof(PostAdventureMenu), "_statsMenu");
 
         /// <summary>The one post-adventure stats window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<IPostAdventureStatsMenu> _source =
@@ -223,7 +220,7 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                sheet.Row(RoundPrimary(row), row.Id, null, TeamCells(row, teams));
+                sheet.Row(RoundPrimary(row), "round-" + row.Round, null, TeamCells(row, teams));
             }
 
             sheet.Finish();
@@ -267,10 +264,26 @@ namespace SongsOfConquestAccess.Screens
             for (int i = 0; i < teams.Count; i++)
             {
                 int teamId = teams[i].TeamId;
-                cells[i] = () => row.GetValue(teamId);
+                cells[i] = () => CellValue(row, teamId);
             }
 
             return cells;
+        }
+
+        /// <summary>One team's figure for one round: the number the game recorded, said as a loss
+        /// where the team lost a battle that round.</summary>
+        private static string CellValue(PostAdventureStatsAdapter.GraphRoundRow row, int teamId)
+        {
+            PostAdventureStatsAdapter.GraphPoint point = row.GetPoint(teamId);
+            if (point == null)
+            {
+                return string.Empty;
+            }
+
+            string value = point.Value.ToString();
+            return point.BattleLost
+                ? ModText.Get(ModStrings.UI.LabelValue, value, ModText.Get(ModStrings.UI.StatusBattleLost))
+                : value;
         }
 
         // ---- the figures under the chart ----
@@ -306,13 +319,6 @@ namespace SongsOfConquestAccess.Screens
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker(key), "post-adventure-stats:" + key),
                 GraphNodes.Text(text)));
-        }
-
-        private static PostAdventureStatsMenu GetStatsMenu(PostAdventureMenu resultMenu)
-        {
-            return resultMenu != null && StatsMenuField != null
-                ? StatsMenuField.GetValue(resultMenu) as PostAdventureStatsMenu
-                : null;
         }
     }
 }
