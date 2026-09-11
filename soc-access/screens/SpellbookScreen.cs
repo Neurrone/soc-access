@@ -518,30 +518,14 @@ namespace SongsOfConquestAccess.Screens
         private static readonly List<SpellbookAdapter.SpellItem> EmptySpells =
             new List<SpellbookAdapter.SpellItem>();
 
-        /// <summary>Whether the failure above has already been written to the log.</summary>
-        private bool _reportedSpellsFailure;
-
         /// <summary>Every column's spells, or none where reading them threw.</summary>
         private Dictionary<SpellbookSpellGroup, List<SpellbookAdapter.SpellItem>> Grouped()
         {
-            try
-            {
-                return Live.GetSpellsByGroup();
-            }
-            catch (Exception exception)
-            {
-                // Reported ONCE, as a section is (ui/SectionItems.cs): a build runs every frame, so
-                // a window that has stopped answering would write a line a frame and bury the log.
-                // What has already been said is mod-owned state that outlives any one spellbook, and
-                // there is no reset hook for it to want.
-                if (!_reportedSpellsFailure)
-                {
-                    _reportedSpellsFailure = true;
-                    SocAccessMod.Instance?.LogWarning("SpellbookScreen section spells failed to build: " + exception);
-                }
-
-                return null;
-            }
+            // Reported ONCE rather than once a frame, which is what SectionItems is for; the
+            // whole grid is the one section, so it is wrapped as a list of one.
+            IReadOnlyList<Dictionary<SpellbookSpellGroup, List<SpellbookAdapter.SpellItem>>> grid =
+                _sections.Of("spells", () => new[] { Live.GetSpellsByGroup() });
+            return grid.Count > 0 ? grid[0] : null;
         }
     }
 }
