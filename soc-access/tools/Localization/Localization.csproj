@@ -7,4 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- The .po reader the mod uses at runtime, so the validator checks exactly what the game
+       resolves rather than a second copy of the parser. -->
+  <ItemGroup>
+    <Compile Include="..\..\localization\PoTranslationCatalog.cs" Link="PoTranslationCatalog.cs" />
+  </ItemGroup>
+
 </Project>

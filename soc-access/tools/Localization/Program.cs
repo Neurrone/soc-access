@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using SongsOfConquestAccess.Localization;
 
 namespace Localization;
 
@@ -441,7 +442,7 @@ internal static class Program
         {
             List<ModStringEntry> expectedEntries = sourceStrings.GetEntriesForLanguage(Path.GetFileNameWithoutExtension(poFile));
             Dictionary<string, ModStringEntry> sourceByKey = expectedEntries.ToDictionary(entry => entry.Key, StringComparer.Ordinal);
-            PoCatalog catalog = PoCatalog.Load(poFile);
+            PoTranslationCatalog catalog = PoTranslationCatalog.Load(poFile);
             foreach (string duplicate in catalog.DuplicateKeys)
             {
                 failures.Add(Path.GetFileName(poFile) + ": duplicate key " + duplicate);
@@ -786,121 +787,6 @@ internal static class Program
             }
 
             return 2;
-        }
-    }
-
-    private sealed record PoEntry(string Key, string Id, string Value);
-
-    private sealed class PoCatalog
-    {
-        public Dictionary<string, PoEntry> Entries { get; } = new Dictionary<string, PoEntry>(StringComparer.Ordinal);
-        public List<string> DuplicateKeys { get; } = new List<string>();
-
-        public static PoCatalog Load(string path)
-        {
-            PoCatalog catalog = new PoCatalog();
-            PoEntryBuilder entry = new PoEntryBuilder();
-
-            foreach (string line in File.ReadAllLines(path, Encoding.UTF8))
-            {
-                if (string.IsNullOrWhiteSpace(line))
-                {
-                    catalog.AddEntry(entry);
-                    entry.Reset();
-                    continue;
-                }
-
-                if (line.StartsWith("#", StringComparison.Ordinal))
-                {
-                    continue;
-                }
-
-                if (line.StartsWith("msgctxt ", StringComparison.Ordinal))
-                {
-                    entry.ActiveField = PoField.Context;
-                    entry.Context = ParsePoString(line.Substring("msgctxt ".Length));
-                    continue;
-                }
-
-                if (line.StartsWith("msgid ", StringComparison.Ordinal))
-                {
-                    entry.ActiveField = PoField.Id;
-                    entry.Id = ParsePoString(line.Substring("msgid ".Length));
-                    continue;
-                }
-
-                if (line.StartsWith("msgstr ", StringComparison.Ordinal))
-                {
-                    entry.ActiveField = PoField.String;
-                    entry.Value = ParsePoString(line.Substring("msgstr ".Length));
-                    continue;
-                }
-
-                if (line.StartsWith("\"", StringComparison.Ordinal))
-                {
-                    entry.Append(ParsePoString(line));
-                }
-            }
-
-            catalog.AddEntry(entry);
-            return catalog;
-        }
-
-        private void AddEntry(PoEntryBuilder entry)
-        {
-            string? key = !string.IsNullOrWhiteSpace(entry.Context) ? entry.Context : entry.Id;
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                return;
-            }
-
-            if (Entries.ContainsKey(key))
-            {
-                DuplicateKeys.Add(key);
-                return;
-            }
-
-            Entries[key] = new PoEntry(key, entry.Id ?? string.Empty, entry.Value ?? string.Empty);
-        }
-    }
-
-    private enum PoField
-    {
-        None,
-        Context,
-        Id,
-        String
-    }
-
-    private sealed class PoEntryBuilder
-    {
-        public string? Context;
-        public string? Id;
-        public string? Value;
-        public PoField ActiveField;
-
-        public void Append(string value)
-        {
-            switch (ActiveField)
-            {
-                case PoField.Context:
-                    Context += value;
-                    break;
-                case PoField.Id:
-                    Id += value;
-                    break;
-                case PoField.String:
-                    Value += value;
-                    break;
-            }
-        }
-
-        public void Reset()
-        {
-            Context = null;
-            Id = null;
-            Value = null;
-            ActiveField = PoField.None;
         }
     }
 }

@@ -5,25 +5,64 @@ using System.Text;
 
 namespace SongsOfConquestAccess.Localization
 {
+    /// <summary>One entry of a .po file: the key it is found by (the msgctxt, or the msgid where
+    /// there is none), the source text it was translated from, and the translation itself.</summary>
+    public sealed class PoEntry
+    {
+        public PoEntry(string key, string id, string value)
+        {
+            Key = key;
+            Id = id;
+            Value = value;
+        }
+
+        public string Key { get; private set; }
+        public string Id { get; private set; }
+        public string Value { get; private set; }
+    }
+
+    /// <summary>
+    /// The one .po reader. The mod reads a translation file through it at runtime and the
+    /// localization tool validates the same files through it (linked into
+    /// <c>tools/Localization</c>), so what the validator checks is exactly what the game resolves.
+    /// </summary>
     public sealed class PoTranslationCatalog
     {
-        private readonly Dictionary<string, string> _entries;
+        private readonly Dictionary<string, PoEntry> _entries;
+        private readonly List<string> _duplicateKeys;
 
-        private PoTranslationCatalog(Dictionary<string, string> entries)
+        private PoTranslationCatalog(Dictionary<string, PoEntry> entries, List<string> duplicateKeys)
         {
             _entries = entries;
+            _duplicateKeys = duplicateKeys;
+        }
+
+        /// <summary>Every entry the file holds, by key. A key that appears twice is kept at its LAST
+        /// occurrence, which is the one a reader resolves, and is also listed in
+        /// <see cref="DuplicateKeys"/>.</summary>
+        public IReadOnlyDictionary<string, PoEntry> Entries
+        {
+            get { return _entries; }
+        }
+
+        /// <summary>Every key the file declared more than once, in the order the repeats were met.
+        /// </summary>
+        public IReadOnlyList<string> DuplicateKeys
+        {
+            get { return _duplicateKeys; }
         }
 
         public static PoTranslationCatalog Load(string path)
         {
-            Dictionary<string, string> entries = new Dictionary<string, string>(StringComparer.Ordinal);
+            Dictionary<string, PoEntry> entries = new Dictionary<string, PoEntry>(StringComparer.Ordinal);
+            List<string> duplicateKeys = new List<string>();
             PoEntryBuilder entry = new PoEntryBuilder();
 
             foreach (string line in File.ReadAllLines(path, Encoding.UTF8))
             {
                 if (string.IsNullOrWhiteSpace(line))
                 {
-                    AddEntry(entries, entry);
+                    AddEntry(entries, duplicateKeys, entry);
                     entry.Reset();
                     continue;
                 }
@@ -60,18 +99,33 @@ namespace SongsOfConquestAccess.Localization
                 }
             }
 
-            AddEntry(entries, entry);
-            return new PoTranslationCatalog(entries);
+            AddEntry(entries, duplicateKeys, entry);
+            return new PoTranslationCatalog(entries, duplicateKeys);
         }
 
+        /// <summary>The translation for a key, where the file holds one that is not blank. A blank
+        /// msgstr is not a translation: the caller falls back to the English source.</summary>
         public bool TryGetText(string key, out string text)
         {
-            return _entries.TryGetValue(key, out text) && !string.IsNullOrWhiteSpace(text);
+            text = string.Empty;
+            if (key == null || !_entries.ContainsKey(key))
+            {
+                return false;
+            }
+
+            PoEntry entry = _entries[key];
+            if (string.IsNullOrWhiteSpace(entry.Value))
+            {
+                return false;
+            }
+
+            text = entry.Value;
+            return true;
         }
 
-        private static void AddEntry(Dictionary<string, string> entries, PoEntryBuilder entry)
+        private static void AddEntry(Dictionary<string, PoEntry> entries, List<string> duplicateKeys, PoEntryBuilder entry)
         {
-            if (entry == null || string.IsNullOrWhiteSpace(entry.Value))
+            if (entry == null)
             {
                 return;
             }
@@ -82,7 +136,12 @@ namespace SongsOfConquestAccess.Localization
                 return;
             }
 
-            entries[key] = entry.Value;
+            if (entries.ContainsKey(key))
+            {
+                duplicateKeys.Add(key);
+            }
+
+            entries[key] = new PoEntry(key, entry.Id ?? string.Empty, entry.Value ?? string.Empty);
         }
 
         private static string ParsePoString(string value)
@@ -140,9 +199,9 @@ namespace SongsOfConquestAccess.Localization
 
         private sealed class PoEntryBuilder
         {
-            public string Context;
-            public string Id;
-            public string Value;
+            public string Context = string.Empty;
+            public string Id = string.Empty;
+            public string Value = string.Empty;
             public PoField ActiveField;
 
             public void Append(string value)
@@ -163,9 +222,9 @@ namespace SongsOfConquestAccess.Localization
 
             public void Reset()
             {
-                Context = null;
-                Id = null;
-                Value = null;
+                Context = string.Empty;
+                Id = string.Empty;
+                Value = string.Empty;
                 ActiveField = PoField.None;
             }
         }
