@@ -109,11 +109,16 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        /// <summary>The game's own drag noise, for the keyboard's carry. Called on every build: the
-        /// registration is a delegate over this load and must not outlive it.</summary>
+        /// <summary>The game's own drag noise, for the keyboard's carry. Called on every build but
+        /// made once per load: the delegates are over this assembly and must not outlive it, and
+        /// <c>CarrySounds.Reset</c> on Stop is what ends them; the next build after one asks again.
+        /// </summary>
         public static void RegisterSounds()
         {
-            CarrySounds.Register(ArtifactCargo, () => NativeSoundUtility.PostEvent(PickUpSound), null);
+            if (!CarrySounds.Has(ArtifactCargo))
+            {
+                CarrySounds.Register(ArtifactCargo, () => NativeSoundUtility.PostEvent(PickUpSound), null);
+            }
         }
 
         /// <summary>The equipment column, under the game's own caption or the one the caller composed

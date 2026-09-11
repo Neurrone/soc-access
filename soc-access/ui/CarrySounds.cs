@@ -46,6 +46,15 @@ namespace SongsOfConquestAccess.UI
             ByKind[kind] = new Cues { Started = started, Ended = ended };
         }
 
+        /// <summary>Whether a carry of <paramref name="kind"/> already has its cues. A screen asks
+        /// before registering, so the two delegates and the entry are made once per load instead of
+        /// once per build, and a <see cref="Reset"/> is still healed by the next build that asks.
+        /// </summary>
+        public static bool Has(string kind)
+        {
+            return !string.IsNullOrEmpty(kind) && ByKind.ContainsKey(kind);
+        }
+
         /// <summary>Forget every registration - mod teardown, and test isolation.</summary>
         public static void Reset()
         {

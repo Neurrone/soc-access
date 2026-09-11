@@ -128,11 +128,25 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The slots the bar DRAWS, in the order it draws them.
         /// <paramref name="includeLocked"/> keeps the ones drawn with a lock on them
         /// (<c>TroopHUDEntry.IsUnlocked</c> false), which a wielder band draws and a bar built with
-        /// <c>hideLockedSlots</c> does not.</summary>
+        /// <c>hideLockedSlots</c> does not.
+        ///
+        /// THE SAME LIST OBJECT comes back while the bar has not moved, so what a caller built from
+        /// it can be kept on that list's identity - the shape <c>ArtifactSlotNodes.Column</c> already
+        /// has, and what <c>ui/TroopHudRows</c> keys its rows on. The key is therefore everything a
+        /// ROW branches on when it is built: which entries are drawn, in what order, whether each is
+        /// unlocked, whether anything is in it, and whether the game would disband what is. A row
+        /// built for the old answer would be the wrong row for the new one.</summary>
         public IReadOnlyList<SlotItem> GetSlots(bool includeLocked = false)
         {
-            List<SlotItem> result = new List<SlotItem>();
             List<TroopHUDEntry> entries = GetEntries();
+            if (_slots != null && _slotsIncludeLocked == includeLocked && SlotsUnchanged(entries, includeLocked))
+            {
+                return _slots;
+            }
+
+            List<SlotItem> result = new List<SlotItem>();
+            _slotEntries.Clear();
+            _slotStates.Clear();
             for (int i = 0; i < entries.Count; i++)
             {
                 TroopHUDEntry entry = entries[i];
@@ -141,10 +155,58 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                result.Add(new SlotItem(this, entry));
+                SlotItem slot = new SlotItem(this, entry);
+                result.Add(slot);
+                _slotEntries.Add(entry);
+                _slotStates.Add(StateOf(slot));
             }
 
+            _slots = result;
+            _slotsIncludeLocked = includeLocked;
             return result;
+        }
+
+        private IReadOnlyList<SlotItem> _slots;
+
+        private bool _slotsIncludeLocked;
+
+        private readonly List<TroopHUDEntry> _slotEntries = new List<TroopHUDEntry>();
+
+        private readonly List<int> _slotStates = new List<int>();
+
+        /// <summary>What a row built from a slot branches on, as one value to compare.</summary>
+        private static int StateOf(SlotItem slot)
+        {
+            return (slot.IsUnlocked ? 1 : 0)
+                | (slot.IsOccupied ? 2 : 0)
+                | (slot.CanDisband ? 4 : 0);
+        }
+
+        /// <summary>Whether the drawn entries are the same ones, in the same order and the same
+        /// state, as the kept list. Walks the game's own list rather than building a second one, so
+        /// the answer costs a state read per drawn slot and no allocation at all.</summary>
+        private bool SlotsUnchanged(List<TroopHUDEntry> entries, bool includeLocked)
+        {
+            int at = 0;
+            for (int i = 0; i < entries.Count; i++)
+            {
+                TroopHUDEntry entry = entries[i];
+                if (!IsDrawnEntry(entry) || (!includeLocked && !entry.IsUnlocked))
+                {
+                    continue;
+                }
+
+                if (at >= _slotEntries.Count
+                    || !ReferenceEquals(_slotEntries[at], entry)
+                    || _slotStates[at] != StateOf(_slots[at]))
+                {
+                    return false;
+                }
+
+                at++;
+            }
+
+            return at == _slotEntries.Count;
         }
 
         public DropResult Drop(SlotItem source, SlotItem target)

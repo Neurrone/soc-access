@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using SongsOfConquest.Client.Adventure.UI;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
@@ -101,7 +103,7 @@ namespace SongsOfConquestAccess.UI
             builder.BeginStop(stopKey);
             AddPortrait(builder, keyPrefix, portrait, wielderName, portraitTooltip, focusPortrait);
 
-            string caption = GameText.Get("Commanders/Tooltip/Troops", string.Empty);
+            string caption = TroopsCaption();
             bool named = !string.IsNullOrWhiteSpace(caption);
             if (named)
             {
@@ -170,15 +172,101 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            // The game's own drag noise, for the keyboard's carry. Registered on every build: the
-            // registration is a delegate over this load and must not outlive it.
-            CarrySounds.Register(TroopCargo, () => NativeSoundUtility.PostEvent(PickUpSound), null);
+            // The game's own drag noise, for the keyboard's carry. Made once per load - the
+            // delegates are over this assembly and must not outlive it, and CarrySounds.Reset on
+            // Stop is what ends them; the next build after one asks again.
+            if (!CarrySounds.Has(TroopCargo))
+            {
+                CarrySounds.Register(TroopCargo, () => NativeSoundUtility.PostEvent(PickUpSound), null);
+            }
 
             IReadOnlyList<TroopHudAdapter.SlotItem> slots = troops.GetSlots();
-            for (int i = 0; i < slots.Count; i++)
+            bool open = available == null || available();
+            List<NodeDeclaration> nodes = Kept(slots, rowPrefix, available != null, open);
+            if (nodes == null)
             {
-                AddRow(builder, troops, slots[i], rowPrefix + i, available);
+                nodes = new List<NodeDeclaration>(slots.Count);
+                for (int i = 0; i < slots.Count; i++)
+                {
+                    AddRow(nodes, troops, slots[i], rowPrefix + i, available, open);
+                }
+
+                Keep(slots, rowPrefix, available != null, open, nodes);
             }
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                builder.AddItem(nodes[i]);
+            }
+        }
+
+        /// <summary>
+        /// ONE BAR'S ROWS, KEPT BETWEEN BUILDS, keyed on the list the adapter answered with.
+        ///
+        /// A row is a vtable, ten closures and up to two usage hints, every one of which reads the
+        /// game when it is READ, so rebuilding a bar whose slots have not moved bought nothing but
+        /// the allocation - and a fresh troop tooltip per occupied row per frame with it. The
+        /// adapter hands back the same list while the bar has not moved
+        /// (<see cref="TroopHudAdapter.GetSlots"/>), which is the whole key to the slots' half of it.
+        ///
+        /// The rest of the key is the CALLER'S, because two things it passes decide what a row is
+        /// built as: the key prefix the rows are named under, and whether the bar can be worked at
+        /// all - the hostile join offer draws one that is locked until the offer is answered, and
+        /// its rows carry neither drop nor pick-up while it is.
+        ///
+        /// Held against the slot list rather than by the screen, because nine screens call this and
+        /// a contributor has no field of theirs to sit in. The table holds the list WEAKLY, so a
+        /// bar's rows die with the adapter that answered for it and nothing has to say when a menu
+        /// closed.
+        /// </summary>
+        private sealed class Bar
+        {
+            public string Prefix;
+
+            public bool Gated;
+
+            public bool Open;
+
+            public List<NodeDeclaration> Nodes;
+        }
+
+        private static readonly ConditionalWeakTable<object, Bar> Bars = new ConditionalWeakTable<object, Bar>();
+
+        private static List<NodeDeclaration> Kept(object slots, string prefix, bool gated, bool open)
+        {
+            Bar bar;
+            return Bars.TryGetValue(slots, out bar)
+                && bar.Gated == gated
+                && bar.Open == open
+                && string.Equals(bar.Prefix, prefix, StringComparison.Ordinal)
+                ? bar.Nodes
+                : null;
+        }
+
+        private static void Keep(object slots, string prefix, bool gated, bool open, List<NodeDeclaration> nodes)
+        {
+            Bars.Remove(slots);
+            Bars.Add(slots, new Bar { Prefix = prefix, Gated = gated, Open = open, Nodes = nodes });
+        }
+
+        // The game's own word for an army, asked once per language instead of once per band per
+        // frame: WielderStop runs on every build of eight screens and the lookup is I2's, which is
+        // a key probe, a table read and a format, not a dictionary hit.
+        private static ILanguageDefinition _captionLanguage;
+
+        private static string _caption;
+
+        private static string TroopsCaption()
+        {
+            ILocalizationHandler localization = GlobalLocalizationVariables.LocalizationHandler;
+            ILanguageDefinition language = localization != null ? localization.CurrentLanguage : null;
+            if (_caption == null || !ReferenceEquals(language, _captionLanguage))
+            {
+                _captionLanguage = language;
+                _caption = GameText.Get("Commanders/Tooltip/Troops", string.Empty) ?? string.Empty;
+            }
+
+            return _caption;
         }
 
         /// <summary>Where a screen's row keys start, so the same prefix names the rows and finds the
@@ -271,13 +359,20 @@ namespace SongsOfConquestAccess.UI
         /// The name is watched live - a split, a merge and a disband all happen under a cursor standing
         /// right here. An EMPTY slot is a line and not a button (owner ruling 2026-09-08): the game
         /// wires the entry's click to the troop in it, so there is nothing to press, only somewhere a
-        /// carried troop can be dropped.</summary>
+        /// carried troop can be dropped.
+        ///
+        /// THE ROW IS BUILT ONCE PER SLOT LIST, not once per frame (<see cref="Bar"/>), so everything
+        /// written here is either a closure that reads the game when it is read - which the label,
+        /// the click, the drop, the pick-up and the two gates all are - or a fact that cannot change
+        /// while the slot list and the caller's gate do not. <c>NodeHints.Add</c> APPENDS, so a
+        /// vtable must never be passed through here twice.</summary>
         private static void AddRow(
-            GraphBuilder builder,
+            List<NodeDeclaration> into,
             TroopHudAdapter troops,
             TroopHudAdapter.SlotItem slot,
             string key,
-            Func<bool> available)
+            Func<bool> available,
+            bool open)
         {
             TroopHudAdapter.SlotItem it = slot;
             Func<bool> workable = available;
@@ -294,7 +389,6 @@ namespace SongsOfConquestAccess.UI
             // Selecting the entry is what makes the game draw the troop's details for it.
             vtable.OnFocusVisual = () => it.Focus();
 
-            bool open = workable == null || workable();
             if (it.IsUnlocked && open)
             {
                 vtable.DropKind = TroopCargo;
@@ -324,7 +418,7 @@ namespace SongsOfConquestAccess.UI
                     () => it.CanDisband);
             }
 
-            builder.AddItem(new DrawnNode(ControlId.For(it.Entry, key), vtable, it.Entry));
+            into.Add(new DrawnNode(ControlId.For(it.Entry, key), vtable, it.Entry));
         }
 
         /// <summary>What a slot is called: the troop in it and how many of them, or the mod's word for
