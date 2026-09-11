@@ -60,9 +60,6 @@ namespace SongsOfConquestAccess.UI
         /// <summary>The raycast target behind one dialog.</summary>
         public const string BlockerName = "SocAccessModDialogBlocker";
 
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(OptionsMenuInstaller), "Container");
-
         private static readonly List<ModDialog> Stack = new List<ModDialog>();
 
         private readonly List<Tab> _tabs = new List<Tab>();
@@ -127,7 +124,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             Stack.Clear();
-            Transform canvas = FindCanvas();
+            Transform canvas = OptionsMenuHost.FindCanvas();
             if (canvas == null)
             {
                 return;
@@ -410,13 +407,11 @@ namespace SongsOfConquestAccess.UI
 
         private bool Build(string title, bool withTabs)
         {
-            OptionsMenuInstaller installer = FindInstaller();
-            DiContainer container = Container(installer);
+            OptionsMenuInstaller installer = OptionsMenuHost.FindInstaller();
+            DiContainer container = OptionsMenuHost.ContainerOf(installer);
             OptionsMenu.Settings settings = installer != null ? installer.settings : null;
-            Transform panel = settings != null && settings.parent != null
-                ? settings.parent.MonoTransform.Find("Panel")
-                : null;
-            Transform canvas = panel != null ? panel.parent.parent : null;
+            Transform panel = OptionsMenuHost.PanelOf(installer);
+            Transform canvas = OptionsMenuHost.CanvasOf(panel);
             if (container == null || settings == null || panel == null || canvas == null)
             {
                 Warn("the options window's panel could not be found, so no dialog was drawn");
@@ -650,44 +645,6 @@ namespace SongsOfConquestAccess.UI
             {
                 UnityEngine.Object.DestroyImmediate(bindings[i]);
             }
-        }
-
-        private static Transform FindCanvas()
-        {
-            OptionsMenuInstaller installer = FindInstaller();
-            OptionsMenu.Settings settings = installer != null ? installer.settings : null;
-            Transform panel = settings != null && settings.parent != null
-                ? settings.parent.MonoTransform.Find("Panel")
-                : null;
-            return panel != null ? panel.parent.parent : null;
-        }
-
-        private static OptionsMenuInstaller FindInstaller()
-        {
-            OptionsMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<OptionsMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                OptionsMenuInstaller installer = installers[i];
-                if (installer != null
-                    && installer.gameObject != null
-                    && installer.gameObject.scene.isLoaded
-                    && installer.settings != null)
-                {
-                    return installer;
-                }
-            }
-
-            return null;
-        }
-
-        private static DiContainer Container(OptionsMenuInstaller installer)
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            return InstallerContainerProperty.GetValue(installer, null) as DiContainer;
         }
 
         private static void Warn(string message)

@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
@@ -68,6 +69,15 @@ namespace SongsOfConquestAccess.UI
         }
 
         private static GameTextEditor _owner;
+
+        /// <summary>Forget which editor holds the keyboard. For the mod going away with an edit still
+        /// open: the two statics above are the mod's own word on who owns the field, and they are the
+        /// only state here that outlives the screen that made the editor.</summary>
+        public static void Reset()
+        {
+            _owner = null;
+            CurrentInput = null;
+        }
 
         // Whether the end of the edit is spoken. The chat box keeps quiet: its Enter SENDS, the line
         // arriving in the history is the announcement, and the game empties the box, which would
@@ -321,8 +331,9 @@ namespace SongsOfConquestAccess.UI
                     {
                         return _game != null ? _game.Interactable : _input != null && _input.interactable;
                     }
-                    catch (Exception)
+                    catch (Exception error)
                     {
+                        Report("asking whether the field is interactable", error);
                         return false;
                     }
                 }
@@ -341,8 +352,9 @@ namespace SongsOfConquestAccess.UI
 
                         return _input != null ? _input.text ?? string.Empty : string.Empty;
                     }
-                    catch (Exception)
+                    catch (Exception error)
                     {
+                        Report("reading the field's text", error);
                         return string.Empty;
                     }
                 }
@@ -370,8 +382,9 @@ namespace SongsOfConquestAccess.UI
 
                         return _game != null && _game.Focused;
                     }
-                    catch (Exception)
+                    catch (Exception error)
                     {
+                        Report("asking whether the field is focused", error);
                         return false;
                     }
                 }
@@ -430,8 +443,9 @@ namespace SongsOfConquestAccess.UI
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception error)
                 {
+                    Report("switching the virtual keyboard's helper off", error);
                 }
             }
 
@@ -445,8 +459,9 @@ namespace SongsOfConquestAccess.UI
                         _suppressedCoadjutant = null;
                     }
                 }
-                catch (Exception)
+                catch (Exception error)
                 {
+                    Report("switching the virtual keyboard's helper back on", error);
                 }
             }
 
@@ -466,6 +481,21 @@ namespace SongsOfConquestAccess.UI
                 echo.Begin(_input);
             }
 
+            // A field the game has destroyed throws rather than answering, and these run on every
+            // build and every keystroke: each site says what threw the first time and then keeps
+            // quiet. The table holds only the site names, which are fixed.
+            private static readonly HashSet<string> Reported = new HashSet<string>();
+
+            private static void Report(string what, Exception error)
+            {
+                if (!Reported.Add(what))
+                {
+                    return;
+                }
+
+                SocAccessMod.Instance?.LogWarning("Text editor: " + what + " threw: " + error);
+            }
+
             private static TMPro.TMP_InputField NativeInputFieldOf(IUITextMeshInputField field)
             {
                 try
@@ -473,8 +503,9 @@ namespace SongsOfConquestAccess.UI
                     UITextMeshInputField concrete = field as UITextMeshInputField;
                     return concrete != null ? concrete.GetInputField() : null;
                 }
-                catch (Exception)
+                catch (Exception error)
                 {
+                    Report("reading the field's native input field", error);
                     return null;
                 }
             }
