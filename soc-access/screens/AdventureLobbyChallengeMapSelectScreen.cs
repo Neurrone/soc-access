@@ -233,8 +233,13 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>The preview beside the table, as the one line it is: the challenge's name as the
-        /// panel draws it, watched live, with the dossier and the win conditions as a section - read
-        /// on arrival and held in the review buffer one drawn line at a time.</summary>
+        /// panel draws it, watched live, with the dossier as a section - read on arrival and held in
+        /// the review buffer one drawn line at a time.
+        ///
+        /// THE WIN CONDITIONS ARE NOT READ OUT, as on the map select page: the panel draws them as
+        /// ICONS whose words the game only reveals on hover, so they are buffer-only, where the
+        /// player who wants them goes to look. The dossier, by contrast, is drawn text
+        /// (<c>LobbyMapPreviewText.GetInfo</c>) and stays in the readout.</summary>
         private void BuildDetails(GraphBuilder builder)
         {
             AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
@@ -252,7 +257,8 @@ namespace SongsOfConquestAccess.Screens
                 },
                 Sections = new List<NodeSection>
                 {
-                    NodeSection.Composed(() => SpokenLines.Of(new[] { Description(), PreviewWinConditions() })),
+                    NodeSection.Composed(() => SpokenLines.Of(new[] { Description() })),
+                    NodeSection.Buffer(() => SpokenLines.Of(new[] { PreviewWinConditions() })),
                 },
             };
             builder.AddItem(new SyntheticNode(
