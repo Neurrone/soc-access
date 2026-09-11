@@ -84,11 +84,23 @@ namespace SongsOfConquestAccess.UI
                     ? TooltipMode.Indicate
                     : TooltipMode.Announce;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                // Logged ONCE. The question is put for every tooltip-bearing node that is declared,
+                // so a widget whose details read throws would write a line a frame; and the answer
+                // that matters - the tooltip stays in the review buffer and out of the readout - is
+                // the same whether or not anybody reads the log.
+                if (!_modeFailureLogged)
+                {
+                    _modeFailureLogged = true;
+                    SocAccessMod.Instance?.LogWarning("tooltip: deciding how loudly a tooltip reads threw: " + e);
+                }
+
                 return TooltipMode.None;
             }
         }
+
+        private static bool _modeFailureLogged;
 
         /// <summary>
         /// A control's tooltip as a declared SECTION - the single place it is written down, from which
