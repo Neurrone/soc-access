@@ -115,7 +115,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 int index = i;
                 result.Add(new TabItem(
-                    "options-tab-" + index,
+                    index,
                     () => MenuRows.Label(button),
                     () => SelectTab(index),
                     () => button.gameObject.activeInHierarchy));
@@ -358,15 +358,16 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class TabItem
         {
-            public TabItem(string id, Func<string> getLabel, Func<bool> select, Func<bool> isVisible)
+            public TabItem(int index, Func<string> getLabel, Func<bool> select, Func<bool> isVisible)
             {
-                Id = id;
+                Index = index;
                 GetLabel = getLabel;
                 Select = select;
                 IsVisible = isVisible;
             }
 
-            public string Id { get; private set; }
+            /// <summary>The tab's position in the game's tab strip; the screen spells the node id.</summary>
+            public int Index { get; private set; }
             public Func<string> GetLabel { get; private set; }
             public Func<bool> Select { get; private set; }
             public Func<bool> IsVisible { get; private set; }

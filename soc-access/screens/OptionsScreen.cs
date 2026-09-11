@@ -151,7 +151,7 @@ namespace SongsOfConquestAccess.Screens
                     () => Live.GetActiveTabIndex() == index,
                     () => tab.Select(),
                     tab.IsVisible);
-                builder.AddItem(new SyntheticNode(ControlId.Structural("options:tab/" + tab.Id), vtable));
+                builder.AddItem(new SyntheticNode(ControlId.Structural("options:tab/options-tab-" + tab.Index), vtable));
             }
         }
     }
