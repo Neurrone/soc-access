@@ -184,7 +184,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildQuickbar(GraphBuilder builder)
         {
-            string header = OneLine(Live.GetQuickbarHeaderText());
+            string header = SpokenLines.First(Live.GetQuickbarHeaderText());
             bool named = !string.IsNullOrWhiteSpace(header);
             if (named)
             {
@@ -436,7 +436,7 @@ namespace SongsOfConquestAccess.Screens
             if (it.EssenceComponent != null)
             {
                 NodeVtable essence = GraphNodes.Text(() => it.EssenceName, null, it.EssenceTooltip);
-                essence.Announcements.Add(GraphNodes.ValuePart(() => OneLine(it.EssenceAmountText)));
+                essence.Announcements.Add(GraphNodes.ValuePart(() => SpokenLines.First(it.EssenceAmountText)));
                 builder.StartRow("spellbook:essence/" + key, positions: false);
                 builder.AddItem(new DrawnNode(
                     ControlId.For(it.EssenceComponent, "spellbook:essence/" + key),
@@ -447,7 +447,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (it.TierComponent != null)
             {
-                NodeVtable tier = GraphNodes.Text(() => OneLine(it.TierTitle), null, it.TierTooltip);
+                NodeVtable tier = GraphNodes.Text(() => SpokenLines.First(it.TierTitle), null, it.TierTooltip);
                 builder.StartRow("spellbook:tier/" + key, positions: false);
                 builder.AddItem(new DrawnNode(
                     ControlId.For(it.TierComponent, "spellbook:tier/" + key),
@@ -526,14 +526,6 @@ namespace SongsOfConquestAccess.Screens
                 SocAccessMod.Instance?.LogWarning("SpellbookScreen section spells failed to build: " + exception);
                 return null;
             }
-        }
-
-        /// <summary>Game text written for a renderer, read as one spoken line: its rich-text tags are
-        /// not words.</summary>
-        private static string OneLine(string raw)
-        {
-            IList<string> lines = SpokenLines.Of(new[] { raw });
-            return lines.Count > 0 ? lines[0] : string.Empty;
         }
     }
 }

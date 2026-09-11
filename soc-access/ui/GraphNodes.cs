@@ -149,17 +149,48 @@ namespace SongsOfConquestAccess.UI
         /// <summary>One of a menu page's own drawn buttons, declared straight onto the builder: a
         /// button the game is not drawing is not in the tree at all, a drawn but disabled one stays
         /// and says so, and arriving on it moves the game's own selection onto it so the page looks
-        /// where the cursor is.</summary>
-        public static void MenuButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
+        /// where the cursor is. A page whose buttons carry a tooltip, or which shows the cursor its
+        /// own way, passes them.</summary>
+        public static void MenuButton(
+            GraphBuilder builder,
+            string key,
+            IMenuButtonAdapter button,
+            Tooltip tooltip = null,
+            Action onFocusVisual = null)
         {
             if (button == null || button.Button == null || !button.IsVisible())
             {
                 return;
             }
 
-            NodeVtable vtable = Button(button.GetLabel, () => button.Activate(), button.IsEnabled);
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button.Button);
+            NodeVtable vtable = Button(button.GetLabel, () => button.Activate(), button.IsEnabled, tooltip);
+            vtable.OnFocusVisual = onFocusVisual ?? (() => NativeSelectionUtility.Select(button.Button));
             builder.AddItem(new DrawnNode(ControlId.For(button.Button, key), vtable, button.Button));
+        }
+
+        /// <summary>A HUD BUTTON WITH NO WIDGET THE SCREEN CAN KEY ON, declared straight onto the
+        /// builder from its structural key alone: the adventure map's and the battle HUD's command
+        /// buttons, which the mod reads off a panel the game rebinds rather than off one object per
+        /// button. A button the game is not drawing is not in the tree at all; a drawn but disabled
+        /// one stays and says so.</summary>
+        public static void SyntheticButton(
+            GraphBuilder builder,
+            string key,
+            bool drawn,
+            Func<string> label,
+            Action activate,
+            Func<bool> enabled = null,
+            Tooltip tooltip = null,
+            Action onFocusVisual = null)
+        {
+            if (!drawn)
+            {
+                return;
+            }
+
+            NodeVtable vtable = Button(label, activate, enabled, tooltip);
+            vtable.OnFocusVisual = onFocusVisual;
+            builder.AddItem(new SyntheticNode(ControlId.Structural(key), vtable));
         }
 
         /// <summary>THE WINDOW'S OWN CLOSE CONTROL, over the cross the game draws: in the tree only
@@ -196,6 +227,40 @@ namespace SongsOfConquestAccess.UI
             builder.AddItem(new SyntheticNode(
                 ControlId.For(marker, key),
                 Button(() => ModText.Get(ModStrings.Screens.Close), close)));
+        }
+
+        /// <summary>A FIGURE THE GAME DREW BESIDE A LINE, as that line's value: the amount at the
+        /// right of a troop row, the tier on an owned entity. A line the game wrote no figure on says
+        /// nothing beyond its name. The text is read once, here, because it is what the game had
+        /// written when the line was built.</summary>
+        public static void AddValue(NodeVtable vtable, string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            string text = value;
+            vtable.Announcements.Add(ValuePart(() => text, watch: false));
+        }
+
+        /// <summary>ONE LINE OF A PANE'S OWN TEXT, over a subject the screen holds because the menu
+        /// draws the text into a mesh it rebinds rather than into a row of its own. A line the pane
+        /// has written nothing into is not in the tree, so a page that has not filled it in yet
+        /// contributes no empty row.</summary>
+        public static void TextLine(
+            GraphBuilder builder,
+            object marker,
+            string key,
+            Func<string> text,
+            Tooltip tooltip = null)
+        {
+            if (string.IsNullOrWhiteSpace(text()))
+            {
+                return;
+            }
+
+            builder.AddItem(new SyntheticNode(ControlId.For(marker, key), Text(text, null, tooltip)));
         }
 
         /// <summary>A container the player expands and collapses. Declare it with the builder's

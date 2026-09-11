@@ -384,8 +384,7 @@ namespace SongsOfConquestAccess.UI
                 return _lastClean;
             }
 
-            IList<string> lines = SpokenLines.Of(new[] { raw });
-            string clean = lines.Count > 0 ? lines[0] : string.Empty;
+            string clean = SpokenLines.First(raw);
             _lastRaw = raw;
             _lastClean = clean;
             return clean;

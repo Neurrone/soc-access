@@ -369,14 +369,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddLine(GraphBuilder builder, string key, Func<string> text)
         {
-            if (string.IsNullOrWhiteSpace(text()))
-            {
-                return;
-            }
-
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(key), "purchase-wielder:" + key),
-                GraphNodes.Text(text)));
+            GraphNodes.TextLine(builder, Marker(key), "purchase-wielder:" + key, text);
         }
 
         /// <summary>The same, for a text the pane may have written in more than one paragraph: one

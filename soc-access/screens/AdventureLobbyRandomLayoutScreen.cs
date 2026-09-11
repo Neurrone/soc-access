@@ -121,9 +121,9 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(ButtonsStop);
             // Confirm under the cards, then the header band's Back and Options.
-            AddButton(builder, "random-layout:confirm", Live.ConfirmButton);
-            AddButton(builder, "random-layout:back", Live.BackButton);
-            AddButton(builder, "random-layout:options", Live.OptionsButton);
+            GraphNodes.MenuButton(builder, "random-layout:confirm", Live.ConfirmButton);
+            GraphNodes.MenuButton(builder, "random-layout:back", Live.BackButton);
+            GraphNodes.MenuButton(builder, "random-layout:options", Live.OptionsButton);
         }
 
         private void BuildLayouts(GraphBuilder builder)
@@ -258,18 +258,6 @@ namespace SongsOfConquestAccess.Screens
             IReadOnlyList<string> options = dropdown.GetOptions();
             int value = dropdown.GetValue();
             return options != null && value >= 0 && value < options.Count ? options[value] : string.Empty;
-        }
-
-        private static void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
-        {
-            if (button == null || button.Button == null || !button.IsVisible())
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.Button(button.GetLabel, () => button.Activate(), button.IsEnabled);
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button.Button);
-            builder.AddItem(new DrawnNode(ControlId.For(button.Button, key), vtable, button.Button));
         }
     }
 }

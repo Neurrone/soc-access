@@ -524,14 +524,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddLine(GraphBuilder builder, string key, Func<string> text, Tooltip tooltip)
         {
-            if (string.IsNullOrWhiteSpace(text()))
-            {
-                return;
-            }
-
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(key), "pre-battle:" + key),
-                GraphNodes.Text(text, null, tooltip)));
+            GraphNodes.TextLine(builder, Marker(key), "pre-battle:" + key, text, tooltip);
         }
     }
 }

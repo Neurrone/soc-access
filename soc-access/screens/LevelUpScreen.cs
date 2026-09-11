@@ -248,14 +248,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddLine(GraphBuilder builder, string key, Func<string> text)
         {
-            if (string.IsNullOrWhiteSpace(text()))
-            {
-                return;
-            }
-
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(key), "level-up:" + key),
-                GraphNodes.Text(text)));
+            GraphNodes.TextLine(builder, Marker(key), "level-up:" + key, text);
         }
 
     }

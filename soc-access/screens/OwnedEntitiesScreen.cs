@@ -163,7 +163,7 @@ namespace SongsOfConquestAccess.Screens
         {
             KingdomEntityOverviewAdapter.CategoryItem it = category;
             NodeVtable vtable = GraphNodes.Button(() => it.Name, () => it.MoveCamera());
-            AddTier(vtable, it.Tier);
+            GraphNodes.AddValue(vtable, it.Tier);
             return vtable;
         }
 
@@ -219,7 +219,7 @@ namespace SongsOfConquestAccess.Screens
             KingdomEntityOverviewAdapter.RowItem it = row;
             NodeVtable vtable = GraphNodes.Button(() => BuildingLabel(it), () => it.Activate());
             vtable.OnFocusVisual = () => it.Focus();
-            AddTier(vtable, it.Tier);
+            GraphNodes.AddValue(vtable, it.Tier);
             return vtable;
         }
 
@@ -228,19 +228,6 @@ namespace SongsOfConquestAccess.Screens
             return string.IsNullOrWhiteSpace(row.Amount)
                 ? row.Name
                 : ModText.Get(ModStrings.Common.ResourceAmount, row.Amount, row.Name);
-        }
-
-        /// <summary>The tier the game wrote, as the line's value. Nothing written means nothing said:
-        /// the catch-all's lines carry the prefab's placeholder, which is not drawn.</summary>
-        private static void AddTier(NodeVtable vtable, string tier)
-        {
-            if (string.IsNullOrWhiteSpace(tier))
-            {
-                return;
-            }
-
-            string text = tier;
-            vtable.Announcements.Add(GraphNodes.ValuePart(() => text, watch: false));
         }
 
         /// <summary>Whether the game drew this figure as nothing gained.

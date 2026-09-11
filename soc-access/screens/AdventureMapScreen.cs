@@ -89,15 +89,6 @@ namespace SongsOfConquestAccess.Screens
             ResourceType.CelestialOre
         };
 
-        private static readonly EssenceType[] EssenceRowOrder =
-        {
-            EssenceType.Order,
-            EssenceType.Creation,
-            EssenceType.Chaos,
-            EssenceType.Arcana,
-            EssenceType.Destruction
-        };
-
         private const int ObjectiveSlots = 16;
         private const int NotificationSlots = 5;
         private const int TownSlots = 32;
@@ -515,7 +506,7 @@ namespace SongsOfConquestAccess.Screens
 
             BuildEssences(builder, hud, essencesDrawn);
 
-            AddHudButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 "adventure-map:wielder-sheet",
                 hud.IsInventoryButtonVisible(),
@@ -524,7 +515,7 @@ namespace SongsOfConquestAccess.Screens
                 hud.IsInventoryButtonEnabled,
                 hud.InventoryButtonTooltip,
                 hud.FocusInventoryButton);
-            AddHudButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 "adventure-map:movement",
                 hud.IsMoveToDestinationButtonVisible(),
@@ -533,7 +524,7 @@ namespace SongsOfConquestAccess.Screens
                 hud.IsMoveToDestinationButtonEnabled,
                 hud.MoveToDestinationButtonTooltip,
                 hud.FocusMoveToDestinationButton);
-            AddHudButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 "adventure-map:spellbook",
                 hud.IsSpellbookButtonVisible(),
@@ -576,29 +567,12 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            string caption = GameText.Get("Common/CommanderInventory/Essences", string.Empty);
-            bool named = !string.IsNullOrWhiteSpace(caption);
-            if (named)
-            {
-                builder.PushContext(caption);
-            }
-
-            builder.SetRegion("adventure-map:essences");
-            for (int i = 0; i < EssenceRowOrder.Length; i++)
-            {
-                EssenceType essence = EssenceRowOrder[i];
-                builder.AddItem(new SyntheticNode(
-                    ControlId.Structural("adventure-map:essence:" + essence),
-                    Focused(
-                        GraphNodes.Text(() => hud.GetEssenceLabel(essence), null, hud.GetEssenceTooltip(essence)),
-                        () => hud.FocusEssence(essence))));
-            }
-
-            builder.SetRegion(null);
-            if (named)
-            {
-                builder.PopContext();
-            }
+            EssenceRows.Build(
+                builder,
+                "adventure-map:",
+                essence => hud.GetEssenceLabel(essence),
+                essence => hud.GetEssenceTooltip(essence),
+                essence => hud.FocusEssence(essence));
         }
 
         // ---- the army ----
@@ -674,7 +648,7 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(KingdomStop);
             builder.PushContext(ModText.Get(ModStrings.Screens.Kingdom));
 
-            AddHudButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 "adventure-map:game-menu",
                 optionsDrawn,
@@ -687,7 +661,7 @@ namespace SongsOfConquestAccess.Screens
             for (int i = 0; overviewDrawn && i < KingdomOverviewSlots; i++)
             {
                 int index = i;
-                AddHudButton(
+                GraphNodes.SyntheticButton(
                     builder,
                     KingdomKeyPrefix + index,
                     hud.IsKingdomOverviewItemVisible(index),
@@ -698,7 +672,7 @@ namespace SongsOfConquestAccess.Screens
                     () => hud.FocusKingdomOverviewItem(index));
             }
 
-            AddHudButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 "adventure-map:chat",
                 chatDrawn,
@@ -707,7 +681,7 @@ namespace SongsOfConquestAccess.Screens
                 () => chat.IsButtonEnabled(),
                 chatDrawn ? chat.ButtonTooltip : null,
                 () => chat.FocusButton());
-            AddHudButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 "adventure-map:bug-report",
                 bugReportDrawn,
@@ -749,7 +723,7 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                AddHudButton(
+                GraphNodes.SyntheticButton(
                     builder,
                     WielderKeyPrefix + index,
                     true,
@@ -784,7 +758,7 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                AddHudButton(
+                GraphNodes.SyntheticButton(
                     builder,
                     TownKeyPrefix + index,
                     true,
@@ -958,26 +932,6 @@ namespace SongsOfConquestAccess.Screens
         }
 
         // ---- shared node plumbing ----
-
-        private static void AddHudButton(
-            GraphBuilder builder,
-            string key,
-            bool drawn,
-            Func<string> label,
-            Func<bool> activate,
-            Func<bool> enabled,
-            Tooltip tooltip,
-            Action focus)
-        {
-            if (!drawn)
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.Button(label, () => activate(), enabled, tooltip);
-            vtable.OnFocusVisual = focus;
-            builder.AddItem(new SyntheticNode(ControlId.Structural(key), vtable));
-        }
 
         /// <summary>Selecting the game's own control is what makes it draw the details the mod then
         /// reads, so every HUD line focuses its control.</summary>

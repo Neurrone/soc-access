@@ -57,6 +57,16 @@ namespace SongsOfConquestAccess.UI
             return string.Join("\n", lines.ToArray());
         }
 
+        /// <summary>The FIRST spoken line of a raw string, or empty. For a game text written for a
+        /// renderer that is read as one line - a pane's header, a tier title, a button's own caption -
+        /// where anything the mesh carries under it is not part of it.</summary>
+        public static string First(string raw)
+        {
+            List<string> lines = new List<string>();
+            AddLines(raw, lines);
+            return lines.Count > 0 ? lines[0] : string.Empty;
+        }
+
         private static void AddLines(string text, List<string> lines)
         {
             if (string.IsNullOrEmpty(text))

@@ -292,21 +292,8 @@ namespace SongsOfConquestAccess.Screens
         private void BuildButtons(GraphBuilder builder)
         {
             // Back (x 21) then Options (x 1233) of the header band, left to right.
-            AddButton(builder, "player-stats:back", Live.BackButton);
-            AddButton(builder, "player-stats:options", Live.OptionsButton);
-        }
-
-        private static void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
-        {
-            if (button == null || button.Button == null || !button.IsVisible())
-            {
-                return;
-            }
-
-            IMenuButtonAdapter it = button;
-            NodeVtable vtable = GraphNodes.Button(it.GetLabel, () => it.Activate(), it.IsEnabled);
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(it.Button);
-            builder.AddItem(new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button));
+            GraphNodes.MenuButton(builder, "player-stats:back", Live.BackButton);
+            GraphNodes.MenuButton(builder, "player-stats:options", Live.OptionsButton);
         }
     }
 }
