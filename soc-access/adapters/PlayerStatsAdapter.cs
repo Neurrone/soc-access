@@ -218,7 +218,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                rows.Add(new TableRowItem("faction-" + i, i, GetRectTransform(entry), faction, percent));
+                rows.Add(new TableRowItem(i, GetRectTransform(entry), faction, percent));
             }
 
             return rows.ToArray();
@@ -251,7 +251,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                rows.Add(new TableRowItem("map-" + i, i, GetRectTransform(entry), map, details, games));
+                rows.Add(new TableRowItem(i, GetRectTransform(entry), map, details, games));
             }
 
             return rows.ToArray();
@@ -275,7 +275,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 rows.Add(new TableRowItem(
-                    "wielder-" + i,
                     i,
                     GetRectTransform(entry),
                     Reflect.Get<UITextMesh>(entry, WielderNameField),
@@ -305,7 +304,7 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<TableRowItem> GetTroopRows()
         {
             PlayerStatsTroopEntry[] entries = Reflect.Get<PlayerStatsTroopEntry[]>(GetOverallMenu(), OverallTopTroopsField);
-            return _troopRows.Get(entries, () => ReadTroopRows(entries, "troop"));
+            return _troopRows.Get(entries, () => ReadTroopRows(entries));
         }
 
         public string TroopSummary
@@ -361,7 +360,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 rows.Add(new TableRowItem(
-                    "spell-" + i,
                     i,
                     GetRectTransform(entry),
                     Reflect.Get<UITextMesh>(entry, SpellNameField),
@@ -391,7 +389,7 @@ namespace SongsOfConquestAccess.Adapters
             List<PlayerStatsTroopEntry> entries = Reflect.Get<List<PlayerStatsTroopEntry>>(GetBattleMenu(), BattleTopEnemyTroopsField);
             return _enemyTroopRows.Get(
                 entries,
-                () => ReadTroopRows(entries != null ? entries.ToArray() : null, "enemy-troop"));
+                () => ReadTroopRows(entries != null ? entries.ToArray() : null));
         }
 
         public string OverallGeneralLabel
@@ -444,7 +442,7 @@ namespace SongsOfConquestAccess.Adapters
             ScrollView.Reveal(FindScrollRect(), source);
         }
 
-        private IReadOnlyList<TableRowItem> ReadTroopRows(PlayerStatsTroopEntry[] entries, string idPrefix)
+        private IReadOnlyList<TableRowItem> ReadTroopRows(PlayerStatsTroopEntry[] entries)
         {
             List<TableRowItem> rows = new List<TableRowItem>();
             for (int i = 0; entries != null && i < entries.Length; i++)
@@ -456,7 +454,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 rows.Add(new TableRowItem(
-                    idPrefix + "-" + i,
                     i,
                     GetRectTransform(entry),
                     Reflect.Get<UITextMesh>(entry, TroopNameField),
@@ -861,16 +858,13 @@ namespace SongsOfConquestAccess.Adapters
             private readonly UITextMesh _label;
             private readonly UITextMesh[] _values;
 
-            public TableRowItem(string id, int index, RectTransform sourceTransform, UITextMesh label, params UITextMesh[] values)
+            public TableRowItem(int index, RectTransform sourceTransform, UITextMesh label, params UITextMesh[] values)
             {
-                Id = id ?? string.Empty;
                 Index = index;
                 SourceTransform = sourceTransform;
                 _label = label;
                 _values = values ?? NoValues;
             }
-
-            public string Id { get; private set; }
 
             /// <summary>Where the row sits in the table the game drew, counted from zero.</summary>
             public int Index { get; private set; }

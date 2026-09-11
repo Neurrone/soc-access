@@ -246,11 +246,6 @@ namespace SongsOfConquestAccess.Adapters
                 get { return _entry; }
             }
 
-            public string Id
-            {
-                get { return "icon-dropdown-option-" + _index; }
-            }
-
             public string TypeName
             {
                 get

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
@@ -106,7 +106,7 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 AdventureLobbyInviteProvidersAdapter.ProviderButtonItem it = item;
-                ControlId id = ControlId.For(it.Button, it.Id);
+                ControlId id = ControlId.For(it.Button, "invite-provider-" + it.Index);
                 NodeVtable vtable = GraphNodes.Button(
                     () => it.Label,
                     () => it.Activate(),

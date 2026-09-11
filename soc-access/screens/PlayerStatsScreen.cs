@@ -152,26 +152,30 @@ namespace SongsOfConquestAccess.Screens
                 Live.FactionsLabel,
                 new[] { ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnPlayDistribution },
                 Live.GetFactionRows(),
-                "factions");
+                "factions",
+                "faction");
             Table(
                 sheet,
                 Live.TopMapsLabel,
                 new[] { ModStrings.UI.ColumnMap, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnDetails, ModStrings.UI.ColumnGames },
                 Live.GetMapRows(),
-                "maps");
+                "maps",
+                "map");
             Table(
                 sheet,
                 Live.TopWieldersLabel,
                 new[] { ModStrings.UI.ColumnWielder, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnTimesRecruited },
                 Live.GetWielderRows(),
-                "wielders");
+                "wielders",
+                "wielder");
             Summary(sheet, "wielders", Live.WielderSummary, Live.WielderSummaryTransform);
             Table(
                 sheet,
                 Live.TopTroopsLabel,
                 new[] { ModStrings.UI.ColumnTroop, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnTimesTrained },
                 Live.GetTroopRows(),
-                "troops");
+                "troops",
+                "troop");
             Summary(sheet, "troops", Live.TroopSummary, Live.TroopSummaryTransform);
         }
 
@@ -183,14 +187,16 @@ namespace SongsOfConquestAccess.Screens
                 Live.SpellsLabel,
                 new[] { ModStrings.UI.ColumnSpell, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnTimesCast },
                 Live.GetSpellRows(),
-                "spells");
+                "spells",
+                "spell");
             Summary(sheet, "spells", Live.SpellSummary, Live.SpellSummaryTransform);
             Table(
                 sheet,
                 Live.EnemyTroopsLabel,
                 new[] { ModStrings.UI.ColumnTroop, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnKills },
                 Live.GetEnemyTroopRows(),
-                "enemy-troops");
+                "enemy-troops",
+                "enemy-troop");
         }
 
         /// <summary>A panel the page draws as plain lines rather than as a table: its caption is the
@@ -225,7 +231,8 @@ namespace SongsOfConquestAccess.Screens
             string caption,
             ModString[] columns,
             IReadOnlyList<PlayerStatsAdapter.TableRowItem> rows,
-            string key)
+            string key,
+            string rowKey)
         {
             string[] captions = new string[columns.Length];
             for (int i = 0; i < columns.Length; i++)
@@ -256,7 +263,7 @@ namespace SongsOfConquestAccess.Screens
                     cells.Add(new GraphSheet.SheetCell(c, 0, Cell(captions[c], it, () => it.Value(value))));
                 }
 
-                sheet.RowAt(Primary(row), key + "/" + row.Id, cells, row.SourceTransform);
+                sheet.RowAt(Primary(row), key + "/" + rowKey + "-" + row.Index, cells, row.SourceTransform);
             }
         }
 
