@@ -189,7 +189,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsOptionsButtonVisible()
         {
-            return HudGroupVisible(_settings != null ? _settings.OptionsButtonsContainer : null)
+            return GameObjects.IsGroupVisible(_settings != null ? _settings.OptionsButtonsContainer : null)
                 && IsButtonVisible(GetOptionsButton());
         }
 
@@ -1116,17 +1116,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsButtonInteractable(UIButton button)
         {
             return IsButtonVisible(button) && button.Interactable;
-        }
-
-        private static bool HudGroupVisible(GameObject gameObject)
-        {
-            if (gameObject == null || !gameObject.activeInHierarchy)
-            {
-                return false;
-            }
-
-            CanvasGroup canvasGroup = gameObject.GetComponent<CanvasGroup>();
-            return canvasGroup == null || canvasGroup.alpha > 0.01f;
         }
 
         /// <summary>

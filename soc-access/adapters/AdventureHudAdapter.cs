@@ -172,7 +172,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             CommanderHUD.Settings settings = CommanderSettings;
             return settings != null
-                && HudGroupVisible(HudStateSettings != null ? HudStateSettings.SelectionHUDContainer : null)
+                && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.SelectionHUDContainer : null)
                 && GameObjects.IsLive(settings.CommanderContainer as Component)
                 && settings.Portrait != null
                 && settings.Portrait.Commander != null;
@@ -437,7 +437,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             ResourceHUD.Settings settings = ResourceSettings;
             return settings != null
-                && HudGroupVisible(HudStateSettings != null ? HudStateSettings.ResourceContainer : null)
+                && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.ResourceContainer : null)
                 && settings.Container != null
                 && settings.Container.activeInHierarchy;
         }
@@ -679,7 +679,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsNotificationsMenuVisible()
         {
-            return HudGroupVisible(HudStateSettings != null ? HudStateSettings.NotificationHUDContainer : null)
+            return GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.NotificationHUDContainer : null)
                 && GetNotificationEntryCount() > 0;
         }
 
@@ -739,7 +739,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsTownListMenuVisible()
         {
-            return HudGroupVisible(HudStateSettings != null ? HudStateSettings.TownListContainer : null)
+            return GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.TownListContainer : null)
                 && GetTownListEntryCount() > 0;
         }
 
@@ -777,7 +777,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsWielderListMenuVisible()
         {
-            return HudGroupVisible(HudStateSettings != null ? HudStateSettings.WielderlistContainer : null)
+            return GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.WielderlistContainer : null)
                 && GetWielderListEntryCount() > 0;
         }
 
@@ -789,7 +789,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsWielderAmountVisible()
         {
             return IsWielderListMenuVisible()
-                && HudGroupVisible(Reflect.Get<GameObject>(WielderList, WielderAmountContainerField));
+                && GameObjects.IsGroupVisible(Reflect.Get<GameObject>(WielderList, WielderAmountContainerField));
         }
 
         /// <summary>The count the list writes over itself, in the game's own words
@@ -860,7 +860,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsOptionsButtonVisible()
         {
             return IsAdventureHudVisible()
-                && HudGroupVisible(HudStateSettings != null ? HudStateSettings.OptionsButtonsContainer : null)
+                && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.OptionsButtonsContainer : null)
                 && IsButtonVisible(GetOptionsButton());
         }
 
@@ -891,7 +891,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsKingdomOverviewMenuVisible()
         {
-            return HudGroupVisible(HudStateSettings != null ? HudStateSettings.KingdomOverviewContainer : null)
+            return GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.KingdomOverviewContainer : null)
                 && KingdomSettings != null;
         }
 
@@ -957,7 +957,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsTeamQueueMenuVisible()
         {
-            return HudGroupVisible(HudStateSettings != null ? HudStateSettings.TeamQueueContainer : null)
+            return GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.TeamQueueContainer : null)
                 && GetTeamQueueEntryCount() > 0;
         }
 
@@ -988,7 +988,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsEndTurnButtonVisible()
         {
             return IsAdventureHudVisible()
-                && HudGroupVisible(HudStateSettings != null ? HudStateSettings.EndTurnContainer : null)
+                && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.EndTurnContainer : null)
                 && IsButtonVisible(EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null);
         }
 
@@ -1069,7 +1069,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsRoundTextVisible()
         {
             return IsAdventureHudVisible()
-                && HudGroupVisible(HudStateSettings != null ? HudStateSettings.TeamQueueContainer : null)
+                && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.TeamQueueContainer : null)
                 && !string.IsNullOrWhiteSpace(RoundTextLabel);
         }
 
@@ -1516,7 +1516,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             GameObject container = HudStateSettings != null ? HudStateSettings.ObjectivesContainer : null;
-            if (HudGroupVisible(container))
+            if (GameObjects.IsGroupVisible(container))
             {
                 return true;
             }
@@ -1948,27 +1948,6 @@ namespace SongsOfConquestAccess.Adapters
 
             GameObject gameObject = ((Component)button).gameObject;
             return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static bool HudGroupVisible(GameObject gameObject)
-        {
-            if (gameObject == null)
-            {
-                return false;
-            }
-
-            if (!gameObject.activeInHierarchy)
-            {
-                return false;
-            }
-
-            CanvasGroup canvasGroup = gameObject.GetComponent<CanvasGroup>();
-            if (canvasGroup == null)
-            {
-                return true;
-            }
-
-            return canvasGroup.alpha > 0.01f && canvasGroup.interactable && canvasGroup.blocksRaycasts;
         }
 
         private string GetCommanderName(ICommanderState commander)

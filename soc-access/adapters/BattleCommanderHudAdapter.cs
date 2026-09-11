@@ -296,7 +296,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool IsAiControlSideActive(CombatHudSide side)
         {
-            if (!HudGroupVisible(GetAiAutoBattleContainer(side))
+            if (!GameObjects.IsGroupVisible(GetAiAutoBattleContainer(side))
                 || _facade == null
                 || _facade.Teams == null)
             {
@@ -415,17 +415,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsButtonInteractable(UIButton button)
         {
             return IsButtonVisible(button) && button.Interactable;
-        }
-
-        private static bool HudGroupVisible(GameObject gameObject)
-        {
-            if (gameObject == null || !gameObject.activeInHierarchy)
-            {
-                return false;
-            }
-
-            CanvasGroup canvasGroup = gameObject.GetComponent<CanvasGroup>();
-            return canvasGroup == null || canvasGroup.alpha > 0.01f;
         }
     }
 }
