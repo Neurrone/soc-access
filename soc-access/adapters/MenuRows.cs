@@ -6,6 +6,7 @@ using SongsOfConquest.Client;
 using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
 using TMPro;
@@ -36,7 +37,7 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>Everything the collection has drawn, in drawn order.</summary>
         public static IReadOnlyList<MenuRow> Read(IMenuFactoryCollection factory)
         {
-            return Read(factory, null);
+            return Read(factory, new MenuRowSettings());
         }
 
         /// <summary>Everything the collection has drawn, in drawn order.
@@ -45,19 +46,28 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public static IReadOnlyList<MenuRow> Read(IMenuFactoryCollection factory, KeyBindingSource keyBindings)
         {
+            return Read(factory, new MenuRowSettings { KeyBindings = keyBindings });
+        }
+
+        /// <summary>Everything the collection has drawn, in drawn order, named and read the way
+        /// <paramref name="settings"/> asks.</summary>
+        public static IReadOnlyList<MenuRow> Read(IMenuFactoryCollection factory, MenuRowSettings settings)
+        {
             if (factory == null)
             {
                 return new MenuRow[0];
             }
 
+            settings = settings ?? new MenuRowSettings();
             List<MenuRow> items = new List<MenuRow>();
-            AddTexts(items, factory);
-            AddInputs(items, factory);
-            AddDropdowns(items, factory);
-            AddToggles(items, factory);
-            AddSliders(items, factory);
-            AddButtons(items, factory);
-            AddKeyBindings(items, factory, keyBindings);
+            AddTexts(items, factory, settings);
+            AddInputs(items, factory, settings);
+            AddTimeInputs(items, factory, settings);
+            AddDropdowns(items, factory, settings);
+            AddToggles(items, factory, settings);
+            AddSliders(items, factory, settings);
+            AddButtons(items, factory, settings);
+            AddKeyBindings(items, factory, settings);
             SortByHierarchy(items);
             return items;
         }
@@ -65,6 +75,12 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>One button read on its own - the window's own control rather than a drawn row.
         /// </summary>
         public static MenuRowButton Button(string id, UIButton button)
+        {
+            return Button(id, button, null);
+        }
+
+        /// <summary>The same, with the handler this window's tooltips are resolved through.</summary>
+        public static MenuRowButton Button(string id, UIButton button, ILocalizationHandler localization)
         {
             if (button == null)
             {
@@ -78,10 +94,17 @@ namespace SongsOfConquestAccess.Adapters
                 () => NativeSelectionUtility.Select(button),
                 () => button.Active && button.Interactable,
                 () => IsActive(button),
-                () => Tooltip.ForComponent(button, null));
+                () => Tooltip.ForComponent(button, localization));
         }
 
-        private static void AddTexts(List<MenuRow> items, IMenuFactoryCollection factory)
+        /// <summary>What a row of this form is called: "options-toggle-3", "game-settings-text-0".
+        /// </summary>
+        private static string RowId(MenuRowSettings settings, string kind, int index)
+        {
+            return settings.IdPrefix + "-" + kind + "-" + index;
+        }
+
+        private static void AddTexts(List<MenuRow> items, IMenuFactoryCollection factory, MenuRowSettings settings)
         {
             List<IUITextMesh> texts = new List<IUITextMesh>();
             factory.GetCreatedTextMeshes(texts);
@@ -97,13 +120,13 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowText(
-                        "options-text-" + i,
+                        RowId(settings, "text", i),
                         () => SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text)),
                         () => IsActive(component))));
             }
         }
 
-        private static void AddInputs(List<MenuRow> items, IMenuFactoryCollection factory)
+        private static void AddInputs(List<MenuRow> items, IMenuFactoryCollection factory, MenuRowSettings settings)
         {
             List<IUITextMeshInputField> fields = new List<IUITextMeshInputField>();
             factory.GetCreatedTextMeshInputFields(fields);
@@ -119,16 +142,77 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowInput(
-                        "options-input-" + i,
+                        RowId(settings, "input", i),
                         () => InputLabel(field),
                         () => field,
                         () => field.Active && field.Interactable,
                         () => IsActive(component),
-                        () => Tooltip.ForComponent(InputTextMesh(field) ?? component, null))));
+                        () => Tooltip.ForComponent(InputTextMesh(field) ?? component, settings.Localization))));
             }
         }
 
-        private static void AddDropdowns(List<MenuRow> items, IMenuFactoryCollection factory)
+        // The turn-timer rows of the lobby's game settings: one widget drawing a minutes box and a
+        // seconds box, which the text-mesh reader never sees - the factory keeps them on a list of
+        // their own.
+        private static readonly FieldInfo TimeInputMinutesField =
+            AccessTools.Field(typeof(UITimeInputField), "_minutesInputfield");
+        private static readonly FieldInfo TimeInputSecondsField =
+            AccessTools.Field(typeof(UITimeInputField), "_secondsInputfield");
+
+        private static void AddTimeInputs(List<MenuRow> items, IMenuFactoryCollection factory, MenuRowSettings settings)
+        {
+            List<IUITimeInputField> fields = new List<IUITimeInputField>();
+            factory.GetCreatedTimeInputFields(fields);
+            for (int i = 0; i < fields.Count; i++)
+            {
+                IUITimeInputField field = fields[i];
+                Component component = field as Component;
+                if (component == null)
+                {
+                    continue;
+                }
+
+                items.Add(new MenuRow(
+                    component.transform,
+                    new MenuRowTimeInput(
+                        RowId(settings, "time-input", i),
+                        () => TimeInputLabel(field),
+                        () => TimeInputChildField(field, TimeInputMinutesField),
+                        () => TimeInputChildField(field, TimeInputSecondsField),
+                        () => field.Active && field.Interactable,
+                        () => IsActive(component),
+                        () => Tooltip.ForComponent(component, settings.Localization))));
+            }
+        }
+
+        /// <summary>What the time row DRAWS as its label. Read off the row's own text mesh rather than
+        /// its <c>Text</c> property, which answers with the prefab's placeholder ("Label") once the
+        /// menu has rebuilt the rows - measured on the turn-timer rows, which draw "Base turn time"
+        /// and friends while every one of them reported "Label".</summary>
+        private static string TimeInputLabel(IUITimeInputField field)
+        {
+            UITimeInputField concrete = field as UITimeInputField;
+            if (concrete != null)
+            {
+                string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(concrete.GetTextMeshPro()));
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    return text;
+                }
+            }
+
+            return SpokenLines.Clean(field != null ? field.Text : null);
+        }
+
+        private static IUITextMeshInputField TimeInputChildField(IUITimeInputField field, FieldInfo childField)
+        {
+            UITimeInputField concrete = field as UITimeInputField;
+            return concrete != null && childField != null
+                ? childField.GetValue(concrete) as IUITextMeshInputField
+                : null;
+        }
+
+        private static void AddDropdowns(List<MenuRow> items, IMenuFactoryCollection factory, MenuRowSettings settings)
         {
             List<IUITextMeshDropdown> dropdowns = new List<IUITextMeshDropdown>();
             factory.GetCreatedTextMeshDropdowns(dropdowns);
@@ -144,7 +228,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowDropdown(
-                        "options-dropdown-" + i,
+                        RowId(settings, "dropdown", i),
                         () => DropdownLabel(dropdown),
                         () => DropdownOptions(dropdown),
                         () => DropdownValue(dropdown),
@@ -152,7 +236,7 @@ namespace SongsOfConquestAccess.Adapters
                         () => NativeSelectionUtility.Select(dropdown.GetSelectable()),
                         () => dropdown.Active && dropdown.Interactable,
                         () => IsActive(component),
-                        () => Tooltip.ForComponent(DropdownTextMesh(dropdown) ?? component, null),
+                        () => Tooltip.ForComponent(DropdownTextMesh(dropdown) ?? component, settings.Localization),
                         () => DropdownPopup.Show(dropdown),
                         () => DropdownPopup.Hide(dropdown),
                         () => DropdownPopup.IsOpen(dropdown),
@@ -160,7 +244,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private static void AddToggles(List<MenuRow> items, IMenuFactoryCollection factory)
+        private static void AddToggles(List<MenuRow> items, IMenuFactoryCollection factory, MenuRowSettings settings)
         {
             List<IUIToggle> toggles = new List<IUIToggle>();
             factory.GetCreatedToggles(toggles);
@@ -180,18 +264,18 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowToggle(
-                        "options-toggle-" + i,
+                        RowId(settings, "toggle", i),
                         () => ToggleLabel(toggle),
                         () => toggle.ToggleValue = !toggle.ToggleValue,
                         () => toggle.ToggleValue,
                         () => NativeSelectionUtility.Select(toggle.GetSelectable()),
                         () => toggle.Active && toggle.Interactable,
                         () => IsActive(component),
-                        () => Tooltip.ForComponent(ToggleTextMesh(toggle) ?? component, null))));
+                        () => Tooltip.ForComponent(ToggleTextMesh(toggle) ?? component, settings.Localization))));
             }
         }
 
-        private static void AddSliders(List<MenuRow> items, IMenuFactoryCollection factory)
+        private static void AddSliders(List<MenuRow> items, IMenuFactoryCollection factory, MenuRowSettings settings)
         {
             List<IUISlider> sliders = new List<IUISlider>();
             factory.GetCreatedSliders(sliders);
@@ -207,7 +291,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowSlider(
-                        "options-slider-" + i,
+                        RowId(settings, "slider", i),
                         () => SliderLabel(slider),
                         () => SliderValueText(slider),
                         () => slider.SliderValue,
@@ -218,13 +302,13 @@ namespace SongsOfConquestAccess.Adapters
                         () => NativeSelectionUtility.Select(slider.GetSelectable()),
                         () => slider.Active && slider.Interactable,
                         () => IsActive(component),
-                        () => Tooltip.ForComponent(SliderTextMesh(slider) ?? component, null),
+                        () => Tooltip.ForComponent(SliderTextMesh(slider) ?? component, settings.Localization),
                         () => SliderValueEditor.Label(slider),
                         () => SliderValueEditor.Open(slider))));
             }
         }
 
-        private static void AddButtons(List<MenuRow> items, IMenuFactoryCollection factory)
+        private static void AddButtons(List<MenuRow> items, IMenuFactoryCollection factory, MenuRowSettings settings)
         {
             List<IUIButton> buttons = new List<IUIButton>();
             factory.GetCreatedButtons(buttons);
@@ -240,13 +324,13 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowButton(
-                        "options-button-" + i,
+                        RowId(settings, settings.ButtonIdKind, i),
                         () => Label(button),
                         () => NativeSelectionUtility.Click(button),
                         () => NativeSelectionUtility.Select(component),
                         () => button.Active && button.Interactable,
                         () => IsActive(component),
-                        () => Tooltip.ForComponent(component, null))));
+                        () => Tooltip.ForComponent(component, settings.Localization))));
             }
         }
 
@@ -262,7 +346,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo EntryButtonField = AccessTools.Field(typeof(UIKeyBindingEntry), "_button");
         private static readonly FieldInfo EntryTextField = AccessTools.Field(typeof(UIKeyBindingEntry), "_text");
 
-        private static void AddKeyBindings(List<MenuRow> items, IMenuFactoryCollection factory, KeyBindingSource source)
+        private static void AddKeyBindings(List<MenuRow> items, IMenuFactoryCollection factory, MenuRowSettings settings)
         {
             List<IUIKeyBinding> bindings = new List<IUIKeyBinding>();
             factory.GetCreatedKeyBindings(bindings);
@@ -275,7 +359,9 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                items.Add(new MenuRow(component.transform, MakeKeyBinding("options-keybind-" + i, widget, source)));
+                items.Add(new MenuRow(
+                    component.transform,
+                    MakeKeyBinding(RowId(settings, "keybind", i), widget, settings.KeyBindings)));
             }
         }
 
@@ -738,6 +824,25 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
+    /// <summary>
+    /// What tells one drawn form's rows from another's. The rows themselves are read the same way
+    /// for every form; these are the three things a window owns rather than the reader: the word its
+    /// row ids begin with, which is what a screen's node keys are built from, what it calls a button
+    /// row (the lobby's windows called theirs "content-button" before the reader was shared), and
+    /// the handler its tooltips are resolved through - null on the Options window, whose controls
+    /// carry their tooltip text already localized.
+    /// </summary>
+    public sealed class MenuRowSettings
+    {
+        public string IdPrefix = "options";
+        public string ButtonIdKind = "button";
+        public ILocalizationHandler Localization;
+
+        /// <summary>The rebindable-action context (the Options window's Controls page); null for a
+        /// form that draws none.</summary>
+        public KeyBindingSource KeyBindings;
+    }
+
     /// <summary>One drawn row: what it is, and where it is drawn.</summary>
     public sealed class MenuRow
     {
@@ -805,6 +910,38 @@ namespace SongsOfConquestAccess.Adapters
         public string Id { get; private set; }
         public Func<string> GetLabel { get; private set; }
         public Func<IUITextMeshInputField> GetField { get; private set; }
+        public Func<bool> IsEnabled { get; private set; }
+        public Func<bool> IsVisible { get; private set; }
+        public Func<Tooltip> GetTooltip { get; private set; }
+    }
+
+    /// <summary>A time the form draws: one row holding a minutes box and a seconds box, each of them
+    /// a text box the game's own keyboard fills. The widget draws a slider too, which the game
+    /// switches off outside gamepad mode, so the two boxes are what a keyboard reads.</summary>
+    public sealed class MenuRowTimeInput
+    {
+        public MenuRowTimeInput(
+            string id,
+            Func<string> getLabel,
+            Func<IUITextMeshInputField> getMinutesField,
+            Func<IUITextMeshInputField> getSecondsField,
+            Func<bool> isEnabled,
+            Func<bool> isVisible,
+            Func<Tooltip> getTooltip)
+        {
+            Id = id;
+            GetLabel = getLabel;
+            GetMinutesField = getMinutesField;
+            GetSecondsField = getSecondsField;
+            IsEnabled = isEnabled;
+            IsVisible = isVisible;
+            GetTooltip = getTooltip;
+        }
+
+        public string Id { get; private set; }
+        public Func<string> GetLabel { get; private set; }
+        public Func<IUITextMeshInputField> GetMinutesField { get; private set; }
+        public Func<IUITextMeshInputField> GetSecondsField { get; private set; }
         public Func<bool> IsEnabled { get; private set; }
         public Func<bool> IsVisible { get; private set; }
         public Func<Tooltip> GetTooltip { get; private set; }

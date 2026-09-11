@@ -1,24 +1,28 @@
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
-using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
+    /// <summary>
+    /// The lobby's game settings window, read as facts. Its rows are whatever its
+    /// <see cref="MenuFactoryController"/> drew, so they are read by <see cref="MenuRows"/> like
+    /// every other settings form's - the window owns only what its rows are called, the handler its
+    /// tooltips resolve through, and its own Cancel and Apply.
+    /// </summary>
     public sealed class AdventureLobbyGameSettingsAdapter : IPresent
     {
         private static readonly FieldInfo ContainerField =
             AccessTools.Field(typeof(LobbyMapSettingsMenu), "_container");
+        private static readonly FieldInfo ContentContainerField =
+            AccessTools.Field(typeof(LobbyMapSettingsMenu), "_contentContainer");
         private static readonly FieldInfo FactoryField =
             AccessTools.Field(typeof(LobbyMapSettingsMenu), "_factory");
         private static readonly FieldInfo ApplyButtonField =
@@ -27,15 +31,14 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(LobbyMapSettingsMenu), "_cancelButton");
         private static readonly FieldInfo LocalizationField =
             AccessTools.Field(typeof(LobbyMapSettingsMenu), "_localizationHandler");
-        private static readonly MethodInfo DropdownGetTextMethod =
-            AccessTools.Method(typeof(UITextMeshDropdown), "GetText");
-        private static readonly FieldInfo TimeInputMinutesField =
-            AccessTools.Field(typeof(UITimeInputField), "_minutesInputfield");
-        private static readonly FieldInfo TimeInputSecondsField =
-            AccessTools.Field(typeof(UITimeInputField), "_secondsInputfield");
 
         private readonly LobbyMapSettingsMenu _menu;
         private readonly ILocalizationHandler _localization;
+        private readonly MenuRowSettings _rowSettings;
+
+        // The rows of the window, re-read only when its content column is redrawn (the menu's own
+        // Refresh destroys every child of it and draws new ones).
+        private MenuRowMemo _rows;
 
         public AdventureLobbyGameSettingsAdapter(LobbyMapSettingsMenu menu)
         {
@@ -43,6 +46,12 @@ namespace SongsOfConquestAccess.Adapters
             _localization = menu != null && LocalizationField != null
                 ? LocalizationField.GetValue(menu) as ILocalizationHandler
                 : GlobalLocalizationVariables.LocalizationHandler;
+            _rowSettings = new MenuRowSettings
+            {
+                IdPrefix = "game-settings",
+                ButtonIdKind = "content-button",
+                Localization = _localization,
+            };
         }
 
         public object SourceKey
@@ -68,611 +77,36 @@ namespace SongsOfConquestAccess.Adapters
                 && ((Component)container).gameObject.activeInHierarchy;
         }
 
-        public IReadOnlyList<ControlItem> GetContentControls()
+        public IReadOnlyList<MenuRow> GetContentControls()
         {
-            IMenuFactoryCollection factory = GetField<IMenuFactoryCollection>(FactoryField);
-            if (factory == null)
+            if (_rows == null)
             {
-                return new ControlItem[0];
-            }
-
-            List<ControlItem> items = new List<ControlItem>();
-            AddTextItems(items, factory);
-            AddDropdownItems(items, factory);
-            AddToggleItems(items, factory);
-            AddTextInputItems(items, factory);
-            AddTimeInputItems(items, factory);
-            AddButtonItems(items, factory);
-            items.Sort(CompareControlItems);
-            return items;
-        }
-
-        public ButtonItem GetCancelButton()
-        {
-            UIButton button = GetField<UIButton>(CancelButtonField);
-            return button != null
-                ? BuildButton("game-settings-cancel", button)
-                : null;
-        }
-
-        public ButtonItem GetApplyButton()
-        {
-            UIButton button = GetField<UIButton>(ApplyButtonField);
-            return button != null
-                ? BuildButton("game-settings-confirm", button)
-                : null;
-        }
-
-        private void AddTextItems(List<ControlItem> items, IMenuFactoryCollection factory)
-        {
-            List<IUITextMesh> texts = new List<IUITextMesh>();
-            factory.GetCreatedTextMeshes(texts);
-            for (int i = 0; i < texts.Count; i++)
-            {
-                IUITextMesh text = texts[i];
-                Component component = text as Component;
-                if (component == null)
+                IMenuFactoryCollection factory = GetField<IMenuFactoryCollection>(FactoryField);
+                if (factory == null)
                 {
-                    continue;
+                    return new MenuRow[0];
                 }
 
-                int index = i;
-                items.Add(new ControlItem(
-                    component.transform,
-                    new TextItem(
-                        "game-settings-text-" + index,
-                        () => SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text)),
-                        () => IsActive(component))));
+                UITransform content = GetField<UITransform>(ContentContainerField);
+                _rows = new MenuRowMemo(factory, content != null ? content.MonoTransform : null, _rowSettings);
             }
+
+            return _rows.Rows;
         }
 
-        private void AddDropdownItems(List<ControlItem> items, IMenuFactoryCollection factory)
+        public MenuRowButton GetCancelButton()
         {
-            List<IUITextMeshDropdown> dropdowns = new List<IUITextMeshDropdown>();
-            factory.GetCreatedTextMeshDropdowns(dropdowns);
-            for (int i = 0; i < dropdowns.Count; i++)
-            {
-                IUITextMeshDropdown dropdown = dropdowns[i];
-                Component component = dropdown as Component;
-                if (component == null)
-                {
-                    continue;
-                }
-
-                int index = i;
-                items.Add(new ControlItem(
-                    component.transform,
-                    new DropdownItem(
-                        "game-settings-dropdown-" + index,
-                        () => GetDropdownLabel(dropdown),
-                        () => GetDropdownOptions(dropdown),
-                        () => GetDropdownValue(dropdown),
-                        value => SetDropdownValue(dropdown, value),
-                        () => NativeSelectionUtility.Select(dropdown.GetSelectable()),
-                        () => dropdown.Active && dropdown.Interactable,
-                        () => IsActive(component),
-                        () => Tooltip.ForComponent(GetDropdownTooltipComponent(dropdown) ?? component, _localization),
-                        () => DropdownPopup.Show(dropdown),
-                        () => DropdownPopup.Hide(dropdown),
-                        () => DropdownPopup.IsOpen(dropdown),
-                        optionIndex => DropdownPopup.FocusOption(dropdown, optionIndex))));
-            }
+            return MenuRows.Button("game-settings-cancel", GetField<UIButton>(CancelButtonField), _localization);
         }
 
-        private void AddToggleItems(List<ControlItem> items, IMenuFactoryCollection factory)
+        public MenuRowButton GetApplyButton()
         {
-            List<IUIToggle> toggles = new List<IUIToggle>();
-            factory.GetCreatedToggles(toggles);
-            List<IUIToggle> tinyToggles = new List<IUIToggle>();
-            factory.GetCreatedTinyToggles(tinyToggles);
-            toggles.AddRange(tinyToggles);
-
-            for (int i = 0; i < toggles.Count; i++)
-            {
-                IUIToggle toggle = toggles[i];
-                Component component = toggle as Component;
-                if (component == null)
-                {
-                    continue;
-                }
-
-                int index = i;
-                items.Add(new ControlItem(
-                    component.transform,
-                    new ToggleItem(
-                        "game-settings-toggle-" + index,
-                        () => GetToggleLabel(toggle),
-                        () => toggle.ToggleValue = !toggle.ToggleValue,
-                        () => toggle.ToggleValue,
-                        () => NativeSelectionUtility.Select(toggle.GetSelectable()),
-                        () => toggle.Active && toggle.Interactable,
-                        () => IsActive(component),
-                        () => Tooltip.ForComponent(GetToggleTooltipComponent(toggle) ?? component, _localization))));
-            }
-        }
-
-        private void AddTextInputItems(List<ControlItem> items, IMenuFactoryCollection factory)
-        {
-            List<IUITextMeshInputField> fields = new List<IUITextMeshInputField>();
-            factory.GetCreatedTextMeshInputFields(fields);
-            for (int i = 0; i < fields.Count; i++)
-            {
-                IUITextMeshInputField field = fields[i];
-                Component component = field as Component;
-                if (component == null)
-                {
-                    continue;
-                }
-
-                int index = i;
-                items.Add(new ControlItem(
-                    component.transform,
-                    new TextInputItem(
-                        "game-settings-input-" + index,
-                        () => GetInputLabel(field),
-                        () => field,
-                        () => NativeSelectionUtility.Select(field.GetSelectable()),
-                        () => field.Active && field.Interactable,
-                        () => IsActive(component),
-                        () => Tooltip.ForComponent(GetInputTooltipComponent(field) ?? component, _localization))));
-            }
-        }
-
-        private void AddTimeInputItems(List<ControlItem> items, IMenuFactoryCollection factory)
-        {
-            List<IUITimeInputField> fields = new List<IUITimeInputField>();
-            factory.GetCreatedTimeInputFields(fields);
-            for (int i = 0; i < fields.Count; i++)
-            {
-                IUITimeInputField field = fields[i];
-                Component component = field as Component;
-                if (component == null)
-                {
-                    continue;
-                }
-
-                int index = i;
-                items.Add(new ControlItem(
-                    component.transform,
-                    new TimeInputItem(
-                        "game-settings-time-input-" + index,
-                        () => GetTimeInputLabel(field),
-                        () => field,
-                        () => GetTimeInputChildField(field, TimeInputMinutesField),
-                        () => GetTimeInputChildField(field, TimeInputSecondsField),
-                        () => NativeSelectionUtility.Select(field.GetSelectable()),
-                        () => field.Active && field.Interactable,
-                        () => IsActive(component),
-                        () => Tooltip.ForComponent(component, _localization))));
-            }
-        }
-
-        private void AddButtonItems(List<ControlItem> items, IMenuFactoryCollection factory)
-        {
-            List<IUIButton> buttons = new List<IUIButton>();
-            factory.GetCreatedButtons(buttons);
-            for (int i = 0; i < buttons.Count; i++)
-            {
-                IUIButton button = buttons[i];
-                Component component = button as Component;
-                if (component == null)
-                {
-                    continue;
-                }
-
-                int index = i;
-                items.Add(new ControlItem(
-                    component.transform,
-                    new ButtonItem(
-                        "game-settings-content-button-" + index,
-                        () => GetButtonLabel(button),
-                        () => NativeSelectionUtility.Click(button),
-                        () => NativeSelectionUtility.Select(component),
-                        () => button.Active && button.Interactable,
-                        () => IsActive(component),
-                        () => Tooltip.ForComponent(component, _localization))));
-            }
-        }
-
-        private ButtonItem BuildButton(string id, IUIButton button)
-        {
-            Component component = button as Component;
-            return new ButtonItem(
-                id,
-                () => GetButtonLabel(button),
-                () => NativeSelectionUtility.Click(button),
-                () => NativeSelectionUtility.Select(component),
-                () => button.Active && button.Interactable,
-                () => IsActive(component),
-                () => Tooltip.ForComponent(component, _localization));
+            return MenuRows.Button("game-settings-confirm", GetField<UIButton>(ApplyButtonField), _localization);
         }
 
         private T GetField<T>(FieldInfo field) where T : class
         {
             return _menu != null && field != null ? field.GetValue(_menu) as T : null;
-        }
-
-        private static string GetButtonLabel(IUIButton button)
-        {
-            UIButton concrete = button as UIButton;
-            return concrete != null
-                ? MenuButtonTextUtility.GetAllVisibleText(concrete)
-                : SpokenLines.Clean(button != null ? button.Text : null);
-        }
-
-        private static string GetTextLabel(IUIText text)
-        {
-            return SpokenLines.Clean(text != null ? text.Text : null);
-        }
-
-        /// <summary>What the time row DRAWS as its label. Read off the row's own text mesh rather than
-        /// its <c>Text</c> property, which answers with the prefab's placeholder ("Label") once the
-        /// menu has rebuilt the rows - measured on the turn-timer rows, which draw "Base turn time"
-        /// and friends while every one of them reported "Label".</summary>
-        private static string GetTimeInputLabel(IUITimeInputField field)
-        {
-            UITimeInputField concrete = field as UITimeInputField;
-            if (concrete != null)
-            {
-                string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(concrete.GetTextMeshPro()));
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    return text;
-                }
-            }
-
-            return GetTextLabel(field);
-        }
-
-        private static IUITextMeshInputField GetTimeInputChildField(IUITimeInputField field, FieldInfo childField)
-        {
-            UITimeInputField concrete = field as UITimeInputField;
-            return concrete != null && childField != null
-                ? childField.GetValue(concrete) as IUITextMeshInputField
-                : null;
-        }
-
-        private static string GetInputLabel(IUITextMeshInputField field)
-        {
-            UITextMeshInputField concrete = field as UITextMeshInputField;
-            if (concrete != null)
-            {
-                string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(concrete.GetTextMeshPro()));
-                if (!string.IsNullOrWhiteSpace(label))
-                {
-                    return label;
-                }
-            }
-
-            return GetTextLabel(field);
-        }
-
-        private static Component GetInputTooltipComponent(IUITextMeshInputField field)
-        {
-            UITextMeshInputField concrete = field as UITextMeshInputField;
-            return concrete != null ? concrete.GetTextMeshPro() as Component : null;
-        }
-
-        private static string GetToggleLabel(IUIToggle toggle)
-        {
-            UIToggle concrete = toggle as UIToggle;
-            if (concrete != null)
-            {
-                string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(concrete.GetTextMesh()));
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    return text;
-                }
-            }
-
-            return SpokenLines.Clean(toggle != null ? toggle.Text : null);
-        }
-
-        private static Component GetToggleTooltipComponent(IUIToggle toggle)
-        {
-            UIToggle concrete = toggle as UIToggle;
-            return concrete != null ? concrete.GetTextMesh() as Component : null;
-        }
-
-        private static string GetDropdownLabel(IUITextMeshDropdown dropdown)
-        {
-            UITextMeshDropdown concrete = dropdown as UITextMeshDropdown;
-            if (concrete != null && DropdownGetTextMethod != null)
-            {
-                IUITextMesh textMesh = DropdownGetTextMethod.Invoke(concrete, new object[0]) as IUITextMesh;
-                string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    return text;
-                }
-            }
-
-            return SpokenLines.Clean(dropdown != null ? dropdown.Text : null);
-        }
-
-        private static Component GetDropdownTooltipComponent(IUITextMeshDropdown dropdown)
-        {
-            UITextMeshDropdown concrete = dropdown as UITextMeshDropdown;
-            if (concrete == null || DropdownGetTextMethod == null)
-            {
-                return null;
-            }
-
-            return DropdownGetTextMethod.Invoke(concrete, new object[0]) as Component;
-        }
-
-        // LAZY, never on a build path: the options are reached only through a Func the node holds,
-        // so the walk is paid when the player opens the dropdown.
-        private static IReadOnlyList<string> GetDropdownOptions(IUITextMeshDropdown dropdown)
-        {
-            Component component = dropdown as Component;
-            TMP_Dropdown tmpDropdown = component != null ? component.GetComponentInChildren<TMP_Dropdown>(true) : null;
-            if (tmpDropdown == null || tmpDropdown.options == null)
-            {
-                return new string[0];
-            }
-
-            List<string> options = new List<string>();
-            for (int i = 0; i < tmpDropdown.options.Count; i++)
-            {
-                options.Add(SpokenLines.Clean(tmpDropdown.options[i].text));
-            }
-
-            return options;
-        }
-
-        private static int GetDropdownValue(IUITextMeshDropdown dropdown)
-        {
-            if (dropdown == null)
-            {
-                return 0;
-            }
-
-            int count = dropdown.DropdownValueCount;
-            if (count <= 0)
-            {
-                return 0;
-            }
-
-            int value = dropdown.DropdownValue;
-            if (value < 0)
-            {
-                return 0;
-            }
-
-            return value >= count ? count - 1 : value;
-        }
-
-        private static bool SetDropdownValue(IUITextMeshDropdown dropdown, int value)
-        {
-            if (dropdown == null || !dropdown.Active || !dropdown.Interactable)
-            {
-                return false;
-            }
-
-            int count = dropdown.DropdownValueCount;
-            if (count <= 0)
-            {
-                return false;
-            }
-
-            if (value < 0)
-            {
-                value = 0;
-            }
-            else if (value >= count)
-            {
-                value = count - 1;
-            }
-
-            dropdown.DropdownValue = value;
-            return true;
-        }
-
-        private static bool IsActive(Component component)
-        {
-            return component != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static int CompareControlItems(ControlItem left, ControlItem right)
-        {
-            if (ReferenceEquals(left, right))
-            {
-                return 0;
-            }
-
-            return string.CompareOrdinal(BuildHierarchyKey(left.Transform), BuildHierarchyKey(right.Transform));
-        }
-
-        private static string BuildHierarchyKey(Transform transform)
-        {
-            if (transform == null)
-            {
-                return string.Empty;
-            }
-
-            List<int> indices = new List<int>();
-            Transform current = transform;
-            while (current != null)
-            {
-                indices.Add(current.GetSiblingIndex());
-                current = current.parent;
-            }
-
-            indices.Reverse();
-            string[] parts = new string[indices.Count];
-            for (int i = 0; i < indices.Count; i++)
-            {
-                parts[i] = indices[i].ToString("D4");
-            }
-
-            return string.Join(".", parts);
-        }
-
-        public sealed class ControlItem
-        {
-            public ControlItem(Transform transform, object item)
-            {
-                Transform = transform;
-                Item = item;
-            }
-
-            public Transform Transform { get; private set; }
-            public object Item { get; private set; }
-        }
-
-        public sealed class TextItem
-        {
-            public TextItem(string id, Func<string> getText, Func<bool> isVisible)
-            {
-                Id = id;
-                GetText = getText;
-                IsVisible = isVisible;
-            }
-
-            public string Id { get; private set; }
-            public Func<string> GetText { get; private set; }
-            public Func<bool> IsVisible { get; private set; }
-        }
-
-        public sealed class DropdownItem : IDropList
-        {
-            public DropdownItem(string id, Func<string> getLabel, Func<IReadOnlyList<string>> getOptions, Func<int> getValue, Func<int, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip, Func<bool> openPopup, Func<bool> closePopup, Func<bool> isPopupOpen, Func<int, bool> focusOption)
-            {
-                Id = id;
-                GetLabel = getLabel;
-                GetOptions = getOptions;
-                GetValue = getValue;
-                SetValue = setValue;
-                Focus = focus;
-                IsEnabled = isEnabled;
-                IsVisible = isVisible;
-                GetTooltip = getTooltip;
-                OpenPopup = openPopup;
-                ClosePopup = closePopup;
-                IsPopupOpen = isPopupOpen;
-                FocusOption = focusOption;
-            }
-
-            public string Id { get; private set; }
-            public Func<string> GetLabel { get; private set; }
-            public Func<IReadOnlyList<string>> GetOptions { get; private set; }
-            public Func<int> GetValue { get; private set; }
-            public Func<int, bool> SetValue { get; private set; }
-            public Action Focus { get; private set; }
-            public Func<bool> IsEnabled { get; private set; }
-            public Func<bool> IsVisible { get; private set; }
-            public Func<Tooltip> GetTooltip { get; private set; }
-
-            /// <summary>The game's own list popup: opened, closed, asked about, and told which entry
-            /// to highlight.</summary>
-            public Func<bool> OpenPopup { get; private set; }
-            public Func<bool> ClosePopup { get; private set; }
-            public Func<bool> IsPopupOpen { get; private set; }
-            public Func<int, bool> FocusOption { get; private set; }
-        }
-
-        public sealed class ToggleItem
-        {
-            public ToggleItem(string id, Func<string> getLabel, Action toggle, Func<bool> isChecked, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
-            {
-                Id = id;
-                GetLabel = getLabel;
-                Toggle = toggle;
-                IsChecked = isChecked;
-                Focus = focus;
-                IsEnabled = isEnabled;
-                IsVisible = isVisible;
-                GetTooltip = getTooltip;
-            }
-
-            public string Id { get; private set; }
-            public Func<string> GetLabel { get; private set; }
-            public Action Toggle { get; private set; }
-            public Func<bool> IsChecked { get; private set; }
-            public Action Focus { get; private set; }
-            public Func<bool> IsEnabled { get; private set; }
-            public Func<bool> IsVisible { get; private set; }
-            public Func<Tooltip> GetTooltip { get; private set; }
-        }
-
-        public sealed class TextInputItem
-        {
-            public TextInputItem(string id, Func<string> getLabel, Func<IUITextMeshInputField> getField, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
-            {
-                Id = id;
-                GetLabel = getLabel;
-                GetField = getField;
-                Focus = focus;
-                IsEnabled = isEnabled;
-                IsVisible = isVisible;
-                GetTooltip = getTooltip;
-            }
-
-            public string Id { get; private set; }
-            public Func<string> GetLabel { get; private set; }
-            public Func<IUITextMeshInputField> GetField { get; private set; }
-            public Action Focus { get; private set; }
-            public Func<bool> IsEnabled { get; private set; }
-            public Func<bool> IsVisible { get; private set; }
-            public Func<Tooltip> GetTooltip { get; private set; }
-        }
-
-        public sealed class TimeInputItem
-        {
-            public TimeInputItem(
-                string id,
-                Func<string> getLabel,
-                Func<IUITimeInputField> getField,
-                Func<IUITextMeshInputField> getMinutesField,
-                Func<IUITextMeshInputField> getSecondsField,
-                Action focus,
-                Func<bool> isEnabled,
-                Func<bool> isVisible,
-                Func<Tooltip> getTooltip)
-            {
-                Id = id;
-                GetLabel = getLabel;
-                GetField = getField;
-                GetMinutesField = getMinutesField;
-                GetSecondsField = getSecondsField;
-                Focus = focus;
-                IsEnabled = isEnabled;
-                IsVisible = isVisible;
-                GetTooltip = getTooltip;
-            }
-
-            public string Id { get; private set; }
-            public Func<string> GetLabel { get; private set; }
-            public Func<IUITimeInputField> GetField { get; private set; }
-            public Func<IUITextMeshInputField> GetMinutesField { get; private set; }
-            public Func<IUITextMeshInputField> GetSecondsField { get; private set; }
-            public Action Focus { get; private set; }
-            public Func<bool> IsEnabled { get; private set; }
-            public Func<bool> IsVisible { get; private set; }
-            public Func<Tooltip> GetTooltip { get; private set; }
-        }
-
-        public sealed class ButtonItem
-        {
-            public ButtonItem(string id, Func<string> getLabel, Func<bool> activate, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
-            {
-                Id = id;
-                GetLabel = getLabel;
-                Activate = activate;
-                Focus = focus;
-                IsEnabled = isEnabled;
-                IsVisible = isVisible;
-                GetTooltip = getTooltip;
-            }
-
-            public string Id { get; private set; }
-            public Func<string> GetLabel { get; private set; }
-            public Func<bool> Activate { get; private set; }
-            public Action Focus { get; private set; }
-            public Func<bool> IsEnabled { get; private set; }
-            public Func<bool> IsVisible { get; private set; }
-            public Func<Tooltip> GetTooltip { get; private set; }
         }
     }
 }

@@ -21,7 +21,7 @@ namespace SongsOfConquestAccess.Adapters
     public sealed class MenuRowMemo
     {
         private readonly IMenuFactoryCollection _factory;
-        private readonly KeyBindingSource _keyBindings;
+        private readonly MenuRowSettings _settings;
         private readonly Transform _column;
 
         private IReadOnlyList<MenuRow> _rows;
@@ -33,10 +33,17 @@ namespace SongsOfConquestAccess.Adapters
         /// <param name="keyBindings">The rebindable-action context, or null for a form that draws
         /// none of its own.</param>
         public MenuRowMemo(IMenuFactoryCollection factory, Transform column, KeyBindingSource keyBindings)
+            : this(factory, column, new MenuRowSettings { KeyBindings = keyBindings })
+        {
+        }
+
+        /// <param name="column">The content column the factory draws into.</param>
+        /// <param name="settings">How this form's rows are named and read.</param>
+        public MenuRowMemo(IMenuFactoryCollection factory, Transform column, MenuRowSettings settings)
         {
             _factory = factory;
             _column = column;
-            _keyBindings = keyBindings;
+            _settings = settings;
         }
 
         public IReadOnlyList<MenuRow> Rows
@@ -45,7 +52,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 if (_column == null)
                 {
-                    return _rows ?? (_rows = MenuRows.Read(_factory, _keyBindings));
+                    return _rows ?? (_rows = MenuRows.Read(_factory, _settings));
                 }
 
                 int count = _column.childCount;
@@ -53,7 +60,7 @@ namespace SongsOfConquestAccess.Adapters
                 Transform last = count > 0 ? _column.GetChild(count - 1) : null;
                 if (_rows == null || count != _childCount || !ReferenceEquals(first, _first) || !ReferenceEquals(last, _last))
                 {
-                    _rows = MenuRows.Read(_factory, _keyBindings);
+                    _rows = MenuRows.Read(_factory, _settings);
                     _childCount = count;
                     _first = first;
                     _last = last;

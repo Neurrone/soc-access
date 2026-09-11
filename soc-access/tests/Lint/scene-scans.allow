@@ -8,7 +8,6 @@ soc-access/adapters/AdventureHudAdapter.cs | 1 | : (container != null ? containe
 soc-access/adapters/AdventureHudAdapter.cs | 1 | OptionsButtonInstaller installer = container != null ? container.GetComponentInChildren<OptionsButtonInstaller>(false) : null;
 soc-access/adapters/AdventureHudAdapter.cs | 1 | UITextMesh[] texts = container.GetComponentsInChildren<UITextMesh>(false);
 
-soc-access/adapters/AdventureLobbyGameSettingsAdapter.cs | 1 | TMP_Dropdown tmpDropdown = component != null ? component.GetComponentInChildren<TMP_Dropdown>(true) : null;
 
 soc-access/adapters/AdventureLobbyRandomLayoutAdapter.cs | 1 | TMP_Dropdown tmpDropdown = component != null ? component.GetComponentInChildren<TMP_Dropdown>(true) : null;
 
