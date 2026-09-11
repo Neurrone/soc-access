@@ -107,6 +107,26 @@ namespace SongsOfConquestAccess.UI
                 _inventorySlots = cells;
                 _inventoryNodes = nodes;
             }
+
+            private string _autoArrangeRaw;
+
+            private string _autoArrangeClean;
+
+            /// <summary>The auto-arrange caption as one spoken line: game text written for a
+            /// renderer, whose rich-text tags and mouse-button icons are not words. Cleaned once per
+            /// wording rather than per build, because it is the same localized line every time and
+            /// cleaning it runs three regexes. Per column, so two backpacks on one page cannot take
+            /// turns evicting each other's answer.</summary>
+            public string OneLine(string raw)
+            {
+                if (_autoArrangeClean == null || !string.Equals(raw, _autoArrangeRaw, StringComparison.Ordinal))
+                {
+                    _autoArrangeRaw = raw;
+                    _autoArrangeClean = SpokenLines.First(raw);
+                }
+
+                return _autoArrangeClean;
+            }
         }
 
         /// <summary>The game's own drag noise, for the keyboard's carry. Called on every build but
@@ -212,7 +232,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             builder.PushContext(caption ?? slots.InventoryLabel);
-            AddAutoArrange(builder, slots, keyPrefix, autoArrangeMarker);
+            AddAutoArrange(builder, slots, keyPrefix, autoArrangeMarker, column);
             for (int i = 0; i < nodes.Count; i++)
             {
                 builder.AddItem(nodes[i]);
@@ -229,9 +249,12 @@ namespace SongsOfConquestAccess.UI
             GraphBuilder builder,
             IArtifactSlots slots,
             string keyPrefix,
-            object marker)
+            object marker,
+            Column column)
         {
-            string label = OneLine(slots.AutoArrangeText);
+            string label = column != null
+                ? column.OneLine(slots.AutoArrangeText)
+                : SpokenLines.First(slots.AutoArrangeText);
             if (marker == null || string.IsNullOrWhiteSpace(label))
             {
                 return;
@@ -375,24 +398,5 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        /// <summary>Game text written for a renderer, read as one spoken line: its rich-text tags and
-        /// its mouse-button icons are not words.</summary>
-        // The auto-arrange caption is the same localized string on every build, and cleaning it ran
-        // three regexes a frame. One remembered answer covers it: every backpack draws that one line.
-        private static string _lastRaw;
-        private static string _lastClean;
-
-        private static string OneLine(string raw)
-        {
-            if (_lastClean != null && string.Equals(raw, _lastRaw, StringComparison.Ordinal))
-            {
-                return _lastClean;
-            }
-
-            string clean = SpokenLines.First(raw);
-            _lastRaw = raw;
-            _lastClean = clean;
-            return clean;
-        }
     }
 }
