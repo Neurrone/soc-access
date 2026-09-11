@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using HarmonyLib;
 using ModIO;
 using ModIOBrowser;
@@ -581,47 +580,14 @@ namespace SongsOfConquestAccess.Adapters
                 return key ?? string.Empty;
             }
 
-            return StripTmpMarkup(manager.Get(key));
+            return SpokenLines.Clean(manager.Get(key));
         }
 
         private static string GetText(TMP_Text text)
         {
             return text != null && text.gameObject.activeInHierarchy
-                ? StripTmpMarkup(text.text)
+                ? SpokenLines.Clean(text.text)
                 : string.Empty;
-        }
-
-        private static string StripTmpMarkup(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            StringBuilder builder = new StringBuilder(text.Length);
-            bool inTag = false;
-            for (int i = 0; i < text.Length; i++)
-            {
-                char c = text[i];
-                if (c == '<')
-                {
-                    inTag = true;
-                    continue;
-                }
-
-                if (c == '>')
-                {
-                    inTag = false;
-                    continue;
-                }
-
-                if (!inTag)
-                {
-                    builder.Append(c);
-                }
-            }
-
-            return builder.ToString().Trim();
         }
 
         private static bool SelectViaModIoNavigation(Selectable selectable)
@@ -799,7 +765,7 @@ namespace SongsOfConquestAccess.Adapters
                 for (int i = 0; i < _dropdown.options.Count; i++)
                 {
                     TMP_Dropdown.OptionData option = _dropdown.options[i];
-                    result.Add(StripTmpMarkup(option != null ? option.text : string.Empty));
+                    result.Add(SpokenLines.Clean(option != null ? option.text : string.Empty));
                 }
 
                 return result;

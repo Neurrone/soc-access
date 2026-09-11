@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
 using SongsOfConquestAccess.Screens;
+using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.Localization;
 using TMPro;
 using UnityEngine;
@@ -585,7 +585,7 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(TMP_Text text)
         {
             return text != null && text.gameObject.activeInHierarchy
-                ? StripTmpMarkup(text.text)
+                ? SpokenLines.Clean(text.text)
                 : string.Empty;
         }
 
@@ -647,39 +647,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 parts.Add(value);
             }
-        }
-
-        private static string StripTmpMarkup(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            StringBuilder builder = new StringBuilder(text.Length);
-            bool inTag = false;
-            for (int i = 0; i < text.Length; i++)
-            {
-                char c = text[i];
-                if (c == '<')
-                {
-                    inTag = true;
-                    continue;
-                }
-
-                if (c == '>')
-                {
-                    inTag = false;
-                    continue;
-                }
-
-                if (!inTag)
-                {
-                    builder.Append(c);
-                }
-            }
-
-            return builder.ToString().Trim();
         }
 
         /// <summary>The results page's sort dropdown, answering the questions every drop list answers
@@ -754,7 +721,7 @@ namespace SongsOfConquestAccess.Adapters
                 for (int i = 0; i < dropdown.options.Count; i++)
                 {
                     TMP_Dropdown.OptionData option = dropdown.options[i];
-                    result.Add(StripTmpMarkup(option != null ? option.text : string.Empty));
+                    result.Add(SpokenLines.Clean(option != null ? option.text : string.Empty));
                 }
 
                 return result;

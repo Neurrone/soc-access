@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Loading;
@@ -9,6 +8,7 @@ using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -833,18 +833,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh text)
         {
-            return CleanText(UITextMeshTextUtility.GetEffectiveText(text));
-        }
-
-        private static string CleanText(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
-            string withoutTags = Regex.Replace(value, "<.*?>", string.Empty);
-            return withoutTags.Replace("\r\n", "\n").Replace('\r', '\n').Trim();
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         private static string JoinLines(params string[] lines)

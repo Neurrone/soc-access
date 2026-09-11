@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
@@ -359,7 +358,7 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(TMP_Text text)
         {
             return text != null && text.gameObject.activeInHierarchy
-                ? StripTmpMarkup(text.text)
+                ? SpokenLines.Clean(text.text)
                 : string.Empty;
         }
 
@@ -391,39 +390,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Empty;
-        }
-
-        private static string StripTmpMarkup(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            StringBuilder builder = new StringBuilder(text.Length);
-            bool inTag = false;
-            for (int i = 0; i < text.Length; i++)
-            {
-                char c = text[i];
-                if (c == '<')
-                {
-                    inTag = true;
-                    continue;
-                }
-
-                if (c == '>')
-                {
-                    inTag = false;
-                    continue;
-                }
-
-                if (!inTag)
-                {
-                    builder.Append(c);
-                }
-            }
-
-            return builder.ToString().Trim();
         }
 
         public sealed class CategoryItem

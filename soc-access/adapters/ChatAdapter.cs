@@ -9,6 +9,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Chat;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -558,7 +559,7 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     StringBuilder builder = new StringBuilder();
                     RenderMessageMethod.Invoke(_window, new object[] { builder, message });
-                    return StripColorTags(builder.ToString());
+                    return SpokenLines.Clean(builder.ToString());
                 }
                 catch (Exception exception)
                 {
@@ -567,30 +568,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return message.Message ?? string.Empty;
-        }
-
-        private static string StripColorTags(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return string.Empty;
-            }
-
-            string result = text.Replace("</color>", string.Empty);
-            int index = result.IndexOf("<color=", StringComparison.OrdinalIgnoreCase);
-            while (index >= 0)
-            {
-                int end = result.IndexOf('>', index);
-                if (end < 0)
-                {
-                    break;
-                }
-
-                result = result.Remove(index, end - index + 1);
-                index = result.IndexOf("<color=", StringComparison.OrdinalIgnoreCase);
-            }
-
-            return result;
         }
 
         private UIButton GetChatButton()
