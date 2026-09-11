@@ -916,7 +916,7 @@ namespace SongsOfConquestAccess.Screens
         /// what opens the pause menu.</summary>
         public override bool ConsumesBack
         {
-            get { return !IsBoardFocused() || Grid().IsInspecting || IsAiming; }
+            get { return !IsBoardFocused() || (Grid() != null && Grid().IsInspecting) || IsAiming; }
         }
 
         public override bool Back()
@@ -974,11 +974,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return moved;
-        }
-
-        public bool CanFocusActingTroop()
-        {
-            return HasActingTroops(enemy: false);
         }
 
         public bool CanNavigateLocalActingTroops()
