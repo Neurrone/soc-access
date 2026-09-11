@@ -207,7 +207,7 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                NodeVtable vtable = GraphNodes.Text(() => Plain(item.Label));
+                NodeVtable vtable = GraphNodes.Text(() => CellText.Plain(item.Label));
                 vtable.OnFocusVisual = () => Live.ScrollIntoView(item.SourceTransform);
                 sheet.Line(vtable, item.SourceTransform);
             }
@@ -269,7 +269,7 @@ namespace SongsOfConquestAccess.Screens
             NodeVtable vtable = new NodeVtable
             {
                 ControlType = ControlTypes.Text,
-                Announcements = new List<NodeAnnouncement> { GraphNodes.LabelPart(() => Plain(it.Label)) },
+                Announcements = new List<NodeAnnouncement> { GraphNodes.LabelPart(() => CellText.Plain(it.Label)) },
                 OnFocusVisual = () => Live.ScrollIntoView(it.SourceTransform),
             };
             return vtable;
@@ -280,33 +280,15 @@ namespace SongsOfConquestAccess.Screens
         private NodeVtable Cell(string caption, PlayerStatsAdapter.TableRowItem row, Func<string> value)
         {
             PlayerStatsAdapter.TableRowItem it = row;
-            Func<string> text = () => Filled(Plain(value()));
+            Func<string> text = () => CellText.Filled(CellText.Plain(value()));
             return new NodeVtable
             {
                 ControlType = ControlTypes.Text,
                 Announcements = new List<NodeAnnouncement> { GraphNodes.ValuePart(text, watch: false) },
-                SearchText = () => Plain(it.Label),
+                SearchText = () => CellText.Plain(it.Label),
                 BufferHead = () => ModText.Get(ModStrings.Common.ListSeparator, caption, text()),
                 OnFocusVisual = () => Live.ScrollIntoView(it.SourceTransform),
             };
-        }
-
-        /// <summary>One spoken line out of what the page drew. The stat tiles carry the break the
-        /// prefab wraps their caption on ("Games\nPlayed: 5"), which is a rendering accident rather
-        /// than two things to say, so the lines are joined back into one.</summary>
-        private static string Plain(string value)
-        {
-            return string.Join(" ", SpokenLines.Of(new[] { value }));
-        }
-
-        private static string Filled(string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                return value;
-            }
-
-            return GraphSheet.BlankText != null ? GraphSheet.BlankText() : string.Empty;
         }
 
         // ---- the page's buttons ----

@@ -436,7 +436,7 @@ namespace SongsOfConquestAccess.Screens
         {
             AdventureLobbyMapSelectRowAdapter it = row;
             Func<string> caption = Caption(captions, SheetColumns[column]);
-            Func<string> text = () => Filled(value());
+            Func<string> text = () => CellText.Filled(value());
             NodeVtable vtable = new NodeVtable
             {
                 ControlType = ControlTypes.Text,
@@ -449,16 +449,6 @@ namespace SongsOfConquestAccess.Screens
             };
             GraphNodes.Aim(vtable, tooltip);
             return vtable;
-        }
-
-        private static string Filled(string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                return value;
-            }
-
-            return GraphSheet.BlankText != null ? GraphSheet.BlankText() : string.Empty;
         }
 
         /// <summary>The column captions in the sheet's own order, the primary's first.</summary>
