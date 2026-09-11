@@ -775,7 +775,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return UITextMeshTextUtility.GetEffectiveText(textMesh);
+            return UITextMeshTextUtility.Spoken(textMesh);
         }
 
         private static void AddTextParts(
