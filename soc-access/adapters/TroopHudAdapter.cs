@@ -213,7 +213,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            using (NativeScreenInputPositionOverride.Apply(GetScreenCenter(sourceEntry)))
+            using (ApplyScreenInputPositionOverride(GetScreenCenter(sourceEntry)))
             {
                 Vector3 sourceContainerPosition = sourceEntry.Container.Position;
                 movable.BeginDrag(sourceEntry, new Vector2(sourceContainerPosition.x, sourceContainerPosition.y));
@@ -241,7 +241,7 @@ namespace SongsOfConquestAccess.Adapters
             Vector3 dragDirection = targetPosition - sourcePosition;
             bool ctrlHeld = IsCtrlHeld();
 
-            using (NativeScreenInputPositionOverride.Apply(GetScreenCenter(targetEntry)))
+            using (ApplyScreenInputPositionOverride(GetScreenCenter(targetEntry)))
             {
                 CurrentHoverEntryField?.SetValue(movable, targetEntry);
                 IsDraggingRightField?.SetValue(movable, sourcePosition.x < targetPosition.x);
@@ -638,97 +638,22 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private sealed class NativeScreenInputPositionOverride : IDisposable
+        /// <summary>
+        /// The game's own pointer moved to a screen point for the length of a native drag call,
+        /// so the drag reads the position the mod means rather than where the mouse happens to be.
+        /// </summary>
+        private static ScreenInputOverride ApplyScreenInputPositionOverride(Vector2 position)
         {
-            private readonly object _response;
-            private readonly PropertyInfo _positionProperty;
-            private readonly object _oldPosition;
-            private bool _disposed;
-
-            private NativeScreenInputPositionOverride(object response, PropertyInfo positionProperty, Vector2 position)
+            IInputManager inputManager = InputManagerStaticAccessUnsafe.Current;
+            object response = ScreenInputOverride.ResolveWritableResponse(
+                inputManager != null && inputManager.Screen != null ? inputManager.Screen.Primary : null);
+            if (response == null)
             {
-                _response = response;
-                _positionProperty = positionProperty;
-                _oldPosition = _positionProperty.GetValue(_response, null);
-                SetPosition(position);
+                SocAccessMod.Instance?.LogWarning("TroopHudAdapter could not override native screen input position");
+                return null;
             }
 
-            public static NativeScreenInputPositionOverride Apply(Vector2 position)
-            {
-                object response = ResolveWritablePrimaryResponse();
-                if (response == null)
-                {
-                    SocAccessMod.Instance?.LogWarning("TroopHudAdapter could not override native screen input position");
-                    return null;
-                }
-
-                PropertyInfo positionProperty = AccessTools.Property(response.GetType(), "Position");
-                if (positionProperty == null || !positionProperty.CanWrite)
-                {
-                    SocAccessMod.Instance?.LogWarning("TroopHudAdapter could not override native screen input position because Position was not writable on " + response.GetType().FullName);
-                    return null;
-                }
-
-                return new NativeScreenInputPositionOverride(response, positionProperty, position);
-            }
-
-            public void SetPosition(Vector2 position)
-            {
-                if (_response != null && _positionProperty != null)
-                {
-                    _positionProperty.SetValue(_response, position, null);
-                }
-            }
-
-            public void Dispose()
-            {
-                if (_disposed || _response == null || _positionProperty == null)
-                {
-                    return;
-                }
-
-                _positionProperty.SetValue(_response, _oldPosition, null);
-                _disposed = true;
-            }
-
-            private static object ResolveWritablePrimaryResponse()
-            {
-                IInputManager inputManager = InputManagerStaticAccessUnsafe.Current;
-                object response = inputManager != null && inputManager.Screen != null
-                    ? inputManager.Screen.Primary
-                    : null;
-                if (response == null)
-                {
-                    return null;
-                }
-
-                if (HasWritablePosition(response))
-                {
-                    return response;
-                }
-
-                FieldInfo currentResponseField = AccessTools.Field(response.GetType(), "_currentResponse");
-                object currentResponse = currentResponseField != null ? currentResponseField.GetValue(response) : null;
-                if (HasWritablePosition(currentResponse))
-                {
-                    return currentResponse;
-                }
-
-                FieldInfo mouseResponseField = AccessTools.Field(response.GetType(), "_mouseResponse");
-                object mouseResponse = mouseResponseField != null ? mouseResponseField.GetValue(response) : null;
-                return HasWritablePosition(mouseResponse) ? mouseResponse : null;
-            }
-
-            private static bool HasWritablePosition(object response)
-            {
-                if (response == null)
-                {
-                    return false;
-                }
-
-                PropertyInfo property = AccessTools.Property(response.GetType(), "Position");
-                return property != null && property.CanWrite;
-            }
+            return ScreenInputOverride.ApplyPosition(response, position, "TroopHudAdapter");
         }
     }
 }

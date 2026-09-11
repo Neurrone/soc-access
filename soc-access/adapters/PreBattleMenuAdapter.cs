@@ -77,8 +77,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly PreBattleMenu _menu;
         private AdventureBattleMenu.Settings _settings;
         private bool _settingsProbed;
-        private GameObject _cursorOverlay;
-        private RectTransform[] _cursorOverlaySegments;
+        private readonly FocusedTileOverlay _cursorOverlay = new FocusedTileOverlay("SongsOfConquestAccess_TroopPlacementCursor");
 
         private enum BattleParticipantSide
         {
@@ -298,7 +297,7 @@ namespace SongsOfConquestAccess.Adapters
                     if (tile.Elevation == elevation)
                     {
                         ScannerResult result = new ScannerResult(
-                            ScannerTileKey("terrain:elevated:" + elevation, tile.Point),
+                            ScannerTileKeys.For("terrain:elevated:" + elevation, tile.Point),
                             ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
                             tile.Point)
                         {
@@ -318,7 +317,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (tile.IsImpassable)
                 {
                     ScannerResult result = new ScannerResult(
-                        ScannerTileKey("terrain:impassable", tile.Point),
+                        ScannerTileKeys.For("terrain:impassable", tile.Point),
                         ModText.Get(ModStrings.Scanner.ImpassableTerrain),
                         tile.Point)
                     {
@@ -340,7 +339,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (tile.TroopSide.HasValue && IsOwnSide(placement, tile.TroopSide.Value) == own)
                 {
                     ScannerResult result = new ScannerResult(
-                        ScannerTileKey(own ? "troop:friendly" : "troop:enemy", tile.Point),
+                        ScannerTileKeys.For(own ? "troop:friendly" : "troop:enemy", tile.Point),
                         string.IsNullOrWhiteSpace(tile.TroopLabel) ? ModText.Get(ModStrings.Combat.UnknownTroop) : tile.TroopLabel,
                         tile.Point)
                     {
@@ -356,7 +355,7 @@ namespace SongsOfConquestAccess.Adapters
                     snapshot.Add(
                         ScannerCategoryKeys.Troops,
                         ScannerSubcategoryKeys.All,
-                        CloneResult(result));
+                        result.Clone());
                     snapshot.Add(
                         ScannerCategoryKeys.Troops,
                         own ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy,
@@ -372,7 +371,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (tile.SpawnSide.HasValue && IsOwnSide(placement, tile.SpawnSide.Value) == own)
                 {
                     ScannerResult result = new ScannerResult(
-                        ScannerTileKey(own ? "spawn:friendly" : "spawn:enemy", tile.Point),
+                        ScannerTileKeys.For(own ? "spawn:friendly" : "spawn:enemy", tile.Point),
                         ModText.Get(ModStrings.Spatial.SpawnPoint),
                         tile.Point)
                     {
@@ -391,7 +390,7 @@ namespace SongsOfConquestAccess.Adapters
                     snapshot.Add(
                         ScannerCategoryKeys.SpawnPoints,
                         ScannerSubcategoryKeys.All,
-                        CloneResult(result));
+                        result.Clone());
                     snapshot.Add(
                         ScannerCategoryKeys.SpawnPoints,
                         own ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy,
@@ -418,29 +417,6 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
         }
 
-        private static string ScannerTileKey(string prefix, Vector2Int point)
-        {
-            return prefix + ":" + point.x + ":" + point.y;
-        }
-
-        private static ScannerResult CloneResult(ScannerResult result)
-        {
-            ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
-            {
-                NotVisible = result.NotVisible,
-                Unvisited = result.Unvisited,
-                Attackable = result.Attackable,
-                Relationship = result.Relationship,
-                StableReference = result.StableReference,
-                Kind = result.Kind,
-                ItemKey = result.ItemKey,
-                ItemLabel = result.ItemLabel,
-                InstanceLabel = result.InstanceLabel
-            };
-            clone.Points.AddRange(result.Points);
-            return clone;
-        }
-
         private static string ScannerTroopItemKey(TroopPlacementTile tile)
         {
             if (tile == null || tile.Troop == null || tile.TroopDetailsHidden)
@@ -454,9 +430,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)
         {
-            return result != null && BuildSnapshot().IsValidTile(result.Position)
+            return result != null && IsPlacementTile(result.Position)
                 ? ScannerResultRefresh.Valid(result.Position)
                 : ScannerResultRefresh.Invalid;
+        }
+
+        /// <summary>
+        /// Whether a point is one of the board's tiles, answered from the map and the renderer
+        /// rather than by rebuilding the placement snapshot: the same two questions
+        /// <see cref="BuildSnapshot"/> asks before it puts a tile in.
+        /// </summary>
+        private bool IsPlacementTile(Vector2Int point)
+        {
+            MapFormat map = GetMap();
+            return map != null && GetDeploymentMenu() != null && IsGridTile(map, GetDeploymentRenderer(), point);
         }
 
         public bool TryMoveTroop(Vector2Int source, Vector2Int destination)
@@ -556,6 +543,7 @@ namespace SongsOfConquestAccess.Adapters
         public void Dispose()
         {
             RemoveDeploymentChangedHandler();
+            ClearFocusedTileOverlay();
         }
 
         public void SetFocusedTileOverlay(Vector2Int tile)
@@ -567,14 +555,12 @@ namespace SongsOfConquestAccess.Adapters
 
             try
             {
-                EnsureCursorOverlay();
-                if (_cursorOverlay == null || _cursorOverlaySegments == null)
+                if (!_cursorOverlay.Ensure())
                 {
                     return;
                 }
 
-                SetScreenOverlayPosition(GetScreenPoint(tile));
-                _cursorOverlay.SetActive(true);
+                _cursorOverlay.MoveTo(GetScreenPoint(tile));
             }
             catch (Exception exception)
             {
@@ -584,16 +570,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public void ClearFocusedTileOverlay()
         {
-            if (_cursorOverlay == null)
+            if (!_cursorOverlay.IsCreated)
             {
                 return;
             }
 
             try
             {
-                UnityEngine.Object.Destroy(_cursorOverlay);
-                _cursorOverlay = null;
-                _cursorOverlaySegments = null;
+                _cursorOverlay.Destroy();
             }
             catch (Exception exception)
             {
@@ -700,7 +684,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool CanResolveTile(Vector2Int tile)
         {
-            DeploymentRenderer renderer = GetDeploymentRenderer();
+            return CanResolveTile(GetDeploymentRenderer(), tile);
+        }
+
+        private static bool CanResolveTile(DeploymentRenderer renderer, Vector2Int tile)
+        {
             if (renderer == null)
             {
                 return true;
@@ -745,12 +733,15 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddTiles(TroopPlacementSnapshot snapshot, MapFormat map)
         {
+            // One renderer for the whole board: resolving it walks the menu's controller through
+            // two reflected fields, and this loop runs over every tile of the map.
+            DeploymentRenderer renderer = GetDeploymentRenderer();
             for (int y = 0; y < snapshot.Size.y; y++)
             {
                 for (int x = 0; x < snapshot.Size.x; x++)
                 {
                     Vector2Int point = new Vector2Int(x, y);
-                    if (!IsGridTile(map, point))
+                    if (!IsGridTile(map, renderer, point))
                     {
                         continue;
                     }
@@ -888,10 +879,10 @@ namespace SongsOfConquestAccess.Adapters
             name = SpokenLines.Clean(name);
             if (string.IsNullOrWhiteSpace(name))
             {
-                name = "troops";
+                return string.Empty;
             }
 
-            return size > 0 ? size + " " + name : name;
+            return size > 0 ? ModText.Get(ModStrings.Combat.TroopQuantity, size, name) : name;
         }
 
         private static bool IsOwnSide(TroopPlacementSnapshot snapshot, BattleSide side)
@@ -1125,87 +1116,19 @@ namespace SongsOfConquestAccess.Adapters
             return null;
         }
 
-        private bool IsGridTile(MapFormat map, Vector2Int point)
+        private static bool IsGridTile(MapFormat map, DeploymentRenderer renderer, Vector2Int point)
         {
             if (map == null || !map.IsPointWithinMap(point))
             {
                 return false;
             }
 
-            return CanResolveTile(point);
+            return CanResolveTile(renderer, point);
         }
 
         private static bool IsBlocker(byte value)
         {
             return value == 4 || value == 9 || value == 10 || value == 11;
-        }
-
-        private void EnsureCursorOverlay()
-        {
-            if (_cursorOverlay != null && _cursorOverlaySegments != null)
-            {
-                return;
-            }
-
-            _cursorOverlay = new GameObject("SongsOfConquestAccess_TroopPlacementCursor");
-            Canvas canvas = _cursorOverlay.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            // Keep the cursor above map visuals and the native overlay canvas
-            // (29998), but below native tooltip canvases (30001) and windows.
-            canvas.sortingOrder = 29999;
-            CanvasScaler scaler = _cursorOverlay.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            CanvasGroup canvasGroup = _cursorOverlay.AddComponent<CanvasGroup>();
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.interactable = false;
-
-            _cursorOverlaySegments = new[]
-            {
-                CreateOverlaySegment("Top"),
-                CreateOverlaySegment("Right"),
-                CreateOverlaySegment("Bottom"),
-                CreateOverlaySegment("Left")
-            };
-        }
-
-        private RectTransform CreateOverlaySegment(string name)
-        {
-            GameObject segment = new GameObject(name);
-            segment.transform.SetParent(_cursorOverlay.transform, false);
-            Image image = segment.AddComponent<Image>();
-            image.color = Color.yellow;
-            image.raycastTarget = false;
-            RectTransform rect = segment.GetComponent<RectTransform>();
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.zero;
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            return rect;
-        }
-
-        private void SetScreenOverlayPosition(Vector2 point)
-        {
-            const float size = 42f;
-            const float thickness = 4f;
-            if (_cursorOverlaySegments == null || _cursorOverlaySegments.Length != 4)
-            {
-                return;
-            }
-
-            SetSegment(_cursorOverlaySegments[0], point + new Vector2(0f, size * 0.5f), new Vector2(size, thickness));
-            SetSegment(_cursorOverlaySegments[1], point + new Vector2(size * 0.5f, 0f), new Vector2(thickness, size));
-            SetSegment(_cursorOverlaySegments[2], point + new Vector2(0f, -size * 0.5f), new Vector2(size, thickness));
-            SetSegment(_cursorOverlaySegments[3], point + new Vector2(-size * 0.5f, 0f), new Vector2(thickness, size));
-        }
-
-        private static void SetSegment(RectTransform segment, Vector2 position, Vector2 size)
-        {
-            if (segment == null)
-            {
-                return;
-            }
-
-            segment.anchoredPosition = position;
-            segment.sizeDelta = size;
         }
 
         private Vector2 GetScreenPoint(Vector2Int tile)

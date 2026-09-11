@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -421,16 +421,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public int GetCurrentTroopId()
         {
-            try
-            {
-                return _facade != null && _facade.Troops != null && _facade.Troops.Current != null
-                    ? _facade.Troops.Current.Id
-                    : -1;
-            }
-            catch
-            {
-                return -1;
-            }
+            return BattleFacadeState.CurrentTroopId(_facade);
         }
 
         public bool IsQueueMenuVisible()
@@ -823,14 +814,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private int GetCurrentRound()
         {
-            try
-            {
-                return _facade != null && _facade.Queue != null ? _facade.Queue.CurrentRound : 0;
-            }
-            catch
-            {
-                return 0;
-            }
+            return BattleFacadeState.CurrentRound(_facade);
         }
 
         private int GetTurnsLeftInRound()
@@ -926,25 +910,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private int GetLocalTeamId()
         {
-            try
-            {
-                if (_facade == null || _facade.Teams == null)
-                {
-                    return -1;
-                }
-
-                int localTeamId = _facade.Teams.LocalTeamIdInControl;
-                if (localTeamId >= 0)
-                {
-                    return localTeamId;
-                }
-
-                return _facade.Teams.Current != null ? _facade.Teams.Current.Id : -1;
-            }
-            catch
-            {
-                return -1;
-            }
+            return BattleFacadeState.LocalTeamId(_facade);
         }
 
         private UIButton GetQuickbarEntryButton(QuickbarEntry entry)

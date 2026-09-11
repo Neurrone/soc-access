@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using UnityEngine;
@@ -121,6 +121,29 @@ namespace SongsOfConquestAccess.Scanner
         public object StableReference { get; set; }
 
         public List<Vector2Int> Points { get; private set; }
+
+        /// <summary>
+        /// A copy carrying every field, for the snapshots that file one result
+        /// under several categories and must not share one object between them.
+        /// </summary>
+        public ScannerResult Clone()
+        {
+            ScannerResult clone = new ScannerResult(Key, Label, Position)
+            {
+                NotVisible = NotVisible,
+                Unvisited = Unvisited,
+                Attackable = Attackable,
+                Relationship = Relationship,
+                StableReference = StableReference,
+                Kind = Kind,
+                ItemKey = ItemKey,
+                ItemLabel = ItemLabel,
+                InstanceLabel = InstanceLabel,
+                EntityCategory = EntityCategory
+            };
+            clone.Points.AddRange(Points);
+            return clone;
+        }
 
         /// <summary>
         /// Takes the position the adapter reported on the last re-query, which

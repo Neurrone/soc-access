@@ -99,8 +99,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FieldInfo _attackPreviewKillsContainerField;
         private readonly FieldInfo _attackPreviewKillsTextField;
         private readonly FieldInfo _attackPreviewAdditionalTextField;
-        private GameObject _cursorOverlay;
-        private RectTransform[] _cursorOverlaySegments;
+        private readonly FocusedTileOverlay _cursorOverlay = new FocusedTileOverlay("SongsOfConquestAccess_CombatCursor");
         private Action<ISpellDefinition, string> _targetInstructionHandler;
         private Action _spellTargetingEndHandler;
         private Action<ISpellDefinition> _beginCastHandler;
@@ -344,21 +343,13 @@ namespace SongsOfConquestAccess.Adapters
         public void Dispose()
         {
             DetachAbilityTargetingBegin();
+            ClearFocusedTileOverlay();
             EndCombat();
         }
 
         public int GetCurrentTroopId()
         {
-            try
-            {
-                return _facade != null && _facade.Troops != null && _facade.Troops.Current != null
-                    ? _facade.Troops.Current.Id
-                    : -1;
-            }
-            catch
-            {
-                return -1;
-            }
+            return BattleFacadeState.CurrentTroopId(_facade);
         }
 
         public bool IsLocalTurn()
@@ -550,7 +541,7 @@ namespace SongsOfConquestAccess.Adapters
                     if (tile.Troop != null && IsFriendlyTroop(tile.Troop) == friendly)
                     {
                         ScannerResult result = new ScannerResult(
-                            ScannerTileKey(friendly ? "troop:friendly" : "troop:enemy", point),
+                            ScannerTileKeys.For(friendly ? "troop:friendly" : "troop:enemy", point),
                             FormatTroopGridLabel(tile.Troop),
                             point)
                         {
@@ -564,7 +555,7 @@ namespace SongsOfConquestAccess.Adapters
                                 : ScannerResultRelationship.Enemy,
                             Attackable = tile.IsTroopAttackable
                         };
-                        snapshot.Add(ScannerCategoryKeys.Troops, ScannerSubcategoryKeys.All, CloneResult(result));
+                        snapshot.Add(ScannerCategoryKeys.Troops, ScannerSubcategoryKeys.All, result.Clone());
                         snapshot.Add(ScannerCategoryKeys.Troops, friendly ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy, result);
                     }
                 }
@@ -591,7 +582,7 @@ namespace SongsOfConquestAccess.Adapters
                         {
                             bool friendlyGate = IsFriendlyMapEntity(mapEntity);
                             ScannerResult result = new ScannerResult(
-                                ScannerTileKey(friendlyGate ? "gate:friendly" : "gate:enemy", point),
+                                ScannerTileKeys.For(friendlyGate ? "gate:friendly" : "gate:enemy", point),
                                 GetMapEntityName(mapEntity),
                                 point)
                             {
@@ -600,13 +591,13 @@ namespace SongsOfConquestAccess.Adapters
                                     : ScannerResultRelationship.Enemy,
                                 Attackable = tile.IsEntityAttackable
                             };
-                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
+                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, result.Clone());
                             snapshot.Add(ScannerCategoryKeys.Entities, friendlyGate ? ScannerSubcategoryKeys.FriendlyGates : ScannerSubcategoryKeys.EnemyGates, result);
                         }
                         else if (tile.Entity != null)
                         {
                             ScannerResult result = new ScannerResult(
-                                ScannerTileKey("entity:attackable", point),
+                                ScannerTileKeys.For("entity:attackable", point),
                                 GetMapEntityName(tile.Entity),
                                 point)
                             {
@@ -616,16 +607,16 @@ namespace SongsOfConquestAccess.Adapters
                                 // and the one worth answering per result.
                                 Attackable = tile.IsEntityAttackable
                             };
-                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
+                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, result.Clone());
                             snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.Attackable, result);
                         }
                         else if (tile.MapEffects.Count > 0)
                         {
                             ScannerResult result = new ScannerResult(
-                                ScannerTileKey("entity:dangerous", point),
+                                ScannerTileKeys.For("entity:dangerous", point),
                                 GetMapEntityName(mapEntity),
                                 point);
-                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
+                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, result.Clone());
                             snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.Dangerous, result);
                         }
                     }
@@ -651,7 +642,7 @@ namespace SongsOfConquestAccess.Adapters
                         if (tile.Elevation == elevation)
                         {
                             ScannerResult result = new ScannerResult(
-                                ScannerTileKey("terrain:elevated:" + elevation, point),
+                                ScannerTileKeys.For("terrain:elevated:" + elevation, point),
                                 ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
                                 point)
                             {
@@ -678,7 +669,7 @@ namespace SongsOfConquestAccess.Adapters
                     if (tile.IsImpassable)
                     {
                         ScannerResult result = new ScannerResult(
-                            ScannerTileKey("terrain:impassable", point),
+                            ScannerTileKeys.For("terrain:impassable", point),
                             ModText.Get(ModStrings.Scanner.ImpassableTerrain),
                             point)
                         {
@@ -694,7 +685,7 @@ namespace SongsOfConquestAccess.Adapters
                             ScannerCategoryKeys.Terrain,
                             ScannerSubcategoryKeys.All,
                             new ScannerResult(
-                                ScannerTileKey("obstacle:blocked", point),
+                                ScannerTileKeys.For("obstacle:blocked", point),
                                 ModText.Get(ModStrings.Scanner.Blocked),
                                 point)
                             {
@@ -703,29 +694,6 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
             }
-        }
-
-        private static string ScannerTileKey(string prefix, Vector2Int point)
-        {
-            return prefix + ":" + point.x + ":" + point.y;
-        }
-
-        private static ScannerResult CloneResult(ScannerResult result)
-        {
-            ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
-            {
-                NotVisible = result.NotVisible,
-                Unvisited = result.Unvisited,
-                Attackable = result.Attackable,
-                Relationship = result.Relationship,
-                StableReference = result.StableReference,
-                Kind = result.Kind,
-                ItemKey = result.ItemKey,
-                ItemLabel = result.ItemLabel,
-                InstanceLabel = result.InstanceLabel
-            };
-            clone.Points.AddRange(result.Points);
-            return clone;
         }
 
         /// <summary>
@@ -1560,14 +1528,12 @@ namespace SongsOfConquestAccess.Adapters
 
             try
             {
-                EnsureCursorOverlay();
-                if (_cursorOverlay == null || _cursorOverlaySegments == null)
+                if (!_cursorOverlay.Ensure())
                 {
                     return;
                 }
 
-                SetScreenOverlayPosition(GetScreenPoint(tile));
-                _cursorOverlay.SetActive(true);
+                _cursorOverlay.MoveTo(GetScreenPoint(tile));
             }
             catch (Exception exception)
             {
@@ -1577,16 +1543,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public void ClearFocusedTileOverlay()
         {
-            if (_cursorOverlay == null)
+            if (!_cursorOverlay.IsCreated)
             {
                 return;
             }
 
             try
             {
-                UnityEngine.Object.Destroy(_cursorOverlay);
-                _cursorOverlay = null;
-                _cursorOverlaySegments = null;
+                _cursorOverlay.Destroy();
             }
             catch (Exception exception)
             {
@@ -1800,7 +1764,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            object response = ResolveWritableScreenInputResponse(_inputManager.Screen.Primary);
+            object response = ScreenInputOverride.ResolveWritableResponse(_inputManager.Screen.Primary);
             if (response == null)
             {
                 SocAccessMod.Instance?.LogWarning("CombatAdapter could not override native screen input because no writable ScreenInputResponse could be resolved from " + _inputManager.Screen.Primary.GetType().FullName);
@@ -1817,40 +1781,8 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            screenInputOverride = ScreenInputOverride.Apply(response, screenPosition);
+            screenInputOverride = ScreenInputOverride.ApplyMouseClick(response, screenPosition, "CombatAdapter");
             return screenInputOverride != null;
-        }
-
-        private static object ResolveWritableScreenInputResponse(object response)
-        {
-            if (response == null)
-            {
-                return null;
-            }
-
-            PropertyInfo positionProperty = AccessTools.Property(response.GetType(), "Position");
-            if (positionProperty != null && positionProperty.CanWrite)
-            {
-                return response;
-            }
-
-            FieldInfo currentResponseField = AccessTools.Field(response.GetType(), "_currentResponse");
-            object currentResponse = currentResponseField != null ? currentResponseField.GetValue(response) : null;
-            positionProperty = currentResponse != null ? AccessTools.Property(currentResponse.GetType(), "Position") : null;
-            if (positionProperty != null && positionProperty.CanWrite)
-            {
-                return currentResponse;
-            }
-
-            FieldInfo mouseResponseField = AccessTools.Field(response.GetType(), "_mouseResponse");
-            object mouseResponse = mouseResponseField != null ? mouseResponseField.GetValue(response) : null;
-            positionProperty = mouseResponse != null ? AccessTools.Property(mouseResponse.GetType(), "Position") : null;
-            if (positionProperty != null && positionProperty.CanWrite)
-            {
-                return mouseResponse;
-            }
-
-            return null;
         }
 
         private CombatInspectContext BeginStackInspect(IBattleTroopState troop)
@@ -2840,25 +2772,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private int GetLocalTeamId()
         {
-            try
-            {
-                if (_facade == null || _facade.Teams == null)
-                {
-                    return -1;
-                }
-
-                int localTeamId = _facade.Teams.LocalTeamIdInControl;
-                if (localTeamId >= 0)
-                {
-                    return localTeamId;
-                }
-
-                return _facade.Teams.Current != null ? _facade.Teams.Current.Id : -1;
-            }
-            catch
-            {
-                return -1;
-            }
+            return BattleFacadeState.LocalTeamId(_facade);
         }
 
         private CombatHudSide? GetLocalCombatHudSide()
@@ -2940,14 +2854,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public int GetCurrentRound()
         {
-            try
-            {
-                return _facade != null && _facade.Queue != null ? _facade.Queue.CurrentRound : 0;
-            }
-            catch
-            {
-                return 0;
-            }
+            return BattleFacadeState.CurrentRound(_facade);
         }
 
         public IReadOnlyList<int> GetLocalActingTroopIds()
@@ -3193,175 +3100,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return new Vector3(tile.x, 0f, tile.y);
-        }
-
-        private void EnsureCursorOverlay()
-        {
-            if (_cursorOverlay != null && _cursorOverlaySegments != null)
-            {
-                return;
-            }
-
-            _cursorOverlay = new GameObject("SongsOfConquestAccess_CombatCursor");
-            Canvas canvas = _cursorOverlay.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            // Keep the cursor above map visuals and the native overlay canvas
-            // (29998), but below native tooltip canvases (30001) and windows.
-            canvas.sortingOrder = 29999;
-            CanvasScaler scaler = _cursorOverlay.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            CanvasGroup canvasGroup = _cursorOverlay.AddComponent<CanvasGroup>();
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.interactable = false;
-
-            _cursorOverlaySegments = new[]
-            {
-                CreateOverlaySegment("Top"),
-                CreateOverlaySegment("Right"),
-                CreateOverlaySegment("Bottom"),
-                CreateOverlaySegment("Left")
-            };
-        }
-
-        private RectTransform CreateOverlaySegment(string name)
-        {
-            GameObject segment = new GameObject(name);
-            segment.transform.SetParent(_cursorOverlay.transform, false);
-            Image image = segment.AddComponent<Image>();
-            image.color = Color.yellow;
-            image.raycastTarget = false;
-            RectTransform rect = segment.GetComponent<RectTransform>();
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.zero;
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            return rect;
-        }
-
-        private void SetScreenOverlayPosition(Vector2 point)
-        {
-            const float size = 42f;
-            const float thickness = 4f;
-            if (_cursorOverlaySegments == null || _cursorOverlaySegments.Length != 4)
-            {
-                return;
-            }
-
-            SetSegment(_cursorOverlaySegments[0], point + new Vector2(0f, size * 0.5f), new Vector2(size, thickness));
-            SetSegment(_cursorOverlaySegments[1], point + new Vector2(size * 0.5f, 0f), new Vector2(thickness, size));
-            SetSegment(_cursorOverlaySegments[2], point + new Vector2(0f, -size * 0.5f), new Vector2(size, thickness));
-            SetSegment(_cursorOverlaySegments[3], point + new Vector2(-size * 0.5f, 0f), new Vector2(thickness, size));
-        }
-
-        private static void SetSegment(RectTransform segment, Vector2 position, Vector2 size)
-        {
-            if (segment == null)
-            {
-                return;
-            }
-
-            segment.anchoredPosition = position;
-            segment.sizeDelta = size;
-        }
-
-        private sealed class ScreenInputOverride
-        {
-            private readonly object _response;
-            private readonly PropertyInfo _positionProperty;
-            private readonly PropertyInfo _deltaProperty;
-            private readonly PropertyInfo _isOverUIProperty;
-            private readonly PropertyInfo _isPanningProperty;
-            private readonly PropertyInfo _wasActivatedOverUIProperty;
-            private readonly object _oldPosition;
-            private readonly object _oldDelta;
-            private readonly object _oldIsOverUI;
-            private readonly object _oldIsPanning;
-            private readonly object _oldWasActivatedOverUI;
-            private bool _restored;
-
-            private ScreenInputOverride(
-                object response,
-                Vector2 screenPosition,
-                PropertyInfo positionProperty,
-                PropertyInfo deltaProperty,
-                PropertyInfo isOverUIProperty,
-                PropertyInfo isPanningProperty,
-                PropertyInfo wasActivatedOverUIProperty)
-            {
-                _response = response;
-                ScreenPosition = screenPosition;
-                _positionProperty = positionProperty;
-                _deltaProperty = deltaProperty;
-                _isOverUIProperty = isOverUIProperty;
-                _isPanningProperty = isPanningProperty;
-                _wasActivatedOverUIProperty = wasActivatedOverUIProperty;
-                _oldPosition = _positionProperty.GetValue(_response, null);
-                _oldDelta = _deltaProperty.GetValue(_response, null);
-                _oldIsOverUI = _isOverUIProperty.GetValue(_response, null);
-                _oldIsPanning = _isPanningProperty.GetValue(_response, null);
-                _oldWasActivatedOverUI = _wasActivatedOverUIProperty.GetValue(_response, null);
-
-                _positionProperty.SetValue(_response, screenPosition, null);
-                _deltaProperty.SetValue(_response, Vector2.zero, null);
-                _isOverUIProperty.SetValue(_response, false, null);
-                _isPanningProperty.SetValue(_response, false, null);
-                _wasActivatedOverUIProperty.SetValue(_response, false, null);
-            }
-
-            public Vector2 ScreenPosition { get; private set; }
-
-            public static ScreenInputOverride Apply(object response, Vector2 screenPosition)
-            {
-                if (response == null)
-                {
-                    return null;
-                }
-
-                Type responseType = response.GetType();
-                PropertyInfo positionProperty = GetWritableProperty(responseType, "Position");
-                PropertyInfo deltaProperty = GetWritableProperty(responseType, "Delta");
-                PropertyInfo isOverUIProperty = GetWritableProperty(responseType, "IsOverUI");
-                PropertyInfo isPanningProperty = GetWritableProperty(responseType, "IsPanning");
-                PropertyInfo wasActivatedOverUIProperty = GetWritableProperty(responseType, "WasActivatedOverUI");
-                if (positionProperty == null
-                    || deltaProperty == null
-                    || isOverUIProperty == null
-                    || isPanningProperty == null
-                    || wasActivatedOverUIProperty == null)
-                {
-                    SocAccessMod.Instance?.LogWarning("CombatAdapter could not override native screen input because required writable properties were missing on " + responseType.FullName);
-                    return null;
-                }
-
-                return new ScreenInputOverride(
-                    response,
-                    screenPosition,
-                    positionProperty,
-                    deltaProperty,
-                    isOverUIProperty,
-                    isPanningProperty,
-                    wasActivatedOverUIProperty);
-            }
-
-            public void Restore()
-            {
-                if (_restored)
-                {
-                    return;
-                }
-
-                _positionProperty.SetValue(_response, _oldPosition, null);
-                _deltaProperty.SetValue(_response, _oldDelta, null);
-                _isOverUIProperty.SetValue(_response, _oldIsOverUI, null);
-                _isPanningProperty.SetValue(_response, _oldIsPanning, null);
-                _wasActivatedOverUIProperty.SetValue(_response, _oldWasActivatedOverUI, null);
-                _restored = true;
-            }
-
-            private static PropertyInfo GetWritableProperty(Type type, string name)
-            {
-                PropertyInfo property = AccessTools.Property(type, name);
-                return property != null && property.CanWrite ? property : null;
-            }
         }
 
         private static PathNode[] ToArray(IEnumerable<PathNode> nodes)
