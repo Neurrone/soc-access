@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Lavapotion.Utilities;
 using SongsOfConquest.Client;
@@ -495,84 +495,83 @@ namespace SongsOfConquestAccess.UI
                 return ChangeLookAroundRadius(-LookAroundRadiusStep);
             }
 
-            ScannerQuickKey quickKey;
+            int slot;
             int delta;
-            if (TryGetCustomEntryKey(action.Key, out quickKey, out delta))
+            if (TryGetCustomEntrySlot(action.Key, out slot, out delta))
             {
-                return MoveCustomCategoryEntry(quickKey, delta);
+                return MoveCustomCategoryEntry(slot, delta);
             }
 
             return false;
         }
 
         /// <summary>
-        /// Steps the custom category the player put on this key. A key nobody
-        /// has taken says so rather than falling silent, because a dead
-        /// keypress reads as the mod having missed it.
+        /// Steps the custom category in the slot this key walks. An empty slot
+        /// says so rather than falling silent, because a dead keypress reads as
+        /// the mod having missed it.
         /// </summary>
-        private bool MoveCustomCategoryEntry(ScannerQuickKey quickKey, int delta)
+        private bool MoveCustomCategoryEntry(int slot, int delta)
         {
-            ScannerCustomCategory category = ModSettings.GetScannerCustomCategoryByQuickKey(
-                ScannerTaxonomyKeys.Adventure,
-                quickKey);
-            if (category == null)
+            if (ModSettings.GetScannerCustomCategory(ScannerTaxonomyKeys.Adventure, slot) == null)
             {
                 SpeechPipeline.Output(new SpeechRequest(
-                    ModText.Get(ModStrings.Scanner.NoCustomCategoryOnKey, ScannerQuickKeyText.Name(quickKey)),
+                    ModText.Get(ModStrings.Scanner.CustomCategoryEmpty, slot + 1),
                     interrupt: false));
                 return true;
             }
 
             return HandleScannerNavigationResult(_scanner.ExecuteMoveCustomCategoryEntry(
-                ScannerCustomCategorySynthesizer.CategoryKeyFor(category.Id),
+                ScannerCustomCategorySynthesizer.CategoryKeyFor(slot),
                 delta));
         }
 
-        private static bool TryGetCustomEntryKey(string actionKey, out ScannerQuickKey quickKey, out int delta)
+        /// <summary>Comma walks slot 1, period slot 2 and slash slot 3; Shift
+        /// walks each of them backwards.</summary>
+        private static bool TryGetCustomEntrySlot(string actionKey, out int slot, out int delta)
         {
             if (actionKey == AccessibilityActions.ScannerNextCustomEntryComma.Key)
             {
-                quickKey = ScannerQuickKey.Comma;
+                slot = 0;
                 delta = 1;
                 return true;
             }
 
             if (actionKey == AccessibilityActions.ScannerPreviousCustomEntryComma.Key)
             {
-                quickKey = ScannerQuickKey.Comma;
+                slot = 0;
                 delta = -1;
                 return true;
             }
 
             if (actionKey == AccessibilityActions.ScannerNextCustomEntryPeriod.Key)
             {
-                quickKey = ScannerQuickKey.Period;
+                slot = 1;
                 delta = 1;
                 return true;
             }
 
             if (actionKey == AccessibilityActions.ScannerPreviousCustomEntryPeriod.Key)
             {
-                quickKey = ScannerQuickKey.Period;
+                slot = 1;
                 delta = -1;
                 return true;
             }
 
             if (actionKey == AccessibilityActions.ScannerNextCustomEntrySlash.Key)
             {
-                quickKey = ScannerQuickKey.Slash;
+                slot = 2;
                 delta = 1;
                 return true;
             }
 
             if (actionKey == AccessibilityActions.ScannerPreviousCustomEntrySlash.Key)
             {
-                quickKey = ScannerQuickKey.Slash;
+                slot = 2;
                 delta = -1;
                 return true;
             }
 
-            quickKey = ScannerQuickKey.None;
+            slot = -1;
             delta = 0;
             return false;
         }
@@ -809,9 +808,9 @@ namespace SongsOfConquestAccess.UI
 
         private static bool IsCustomEntryAction(string actionKey)
         {
-            ScannerQuickKey quickKey;
+            int slot;
             int delta;
-            return TryGetCustomEntryKey(actionKey, out quickKey, out delta);
+            return TryGetCustomEntrySlot(actionKey, out slot, out delta);
         }
 
         private static bool IsBookmarkAction(string actionKey)

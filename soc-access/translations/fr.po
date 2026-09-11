@@ -1140,11 +1140,6 @@ msgctxt "Common.TileCount_1"
 msgid "{0} tiles"
 msgstr "{0} cases"
 
-#. Screens.AddCustomCategory
-msgctxt "Screens.AddCustomCategory"
-msgid "Add custom category"
-msgstr "Ajouter une catégorie personnalisée"
-
 #. Screens.Add
 msgctxt "Screens.Add"
 msgid "Add"
@@ -2782,16 +2777,6 @@ msgctxt "Screens.CustomCategoryDefaultName"
 msgid "Custom {0}"
 msgstr "Personnalisée {0}"
 
-#. Screens.CustomCategoryDeleted
-msgctxt "Screens.CustomCategoryDeleted"
-msgid "{0} deleted"
-msgstr "{0} supprimée"
-
-#. Screens.DeleteCustomCategory
-msgctxt "Screens.DeleteCustomCategory"
-msgid "Delete this custom category"
-msgstr "Supprimer cette catégorie personnalisée"
-
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
 msgid "Cancel ability"
@@ -3672,33 +3657,13 @@ msgstr "{0} sélectionnées"
 
 #. Actions.ScannerNextCustomEntry
 msgctxt "Actions.ScannerNextCustomEntry"
-msgid "Next Entry In The Custom Category On {0}"
-msgstr "Entrée suivante de la catégorie personnalisée sur {0}"
+msgid "Move to next result in custom category {0}"
+msgstr "Aller au résultat suivant de la catégorie personnalisée {0}"
 
 #. Actions.ScannerPreviousCustomEntry
 msgctxt "Actions.ScannerPreviousCustomEntry"
-msgid "Previous Entry In The Custom Category On {0}"
-msgstr "Entrée précédente de la catégorie personnalisée sur {0}"
-
-#. Screens.CustomCategoryKey
-msgctxt "Screens.CustomCategoryKey"
-msgid "Key, {0}"
-msgstr "Touche, {0}"
-
-#. Screens.CustomCategoryKeyCurrent
-msgctxt "Screens.CustomCategoryKeyCurrent"
-msgid "{0}, current"
-msgstr "{0}, actuelle"
-
-#. Screens.CustomCategoryKeyHeldBy
-msgctxt "Screens.CustomCategoryKeyHeldBy"
-msgid "{0}, held by {1}"
-msgstr "{0}, attribuée à {1}"
-
-#. Screens.CustomCategoryKeyTitle
-msgctxt "Screens.CustomCategoryKeyTitle"
-msgid "Key for {0}"
-msgstr "Touche pour {0}"
+msgid "Move to previous result in custom category {0}"
+msgstr "Aller au résultat précédent de la catégorie personnalisée {0}"
 
 #. Screens.CustomCategoryName
 msgctxt "Screens.CustomCategoryName"
@@ -3729,31 +3694,6 @@ msgstr "Nom déjà utilisé"
 msgctxt "Screens.Cursor"
 msgid "Cursor"
 msgstr "Curseur"
-
-#. Scanner.NoCustomCategoryOnKey
-msgctxt "Scanner.NoCustomCategoryOnKey"
-msgid "No custom category on {0}"
-msgstr "Aucune catégorie personnalisée sur {0}"
-
-#. Scanner.QuickKeyComma
-msgctxt "Scanner.QuickKeyComma"
-msgid "Comma"
-msgstr "Virgule"
-
-#. Scanner.QuickKeyNone
-msgctxt "Scanner.QuickKeyNone"
-msgid "None"
-msgstr "Aucune"
-
-#. Scanner.QuickKeyPeriod
-msgctxt "Scanner.QuickKeyPeriod"
-msgid "Period"
-msgstr "Point"
-
-#. Scanner.QuickKeySlash
-msgctxt "Scanner.QuickKeySlash"
-msgid "Slash"
-msgstr "Barre oblique"
 
 
 #. UI.RoleCheckbox
@@ -3830,3 +3770,29 @@ msgstr "Envoi du rapport..."
 msgctxt "Screens.BugReportSearchResult"
 msgid "{0}, {1}, {2}"
 msgstr "{0}, {1}, {2}"
+
+#. Screens.ClearCustomCategory
+msgctxt "Screens.ClearCustomCategory"
+msgid "Clear this custom category"
+msgstr "Vider cette catégorie personnalisée"
+
+#. Screens.CustomCategoryCleared
+msgctxt "Screens.CustomCategoryCleared"
+msgid "Custom category {0} cleared"
+msgstr "Catégorie personnalisée {0} vidée"
+
+#. Screens.CustomCategorySlot
+msgctxt "Screens.CustomCategorySlot"
+msgid "Custom category {0}: {1}"
+msgstr "Catégorie personnalisée {0} : {1}"
+
+#. Screens.CustomCategorySlotEmpty
+msgctxt "Screens.CustomCategorySlotEmpty"
+msgid "empty"
+msgstr "vide"
+
+#. Scanner.CustomCategoryEmpty
+msgctxt "Scanner.CustomCategoryEmpty"
+msgid "Custom category {0} is empty"
+msgstr "La catégorie personnalisée {0} est vide"
+

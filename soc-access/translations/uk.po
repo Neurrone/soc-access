@@ -1150,11 +1150,6 @@ msgctxt "Screens.Wielders"
 msgid "Wielders"
 msgstr "Герої"
 
-#. Screens.AddCustomCategory
-msgctxt "Screens.AddCustomCategory"
-msgid "Add custom category"
-msgstr "Додати власну категорію"
-
 #. Screens.Add
 msgctxt "Screens.Add"
 msgid "Add"
@@ -2802,16 +2797,6 @@ msgctxt "Screens.CustomCategoryDefaultName"
 msgid "Custom {0}"
 msgstr "Власна {0}"
 
-#. Screens.CustomCategoryDeleted
-msgctxt "Screens.CustomCategoryDeleted"
-msgid "{0} deleted"
-msgstr "{0} видалено"
-
-#. Screens.DeleteCustomCategory
-msgctxt "Screens.DeleteCustomCategory"
-msgid "Delete this custom category"
-msgstr "Видалити цю власну категорію"
-
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
 msgid "Cancel ability"
@@ -3702,33 +3687,13 @@ msgstr "{0} вибрано"
 
 #. Actions.ScannerNextCustomEntry
 msgctxt "Actions.ScannerNextCustomEntry"
-msgid "Next Entry In The Custom Category On {0}"
-msgstr "Наступний запис у власній категорії на {0}"
+msgid "Move to next result in custom category {0}"
+msgstr "До наступного результату у власній категорії {0}"
 
 #. Actions.ScannerPreviousCustomEntry
 msgctxt "Actions.ScannerPreviousCustomEntry"
-msgid "Previous Entry In The Custom Category On {0}"
-msgstr "Попередній запис у власній категорії на {0}"
-
-#. Screens.CustomCategoryKey
-msgctxt "Screens.CustomCategoryKey"
-msgid "Key, {0}"
-msgstr "Клавіша, {0}"
-
-#. Screens.CustomCategoryKeyCurrent
-msgctxt "Screens.CustomCategoryKeyCurrent"
-msgid "{0}, current"
-msgstr "{0}, поточна"
-
-#. Screens.CustomCategoryKeyHeldBy
-msgctxt "Screens.CustomCategoryKeyHeldBy"
-msgid "{0}, held by {1}"
-msgstr "{0}, зайнята категорією {1}"
-
-#. Screens.CustomCategoryKeyTitle
-msgctxt "Screens.CustomCategoryKeyTitle"
-msgid "Key for {0}"
-msgstr "Клавіша для {0}"
+msgid "Move to previous result in custom category {0}"
+msgstr "До попереднього результату у власній категорії {0}"
 
 #. Screens.CustomCategoryName
 msgctxt "Screens.CustomCategoryName"
@@ -3759,31 +3724,6 @@ msgstr "Ім'я вже використовується"
 msgctxt "Screens.Cursor"
 msgid "Cursor"
 msgstr "Курсор"
-
-#. Scanner.NoCustomCategoryOnKey
-msgctxt "Scanner.NoCustomCategoryOnKey"
-msgid "No custom category on {0}"
-msgstr "На {0} немає власної категорії"
-
-#. Scanner.QuickKeyComma
-msgctxt "Scanner.QuickKeyComma"
-msgid "Comma"
-msgstr "Кома"
-
-#. Scanner.QuickKeyNone
-msgctxt "Scanner.QuickKeyNone"
-msgid "None"
-msgstr "Немає"
-
-#. Scanner.QuickKeyPeriod
-msgctxt "Scanner.QuickKeyPeriod"
-msgid "Period"
-msgstr "Крапка"
-
-#. Scanner.QuickKeySlash
-msgctxt "Scanner.QuickKeySlash"
-msgid "Slash"
-msgstr "Скісна риска"
 
 
 #. UI.RoleCheckbox
@@ -3860,3 +3800,29 @@ msgstr "Надсилання звіту..."
 msgctxt "Screens.BugReportSearchResult"
 msgid "{0}, {1}, {2}"
 msgstr "{0}, {1}, {2}"
+
+#. Screens.ClearCustomCategory
+msgctxt "Screens.ClearCustomCategory"
+msgid "Clear this custom category"
+msgstr "Очистити цю власну категорію"
+
+#. Screens.CustomCategoryCleared
+msgctxt "Screens.CustomCategoryCleared"
+msgid "Custom category {0} cleared"
+msgstr "Власну категорію {0} очищено"
+
+#. Screens.CustomCategorySlot
+msgctxt "Screens.CustomCategorySlot"
+msgid "Custom category {0}: {1}"
+msgstr "Власна категорія {0}: {1}"
+
+#. Screens.CustomCategorySlotEmpty
+msgctxt "Screens.CustomCategorySlotEmpty"
+msgid "empty"
+msgstr "порожня"
+
+#. Scanner.CustomCategoryEmpty
+msgctxt "Scanner.CustomCategoryEmpty"
+msgid "Custom category {0} is empty"
+msgstr "Власна категорія {0} порожня"
+

@@ -1130,11 +1130,6 @@ msgctxt "Screens.Wielders"
 msgid "Wielders"
 msgstr "持有者"
 
-#. Screens.AddCustomCategory
-msgctxt "Screens.AddCustomCategory"
-msgid "Add custom category"
-msgstr "新增自訂類別"
-
 #. Screens.Add
 msgctxt "Screens.Add"
 msgid "Add"
@@ -2762,16 +2757,6 @@ msgctxt "Screens.CustomCategoryDefaultName"
 msgid "Custom {0}"
 msgstr "自訂 {0}"
 
-#. Screens.CustomCategoryDeleted
-msgctxt "Screens.CustomCategoryDeleted"
-msgid "{0} deleted"
-msgstr "已刪除 {0}"
-
-#. Screens.DeleteCustomCategory
-msgctxt "Screens.DeleteCustomCategory"
-msgid "Delete this custom category"
-msgstr "刪除此自訂類別"
-
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
 msgid "Cancel ability"
@@ -3642,33 +3627,13 @@ msgstr "已選 {0} 項"
 
 #. Actions.ScannerNextCustomEntry
 msgctxt "Actions.ScannerNextCustomEntry"
-msgid "Next Entry In The Custom Category On {0}"
-msgstr "{0}上自訂類別的下一項"
+msgid "Move to next result in custom category {0}"
+msgstr "移動到自訂類別 {0} 的下一個結果"
 
 #. Actions.ScannerPreviousCustomEntry
 msgctxt "Actions.ScannerPreviousCustomEntry"
-msgid "Previous Entry In The Custom Category On {0}"
-msgstr "{0}上自訂類別的上一項"
-
-#. Screens.CustomCategoryKey
-msgctxt "Screens.CustomCategoryKey"
-msgid "Key, {0}"
-msgstr "按鍵，{0}"
-
-#. Screens.CustomCategoryKeyCurrent
-msgctxt "Screens.CustomCategoryKeyCurrent"
-msgid "{0}, current"
-msgstr "{0}，目前"
-
-#. Screens.CustomCategoryKeyHeldBy
-msgctxt "Screens.CustomCategoryKeyHeldBy"
-msgid "{0}, held by {1}"
-msgstr "{0}，已指派給{1}"
-
-#. Screens.CustomCategoryKeyTitle
-msgctxt "Screens.CustomCategoryKeyTitle"
-msgid "Key for {0}"
-msgstr "{0}的按鍵"
+msgid "Move to previous result in custom category {0}"
+msgstr "移動到自訂類別 {0} 的上一個結果"
 
 #. Screens.CustomCategoryName
 msgctxt "Screens.CustomCategoryName"
@@ -3699,31 +3664,6 @@ msgstr "名稱已被使用"
 msgctxt "Screens.Cursor"
 msgid "Cursor"
 msgstr "游標"
-
-#. Scanner.NoCustomCategoryOnKey
-msgctxt "Scanner.NoCustomCategoryOnKey"
-msgid "No custom category on {0}"
-msgstr "{0}上沒有自訂類別"
-
-#. Scanner.QuickKeyComma
-msgctxt "Scanner.QuickKeyComma"
-msgid "Comma"
-msgstr "逗號"
-
-#. Scanner.QuickKeyNone
-msgctxt "Scanner.QuickKeyNone"
-msgid "None"
-msgstr "無"
-
-#. Scanner.QuickKeyPeriod
-msgctxt "Scanner.QuickKeyPeriod"
-msgid "Period"
-msgstr "句號"
-
-#. Scanner.QuickKeySlash
-msgctxt "Scanner.QuickKeySlash"
-msgid "Slash"
-msgstr "斜線"
 
 
 #. UI.RoleCheckbox
@@ -3800,3 +3740,29 @@ msgstr "正在傳送報告..."
 msgctxt "Screens.BugReportSearchResult"
 msgid "{0}, {1}, {2}"
 msgstr "{0}，{1}，{2}"
+
+#. Screens.ClearCustomCategory
+msgctxt "Screens.ClearCustomCategory"
+msgid "Clear this custom category"
+msgstr "清空此自訂類別"
+
+#. Screens.CustomCategoryCleared
+msgctxt "Screens.CustomCategoryCleared"
+msgid "Custom category {0} cleared"
+msgstr "已清空自訂類別 {0}"
+
+#. Screens.CustomCategorySlot
+msgctxt "Screens.CustomCategorySlot"
+msgid "Custom category {0}: {1}"
+msgstr "自訂類別 {0}：{1}"
+
+#. Screens.CustomCategorySlotEmpty
+msgctxt "Screens.CustomCategorySlotEmpty"
+msgid "empty"
+msgstr "空"
+
+#. Scanner.CustomCategoryEmpty
+msgctxt "Scanner.CustomCategoryEmpty"
+msgid "Custom category {0} is empty"
+msgstr "自訂類別 {0} 為空"
+

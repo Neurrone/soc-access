@@ -1130,11 +1130,6 @@ msgctxt "Screens.Wielders"
 msgid "Wielders"
 msgstr "위더"
 
-#. Screens.AddCustomCategory
-msgctxt "Screens.AddCustomCategory"
-msgid "Add custom category"
-msgstr "사용자 지정 범주 추가"
-
 #. Screens.Add
 msgctxt "Screens.Add"
 msgid "Add"
@@ -2762,16 +2757,6 @@ msgctxt "Screens.CustomCategoryDefaultName"
 msgid "Custom {0}"
 msgstr "사용자 지정 {0}"
 
-#. Screens.CustomCategoryDeleted
-msgctxt "Screens.CustomCategoryDeleted"
-msgid "{0} deleted"
-msgstr "{0} 삭제됨"
-
-#. Screens.DeleteCustomCategory
-msgctxt "Screens.DeleteCustomCategory"
-msgid "Delete this custom category"
-msgstr "이 사용자 지정 범주 삭제"
-
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
 msgid "Cancel ability"
@@ -3642,33 +3627,13 @@ msgstr "{0}개 선택됨"
 
 #. Actions.ScannerNextCustomEntry
 msgctxt "Actions.ScannerNextCustomEntry"
-msgid "Next Entry In The Custom Category On {0}"
-msgstr "{0}의 사용자 지정 범주 다음 항목"
+msgid "Move to next result in custom category {0}"
+msgstr "사용자 지정 범주 {0}의 다음 결과로 이동"
 
 #. Actions.ScannerPreviousCustomEntry
 msgctxt "Actions.ScannerPreviousCustomEntry"
-msgid "Previous Entry In The Custom Category On {0}"
-msgstr "{0}의 사용자 지정 범주 이전 항목"
-
-#. Screens.CustomCategoryKey
-msgctxt "Screens.CustomCategoryKey"
-msgid "Key, {0}"
-msgstr "키, {0}"
-
-#. Screens.CustomCategoryKeyCurrent
-msgctxt "Screens.CustomCategoryKeyCurrent"
-msgid "{0}, current"
-msgstr "{0}, 현재"
-
-#. Screens.CustomCategoryKeyHeldBy
-msgctxt "Screens.CustomCategoryKeyHeldBy"
-msgid "{0}, held by {1}"
-msgstr "{0}, {1}이(가) 사용 중"
-
-#. Screens.CustomCategoryKeyTitle
-msgctxt "Screens.CustomCategoryKeyTitle"
-msgid "Key for {0}"
-msgstr "{0}의 키"
+msgid "Move to previous result in custom category {0}"
+msgstr "사용자 지정 범주 {0}의 이전 결과로 이동"
 
 #. Screens.CustomCategoryName
 msgctxt "Screens.CustomCategoryName"
@@ -3699,31 +3664,6 @@ msgstr "이미 사용 중인 이름"
 msgctxt "Screens.Cursor"
 msgid "Cursor"
 msgstr "커서"
-
-#. Scanner.NoCustomCategoryOnKey
-msgctxt "Scanner.NoCustomCategoryOnKey"
-msgid "No custom category on {0}"
-msgstr "{0}에 사용자 지정 범주가 없습니다"
-
-#. Scanner.QuickKeyComma
-msgctxt "Scanner.QuickKeyComma"
-msgid "Comma"
-msgstr "쉼표"
-
-#. Scanner.QuickKeyNone
-msgctxt "Scanner.QuickKeyNone"
-msgid "None"
-msgstr "없음"
-
-#. Scanner.QuickKeyPeriod
-msgctxt "Scanner.QuickKeyPeriod"
-msgid "Period"
-msgstr "마침표"
-
-#. Scanner.QuickKeySlash
-msgctxt "Scanner.QuickKeySlash"
-msgid "Slash"
-msgstr "슬래시"
 
 
 #. UI.RoleCheckbox
@@ -3800,3 +3740,29 @@ msgstr "보고서를 보내는 중..."
 msgctxt "Screens.BugReportSearchResult"
 msgid "{0}, {1}, {2}"
 msgstr "{0}, {1}, {2}"
+
+#. Screens.ClearCustomCategory
+msgctxt "Screens.ClearCustomCategory"
+msgid "Clear this custom category"
+msgstr "이 사용자 지정 범주 비우기"
+
+#. Screens.CustomCategoryCleared
+msgctxt "Screens.CustomCategoryCleared"
+msgid "Custom category {0} cleared"
+msgstr "사용자 지정 범주 {0} 비움"
+
+#. Screens.CustomCategorySlot
+msgctxt "Screens.CustomCategorySlot"
+msgid "Custom category {0}: {1}"
+msgstr "사용자 지정 범주 {0}: {1}"
+
+#. Screens.CustomCategorySlotEmpty
+msgctxt "Screens.CustomCategorySlotEmpty"
+msgid "empty"
+msgstr "비어 있음"
+
+#. Scanner.CustomCategoryEmpty
+msgctxt "Scanner.CustomCategoryEmpty"
+msgid "Custom category {0} is empty"
+msgstr "사용자 지정 범주 {0}이(가) 비어 있습니다"
+

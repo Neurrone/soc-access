@@ -4,22 +4,20 @@ using System.Text;
 namespace SongsOfConquestAccess.Scanner
 {
     /// <summary>
-    /// Reads and writes a whole <see cref="ScannerCustomCategoryList"/> as one
-    /// config string, the way the announcement order already rides in one
-    /// comma-separated entry.
+    /// Reads and writes one taxonomy's three slots as one config string, the
+    /// way the announcement order already rides in one comma-separated entry.
     ///
-    /// The text is the next id, then one record per category, separated by
-    /// semicolons. A record is the id, the name, the selectors, the keywords and
-    /// the quick key separated by pipes; selectors and keywords are comma
-    /// separated, and a selector is its category key and subcategory key
+    /// The text is three records separated by semicolons, one per slot in slot
+    /// order; an empty record is an empty slot. A record is the name, the
+    /// selectors and the keywords separated by pipes; selectors and keywords are
+    /// comma separated, and a selector is its category key and subcategory key
     /// separated by a colon. Names and keywords are player-authored, so every
-    /// separator is backslash escaped and only unescaped at the innermost
-    /// split.
+    /// separator is backslash escaped and only unescaped at the innermost split.
     ///
-    /// Both trailing fields are optional on the way in, so text written before
-    /// quick keys existed still reads back with no key set.
+    /// Short and long text both read: a record the string does not reach is an
+    /// empty slot, and anything past the third is ignored.
     /// </summary>
-    public static class ScannerCustomCategoryCodec
+    public static class ScannerCustomSlotsCodec
     {
         private const char RecordSeparator = ';';
         private const char FieldSeparator = '|';
@@ -27,55 +25,91 @@ namespace SongsOfConquestAccess.Scanner
         private const char SelectorSeparator = ':';
         private const char EscapePrefix = '\\';
 
-        public static string Encode(ScannerCustomCategoryList list)
+        public static string Encode(ScannerCustomSlots slots)
         {
-            if (list == null)
+            if (slots == null)
             {
                 return string.Empty;
             }
 
             StringBuilder builder = new StringBuilder();
-            builder.Append(list.NextId);
-            for (int i = 0; i < list.Categories.Count; i++)
+            for (int i = 0; i < ScannerCustomSlots.Count; i++)
             {
-                builder.Append(RecordSeparator);
-                AppendCategory(builder, list.Categories[i]);
+                if (i > 0)
+                {
+                    builder.Append(RecordSeparator);
+                }
+
+                AppendCategory(builder, slots.Slot(i));
             }
 
             return builder.ToString();
         }
 
-        public static ScannerCustomCategoryList Decode(string text)
+        public static ScannerCustomSlots Decode(string text)
         {
-            ScannerCustomCategoryList list = new ScannerCustomCategoryList();
+            ScannerCustomSlots slots = new ScannerCustomSlots();
             if (string.IsNullOrWhiteSpace(text))
             {
-                return list;
+                return slots;
             }
 
             List<string> records = Split(text, RecordSeparator);
-            int nextId;
-            if (records.Count > 0 && int.TryParse(Unescape(records[0]), out nextId))
+            for (int i = 0; i < records.Count && i < ScannerCustomSlots.Count; i++)
             {
-                list.SetNextId(nextId);
+                slots.Set(i, DecodeCategory(records[i]));
             }
 
+            return slots;
+        }
+
+        /// <summary>
+        /// Reads the list format written before the slots existed: a next id,
+        /// then one record per category holding its id, name, selectors,
+        /// keywords and the quick key it was given. Everything but the name, the
+        /// selectors, the keywords and the key is dropped on the floor; the key
+        /// comes back as its raw token, which is what decides the slot the
+        /// category lands in.
+        /// </summary>
+        public static List<ScannerSavedCategory> DecodeLegacy(string text)
+        {
+            List<ScannerSavedCategory> saved = new List<ScannerSavedCategory>();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return saved;
+            }
+
+            List<string> records = Split(text, RecordSeparator);
             for (int i = 1; i < records.Count; i++)
             {
-                ScannerCustomCategory category = DecodeCategory(records[i]);
-                if (category != null)
+                List<string> fields = Split(records[i], FieldSeparator);
+                if (fields.Count < 2)
                 {
-                    list.Restore(category);
+                    continue;
                 }
+
+                ScannerCustomCategory category = new ScannerCustomCategory(Unescape(fields[1]));
+                if (string.IsNullOrWhiteSpace(category.Name))
+                {
+                    continue;
+                }
+
+                ReadSelectorsAndKeywords(category, fields, 2);
+                saved.Add(new ScannerSavedCategory(
+                    category,
+                    fields.Count > 4 ? Unescape(fields[4]) : string.Empty));
             }
 
-            return list;
+            return saved;
         }
 
         private static void AppendCategory(StringBuilder builder, ScannerCustomCategory category)
         {
-            builder.Append(category.Id);
-            builder.Append(FieldSeparator);
+            if (category == null)
+            {
+                return;
+            }
+
             builder.Append(Escape(category.Name));
             builder.Append(FieldSeparator);
             for (int i = 0; i < category.Selectors.Count; i++)
@@ -101,24 +135,34 @@ namespace SongsOfConquestAccess.Scanner
 
                 builder.Append(Escape(category.Keywords[i]));
             }
-
-            builder.Append(FieldSeparator);
-            builder.Append(Escape(ScannerQuickKeys.ToToken(category.QuickKey)));
         }
 
         private static ScannerCustomCategory DecodeCategory(string record)
         {
             List<string> fields = Split(record, FieldSeparator);
-            int id;
-            if (fields.Count < 2 || !int.TryParse(Unescape(fields[0]), out id))
+            if (fields.Count == 0)
             {
                 return null;
             }
 
-            ScannerCustomCategory category = new ScannerCustomCategory(id, Unescape(fields[1]));
-            if (fields.Count > 2)
+            ScannerCustomCategory category = new ScannerCustomCategory(Unescape(fields[0]));
+            if (string.IsNullOrWhiteSpace(category.Name))
             {
-                List<string> selectors = Split(fields[2], ItemSeparator);
+                return null;
+            }
+
+            ReadSelectorsAndKeywords(category, fields, 1);
+            return category;
+        }
+
+        private static void ReadSelectorsAndKeywords(
+            ScannerCustomCategory category,
+            List<string> fields,
+            int first)
+        {
+            if (fields.Count > first)
+            {
+                List<string> selectors = Split(fields[first], ItemSeparator);
                 for (int i = 0; i < selectors.Count; i++)
                 {
                     List<string> parts = Split(selectors[i], SelectorSeparator);
@@ -129,21 +173,14 @@ namespace SongsOfConquestAccess.Scanner
                 }
             }
 
-            if (fields.Count > 3)
+            if (fields.Count > first + 1)
             {
-                List<string> keywords = Split(fields[3], ItemSeparator);
+                List<string> keywords = Split(fields[first + 1], ItemSeparator);
                 for (int i = 0; i < keywords.Count; i++)
                 {
                     category.AddKeyword(Unescape(keywords[i]));
                 }
             }
-
-            if (fields.Count > 4)
-            {
-                category.SetQuickKey(ScannerQuickKeys.FromToken(Unescape(fields[4])));
-            }
-
-            return category;
         }
 
         /// <summary>
@@ -233,5 +270,23 @@ namespace SongsOfConquestAccess.Scanner
 
             return builder.ToString();
         }
+    }
+
+    /// <summary>
+    /// One category read back out of the list format, with the quick-key token
+    /// it was saved under. Only the migration onto the three slots ever sees
+    /// one.
+    /// </summary>
+    public struct ScannerSavedCategory
+    {
+        public ScannerSavedCategory(ScannerCustomCategory category, string quickKeyToken)
+        {
+            Category = category;
+            QuickKeyToken = quickKeyToken ?? string.Empty;
+        }
+
+        public ScannerCustomCategory Category { get; private set; }
+
+        public string QuickKeyToken { get; private set; }
     }
 }

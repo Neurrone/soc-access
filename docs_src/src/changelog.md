@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Custom scanner categories are now three fixed numbered slots per context instead of a list you add to. `,`, `.` and `/` always walk custom categories 1, 2 and 3, so there is no key to choose any more, and `Clear this custom category` empties a slot in place of deleting it. Categories you already had keep the slot their key gave them, and anything past the third is dropped
+
 - The `Keybinds` tab now lists the cursor keys (arrows, `Tab`, `Home`, `End`, clicks and the rest) as its first region and the review buffer as its own, puts the resource summaries with the adventure map and combat, the look-around keys with the adventure map, and orders the rest adventure map, scanner, hex grid, combat, bookmarks. The `Shift+arrow` rows read `Move to next interesting tile ...`, `D` reads `Describe map`, `Space` reads `Start drag` and `Backspace` reads `Clear typeahead`
 - Removed the separate `Map secondary action` row: the backslash on a tile has always been the right click, which is the `Right click` row
 - Fixed `Shift+Tab` (and any held chord) sometimes firing twice: a key the mod took was hidden from the game in a way that also hid it from Unity's own key state, so releasing `Shift` a moment before `Tab`, or holding the chord, read as a new press. Only the taken key is now hidden, and the mod tracks its release itself

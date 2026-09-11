@@ -289,12 +289,12 @@
             public static readonly ModString ScannerJumpToResult = new ModString("Actions.ScannerJumpToResult", "Jump To Scanner Result");
             public static readonly ModString ScannerLookAround = new ModString("Actions.ScannerLookAround", "Look Around");
             public static readonly ModString ScannerNextCategory = new ModString("Actions.ScannerNextCategory", "Next Scanner Category");
-            public static readonly ModString ScannerNextCustomEntry = new ModString("Actions.ScannerNextCustomEntry", "Next Entry In The Custom Category On {0}");
+            public static readonly ModString ScannerNextCustomEntry = new ModString("Actions.ScannerNextCustomEntry", "Move to next result in custom category {0}");
             public static readonly ModString ScannerNextInstance = new ModString("Actions.ScannerNextInstance", "Next Scanner Instance");
             public static readonly ModString ScannerNextItem = new ModString("Actions.ScannerNextItem", "Next Scanner Item");
             public static readonly ModString ScannerNextSubcategory = new ModString("Actions.ScannerNextSubcategory", "Next Scanner Subcategory");
             public static readonly ModString ScannerPreviousCategory = new ModString("Actions.ScannerPreviousCategory", "Previous Scanner Category");
-            public static readonly ModString ScannerPreviousCustomEntry = new ModString("Actions.ScannerPreviousCustomEntry", "Previous Entry In The Custom Category On {0}");
+            public static readonly ModString ScannerPreviousCustomEntry = new ModString("Actions.ScannerPreviousCustomEntry", "Move to previous result in custom category {0}");
             public static readonly ModString ScannerPreviousInstance = new ModString("Actions.ScannerPreviousInstance", "Previous Scanner Instance");
             public static readonly ModString ScannerPreviousItem = new ModString("Actions.ScannerPreviousItem", "Previous Scanner Item");
             public static readonly ModString ScannerPreviousSubcategory = new ModString("Actions.ScannerPreviousSubcategory", "Previous Scanner Subcategory");
@@ -519,7 +519,6 @@
         public static class Screens
         {
             public static readonly ModString AdventureMap = new ModString("Screens.AdventureMap", "Adventure map");
-            public static readonly ModString AddCustomCategory = new ModString("Screens.AddCustomCategory", "Add custom category");
             public static readonly ModString Add = new ModString("Screens.Add", "Add");
             public static readonly ModString AddKeyword = new ModString("Screens.AddKeyword", "Add keyword");
             public static readonly ModString ArtifactDestroyHint = new ModString("Screens.ArtifactDestroyHint", "{0} destroys.");
@@ -560,12 +559,12 @@
             public static readonly ModString Configure = new ModString("Screens.Configure", "Configure");
             public static readonly ModString ConfigureAnnouncementElement = new ModString("Screens.ConfigureAnnouncementElement", "Configure {0}");
             public static readonly ModString CustomCategories = new ModString("Screens.CustomCategories", "{0} custom categories");
+            public static readonly ModString ClearCustomCategory = new ModString("Screens.ClearCustomCategory", "Clear this custom category");
+            public static readonly ModString CustomCategoryCleared = new ModString("Screens.CustomCategoryCleared", "Custom category {0} cleared");
             public static readonly ModString CustomCategoryDefaultName = new ModString("Screens.CustomCategoryDefaultName", "Custom {0}");
-            public static readonly ModString CustomCategoryDeleted = new ModString("Screens.CustomCategoryDeleted", "{0} deleted");
-            public static readonly ModString CustomCategoryKey = new ModString("Screens.CustomCategoryKey", "Key, {0}");
-            public static readonly ModString CustomCategoryKeyCurrent = new ModString("Screens.CustomCategoryKeyCurrent", "{0}, current");
-            public static readonly ModString CustomCategoryKeyHeldBy = new ModString("Screens.CustomCategoryKeyHeldBy", "{0}, held by {1}");
-            public static readonly ModString CustomCategoryKeyTitle = new ModString("Screens.CustomCategoryKeyTitle", "Key for {0}");
+            /// <summary>One of the three fixed slots as the settings list names it: its number and what it holds.</summary>
+            public static readonly ModString CustomCategorySlot = new ModString("Screens.CustomCategorySlot", "Custom category {0}: {1}");
+            public static readonly ModString CustomCategorySlotEmpty = new ModString("Screens.CustomCategorySlotEmpty", "empty");
             public static readonly ModString CustomCategoryName = new ModString("Screens.CustomCategoryName", "Name");
             public static readonly ModString CustomCategoryNameEmpty = new ModString("Screens.CustomCategoryNameEmpty", "A category needs a name");
             public static readonly ModString CustomCategoryNameMissingTitle = new ModString("Screens.CustomCategoryNameMissingTitle", "Name missing");
@@ -573,7 +572,6 @@
             public static readonly ModString CustomCategoryNameTakenTitle = new ModString("Screens.CustomCategoryNameTakenTitle", "Name already in use");
             /// <summary>The Keybinds tab region for the graph cursor: arrows, stops, regions, clicks.</summary>
             public static readonly ModString Cursor = new ModString("Screens.Cursor", "Cursor");
-            public static readonly ModString DeleteCustomCategory = new ModString("Screens.DeleteCustomCategory", "Delete this custom category");
             public static readonly ModString CancelAbility = new ModString("Screens.CancelAbility", "Cancel ability");
             public static readonly ModString CancelSpell = new ModString("Screens.CancelSpell", "Cancel spell");
             public static readonly ModString CurrentTroop = new ModString("Screens.CurrentTroop", "Current troop, {0}");
@@ -786,6 +784,7 @@
             public static readonly ModString Beacons = new ModString("Scanner.Beacons", "Beacons");
             public static readonly ModString Blocked = new ModString("Scanner.Blocked", "Blocked");
             public static readonly ModString Buildings = new ModString("Scanner.Buildings", "Buildings");
+            public static readonly ModString CustomCategoryEmpty = new ModString("Scanner.CustomCategoryEmpty", "Custom category {0} is empty");
             public static readonly ModString Dangerous = new ModString("Scanner.Dangerous", "Dangerous");
             public static readonly ModString DirectionStep = new ModString("Scanner.DirectionStep", "{0}{1}");
             public static readonly ModString DirectionStepLong = new ModString("Scanner.DirectionStepLong", "{0} {1}");
@@ -804,7 +803,6 @@
             public static readonly ModString LookAroundRadius = new ModString("Scanner.LookAroundRadius", "Look around radius {0}");
             public static readonly ModString Merchants = new ModString("Scanner.Merchants", "Merchants");
             public static readonly ModString Neutral = new ModString("Scanner.Neutral", "Neutral");
-            public static readonly ModString NoCustomCategoryOnKey = new ModString("Scanner.NoCustomCategoryOnKey", "No custom category on {0}");
             public static readonly ModString NoTileToReturnTo = new ModString("Scanner.NoTileToReturnTo", "No tile to return to");
             public static readonly ModString North = new ModString("Scanner.North", "north");
             public static readonly ModString NorthShort = new ModString("Scanner.NorthShort", "n");
@@ -816,10 +814,6 @@
             public static readonly ModString OpenGround = new ModString("Scanner.OpenGround", "Open ground");
             public static readonly ModString Obstacles = new ModString("Scanner.Obstacles", "Obstacles");
             public static readonly ModString Pickups = new ModString("Scanner.Pickups", "Pickups");
-            public static readonly ModString QuickKeyComma = new ModString("Scanner.QuickKeyComma", "Comma");
-            public static readonly ModString QuickKeyNone = new ModString("Scanner.QuickKeyNone", "None");
-            public static readonly ModString QuickKeyPeriod = new ModString("Scanner.QuickKeyPeriod", "Period");
-            public static readonly ModString QuickKeySlash = new ModString("Scanner.QuickKeySlash", "Slash");
             public static readonly ModString Power = new ModString("Scanner.Power", "Power");
             public static readonly ModString Revealed = new ModString("Scanner.Revealed", "Revealed");
             public static readonly ModString ReachableSummary = new ModString("Scanner.ReachableSummary", "Reachable: {0}");

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.Scanner
@@ -46,6 +46,10 @@ namespace SongsOfConquestAccess.Scanner
     /// plus free-text keywords, gathered under one name so the scopes reached
     /// for every turn sit together instead of scattered across the full
     /// category cycle.
+    ///
+    /// It carries no identity of its own. Which category this is, is which of
+    /// the three numbered slots holds it (<see cref="ScannerCustomSlots"/>), so
+    /// there is nothing here for a key or a config entry to name it by.
     /// </summary>
     public sealed class ScannerCustomCategory
     {
@@ -53,13 +57,10 @@ namespace SongsOfConquestAccess.Scanner
         private readonly List<string> _keywords = new List<string>();
         private string _name;
 
-        public ScannerCustomCategory(int id, string name)
+        public ScannerCustomCategory(string name)
         {
-            Id = id;
-            _name = name ?? string.Empty;
+            _name = (name ?? string.Empty).Trim();
         }
-
-        public int Id { get; private set; }
 
         public string Name
         {
@@ -74,24 +75,6 @@ namespace SongsOfConquestAccess.Scanner
         public IReadOnlyList<string> Keywords
         {
             get { return _keywords; }
-        }
-
-        /// <summary>
-        /// The single key that walks this category on the adventure map. Only
-        /// one category can hold a given key, which the list this belongs to is
-        /// what enforces; a category on its own only knows what it was told.
-        /// </summary>
-        public ScannerQuickKey QuickKey { get; private set; }
-
-        public bool SetQuickKey(ScannerQuickKey quickKey)
-        {
-            if (QuickKey == quickKey)
-            {
-                return false;
-            }
-
-            QuickKey = quickKey;
-            return true;
         }
 
         /// <summary>

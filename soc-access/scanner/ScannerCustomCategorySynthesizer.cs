@@ -1,11 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Scanner
 {
     /// <summary>
-    /// Builds the player's custom categories out of a finished snapshot and
-    /// puts them in front of it. Each selector becomes a subcategory holding
+    /// Builds the player's three slots of custom categories out of a finished
+    /// snapshot and puts the filled ones in front of it, in slot order. Each selector becomes a subcategory holding
     /// the results of the taxonomy subcategory it names; each keyword becomes a
     /// subcategory holding every result whose name matches it; an All
     /// subcategory gathers the lot.
@@ -23,11 +23,13 @@ namespace SongsOfConquestAccess.Scanner
 
         /// <summary>
         /// The key a synthesized category carries in the snapshot, which is how
-        /// anything that has to find one definition again names it.
+        /// anything that has to find one definition again names it. It is the
+        /// slot number the player hears, so the key a keypress asks for never
+        /// moves when another slot is edited.
         /// </summary>
-        public static string CategoryKeyFor(int id)
+        public static string CategoryKeyFor(int slot)
         {
-            return CategoryKeyPrefix + id;
+            return CategoryKeyPrefix + (slot + 1);
         }
 
         /// <summary>
@@ -43,24 +45,24 @@ namespace SongsOfConquestAccess.Scanner
                 // without the player's categories still scans the map.
                 ScannerContribution.Run(
                     "custom categories",
-                    () => Apply(snapshot, ModSettings.GetScannerCustomCategories(snapshot.Taxonomy.Key)));
+                    () => Apply(snapshot, ModSettings.GetScannerCustomSlots(snapshot.Taxonomy.Key)));
             }
 
             return snapshot;
         }
 
-        public static void Apply(ScannerSnapshot snapshot, IReadOnlyList<ScannerCustomCategory> customCategories)
+        public static void Apply(ScannerSnapshot snapshot, ScannerCustomSlots slots)
         {
-            if (snapshot == null || customCategories == null || customCategories.Count == 0)
+            if (snapshot == null || slots == null)
             {
                 return;
             }
 
             List<ScannerCategory> synthesized = new List<ScannerCategory>();
             KeywordCandidates candidates = new KeywordCandidates(snapshot);
-            for (int i = 0; i < customCategories.Count; i++)
+            for (int i = 0; i < ScannerCustomSlots.Count; i++)
             {
-                ScannerCategory category = Build(snapshot, customCategories[i], candidates);
+                ScannerCategory category = Build(snapshot, slots.Slot(i), i, candidates);
                 if (category != null)
                 {
                     synthesized.Add(category);
@@ -73,6 +75,7 @@ namespace SongsOfConquestAccess.Scanner
         private static ScannerCategory Build(
             ScannerSnapshot snapshot,
             ScannerCustomCategory definition,
+            int slot,
             KeywordCandidates candidates)
         {
             if (definition == null)
@@ -81,7 +84,7 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             ScannerCategory category = new ScannerCategory(
-                CategoryKeyFor(definition.Id),
+                CategoryKeyFor(slot),
                 () => definition.Name)
             {
                 IsCustom = true

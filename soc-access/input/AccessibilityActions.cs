@@ -1,4 +1,4 @@
-using UnityEngine.InputSystem;
+﻿using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Bookmarks;
 using SongsOfConquestAccess.Localization;
@@ -173,22 +173,22 @@ namespace SongsOfConquestAccess.Input
         // category. Combat binds comma and period to its own troop cycles, and
         // both are claimed by the focused widget, so the two never meet.
         public static readonly InputAction ScannerNextCustomEntryComma =
-            CustomEntry("scanner_next_custom_entry_comma", ModStrings.Actions.ScannerNextCustomEntry, ModStrings.Scanner.QuickKeyComma, Key.Comma, shift: false);
+            CustomEntry("scanner_next_custom_entry_comma", ModStrings.Actions.ScannerNextCustomEntry, 1, Key.Comma, shift: false);
 
         public static readonly InputAction ScannerPreviousCustomEntryComma =
-            CustomEntry("scanner_previous_custom_entry_comma", ModStrings.Actions.ScannerPreviousCustomEntry, ModStrings.Scanner.QuickKeyComma, Key.Comma, shift: true);
+            CustomEntry("scanner_previous_custom_entry_comma", ModStrings.Actions.ScannerPreviousCustomEntry, 1, Key.Comma, shift: true);
 
         public static readonly InputAction ScannerNextCustomEntryPeriod =
-            CustomEntry("scanner_next_custom_entry_period", ModStrings.Actions.ScannerNextCustomEntry, ModStrings.Scanner.QuickKeyPeriod, Key.Period, shift: false);
+            CustomEntry("scanner_next_custom_entry_period", ModStrings.Actions.ScannerNextCustomEntry, 2, Key.Period, shift: false);
 
         public static readonly InputAction ScannerPreviousCustomEntryPeriod =
-            CustomEntry("scanner_previous_custom_entry_period", ModStrings.Actions.ScannerPreviousCustomEntry, ModStrings.Scanner.QuickKeyPeriod, Key.Period, shift: true);
+            CustomEntry("scanner_previous_custom_entry_period", ModStrings.Actions.ScannerPreviousCustomEntry, 2, Key.Period, shift: true);
 
         public static readonly InputAction ScannerNextCustomEntrySlash =
-            CustomEntry("scanner_next_custom_entry_slash", ModStrings.Actions.ScannerNextCustomEntry, ModStrings.Scanner.QuickKeySlash, Key.Slash, shift: false);
+            CustomEntry("scanner_next_custom_entry_slash", ModStrings.Actions.ScannerNextCustomEntry, 3, Key.Slash, shift: false);
 
         public static readonly InputAction ScannerPreviousCustomEntrySlash =
-            CustomEntry("scanner_previous_custom_entry_slash", ModStrings.Actions.ScannerPreviousCustomEntry, ModStrings.Scanner.QuickKeySlash, Key.Slash, shift: true);
+            CustomEntry("scanner_previous_custom_entry_slash", ModStrings.Actions.ScannerPreviousCustomEntry, 3, Key.Slash, shift: true);
 
         // The graph engine's own keys (screens/GraphScreen.cs). Named for what the player is doing
         // rather than for the control under the cursor, because on a graph screen one key means
@@ -429,15 +429,15 @@ namespace SongsOfConquestAccess.Input
         }
 
         /// <summary>
-        /// The label names the key the action is bound to, because the category
-        /// it walks is whichever one the player put on that key and can change
-        /// between one reading of the label and the next.
+        /// The label names the numbered slot the key walks, which is fixed: what
+        /// the player put in that slot can change, but which slot the key
+        /// answers for never does.
         /// </summary>
-        private static InputAction CustomEntry(string key, ModString label, ModString keyName, Key boundKey, bool shift)
+        private static InputAction CustomEntry(string key, ModString label, int slotNumber, Key boundKey, bool shift)
         {
             return new InputAction(
                     key,
-                    () => ModText.Get(label, ModText.Get(keyName)),
+                    () => ModText.Get(label, slotNumber),
                     InputClaimScope.FocusedWidget,
                     InputRepeatPolicy.OneShotUntilRelease())
                 .AddBinding(new KeyboardBinding(boundKey, shift: shift));

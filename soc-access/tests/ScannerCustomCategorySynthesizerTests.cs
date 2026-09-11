@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Scanner;
 using UnityEngine;
@@ -12,10 +12,10 @@ namespace SongsOfConquestAccess.Tests
         public void ASelectorHoldsExactlyTheSubcategoryItNames()
         {
             ScannerSnapshot snapshot = BuildAdventureSnapshot();
-            ScannerCustomCategory definition = new ScannerCustomCategory(1, "Scouting");
+            ScannerCustomCategory definition = new ScannerCustomCategory("Scouting");
             definition.SetSelector(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.Unvisited, selected: true);
 
-            ScannerCustomCategorySynthesizer.Apply(snapshot, new[] { definition });
+            ScannerCustomCategorySynthesizer.Apply(snapshot, Slots(definition));
 
             ScannerCategory custom = snapshot.Categories[0];
             Assert.AreEqual("Scouting", custom.Label);
@@ -32,9 +32,9 @@ namespace SongsOfConquestAccess.Tests
             ScannerSnapshot snapshot = BuildAdventureSnapshot();
             string firstRealCategory = snapshot.Categories[0].Key;
 
-            ScannerCustomCategorySynthesizer.Apply(
-                snapshot,
-                new[] { new ScannerCustomCategory(1, "First"), new ScannerCustomCategory(2, "Second") });
+            ScannerCustomCategorySynthesizer.Apply(snapshot, Slots(
+                new ScannerCustomCategory("First"),
+                new ScannerCustomCategory("Second")));
 
             Assert.AreEqual("First", snapshot.Categories[0].Label);
             Assert.AreEqual("Second", snapshot.Categories[1].Label);
@@ -46,10 +46,10 @@ namespace SongsOfConquestAccess.Tests
         public void AKeywordCatchesResultsByItemAndInstanceNameAsWellAsLabel()
         {
             ScannerSnapshot snapshot = BuildAdventureSnapshot();
-            ScannerCustomCategory definition = new ScannerCustomCategory(1, "Ground");
+            ScannerCustomCategory definition = new ScannerCustomCategory("Ground");
             definition.AddKeyword("grass");
 
-            ScannerCustomCategorySynthesizer.Apply(snapshot, new[] { definition });
+            ScannerCustomCategorySynthesizer.Apply(snapshot, Slots(definition));
 
             ScannerCategory custom = snapshot.Categories[0];
             Assert.AreEqual("grass", custom.Subcategories[1].Label);
@@ -67,13 +67,13 @@ namespace SongsOfConquestAccess.Tests
         public void EveryKeywordOfEveryCategoryCatchesItsOwn()
         {
             ScannerSnapshot snapshot = BuildAdventureSnapshot();
-            ScannerCustomCategory ground = new ScannerCustomCategory(1, "Ground");
+            ScannerCustomCategory ground = new ScannerCustomCategory("Ground");
             ground.AddKeyword("grass");
             ground.AddKeyword("crate");
-            ScannerCustomCategory loot = new ScannerCustomCategory(2, "Loot");
+            ScannerCustomCategory loot = new ScannerCustomCategory("Loot");
             loot.AddKeyword("chest");
 
-            ScannerCustomCategorySynthesizer.Apply(snapshot, new[] { ground, loot });
+            ScannerCustomCategorySynthesizer.Apply(snapshot, Slots(ground, loot));
 
             ScannerCategory first = snapshot.Categories[0];
             ScannerCategory second = snapshot.Categories[1];
@@ -88,12 +88,12 @@ namespace SongsOfConquestAccess.Tests
         public void TheAllSubcategoryHearsAResultOnceHoweverManyWaysItWasCaught()
         {
             ScannerSnapshot snapshot = BuildAdventureSnapshot();
-            ScannerCustomCategory definition = new ScannerCustomCategory(1, "Everything");
+            ScannerCustomCategory definition = new ScannerCustomCategory("Everything");
             definition.SetSelector(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.All, selected: true);
             definition.SetSelector(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.Unvisited, selected: true);
             definition.AddKeyword("chest");
 
-            ScannerCustomCategorySynthesizer.Apply(snapshot, new[] { definition });
+            ScannerCustomCategorySynthesizer.Apply(snapshot, Slots(definition));
 
             ScannerCategory custom = snapshot.Categories[0];
             CollectionAssert.AreEquivalent(
@@ -105,10 +105,10 @@ namespace SongsOfConquestAccess.Tests
         public void ASelectorTheTaxonomyNoLongerHasIsSkipped()
         {
             ScannerSnapshot snapshot = BuildAdventureSnapshot();
-            ScannerCustomCategory definition = new ScannerCustomCategory(1, "Stale");
+            ScannerCustomCategory definition = new ScannerCustomCategory("Stale");
             definition.SetSelector("retired_category", ScannerSubcategoryKeys.All, selected: true);
 
-            ScannerCustomCategorySynthesizer.Apply(snapshot, new[] { definition });
+            ScannerCustomCategorySynthesizer.Apply(snapshot, Slots(definition));
 
             ScannerCategory custom = snapshot.Categories[0];
             Assert.AreEqual(1, custom.Subcategories.Count);
@@ -119,9 +119,9 @@ namespace SongsOfConquestAccess.Tests
         public void SearchAndLookAroundIgnoreTheCopiesInCustomCategories()
         {
             ScannerSnapshot snapshot = BuildAdventureSnapshot();
-            ScannerCustomCategory definition = new ScannerCustomCategory(1, "Scouting");
+            ScannerCustomCategory definition = new ScannerCustomCategory("Scouting");
             definition.SetSelector(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.All, selected: true);
-            ScannerCustomCategorySynthesizer.Apply(snapshot, new[] { definition });
+            ScannerCustomCategorySynthesizer.Apply(snapshot, Slots(definition));
 
             ScannerSnapshot search = ScannerSearch.Build(snapshot, "chest", Vector2Int.zero);
 
@@ -179,12 +179,12 @@ namespace SongsOfConquestAccess.Tests
                 ScannerSubcategoryKeys.Revealed,
                 new ScannerResult("revealed:near", "Chest", new Vector2Int(1, 0)));
 
-            ScannerCustomCategory definition = new ScannerCustomCategory(1, "Watchlist");
+            ScannerCustomCategory definition = new ScannerCustomCategory("Watchlist");
             definition.SetSelector(
                 ScannerCategoryKeys.Exploration,
                 ScannerSubcategoryKeys.Revealed,
                 selected: true);
-            ScannerCustomCategorySynthesizer.Apply(snapshot, new[] { definition });
+            ScannerCustomCategorySynthesizer.Apply(snapshot, Slots(definition));
             snapshot.SortByDistance(Vector2Int.zero);
 
             ScannerSubcategory selector = snapshot.Categories[0].Subcategories[1];
@@ -202,6 +202,19 @@ namespace SongsOfConquestAccess.Tests
             }
 
             return keys.ToArray();
+        }
+
+        /// <summary>The three slots, filled from the front, which is what the
+        /// settings hand the synthesizer.</summary>
+        private static ScannerCustomSlots Slots(params ScannerCustomCategory[] categories)
+        {
+            ScannerCustomSlots slots = new ScannerCustomSlots();
+            for (int i = 0; i < categories.Length; i++)
+            {
+                slots.Set(i, categories[i]);
+            }
+
+            return slots;
         }
     }
 }

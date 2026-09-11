@@ -462,136 +462,98 @@ namespace SongsOfConquestAccess
             _config?.Save();
         }
 
-        public static IReadOnlyList<ScannerCustomCategory> GetScannerCustomCategories(string taxonomyKey)
+        /// <summary>
+        /// One taxonomy's three slots, decoded once and kept. Migration off the
+        /// list format happens here, on the first read after an upgrade.
+        /// </summary>
+        public static ScannerCustomSlots GetScannerCustomSlots(string taxonomyKey)
         {
-            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
-            return list != null ? list.Categories : new ScannerCustomCategory[0];
+            return GetScannerCustomSlotsCore(taxonomyKey) ?? new ScannerCustomSlots();
         }
 
-        public static ScannerCustomCategory GetScannerCustomCategory(string taxonomyKey, int id)
+        public static ScannerCustomCategory GetScannerCustomCategory(string taxonomyKey, int slot)
         {
-            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
-            return list != null ? list.Get(id) : null;
+            ScannerCustomSlots slots = GetScannerCustomSlotsCore(taxonomyKey);
+            return slots != null ? slots.Slot(slot) : null;
         }
 
         /// <summary>
-        /// The caller supplies the starting name because the wording is
-        /// localized accessibility text, and it is stored rather than derived so
-        /// it stays put when an earlier category is deleted. The caller also
-        /// says which names are already spoken for, because the built-in
-        /// category labels a new name must not collide with belong to the
-        /// taxonomy rather than to the stored list.
+        /// Fills an empty slot with a category under the name the caller hands
+        /// in, because the wording of the starting name is localized
+        /// accessibility text. A slot that already holds one is left alone.
         /// </summary>
-        public static ScannerCustomCategory AddScannerCustomCategory(
-            string taxonomyKey,
-            Func<int, string> nameForPosition,
-            Func<string, bool> nameIsTaken)
+        public static ScannerCustomCategory AddScannerCustomCategory(string taxonomyKey, int slot, string name)
         {
-            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
-            if (list == null)
+            ScannerCustomSlots slots = GetScannerCustomSlotsCore(taxonomyKey);
+            if (slots == null || slots.Slot(slot) != null)
             {
                 return null;
             }
 
-            ScannerCustomCategory category = list.Add(nameForPosition, nameIsTaken);
-            if (SupportsScannerQuickKeys(taxonomyKey))
+            ScannerCustomCategory category = new ScannerCustomCategory(name);
+            if (!slots.Set(slot, category))
             {
-                category.SetQuickKey(list.FirstFreeQuickKey());
+                return null;
             }
 
-            SaveScannerCustomCategories(taxonomyKey, list);
+            SaveScannerCustomSlots(taxonomyKey, slots);
             return category;
         }
 
-        /// <summary>
-        /// Only the adventure map walks a custom category from a single key, so
-        /// only its categories are given one. Battle keeps those keys for the
-        /// acting and enemy troop cycles.
-        /// </summary>
-        public static bool SupportsScannerQuickKeys(string taxonomyKey)
+        /// <summary>Empties a slot. The slot itself stays, so there is nothing
+        /// to renumber and no key that stops answering.</summary>
+        public static bool ClearScannerCustomCategory(string taxonomyKey, int slot)
         {
-            return taxonomyKey == ScannerTaxonomyKeys.Adventure;
-        }
-
-        public static ScannerCustomCategory GetScannerCustomCategoryByQuickKey(string taxonomyKey, ScannerQuickKey quickKey)
-        {
-            if (!SupportsScannerQuickKeys(taxonomyKey))
-            {
-                return null;
-            }
-
-            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
-            return list != null ? list.GetByQuickKey(quickKey) : null;
-        }
-
-        public static bool SetScannerCustomCategoryQuickKey(string taxonomyKey, int id, ScannerQuickKey quickKey)
-        {
-            if (!SupportsScannerQuickKeys(taxonomyKey))
+            ScannerCustomSlots slots = GetScannerCustomSlotsCore(taxonomyKey);
+            if (slots == null || slots.Slot(slot) == null || !slots.Clear(slot))
             {
                 return false;
             }
 
-            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
-            if (list == null || !list.SetQuickKey(id, quickKey))
-            {
-                return false;
-            }
-
-            SaveScannerCustomCategories(taxonomyKey, list);
+            SaveScannerCustomSlots(taxonomyKey, slots);
             return true;
         }
 
-        public static bool RemoveScannerCustomCategory(string taxonomyKey, int id)
+        public static bool RenameScannerCustomCategory(string taxonomyKey, int slot, string name)
         {
-            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
-            if (list == null || !list.Remove(id))
-            {
-                return false;
-            }
-
-            SaveScannerCustomCategories(taxonomyKey, list);
-            return true;
-        }
-
-        public static bool RenameScannerCustomCategory(string taxonomyKey, int id, string name)
-        {
-            return MutateScannerCustomCategory(taxonomyKey, id, category => category.Rename(name));
+            return MutateScannerCustomCategory(taxonomyKey, slot, category => category.Rename(name));
         }
 
         public static bool SetScannerCustomCategorySelector(
             string taxonomyKey,
-            int id,
+            int slot,
             string categoryKey,
             string subcategoryKey,
             bool selected)
         {
             return MutateScannerCustomCategory(
                 taxonomyKey,
-                id,
+                slot,
                 category => category.SetSelector(categoryKey, subcategoryKey, selected));
         }
 
-        public static bool AddScannerCustomCategoryKeyword(string taxonomyKey, int id, string keyword)
+        public static bool AddScannerCustomCategoryKeyword(string taxonomyKey, int slot, string keyword)
         {
-            return MutateScannerCustomCategory(taxonomyKey, id, category => category.AddKeyword(keyword));
+            return MutateScannerCustomCategory(taxonomyKey, slot, category => category.AddKeyword(keyword));
         }
 
-        public static bool RemoveScannerCustomCategoryKeyword(string taxonomyKey, int id, string keyword)
+        public static bool RemoveScannerCustomCategoryKeyword(string taxonomyKey, int slot, string keyword)
         {
-            return MutateScannerCustomCategory(taxonomyKey, id, category => category.RemoveKeyword(keyword));
+            return MutateScannerCustomCategory(taxonomyKey, slot, category => category.RemoveKeyword(keyword));
         }
 
         /// <summary>
-        /// One taxonomy's custom categories as the one string they are stored as, and putting that
-        /// string back.
+        /// One taxonomy's three slots as the one string they are stored as, and putting that string
+        /// back.
         ///
-        /// The category dialogs edit a category in place, as the menus they replace did, so Cancel
-        /// has to be able to undo a name, a key, a set of subcategories and a list of keywords at
-        /// once. The stored form already says all of that, so the snapshot is the stored form.
+        /// The category dialogs edit a slot in place, as the menus they replace did, so Cancel has
+        /// to be able to undo a name, a set of subcategories and a list of keywords at once, and to
+        /// empty a slot the editor filled. The stored form already says all of that, so the snapshot
+        /// is the stored form.
         /// </summary>
         public static string SnapshotScannerCustomCategories(string taxonomyKey)
         {
-            return ScannerCustomCategoryCodec.Encode(GetScannerCustomCategoryList(taxonomyKey));
+            return ScannerCustomSlotsCodec.Encode(GetScannerCustomSlotsCore(taxonomyKey));
         }
 
         public static bool RestoreScannerCustomCategories(string taxonomyKey, string snapshot)
@@ -602,8 +564,8 @@ namespace SongsOfConquestAccess
                 return false;
             }
 
-            config.List = ScannerCustomCategoryCodec.Decode(snapshot);
-            SaveScannerCustomCategories(taxonomyKey, config.List);
+            config.Slots = ScannerCustomSlotsCodec.Decode(snapshot);
+            SaveScannerCustomSlots(taxonomyKey, config.Slots);
             return true;
         }
 
@@ -854,6 +816,10 @@ namespace SongsOfConquestAccess
             return value > maximum ? maximum : value;
         }
 
+        /// <summary>
+        /// The slots entry, and beside it the list entry older builds wrote, kept bound so that what
+        /// a player already saved can be moved onto the slots the first time they are read.
+        /// </summary>
         private static void BindScannerCustomCategories(ConfigFile config)
         {
             _scannerCustomCategories.Clear();
@@ -864,9 +830,14 @@ namespace SongsOfConquestAccess
                 {
                     Entry = config.Bind(
                         "Scanner",
+                        ToConfigKeyPrefix(taxonomyKey) + "CustomCategorySlots",
+                        string.Empty,
+                        "The three player-defined scanner categories for this context. Edited through the mod settings screen."),
+                    Legacy = config.Bind(
+                        "Scanner",
                         ToConfigKeyPrefix(taxonomyKey) + "CustomCategories",
                         string.Empty,
-                        "Player-defined scanner categories for this context. Edited through the mod settings screen.")
+                        "Player-defined scanner categories as builds before the three fixed slots wrote them. Moved onto the slots once and then emptied.")
                 };
             }
         }
@@ -876,7 +847,7 @@ namespace SongsOfConquestAccess
         /// rather than game state: nothing outside this class can change them
         /// between reads.
         /// </summary>
-        private static ScannerCustomCategoryList GetScannerCustomCategoryList(string taxonomyKey)
+        private static ScannerCustomSlots GetScannerCustomSlotsCore(string taxonomyKey)
         {
             ScannerCustomCategoryConfig config = GetScannerCustomCategoryConfig(taxonomyKey);
             if (config == null)
@@ -884,12 +855,39 @@ namespace SongsOfConquestAccess
                 return null;
             }
 
-            if (config.List == null)
+            if (config.Slots == null)
             {
-                config.List = ScannerCustomCategoryCodec.Decode(config.Entry != null ? config.Entry.Value : null);
+                config.Slots = ScannerCustomSlotsCodec.Decode(config.Entry != null ? config.Entry.Value : null);
+                MigrateScannerCustomCategories(taxonomyKey, config);
             }
 
-            return config.List;
+            return config.Slots;
+        }
+
+        /// <summary>
+        /// Moves what an older build saved as a list onto the three slots, once. The list entry is
+        /// emptied as the slots are written, so this runs on one load and never again, and a player
+        /// who had more than three categories is told in the log which ones did not fit.
+        /// </summary>
+        private static void MigrateScannerCustomCategories(string taxonomyKey, ScannerCustomCategoryConfig config)
+        {
+            if (config.Legacy == null || string.IsNullOrWhiteSpace(config.Legacy.Value))
+            {
+                return;
+            }
+
+            IReadOnlyList<string> dropped;
+            config.Slots = ScannerCustomSlotsMigration.Migrate(
+                ScannerCustomSlotsCodec.DecodeLegacy(config.Legacy.Value),
+                out dropped);
+            config.Legacy.Value = string.Empty;
+            SaveScannerCustomSlots(taxonomyKey, config.Slots);
+            if (dropped.Count > 0)
+            {
+                SocAccessMod.Instance?.LogWarning(
+                    "Scanner custom categories for '" + taxonomyKey + "' no longer fit the three slots; dropped: "
+                    + string.Join(", ", new List<string>(dropped).ToArray()));
+            }
         }
 
         private static ScannerCustomCategoryConfig GetScannerCustomCategoryConfig(string taxonomyKey)
@@ -905,21 +903,21 @@ namespace SongsOfConquestAccess
 
         private static bool MutateScannerCustomCategory(
             string taxonomyKey,
-            int id,
+            int slot,
             Func<ScannerCustomCategory, bool> mutate)
         {
-            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
-            ScannerCustomCategory category = list != null ? list.Get(id) : null;
+            ScannerCustomSlots slots = GetScannerCustomSlotsCore(taxonomyKey);
+            ScannerCustomCategory category = slots != null ? slots.Slot(slot) : null;
             if (category == null || mutate == null || !mutate(category))
             {
                 return false;
             }
 
-            SaveScannerCustomCategories(taxonomyKey, list);
+            SaveScannerCustomSlots(taxonomyKey, slots);
             return true;
         }
 
-        private static void SaveScannerCustomCategories(string taxonomyKey, ScannerCustomCategoryList list)
+        private static void SaveScannerCustomSlots(string taxonomyKey, ScannerCustomSlots slots)
         {
             ScannerCustomCategoryConfig config = GetScannerCustomCategoryConfig(taxonomyKey);
             if (config == null || config.Entry == null)
@@ -927,7 +925,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            config.Entry.Value = ScannerCustomCategoryCodec.Encode(list);
+            config.Entry.Value = ScannerCustomSlotsCodec.Encode(slots);
             _config?.Save();
         }
 
@@ -1167,7 +1165,8 @@ namespace SongsOfConquestAccess
         private sealed class ScannerCustomCategoryConfig
         {
             public ConfigEntry<string> Entry { get; set; }
-            public ScannerCustomCategoryList List { get; set; }
+            public ConfigEntry<string> Legacy { get; set; }
+            public ScannerCustomSlots Slots { get; set; }
         }
 
         private sealed class KeybindConfig

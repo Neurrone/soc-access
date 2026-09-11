@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 
@@ -6,7 +6,7 @@ namespace SongsOfConquestAccess.Input
 {
     /// <summary>
     /// Reads and writes a mod gesture's override bindings as one config string, the way
-    /// <see cref="Scanner.ScannerCustomCategoryCodec"/> rides a whole list in one entry.
+    /// <see cref="Scanner.ScannerCustomSlotsCodec"/> rides three whole categories in one entry.
     ///
     /// One token per binding, tokens separated by semicolons; a token is the Unity <see cref="Key"/>
     /// enum name and the three modifier flags separated by commas - the same stable, English form

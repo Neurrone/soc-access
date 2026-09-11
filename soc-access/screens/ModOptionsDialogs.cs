@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Audio;
@@ -285,56 +285,52 @@ namespace SongsOfConquestAccess.Screens
                 screen => DrawCustomCategories(screen, taxonomy));
         }
 
+        /// <summary>The three slots, always all three and always in order, each named by its number
+        /// and by what it holds, so an empty one is a row the player can walk onto and fill rather
+        /// than something they have to add first.</summary>
         private static void DrawCustomCategories(ModDialogScreen screen, ScannerTaxonomy taxonomy)
         {
             ModDialog dialog = screen.Dialog;
-            IReadOnlyList<ScannerCustomCategory> categories = ModSettings.GetScannerCustomCategories(taxonomy.Key);
-            for (int i = 0; i < categories.Count; i++)
+            for (int i = 0; i < ScannerCustomSlots.Count; i++)
             {
-                int id = categories[i].Id;
-                dialog.AddButton(categories[i].Name, () => OpenCustomCategory(screen, taxonomy, id));
+                int slot = i;
+                ScannerCustomCategory category = ModSettings.GetScannerCustomCategory(taxonomy.Key, slot);
+                dialog.AddButton(
+                    ModText.Get(
+                        ModStrings.Screens.CustomCategorySlot,
+                        slot + 1,
+                        category != null
+                            ? category.Name
+                            : ModText.Get(ModStrings.Screens.CustomCategorySlotEmpty)),
+                    () => OpenCustomCategory(screen, taxonomy, slot));
             }
-
-            dialog.AddButton(
-                ModText.Get(ModStrings.Screens.AddCustomCategory),
-                () =>
-                {
-                    // The built-in labels are resolved once here rather than inside the predicate,
-                    // which the walk past a taken position calls again for every candidate name.
-                    IReadOnlyList<string> builtInNames = ScannerCustomCategoryNameConflict.BuiltInNames(taxonomy);
-                    ScannerCustomCategory added = ModSettings.AddScannerCustomCategory(
-                        taxonomy.Key,
-                        position => ModText.Get(ModStrings.Screens.CustomCategoryDefaultName, position),
-                        name => ScannerCustomCategoryNameConflict.Exists(
-                            name,
-                            builtInNames,
-                            ModSettings.GetScannerCustomCategories(taxonomy.Key),
-                            0));
-                    if (added == null)
-                    {
-                        return;
-                    }
-
-                    screen.Redraw();
-                    OpenCustomCategory(screen, taxonomy, added.Id);
-                });
         }
 
-        // ---- one custom category ----
+        // ---- one slot ----
 
-        private static void OpenCustomCategory(ModDialogScreen parent, ScannerTaxonomy taxonomy, int id)
+        /// <summary>
+        /// The editor for one slot. An empty slot is filled as it is opened, under the name its
+        /// number gives it, because a category is a name plus what it asks for and there is nothing
+        /// to tick columns onto until the slot holds one. Cancel puts the whole taxonomy back as it
+        /// was, which empties a slot this opening filled.
+        /// </summary>
+        private static void OpenCustomCategory(ModDialogScreen parent, ScannerTaxonomy taxonomy, int slot)
         {
             string snapshot = ModSettings.SnapshotScannerCustomCategories(taxonomy.Key);
-            ScannerCustomCategory category = ModSettings.GetScannerCustomCategory(taxonomy.Key, id);
+            ScannerCustomCategory category = ModSettings.GetScannerCustomCategory(taxonomy.Key, slot)
+                ?? ModSettings.AddScannerCustomCategory(
+                    taxonomy.Key,
+                    slot,
+                    ModText.Get(ModStrings.Screens.CustomCategoryDefaultName, slot + 1));
             if (category == null)
             {
                 return;
             }
 
             ModDialogScreen.Open(
-                "mod-category-" + taxonomy.Key + "-" + id,
-                category.Name,
-                screen => DrawCustomCategory(screen, parent, taxonomy, id),
+                "mod-category-" + taxonomy.Key + "-" + slot,
+                ModText.Get(ModStrings.Screens.CustomCategorySlot, slot + 1, category.Name),
+                screen => DrawCustomCategory(screen, parent, taxonomy, slot),
                 () =>
                 {
                     ModSettings.RestoreScannerCustomCategories(taxonomy.Key, snapshot);
@@ -343,10 +339,10 @@ namespace SongsOfConquestAccess.Screens
                 });
         }
 
-        private static void DrawCustomCategory(ModDialogScreen screen, ModDialogScreen parent, ScannerTaxonomy taxonomy, int id)
+        private static void DrawCustomCategory(ModDialogScreen screen, ModDialogScreen parent, ScannerTaxonomy taxonomy, int slot)
         {
             ModDialog dialog = screen.Dialog;
-            ScannerCustomCategory category = ModSettings.GetScannerCustomCategory(taxonomy.Key, id);
+            ScannerCustomCategory category = ModSettings.GetScannerCustomCategory(taxonomy.Key, slot);
             if (category == null)
             {
                 return;
@@ -360,18 +356,13 @@ namespace SongsOfConquestAccess.Screens
                 category.Name,
                 null);
 
-            if (ModSettings.SupportsScannerQuickKeys(taxonomy.Key))
-            {
-                AddQuickKeyDropdown(dialog, taxonomy, id, category);
-            }
-
             IReadOnlyList<ScannerCategoryDefinition> definitions = taxonomy.Categories;
             for (int i = 0; i < definitions.Count; i++)
             {
                 ScannerCategoryDefinition definition = definitions[i];
                 dialog.AddButton(
                     DescribeSource(category, definition),
-                    () => OpenCategorySelectors(screen, taxonomy, id, definition));
+                    () => OpenCategorySelectors(screen, taxonomy, slot, definition));
             }
 
             for (int i = 0; i < category.Keywords.Count; i++)
@@ -381,7 +372,7 @@ namespace SongsOfConquestAccess.Screens
                     ModText.Get(ModStrings.Screens.RemoveKeyword, keyword),
                     () =>
                     {
-                        ModSettings.RemoveScannerCustomCategoryKeyword(taxonomy.Key, id, keyword);
+                        ModSettings.RemoveScannerCustomCategoryKeyword(taxonomy.Key, slot, keyword);
                         screen.Redraw();
                     });
             }
@@ -397,7 +388,7 @@ namespace SongsOfConquestAccess.Screens
                     string trimmed = Value(keywordField);
                     // A refused keyword that was not blank was already there, and swallowing that
                     // silently reads as a dead keypress.
-                    if (!ModSettings.AddScannerCustomCategoryKeyword(taxonomy.Key, id, trimmed) && trimmed.Length > 0)
+                    if (!ModSettings.AddScannerCustomCategoryKeyword(taxonomy.Key, slot, trimmed) && trimmed.Length > 0)
                     {
                         Speak(ModText.Get(ModStrings.Screens.KeywordAlreadyAdded));
                         return;
@@ -406,23 +397,24 @@ namespace SongsOfConquestAccess.Screens
                     screen.Redraw();
                 });
 
+            // Emptying the slot is the delete: the slot itself stays, so the key that walks it keeps
+            // answering and nothing is renumbered.
             dialog.AddButton(
-                ModText.Get(ModStrings.Screens.DeleteCustomCategory),
+                ModText.Get(ModStrings.Screens.ClearCustomCategory),
                 () =>
                 {
-                    string name = category.Name;
-                    if (!ModSettings.RemoveScannerCustomCategory(taxonomy.Key, id))
+                    if (!ModSettings.ClearScannerCustomCategory(taxonomy.Key, slot))
                     {
                         return;
                     }
 
-                    Speak(ModText.Get(ModStrings.Screens.CustomCategoryDeleted, name));
+                    Speak(ModText.Get(ModStrings.Screens.CustomCategoryCleared, slot + 1));
                     parent.Redraw();
                     screen.Close();
                 });
             AddCancelAndConfirm(screen, () =>
             {
-                if (!Rename(taxonomy, id, Value(nameField)))
+                if (!Rename(taxonomy, slot, Value(nameField)))
                 {
                     return false;
                 }
@@ -446,7 +438,7 @@ namespace SongsOfConquestAccess.Screens
         /// typed still in the box, so a near miss is edited rather than typed out again. A name
         /// left as it was is not a refusal: Confirm simply closes.
         /// </summary>
-        private static bool Rename(ScannerTaxonomy taxonomy, int id, string name)
+        private static bool Rename(ScannerTaxonomy taxonomy, int slot, string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -460,8 +452,8 @@ namespace SongsOfConquestAccess.Screens
             if (ScannerCustomCategoryNameConflict.Exists(
                     name,
                     taxonomy,
-                    ModSettings.GetScannerCustomCategories(taxonomy.Key),
-                    id))
+                    ModSettings.GetScannerCustomSlots(taxonomy.Key),
+                    slot))
             {
                 OpenNameRefused(
                     "mod-category-name-taken",
@@ -470,7 +462,7 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            ModSettings.RenameScannerCustomCategory(taxonomy.Key, id, name);
+            ModSettings.RenameScannerCustomCategory(taxonomy.Key, slot, name);
             return true;
         }
 
@@ -494,57 +486,6 @@ namespace SongsOfConquestAccess.Screens
                         GameText.Get("Common/Ok", ModText.Get(ModStrings.Screens.Ok)),
                         () => screen.Close());
                 });
-        }
-
-        /// <summary>
-        /// The one key that walks this category on the adventure map. Every option says who holds
-        /// it, because picking one that is taken MOVES it, and the player deserves to know what
-        /// they are about to take it from.
-        /// </summary>
-        private static void AddQuickKeyDropdown(ModDialog dialog, ScannerTaxonomy taxonomy, int id, ScannerCustomCategory category)
-        {
-            List<UITextMeshDropdown.Option> options = new List<UITextMeshDropdown.Option>();
-            List<ScannerQuickKey> keys = new List<ScannerQuickKey>();
-            int value = 0;
-            for (int i = 0; i <= ScannerQuickKeys.Assignable.Length; i++)
-            {
-                ScannerQuickKey quickKey = i < ScannerQuickKeys.Assignable.Length
-                    ? ScannerQuickKeys.Assignable[i]
-                    : ScannerQuickKey.None;
-                if (category.QuickKey == quickKey)
-                {
-                    value = keys.Count;
-                }
-
-                keys.Add(quickKey);
-                options.Add(new UITextMeshDropdown.Option(DescribeQuickKey(taxonomy, category, quickKey)));
-            }
-
-            dialog.AddDropdown(
-                ModText.Get(ModStrings.Screens.CustomCategoryKeyTitle, category.Name),
-                options,
-                value,
-                index =>
-                {
-                    if (index >= 0 && index < keys.Count)
-                    {
-                        ModSettings.SetScannerCustomCategoryQuickKey(taxonomy.Key, id, keys[index]);
-                    }
-                });
-        }
-
-        private static string DescribeQuickKey(ScannerTaxonomy taxonomy, ScannerCustomCategory category, ScannerQuickKey quickKey)
-        {
-            string name = ScannerQuickKeyText.Name(quickKey);
-            if (category.QuickKey == quickKey)
-            {
-                return ModText.Get(ModStrings.Screens.CustomCategoryKeyCurrent, name);
-            }
-
-            ScannerCustomCategory holder = ModSettings.GetScannerCustomCategoryByQuickKey(taxonomy.Key, quickKey);
-            return holder != null
-                ? ModText.Get(ModStrings.Screens.CustomCategoryKeyHeldBy, name, holder.Name)
-                : name;
         }
 
         /// <summary>Says how much of a source category this custom category takes, so the player can
@@ -572,14 +513,14 @@ namespace SongsOfConquestAccess.Screens
         private static void OpenCategorySelectors(
             ModDialogScreen parent,
             ScannerTaxonomy taxonomy,
-            int id,
+            int slot,
             ScannerCategoryDefinition definition)
         {
             string snapshot = ModSettings.SnapshotScannerCustomCategories(taxonomy.Key);
             ModDialogScreen.Open(
-                "mod-selectors-" + taxonomy.Key + "-" + id + "-" + definition.Key,
+                "mod-selectors-" + taxonomy.Key + "-" + slot + "-" + definition.Key,
                 definition.Label != null ? definition.Label() : definition.Key,
-                screen => DrawCategorySelectors(screen, parent, taxonomy, id, definition),
+                screen => DrawCategorySelectors(screen, parent, taxonomy, slot, definition),
                 () =>
                 {
                     ModSettings.RestoreScannerCustomCategories(taxonomy.Key, snapshot);
@@ -592,7 +533,7 @@ namespace SongsOfConquestAccess.Screens
             ModDialogScreen screen,
             ModDialogScreen parent,
             ScannerTaxonomy taxonomy,
-            int id,
+            int slot,
             ScannerCategoryDefinition definition)
         {
             ModDialog dialog = screen.Dialog;
@@ -600,13 +541,13 @@ namespace SongsOfConquestAccess.Screens
             {
                 ScannerSubcategoryDefinition subcategory = definition.Subcategories[i];
                 string subcategoryKey = subcategory.Key;
-                ScannerCustomCategory category = ModSettings.GetScannerCustomCategory(taxonomy.Key, id);
+                ScannerCustomCategory category = ModSettings.GetScannerCustomCategory(taxonomy.Key, slot);
                 dialog.AddToggle(
                     subcategory.Label != null ? subcategory.Label() : subcategoryKey,
                     category != null && category.HasSelector(definition.Key, subcategoryKey),
                     value => ModSettings.SetScannerCustomCategorySelector(
                         taxonomy.Key,
-                        id,
+                        slot,
                         definition.Key,
                         subcategoryKey,
                         value));

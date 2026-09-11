@@ -1,5 +1,4 @@
-using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Scanner;
 
 namespace SongsOfConquestAccess.Tests
@@ -10,7 +9,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void ABlankRenameIsRefusedSoTheCategoryKeepsASpokenName()
         {
-            ScannerCustomCategory category = new ScannerCustomCategory(1, "Custom 1");
+            ScannerCustomCategory category = new ScannerCustomCategory("Custom 1");
 
             Assert.IsFalse(category.Rename("   "));
             Assert.AreEqual("Custom 1", category.Name);
@@ -21,7 +20,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void SelectorsToggleOnAndOffWithoutDuplicating()
         {
-            ScannerCustomCategory category = new ScannerCustomCategory(1, "Custom 1");
+            ScannerCustomCategory category = new ScannerCustomCategory("Custom 1");
 
             Assert.IsTrue(category.SetSelector(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.Unvisited, selected: true));
             Assert.IsFalse(category.SetSelector(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.Unvisited, selected: true));
@@ -36,7 +35,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void TheSameSubcategoryKeyUnderTwoCategoriesStaysTwoSelectors()
         {
-            ScannerCustomCategory category = new ScannerCustomCategory(1, "Custom 1");
+            ScannerCustomCategory category = new ScannerCustomCategory("Custom 1");
 
             category.SetSelector(ScannerCategoryKeys.Buildings, ScannerSubcategoryKeys.Enemy, selected: true);
             category.SetSelector(ScannerCategoryKeys.TroopSources, ScannerSubcategoryKeys.Enemy, selected: true);
@@ -47,7 +46,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void ABlankOrRepeatedKeywordIsRefused()
         {
-            ScannerCustomCategory category = new ScannerCustomCategory(1, "Custom 1");
+            ScannerCustomCategory category = new ScannerCustomCategory("Custom 1");
 
             Assert.IsTrue(category.AddKeyword("  mine  "));
             Assert.IsFalse(category.AddKeyword("MINE"));
@@ -59,66 +58,5 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(0, category.Keywords.Count);
         }
 
-        [TestMethod]
-        public void DeletingACategoryNeverLetsALaterOneInheritItsId()
-        {
-            ScannerCustomCategoryList list = new ScannerCustomCategoryList();
-
-            ScannerCustomCategory first = list.Add(position => "Custom " + position, null);
-            list.Remove(first.Id);
-            ScannerCustomCategory second = list.Add(position => "Custom " + position, null);
-
-            Assert.AreNotEqual(first.Id, second.Id);
-            Assert.IsNull(list.Get(first.Id));
-        }
-
-        /// <summary>
-        /// Positions are counted from how many categories are left, so deleting the middle of three
-        /// would name the next one after the survivor. Two categories under one name are one name
-        /// in the cycle the player hears, so the walk goes past a position already spoken for.
-        /// </summary>
-        [TestMethod]
-        public void AddingAfterADeletionSkipsAPositionWhoseNameSurvived()
-        {
-            ScannerCustomCategoryList list = new ScannerCustomCategoryList();
-            Func<int, string> name = position => "Custom " + position;
-            Func<string, bool> taken = candidate => ScannerCustomCategoryNameConflict.Exists(
-                candidate,
-                new string[0],
-                list.Categories,
-                0);
-
-            list.Add(name, taken);
-            ScannerCustomCategory second = list.Add(name, taken);
-            list.Add(name, taken);
-            list.Remove(second.Id);
-
-            Assert.AreEqual("Custom 4", list.Add(name, taken).Name);
-        }
-
-        [TestMethod]
-        public void AddingSkipsAPositionABuiltInCategoryAlreadyAnswersTo()
-        {
-            ScannerCustomCategoryList list = new ScannerCustomCategoryList();
-            string[] builtInNames = new[] { "Custom 1" };
-            Func<int, string> name = position => "Custom " + position;
-            Func<string, bool> taken = candidate => ScannerCustomCategoryNameConflict.Exists(
-                candidate,
-                builtInNames,
-                list.Categories,
-                0);
-
-            Assert.AreEqual("Custom 2", list.Add(name, taken).Name);
-        }
-
-        [TestMethod]
-        public void RestoredCategoriesDragTheIdCounterPastThemselves()
-        {
-            ScannerCustomCategoryList list = new ScannerCustomCategoryList();
-
-            list.Restore(new ScannerCustomCategory(7, "Custom 1"));
-
-            Assert.AreEqual(8, list.Add(position => "Custom " + position, null).Id);
-        }
     }
 }

@@ -1196,7 +1196,7 @@ msgstr ""
 
 #. Actions.ScannerNextCustomEntry
 msgctxt "Actions.ScannerNextCustomEntry"
-msgid "Next Entry In The Custom Category On {0}"
+msgid "Move to next result in custom category {0}"
 msgstr ""
 
 #. Actions.ScannerNextInstance
@@ -1221,7 +1221,7 @@ msgstr ""
 
 #. Actions.ScannerPreviousCustomEntry
 msgctxt "Actions.ScannerPreviousCustomEntry"
-msgid "Previous Entry In The Custom Category On {0}"
+msgid "Move to previous result in custom category {0}"
 msgstr ""
 
 #. Actions.ScannerPreviousInstance
@@ -2254,11 +2254,6 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr ""
 
-#. Screens.AddCustomCategory
-msgctxt "Screens.AddCustomCategory"
-msgid "Add custom category"
-msgstr ""
-
 #. Screens.Add
 msgctxt "Screens.Add"
 msgid "Add"
@@ -2444,34 +2439,29 @@ msgctxt "Screens.CustomCategories"
 msgid "{0} custom categories"
 msgstr ""
 
+#. Screens.ClearCustomCategory
+msgctxt "Screens.ClearCustomCategory"
+msgid "Clear this custom category"
+msgstr ""
+
+#. Screens.CustomCategoryCleared
+msgctxt "Screens.CustomCategoryCleared"
+msgid "Custom category {0} cleared"
+msgstr ""
+
 #. Screens.CustomCategoryDefaultName
 msgctxt "Screens.CustomCategoryDefaultName"
 msgid "Custom {0}"
 msgstr ""
 
-#. Screens.CustomCategoryDeleted
-msgctxt "Screens.CustomCategoryDeleted"
-msgid "{0} deleted"
+#. Screens.CustomCategorySlot
+msgctxt "Screens.CustomCategorySlot"
+msgid "Custom category {0}: {1}"
 msgstr ""
 
-#. Screens.CustomCategoryKey
-msgctxt "Screens.CustomCategoryKey"
-msgid "Key, {0}"
-msgstr ""
-
-#. Screens.CustomCategoryKeyCurrent
-msgctxt "Screens.CustomCategoryKeyCurrent"
-msgid "{0}, current"
-msgstr ""
-
-#. Screens.CustomCategoryKeyHeldBy
-msgctxt "Screens.CustomCategoryKeyHeldBy"
-msgid "{0}, held by {1}"
-msgstr ""
-
-#. Screens.CustomCategoryKeyTitle
-msgctxt "Screens.CustomCategoryKeyTitle"
-msgid "Key for {0}"
+#. Screens.CustomCategorySlotEmpty
+msgctxt "Screens.CustomCategorySlotEmpty"
+msgid "empty"
 msgstr ""
 
 #. Screens.CustomCategoryName
@@ -2502,11 +2492,6 @@ msgstr ""
 #. Screens.Cursor
 msgctxt "Screens.Cursor"
 msgid "Cursor"
-msgstr ""
-
-#. Screens.DeleteCustomCategory
-msgctxt "Screens.DeleteCustomCategory"
-msgid "Delete this custom category"
 msgstr ""
 
 #. Screens.CancelAbility
@@ -3439,6 +3424,11 @@ msgctxt "Scanner.Buildings"
 msgid "Buildings"
 msgstr ""
 
+#. Scanner.CustomCategoryEmpty
+msgctxt "Scanner.CustomCategoryEmpty"
+msgid "Custom category {0} is empty"
+msgstr ""
+
 #. Scanner.Dangerous
 msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
@@ -3529,11 +3519,6 @@ msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr ""
 
-#. Scanner.NoCustomCategoryOnKey
-msgctxt "Scanner.NoCustomCategoryOnKey"
-msgid "No custom category on {0}"
-msgstr ""
-
 #. Scanner.NoTileToReturnTo
 msgctxt "Scanner.NoTileToReturnTo"
 msgid "No tile to return to"
@@ -3587,26 +3572,6 @@ msgstr ""
 #. Scanner.Pickups
 msgctxt "Scanner.Pickups"
 msgid "Pickups"
-msgstr ""
-
-#. Scanner.QuickKeyComma
-msgctxt "Scanner.QuickKeyComma"
-msgid "Comma"
-msgstr ""
-
-#. Scanner.QuickKeyNone
-msgctxt "Scanner.QuickKeyNone"
-msgid "None"
-msgstr ""
-
-#. Scanner.QuickKeyPeriod
-msgctxt "Scanner.QuickKeyPeriod"
-msgid "Period"
-msgstr ""
-
-#. Scanner.QuickKeySlash
-msgctxt "Scanner.QuickKeySlash"
-msgid "Slash"
 msgstr ""
 
 #. Scanner.Power

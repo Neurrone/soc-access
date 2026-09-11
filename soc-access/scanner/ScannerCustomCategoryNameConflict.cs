@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.Scanner
@@ -6,31 +6,31 @@ namespace SongsOfConquestAccess.Scanner
     /// <summary>
     /// Decides whether a proposed custom category name is already taken inside
     /// one taxonomy. The category cycle is only ever read aloud, so two
-    /// categories sharing a name are one name to the player no matter which ids
-    /// sit behind them, and the name is what has to stay distinct.
+    /// categories sharing a name are one name to the player no matter which
+    /// slots hold them, and the name is what has to stay distinct.
     /// </summary>
     public static class ScannerCustomCategoryNameConflict
     {
         /// <summary>
         /// Reports whether <paramref name="name"/> is already the name of a
-        /// built-in category of <paramref name="taxonomy"/> or of a custom
-        /// category other than <paramref name="renamedId"/>. A blank name never
-        /// conflicts; it is refused further down for being blank.
+        /// built-in category of <paramref name="taxonomy"/> or of a slot other
+        /// than <paramref name="slot"/>. A blank name never conflicts; it is
+        /// refused further down for being blank.
         /// </summary>
         public static bool Exists(
             string name,
             ScannerTaxonomy taxonomy,
-            IReadOnlyList<ScannerCustomCategory> customCategories,
-            int renamedId)
+            ScannerCustomSlots slots,
+            int slot)
         {
-            return Exists(name, BuiltInNames(taxonomy), customCategories, renamedId);
+            return Exists(name, BuiltInNames(taxonomy), slots, slot);
         }
 
         public static bool Exists(
             string name,
             IReadOnlyList<string> builtInNames,
-            IReadOnlyList<ScannerCustomCategory> customCategories,
-            int renamedId)
+            ScannerCustomSlots slots,
+            int slot)
         {
             string trimmed = (name ?? string.Empty).Trim();
             if (trimmed.Length == 0)
@@ -49,21 +49,7 @@ namespace SongsOfConquestAccess.Scanner
                 }
             }
 
-            if (customCategories == null)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < customCategories.Count; i++)
-            {
-                ScannerCustomCategory category = customCategories[i];
-                if (category != null && category.Id != renamedId && IsSameName(category.Name, trimmed))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return slots != null && slots.NameTaken(trimmed, slot);
         }
 
         /// <summary>
