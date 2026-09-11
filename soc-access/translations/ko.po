@@ -1265,6 +1265,36 @@ msgctxt "Actions.HexGridWest"
 msgid "Hex Grid West"
 msgstr "육각 격자 서쪽"
 
+#. Actions.HexGridSkipEast
+msgctxt "Actions.HexGridSkipEast"
+msgid "Move to next interesting tile east"
+msgstr "동쪽의 다음 주목할 타일로 이동"
+
+#. Actions.HexGridSkipNorthEast
+msgctxt "Actions.HexGridSkipNorthEast"
+msgid "Move to next interesting tile north east"
+msgstr "북동쪽의 다음 주목할 타일로 이동"
+
+#. Actions.HexGridSkipNorthWest
+msgctxt "Actions.HexGridSkipNorthWest"
+msgid "Move to next interesting tile north west"
+msgstr "북서쪽의 다음 주목할 타일로 이동"
+
+#. Actions.HexGridSkipSouthEast
+msgctxt "Actions.HexGridSkipSouthEast"
+msgid "Move to next interesting tile south east"
+msgstr "남동쪽의 다음 주목할 타일로 이동"
+
+#. Actions.HexGridSkipSouthWest
+msgctxt "Actions.HexGridSkipSouthWest"
+msgid "Move to next interesting tile south west"
+msgstr "남서쪽의 다음 주목할 타일로 이동"
+
+#. Actions.HexGridSkipWest
+msgctxt "Actions.HexGridSkipWest"
+msgid "Move to next interesting tile west"
+msgstr "서쪽의 다음 주목할 타일로 이동"
+
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
@@ -1290,10 +1320,25 @@ msgctxt "Actions.MapMoveWest"
 msgid "Map Move West"
 msgstr "지도를 서쪽으로 이동"
 
-#. Actions.MapSecondaryAction
-msgctxt "Actions.MapSecondaryAction"
-msgid "Map Secondary Action"
-msgstr "지도 보조 동작"
+#. Actions.MapSkipEast
+msgctxt "Actions.MapSkipEast"
+msgid "Move to next interesting tile east"
+msgstr "동쪽의 다음 주목할 타일로 이동"
+
+#. Actions.MapSkipNorth
+msgctxt "Actions.MapSkipNorth"
+msgid "Move to next interesting tile north"
+msgstr "북쪽의 다음 주목할 타일로 이동"
+
+#. Actions.MapSkipSouth
+msgctxt "Actions.MapSkipSouth"
+msgid "Move to next interesting tile south"
+msgstr "남쪽의 다음 주목할 타일로 이동"
+
+#. Actions.MapSkipWest
+msgctxt "Actions.MapSkipWest"
+msgid "Move to next interesting tile west"
+msgstr "서쪽의 다음 주목할 타일로 이동"
 
 #. Actions.NextBuffer
 msgctxt "Actions.NextBuffer"
@@ -1427,8 +1472,8 @@ msgstr "뒤로"
 
 #. Actions.UiCarry
 msgctxt "Actions.UiCarry"
-msgid "Pick up or drop"
-msgstr "집기 또는 놓기"
+msgid "Start drag"
+msgstr "끌기 시작"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
@@ -1497,8 +1542,8 @@ msgstr "오른쪽 클릭"
 
 #. Actions.UiClearSearch
 msgctxt "Actions.UiClearSearch"
-msgid "Clear Search"
-msgstr "검색 지우기"
+msgid "Clear typeahead"
+msgstr "미리 입력 지우기"
 
 #. Actions.UiUp
 msgctxt "Actions.UiUp"
@@ -3035,8 +3080,8 @@ msgstr "구매"
 
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"
-msgid "Describe Position"
-msgstr "위치 설명"
+msgid "Describe map"
+msgstr "지도 설명"
 
 #. Actions.Dismiss
 msgctxt "Actions.Dismiss"
@@ -3087,6 +3132,11 @@ msgstr "위로 이동"
 msgctxt "Screens.ResetAllToDefaults"
 msgid "Reset all to defaults"
 msgstr "모두 기본값으로 재설정"
+
+#. Screens.ReviewBuffer
+msgctxt "Screens.ReviewBuffer"
+msgid "Review buffer"
+msgstr "검토 버퍼"
 
 #. Screens.ResetToDefaults
 msgctxt "Screens.ResetToDefaults"
@@ -3645,6 +3695,11 @@ msgctxt "Screens.CustomCategoryNameTakenTitle"
 msgid "Name already in use"
 msgstr "이미 사용 중인 이름"
 
+#. Screens.Cursor
+msgctxt "Screens.Cursor"
+msgid "Cursor"
+msgstr "커서"
+
 #. Scanner.NoCustomCategoryOnKey
 msgctxt "Scanner.NoCustomCategoryOnKey"
 msgid "No custom category on {0}"
@@ -3710,11 +3765,6 @@ msgstr "다음에 누르는 키가 단축키로 지정됩니다."
 msgctxt "Screens.Keybinds"
 msgid "Keybinds"
 msgstr "키 지정"
-
-#. Screens.GeneralAndReviewBuffer
-msgctxt "Screens.GeneralAndReviewBuffer"
-msgid "General and review buffer"
-msgstr "일반 및 리뷰 버퍼"
 
 #. Screens.Bookmarks
 msgctxt "Screens.Bookmarks"

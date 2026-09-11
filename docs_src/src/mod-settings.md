@@ -1,6 +1,6 @@
 # Mod Settings
 
-Press `Ctrl+m` to open the mod's settings screen.
+Open the mod's settings screen with the `Mod options` button on the main menu or the pause menu.
 
 ## Detailed Threat Info
 

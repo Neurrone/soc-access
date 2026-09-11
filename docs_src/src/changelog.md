@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The `Keybinds` tab now lists the cursor keys (arrows, `Tab`, `Home`, `End`, clicks and the rest) as its first region and the review buffer as its own, puts the resource summaries with the adventure map and combat, the look-around keys with the adventure map, and orders the rest adventure map, scanner, hex grid, combat, bookmarks. The `Shift+arrow` rows read `Move to next interesting tile ...`, `D` reads `Describe map`, `Space` reads `Start drag` and `Backspace` reads `Clear typeahead`
+- Removed the separate `Map secondary action` row: the backslash on a tile has always been the right click, which is the `Right click` row
 - Removed the `Ctrl+M` shortcut. Mod settings are opened with the `Mod options` button on the main menu or the pause menu
 - The `Keybinds` tab of mod settings now draws each gesture as a real key-binding row, the same control the game's `Controls` page uses, so it can be worked with the mouse too. Rebinding to a chord such as `Ctrl+R` now records the modifier
 - The key-binding tables of the game's `Controls` page and the mod's `Keybinds` tab are part of the settings list rather than a Tab stop of their own, scroll the selected row into view, and no longer read a usage hint on the chip and the `+` cell

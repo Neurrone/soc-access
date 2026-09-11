@@ -50,7 +50,7 @@ Moving to a different item reads its name. Stepping between copies of the same i
 
 ## Custom Categories
 
-You can define your own categories that collect the things you care about. Press `Ctrl+m` to open mod settings, go to the scanner tab, and choose `Adventure map custom categories` or `Battle custom categories`. Each context keeps its own set.
+You can define your own categories that collect the things you care about. Open mod settings with the `Mod options` button on the main menu or the pause menu, go to the scanner tab, and choose `Adventure map custom categories` or `Battle custom categories`. Each context keeps its own set.
 
 A custom category is built from two kinds of rule:
 

@@ -80,24 +80,17 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction MapMoveEast = OneShot("map_move_east", ModStrings.Actions.MapMoveEast, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.RightArrow));
 
-        public static readonly InputAction MapSkipNorth = OneShot("map_skip_north", ModStrings.Actions.MapMoveNorth, InputClaimScope.Screen)
+        public static readonly InputAction MapSkipNorth = OneShot("map_skip_north", ModStrings.Actions.MapSkipNorth, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.UpArrow, shift: true));
 
-        public static readonly InputAction MapSkipSouth = OneShot("map_skip_south", ModStrings.Actions.MapMoveSouth, InputClaimScope.Screen)
+        public static readonly InputAction MapSkipSouth = OneShot("map_skip_south", ModStrings.Actions.MapSkipSouth, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.DownArrow, shift: true));
 
-        public static readonly InputAction MapSkipWest = OneShot("map_skip_west", ModStrings.Actions.MapMoveWest, InputClaimScope.Screen)
+        public static readonly InputAction MapSkipWest = OneShot("map_skip_west", ModStrings.Actions.MapSkipWest, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.LeftArrow, shift: true));
 
-        public static readonly InputAction MapSkipEast = OneShot("map_skip_east", ModStrings.Actions.MapMoveEast, InputClaimScope.Screen)
+        public static readonly InputAction MapSkipEast = OneShot("map_skip_east", ModStrings.Actions.MapSkipEast, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.RightArrow, shift: true));
-
-        public static readonly InputAction MapSecondaryAction = OneShot("map_secondary_action", ModStrings.Actions.MapSecondaryAction, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.Backslash))
-            // A reported keyboard produced a visible backslash but Unity exposed the key as OEM1:
-            // key=OEM1 displayName=\ ctrl=False shift=False alt=False. Match only this literal
-            // display name here instead of treating OEM1 as a universal backslash key.
-            .AddBinding(new KeyboardDisplayNameBinding("\\"));
 
         public static readonly InputAction NextWielder = OneShot("next_wielder", ModStrings.Actions.NextWielder, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.W));
@@ -262,14 +255,15 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction UiClearSearch = OneShot("ui_clear_search", ModStrings.Actions.UiClearSearch, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Backspace));
 
-        // The right-click equivalent, on the key the map's secondary action
-        // already uses.
+        // The right-click equivalent: on the map and the battle board it is the tile's secondary
+        // action (the game's own right click), through the node's contextual handler.
         public static readonly InputAction UiRightClick = OneShot("ui_right_click", ModStrings.Actions.UiRightClick, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Backslash))
             .AddBinding(new KeyboardDisplayNameBinding("\\"))
             // Ctrl+right click, the same native right click with the physical Ctrl the game's own
-            // handler reads. The display-name fallback is repeated with Ctrl for the keyboard that
-            // reports backslash as OEM1 (see MapSecondaryAction).
+            // handler reads. The display-name fallback is for a reported keyboard that produced a
+            // visible backslash on a key Unity exposed as OEM1 (key=OEM1 displayName=\): only that
+            // literal display name is matched, OEM1 is not treated as a universal backslash key.
             .AddBinding(new KeyboardBinding(Key.Backslash, ctrl: true))
             .AddBinding(new KeyboardDisplayNameBinding("\\", ctrl: true));
 
@@ -307,22 +301,22 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction HexGridFocusCenterTile = OneShot("hex_grid_focus_center_tile", ModStrings.Actions.HexGridFocusCenterTile, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Space, ctrl: true));
 
-        public static readonly InputAction HexGridSkipWest = OneShot("hex_grid_skip_west", ModStrings.Actions.HexGridWest, InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridSkipWest = OneShot("hex_grid_skip_west", ModStrings.Actions.HexGridSkipWest, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.A, shift: true));
 
-        public static readonly InputAction HexGridSkipEast = OneShot("hex_grid_skip_east", ModStrings.Actions.HexGridEast, InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridSkipEast = OneShot("hex_grid_skip_east", ModStrings.Actions.HexGridSkipEast, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.D, shift: true));
 
-        public static readonly InputAction HexGridSkipNorthWest = OneShot("hex_grid_skip_north_west", ModStrings.Actions.HexGridNorthWest, InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridSkipNorthWest = OneShot("hex_grid_skip_north_west", ModStrings.Actions.HexGridSkipNorthWest, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Q, shift: true));
 
-        public static readonly InputAction HexGridSkipNorthEast = OneShot("hex_grid_skip_north_east", ModStrings.Actions.HexGridNorthEast, InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridSkipNorthEast = OneShot("hex_grid_skip_north_east", ModStrings.Actions.HexGridSkipNorthEast, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.E, shift: true));
 
-        public static readonly InputAction HexGridSkipSouthWest = OneShot("hex_grid_skip_south_west", ModStrings.Actions.HexGridSouthWest, InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridSkipSouthWest = OneShot("hex_grid_skip_south_west", ModStrings.Actions.HexGridSkipSouthWest, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Z, shift: true));
 
-        public static readonly InputAction HexGridSkipSouthEast = OneShot("hex_grid_skip_south_east", ModStrings.Actions.HexGridSouthEast, InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridSkipSouthEast = OneShot("hex_grid_skip_south_east", ModStrings.Actions.HexGridSkipSouthEast, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.C, shift: true));
 
         public static readonly InputAction CombatInspect = OneShot("combat_inspect", ModStrings.Actions.CombatInspect, InputClaimScope.FocusedWidget)
@@ -535,7 +529,6 @@ namespace SongsOfConquestAccess.Input
                 MapSkipSouth,
                 MapSkipWest,
                 MapSkipEast,
-                MapSecondaryAction,
                 NextWielder,
                 NextSettlement,
                 SummarizeReachableEntities,

@@ -1275,6 +1275,36 @@ msgctxt "Actions.HexGridWest"
 msgid "Hex Grid West"
 msgstr "Hexraster Westen"
 
+#. Actions.HexGridSkipEast
+msgctxt "Actions.HexGridSkipEast"
+msgid "Move to next interesting tile east"
+msgstr "Zum nächsten interessanten Feld im Osten bewegen"
+
+#. Actions.HexGridSkipNorthEast
+msgctxt "Actions.HexGridSkipNorthEast"
+msgid "Move to next interesting tile north east"
+msgstr "Zum nächsten interessanten Feld im Nordosten bewegen"
+
+#. Actions.HexGridSkipNorthWest
+msgctxt "Actions.HexGridSkipNorthWest"
+msgid "Move to next interesting tile north west"
+msgstr "Zum nächsten interessanten Feld im Nordwesten bewegen"
+
+#. Actions.HexGridSkipSouthEast
+msgctxt "Actions.HexGridSkipSouthEast"
+msgid "Move to next interesting tile south east"
+msgstr "Zum nächsten interessanten Feld im Südosten bewegen"
+
+#. Actions.HexGridSkipSouthWest
+msgctxt "Actions.HexGridSkipSouthWest"
+msgid "Move to next interesting tile south west"
+msgstr "Zum nächsten interessanten Feld im Südwesten bewegen"
+
+#. Actions.HexGridSkipWest
+msgctxt "Actions.HexGridSkipWest"
+msgid "Move to next interesting tile west"
+msgstr "Zum nächsten interessanten Feld im Westen bewegen"
+
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
@@ -1300,10 +1330,25 @@ msgctxt "Actions.MapMoveWest"
 msgid "Map Move West"
 msgstr "Karte nach Westen bewegen"
 
-#. Actions.MapSecondaryAction
-msgctxt "Actions.MapSecondaryAction"
-msgid "Map Secondary Action"
-msgstr "Sekundäre Kartenaktion"
+#. Actions.MapSkipEast
+msgctxt "Actions.MapSkipEast"
+msgid "Move to next interesting tile east"
+msgstr "Zum nächsten interessanten Feld im Osten bewegen"
+
+#. Actions.MapSkipNorth
+msgctxt "Actions.MapSkipNorth"
+msgid "Move to next interesting tile north"
+msgstr "Zum nächsten interessanten Feld im Norden bewegen"
+
+#. Actions.MapSkipSouth
+msgctxt "Actions.MapSkipSouth"
+msgid "Move to next interesting tile south"
+msgstr "Zum nächsten interessanten Feld im Süden bewegen"
+
+#. Actions.MapSkipWest
+msgctxt "Actions.MapSkipWest"
+msgid "Move to next interesting tile west"
+msgstr "Zum nächsten interessanten Feld im Westen bewegen"
 
 #. Actions.NextBuffer
 msgctxt "Actions.NextBuffer"
@@ -1442,8 +1487,8 @@ msgstr "Zurück"
 
 #. Actions.UiCarry
 msgctxt "Actions.UiCarry"
-msgid "Pick up or drop"
-msgstr "Aufnehmen oder ablegen"
+msgid "Start drag"
+msgstr "Ziehen beginnen"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
@@ -1512,8 +1557,8 @@ msgstr "Rechtsklick"
 
 #. Actions.UiClearSearch
 msgctxt "Actions.UiClearSearch"
-msgid "Clear Search"
-msgstr "Suche löschen"
+msgid "Clear typeahead"
+msgstr "Schnellsuche löschen"
 
 #. Actions.UiUp
 msgctxt "Actions.UiUp"
@@ -3060,8 +3105,8 @@ msgstr "Kaufen"
 
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"
-msgid "Describe Position"
-msgstr "Position beschreiben"
+msgid "Describe map"
+msgstr "Karte beschreiben"
 
 #. Actions.Dismiss
 msgctxt "Actions.Dismiss"
@@ -3112,6 +3157,11 @@ msgstr "Nach oben"
 msgctxt "Screens.ResetAllToDefaults"
 msgid "Reset all to defaults"
 msgstr "Alles auf Standardwerte zurücksetzen"
+
+#. Screens.ReviewBuffer
+msgctxt "Screens.ReviewBuffer"
+msgid "Review buffer"
+msgstr "Verlaufspuffer"
 
 #. Screens.ResetToDefaults
 msgctxt "Screens.ResetToDefaults"
@@ -3675,6 +3725,11 @@ msgctxt "Screens.CustomCategoryNameTakenTitle"
 msgid "Name already in use"
 msgstr "Name bereits vergeben"
 
+#. Screens.Cursor
+msgctxt "Screens.Cursor"
+msgid "Cursor"
+msgstr "Cursor"
+
 #. Scanner.NoCustomCategoryOnKey
 msgctxt "Scanner.NoCustomCategoryOnKey"
 msgid "No custom category on {0}"
@@ -3740,11 +3795,6 @@ msgstr "Die nächste Taste, die du drückst, wird zur Belegung."
 msgctxt "Screens.Keybinds"
 msgid "Keybinds"
 msgstr "Tastenbelegung"
-
-#. Screens.GeneralAndReviewBuffer
-msgctxt "Screens.GeneralAndReviewBuffer"
-msgid "General and review buffer"
-msgstr "Allgemein und Verlaufspuffer"
 
 #. Screens.Bookmarks
 msgctxt "Screens.Bookmarks"

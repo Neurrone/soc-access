@@ -1265,6 +1265,36 @@ msgctxt "Actions.HexGridWest"
 msgid "Hex Grid West"
 msgstr "六角网格西"
 
+#. Actions.HexGridSkipEast
+msgctxt "Actions.HexGridSkipEast"
+msgid "Move to next interesting tile east"
+msgstr "移动到东方向的下一个值得注意的地块"
+
+#. Actions.HexGridSkipNorthEast
+msgctxt "Actions.HexGridSkipNorthEast"
+msgid "Move to next interesting tile north east"
+msgstr "移动到东北方向的下一个值得注意的地块"
+
+#. Actions.HexGridSkipNorthWest
+msgctxt "Actions.HexGridSkipNorthWest"
+msgid "Move to next interesting tile north west"
+msgstr "移动到西北方向的下一个值得注意的地块"
+
+#. Actions.HexGridSkipSouthEast
+msgctxt "Actions.HexGridSkipSouthEast"
+msgid "Move to next interesting tile south east"
+msgstr "移动到东南方向的下一个值得注意的地块"
+
+#. Actions.HexGridSkipSouthWest
+msgctxt "Actions.HexGridSkipSouthWest"
+msgid "Move to next interesting tile south west"
+msgstr "移动到西南方向的下一个值得注意的地块"
+
+#. Actions.HexGridSkipWest
+msgctxt "Actions.HexGridSkipWest"
+msgid "Move to next interesting tile west"
+msgstr "移动到西方向的下一个值得注意的地块"
+
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
@@ -1290,10 +1320,25 @@ msgctxt "Actions.MapMoveWest"
 msgid "Map Move West"
 msgstr "地图向西移动"
 
-#. Actions.MapSecondaryAction
-msgctxt "Actions.MapSecondaryAction"
-msgid "Map Secondary Action"
-msgstr "地图次要操作"
+#. Actions.MapSkipEast
+msgctxt "Actions.MapSkipEast"
+msgid "Move to next interesting tile east"
+msgstr "移动到东方向的下一个值得注意的地块"
+
+#. Actions.MapSkipNorth
+msgctxt "Actions.MapSkipNorth"
+msgid "Move to next interesting tile north"
+msgstr "移动到北方向的下一个值得注意的地块"
+
+#. Actions.MapSkipSouth
+msgctxt "Actions.MapSkipSouth"
+msgid "Move to next interesting tile south"
+msgstr "移动到南方向的下一个值得注意的地块"
+
+#. Actions.MapSkipWest
+msgctxt "Actions.MapSkipWest"
+msgid "Move to next interesting tile west"
+msgstr "移动到西方向的下一个值得注意的地块"
 
 #. Actions.NextBuffer
 msgctxt "Actions.NextBuffer"
@@ -1427,8 +1472,8 @@ msgstr "返回"
 
 #. Actions.UiCarry
 msgctxt "Actions.UiCarry"
-msgid "Pick up or drop"
-msgstr "拿起或放下"
+msgid "Start drag"
+msgstr "开始拖动"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
@@ -1497,8 +1542,8 @@ msgstr "右键点击"
 
 #. Actions.UiClearSearch
 msgctxt "Actions.UiClearSearch"
-msgid "Clear Search"
-msgstr "清除搜索"
+msgid "Clear typeahead"
+msgstr "清除快速输入"
 
 #. Actions.UiUp
 msgctxt "Actions.UiUp"
@@ -3035,8 +3080,8 @@ msgstr "购买"
 
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"
-msgid "Describe Position"
-msgstr "描述位置"
+msgid "Describe map"
+msgstr "描述地图"
 
 #. Actions.Dismiss
 msgctxt "Actions.Dismiss"
@@ -3087,6 +3132,11 @@ msgstr "上移"
 msgctxt "Screens.ResetAllToDefaults"
 msgid "Reset all to defaults"
 msgstr "全部重置为默认值"
+
+#. Screens.ReviewBuffer
+msgctxt "Screens.ReviewBuffer"
+msgid "Review buffer"
+msgstr "查看缓冲区"
 
 #. Screens.ResetToDefaults
 msgctxt "Screens.ResetToDefaults"
@@ -3645,6 +3695,11 @@ msgctxt "Screens.CustomCategoryNameTakenTitle"
 msgid "Name already in use"
 msgstr "名称已被使用"
 
+#. Screens.Cursor
+msgctxt "Screens.Cursor"
+msgid "Cursor"
+msgstr "光标"
+
 #. Scanner.NoCustomCategoryOnKey
 msgctxt "Scanner.NoCustomCategoryOnKey"
 msgid "No custom category on {0}"
@@ -3710,11 +3765,6 @@ msgstr "你按下的下一个键将成为绑定。"
 msgctxt "Screens.Keybinds"
 msgid "Keybinds"
 msgstr "按键绑定"
-
-#. Screens.GeneralAndReviewBuffer
-msgctxt "Screens.GeneralAndReviewBuffer"
-msgid "General and review buffer"
-msgstr "常规与回顾缓冲区"
 
 #. Screens.Bookmarks
 msgctxt "Screens.Bookmarks"

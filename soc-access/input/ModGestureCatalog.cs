@@ -11,11 +11,12 @@ namespace SongsOfConquestAccess.Input
     /// region wording (localized <see cref="ModStrings"/>) live here, above it, per the adapter/screen
     /// split.
     ///
-    /// Only gestures a player may usefully rebind appear. The graph engine's navigation spine
-    /// (ui_up/down/left/right, ui_next/prev, ui_home/end, ui_left_click, ui_right_click, ui_back,
-    /// ui_carry and the rest) is left out entirely - remapping it would fight the mod itself - and so
-    /// are the Ctrl+digit quick-split chords, whose multi-key semantics a single-key capture cannot
-    /// express. Everything a group lists is captured as one <see cref="KeyboardBinding"/>.
+    /// The graph engine's navigation spine (the arrows, the stops, the regions, the clicks) is the
+    /// first block, as it is in Endless Space 2 Access, so the keys a player meets first are the
+    /// first they can see and change. Only the Ctrl+digit quick-split chords are held out, since
+    /// their multi-key semantics a single-key capture cannot express. Everything a group lists is
+    /// captured as one <see cref="KeyboardBinding"/>. The order is the owner's (2026-09-11): cursor,
+    /// review buffer, adventure map, scanner, hex grid, combat, and the forty bookmark rows last.
     /// </summary>
     public static class ModGestureCatalog
     {
@@ -81,10 +82,29 @@ namespace SongsOfConquestAccess.Input
         {
             List<Group> groups = new List<Group>();
 
-            groups.Add(new Group(ModStrings.Screens.GeneralAndReviewBuffer, new[]
+            groups.Add(new Group(ModStrings.Screens.Cursor, new[]
             {
-                AccessibilityActions.SummarizeResources,
-                AccessibilityActions.SummarizeEnemyResources,
+                AccessibilityActions.UiUp,
+                AccessibilityActions.UiDown,
+                AccessibilityActions.UiLeft,
+                AccessibilityActions.UiRight,
+                AccessibilityActions.UiNext,
+                AccessibilityActions.UiPrev,
+                AccessibilityActions.UiHome,
+                AccessibilityActions.UiEnd,
+                AccessibilityActions.UiRegionPrev,
+                AccessibilityActions.UiRegionNext,
+                AccessibilityActions.UiCoarseDecrease,
+                AccessibilityActions.UiCoarseIncrease,
+                AccessibilityActions.UiLeftClick,
+                AccessibilityActions.UiRightClick,
+                AccessibilityActions.UiCarry,
+                AccessibilityActions.UiBack,
+                AccessibilityActions.UiClearSearch,
+            }));
+
+            groups.Add(new Group(ModStrings.Screens.ReviewBuffer, new[]
+            {
                 AccessibilityActions.PreviousBuffer,
                 AccessibilityActions.NextBuffer,
                 AccessibilityActions.PreviousBufferLine,
@@ -103,24 +123,20 @@ namespace SongsOfConquestAccess.Input
                 AccessibilityActions.MapSkipSouth,
                 AccessibilityActions.MapSkipWest,
                 AccessibilityActions.MapSkipEast,
-                AccessibilityActions.MapSecondaryAction,
                 AccessibilityActions.NextWielder,
                 AccessibilityActions.NextSettlement,
                 AccessibilityActions.SummarizeReachableEntities,
+                AccessibilityActions.SummarizeResources,
                 AccessibilityActions.DescribePosition,
                 AccessibilityActions.SonarSweep,
+                AccessibilityActions.ScannerLookAround,
+                AccessibilityActions.ScannerIncreaseLookAroundRadius,
+                AccessibilityActions.ScannerDecreaseLookAroundRadius,
                 AccessibilityActions.FocusHudTroops,
                 AccessibilityActions.FocusHudResources,
                 AccessibilityActions.FocusHudObjectives,
                 AccessibilityActions.FocusHudNotifications,
             }));
-
-            List<InputAction> bookmarks = new List<InputAction>();
-            bookmarks.AddRange(AccessibilityActions.SaveBookmarks);
-            bookmarks.AddRange(AccessibilityActions.JumpToBookmarks);
-            bookmarks.AddRange(AccessibilityActions.SpeakBookmarkDirections);
-            bookmarks.AddRange(AccessibilityActions.ToggleBookmarkBeacons);
-            groups.Add(new Group(ModStrings.Screens.Bookmarks, bookmarks.ToArray()));
 
             groups.Add(new Group(ModStrings.Screens.Scanner, new[]
             {
@@ -136,29 +152,12 @@ namespace SongsOfConquestAccess.Input
                 AccessibilityActions.ScannerJumpToResult,
                 AccessibilityActions.ScannerSpeakDistanceAndDirection,
                 AccessibilityActions.ScannerReturnFromJump,
-                AccessibilityActions.ScannerLookAround,
-                AccessibilityActions.ScannerIncreaseLookAroundRadius,
-                AccessibilityActions.ScannerDecreaseLookAroundRadius,
                 AccessibilityActions.ScannerNextCustomEntryComma,
                 AccessibilityActions.ScannerPreviousCustomEntryComma,
                 AccessibilityActions.ScannerNextCustomEntryPeriod,
                 AccessibilityActions.ScannerPreviousCustomEntryPeriod,
                 AccessibilityActions.ScannerNextCustomEntrySlash,
                 AccessibilityActions.ScannerPreviousCustomEntrySlash,
-            }));
-
-            groups.Add(new Group(ModStrings.Screens.Combat, new[]
-            {
-                AccessibilityActions.CombatInspect,
-                AccessibilityActions.CombatNextActingTroop,
-                AccessibilityActions.CombatPreviousActingTroop,
-                AccessibilityActions.CombatFocusActingTroop,
-                AccessibilityActions.CombatNextEnemyTroop,
-                AccessibilityActions.CombatPreviousEnemyTroop,
-                AccessibilityActions.CombatNextRelevantTile,
-                AccessibilityActions.CombatPreviousRelevantTile,
-                AccessibilityActions.CombatFocusTimeline,
-                AccessibilityActions.ReadThreat,
             }));
 
             groups.Add(new Group(ModStrings.Screens.HexGrid, new[]
@@ -177,6 +176,29 @@ namespace SongsOfConquestAccess.Input
                 AccessibilityActions.HexGridSkipSouthWest,
                 AccessibilityActions.HexGridSkipSouthEast,
             }));
+
+            groups.Add(new Group(ModStrings.Screens.Combat, new[]
+            {
+                AccessibilityActions.CombatInspect,
+                AccessibilityActions.CombatNextActingTroop,
+                AccessibilityActions.CombatPreviousActingTroop,
+                AccessibilityActions.CombatFocusActingTroop,
+                AccessibilityActions.CombatNextEnemyTroop,
+                AccessibilityActions.CombatPreviousEnemyTroop,
+                AccessibilityActions.CombatNextRelevantTile,
+                AccessibilityActions.CombatPreviousRelevantTile,
+                AccessibilityActions.CombatFocusTimeline,
+                AccessibilityActions.ReadThreat,
+                AccessibilityActions.SummarizeEnemyResources,
+            }));
+
+            // Last, and forty rows long: four gestures per bookmark slot.
+            List<InputAction> bookmarks = new List<InputAction>();
+            bookmarks.AddRange(AccessibilityActions.SaveBookmarks);
+            bookmarks.AddRange(AccessibilityActions.JumpToBookmarks);
+            bookmarks.AddRange(AccessibilityActions.SpeakBookmarkDirections);
+            bookmarks.AddRange(AccessibilityActions.ToggleBookmarkBeacons);
+            groups.Add(new Group(ModStrings.Screens.Bookmarks, bookmarks.ToArray()));
 
             return groups.ToArray();
         }

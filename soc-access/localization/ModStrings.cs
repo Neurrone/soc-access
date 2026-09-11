@@ -248,7 +248,7 @@
             public static readonly ModString CombatPreviousActingTroop = new ModString("Actions.CombatPreviousActingTroop", "Previous Acting Troop");
             public static readonly ModString CombatPreviousEnemyTroop = new ModString("Actions.CombatPreviousEnemyTroop", "Previous Enemy Troop");
             public static readonly ModString CombatPreviousRelevantTile = new ModString("Actions.CombatPreviousRelevantTile", "Previous Relevant Combat Tile");
-            public static readonly ModString DescribePosition = new ModString("Actions.DescribePosition", "Describe Position");
+            public static readonly ModString DescribePosition = new ModString("Actions.DescribePosition", "Describe map");
             public static readonly ModString Dismiss = new ModString("Actions.Dismiss", "Dismiss");
             public static readonly ModString FirstBufferLine = new ModString("Actions.FirstBufferLine", "First Buffer Line");
             public static readonly ModString FocusHudNotifications = new ModString("Actions.FocusHudNotifications", "Focus HUD Notifications");
@@ -262,12 +262,21 @@
             public static readonly ModString HexGridSouthWest = new ModString("Actions.HexGridSouthWest", "Hex Grid Southwest");
             public static readonly ModString HexGridFocusCenterTile = new ModString("Actions.HexGridFocusCenterTile", "Focus Center Tile");
             public static readonly ModString HexGridWest = new ModString("Actions.HexGridWest", "Hex Grid West");
+            public static readonly ModString HexGridSkipEast = new ModString("Actions.HexGridSkipEast", "Move to next interesting tile east");
+            public static readonly ModString HexGridSkipNorthEast = new ModString("Actions.HexGridSkipNorthEast", "Move to next interesting tile north east");
+            public static readonly ModString HexGridSkipNorthWest = new ModString("Actions.HexGridSkipNorthWest", "Move to next interesting tile north west");
+            public static readonly ModString HexGridSkipSouthEast = new ModString("Actions.HexGridSkipSouthEast", "Move to next interesting tile south east");
+            public static readonly ModString HexGridSkipSouthWest = new ModString("Actions.HexGridSkipSouthWest", "Move to next interesting tile south west");
+            public static readonly ModString HexGridSkipWest = new ModString("Actions.HexGridSkipWest", "Move to next interesting tile west");
             public static readonly ModString LastBufferLine = new ModString("Actions.LastBufferLine", "Last Buffer Line");
             public static readonly ModString MapMoveEast = new ModString("Actions.MapMoveEast", "Map Move East");
             public static readonly ModString MapMoveNorth = new ModString("Actions.MapMoveNorth", "Map Move North");
             public static readonly ModString MapMoveSouth = new ModString("Actions.MapMoveSouth", "Map Move South");
             public static readonly ModString MapMoveWest = new ModString("Actions.MapMoveWest", "Map Move West");
-            public static readonly ModString MapSecondaryAction = new ModString("Actions.MapSecondaryAction", "Map Secondary Action");
+            public static readonly ModString MapSkipEast = new ModString("Actions.MapSkipEast", "Move to next interesting tile east");
+            public static readonly ModString MapSkipNorth = new ModString("Actions.MapSkipNorth", "Move to next interesting tile north");
+            public static readonly ModString MapSkipSouth = new ModString("Actions.MapSkipSouth", "Move to next interesting tile south");
+            public static readonly ModString MapSkipWest = new ModString("Actions.MapSkipWest", "Move to next interesting tile west");
             public static readonly ModString NextBuffer = new ModString("Actions.NextBuffer", "Next Buffer");
             public static readonly ModString NextBufferLine = new ModString("Actions.NextBufferLine", "Next Buffer Line");
             public static readonly ModString NextSettlement = new ModString("Actions.NextSettlement", "Next Settlement");
@@ -297,8 +306,8 @@
             public static readonly ModString SummarizeResources = new ModString("Actions.SummarizeResources", "Summarize Resources");
             public static readonly ModPluralString TroopSplit = new ModPluralString("Actions.TroopSplit", "Split Off {0} Troop", "Split Off {0} Troops");
             public static readonly ModString UiBack = new ModString("Actions.UiBack", "Back");
-            public static readonly ModString UiCarry = new ModString("Actions.UiCarry", "Pick up or drop");
-            public static readonly ModString UiClearSearch = new ModString("Actions.UiClearSearch", "Clear Search");
+            public static readonly ModString UiCarry = new ModString("Actions.UiCarry", "Start drag");
+            public static readonly ModString UiClearSearch = new ModString("Actions.UiClearSearch", "Clear typeahead");
             public static readonly ModString UiCoarseDecrease = new ModString("Actions.UiCoarseDecrease", "Coarse Decrease");
             public static readonly ModString UiCoarseIncrease = new ModString("Actions.UiCoarseIncrease", "Coarse Increase");
             public static readonly ModString UiDown = new ModString("Actions.UiDown", "Move Down");
@@ -562,6 +571,8 @@
             public static readonly ModString CustomCategoryNameMissingTitle = new ModString("Screens.CustomCategoryNameMissingTitle", "Name missing");
             public static readonly ModString CustomCategoryNameTaken = new ModString("Screens.CustomCategoryNameTaken", "{0} is already the name of a category");
             public static readonly ModString CustomCategoryNameTakenTitle = new ModString("Screens.CustomCategoryNameTakenTitle", "Name already in use");
+            /// <summary>The Keybinds tab region for the graph cursor: arrows, stops, regions, clicks.</summary>
+            public static readonly ModString Cursor = new ModString("Screens.Cursor", "Cursor");
             public static readonly ModString DeleteCustomCategory = new ModString("Screens.DeleteCustomCategory", "Delete this custom category");
             public static readonly ModString CancelAbility = new ModString("Screens.CancelAbility", "Cancel ability");
             public static readonly ModString CancelSpell = new ModString("Screens.CancelSpell", "Cancel spell");
@@ -631,8 +642,6 @@
             public static readonly ModString CaptureNoCancel = new ModString("Screens.CaptureNoCancel", "The next key you press becomes the binding.");
             /// <summary>The Keybinds tab: the mod's own gestures as a rebindable table.</summary>
             public static readonly ModString Keybinds = new ModString("Screens.Keybinds", "Keybinds");
-            /// <summary>The Keybinds tab region for the global and review-buffer gestures.</summary>
-            public static readonly ModString GeneralAndReviewBuffer = new ModString("Screens.GeneralAndReviewBuffer", "General and review buffer");
             /// <summary>The Keybinds tab region for the bookmark gestures.</summary>
             public static readonly ModString Bookmarks = new ModString("Screens.Bookmarks", "Bookmarks");
             /// <summary>The Keybinds tab region for the battle hex-grid gestures.</summary>
@@ -668,6 +677,8 @@
             public static readonly ModString RemoveKeyword = new ModString("Screens.RemoveKeyword", "Remove keyword, {0}");
             public static readonly ModString ResearchTier = new ModString("Screens.ResearchTier", "{0} ({1} {2})");
             public static readonly ModString ResetAllToDefaults = new ModString("Screens.ResetAllToDefaults", "Reset all to defaults");
+            /// <summary>The Keybinds tab region for the review-buffer gestures.</summary>
+            public static readonly ModString ReviewBuffer = new ModString("Screens.ReviewBuffer", "Review buffer");
             public static readonly ModString ResetToDefaults = new ModString("Screens.ResetToDefaults", "Reset to defaults");
             public static readonly ModString Resources = new ModString("Screens.Resources", "Resources");
             public static readonly ModString Round = new ModString("Screens.Round", "Round {0}");
