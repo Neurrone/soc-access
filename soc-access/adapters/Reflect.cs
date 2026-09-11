@@ -100,6 +100,8 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch
             {
+                // Silent on purpose: an absent binding is an expected answer here and throwing is
+                // how Zenject says so, so the null the caller already handles is the whole report.
                 return null;
             }
         }

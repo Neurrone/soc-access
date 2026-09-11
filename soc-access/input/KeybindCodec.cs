@@ -163,6 +163,9 @@ namespace SongsOfConquestAccess.Input
             }
             catch (Exception)
             {
+                // Silent on purpose: this parses a chord out of the config file, which the player
+                // may have typed, and a name that is not a key is the false the caller already
+                // reports - tolerantly, like the rest of the reader.
                 return false;
             }
         }

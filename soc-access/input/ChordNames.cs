@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine.InputSystem;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Input
@@ -130,8 +131,9 @@ namespace SongsOfConquestAccess.Input
                 {
                     shown = display(key);
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
+                    LogOnce.Warn("ChordNames.KeyName: asking Unity for a key's display name", exception);
                     shown = null;
                 }
             }

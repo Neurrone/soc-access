@@ -1088,12 +1088,9 @@ namespace SongsOfConquestAccess.UI
                         text = part.Text();
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // Silent on purpose: this runs for every live part of the focused node on every
-                    // frame, so a getter that throws would throw again next frame and a log would be
-                    // one line per frame for as long as the cursor rests there. A part that cannot
-                    // be read reads as nothing, which the diff below treats as "unchanged".
+                    LogOnce.Warn("GraphNavigator: a live part's text", e);
                 }
 
                 if (baseline)
@@ -1134,18 +1131,7 @@ namespace SongsOfConquestAccess.UI
         {
             DrawnNode drawn = node == null ? null : node.Declared as DrawnNode;
             UnityEngine.Component component = drawn == null ? null : drawn.DrawnBy as UnityEngine.Component;
-            try
-            {
-                return component == null || component.gameObject.activeInHierarchy;
-            }
-            catch (Exception)
-            {
-                // Silent on purpose: asking a DESTROYED component for its game object throws, and
-                // that is the ordinary way a drawn node goes away - a menu closing under the cursor,
-                // once a frame while it does. Answered as still drawn, which is the same answer a
-                // node the engine cannot ask gets, and the next build drops the node anyway.
-                return true;
-            }
+            return component == null || component.gameObject.activeInHierarchy;
         }
 
         private bool Workable()
@@ -1252,12 +1238,9 @@ namespace SongsOfConquestAccess.UI
                 Func<object> points = node == null || node.Vtable == null ? null : node.Vtable.PointsAt;
                 return points == null ? null : points();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // Silent on purpose: this is asked of the focused node on every frame to see whether
-                // its pointer target has moved, so a throwing PointsAt would log once a frame. No
-                // target is the same answer a node that declares none gives - the hover is released
-                // and nothing else changes.
+                LogOnce.Warn("GraphNavigator: what a node points at", e);
                 return null;
             }
         }
