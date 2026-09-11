@@ -115,6 +115,15 @@
             public static readonly ModString WieldersNoLongerVisible = new ModString("Events.WieldersNoLongerVisible", "{0} no longer visible");
             public static readonly ModString WielderMoved = new ModString("Events.WielderMoved", "{0} moved to {1}");
             public static readonly ModString WielderTeleported = new ModString("Events.WielderTeleported", "{0} teleported to {1}");
+
+            /// <summary>The mod could not reach the game's own map input at all. Spoken inside
+            /// <see cref="ModError"/>; these are mod failures, not the game refusing an action.
+            /// </summary>
+            public static readonly ModString MapInputNotReady = new ModString("Events.MapInputNotReady", "Map input is not ready.");
+            public static readonly ModString MapInteractionNotReady = new ModString("Events.MapInteractionNotReady", "Map interaction is not ready.");
+            public static readonly ModString MapTileNotTargetable = new ModString("Events.MapTileNotTargetable", "Could not target tile.");
+            public static readonly ModString MapPrimaryActionFailed = new ModString("Events.MapPrimaryActionFailed", "Could not perform primary action.");
+            public static readonly ModString MapSecondaryActionFailed = new ModString("Events.MapSecondaryActionFailed", "Could not perform secondary action.");
         }
 
         public static class Graph

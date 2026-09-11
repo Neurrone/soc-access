@@ -3185,8 +3185,8 @@ namespace SongsOfConquestAccess.Adapters
                 TryInvokeNativeMapInput(
                     tilePosition,
                     "primary",
-                    "Map input is not ready.",
-                    "Could not target tile.",
+                    ModText.Get(ModStrings.Events.MapInputNotReady),
+                    ModText.Get(ModStrings.Events.MapTileNotTargetable),
                     delegate(object inputModule, ScreenInputOverride screenInputOverride)
                     {
                         InvokeNativeInputModuleAction(inputModule, "HandlePrimaryInputStart");
@@ -3197,7 +3197,7 @@ namespace SongsOfConquestAccess.Adapters
             catch (Exception exception)
             {
                 SocAccessMod.Instance?.LogWarning("AdventureMapAdapter primary action failed: " + exception);
-                PublishDenied(tilePosition, "Could not perform primary action.");
+                PublishDenied(tilePosition, ModText.Get(ModStrings.Events.MapPrimaryActionFailed));
                 return true;
             }
         }
@@ -3211,8 +3211,8 @@ namespace SongsOfConquestAccess.Adapters
                 TryInvokeNativeMapInput(
                     tilePosition,
                     "secondary",
-                    "Map interaction is not ready.",
-                    "Could not target tile.",
+                    ModText.Get(ModStrings.Events.MapInteractionNotReady),
+                    ModText.Get(ModStrings.Events.MapTileNotTargetable),
                     delegate(object inputModule, ScreenInputOverride screenInputOverride)
                     {
                         InvokeNativeInputModuleAction(inputModule, "HandleSecondaryInputStart");
@@ -3223,7 +3223,7 @@ namespace SongsOfConquestAccess.Adapters
             catch (Exception exception)
             {
                 SocAccessMod.Instance?.LogWarning("AdventureMapAdapter secondary action failed: " + exception);
-                PublishDenied(tilePosition, "Could not perform secondary action.");
+                PublishDenied(tilePosition, ModText.Get(ModStrings.Events.MapSecondaryActionFailed));
                 return true;
             }
         }

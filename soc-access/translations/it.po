@@ -3857,3 +3857,28 @@ msgstr "{0}, {1} {2}, {3} / {4}"
 msgctxt "Screens.UpgradeTiers"
 msgid "{0} {1} / {2}"
 msgstr "{0} {1} / {2}"
+
+#. Events.MapInputNotReady
+msgctxt "Events.MapInputNotReady"
+msgid "Map input is not ready."
+msgstr "L'input della mappa non è pronto."
+
+#. Events.MapInteractionNotReady
+msgctxt "Events.MapInteractionNotReady"
+msgid "Map interaction is not ready."
+msgstr "L'interazione con la mappa non è pronta."
+
+#. Events.MapTileNotTargetable
+msgctxt "Events.MapTileNotTargetable"
+msgid "Could not target tile."
+msgstr "Impossibile prendere di mira la casella."
+
+#. Events.MapPrimaryActionFailed
+msgctxt "Events.MapPrimaryActionFailed"
+msgid "Could not perform primary action."
+msgstr "Impossibile eseguire l'azione primaria."
+
+#. Events.MapSecondaryActionFailed
+msgctxt "Events.MapSecondaryActionFailed"
+msgid "Could not perform secondary action."
+msgstr "Impossibile eseguire l'azione secondaria."
