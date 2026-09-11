@@ -108,6 +108,15 @@ namespace SongsOfConquestAccess.Adapters
         private Vector2Int _reachableMovementOrigin;
         private float _reachableMovementMovesLeft;
 
+        // The zones of control covering each tile for one frame. See GetZoneOfControlNames.
+        private Dictionary<Vector2Int, List<string>> _zoneOfControlNames;
+        private int _zoneOfControlFrame = -1;
+        private int _zoneOfControlTeamId;
+
+        // The living commanders by tile for one frame. See GetCommanderAtVisiblePoint.
+        private Dictionary<Vector2Int, ICommanderState> _commandersByPoint;
+        private int _commandersByPointFrame = -1;
+
         // WHAT THIS ADAPTER ATTACHED TO THE GAME. The map's own event listener is bound to this
         // adventure's facade, selection handler and fog manager, so it lives exactly as long as the
         // adapter over them does and is released in Dispose - never on the screen, which outlives
@@ -1913,7 +1922,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                List<Vector2Int> points = GetZoneOfControlPoints(localTeamId, commander.Id);
+                List<Vector2Int> points = GetZoneOfControlPoints(localTeamId, commander);
                 if (points.Count == 0)
                 {
                     continue;
@@ -1949,30 +1958,80 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            IEnumerable<ICommanderState> commanders = _facade != null && _facade.Commanders != null ? _facade.Commanders.All : null;
-            if (commanders == null)
+            Dictionary<Vector2Int, List<string>> zones = GetZoneOfControlNames(localTeamId);
+            List<string> names;
+            if (zones == null || !zones.TryGetValue(tile.Position, out names))
             {
                 return;
             }
 
-            foreach (ICommanderState commander in commanders)
+            for (int i = 0; i < names.Count; i++)
             {
-                if (!IsOverlayVisibleZoneOfControlSource(commander))
-                {
-                    continue;
-                }
+                tile.ZoneOfControlNames.Add(names[i]);
+            }
+        }
 
-                if (tile.Position == commander.Position || !ZoneOfControlContains(localTeamId, commander.Id, tile.Position))
-                {
-                    continue;
-                }
+        /// <summary>
+        /// Which commanders' zones of control cover each tile, by the name the map speaks them
+        /// under, built once per (local team, frame).
+        ///
+        /// This used to be asked per tile: every tile read walked every commander, and for each one
+        /// enumerated <c>GetZoneOfControlPoints</c>, a lazy LINQ over the commander's cached points
+        /// that calls <c>GetAtPoint</c> for each. A tile read is a lookup now. Every commander's
+        /// zone, its name and the fog over it are read from the game on the miss, so a move, a
+        /// death, a fog change and a hot reload all miss on their own; <c>Time.frameCount</c> closes
+        /// the key because within one frame none of them can have happened.
+        ///
+        /// The commanders are walked in the facade's own order and a tile's names are added in that
+        /// order and de-duplicated, which is what the per-tile walk produced.
+        /// </summary>
+        private Dictionary<Vector2Int, List<string>> GetZoneOfControlNames(int localTeamId)
+        {
+            int frame = Time.frameCount;
+            if (_zoneOfControlNames != null && _zoneOfControlFrame == frame && _zoneOfControlTeamId == localTeamId)
+            {
+                return _zoneOfControlNames;
+            }
 
-                string name = FirstNonEmpty(AdventureMapEntityLabel.GetCommanderName(_facade, commander), ModText.Get(ModStrings.Spatial.Commander));
-                if (!ContainsString(tile.ZoneOfControlNames, name))
+            Dictionary<Vector2Int, List<string>> zones = new Dictionary<Vector2Int, List<string>>();
+            IEnumerable<ICommanderState> commanders = _facade != null && _facade.Commanders != null ? _facade.Commanders.All : null;
+            if (commanders != null)
+            {
+                foreach (ICommanderState commander in commanders)
                 {
-                    tile.ZoneOfControlNames.Add(name);
+                    if (!IsOverlayVisibleZoneOfControlSource(commander))
+                    {
+                        continue;
+                    }
+
+                    List<Vector2Int> points = GetZoneOfControlPoints(localTeamId, commander);
+                    if (points.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    string name = FirstNonEmpty(AdventureMapEntityLabel.GetCommanderName(_facade, commander), ModText.Get(ModStrings.Spatial.Commander));
+                    for (int i = 0; i < points.Count; i++)
+                    {
+                        List<string> names;
+                        if (!zones.TryGetValue(points[i], out names))
+                        {
+                            names = new List<string>();
+                            zones.Add(points[i], names);
+                        }
+
+                        if (!ContainsString(names, name))
+                        {
+                            names.Add(name);
+                        }
+                    }
                 }
             }
+
+            _zoneOfControlNames = zones;
+            _zoneOfControlFrame = frame;
+            _zoneOfControlTeamId = localTeamId;
+            return zones;
         }
 
         private Func<Vector2Int, bool> CreateCommanderZoneOfControlPointValidator(ScannerResult result)
@@ -2014,18 +2073,17 @@ namespace SongsOfConquestAccess.Adapters
                 && !_facade.Teams.IsInPartnership(commander.TeamId, localTeamId);
         }
 
-        private List<Vector2Int> GetZoneOfControlPoints(int localTeamId, int commanderId)
+        private List<Vector2Int> GetZoneOfControlPoints(int localTeamId, ICommanderState commander)
         {
             List<Vector2Int> points = new List<Vector2Int>();
-            IEnumerable<int2> nativePoints = _facade != null && _facade.Commanders != null
-                ? _facade.Commanders.GetZoneOfControlPoints(localTeamId, commanderId)
+            IEnumerable<int2> nativePoints = _facade != null && _facade.Commanders != null && commander != null
+                ? _facade.Commanders.GetZoneOfControlPoints(localTeamId, commander.Id)
                 : null;
             if (nativePoints == null)
             {
                 return points;
             }
 
-            ICommanderState commander = FindCommanderById(commanderId);
             foreach (int2 point in nativePoints)
             {
                 Vector2Int vector = new Vector2Int(point.x, point.y);
@@ -3855,23 +3913,40 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>
+        /// The commander standing on a tile, as the map speaks it: the first living commander the
+        /// facade lists there, whatever team it is on.
+        ///
+        /// Deliberately not <c>_facade.Commanders.GetAtPoint</c>, which is indexed but answers a
+        /// different question - it takes a team, drops commanders whose internal state is Hidden and
+        /// picks a "best" of several - so switching to it would change what the map says. Instead
+        /// the whole list is walked once per frame and indexed by tile, in the facade's own order
+        /// with the first entry per tile kept, which is exactly what the per-tile walk returned.
+        /// </summary>
         private ICommanderState GetCommanderAtVisiblePoint(Vector2Int position)
         {
-            IEnumerable<ICommanderState> commanders = _facade.Commanders.All;
-            if (commanders == null)
+            int frame = Time.frameCount;
+            if (_commandersByPoint == null || _commandersByPointFrame != frame)
             {
-                return null;
-            }
-
-            foreach (ICommanderState commander in commanders)
-            {
-                if (commander != null && commander.IsAlive && commander.Position == position)
+                Dictionary<Vector2Int, ICommanderState> byPoint = new Dictionary<Vector2Int, ICommanderState>();
+                IEnumerable<ICommanderState> commanders = _facade.Commanders.All;
+                if (commanders != null)
                 {
-                    return commander;
+                    foreach (ICommanderState commander in commanders)
+                    {
+                        if (commander != null && commander.IsAlive && !byPoint.ContainsKey(commander.Position))
+                        {
+                            byPoint.Add(commander.Position, commander);
+                        }
+                    }
                 }
+
+                _commandersByPoint = byPoint;
+                _commandersByPointFrame = frame;
             }
 
-            return null;
+            ICommanderState found;
+            return _commandersByPoint.TryGetValue(position, out found) ? found : null;
         }
 
         private string GetMapEntityRelationship(IMapEntity entity, int localTeamId)
