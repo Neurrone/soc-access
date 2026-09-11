@@ -40,8 +40,6 @@ namespace SongsOfConquestAccess.Screens
 
         // The lines the game gives no component of their own for, and the close, keyed by subjects
         // held across rebuilds so the reconciler seats the cursor back on the same node.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         public MapEntityMiniMenuAdapter Adapter
         {
             get { return Live; }
@@ -262,18 +260,6 @@ namespace SongsOfConquestAccess.Screens
                 GraphNodes.Button(
                     () => ModText.Get(ModStrings.Screens.Close),
                     () => Live.Close())));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

@@ -29,8 +29,6 @@ namespace SongsOfConquestAccess.Screens
         private const string ResultsStop = "community-maps-search-results-list";
         private const string FooterStop = "community-maps-search-results-footer";
 
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The results page, read off mod.io's own singleton every frame
         /// (<see cref="CommunityMapsSources"/>).</summary>
         protected override object ResolveMenu()
@@ -188,18 +186,6 @@ namespace SongsOfConquestAccess.Screens
             return new SyntheticNode(
                 ControlId.For(Marker(key), "community-maps-search-results:" + key),
                 vtable);
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

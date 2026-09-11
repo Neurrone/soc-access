@@ -42,8 +42,6 @@ namespace SongsOfConquestAccess.Screens
 
         // Stable subjects for the nodes the adapter has no game component for (or none under test), so
         // the cursor seats onto the same node across builds. Made once per structural key and kept.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         // The window the screen last announced a name for. Mod-owned: it outlives no menu (the
         // adapter does), but a screen lives for the whole mod load, so it is reset when the page is
         // left. There is no hook that fires on a window swap; the update reads it from the game.
@@ -369,18 +367,6 @@ namespace SongsOfConquestAccess.Screens
             ControlId synthetic = ControlId.For(Marker(key), key);
             builder.AddItem(new SyntheticNode(synthetic, vtable));
             return synthetic;
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers[key] = marker;
-            }
-
-            return marker;
         }
 
         private static void Take(ref ControlId start, ControlId id)

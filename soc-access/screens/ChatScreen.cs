@@ -44,8 +44,6 @@ namespace SongsOfConquestAccess.Screens
 
         // Subjects of their own for the lines the game gives no component for: a message is text the
         // window renders into one mesh, and the way out is the mod's own row.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The chat window the game has up, drawn or not (<see cref="ChatSource"/>); the
         /// page is this screen only while the window is OPEN.</summary>
         protected override object ResolveMenu()
@@ -295,18 +293,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return spoken;
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

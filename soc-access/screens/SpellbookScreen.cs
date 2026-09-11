@@ -72,8 +72,6 @@ namespace SongsOfConquestAccess.Screens
 
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the removal target is a line the mod invented.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         // Whether the carry that is ending ran the game's own drag, which plays the game's own noise
         // for how it ended. Only a carry that did NOT get that far - one the player gave up, or one
         // the game would not take - is the mod's to make a noise about.
@@ -554,18 +552,6 @@ namespace SongsOfConquestAccess.Screens
         {
             IList<string> lines = SpokenLines.Of(new[] { raw });
             return lines.Count > 0 ? lines[0] : string.Empty;
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

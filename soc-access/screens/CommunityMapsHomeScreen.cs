@@ -54,8 +54,6 @@ namespace SongsOfConquestAccess.Screens
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same row: mod.io rebuilds its list item objects whenever a band refreshes, and
         // a band's item is a place in a named band either way.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The Browse page, read off mod.io's own singleton every frame
         /// (<see cref="CommunityMapsSources"/>).</summary>
         protected override object ResolveMenu()
@@ -333,18 +331,6 @@ namespace SongsOfConquestAccess.Screens
         private SyntheticNode Synthetic(string key, NodeVtable vtable)
         {
             return new SyntheticNode(ControlId.For(Marker(key), "community-maps:" + key), vtable);
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

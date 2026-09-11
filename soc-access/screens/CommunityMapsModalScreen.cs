@@ -57,8 +57,6 @@ namespace SongsOfConquestAccess.Screens
         // A subject of its own for each node the modal gives no component for, kept across rebuilds:
         // the reconciler seats the cursor by SUBJECT before it looks at the structural key, so two
         // nodes sharing one collapse onto whichever was declared first.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         // The five-digit code as it was last spoken, so typing echoes the digit that changed rather
         // than the whole box. Mod-owned announcement state, which outlives the panel.
         private string _lastCode;
@@ -398,18 +396,6 @@ namespace SongsOfConquestAccess.Screens
                 items[j + 1] = moving;
                 lefts[j + 1] = left;
             }
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers[key] = marker;
-            }
-
-            return marker;
         }
 
         private static int CommonPrefixLength(string a, string b)

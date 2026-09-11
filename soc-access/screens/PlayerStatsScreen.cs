@@ -44,8 +44,6 @@ namespace SongsOfConquestAccess.Screens
 
         // A subject of its own per summary line, kept across rebuilds so the reconciler seats the
         // cursor on the same line: the page draws them as labels the mod has nothing else to key on.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The page's navigation object, an unbound scene object found by one gated walk of
         /// its own scene's roots (<see cref="MenuSceneSources"/>).</summary>
         protected override object ResolveMenu()
@@ -311,18 +309,6 @@ namespace SongsOfConquestAccess.Screens
             NodeVtable vtable = GraphNodes.Button(it.GetLabel, () => it.Activate(), it.IsEnabled);
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(it.Button);
             builder.AddItem(new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

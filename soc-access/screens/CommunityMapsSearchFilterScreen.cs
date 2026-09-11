@@ -30,8 +30,6 @@ namespace SongsOfConquestAccess.Screens
         private const string ButtonsStop = "search-filter-buttons";
 
         private readonly GameTextEditor _editor = new GameTextEditor();
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The search and filter panel, read off mod.io's own singleton every frame
         /// (<see cref="CommunityMapsSources"/>). mod.io hides this panel's game object when a search
         /// opens the results page, so the adapter's <c>IsPresent</c> is what answers "the player has
@@ -213,18 +211,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.AddItem(new SyntheticNode(ControlId.For(Marker(key), key), vtable));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

@@ -76,8 +76,6 @@ namespace SongsOfConquestAccess.Screens
 
         // Subjects of their own for the lines the game gives no component for, kept across rebuilds so
         // the reconciler seats the cursor on the same line.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         // The identity of each slot row, one string instance per row kept across rebuilds. The sheet
         // keys every cell of a row off this and hands the primary the same object as its subject, so
         // the cursor seats back on the column it left when the lobby redraws the row under it - which
@@ -618,18 +616,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return key;
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

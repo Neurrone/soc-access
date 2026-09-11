@@ -89,8 +89,6 @@ namespace SongsOfConquestAccess.Screens
 
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor back on the same one: the menu gives no component a text line can be keyed on.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         // The tile tooltip is the game's whole troop-details capture and the graph is rebuilt for
         // every navigation operation, so it is composed once per tile - which is exactly as often as
         // the widget engine's focus commit composed it.
@@ -541,18 +539,6 @@ namespace SongsOfConquestAccess.Screens
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker(key), "pre-battle:" + key),
                 GraphNodes.Text(text, null, tooltip)));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

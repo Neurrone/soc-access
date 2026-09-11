@@ -52,8 +52,6 @@ namespace SongsOfConquestAccess.Screens
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor back on the same one: the menu gives no component the screen can key the XP figure,
         // the returned-troops line or the "None" row on.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         // Resolving a portrait walks the menu's parents and the scene root, so each side is looked
         // for once per menu, hit or miss: a defender without a commander has no portrait to find,
         // and the search would otherwise run again every frame. A new menu starts both over.
@@ -384,18 +382,6 @@ namespace SongsOfConquestAccess.Screens
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker(key), "post-battle:" + key),
                 GraphNodes.Text(text)));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

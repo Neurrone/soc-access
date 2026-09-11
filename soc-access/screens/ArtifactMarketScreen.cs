@@ -78,8 +78,6 @@ namespace SongsOfConquestAccess.Screens
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the description and the auto-arrange button are not drawn as
         // controls of their own.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         // This column's slot nodes, kept for as long as the adapter hands back the same slot list.
         // The nodes are closures that read the game when they are READ, so rebuilding them every
         // frame bought nothing but the allocation; the contributor owns the key and the rule
@@ -468,18 +466,6 @@ namespace SongsOfConquestAccess.Screens
                 SocAccessMod.Instance?.LogWarning("ArtifactMarketScreen section " + section + " failed to build: " + exception);
                 return new T[0];
             }
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

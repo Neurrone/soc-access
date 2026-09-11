@@ -42,8 +42,6 @@ namespace SongsOfConquestAccess.Screens
         private const string FooterStop = "community-maps-collection-footer";
 
         private readonly GameTextEditor _editor = new GameTextEditor();
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The Collection page, read off mod.io's own singleton every frame
         /// (<see cref="CommunityMapsSources"/>). Whether it is the page SHOWING is the adapter's
         /// <c>IsPresent</c>, which reads the panel's own active state.</summary>
@@ -285,18 +283,6 @@ namespace SongsOfConquestAccess.Screens
             return new SyntheticNode(
                 ControlId.For(Marker(key), "community-maps-collection:" + key),
                 vtable);
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

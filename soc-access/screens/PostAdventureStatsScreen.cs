@@ -52,8 +52,6 @@ namespace SongsOfConquestAccess.Screens
 
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the menu gives no component the screen can key its figures on.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The one post-adventure stats window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<IPostAdventureStatsMenu> _source =
             ScreenSource<IPostAdventureStatsMenu>.FromScene(LoadedScenes.AdventureScene);
@@ -334,18 +332,6 @@ namespace SongsOfConquestAccess.Screens
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker(key), "post-adventure-stats:" + key),
                 GraphNodes.Text(text)));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
 
         private static PostAdventureStatsMenu GetStatsMenu(PostAdventureMenu resultMenu)

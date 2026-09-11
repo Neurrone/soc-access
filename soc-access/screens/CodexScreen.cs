@@ -64,8 +64,6 @@ namespace SongsOfConquestAccess.Screens
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same line: the body's lines, which the mod reads off text meshes several of
         // them share, and the footer's Close.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         protected override object ResolveMenu()
         {
             return _source.Current;
@@ -362,18 +360,6 @@ namespace SongsOfConquestAccess.Screens
                 vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
                 builder.AddItem(new DrawnNode(ControlId.For(close, "codex:close"), vtable, close));
             }
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

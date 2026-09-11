@@ -19,8 +19,18 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public abstract class GraphScreen : Screen
     {
+        private readonly MarkerTable _markers = new MarkerTable();
+
         /// <summary>Declare the screen's controls. Called on every navigation operation.</summary>
         public abstract void Build(GraphBuilder builder);
+
+        /// <summary>This screen's own object for that node key, to mint a node id from. The object
+        /// belongs to this screen INSTANCE, so two screens using the same key still get two ids.
+        /// </summary>
+        protected object Marker(string key)
+        {
+            return _markers.For(key);
+        }
 
         /// <summary>Where focus lands on first arrival, as a Tab-stop key; null starts at the graph's
         /// own start node.</summary>

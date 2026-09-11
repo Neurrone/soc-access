@@ -48,8 +48,6 @@ namespace SongsOfConquestAccess.Screens
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the quote, the four stats, the specialization and the purchase
         // status are read off text meshes the details pane rebinds rather than off rows of their own.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         public PurchaseWielderMenuAdapter Adapter
         {
             get { return Live; }
@@ -403,18 +401,6 @@ namespace SongsOfConquestAccess.Screens
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker(key), "purchase-wielder:" + key),
                 GraphNodes.Paragraphs(() => paragraphs)));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

@@ -62,8 +62,6 @@ namespace SongsOfConquestAccess.Screens
 
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same line while what it says changes under it.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         public object SourceKey
         {
             get { return Live != null ? Live.SourceKey : null; }
@@ -426,18 +424,6 @@ namespace SongsOfConquestAccess.Screens
                 Live.IsInputEnabled);
             vtable.OnFocusVisual = () => Live.FocusInput();
             builder.AddItem(new DrawnNode(ControlId.For(subject, "save-load:name"), vtable, subject));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

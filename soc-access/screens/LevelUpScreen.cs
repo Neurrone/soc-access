@@ -45,8 +45,6 @@ namespace SongsOfConquestAccess.Screens
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the menu gives no component for its heading, its identity line, the
         // "Choose a Skill" caption or the max-level notice.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The one level-up window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<ICommanderLevelUpMenu> _source =
             ScreenSource<ICommanderLevelUpMenu>.FromScene(LoadedScenes.AdventureScene);
@@ -282,18 +280,6 @@ namespace SongsOfConquestAccess.Screens
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker(key), "level-up:" + key),
                 GraphNodes.Text(text)));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
 
     }
