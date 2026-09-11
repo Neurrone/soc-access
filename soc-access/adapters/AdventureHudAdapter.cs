@@ -336,15 +336,6 @@ namespace SongsOfConquestAccess.Adapters
             return entry != null && entry.IsUnlocked && GameObjects.IsLive(entry);
         }
 
-        public void FocusTroopSlot(int index)
-        {
-            TroopHUDEntry entry = GetTroopSlot(index);
-            if (entry != null)
-            {
-                NativeSelectionUtility.Select(entry.GetSelectable());
-            }
-        }
-
         public bool IsInventoryButtonVisible()
         {
             return IsSelectionHudVisible() && MenuButtonAdapterBase.IsButtonDrawn(CommanderSettings != null ? CommanderSettings.InventoryButton : null);

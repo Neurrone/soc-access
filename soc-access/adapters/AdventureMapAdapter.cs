@@ -73,8 +73,6 @@ namespace SongsOfConquestAccess.Adapters
         private readonly MethodInfo _pointToWorldMethod;
         private readonly MethodInfo _getTooltipForTilePositionMethod;
         private readonly FieldInfo _runtimeTooltipBehaviorField;
-        private readonly FieldInfo _innerTooltipManagerField;
-        private readonly FieldInfo _gamepadTooltipHandleField;
         private readonly FieldInfo _fogHasFinishedLoadingField;
         private readonly FieldInfo _currentInputModuleField;
         // The kinds the game names its map tooltip instruction rows after
@@ -195,12 +193,6 @@ namespace SongsOfConquestAccess.Adapters
             _runtimeTooltipBehaviorField = tooltipManagerType != null
                 ? AccessTools.Field(tooltipManagerType, "_tooltipBehavior")
                 : null;
-            _innerTooltipManagerField = tooltipManagerType != null
-                ? AccessTools.Field(tooltipManagerType, "_tooltipManager")
-                : null;
-            _gamepadTooltipHandleField = tooltipManagerType != null
-                ? AccessTools.Field(tooltipManagerType, "_gamepadTooltipHandle")
-                : null;
             _fogHasFinishedLoadingField = fogManager != null
                 ? AccessTools.Field(fogManager.GetType(), "_hasFinishedLoading")
                 : null;
@@ -257,16 +249,6 @@ namespace SongsOfConquestAccess.Adapters
         public ISelectionHandler SelectionHandler
         {
             get { return _selectionHandler; }
-        }
-
-        public IFogManager FogManager
-        {
-            get { return _fogManager; }
-        }
-
-        public IHumanAdventureControllerFacade HumanAdventureControllerFacade
-        {
-            get { return _humanAdventureControllerFacade; }
         }
 
         public ILocalizationHandler LocalizationHandler
@@ -346,7 +328,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPresent()
         {
-            return GetReadinessDiagnostic() == null;
+            return GetReadinessDiagnostic(compose: false) == null;
         }
 
         /// <summary>Whether the game is showing a STORY TRIGGER of the local player's - a message, a
@@ -379,6 +361,15 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         public string GetReadinessDiagnostic()
+        {
+            return GetReadinessDiagnostic(compose: true);
+        }
+
+        /// <param name="compose">Whether the three reasons that name a value may build the string
+        /// that says it. <see cref="IsPresent"/> asks this every frame for every screen and only
+        /// looks at whether there IS a reason, so it passes false and a map being swapped out costs
+        /// no string per frame.</param>
+        private string GetReadinessDiagnostic(bool compose)
         {
             if (SourceKey == null)
             {
@@ -457,7 +448,9 @@ namespace SongsOfConquestAccess.Adapters
 
             if (_facade.Level.Width <= 0 || _facade.Level.Height <= 0)
             {
-                return "invalid map size " + _facade.Level.Width + "x" + _facade.Level.Height;
+                return compose
+                    ? "invalid map size " + _facade.Level.Width + "x" + _facade.Level.Height
+                    : "invalid map size";
             }
 
             if (!_facade.IsGameStarted)
@@ -493,12 +486,14 @@ namespace SongsOfConquestAccess.Adapters
 
             if (_sceneLoader.State != SceneLoaderState.None)
             {
-                return "scene loader busy: " + _sceneLoader.State;
+                return compose ? "scene loader busy: " + _sceneLoader.State : "scene loader busy";
             }
 
             if (_sceneLoader.Current != SceneType.Adventure)
             {
-                return "scene loader is on " + (_sceneLoader.Current == null ? "nothing" : _sceneLoader.Current.SceneName);
+                return compose
+                    ? "scene loader is on " + (_sceneLoader.Current == null ? "nothing" : _sceneLoader.Current.SceneName)
+                    : "scene loader is elsewhere";
             }
 
             return null;
@@ -3444,44 +3439,6 @@ namespace SongsOfConquestAccess.Adapters
             return new Vector3(tile.x, 0f, tile.y);
         }
 
-        private void ShowFocusedTileTooltip(Vector2Int tile)
-        {
-            if (_tooltipManager == null)
-            {
-                return;
-            }
-
-            _tooltipManager.HideTileTooltip();
-            if (!ShouldShowFocusedTileTooltip(tile))
-            {
-                return;
-            }
-
-            Vector2Int detailsTile = GetTooltipDetailsTile(tile);
-            IDetails details = GetTooltipDetailsForTile(detailsTile);
-            if (details == null)
-            {
-                return;
-            }
-
-            object runtimeTooltipBehavior = _runtimeTooltipBehaviorField?.GetValue(_tooltipManager);
-            ITooltipManager innerTooltipManager = _innerTooltipManagerField?.GetValue(_tooltipManager) as ITooltipManager;
-            if (runtimeTooltipBehavior == null || innerTooltipManager == null)
-            {
-                return;
-            }
-
-            Vector2 point = GetScreenPoint(tile);
-            ITooltipManager.Handle handle = innerTooltipManager.ForceDisplayTooltip(
-                runtimeTooltipBehavior as ITooltipable,
-                new TooltipLocation(point),
-                details);
-            if (_gamepadTooltipHandleField != null)
-            {
-                _gamepadTooltipHandleField.SetValue(_tooltipManager, handle);
-            }
-        }
-
         private bool ShouldShowFocusedTileTooltip(Vector2Int tile)
         {
             int localTeamId = GetLocalTeamId();
@@ -3862,34 +3819,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool ContainsInteractionPoint(int mapEntityId, Vector2Int position)
-        {
-            Vector2Int[] interactionPoints = null;
-            try
-            {
-                interactionPoints = _facade.MapEntities.GetInteractionPoints(mapEntityId);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            if (interactionPoints == null)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < interactionPoints.Length; i++)
-            {
-                if (interactionPoints[i] == position)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         private static string FormatTile(Vector2Int tile)
         {
             return tile.x + "," + tile.y;
@@ -3916,11 +3845,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return false;
-        }
-
-        private static string FormatPossessive(string name)
-        {
-            return ModText.FormatPossessiveName(name, ModStrings.Spatial.CommanderPossessive);
         }
 
         private byte GetLayerValue(Vector2Int position, LayerKind kind)
