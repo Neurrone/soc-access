@@ -195,6 +195,12 @@ namespace SongsOfConquestAccess.Adapters
         private Action<bool> _endAbilityTargetingHandler;
         private bool _hasBeenPresent;
         private bool _combatEnded;
+        // This frame's answer to "which enemies reach that tile", for the one tile it was asked
+        // about. See BuildEnemyInfluenceSources.
+        private List<CombatInfluenceSource> _influenceSources;
+        private int _influenceFrame = -1;
+        private Vector2Int _influencePoint;
+        private int _influenceOccupantId = -1;
 
         public CombatAdapter(BattleSceneInstaller installer)
             : this(
@@ -804,29 +810,42 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             PathNode[] path = GetPathTo(point);
-            _cursorManager?.SetCurrentTile(point);
-            _gridManager?.SetCurrentTile(point, path);
-            _pathManager?.SetCurrentTile(point, path);
-            _highlightManager?.SetCurrentTile(point);
+            SetNativeCursorTile(point, path);
             if (GetTargetingMode() != CombatTargetingMode.None || IsAnySpellCastingStateActive())
             {
                 return;
             }
 
+            SetNativeCurrentTroopState();
+            _attackPreviewHandler?.Hide();
+            // The tile and the path travel down with the point: nothing between here and the hover
+            // sync changes what either of them answers, and reading them again cost a second
+            // whole-board path search per cursor step.
+            CombatTile tile = GetTile(point);
+            if (tile != null && (tile.Troop != null || tile.Entity != null))
+            {
+                SynchronizeNativeHoverForPreview(point, tile, path);
+            }
+        }
+
+        /// <summary>Point the game's four battle managers at a tile, which is what the mouse moving
+        /// over it does.</summary>
+        private void SetNativeCursorTile(Vector2Int point, PathNode[] path)
+        {
+            _cursorManager?.SetCurrentTile(point);
+            _gridManager?.SetCurrentTile(point, path);
+            _pathManager?.SetCurrentTile(point, path);
+            _highlightManager?.SetCurrentTile(point);
+        }
+
+        /// <summary>Put all four back into the state the game draws for the troop whose turn it is.
+        /// </summary>
+        private void SetNativeCurrentTroopState()
+        {
             _cursorManager?.SetState(BattleCursorManager.State.CurrentTroop);
             _gridManager?.SetState(BattleGridManager.State.CurrentTroop);
             _pathManager?.SetState(BattlePathManager.State.CurrentTroop);
             _highlightManager?.SetState(BattleHighlightManager.State.CurrentTroop);
-            _attackPreviewHandler?.Hide();
-            CombatTile tile = GetTile(point);
-            if (tile != null && tile.Troop != null)
-            {
-                SynchronizeNativeHoverForPreview(point);
-            }
-            else if (tile != null && tile.Entity != null)
-            {
-                SynchronizeNativeHoverForPreview(point);
-            }
         }
 
         /// <summary>Listen for the game asking for a spell target. The two facts it asks with - the
@@ -1615,13 +1634,14 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            CombatTile tile = GetTile(point);
-            PathNode[] path = GetPathTo(point);
+            SynchronizeNativeHoverForInput(point, GetTile(point), GetPathTo(point));
+        }
 
-            _cursorManager?.SetCurrentTile(point);
-            _gridManager?.SetCurrentTile(point, path);
-            _pathManager?.SetCurrentTile(point, path);
-            _highlightManager?.SetCurrentTile(point);
+        /// <summary>The same hover sync for a caller that has already read the tile and the path this
+        /// frame.</summary>
+        private void SynchronizeNativeHoverForInput(Vector2Int point, CombatTile tile, PathNode[] path)
+        {
+            SetNativeCursorTile(point, path);
 
             if (_humanBattleController == null || tile == null)
             {
@@ -1688,10 +1708,7 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                _cursorManager?.SetState(BattleCursorManager.State.CurrentTroop);
-                _gridManager?.SetState(BattleGridManager.State.CurrentTroop);
-                _highlightManager?.SetState(BattleHighlightManager.State.CurrentTroop);
-                _pathManager?.SetState(BattlePathManager.State.CurrentTroop);
+                SetNativeCurrentTroopState();
                 _humanBattleController.StateMachine.ChangeState(HumanBattleController.State.ShowCurrentTroop);
             }
         }
@@ -1824,16 +1841,14 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
+            PathNode[] path = GetPathTo(troop.Position);
             _gridManager?.SetInspectedTroop(troop);
-            _cursorManager?.SetCurrentTile(troop.Position);
-            _gridManager?.SetCurrentTile(troop.Position, GetPathTo(troop.Position));
-            _highlightManager?.SetCurrentTile(troop.Position);
-            _gridManager?.SetState(BattleGridManager.State.InspectTroop);
-            _highlightManager?.SetState(BattleHighlightManager.State.InspectTroop);
-            _pathManager?.SetCurrentTile(troop.Position, GetPathTo(troop.Position));
+            SetNativeCursorTile(troop.Position, path);
             _cursorManager?.SetState(BattleCursorManager.State.InspectTroop);
+            _gridManager?.SetState(BattleGridManager.State.InspectTroop);
             _pathManager?.SetState(BattlePathManager.State.InspectTroop);
-            SynchronizeNativeHoverForPreview(troop.Position);
+            _highlightManager?.SetState(BattleHighlightManager.State.InspectTroop);
+            SynchronizeNativeHoverForPreview(troop.Position, GetTile(troop.Position), path);
 
             CombatInspectContext context = CombatInspectContext.ForStack(troop.Position);
             BuildStackRanges(troop, context);
@@ -1844,14 +1859,8 @@ namespace SongsOfConquestAccess.Adapters
         private CombatInspectContext BeginPathInspect(Vector2Int point)
         {
             PathNode[] path = GetPathTo(point);
-            _cursorManager?.SetCurrentTile(point);
-            _gridManager?.SetCurrentTile(point, path);
-            _pathManager?.SetCurrentTile(point, path);
-            _highlightManager?.SetCurrentTile(point);
-            _cursorManager?.SetState(BattleCursorManager.State.CurrentTroop);
-            _gridManager?.SetState(BattleGridManager.State.CurrentTroop);
-            _pathManager?.SetState(BattlePathManager.State.CurrentTroop);
-            _highlightManager?.SetState(BattleHighlightManager.State.CurrentTroop);
+            SetNativeCursorTile(point, path);
+            SetNativeCurrentTroopState();
             _attackPreviewHandler?.Hide();
             CombatInspectContext context = CombatInspectContext.ForPath(point, ConvertPath(path));
             context.TooltipDetails = BuildTileDetails(point);
@@ -1866,10 +1875,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             PathNode[] path = GetPathToEntity(entity);
-            _cursorManager?.SetCurrentTile(entity.Position);
-            _gridManager?.SetCurrentTile(entity.Position, path);
-            _pathManager?.SetCurrentTile(entity.Position, path);
-            _highlightManager?.SetCurrentTile(entity.Position);
+            SetNativeCursorTile(entity.Position, path);
             _cursorManager?.SetState(BattleCursorManager.State.InspectTile);
             _gridManager?.SetState(BattleGridManager.State.InspectEntity);
             _highlightManager?.SetState(BattleHighlightManager.State.InspectEntity);
@@ -1890,23 +1896,24 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            CombatTile tile = GetTile(point);
+            SynchronizeNativeHoverForPreview(point, GetTile(point), GetPathTo(point));
+        }
+
+        /// <summary>The hover sync plus the game's attack preview, for a caller that has already read
+        /// the tile and the path. The two melee sweeps the preview wants are the ones the hover sync
+        /// itself puts on the controller, so they are not swept a second time here.</summary>
+        private void SynchronizeNativeHoverForPreview(Vector2Int point, CombatTile tile, PathNode[] path)
+        {
             if (tile == null)
             {
                 return;
             }
 
-            SynchronizeNativeHoverForInput(point);
+            SynchronizeNativeHoverForInput(point, tile, path);
 
             if (_humanBattleController == null)
             {
                 return;
-            }
-
-            if (_facade != null && _facade.Level != null && _facade.Troops != null && _facade.Troops.Current != null)
-            {
-                _humanBattleController.EnemiesWithinMeleeReach = _facade.Level.AllEnemiesWithinMeleeReach(_facade.Troops.Current).ToList();
-                _humanBattleController.MapEntitiesWithinMeleeReach = _facade.Level.AllMapEntitiesWithinMeleeReach(_facade.Troops.Current).ToList();
             }
 
             UpdateNativeAttackPreviews();
@@ -2085,7 +2092,33 @@ namespace SongsOfConquestAccess.Adapters
             return BuildEnemyInfluenceSources(point, occupyingTroop).Count > 0;
         }
 
+        /// <summary>Which enemy stacks reach a tile, and how. Every stack is asked for its own
+        /// movement and attack ranges, so this is a pathfind per enemy per call - and one cursor step
+        /// asks for it three times over: the cue that warns about a threatened tile, the tile's
+        /// readout, and the graph rebuilt in the same frame. Held for the frame it was worked out in
+        /// and for the tile it was worked out for, which is as long as the answer cannot have
+        /// changed; the frame count is the game's own, so nothing has to remember to drop it.
+        /// </summary>
         private List<CombatInfluenceSource> BuildEnemyInfluenceSources(Vector2Int point, IBattleTroopState occupyingTroop)
+        {
+            int frame = Time.frameCount;
+            int occupantId = occupyingTroop != null ? occupyingTroop.Id : -1;
+            if (_influenceSources != null
+                && _influenceFrame == frame
+                && _influencePoint == point
+                && _influenceOccupantId == occupantId)
+            {
+                return _influenceSources;
+            }
+
+            _influenceFrame = frame;
+            _influencePoint = point;
+            _influenceOccupantId = occupantId;
+            _influenceSources = BuildEnemyInfluenceSourcesCore(point, occupyingTroop);
+            return _influenceSources;
+        }
+
+        private List<CombatInfluenceSource> BuildEnemyInfluenceSourcesCore(Vector2Int point, IBattleTroopState occupyingTroop)
         {
             int perspectiveTeamId = GetLocalTeamId();
             if (_facade == null || _facade.Troops == null || _facade.Teams == null || perspectiveTeamId < 0)
