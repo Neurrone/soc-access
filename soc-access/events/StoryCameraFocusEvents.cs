@@ -76,7 +76,7 @@ namespace SongsOfConquestAccess.Events
                 }
             }
 
-            return string.Join("; ", parts.ToArray());
+            return ModText.JoinList(ModStrings.Common.ClauseSeparator, parts);
         }
     }
 }

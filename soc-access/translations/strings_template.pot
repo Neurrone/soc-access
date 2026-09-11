@@ -44,6 +44,26 @@ msgctxt "Common.ResourceAmount"
 msgid "{0} {1}"
 msgstr ""
 
+#. Common.Sentence
+msgctxt "Common.Sentence"
+msgid "{0}."
+msgstr ""
+
+#. Common.SentenceSeparator
+msgctxt "Common.SentenceSeparator"
+msgid "{0}. {1}"
+msgstr ""
+
+#. Common.ClauseSeparator
+msgctxt "Common.ClauseSeparator"
+msgid "{0}; {1}"
+msgstr ""
+
+#. Common.PhraseSeparator
+msgctxt "Common.PhraseSeparator"
+msgid "{0} {1}"
+msgstr ""
+
 #. TeamColors.Black
 msgctxt "TeamColors.Black"
 msgid "black"
@@ -942,6 +962,11 @@ msgstr ""
 #. Spatial.Coordinates
 msgctxt "Spatial.Coordinates"
 msgid "{0}, {1}"
+msgstr ""
+
+#. Spatial.MovementOfMax
+msgctxt "Spatial.MovementOfMax"
+msgid "{0} / {1}"
 msgstr ""
 
 #. Actions.Cancel

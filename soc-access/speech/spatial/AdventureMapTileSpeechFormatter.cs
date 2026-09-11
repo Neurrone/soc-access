@@ -45,7 +45,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             string text = Compose(
                 AdventureMapAnnouncementDefinitions.Tile,
                 BuildTileParts(tile));
-            return string.IsNullOrWhiteSpace(text) ? string.Empty : text + ".";
+            return string.IsNullOrWhiteSpace(text) ? string.Empty : ModText.Get(ModStrings.Common.Sentence, text);
         }
 
         private string DescribeWielder(AdventureMapTile tile)
@@ -158,7 +158,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             if (appendRouteToTerrain)
             {
-                terrain += ", " + route;
+                terrain = ModText.Get(ModStrings.Common.ListSeparator, terrain, route);
             }
 
             if (!string.IsNullOrWhiteSpace(terrain))
@@ -277,13 +277,13 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 }
             }
 
-            return string.Join(". ", parts.ToArray());
+            return ModText.JoinList(ModStrings.Common.SentenceSeparator, parts);
         }
 
         public static string DescribeReachabilityOrRoutePreview(AdventureMapTile tile)
         {
             List<string> details = GetMovementDetails(tile);
-            return details.Count > 0 ? string.Join(", ", details.ToArray()) : string.Empty;
+            return details.Count > 0 ? ModText.JoinListWithCommas(details) : string.Empty;
         }
 
         private static List<string> GetMovementDetails(AdventureMapTile tile)
@@ -331,7 +331,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 if (!indicator.HasRoutePreview)
                 {
                     details.Add(ModText.Get(ModStrings.Spatial.NoRoutePreview));
-                    return string.Join(", ", details.ToArray());
+                    return ModText.JoinListWithCommas(details);
                 }
 
                 string arrival = DescribeArrivalTurns(indicator.TravelTurns);
@@ -369,7 +369,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 details.Add(ModText.Get(ModStrings.Spatial.Cost, indicator.CostMark.Value));
             }
 
-            return string.Join(", ", details.ToArray());
+            return ModText.JoinListWithCommas(details);
         }
 
         // Travel turns are ordinals counting the current turn as 1, matching the
@@ -430,7 +430,10 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return ModText.Get(
                 ModStrings.UI.LabelValue,
                 FirstNonEmpty(commander.MovementLabel, ModText.Get(ModStrings.Spatial.Movement)),
-                FormatMovementValue(commander.MovesLeft) + " / " + FormatMovementValue(commander.MaxMovement));
+                ModText.Get(
+                    ModStrings.Spatial.MovementOfMax,
+                    FormatMovementValue(commander.MovesLeft),
+                    FormatMovementValue(commander.MaxMovement)));
         }
 
         private static string FirstNonEmpty(string preferred, string fallback)

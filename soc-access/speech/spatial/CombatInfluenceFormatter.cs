@@ -59,7 +59,9 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 sentences.Add(ModText.Get(ModStrings.UI.LabelValue, FormatGroupLabel(group), FormatTroops(troops)));
             }
 
-            return sentences.Count > 0 ? string.Join(". ", sentences.ToArray()) + "." : string.Empty;
+            return sentences.Count > 0
+                ? ModText.Get(ModStrings.Common.Sentence, ModText.JoinList(ModStrings.Common.SentenceSeparator, sentences))
+                : string.Empty;
         }
 
         private static Dictionary<CombatInfluenceGroup, List<TroopRef>> BuildGroups(IList<CombatInfluenceSource> sources)
@@ -126,7 +128,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         private static string FormatTroops(IList<TroopRef> troops)
         {
-            return string.Join(", ", troops.Select(FormatTroop).ToArray());
+            return ModText.JoinListWithCommas(troops.Select(FormatTroop).ToList());
         }
 
         private static string FormatTroop(TroopRef troop)

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
@@ -65,9 +65,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 }
 
                 bool suffix = includeSuffix != null ? includeSuffix(group, element) : element.DefaultSuffix;
-                rendered.Add(new RenderedPart(
-                    text,
-                    suffix ? "," : string.Empty));
+                rendered.Add(new RenderedPart(text, suffix));
             }
 
             if (rendered.Count == 0)
@@ -75,24 +73,24 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 return string.Empty;
             }
 
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < rendered.Count; i++)
+            // The part before decides how the two are joined: with its suffix, or with nothing
+            // between them. Both joins are one ModString with both parts in it, so a language can
+            // punctuate and order the pair its own way.
+            string composed = rendered[0].Text;
+            for (int i = 1; i < rendered.Count; i++)
             {
-                if (i > 0)
-                {
-                    builder.Append(rendered[i - 1].Suffix);
-                    builder.Append(' ');
-                }
-
-                builder.Append(rendered[i].Text);
+                composed = ModText.Get(
+                    rendered[i - 1].Suffix ? ModStrings.Common.ListSeparator : ModStrings.Common.PhraseSeparator,
+                    composed,
+                    rendered[i].Text);
             }
 
-            return builder.ToString();
+            return composed;
         }
 
         private sealed class RenderedPart
         {
-            public RenderedPart(string text, string suffix)
+            public RenderedPart(string text, bool suffix)
             {
                 Text = text;
                 Suffix = suffix;
@@ -100,7 +98,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             public string Text { get; private set; }
 
-            public string Suffix { get; private set; }
+            /// <summary>Whether this part is separated from the one after it.</summary>
+            public bool Suffix { get; private set; }
         }
 
         private static IReadOnlyList<string> GetDefaultOrder(AnnouncementGroupDefinition group)

@@ -13,6 +13,10 @@
             public static readonly ModString Quantity = new ModString("Common.Quantity", "quantity");
             public static readonly ModString ResourceAmount = new ModString("Common.ResourceAmount", "{0} {1}");
             public static readonly ModPluralString TileCount = new ModPluralString("Common.TileCount", "{0} tile", "{0} tiles");
+            public static readonly ModString Sentence = new ModString("Common.Sentence", "{0}.");
+            public static readonly ModString SentenceSeparator = new ModString("Common.SentenceSeparator", "{0}. {1}");
+            public static readonly ModString ClauseSeparator = new ModString("Common.ClauseSeparator", "{0}; {1}");
+            public static readonly ModString PhraseSeparator = new ModString("Common.PhraseSeparator", "{0} {1}");
         }
 
         public static class TeamColors
@@ -235,6 +239,7 @@
             public static readonly ModString ZoneOfControlTiles = new ModString("Spatial.ZoneOfControlTiles", "{0} within {1} zone of control");
             public static readonly ModString ZoneOfControlInstance = new ModString("Spatial.ZoneOfControlInstance", "{0} within {1}");
             public static readonly ModString Coordinates = new ModString("Spatial.Coordinates", "{0}, {1}");
+            public static readonly ModString MovementOfMax = new ModString("Spatial.MovementOfMax", "{0} / {1}");
         }
 
         public static class Actions

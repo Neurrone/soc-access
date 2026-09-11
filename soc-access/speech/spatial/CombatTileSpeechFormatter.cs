@@ -60,7 +60,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 }
             }
 
-            return string.Join(", ", parts.ToArray());
+            return ModText.JoinListWithCommas(parts);
         }
 
         public string DescribeTroop(CombatTile tile)
@@ -221,7 +221,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 }
             }
 
-            return string.Join(", ", parts.ToArray());
+            return ModText.JoinListWithCommas(parts);
         }
 
         private static void AddTilePartIfPresent(string key, string text, out AnnouncementPart part)

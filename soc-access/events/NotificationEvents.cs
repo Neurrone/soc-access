@@ -1,4 +1,3 @@
-using System.Text;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 
@@ -211,26 +210,7 @@ namespace SongsOfConquestAccess.Events
     {
         public static string JoinNonEmpty(params string[] values)
         {
-            StringBuilder builder = new StringBuilder();
-            if (values == null)
-            {
-                return builder.ToString();
-            }
-
-            foreach (string value in values)
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    if (builder.Length > 0)
-                    {
-                        builder.Append(": ");
-                    }
-
-                    builder.Append(value);
-                }
-            }
-
-            return builder.ToString();
+            return ModText.JoinList(ModStrings.UI.LabelValue, values);
         }
     }
 }
