@@ -451,13 +451,17 @@ namespace SongsOfConquestAccess.Adapters
         /// clear it on Close, so a menu left open over an entity that has gone (a save loaded under
         /// it, the building destroyed) keeps every other sign of being up: its object is still
         /// active, its sub-page is still drawn, and its Async is still uncompleted because Close
-        /// never ran. The entity's own IsDisposed is what the game changes
-        /// (<c>AbstractMapEntity.Dispose</c>), so that is what is read.</summary>
+        /// never ran. The entity's own IsDisposed is what <c>AbstractMapEntity.Dispose</c> changes,
+        /// but <c>DestroyMapEntityCommand</c> only removes the entity from the map without disposing
+        /// it (verified in-game 2026-09-12: IsDisposed stayed false on the destroyed rally point), so
+        /// the map facade is asked whether the entity still exists as well.</summary>
         private bool IsEntityAlive()
         {
             IRecruitmentPoolComponent pool = Reflect.Get<IRecruitmentPoolComponent>(_menu, RecruitmentPoolField);
             IMapEntity entity = pool != null ? pool.MapEntity : null;
-            return entity != null && !entity.IsDisposed;
+            return entity != null
+                && !entity.IsDisposed
+                && (_facade == null || _facade.MapEntities == null || _facade.MapEntities.Exists(entity.Id));
         }
 
         /// <summary>The menu object is up AND it is still about a building that exists: the landing
