@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -55,14 +55,8 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 SaveLoadGameMenu.Settings settings = Settings;
-                string title = SpokenLines.Clean(
+                return SpokenLines.Clean(
                     UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.TitleText : null));
-                if (!string.IsNullOrWhiteSpace(title))
-                {
-                    return title;
-                }
-
-                return string.Empty;
             }
         }
 
@@ -122,12 +116,30 @@ namespace SongsOfConquestAccess.Adapters
         /// collapsed.</summary>
         public IList<string> GetSaveDescriptionLines()
         {
-            SaveLoadGameMenu.Settings settings = Settings;
-            return SpokenLines.Of(new[]
+            int frame = Time.frameCount;
+            if (_saveDescriptionLines == null || _saveDescriptionFrame != frame)
             {
-                UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.SaveDescriptionText : null),
-            });
+                // Split once a frame: the build asks whether there is a line and the node asks for
+                // it (AGENTS.md, Performance).
+                _saveDescriptionFrame = frame;
+                SaveLoadGameMenu.Settings settings = Settings;
+                _saveDescriptionLines = SpokenLines.Of(new[]
+                {
+                    UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.SaveDescriptionText : null),
+                });
+            }
+
+            return _saveDescriptionLines;
         }
+
+        /// <summary>Whether the menu is drawing a description and wrote anything in it.</summary>
+        public bool HasSaveDescription()
+        {
+            return IsSaveDescriptionVisible() && GetSaveDescriptionLines().Count > 0;
+        }
+
+        private IList<string> _saveDescriptionLines;
+        private int _saveDescriptionFrame = -1;
 
         public bool IsSaveDescriptionVisible()
         {
@@ -152,9 +164,36 @@ namespace SongsOfConquestAccess.Adapters
         /// are the caller's to split - a normaliser here would join them into one breath.</summary>
         public string GetInformationText()
         {
-            SaveLoadGameMenu.Settings settings = Settings;
-            return UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.InformationText : null);
+            int frame = Time.frameCount;
+            if (_informationFrame != frame)
+            {
+                // Read once a frame: the build asks whether there is a block, and the panel's label
+                // and its section each ask for the lines (AGENTS.md, Performance).
+                _informationFrame = frame;
+                SaveLoadGameMenu.Settings settings = Settings;
+                _informationText = UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.InformationText : null);
+            }
+
+            return _informationText;
         }
+
+        /// <summary>The paragraphs of the block above, split once a frame.</summary>
+        public IList<string> GetDetailsLines()
+        {
+            int frame = Time.frameCount;
+            if (_detailsLines == null || _detailsLinesFrame != frame)
+            {
+                _detailsLinesFrame = frame;
+                _detailsLines = SpokenLines.Of(new[] { GetInformationText() });
+            }
+
+            return _detailsLines;
+        }
+
+        private string _informationText;
+        private int _informationFrame = -1;
+        private IList<string> _detailsLines;
+        private int _detailsLinesFrame = -1;
 
         public bool HasDetailsText()
         {
@@ -180,7 +219,23 @@ namespace SongsOfConquestAccess.Adapters
             return GetInformationText();
         }
 
+        /// <summary>The category tabs, built at most once a frame: each carries six closures and the
+        /// build reads the list whole (AGENTS.md, Performance). The closures read the live buttons,
+        /// so a tab the game switches on or off inside the frame is still followed.</summary>
         public IReadOnlyList<TabItem> GetTabs()
+        {
+            int frame = Time.frameCount;
+            if (_tabs != null && _tabsFrame == frame)
+            {
+                return _tabs;
+            }
+
+            _tabsFrame = frame;
+            _tabs = ReadTabs();
+            return _tabs;
+        }
+
+        private IReadOnlyList<TabItem> ReadTabs()
         {
             List<TabItem> result = new List<TabItem>();
             SaveLoadGameMenu.Settings settings = Settings;
@@ -200,8 +255,8 @@ namespace SongsOfConquestAccess.Adapters
                     "save-load-tab-" + index,
                     index,
                     button,
-                    () => GetTabLabel(index, button),
-                    () => ActivateTab(index, button),
+                    () => GetTabLabel(button),
+                    () => ActivateTab(button),
                     () => FocusButton(button),
                     () => GameObjects.IsLive(tabGroup as Component) && MenuButtonAdapterBase.IsButtonVisible(button),
                     () => button != null && button.Active && button.Interactable,
@@ -211,7 +266,22 @@ namespace SongsOfConquestAccess.Adapters
             return result;
         }
 
+        /// <summary>The save rows the menu is drawing, built at most once a frame; each row reads the
+        /// game when it is asked.</summary>
         public IReadOnlyList<SaveEntry> GetEntries()
+        {
+            int frame = Time.frameCount;
+            if (_entries != null && _entriesFrame == frame)
+            {
+                return _entries;
+            }
+
+            _entriesFrame = frame;
+            _entries = ReadEntries();
+            return _entries;
+        }
+
+        private IReadOnlyList<SaveEntry> ReadEntries()
         {
             List<SaveEntry> result = new List<SaveEntry>();
             IList entries = ActiveEntriesField != null && _menu != null ? ActiveEntriesField.GetValue(_menu) as IList : null;
@@ -237,65 +307,84 @@ namespace SongsOfConquestAccess.Adapters
 
         public ButtonItem SaveButton
         {
-            get
-            {
-                SaveLoadGameMenu.Settings settings = Settings;
-                return BuildButton("save-load-save", settings != null ? settings.SaveGameButton : null);
-            }
+            get { return Buttons().Save; }
         }
 
         public ButtonItem LoadButton
         {
-            get
-            {
-                SaveLoadGameMenu.Settings settings = Settings;
-                return BuildEnabledOnlyButton("save-load-load", settings != null ? settings.LoadGameButton : null);
-            }
+            get { return Buttons().Load; }
         }
 
         public ButtonItem LoadAsHotseatButton
         {
-            get
-            {
-                SaveLoadGameMenu.Settings settings = Settings;
-                return BuildEnabledOnlyButton("save-load-load-hotseat", settings != null ? settings.LoadAsHotseatGameButton : null);
-            }
+            get { return Buttons().LoadAsHotseat; }
         }
 
         public ButtonItem LoadAsOnlineButton
         {
-            get
-            {
-                SaveLoadGameMenu.Settings settings = Settings;
-                return BuildEnabledOnlyButton("save-load-load-online", settings != null ? settings.LoadAsOnlineGameButton : null);
-            }
+            get { return Buttons().LoadAsOnline; }
         }
 
         public ButtonItem DeleteButton
         {
-            get
-            {
-                SaveLoadGameMenu.Settings settings = Settings;
-                return BuildButton("save-load-delete", settings != null ? settings.DeleteSaveButton : null);
-            }
+            get { return Buttons().Delete; }
         }
 
         public ButtonItem CancelButton
         {
-            get
-            {
-                SaveLoadGameMenu.Settings settings = Settings;
-                UIButton button = settings != null ? settings.ExitButton : null;
-                return new ButtonItem(
-                    "save-load-cancel",
-                    button,
-                    () => GetButtonLabel(button),
-                    Close,
-                    () => FocusButton(button),
-                    () => true,
-                    () => true);
-            }
+            get { return Buttons().Cancel; }
         }
+
+        /// <summary>The window's six commands, built at most once a frame: each is an object and five
+        /// closures, and the build asks for every one of them (AGENTS.md, Performance). What each one
+        /// says, and whether it is drawn or enabled, is still read off the live button when it is
+        /// asked.</summary>
+        private Commands Buttons()
+        {
+            int frame = Time.frameCount;
+            if (_commands != null && _commandsFrame == frame)
+            {
+                return _commands;
+            }
+
+            _commandsFrame = frame;
+            SaveLoadGameMenu.Settings settings = Settings;
+            UIButton exit = settings != null ? settings.ExitButton : null;
+            _commands = new Commands
+            {
+                Save = BuildButton("save-load-save", settings != null ? settings.SaveGameButton : null),
+                Load = BuildEnabledOnlyButton("save-load-load", settings != null ? settings.LoadGameButton : null),
+                LoadAsHotseat = BuildEnabledOnlyButton("save-load-load-hotseat", settings != null ? settings.LoadAsHotseatGameButton : null),
+                LoadAsOnline = BuildEnabledOnlyButton("save-load-load-online", settings != null ? settings.LoadAsOnlineGameButton : null),
+                Delete = BuildButton("save-load-delete", settings != null ? settings.DeleteSaveButton : null),
+                Cancel = new ButtonItem(
+                    "save-load-cancel",
+                    exit,
+                    () => GetButtonLabel(exit),
+                    Close,
+                    () => FocusButton(exit),
+                    () => true,
+                    () => true),
+            };
+            return _commands;
+        }
+
+        private sealed class Commands
+        {
+            public ButtonItem Save;
+            public ButtonItem Load;
+            public ButtonItem LoadAsHotseat;
+            public ButtonItem LoadAsOnline;
+            public ButtonItem Delete;
+            public ButtonItem Cancel;
+        }
+
+        private Commands _commands;
+        private int _commandsFrame = -1;
+        private IReadOnlyList<TabItem> _tabs;
+        private int _tabsFrame = -1;
+        private IReadOnlyList<SaveEntry> _entries;
+        private int _entriesFrame = -1;
 
         private SaveLoadGameMenu.Settings Settings
         {
@@ -339,7 +428,7 @@ namespace SongsOfConquestAccess.Adapters
             return string.IsNullOrWhiteSpace(direct) ? MenuButtonTextUtility.GetAllVisibleText(button) : direct;
         }
 
-        private static string GetTabLabel(int index, UIButton button)
+        private static string GetTabLabel(UIButton button)
         {
             return GetButtonLabel(button);
         }
@@ -364,7 +453,7 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Select(button);
         }
 
-        private static bool ActivateTab(int index, UIButton button)
+        private static bool ActivateTab(UIButton button)
         {
             if (button == null || !button.Active || !button.Interactable || !MenuButtonAdapterBase.IsButtonVisible(button))
             {

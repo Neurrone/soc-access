@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
@@ -133,15 +133,11 @@ namespace SongsOfConquestAccess.Screens
         {
             // Save mode draws its "Saved as ..." line where load mode draws the tabs. The
             // description is read ONCE: the guard and the paragraph count are the same question.
-            if (Live.IsSaveDescriptionVisible())
+            if (Live.HasSaveDescription())
             {
-                IList<string> description = Live.GetSaveDescriptionLines();
-                if (description.Count > 0)
-                {
-                    builder.AddItem(new SyntheticNode(
-                        ControlId.For(Marker("description"), "save-load:description"),
-                        GraphNodes.Paragraphs(() => description)));
-                }
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(Marker("description"), "save-load:description"),
+                    GraphNodes.Paragraphs(Live.GetSaveDescriptionLines)));
             }
 
             IReadOnlyList<SaveLoadGameMenuAdapter.TabItem> tabs = Live.GetTabs();
@@ -282,13 +278,13 @@ namespace SongsOfConquestAccess.Screens
 
         private string DetailsLine(int index)
         {
-            IList<string> lines = DetailsLines();
+            IList<string> lines = Live.GetDetailsLines();
             return index >= 0 && index < lines.Count ? lines[index] : string.Empty;
         }
 
         private IList<string> DetailsRest()
         {
-            IList<string> lines = DetailsLines();
+            IList<string> lines = Live.GetDetailsLines();
             List<string> rest = new List<string>();
             for (int i = 1; i < lines.Count; i++)
             {
@@ -296,11 +292,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return rest;
-        }
-
-        private IList<string> DetailsLines()
-        {
-            return SpokenLines.Of(new[] { Live.GetDetailsText() });
         }
 
         // ---- the buttons ----
