@@ -31,7 +31,6 @@ namespace SongsOfConquestAccess.UI
     /// </summary>
     public sealed class AdventureMapGrid
     {
-        private const string ScannerWrapCueKey = "Common_ClickUnfold";
         private const int DefaultLookAroundRadius = 15;
         private const int MinimumLookAroundRadius = 5;
         private const int MaximumLookAroundRadius = 30;
@@ -371,7 +370,7 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
-            SpeakSkipped(result.SkippedCount);
+            TileSkipNavigator.SpeakSkipped(result.SkippedCount);
             _cursorTile = result.Target;
             _adapter.EnsureTileInView(_cursorTile);
             Land(announce: true);
@@ -731,7 +730,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (result != null && result.Status == ScannerCommandStatus.Result && result.Wrapped)
             {
-                NativeSoundUtility.PostEvent(ScannerWrapCueKey);
+                NativeSoundUtility.PostEvent(WrapCue.Key);
             }
 
             if (result != null && result.Status == ScannerCommandStatus.Result && result.Result != null)
@@ -772,18 +771,6 @@ namespace SongsOfConquestAccess.UI
             }
 
             return false;
-        }
-
-        private static void SpeakSkipped(int skippedCount)
-        {
-            if (skippedCount <= 0)
-            {
-                return;
-            }
-
-            SpeechPipeline.Output(new SpeechRequest(
-                ModText.Plural(ModStrings.Spatial.SkippedTileCount, skippedCount, skippedCount),
-                interrupt: false));
         }
 
         private static bool IsScannerAction(string actionKey)

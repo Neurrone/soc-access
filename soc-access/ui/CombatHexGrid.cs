@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Input;
@@ -26,30 +26,29 @@ namespace SongsOfConquestAccess.UI
     /// </summary>
     public sealed class CombatHexGrid
     {
-        private const string ScannerWrapCueKey = "Common_ClickUnfold";
-        private static readonly Vector2Int CenterTile = new Vector2Int(6, 4);
-
         private readonly CombatAdapter _adapter;
+
+        // The screen that owns this grid, handed over when it builds it: the troop cycles and the
+        // turn-order jump are the screen's, and the board's keys reach them through here.
+        private readonly CombatScreen _screen;
         private CombatSnapshot _snapshot;
         private Vector2Int _cursor;
         private CombatInspectContext _inspectContext;
         private bool _componentWarningSpoken;
-        private readonly ScannerController _scanner;
-        private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
+        private readonly HexGridScanner _scanner;
 
-        public CombatHexGrid(CombatAdapter adapter)
+        public CombatHexGrid(CombatAdapter adapter, CombatScreen screen)
         {
             _adapter = adapter;
+            _screen = screen;
             RefreshSnapshot();
             _cursor = _adapter != null ? _adapter.GetInitialTile() : Vector2Int.zero;
-            _scanner = new ScannerController(
+            _scanner = new HexGridScanner(
                 origin => ScannerCustomCategorySynthesizer.ApplyFromSettings(
                     _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null),
-                () => _cursor,
                 (result, cursorHint) => _adapter != null
                     ? _adapter.TryRefreshScannerResult(result, cursorHint)
                     : ScannerResultRefresh.Invalid,
-                JumpToScannerResult,
                 (result, directions, index, count, includeItemName) => new CombatScannerSpeechContext(
                     result,
                     _adapter.GetTile(result.Position),
@@ -58,7 +57,9 @@ namespace SongsOfConquestAccess.UI
                     index,
                     count,
                     includeItemName),
-                ScannerDirectionMode.Hex);
+                () => _cursor,
+                SetCursor,
+                PlayTileCuesFor);
         }
 
         public string GetLabel()
@@ -150,19 +151,7 @@ namespace SongsOfConquestAccess.UI
 
         public bool ClaimsAction(string actionKey)
         {
-            return actionKey == AccessibilityActions.HexGridWest.Key
-                || actionKey == AccessibilityActions.HexGridEast.Key
-                || actionKey == AccessibilityActions.HexGridNorthWest.Key
-                || actionKey == AccessibilityActions.HexGridNorthEast.Key
-                || actionKey == AccessibilityActions.HexGridSouthWest.Key
-                || actionKey == AccessibilityActions.HexGridSouthEast.Key
-                || actionKey == AccessibilityActions.HexGridFocusCenterTile.Key
-                || actionKey == AccessibilityActions.HexGridSkipWest.Key
-                || actionKey == AccessibilityActions.HexGridSkipEast.Key
-                || actionKey == AccessibilityActions.HexGridSkipNorthWest.Key
-                || actionKey == AccessibilityActions.HexGridSkipNorthEast.Key
-                || actionKey == AccessibilityActions.HexGridSkipSouthWest.Key
-                || actionKey == AccessibilityActions.HexGridSkipSouthEast.Key
+            return HexGridMoves.ClaimsAction(actionKey)
                 || actionKey == AccessibilityActions.CombatInspect.Key
                 || (CanNavigateLocalActingTroops()
                     && (actionKey == AccessibilityActions.CombatNextActingTroop.Key
@@ -173,7 +162,7 @@ namespace SongsOfConquestAccess.UI
                         || actionKey == AccessibilityActions.CombatPreviousEnemyTroop.Key))
                 || actionKey == AccessibilityActions.CombatFocusTimeline.Key
                 || actionKey == AccessibilityActions.ReadThreat.Key
-                || IsScannerAction(actionKey);
+                || HexGridScanner.ClaimsAction(actionKey);
         }
 
         public bool HandleAction(InputAction action)
@@ -183,74 +172,21 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            if (HandleScannerAction(action))
+            if (_scanner.HandleAction(action))
             {
                 return true;
             }
 
-            if (action.Key == AccessibilityActions.HexGridWest.Key)
+            bool skip;
+            Func<Vector2Int, Vector2Int> step = HexGridMoves.TryGetStep(action.Key, out skip);
+            if (step != null)
             {
-                return Move(-1, 0);
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipWest.Key)
-            {
-                return SkipMove(point => new Vector2Int(point.x - 1, point.y));
-            }
-
-            if (action.Key == AccessibilityActions.HexGridEast.Key)
-            {
-                return Move(1, 0);
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipEast.Key)
-            {
-                return SkipMove(point => new Vector2Int(point.x + 1, point.y));
-            }
-
-            if (action.Key == AccessibilityActions.HexGridNorthWest.Key)
-            {
-                return MoveDiagonal(north: true, east: false);
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipNorthWest.Key)
-            {
-                return SkipMove(point => GetDiagonalNeighbor(point, north: true, east: false));
-            }
-
-            if (action.Key == AccessibilityActions.HexGridNorthEast.Key)
-            {
-                return MoveDiagonal(north: true, east: true);
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipNorthEast.Key)
-            {
-                return SkipMove(point => GetDiagonalNeighbor(point, north: true, east: true));
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSouthWest.Key)
-            {
-                return MoveDiagonal(north: false, east: false);
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipSouthWest.Key)
-            {
-                return SkipMove(point => GetDiagonalNeighbor(point, north: false, east: false));
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSouthEast.Key)
-            {
-                return MoveDiagonal(north: false, east: true);
+                return skip ? SkipMove(step) : SetCursor(step(_cursor));
             }
 
             if (action.Key == AccessibilityActions.HexGridFocusCenterTile.Key)
             {
                 return MoveToCenterTile();
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipSouthEast.Key)
-            {
-                return SkipMove(point => GetDiagonalNeighbor(point, north: false, east: true));
             }
 
             if (action.Key == AccessibilityActions.CombatInspect.Key)
@@ -265,38 +201,32 @@ namespace SongsOfConquestAccess.UI
 
             if (action.Key == AccessibilityActions.CombatNextActingTroop.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.NavigateLocalActingTroop(1);
+                return _screen != null && _screen.NavigateLocalActingTroop(1);
             }
 
             if (action.Key == AccessibilityActions.CombatPreviousActingTroop.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.NavigateLocalActingTroop(-1);
+                return _screen != null && _screen.NavigateLocalActingTroop(-1);
             }
 
             if (action.Key == AccessibilityActions.CombatFocusActingTroop.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.FocusActingTroop();
+                return _screen != null && _screen.FocusActingTroop();
             }
 
             if (action.Key == AccessibilityActions.CombatNextEnemyTroop.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.NavigateEnemyActingTroop(1);
+                return _screen != null && _screen.NavigateEnemyActingTroop(1);
             }
 
             if (action.Key == AccessibilityActions.CombatPreviousEnemyTroop.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.NavigateEnemyActingTroop(-1);
+                return _screen != null && _screen.NavigateEnemyActingTroop(-1);
             }
 
             if (action.Key == AccessibilityActions.CombatFocusTimeline.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.FocusTimeline();
+                return _screen != null && _screen.FocusTimeline();
             }
 
             if (action.Key == AccessibilityActions.ReadThreat.Key)
@@ -309,14 +239,12 @@ namespace SongsOfConquestAccess.UI
 
         private bool CanNavigateLocalActingTroops()
         {
-            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-            return screen != null && screen.CanNavigateLocalActingTroops();
+            return _screen != null && _screen.CanNavigateLocalActingTroops();
         }
 
         private bool CanNavigateEnemyActingTroops()
         {
-            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-            return screen != null && screen.CanNavigateEnemyActingTroops();
+            return _screen != null && _screen.CanNavigateEnemyActingTroops();
         }
 
         /// <summary>Put the cursor on a troop's tile and read it, as a move does: the queue's Enter,
@@ -383,24 +311,10 @@ namespace SongsOfConquestAccess.UI
                 semitoneOffset);
         }
 
-        /// <summary>The remote tile's own cues carry the direction to it; out of range plays nothing.</summary>
-        private void PlayDirectionalTileCues(Vector2Int origin, Vector2Int target)
-        {
-            float pan;
-            float semitones;
-            float gainScale;
-            if (!DirectionalCueMath.TryCompute(origin, target, CueGridGeometry.Hex, out pan, out semitones, out gainScale))
-            {
-                return;
-            }
-
-            PlayTileCuesFor(target, pan, gainScale, semitones);
-        }
-
         private bool MoveToCenterTile()
         {
             RefreshSnapshot();
-            if (_snapshot == null || !_snapshot.IsValidTile(CenterTile))
+            if (_snapshot == null || !_snapshot.IsValidTile(HexGridMoves.CenterTile))
             {
                 return true;
             }
@@ -410,31 +324,21 @@ namespace SongsOfConquestAccess.UI
                 ExitInspect();
             }
 
-            if (_cursor == CenterTile)
+            if (_cursor == HexGridMoves.CenterTile)
             {
                 FocusCurrentTile(updateNativeFocus: true);
                 PlayTileCues();
                 return true;
             }
 
-            _cursor = CenterTile;
+            _cursor = HexGridMoves.CenterTile;
             FocusCurrentTile(updateNativeFocus: true);
             SpeakTile();
             PlayTileCues();
             return true;
         }
 
-        private bool Move(int xDelta, int yDelta)
-        {
-            return SetCursor(new Vector2Int(_cursor.x + xDelta, _cursor.y + yDelta));
-        }
-
-        private bool MoveDiagonal(bool north, bool east)
-        {
-            return SetCursor(GetDiagonalNeighbor(_cursor, north, east));
-        }
-
-        private bool SkipMove(System.Func<Vector2Int, Vector2Int> step)
+        private bool SkipMove(Func<Vector2Int, Vector2Int> step)
         {
             RefreshSnapshot();
             TileSkipResult result = TileSkipNavigator.FindTarget(
@@ -448,7 +352,7 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
-            SpeakSkipped(result.SkippedCount);
+            TileSkipNavigator.SpeakSkipped(result.SkippedCount);
             return SetCursor(result.Target);
         }
 
@@ -460,22 +364,6 @@ namespace SongsOfConquestAccess.UI
             }
 
             return _inspectContext == null || _inspectContext.Contains(point);
-        }
-
-        private static Vector2Int GetDiagonalNeighbor(Vector2Int point, bool north, bool east)
-        {
-            int yDelta = north ? 1 : -1;
-            int xDelta;
-            if ((point.y & 1) == 0)
-            {
-                xDelta = east ? 0 : -1;
-            }
-            else
-            {
-                xDelta = east ? 1 : 0;
-            }
-
-            return new Vector2Int(point.x + xDelta, point.y + yDelta);
         }
 
         private bool ReadThreat()
@@ -564,135 +452,6 @@ namespace SongsOfConquestAccess.UI
             return true;
         }
 
-        private bool JumpToScannerResult(Vector2Int point)
-        {
-            if (point == _cursor)
-            {
-                SpeakHere();
-                return true;
-            }
-
-            Vector2Int origin = _cursor;
-            SetCursor(point);
-            return _jumpAnchor.RememberIfMoved(origin, _cursor);
-        }
-
-        /// <summary>
-        /// A jump onto the tile the cursor already occupies moves nothing, so no
-        /// tile announcement follows it. Say where the player is rather than
-        /// letting the key fall silent.
-        /// </summary>
-        private static void SpeakHere()
-        {
-            SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Spatial.Here), interrupt: false));
-        }
-
-        private bool ReturnFromJump()
-        {
-            Vector2Int anchor;
-            if (!_jumpAnchor.TryTake(out anchor))
-            {
-                CueLibrary.PlayCue(CueLibrary.MoveDenied);
-                SpeechPipeline.Output(new SpeechRequest(
-                    ModText.Get(ModStrings.Scanner.NoTileToReturnTo),
-                    interrupt: false));
-                return true;
-            }
-
-            return SetCursor(anchor);
-        }
-
-        private bool HandleScannerAction(InputAction action)
-        {
-            if (action.Key == AccessibilityActions.ScannerPreviousCategory.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveCategory(-1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerNextCategory.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveCategory(1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerPreviousSubcategory.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveSubcategory(-1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerNextSubcategory.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveSubcategory(1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerPreviousItem.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveItem(-1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerNextItem.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveItem(1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerPreviousInstance.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveInstance(-1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerNextInstance.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveInstance(1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerJumpToResult.Key)
-            {
-                return _scanner.JumpToCurrent();
-            }
-
-            if (action.Key == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteSpeakDistanceAndDirection());
-            }
-
-            if (action.Key == AccessibilityActions.ScannerReturnFromJump.Key)
-            {
-                return ReturnFromJump();
-            }
-
-            return false;
-        }
-
-        private bool HandleScannerNavigationResult(ScannerCommandResult result)
-        {
-            if (result != null && result.Status == ScannerCommandStatus.Result && result.Wrapped)
-            {
-                NativeSoundUtility.PostEvent(ScannerWrapCueKey);
-            }
-
-            if (result != null && result.Status == ScannerCommandStatus.Result && result.Result != null)
-            {
-                PlayDirectionalTileCues(_cursor, result.Result.Position);
-            }
-
-            _scanner.Output(result);
-            return true;
-        }
-
-        private static bool IsScannerAction(string actionKey)
-        {
-            return actionKey == AccessibilityActions.ScannerPreviousCategory.Key
-                || actionKey == AccessibilityActions.ScannerNextCategory.Key
-                || actionKey == AccessibilityActions.ScannerPreviousSubcategory.Key
-                || actionKey == AccessibilityActions.ScannerNextSubcategory.Key
-                || actionKey == AccessibilityActions.ScannerPreviousItem.Key
-                || actionKey == AccessibilityActions.ScannerNextItem.Key
-                || actionKey == AccessibilityActions.ScannerPreviousInstance.Key
-                || actionKey == AccessibilityActions.ScannerNextInstance.Key
-                || actionKey == AccessibilityActions.ScannerJumpToResult.Key
-                || actionKey == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key
-                || actionKey == AccessibilityActions.ScannerReturnFromJump.Key;
-        }
-
         private void FocusCurrentTile(bool updateNativeFocus)
         {
             RefreshSnapshot();
@@ -749,18 +508,6 @@ namespace SongsOfConquestAccess.UI
             SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.Inspecting, target), interrupt: false));
         }
 
-        private static void SpeakSkipped(int skippedCount)
-        {
-            if (skippedCount <= 0)
-            {
-                return;
-            }
-
-            SpeechPipeline.Output(new SpeechRequest(
-                ModText.Plural(ModStrings.Spatial.SkippedTileCount, skippedCount, skippedCount),
-                interrupt: false));
-        }
-
         private void RefreshSnapshot()
         {
             _snapshot = _adapter != null ? _adapter.BuildSnapshot() : null;
@@ -775,12 +522,5 @@ namespace SongsOfConquestAccess.UI
         {
             return _adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None ? null : _inspectContext;
         }
-
-        private static int Mod(int value, int modulus)
-        {
-            int result = value % modulus;
-            return result < 0 ? result + modulus : result;
-        }
-
     }
 }

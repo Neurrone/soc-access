@@ -89,7 +89,6 @@ namespace SongsOfConquestAccess.Screens
         };
 
         private const string ReturnToGridSoundKey = "Common_ClosePauseMenu";
-        private const string FocusWrapCueKey = "Common_ClickUnfold";
 
         private const string BoardStop = "combat:board";
         private const string QuickbarStop = "combat:quickbar";
@@ -165,7 +164,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _gridAdapter = Live;
-            _grid = Live == null ? null : new CombatHexGrid(Live);
+            _grid = Live == null ? null : new CombatHexGrid(Live, this);
             return _grid;
         }
 
@@ -917,7 +916,7 @@ namespace SongsOfConquestAccess.Screens
         /// what opens the pause menu.</summary>
         public override bool ConsumesBack
         {
-            get { return !IsBoardFocused() || Grid().IsInspecting || IsAiming; }
+            get { return !IsBoardFocused() || (Grid() != null && Grid().IsInspecting) || IsAiming; }
         }
 
         public override bool Back()
@@ -975,11 +974,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return moved;
-        }
-
-        public bool CanFocusActingTroop()
-        {
-            return HasActingTroops(enemy: false);
         }
 
         public bool CanNavigateLocalActingTroops()
@@ -1096,7 +1090,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (result.Wrapped)
             {
-                NativeSoundUtility.PostEvent(FocusWrapCueKey);
+                NativeSoundUtility.PostEvent(WrapCue.Key);
             }
 
             return true;
