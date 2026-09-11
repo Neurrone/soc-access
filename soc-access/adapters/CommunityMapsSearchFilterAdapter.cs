@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -25,6 +25,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo ApplyFilterMethod = AccessTools.Method(SearchPanelType, "ApplyFilter");
         private static readonly MethodInfo ClearFilterMethod = AccessTools.Method(SearchPanelType, "ClearFilter");
         private static readonly MethodInfo CloseMethod = AccessTools.Method(SearchPanelType, "Close");
+        private static readonly FieldInfo TagParentField = AccessTools.Field(SearchPanelType, "SearchPanelTagParent");
 
         private readonly object _searchPanel;
         private readonly string _title;
@@ -105,14 +106,38 @@ namespace SongsOfConquestAccess.Adapters
             return result;
         }
 
+        /// <summary>The panel's three commands, listed at most once a frame. The walk for the panel's
+        /// buttons is a frame sweep, so naming the three of them costs one walk and not four
+        /// (AGENTS.md, Performance).</summary>
         public IReadOnlyList<ActionItem> GetActions()
         {
+            int frame = Time.frameCount;
+            if (_actions != null && _actionsFrame == frame)
+            {
+                return _actions;
+            }
+
+            _actionsFrame = frame;
             List<ActionItem> actions = new List<ActionItem>();
             List<Button> buttons = FindActionButtons();
             AddAction(actions, "search", ApplyFilterMethod, buttons, 0);
             AddAction(actions, "clear", ClearFilterMethod, buttons, 1);
             AddAction(actions, "cancel", CloseMethod, buttons, 2);
-            return actions;
+            _actions = actions;
+            return _actions;
+        }
+
+        private IReadOnlyList<ActionItem> _actions;
+        private int _actionsFrame = -1;
+
+        // The panel's own buttons, walked once a frame however many of them are named.
+        private static readonly FrameSweep<Button> PanelButtons =
+            new FrameSweep<Button>("community maps filter panel", inactiveToo: false);
+
+        private Button[] ButtonsOfPanel()
+        {
+            GameObject panel = Panel;
+            return panel != null ? PanelButtons.Under(panel.transform) : null;
         }
 
         public bool ApplyFilter()
@@ -169,8 +194,7 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            GameObject panel = Panel;
-            Button[] buttons = panel != null ? panel.GetComponentsInChildren<Button>(false) : null;
+            Button[] buttons = ButtonsOfPanel();
             if (buttons == null)
             {
                 return null;
@@ -201,8 +225,7 @@ namespace SongsOfConquestAccess.Adapters
         private List<Button> FindActionButtons()
         {
             List<Button> result = new List<Button>();
-            GameObject panel = Panel;
-            Button[] buttons = panel != null ? panel.GetComponentsInChildren<Button>(false) : null;
+            Button[] buttons = ButtonsOfPanel();
             if (buttons == null)
             {
                 return result;
@@ -255,23 +278,44 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
+        /// <summary>Whether the panel is filtering on this tag. The chosen tags are gathered once a
+        /// frame: every drawn chip asks, and the answer was a walk of the whole chosen set each time
+        /// (AGENTS.md, Performance).</summary>
         private bool IsTagSelected(string category, string name)
         {
+            int frame = Time.frameCount;
+            if (_selectedTags == null || _selectedTagsFrame != frame)
+            {
+                _selectedTagsFrame = frame;
+                _selectedTags = ReadSelectedTags();
+            }
+
+            return _selectedTags.Contains(TagKey(category, name));
+        }
+
+        private HashSet<string> _selectedTags;
+        private int _selectedTagsFrame = -1;
+
+        private static HashSet<string> ReadSelectedTags()
+        {
+            HashSet<string> keys = new HashSet<string>();
             IEnumerable selectedTags = SelectedTagsField != null ? SelectedTagsField.GetValue(null) as IEnumerable : null;
             if (selectedTags == null)
             {
-                return false;
+                return keys;
             }
 
             foreach (object tag in selectedTags)
             {
-                if (Reflect.Typed<string>(tag, "category") == category && Reflect.Typed<string>(tag, "name") == name)
-                {
-                    return true;
-                }
+                keys.Add(TagKey(Reflect.Typed<string>(tag, "category"), Reflect.Typed<string>(tag, "name")));
             }
 
-            return false;
+            return keys;
+        }
+
+        private static string TagKey(string category, string name)
+        {
+            return (category ?? string.Empty) + "\u0001" + (name ?? string.Empty);
         }
 
         // LAZY: a click. The walk under the tag chip is paid when the player toggles it.
@@ -303,9 +347,16 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private static TagListItem FindNativeTag(string category, string name)
+        // The chips the panel draws, which the game pools under SearchPanelTagParent and nowhere else
+        // (decompiled SearchPanel.CreateTagListItems). Walking that subtree is what replaced a
+        // scene-wide scan on the focus path, which measured about 19 ms per cursor move.
+        private static readonly FrameSweep<TagListItem> TagChips =
+            new FrameSweep<TagListItem>("community maps filter tags", inactiveToo: true);
+
+        private TagListItem FindNativeTag(string category, string name)
         {
-            TagListItem[] items = Resources.FindObjectsOfTypeAll<TagListItem>();
+            Transform parent = Reflect.Get<Transform>(_searchPanel, TagParentField);
+            TagListItem[] items = parent != null ? TagChips.Under(parent) : new TagListItem[0];
             for (int i = 0; i < items.Length; i++)
             {
                 TagListItem item = items[i];

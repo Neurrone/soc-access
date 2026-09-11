@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -379,11 +379,44 @@ namespace SongsOfConquestAccess.Adapters
         {
             return new DropdownItem(
                 id,
-                FindDropdownLabel(dropdown),
+                DropdownLabel(dropdown),
                 dropdown,
                 SetDropdownValue,
                 FocusDropdown);
         }
+
+        /// <summary>The words drawn beside a dropdown, found once per dropdown and kept while its
+        /// caption says the same thing. Finding them means walking the dropdown for a text that is
+        /// neither its caption nor its item template, and the build asks for both dropdowns every
+        /// frame (AGENTS.md, Performance). The caption is the only part of the answer that moves, so
+        /// it is what the kept answer is keyed on.</summary>
+        private string DropdownLabel(MultiTargetDropdown dropdown)
+        {
+            if (dropdown == null)
+            {
+                return string.Empty;
+            }
+
+            string caption = CommunityMapsText.Of(dropdown.captionText);
+            DropdownLabelMemo memo;
+            if (_dropdownLabels.TryGetValue(dropdown, out memo) && memo.Caption == caption)
+            {
+                return memo.Label;
+            }
+
+            memo = new DropdownLabelMemo { Caption = caption, Label = FindDropdownLabel(dropdown, caption) };
+            _dropdownLabels[dropdown] = memo;
+            return memo.Label;
+        }
+
+        private sealed class DropdownLabelMemo
+        {
+            public string Caption;
+            public string Label;
+        }
+
+        private readonly Dictionary<MultiTargetDropdown, DropdownLabelMemo> _dropdownLabels =
+            new Dictionary<MultiTargetDropdown, DropdownLabelMemo>();
 
         private bool SetDropdownValue(MultiTargetDropdown dropdown, int value)
         {
@@ -515,14 +548,8 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private static string FindDropdownLabel(MultiTargetDropdown dropdown)
+        private static string FindDropdownLabel(MultiTargetDropdown dropdown, string caption)
         {
-            if (dropdown == null)
-            {
-                return string.Empty;
-            }
-
-            string caption = CommunityMapsText.Of(dropdown.captionText);
             TMP_Text[] texts = dropdown.GetComponentsInChildren<TMP_Text>(false);
             for (int i = 0; i < texts.Length; i++)
             {

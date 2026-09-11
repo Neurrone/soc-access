@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using HarmonyLib;
 using ModIOBrowser;
@@ -180,8 +180,8 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>One of mod.io's internal singletons, reached through the two public statics its
-        /// generic base declares. Resolved once per mod load; the per-frame cost is a delegate call
-        /// and a static field read.</summary>
+        /// generic base declares. Bound to delegates once per mod load, so the per-frame cost is a
+        /// delegate call and a static field read.</summary>
         private sealed class Singleton
         {
             private readonly Func<bool> _instantiated;
@@ -238,9 +238,50 @@ namespace SongsOfConquestAccess.Screens
                     return new Singleton(null, null);
                 }
 
-                return new Singleton(
-                    () => (bool)instantiated.Invoke(null, null),
-                    () => getter.Invoke(null, null));
+                return new Singleton(Instantiated(instantiated), Instance(getter));
+            }
+
+            // Bound as delegates rather than kept as MethodInfo: these are read on every build of
+            // every community-maps screen, and MethodInfo.Invoke boxes its arguments and walks the
+            // reflection stack each time. A binding that the runtime refuses falls back to the
+            // reflective call, said once.
+            private static Func<bool> Instantiated(MethodInfo method)
+            {
+                try
+                {
+                    return (Func<bool>)Delegate.CreateDelegate(typeof(Func<bool>), method);
+                }
+                catch (Exception error)
+                {
+                    WarnOnce("binding " + method.DeclaringType + ".SingletonIsInstantiated threw: " + error);
+                    return () => (bool)method.Invoke(null, null);
+                }
+            }
+
+            private static Func<object> Instance(MethodInfo getter)
+            {
+                try
+                {
+                    return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), getter);
+                }
+                catch (Exception error)
+                {
+                    WarnOnce("binding " + getter.DeclaringType + ".Instance threw: " + error);
+                    return () => getter.Invoke(null, null);
+                }
+            }
+
+            private static bool _warned;
+
+            private static void WarnOnce(string message)
+            {
+                if (_warned)
+                {
+                    return;
+                }
+
+                _warned = true;
+                SocAccessMod.Instance?.LogWarning("Community maps: " + message);
             }
         }
     }

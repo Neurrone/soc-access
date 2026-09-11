@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -61,7 +61,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo CollectionIsSubscribedMethod =
             AccessTools.Method(typeof(Collection), "IsSubscribed", new[] { typeof(ModId) });
         private Collection _collection;
-        private bool _collectionProbed;
 
         // Which mesh each band's caption was found on. The search for it is up to three walks of the
         // band and of its neighbours; the words are still read off the mesh live.
@@ -257,16 +256,21 @@ namespace SongsOfConquestAccess.Adapters
             return PageFeatured(right: true);
         }
 
+        /// <summary>The bands the page is drawing and the maps in them, built only when the page has
+        /// redrawn them. There are about eighty items across the bands and each one was a new object
+        /// per frame; the key is what mod.io's own pools hold - how many bands are drawn, how many
+        /// real items they hold between them, and which the first and last of those are - all read
+        /// from the game on every call (AGENTS.md, Performance). Nothing that MOVES is part of the
+        /// snapshot: a band's caption and state and an item's name and download progress are read off
+        /// the game when they are asked for.</summary>
         public IReadOnlyList<RowItem> GetRows()
         {
-            List<RowItem> rows = new List<RowItem>();
             ModListRow[] nativeRows = Reflect.Cast<ModListRow[]>(_home, RowsField);
-            if (nativeRows == null)
-            {
-                return rows;
-            }
-
-            for (int i = 0; i < nativeRows.Length; i++)
+            int drawnRows = 0;
+            int drawnItems = 0;
+            object firstItem = null;
+            object lastItem = null;
+            for (int i = 0; nativeRows != null && i < nativeRows.Length; i++)
             {
                 ModListRow row = nativeRows[i];
                 if (row == null || !row.gameObject.activeInHierarchy)
@@ -274,15 +278,61 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                rows.Add(new RowItem(
-                    i,
-                    FindRowLabel(row),
-                    GetRowStatus(row),
-                    GetRowItems(i, row)));
+                drawnRows++;
+                IList items = RowItemsField != null ? RowItemsField.GetValue(row) as IList : null;
+                for (int item = 0; items != null && item < items.Count; item++)
+                {
+                    ListItem listItem = items[item] as ListItem;
+                    if (listItem == null || !listItem.gameObject.activeInHierarchy || listItem.isPlaceholder)
+                    {
+                        continue;
+                    }
+
+                    drawnItems++;
+                    firstItem = firstItem ?? listItem;
+                    lastItem = listItem;
+                }
+            }
+
+            if (_rows != null
+                && drawnRows == _rowCount
+                && drawnItems == _itemCount
+                && ReferenceEquals(firstItem, _firstItem)
+                && ReferenceEquals(lastItem, _lastItem))
+            {
+                return _rows;
+            }
+
+            _rowCount = drawnRows;
+            _itemCount = drawnItems;
+            _firstItem = firstItem;
+            _lastItem = lastItem;
+            _rows = ReadRows(nativeRows);
+            return _rows;
+        }
+
+        private IReadOnlyList<RowItem> ReadRows(ModListRow[] nativeRows)
+        {
+            List<RowItem> rows = new List<RowItem>();
+            for (int i = 0; nativeRows != null && i < nativeRows.Length; i++)
+            {
+                ModListRow row = nativeRows[i];
+                if (row == null || !row.gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                rows.Add(new RowItem(this, i, row, GetRowItems(i, row)));
             }
 
             return rows;
         }
+
+        private IReadOnlyList<RowItem> _rows;
+        private int _rowCount = -1;
+        private int _itemCount = -1;
+        private object _firstItem;
+        private object _lastItem;
 
         public bool FocusItem(ModItem item)
         {
@@ -525,13 +575,12 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string label = GetItemLabel(item);
-                if (string.IsNullOrWhiteSpace(label))
+                if (string.IsNullOrWhiteSpace(GetItemLabel(item)))
                 {
                     continue;
                 }
 
-                result.Add(new ModItem(rowIndex, i, label, GetProgressText(item), item));
+                result.Add(new ModItem(this, rowIndex, i, item));
             }
 
             return result;
@@ -739,12 +788,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private Collection GetCollection()
         {
-            if (_collectionProbed && _collection != null)
+            if (_collection != null)
             {
                 return _collection;
             }
 
-            _collectionProbed = true;
+            // No probed flag: a miss here is mod.io's singleton not being up yet, and the read behind
+            // it is a static field access, so asking again costs nothing.
             _collection = CommunityMapsSources.Collection;
             return _collection;
         }
@@ -817,17 +867,33 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class RowItem
         {
-            public RowItem(int index, string label, string status, IReadOnlyList<ModItem> items)
+            private readonly CommunityMapsHomeAdapter _adapter;
+            private readonly ModListRow _row;
+
+            public RowItem(CommunityMapsHomeAdapter adapter, int index, ModListRow row, IReadOnlyList<ModItem> items)
             {
+                _adapter = adapter;
+                _row = row;
                 Index = index;
-                Label = label ?? string.Empty;
-                Status = status ?? string.Empty;
                 Items = items ?? new ModItem[0];
             }
 
             public int Index { get; private set; }
-            public string Label { get; private set; }
-            public string Status { get; private set; }
+
+            /// <summary>The band's own caption, read off the mesh it was found on when it is asked
+            /// for.</summary>
+            public string Label
+            {
+                get { return _adapter != null ? _adapter.FindRowLabel(_row) ?? string.Empty : string.Empty; }
+            }
+
+            /// <summary>Whether the band is loading or failed, which changes while the page is
+            /// open.</summary>
+            public string Status
+            {
+                get { return _adapter != null ? _adapter.GetRowStatus(_row) ?? string.Empty : string.Empty; }
+            }
+
             public IReadOnlyList<ModItem> Items { get; private set; }
         }
 
@@ -864,19 +930,32 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class ModItem
         {
-            public ModItem(int rowIndex, int index, string label, string status, ListItem nativeItem)
+            private readonly CommunityMapsHomeAdapter _adapter;
+
+            public ModItem(CommunityMapsHomeAdapter adapter, int rowIndex, int index, ListItem nativeItem)
             {
+                _adapter = adapter;
                 RowIndex = rowIndex;
                 Index = index;
-                Label = label ?? string.Empty;
-                Status = status ?? string.Empty;
                 NativeItem = nativeItem;
             }
 
             public int RowIndex { get; private set; }
             public int Index { get; private set; }
-            public string Label { get; private set; }
-            public string Status { get; private set; }
+
+            /// <summary>The map's own name, read off the game when it is asked for - so the eighty
+            /// items of a page cost one read each, for the one the cursor is on.</summary>
+            public string Label
+            {
+                get { return _adapter != null ? _adapter.GetItemLabel(NativeItem) ?? string.Empty : string.Empty; }
+            }
+
+            /// <summary>How far a download of it has got, which moves while the page is open.</summary>
+            public string Status
+            {
+                get { return _adapter != null ? _adapter.GetProgressText(NativeItem) ?? string.Empty : string.Empty; }
+            }
+
             public ListItem NativeItem { get; private set; }
         }
     }
