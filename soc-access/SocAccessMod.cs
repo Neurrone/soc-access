@@ -93,8 +93,13 @@ namespace SongsOfConquestAccess
             // game's own input manager; a Stop step drops the subscription.
             ModKeybindConflicts.Start();
             // Before the ready line, so /speech carries it: the routes install the speech tap.
-            _modRoutes = new ModRoutes(_host, _screenManager, _inputRouter, this);
-            _modRoutes.Register();
+            // Only when the server is actually listening: a player's install would otherwise pay
+            // for two speech rings that nothing can read, as DynamicAssemblyTypesPatches does.
+            if (DevServerUp)
+            {
+                _modRoutes = new ModRoutes(_host, _screenManager, _inputRouter, this);
+                _modRoutes.Register();
+            }
             _harmony = new Harmony(PluginGuid + "." + Guid.NewGuid());
             try
             {
