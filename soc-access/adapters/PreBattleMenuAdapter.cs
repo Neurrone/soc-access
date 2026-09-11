@@ -430,9 +430,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)
         {
-            return result != null && BuildSnapshot().IsValidTile(result.Position)
+            return result != null && IsPlacementTile(result.Position)
                 ? ScannerResultRefresh.Valid(result.Position)
                 : ScannerResultRefresh.Invalid;
+        }
+
+        /// <summary>
+        /// Whether a point is one of the board's tiles, answered from the map and the renderer
+        /// rather than by rebuilding the placement snapshot: the same two questions
+        /// <see cref="BuildSnapshot"/> asks before it puts a tile in.
+        /// </summary>
+        private bool IsPlacementTile(Vector2Int point)
+        {
+            MapFormat map = GetMap();
+            return map != null && GetDeploymentMenu() != null && IsGridTile(map, GetDeploymentRenderer(), point);
         }
 
         public bool TryMoveTroop(Vector2Int source, Vector2Int destination)
@@ -673,7 +684,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool CanResolveTile(Vector2Int tile)
         {
-            DeploymentRenderer renderer = GetDeploymentRenderer();
+            return CanResolveTile(GetDeploymentRenderer(), tile);
+        }
+
+        private static bool CanResolveTile(DeploymentRenderer renderer, Vector2Int tile)
+        {
             if (renderer == null)
             {
                 return true;
@@ -718,12 +733,15 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddTiles(TroopPlacementSnapshot snapshot, MapFormat map)
         {
+            // One renderer for the whole board: resolving it walks the menu's controller through
+            // two reflected fields, and this loop runs over every tile of the map.
+            DeploymentRenderer renderer = GetDeploymentRenderer();
             for (int y = 0; y < snapshot.Size.y; y++)
             {
                 for (int x = 0; x < snapshot.Size.x; x++)
                 {
                     Vector2Int point = new Vector2Int(x, y);
-                    if (!IsGridTile(map, point))
+                    if (!IsGridTile(map, renderer, point))
                     {
                         continue;
                     }
@@ -861,10 +879,10 @@ namespace SongsOfConquestAccess.Adapters
             name = SpokenLines.Clean(name);
             if (string.IsNullOrWhiteSpace(name))
             {
-                name = "troops";
+                return string.Empty;
             }
 
-            return size > 0 ? size + " " + name : name;
+            return size > 0 ? ModText.Get(ModStrings.Combat.TroopQuantity, size, name) : name;
         }
 
         private static bool IsOwnSide(TroopPlacementSnapshot snapshot, BattleSide side)
@@ -1098,14 +1116,14 @@ namespace SongsOfConquestAccess.Adapters
             return null;
         }
 
-        private bool IsGridTile(MapFormat map, Vector2Int point)
+        private static bool IsGridTile(MapFormat map, DeploymentRenderer renderer, Vector2Int point)
         {
             if (map == null || !map.IsPointWithinMap(point))
             {
                 return false;
             }
 
-            return CanResolveTile(point);
+            return CanResolveTile(renderer, point);
         }
 
         private static bool IsBlocker(byte value)
