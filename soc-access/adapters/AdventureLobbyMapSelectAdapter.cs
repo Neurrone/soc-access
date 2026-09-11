@@ -304,7 +304,6 @@ namespace SongsOfConquestAccess.Adapters
                 return _filters;
             }
 
-            LobbyMapFilters it = nativeFilters;
             List<MapSelectFilterAdapter> filters = new List<MapSelectFilterAdapter>();
             AddFilter(filters, nativeFilters, GetColumnLabel(0), FilterMapTypeDropdownField, null, GetMapTypeFilterOptionLabel);
             AddFilter(filters, nativeFilters, GetColumnLabel(2), FilterMapTagDropdownField, null, GetMapTagFilterOptionLabel);
@@ -312,7 +311,7 @@ namespace SongsOfConquestAccess.Adapters
             AddFilter(filters, nativeFilters, GetColumnLabel(4), FilterPlayersDropdownField, null, GetPlayersFilterOptionLabel);
             AddFilter(filters, nativeFilters, GetColumnLabel(5), FilterSizeDropdownField, null, GetSizeFilterOptionLabel);
             AddFilter(filters, nativeFilters, GetColumnLabel(6), FilterPlayedDropdownField, null, GetCompletedFilterOptionLabel);
-            AddFilter(filters, nativeFilters, GetLocalizedText("LevelEditor/ContentProfile/Name", "Content profile"), FilterContentProfileDropdownField, () => IsContentProfileFilterVisible(it), GetContentProfileFilterOptionLabel);
+            AddFilter(filters, nativeFilters, GetLocalizedText("LevelEditor/ContentProfile/Name", "Content profile"), FilterContentProfileDropdownField, () => IsContentProfileFilterVisible(nativeFilters), GetContentProfileFilterOptionLabel);
             _filters = filters;
             return _filters;
         }
@@ -1103,6 +1102,11 @@ namespace SongsOfConquestAccess.Adapters
                 get { return _toggle == null || _toggle.Interactable; }
             }
 
+            /// <summary>Whether the filter HAS this option. The game never hides one of a list's
+            /// boxes: <c>UIFilterDropdown.AddOption</c> instantiates exactly one per option and
+            /// shows or hides the whole container, which is the list being open or shut and the
+            /// group's business, not the option's. Asking the box itself would also empty the
+            /// search build, which reads the options of a list the player has not opened.</summary>
             public bool IsVisible
             {
                 get

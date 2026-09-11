@@ -22,7 +22,8 @@ namespace SongsOfConquestAccess.UI
     /// window and is shared with the mod's own options dialog, which is drawn with the same factory
     /// out of a copy of the same panel: one description of a form, so the two cannot drift.
     ///
-    /// A caption that heads nothing stays a read-only row.
+    /// A caption that heads nothing stays a read-only row, and a form that draws no captions at all
+    /// (the lobby's two settings windows) asks for every text to be a row where it stands.
     ///
     /// The Options window's Controls page is the one form that draws rows this reader once could not
     /// see: the rebindable-action rows, drawn by <c>AddKeyBinding</c>. They are now read as a TABLE of
@@ -36,14 +37,30 @@ namespace SongsOfConquestAccess.UI
         private const int CoarseSteps = 10;
 
         private readonly string _prefix;
+        private readonly string _rowKey;
+        private readonly bool _captionsHeadRegions;
 
         // A subject of its own per synthesized row, kept across rebuilds so the reconciler seats the
         // cursor on the same line: a caption that heads nothing, and the window's own close button.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
         public MenuFormNodes(string prefix)
+            : this(prefix, null, true)
+        {
+        }
+
+        /// <param name="rowKey">What a row's node key begins with, null for the "<c>prefix</c>:row/"
+        /// the Options window and the mod's dialogs use. It is the form's identity in the tree, so a
+        /// window that already had one keeps it.</param>
+        /// <param name="captionsHeadRegions">Whether a text the form draws over rows opens a REGION
+        /// they belong to. The lobby's settings windows draw no captions at all - every text they
+        /// draw stands on its own line - so there it is false and a text is a read-only row where it
+        /// stands.</param>
+        public MenuFormNodes(string prefix, string rowKey, bool captionsHeadRegions)
         {
             _prefix = prefix;
+            _rowKey = rowKey ?? prefix + ":row/";
+            _captionsHeadRegions = captionsHeadRegions;
         }
 
         /// <summary>The editor behind this form's text boxes, so the screen can answer whether it is
@@ -89,6 +106,12 @@ namespace SongsOfConquestAccess.UI
                 MenuRowText caption = item as MenuRowText;
                 if (caption != null)
                 {
+                    if (!_captionsHeadRegions)
+                    {
+                        AddTextRow(builder, control, caption);
+                        continue;
+                    }
+
                     if (inCaption)
                     {
                         builder.PopContext();
@@ -125,7 +148,35 @@ namespace SongsOfConquestAccess.UI
                 builder.PopContext();
             }
 
-            builder.SetRegion(null);
+            if (_captionsHeadRegions)
+            {
+                builder.SetRegion(null);
+            }
+        }
+
+        /// <summary>A text the form draws on a line of its own, where this form's texts are rows
+        /// rather than captions: read-only, keyed on the mesh the game drew it into.</summary>
+        private void AddTextRow(GraphBuilder builder, MenuRow row, MenuRowText text)
+        {
+            Component subject = row != null ? row.Transform : null;
+            if (subject == null || !text.IsVisible() || string.IsNullOrWhiteSpace(text.GetText()))
+            {
+                return;
+            }
+
+            builder.AddItem(new DrawnNode(
+                ControlId.For(subject, _rowKey + text.Id),
+                GraphNodes.Text(text.GetText),
+                subject));
+        }
+
+        /// <summary>The same, under the label the button itself draws (Cancel, Confirm).</summary>
+        public void AddWindowButton(GraphBuilder builder, MenuRowButton button)
+        {
+            if (button != null)
+            {
+                AddWindowButton(builder, button, button.GetLabel);
+            }
         }
 
         /// <summary>A button the window draws itself rather than a row of the form - the OK along the
@@ -398,7 +449,7 @@ namespace SongsOfConquestAccess.UI
                     toggle.IsEnabled,
                     toggle.GetTooltip());
                 vtable.OnFocusVisual = toggle.Focus;
-                builder.AddItem(new DrawnNode(ControlId.For(subject, _prefix + ":row/" + toggle.Id), vtable, subject));
+                builder.AddItem(new DrawnNode(ControlId.For(subject, _rowKey + toggle.Id), vtable, subject));
                 return;
             }
 
@@ -428,7 +479,18 @@ namespace SongsOfConquestAccess.UI
                     dropdown.IsEnabled,
                     dropdown.GetTooltip());
                 vtable.OnFocusVisual = dropdown.Focus;
-                builder.AddItem(new DrawnNode(ControlId.For(subject, _prefix + ":row/" + dropdown.Id), vtable, subject));
+                builder.AddItem(new DrawnNode(ControlId.For(subject, _rowKey + dropdown.Id), vtable, subject));
+                return;
+            }
+
+            MenuRowTimeInput time = item as MenuRowTimeInput;
+            if (time != null)
+            {
+                if (time.IsVisible())
+                {
+                    AddTimeRow(builder, time);
+                }
+
                 return;
             }
 
@@ -455,7 +517,7 @@ namespace SongsOfConquestAccess.UI
                     input.IsEnabled,
                     input.GetTooltip());
                 GraphNodes.DoNotDrawTooltip(vtable);
-                builder.AddItem(new DrawnNode(ControlId.For(subject, _prefix + ":row/" + input.Id), vtable, subject));
+                builder.AddItem(new DrawnNode(ControlId.For(subject, _rowKey + input.Id), vtable, subject));
                 return;
             }
 
@@ -463,7 +525,7 @@ namespace SongsOfConquestAccess.UI
             if (button != null && button.IsVisible())
             {
                 builder.AddItem(new DrawnNode(
-                    ControlId.For(subject, _prefix + ":row/" + button.Id),
+                    ControlId.For(subject, _rowKey + button.Id),
                     Button(button, button.GetLabel),
                     subject));
             }
@@ -491,7 +553,61 @@ namespace SongsOfConquestAccess.UI
                     ? (Action)null
                     : () => slider.OpenValueEditor());
             vtable.OnFocusVisual = slider.Focus;
-            builder.AddItem(new DrawnNode(ControlId.For(subject, _prefix + ":row/" + slider.Id), vtable, subject));
+            builder.AddItem(new DrawnNode(ControlId.For(subject, _rowKey + slider.Id), vtable, subject));
+        }
+
+        /// <summary>The two halves of a time row, each on the game's own field, each named with the
+        /// row's label and saying how much of what it holds in the game's words
+        /// (<c>Adventure/PostGameMenu/TotalPlayTime/Minutes</c> and <c>.../Seconds</c>, the keys the
+        /// lobby's turn-timer rows were first read with). The widget's gamepad slider is switched off
+        /// outside gamepad mode, so the two boxes are the whole row.</summary>
+        private void AddTimeRow(GraphBuilder builder, MenuRowTimeInput time)
+        {
+            AddTimeField(builder, time, time.GetMinutesField, "minutes", true);
+            AddTimeField(builder, time, time.GetSecondsField, "seconds", false);
+        }
+
+        private void AddTimeField(
+            GraphBuilder builder,
+            MenuRowTimeInput time,
+            Func<IUITextMeshInputField> getField,
+            string part,
+            bool minutes)
+        {
+            IUITextMeshInputField field = getField != null ? getField() : null;
+            Component subject = field != null ? field.MonoTransform : null;
+            if (subject == null)
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.EditField(
+                time.GetLabel,
+                () => Editor.Editing ? null : TimeText(getField, minutes),
+                () => Editor.Request(getField()),
+                time.IsEnabled,
+                time.GetTooltip());
+            GraphNodes.DoNotDrawTooltip(vtable);
+            builder.AddItem(new DrawnNode(
+                ControlId.For(subject, _rowKey + time.Id + "/" + part),
+                vtable,
+                subject));
+        }
+
+        private static string TimeText(Func<IUITextMeshInputField> getField, bool minutes)
+        {
+            IUITextMeshInputField field = getField != null ? getField() : null;
+            string raw = field != null ? field.InputFieldValue : null;
+            int value;
+            if (!int.TryParse(raw, out value))
+            {
+                return raw;
+            }
+
+            string key = minutes
+                ? "Adventure/PostGameMenu/TotalPlayTime/Minutes"
+                : "Adventure/PostGameMenu/TotalPlayTime/Seconds";
+            return GameText.Get(key, raw, value);
         }
 
         private static void Adjust(MenuRowSlider slider, int sign, bool large)

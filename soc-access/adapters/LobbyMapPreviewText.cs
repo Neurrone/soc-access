@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Lobby;
@@ -17,82 +15,23 @@ namespace SongsOfConquestAccess.Adapters
 
         public static string GetTitle(LobbyMapPreview preview)
         {
-            return NormalizeSingleLine(GetText(preview, MapNameHeaderField));
+            return SpokenLines.Clean(GetText(preview, MapNameHeaderField));
         }
 
+        /// <summary>What the panel draws under the name, one drawn line at a time - the paragraphs
+        /// the game wrote, kept apart. <see cref="SpokenLines.Clean"/> is the whole of it: it splits
+        /// on the newlines and the &lt;br&gt;s first and strips each line's tags, and every caller
+        /// runs the result through <see cref="SpokenLines.Of"/> again to make its buffer lines, so a
+        /// blank line kept between paragraphs here would be dropped there anyway.</summary>
         public static string GetInfo(LobbyMapPreview preview)
         {
-            return NormalizeMultiline(GetText(preview, MapInfoField));
-        }
-
-        public static string GetSummary(LobbyMapPreview preview)
-        {
-            return JoinMultilineParts(GetTitle(preview), GetInfo(preview));
+            return SpokenLines.Clean(GetText(preview, MapInfoField));
         }
 
         private static string GetText(LobbyMapPreview preview, FieldInfo field)
         {
             UITextMesh textMesh = preview != null && field != null ? field.GetValue(preview) as UITextMesh : null;
             return UITextMeshTextUtility.GetEffectiveText(textMesh);
-        }
-
-        private static string NormalizeSingleLine(string value)
-        {
-            return SpokenLines.Clean(value);
-        }
-
-        private static string NormalizeMultiline(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
-            string[] rawLines = value.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
-            List<string> lines = new List<string>();
-            bool lastWasBlank = false;
-            for (int i = 0; i < rawLines.Length; i++)
-            {
-                string line = SpokenLines.Clean(rawLines[i]);
-                if (string.IsNullOrWhiteSpace(line))
-                {
-                    if (lines.Count > 0 && !lastWasBlank)
-                    {
-                        lines.Add(string.Empty);
-                        lastWasBlank = true;
-                    }
-
-                    continue;
-                }
-
-                lines.Add(line);
-                lastWasBlank = false;
-            }
-
-            while (lines.Count > 0 && string.IsNullOrWhiteSpace(lines[lines.Count - 1]))
-            {
-                lines.RemoveAt(lines.Count - 1);
-            }
-
-            return string.Join(Environment.NewLine, lines.ToArray());
-        }
-
-        private static string JoinMultilineParts(params string[] parts)
-        {
-            List<string> cleaned = new List<string>();
-            if (parts != null)
-            {
-                for (int i = 0; i < parts.Length; i++)
-                {
-                    string part = parts[i];
-                    if (!string.IsNullOrWhiteSpace(part))
-                    {
-                        cleaned.Add(part.Trim());
-                    }
-                }
-            }
-
-            return cleaned.Count == 0 ? string.Empty : string.Join(Environment.NewLine, cleaned.ToArray());
         }
     }
 }

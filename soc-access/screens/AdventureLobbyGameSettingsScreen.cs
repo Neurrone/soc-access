@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
-using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
-using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -39,7 +34,9 @@ namespace SongsOfConquestAccess.Screens
         private const string RowsStop = "game-settings-rows";
         private const string ButtonsStop = "game-settings-buttons";
 
-        private readonly GameTextEditor _editor = new GameTextEditor();
+        // The rows as nodes: the same reader every settings form is drawn by, told that this
+        // window draws no captions and that its node keys are the ones it already had.
+        private readonly MenuFormNodes _rows = new MenuFormNodes("game-settings", "game-settings:", false);
 
         /// <summary>The popup the lobby page holds in <c>_mapSettingsMenu</c>
         /// (<see cref="LobbySources"/>).</summary>
@@ -79,30 +76,30 @@ namespace SongsOfConquestAccess.Screens
         /// types next is meant for that field and must not start a search.</summary>
         public override bool CapturesRawInput
         {
-            get { return _editor.Pending; }
+            get { return _rows.Editor.Pending; }
         }
 
         public override bool OwnsGameField
         {
-            get { return _editor.Pending || _editor.Editing; }
+            get { return _rows.Editor.Pending || _rows.Editor.Editing; }
         }
 
         public override void OnUpdate()
         {
             base.OnUpdate();
-            _editor.Update(IsActive());
+            _rows.Editor.Update(IsActive());
         }
 
         public override void OnUnfocus()
         {
             base.OnUnfocus();
-            _editor.Abandon();
+            _rows.Editor.Abandon();
         }
 
         public override void OnPop()
         {
             base.OnPop();
-            _editor.Abandon();
+            _rows.Editor.Abandon();
         }
 
 
@@ -114,233 +111,11 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.BeginStop(RowsStop);
-            IReadOnlyList<AdventureLobbyGameSettingsAdapter.ControlItem> controls = Live.GetContentControls();
-            for (int i = 0; i < controls.Count; i++)
-            {
-                AddRow(builder, controls[i]);
-            }
+            _rows.BuildRows(builder, Live.GetContentControls());
 
             builder.BeginStop(ButtonsStop);
-            AddButton(builder, Live.GetCancelButton());
-            AddButton(builder, Live.GetApplyButton());
-        }
-
-        private void AddRow(GraphBuilder builder, AdventureLobbyGameSettingsAdapter.ControlItem control)
-        {
-            object item = control != null ? control.Item : null;
-            Component subject = control != null ? control.Transform : null;
-            if (item == null || subject == null)
-            {
-                return;
-            }
-
-            AdventureLobbyGameSettingsAdapter.TextItem text = item as AdventureLobbyGameSettingsAdapter.TextItem;
-            if (text != null)
-            {
-                if (text.IsVisible() && !string.IsNullOrWhiteSpace(text.GetText()))
-                {
-                    builder.AddItem(new DrawnNode(
-                        ControlId.For(subject, "game-settings:" + text.Id),
-                        GraphNodes.Text(text.GetText),
-                        subject));
-                }
-
-                return;
-            }
-
-            AdventureLobbyGameSettingsAdapter.ToggleItem toggle = item as AdventureLobbyGameSettingsAdapter.ToggleItem;
-            if (toggle != null)
-            {
-                if (!toggle.IsVisible())
-                {
-                    return;
-                }
-
-                NodeVtable vtable = GraphNodes.Checkbox(
-                    toggle.GetLabel,
-                    toggle.IsChecked,
-                    toggle.Toggle,
-                    toggle.IsEnabled,
-                    toggle.GetTooltip());
-                vtable.OnFocusVisual = toggle.Focus;
-                builder.AddItem(new DrawnNode(
-                    ControlId.For(subject, "game-settings:" + toggle.Id),
-                    vtable,
-                    subject));
-                return;
-            }
-
-            AdventureLobbyGameSettingsAdapter.DropdownItem dropdown = item as AdventureLobbyGameSettingsAdapter.DropdownItem;
-            if (dropdown != null)
-            {
-                if (!dropdown.IsVisible())
-                {
-                    return;
-                }
-
-                NodeVtable vtable = GraphNodes.ComboBox(
-                    dropdown.GetLabel,
-                    () => CurrentOption(dropdown),
-                    () => DropListScreen.Open(dropdown, dropdown.GetLabel(), index => dropdown.SetValue(index)),
-                    dropdown.IsEnabled,
-                    dropdown.GetTooltip());
-                vtable.OnFocusVisual = dropdown.Focus;
-                builder.AddItem(new DrawnNode(
-                    ControlId.For(subject, "game-settings:" + dropdown.Id),
-                    vtable,
-                    subject));
-                return;
-            }
-
-            AdventureLobbyGameSettingsAdapter.TextInputItem input = item as AdventureLobbyGameSettingsAdapter.TextInputItem;
-            if (input != null)
-            {
-                if (!input.IsVisible())
-                {
-                    return;
-                }
-
-                // No native focus visual on an edit row: the visual is re-asserted while the cursor
-                // stands here, and re-selecting the ROW takes the keyboard straight back off the
-                // field the player just asked to type in (measured below). The dialog's edit field,
-                // the exemplar, declares none either.
-                NodeVtable vtable = EditField(
-                    input.GetLabel,
-                    input.GetField,
-                    input.IsEnabled,
-                    input.GetTooltip());
-                builder.AddItem(new DrawnNode(
-                    ControlId.For(subject, "game-settings:" + input.Id),
-                    vtable,
-                    subject));
-                return;
-            }
-
-            AdventureLobbyGameSettingsAdapter.TimeInputItem time = item as AdventureLobbyGameSettingsAdapter.TimeInputItem;
-            if (time != null)
-            {
-                if (time.IsVisible())
-                {
-                    AddTimeRow(builder, time);
-                }
-
-                return;
-            }
-
-            AdventureLobbyGameSettingsAdapter.ButtonItem button = item as AdventureLobbyGameSettingsAdapter.ButtonItem;
-            if (button != null && button.IsVisible())
-            {
-                builder.AddItem(new DrawnNode(
-                    ControlId.For(subject, "game-settings:" + button.Id),
-                    Button(button),
-                    subject));
-            }
-        }
-
-        /// <summary>The two halves of a turn-timer row, each on the game's own field, each named with
-        /// the row's label and saying how much of what it holds in the game's words
-        /// (<c>Adventure/PostGameMenu/TotalPlayTime/Minutes</c> and <c>.../Seconds</c>, the keys the
-        /// widget screen read them with).</summary>
-        private void AddTimeRow(GraphBuilder builder, AdventureLobbyGameSettingsAdapter.TimeInputItem time)
-        {
-            AddTimeField(builder, time, time.GetMinutesField, "minutes", true);
-            AddTimeField(builder, time, time.GetSecondsField, "seconds", false);
-        }
-
-        private void AddTimeField(
-            GraphBuilder builder,
-            AdventureLobbyGameSettingsAdapter.TimeInputItem time,
-            Func<IUITextMeshInputField> getField,
-            string part,
-            bool minutes)
-        {
-            IUITextMeshInputField field = getField != null ? getField() : null;
-            Component subject = field != null ? field.MonoTransform : null;
-            if (subject == null)
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.EditField(
-                time.GetLabel,
-                () => _editor.Editing ? null : TimeText(getField, minutes),
-                () => _editor.Request(getField()),
-                time.IsEnabled,
-                time.GetTooltip());
-            GraphNodes.DoNotDrawTooltip(vtable);
-            builder.AddItem(new DrawnNode(
-                ControlId.For(subject, "game-settings:" + time.Id + "/" + part),
-                vtable,
-                subject));
-        }
-
-        private static string TimeText(Func<IUITextMeshInputField> getField, bool minutes)
-        {
-            IUITextMeshInputField field = getField != null ? getField() : null;
-            string raw = field != null ? field.InputFieldValue : null;
-            int value;
-            if (!int.TryParse(raw, out value))
-            {
-                return raw;
-            }
-
-            string key = minutes
-                ? "Adventure/PostGameMenu/TotalPlayTime/Minutes"
-                : "Adventure/PostGameMenu/TotalPlayTime/Seconds";
-            return GameText.Get(key, raw, value);
-        }
-
-        /// <summary>The game's own text box: activating it is the request for the keyboard, and the
-        /// value reports nothing while the game holds it because the echo is already speaking the
-        /// keys.</summary>
-        private NodeVtable EditField(
-            Func<string> label,
-            Func<IUITextMeshInputField> getField,
-            Func<bool> enabled,
-            Tooltip tooltip)
-        {
-            NodeVtable vtable = GraphNodes.EditField(
-                label,
-                () =>
-                {
-                    IUITextMeshInputField field = getField != null ? getField() : null;
-                    return field == null || _editor.Editing ? null : field.InputFieldValue;
-                },
-                () => _editor.Request(getField != null ? getField() : null),
-                enabled,
-                tooltip);
-            GraphNodes.DoNotDrawTooltip(vtable);
-            return vtable;
-        }
-
-        private static void AddButton(GraphBuilder builder, AdventureLobbyGameSettingsAdapter.ButtonItem button)
-        {
-            if (button == null || !button.IsVisible())
-            {
-                return;
-            }
-
-            builder.AddItem(new SyntheticNode(
-                ControlId.Structural("game-settings:" + button.Id),
-                Button(button)));
-        }
-
-        private static NodeVtable Button(AdventureLobbyGameSettingsAdapter.ButtonItem button)
-        {
-            NodeVtable vtable = GraphNodes.Button(
-                button.GetLabel,
-                () => button.Activate(),
-                button.IsEnabled,
-                button.GetTooltip());
-            vtable.OnFocusVisual = button.Focus;
-            return vtable;
-        }
-
-        private static string CurrentOption(AdventureLobbyGameSettingsAdapter.DropdownItem dropdown)
-        {
-            IReadOnlyList<string> options = dropdown.GetOptions();
-            int value = dropdown.GetValue();
-            return options != null && value >= 0 && value < options.Count ? options[value] : string.Empty;
+            _rows.AddWindowButton(builder, Live.GetCancelButton());
+            _rows.AddWindowButton(builder, Live.GetApplyButton());
         }
     }
 }
