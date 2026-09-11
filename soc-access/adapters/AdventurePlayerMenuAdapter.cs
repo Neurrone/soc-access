@@ -145,18 +145,18 @@ namespace SongsOfConquestAccess.Adapters
                 root = null;
             }
 
-            return root == null ? null : new CaptionItem(GetText(text), root);
+            return root == null ? null : new CaptionItem(UITextMeshTextUtility.Spoken(text), root);
         }
 
         private string GetTitle()
         {
-            string nativePlayers = Localize("Common/Players");
+            string nativePlayers = SpokenText.Get(_localization, "Common/Players", string.Empty);
 
             // The mesh the title was found on last time, read live. Only a mesh that has stopped
             // saying anything sends the search over the whole page again.
             if (_titleText != null)
             {
-                string kept = GetText(_titleText);
+                string kept = UITextMeshTextUtility.Spoken(_titleText);
                 if (!string.IsNullOrWhiteSpace(kept))
                 {
                     return kept;
@@ -174,7 +174,7 @@ namespace SongsOfConquestAccess.Adapters
                         continue;
                     }
 
-                    string candidate = GetText(text);
+                    string candidate = UITextMeshTextUtility.Spoken(text);
                     if (!string.IsNullOrWhiteSpace(candidate)
                         && !string.IsNullOrWhiteSpace(nativePlayers)
                         && string.Equals(candidate.Trim(), nativePlayers.Trim(), StringComparison.OrdinalIgnoreCase))
@@ -192,7 +192,7 @@ namespace SongsOfConquestAccess.Adapters
                         continue;
                     }
 
-                    string candidate = GetText(text);
+                    string candidate = UITextMeshTextUtility.Spoken(text);
                     if (!string.IsNullOrWhiteSpace(candidate))
                     {
                         _titleText = text;
@@ -202,16 +202,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return nativePlayers;
-        }
-
-        private string Localize(string key)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, string.Empty));
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static bool IsLiveSceneObject(GameObject gameObject)
@@ -358,14 +348,14 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Name
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_entry, NameTextField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, NameTextField)); }
             }
 
             public string TeamLabel
             {
                 get
                 {
-                    string teamNumber = GetText(Reflect.Get<UITextMesh>(_entry, PartnershipIdField));
+                    string teamNumber = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, PartnershipIdField));
                     return !string.IsNullOrWhiteSpace(teamNumber)
                         ? ModText.Get(ModStrings.Screens.TeamValue, teamNumber)
                         : string.Empty;
@@ -432,7 +422,7 @@ namespace SongsOfConquestAccess.Adapters
                         return string.Empty;
                     }
 
-                    return GetText(Reflect.Get<UITextMesh>(_entry, ScoreTextField));
+                    return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, ScoreTextField));
                 }
             }
 
@@ -454,9 +444,9 @@ namespace SongsOfConquestAccess.Adapters
             public string GetResourceLabel(ResourceType resourceType)
             {
                 string name = SpokenLines.Clean(GameText.Get(_adapter != null ? _adapter._localization : null, "Common/Resource/" + resourceType, string.Empty));
-                string amount = GetText(GetResourceAmountText(resourceType));
+                string amount = UITextMeshTextUtility.Spoken(GetResourceAmountText(resourceType));
                 string income = IsGameObjectVisible(GetResourceIncomeText(resourceType))
-                    ? GetText(GetResourceIncomeText(resourceType))
+                    ? UITextMeshTextUtility.Spoken(GetResourceIncomeText(resourceType))
                     : string.Empty;
 
                 string label = string.IsNullOrWhiteSpace(amount) ? name : name + " " + amount;

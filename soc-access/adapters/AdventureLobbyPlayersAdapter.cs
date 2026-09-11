@@ -141,7 +141,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string PlayersLabel
         {
-            get { return GetLocalizedText("Common/Players", string.Empty); }
+            get { return SpokenText.Get(_localization, "Common/Players", string.Empty); }
         }
 
         /// <summary>The name the map preview panel draws over its picture.</summary>
@@ -178,27 +178,27 @@ namespace SongsOfConquestAccess.Adapters
         /// from the same localization keys <c>LobbyPlayerEntry</c> writes their tooltips with.</summary>
         public string FactionLabel
         {
-            get { return _factionLabel ?? (_factionLabel = GetLocalizedText("Adventure/TeamQueueHUD/Faction", string.Empty)); }
+            get { return _factionLabel ?? (_factionLabel = SpokenText.Get(_localization, "Adventure/TeamQueueHUD/Faction", string.Empty)); }
         }
 
         public string ColorLabel
         {
-            get { return _colorLabel ?? (_colorLabel = GetLocalizedText("Lobby/LobbyPlayerMenu/SetColor", string.Empty)); }
+            get { return _colorLabel ?? (_colorLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/SetColor", string.Empty)); }
         }
 
         public string StartingWielderLabel
         {
-            get { return _startingWielderLabel ?? (_startingWielderLabel = GetLocalizedText("Lobby/LobbyPlayerMenu/SetStartingWielder", string.Empty)); }
+            get { return _startingWielderLabel ?? (_startingWielderLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/SetStartingWielder", string.Empty)); }
         }
 
         public string PartnershipLabel
         {
-            get { return _partnershipLabel ?? (_partnershipLabel = GetLocalizedText("Lobby/LobbyPlayerMenu/Coop", string.Empty)); }
+            get { return _partnershipLabel ?? (_partnershipLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/Coop", string.Empty)); }
         }
 
         public string AiDifficultyLabel
         {
-            get { return _aiDifficultyLabel ?? (_aiDifficultyLabel = GetLocalizedText("Lobby/LobbyPlayerMenu/SetAiDifficulty", string.Empty)); }
+            get { return _aiDifficultyLabel ?? (_aiDifficultyLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/SetAiDifficulty", string.Empty)); }
         }
 
         /// <summary>The rows the lobby is drawing, in team order. They are read off the player menu's
@@ -357,25 +357,15 @@ namespace SongsOfConquestAccess.Adapters
         private string GetMainMenuTitle()
         {
             MainMenuManager.Settings settings = GetMainMenuSettings();
-            string title = GetText(settings != null ? settings.TitleText : null);
+            string title = UITextMeshTextUtility.Spoken(settings != null ? settings.TitleText : null);
             if (string.IsNullOrWhiteSpace(title))
             {
-                title = GetText(settings != null ? settings.DualTitleText : null);
+                title = UITextMeshTextUtility.Spoken(settings != null ? settings.DualTitleText : null);
             }
 
             return title;
         }
 
-        private string GetLocalizedText(string key, string fallback)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
-        }
-
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
 
         private static bool IsLiveSceneObject(GameObject gameObject)
         {
@@ -715,7 +705,7 @@ namespace SongsOfConquestAccess.Adapters
                     return string.Empty;
                 }
 
-                return SpokenLines.Clean(GameText.Get(_adapter != null ? _adapter._localization : null, key, string.Empty));
+                return SpokenText.Get(_adapter != null ? _adapter._localization : null, key, string.Empty);
             }
 
             private static bool IsVisible(Component component)
@@ -769,7 +759,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public string GameName
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_panel, MultiplayerGameNameLabelField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_panel, MultiplayerGameNameLabelField)); }
             }
 
             public bool IsGameNameVisible
@@ -845,7 +835,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public string XboxCrossplayInformation
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_panel, MultiplayerXboxCrossplayInformationField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_panel, MultiplayerXboxCrossplayInformationField)); }
             }
 
             public bool IsXboxCrossplayInformationVisible
@@ -855,11 +845,6 @@ namespace SongsOfConquestAccess.Adapters
                     return IsVisibleComponent(Reflect.Get<Component>(_panel, MultiplayerXboxCrossplayInformationField))
                         && !string.IsNullOrWhiteSpace(XboxCrossplayInformation);
                 }
-            }
-
-            private static string GetText(IUITextMesh textMesh)
-            {
-                return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
             }
         }
 

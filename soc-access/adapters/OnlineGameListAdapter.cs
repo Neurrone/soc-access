@@ -84,7 +84,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 MainMenuManager.Settings settings = GetMainMenuSettings();
-                string title = GetText(settings != null ? settings.TitleText : null);
+                string title = UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.TitleText : null);
                 if (string.IsNullOrWhiteSpace(title))
                 {
                     title = GameText.Get(_localization, "Lobby/GameList/Title", "Game List");
@@ -101,12 +101,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string StatusText
         {
-            get { return GetText(_settings != null ? _settings.BufferText : null); }
+            get { return UITextMeshTextUtility.GetEffectiveText(_settings != null ? _settings.BufferText : null); }
         }
 
         public string SelectedEntryText
         {
-            get { return GetText(_settings != null ? _settings.SelectedEntryText : null); }
+            get { return UITextMeshTextUtility.GetEffectiveText(_settings != null ? _settings.SelectedEntryText : null); }
         }
 
         public bool IsStatusVisible
@@ -298,11 +298,6 @@ namespace SongsOfConquestAccess.Adapters
             return dropdown.Text ?? string.Empty;
         }
 
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return UITextMeshTextUtility.GetEffectiveText(textMesh);
-        }
-
         private static bool IsLoadedMainMenuScene(MainMenuSceneType sceneType)
         {
             MainMenuSceneLoader loader = MainMenuSceneLoader.UnsafeInstance;
@@ -462,12 +457,12 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Name
             {
-                get { return GetText(NameTextRef(_entry)); }
+                get { return UITextMeshTextUtility.GetEffectiveText(NameTextRef(_entry)); }
             }
 
             public string Players
             {
-                get { return GetText(PlayerInfoTextRef(_entry)); }
+                get { return UITextMeshTextUtility.GetEffectiveText(PlayerInfoTextRef(_entry)); }
             }
 
             public string Status

@@ -195,7 +195,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 int level = commander.GetLevel();
-                string levelText = GetText(Reflect.Get<UITextMesh>(GetExperienceBar(), ExperienceBarLevelTextField));
+                string levelText = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GetExperienceBar(), ExperienceBarLevelTextField));
                 int parsedLevel;
                 if (!string.IsNullOrWhiteSpace(levelText) && int.TryParse(levelText, out parsedLevel))
                 {
@@ -446,9 +446,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             ResourceHUD.ResourceEntry entry = GetResourceEntry(resourceType);
             string name = GetResourceName(resourceType);
-            string amount = GetText(entry != null ? entry.AmountText : null);
+            string amount = UITextMeshTextUtility.Spoken(entry != null ? entry.AmountText : null);
             string income = entry != null && IsGameObjectVisible(entry.IncomeText)
-                ? GetText(entry.IncomeText)
+                ? UITextMeshTextUtility.Spoken(entry.IncomeText)
                 : string.Empty;
 
             string label = string.IsNullOrWhiteSpace(amount) ? name : name + " " + amount;
@@ -505,7 +505,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            string label = GetText(snapshot.Text);
+            string label = UITextMeshTextUtility.Spoken(snapshot.Text);
             if (string.IsNullOrWhiteSpace(label))
             {
                 return string.Empty;
@@ -796,7 +796,7 @@ namespace SongsOfConquestAccess.Adapters
         /// ("Adventure/CommanderListHUD/WielderAmount").</summary>
         public string WielderAmountLabel
         {
-            get { return GetText(Reflect.Get<UITextMesh>(WielderList, WielderAmountTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(WielderList, WielderAmountTextField)); }
         }
 
         /// <summary>The wielder-limit explanation the game hangs on the count's hover area.</summary>
@@ -970,7 +970,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             TeamQueueEntryBehaviour entry = GetTeamQueueEntry(index);
             UITextMesh text = Reflect.Get<UITextMesh>(entry, TeamQueueEntryNameTextField);
-            return SpokenLines.Clean(GetText(text));
+            return SpokenLines.Clean(UITextMeshTextUtility.Spoken(text));
         }
 
         public void FocusTeamQueueEntry(int index)
@@ -1563,7 +1563,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < texts.Length; i++)
             {
                 UITextMesh text = texts[i];
-                if (text != null && IsGameObjectVisible(text) && !string.IsNullOrWhiteSpace(GetText(text)))
+                if (text != null && IsGameObjectVisible(text) && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(text)))
                 {
                     IObjectivesHUDEntry entry;
                     entriesByText.TryGetValue(text, out entry);
@@ -1832,7 +1832,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string label = GetText(text);
+                string label = UITextMeshTextUtility.Spoken(text);
                 if (!string.IsNullOrWhiteSpace(label))
                 {
                     return label;
@@ -1945,11 +1945,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return string.Empty;
             }
-        }
-
-        private static string GetText(UITextMesh text)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         private static bool IsButtonVisible(UIButton button)

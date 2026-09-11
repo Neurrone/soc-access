@@ -82,11 +82,6 @@ namespace SongsOfConquestAccess.Adapters
             return result;
         }
 
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
         public abstract class RecruitEntry
         {
             protected RecruitEntry(IPurchaseTroopsEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization, IFactionLookup factionLookup)
@@ -289,7 +284,7 @@ namespace SongsOfConquestAccess.Adapters
             public override string IdPrefix { get { return BuildIdPrefix(); } }
             public override string TroopName { get { return ResolveTroopName(); } }
             public override Tooltip Tooltip { get { return BuildEntryTooltip(); } }
-            public override string NoTroopsText { get { return GetText(Reflect.Get<UITextMesh>(_entry, NoTroopsTextField)); } }
+            public override string NoTroopsText { get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, NoTroopsTextField)); } }
             public override bool IsNoTroopsVisible { get { return IsVisible(Reflect.Get<Component>(_entry, NoTroopsContainerField)); } }
             public override bool IsSliderVisible { get { return IsVisible(GetSlider()); } }
             public override bool IsSliderEnabled { get { UISlider slider = GetSlider(); return slider != null && slider.Interactable; } }
@@ -298,20 +293,20 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    string amount = GetText(Reflect.Get<UITextMesh>(_entry, AmountTextField));
-                    string total = GetText(Reflect.Get<UITextMesh>(_entry, TotalAmountTextField));
+                    string amount = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, AmountTextField));
+                    string total = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, TotalAmountTextField));
                     return SpokenLines.Clean((amount + " " + total).Trim());
                 }
             }
 
             public override string AmountText
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_entry, AmountTextField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, AmountTextField)); }
             }
 
             public override string TotalAmountText
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_entry, TotalAmountTextField)).TrimStart('/').Trim(); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, TotalAmountTextField)).TrimStart('/').Trim(); }
             }
 
             public override Component Slider { get { return GetSlider() as Component; } }
@@ -476,7 +471,7 @@ namespace SongsOfConquestAccess.Adapters
             public override string IdPrefix { get { return BuildIdPrefix(); } }
             public override string TroopName { get { return ResolveTroopName(); } }
             public override Tooltip Tooltip { get { return BuildEntryTooltip(); } }
-            public override string NoTroopsText { get { return GetText(Reflect.Get<UITextMesh>(_entry, NoTroopsTextField)); } }
+            public override string NoTroopsText { get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, NoTroopsTextField)); } }
             public override bool IsNoTroopsVisible { get { return true; } }
         }
 

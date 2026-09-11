@@ -185,7 +185,7 @@ namespace SongsOfConquestAccess.Adapters
             AddButtonTexts(excludedTexts, GetConfirmButton());
             AddButtonTexts(excludedTexts, GetCancelButton());
 
-            string title = GetText(header);
+            string title = UITextMeshTextUtility.GetEffectiveText(header);
             HashSet<string> excludedLabels = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             AddIfNotEmpty(excludedLabels, title);
             AddIfNotEmpty(excludedLabels, PreviousLabel);
@@ -202,7 +202,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string value = GetText(text).Trim();
+                string value = UITextMeshTextUtility.GetEffectiveText(text).Trim();
                 if (string.IsNullOrWhiteSpace(value) || excludedLabels.Contains(value))
                 {
                     continue;
@@ -250,11 +250,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetButtonText(UIButton button)
         {
             return UITextMeshTextUtility.GetEffectiveButtonText(button);
-        }
-
-        private static string GetText(UITextMesh text)
-        {
-            return UITextMeshTextUtility.GetEffectiveText(text);
         }
 
         private static void AddButtonTexts(HashSet<UITextMesh> texts, UIButton button)

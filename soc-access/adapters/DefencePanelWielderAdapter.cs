@@ -96,7 +96,7 @@ namespace SongsOfConquestAccess.Adapters
                     _headerMesh = FindHeaderMesh();
                 }
 
-                return GetText(_headerMesh);
+                return UITextMeshTextUtility.Spoken(_headerMesh);
             }
         }
 
@@ -306,17 +306,7 @@ namespace SongsOfConquestAccess.Adapters
                 return label;
             }
 
-            return GetLocalizedText(localizationKey, fallback);
-        }
-
-        private string GetLocalizedText(string key, string fallback)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, fallback));
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenText.Get(_localization, localizationKey, fallback);
         }
 
         private static string JoinVisibleText(UITextMesh[] textMeshes)
@@ -334,7 +324,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string text = GetText(textMeshes[i]);
+                string text = UITextMeshTextUtility.Spoken(textMeshes[i]);
                 if (!string.IsNullOrWhiteSpace(text) && !parts.Contains(text))
                 {
                     parts.Add(text);

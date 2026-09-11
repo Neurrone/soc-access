@@ -91,7 +91,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, WielderListTitleField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, WielderListTitleField)); }
         }
 
         public int SelectedEntryIndex
@@ -106,7 +106,7 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The name the pane draws for the candidate it is describing.</summary>
         public string SelectedName
         {
-            get { return GetText(Reflect.Get<UITextMesh>(GetDetails(), DetailsNameField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GetDetails(), DetailsNameField)); }
         }
 
         /// <summary>The level the pane draws beside that name, or empty while the pane hides it.
@@ -117,7 +117,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 PurchaseWielderDetails details = GetDetails();
                 return IsVisible(Reflect.Get<GameObject>(details, DetailsLevelContainerField))
-                    ? GetText(Reflect.Get<UITextMesh>(details, DetailsLevelTextField))
+                    ? UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(details, DetailsLevelTextField))
                     : string.Empty;
             }
         }
@@ -126,27 +126,27 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public IList<string> SelectedDescriptionLines
         {
-            get { return GetLines(Reflect.Get<UITextMesh>(GetDetails(), DetailsDescriptionField)); }
+            get { return UITextMeshTextUtility.SpokenLines(Reflect.Get<UITextMesh>(GetDetails(), DetailsDescriptionField)); }
         }
 
         public string OffenceHeader
         {
-            get { return GetLocalizedText("Commanders/Tooltip/Offense", "Offense"); }
+            get { return SpokenText.Get(_localization, "Commanders/Tooltip/Offense", "Offense"); }
         }
 
         public string DefenceHeader
         {
-            get { return GetLocalizedText("Commanders/Tooltip/Defense", "Defense"); }
+            get { return SpokenText.Get(_localization, "Commanders/Tooltip/Defense", "Defense"); }
         }
 
         public string MovementHeader
         {
-            get { return GetLocalizedText("Commanders/Tooltip/Movement", "Movement"); }
+            get { return SpokenText.Get(_localization, "Commanders/Tooltip/Movement", "Movement"); }
         }
 
         public string ViewRadiusHeader
         {
-            get { return GetLocalizedText("Commanders/Tooltip/ViewRadius", "View radius"); }
+            get { return SpokenText.Get(_localization, "Commanders/Tooltip/ViewRadius", "View radius"); }
         }
 
         public string Offence
@@ -298,7 +298,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool HasSpecialization()
         {
             UITextMesh text = Reflect.Get<UITextMesh>(GetDetails(), DetailsSpecializationField);
-            return IsVisible(text as Component) && !string.IsNullOrWhiteSpace(GetText(text));
+            return IsVisible(text as Component) && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(text));
         }
 
         /// <summary>The specialization the pane draws, under the game's own caption, one line per
@@ -307,13 +307,13 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                IList<string> body = GetLines(Reflect.Get<UITextMesh>(GetDetails(), DetailsSpecializationField));
+                IList<string> body = UITextMeshTextUtility.SpokenLines(Reflect.Get<UITextMesh>(GetDetails(), DetailsSpecializationField));
                 if (body.Count == 0)
                 {
                     return body;
                 }
 
-                string header = GetLocalizedText("Commanders/Tooltip/Specializations", string.Empty);
+                string header = SpokenText.Get(_localization, "Commanders/Tooltip/Specializations", string.Empty);
                 if (!string.IsNullOrWhiteSpace(header))
                 {
                     body[0] = header.TrimEnd(':') + ": " + body[0];
@@ -336,7 +336,7 @@ namespace SongsOfConquestAccess.Adapters
                 UITextMesh alreadyOwned = Reflect.Get<UITextMesh>(details, DetailsAlreadyOwnedTextField);
                 if (IsVisible(alreadyOwned as Component))
                 {
-                    return GetText(alreadyOwned);
+                    return UITextMeshTextUtility.Spoken(alreadyOwned);
                 }
 
                 string cost = CostText;
@@ -471,7 +471,7 @@ namespace SongsOfConquestAccess.Adapters
                     : ModText.Get(
                         _localization,
                         ModStrings.UI.LabelValue,
-                        GetLocalizedText("Adventure/BuildMenu/Cost", "Cost").TrimEnd(':'),
+                        SpokenText.Get(_localization, "Adventure/BuildMenu/Cost", "Cost").TrimEnd(':'),
                         ModText.JoinList(_localization, parts));
             }
         }
@@ -493,7 +493,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetDetailsText(FieldInfo field)
         {
-            return GetText(Reflect.Get<UITextMesh>(GetDetails(), field));
+            return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GetDetails(), field));
         }
 
         private IReadOnlyList<TroopHUDEntry> GetTroopEntries()
@@ -512,7 +512,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             Transform header = section == null ? null : section.transform.Find("Header/HeaderText");
             UITextMesh text = header == null ? null : header.GetComponent<UITextMesh>();
-            return text == null ? string.Empty : GetText(text);
+            return text == null ? string.Empty : UITextMeshTextUtility.Spoken(text);
         }
 
         private void AddCostPart(List<string> parts, LargeCostSection section, FieldInfo entryField, FieldInfo textField, ResourceType resourceType)
@@ -523,7 +523,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            string amount = GetText(Reflect.Get<UITextMesh>(section, textField));
+            string amount = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(section, textField));
             if (string.IsNullOrWhiteSpace(amount))
             {
                 return;
@@ -554,19 +554,9 @@ namespace SongsOfConquestAccess.Adapters
             return type.ToString();
         }
 
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
         private static string GetButtonLabel(UIButton button)
         {
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
-        }
-
-        private string GetLocalizedText(string key, string fallback)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
         /// <summary>The first line a tooltip has anything to say on. <c>Tooltip.TextLines</c> captures
@@ -601,12 +591,6 @@ namespace SongsOfConquestAccess.Adapters
 
             object value = TroopHudEntrySizeField.GetValue(entry);
             return value is int ? (int)value : 0;
-        }
-
-        // A text mesh the game may have written more than one paragraph into.
-        private static IList<string> GetLines(IUITextMesh textMesh)
-        {
-            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
         }
 
         private static bool IsVisible(Component component)
@@ -646,13 +630,13 @@ namespace SongsOfConquestAccess.Adapters
             /// <summary>The wielder's own name.</summary>
             public string Name
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_entry, EntryNameField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, EntryNameField)); }
             }
 
             /// <summary>The class line the entry draws under the name ("Level 12 Human Commander").</summary>
             public string ClassText
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_entry, EntryClassField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, EntryClassField)); }
             }
 
             /// <summary>The entry the menu is showing the details of.</summary>

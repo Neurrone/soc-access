@@ -273,17 +273,6 @@ namespace SongsOfConquestAccess.Adapters
                 && component.gameObject.activeInHierarchy;
         }
 
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
-        // A text mesh the game may have written more than one paragraph into.
-        private static IList<string> GetLines(IUITextMesh textMesh)
-        {
-            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
-        }
-
         private static T GetEntryField<T>(LobbyRandomMapPreviewEntry entry, FieldInfo field) where T : class
         {
             return entry != null && field != null ? field.GetValue(entry) as T : null;
@@ -325,14 +314,14 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Title
             {
-                get { return GetText(GetEntryField<UITextMesh>(Entry, EntryTitleField)); }
+                get { return UITextMeshTextUtility.Spoken(GetEntryField<UITextMesh>(Entry, EntryTitleField)); }
             }
 
             /// <summary>The paragraphs the card draws under its title, kept apart rather than
             /// collapsed.</summary>
             public IList<string> DescriptionLines
             {
-                get { return GetLines(GetEntryField<UITextMesh>(Entry, EntryDescriptionField)); }
+                get { return UITextMeshTextUtility.SpokenLines(GetEntryField<UITextMesh>(Entry, EntryDescriptionField)); }
             }
 
             public bool IsSelected

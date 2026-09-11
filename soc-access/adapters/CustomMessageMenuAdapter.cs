@@ -33,7 +33,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 CustomMessageMenu.Settings settings = GetSettings();
-                return GetText(settings != null ? settings.HeaderText : null);
+                return UITextMeshTextUtility.Spoken(settings != null ? settings.HeaderText : null);
             }
         }
 
@@ -61,7 +61,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 CustomMessageMenu.Settings settings = GetSettings();
-                return GetText(settings != null ? settings.PositiveButtonText : null);
+                return UITextMeshTextUtility.Spoken(settings != null ? settings.PositiveButtonText : null);
             }
         }
 
@@ -70,7 +70,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 CustomMessageMenu.Settings settings = GetSettings();
-                return GetText(settings != null ? settings.NegativeButtonText : null);
+                return UITextMeshTextUtility.Spoken(settings != null ? settings.NegativeButtonText : null);
             }
         }
 
@@ -216,11 +216,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return NativeSelectionUtility.Click(button);
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
     }
 }

@@ -165,11 +165,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private string GetLocalizedText(string key, string fallback)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, fallback));
-        }
-
         private string GetCommanderName(int commanderId)
         {
             string name = commanderId >= 0 && _facade != null ? _facade.Commanders.GetName(commanderId) : string.Empty;
@@ -374,7 +369,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 UIButton button = GetModifierCategoryButton(ModifierTabs, index);
                 return new ModifierCategory(
-                    _owner.GetLocalizedText(key, fallback),
+                    SpokenText.Get(_owner._localization, key, fallback),
                     index,
                     button as Component,
                     Tooltip.ForComponent(button as Component, _owner._localization));

@@ -32,7 +32,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(_settings != null ? _settings.HeaderText : null); }
+            get { return UITextMeshTextUtility.Spoken(_settings != null ? _settings.HeaderText : null); }
         }
 
         public string Body
@@ -44,7 +44,7 @@ namespace SongsOfConquestAccess.Adapters
         /// collapsed: the menu reads a paragraph at a time.</summary>
         public IList<string> BodyLines
         {
-            get { return GetLines(_settings != null ? _settings.DescriptionText : null); }
+            get { return UITextMeshTextUtility.SpokenLines(_settings != null ? _settings.DescriptionText : null); }
         }
 
         public bool IsPresent()
@@ -94,9 +94,9 @@ namespace SongsOfConquestAccess.Adapters
             choices.Add(new ChoiceItem(
                 idSuffix,
                 toggle,
-                () => GetText(title),
-                () => GetText(duration),
-                () => GetLines(description),
+                () => UITextMeshTextUtility.Spoken(title),
+                () => UITextMeshTextUtility.Spoken(duration),
+                () => UITextMeshTextUtility.SpokenLines(description),
                 () => toggle.interactable,
                 () => FocusToggle(toggle),
                 () => ActivateToggle(toggle)));
@@ -121,17 +121,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             Transform transform = root != null ? root.transform.Find(relativePath) : null;
             return transform != null ? transform.GetComponent<UITextMesh>() : null;
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
-        // A text mesh the game may have written more than one paragraph into.
-        private static IList<string> GetLines(IUITextMesh textMesh)
-        {
-            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
         }
 
         private static bool IsVisible(Component component)

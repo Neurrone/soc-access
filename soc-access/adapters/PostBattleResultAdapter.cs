@@ -475,7 +475,7 @@ namespace SongsOfConquestAccess.Adapters
                 Component tooltipComponent = Reflect.Get<Component>(entry, TroopEntryTooltipAreaField);
                 Tooltip tooltip = Tooltip.ForComponent(tooltipComponent, _localization);
                 result.Add(new ResultEntry(
-                    GetText(Reflect.Get<UITextMesh>(entry, TroopEntryAmountField)),
+                    UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(entry, TroopEntryAmountField)),
                     TooltipLines.First(tooltip),
                     isLostTroop: true,
                     tooltip,
@@ -573,12 +573,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetText(FieldInfo field)
         {
-            return GetText(Reflect.Get<UITextMesh>(_menu, field));
-        }
-
-        private static string GetText(UITextMesh text)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
+            return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, field));
         }
 
         private bool IsTextVisible(FieldInfo field)
@@ -586,7 +581,7 @@ namespace SongsOfConquestAccess.Adapters
             UITextMesh text = Reflect.Get<UITextMesh>(_menu, field);
             return text != null
                 && text.gameObject.activeInHierarchy
-                && !string.IsNullOrWhiteSpace(GetText(text));
+                && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(text));
         }
 
         private static string GetButtonLabel(UIButton button)

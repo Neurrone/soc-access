@@ -162,7 +162,7 @@ namespace SongsOfConquestAccess.Adapters
         /// through a field the menu holds, so it is read from the same key.</summary>
         public string HeaderText
         {
-            get { return GetLocalizedText("Adventure/BuildMenu/Header", "Build"); }
+            get { return SpokenText.Get(_localization, "Adventure/BuildMenu/Header", "Build"); }
         }
 
         public string BuildSiteSummary
@@ -366,7 +366,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 BuildMenuHeaderSection header = Reflect.Get<BuildMenuHeaderSection>(_menu, HeaderSectionField);
-                return GetText(Reflect.Get<UITextMesh>(header, HeaderNameField));
+                return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(header, HeaderNameField));
             }
         }
 
@@ -377,7 +377,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 BuildMenuHeaderSection header = Reflect.Get<BuildMenuHeaderSection>(_menu, HeaderSectionField);
-                return GetLines(Reflect.Get<UITextMesh>(header, HeaderDescriptionField));
+                return UITextMeshTextUtility.SpokenLines(Reflect.Get<UITextMesh>(header, HeaderDescriptionField));
             }
         }
 
@@ -470,7 +470,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string AvailableResearchHeader
         {
-            get { return GetLocalizedText("Adventure/BuildMenu/AvailableResearch", "Available Research"); }
+            get { return SpokenText.Get(_localization, "Adventure/BuildMenu/AvailableResearch", "Available Research"); }
         }
 
         public IReadOnlyList<SectionMenu> GetIncomeAndGarrisonMenus()
@@ -564,7 +564,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string RequirementsHeader
         {
-            get { return GetLocalizedText("Adventure/BuildMenu/Requirements", "Requirements"); }
+            get { return SpokenText.Get(_localization, "Adventure/BuildMenu/Requirements", "Requirements"); }
         }
 
         public string CurrentTierCostText
@@ -613,7 +613,7 @@ namespace SongsOfConquestAccess.Adapters
                     return string.Empty;
                 }
 
-                return GetText(Reflect.Get<UITextMesh>(_menu, CannotBuyTextField));
+                return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, CannotBuyTextField));
             }
         }
 
@@ -693,7 +693,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string AutoSelectLabel
         {
-            get { return GetLocalizedText("Options/AutoSelectBuildSite", string.Empty); }
+            get { return SpokenText.Get(_localization, "Options/AutoSelectBuildSite", string.Empty); }
         }
 
         public bool IsAutoSelectChecked()
@@ -846,7 +846,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Length; i++)
             {
                 BuildMenuDescriptionEntry entry = entries[i];
-                string text = GetText(Reflect.Get<UITextMesh>(entry, DescriptionEntryTextField));
+                string text = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(entry, DescriptionEntryTextField));
                 if (string.IsNullOrWhiteSpace(text))
                 {
                     continue;
@@ -881,7 +881,7 @@ namespace SongsOfConquestAccess.Adapters
             BuildMenuDescriptionEntry[] entries = GetEntries(section);
             for (int i = 0; i < entries.Length; i++)
             {
-                string text = GetText(Reflect.Get<UITextMesh>(entries[i], DescriptionEntryTextField));
+                string text = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(entries[i], DescriptionEntryTextField));
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     lines.Add(text);
@@ -918,14 +918,14 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            string localized = GetLocalizedText(localizationKey, fallbackHeader);
+            string localized = SpokenText.Get(_localization, localizationKey, fallbackHeader);
             return string.Equals(header, localized, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(header, fallbackHeader, StringComparison.OrdinalIgnoreCase);
         }
 
         private string GetSectionHeader(BuildMenuDescriptionSection section)
         {
-            return GetText(Reflect.Get<UITextMesh>(section, DescriptionSectionHeaderField));
+            return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(section, DescriptionSectionHeaderField));
         }
 
         private void FocusEntry(BuildMenuDescriptionEntry entry)
@@ -1131,7 +1131,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            string amount = GetText(Reflect.Get<UITextMesh>(section, textField));
+            string amount = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(section, textField));
             int parsedAmount;
             if (!string.IsNullOrWhiteSpace(amount) && int.TryParse(amount, out parsedAmount))
             {
@@ -1157,11 +1157,11 @@ namespace SongsOfConquestAccess.Adapters
             switch (size)
             {
                 case BuildSiteSize.Medium:
-                    return GetLocalizedText("Adventure/BuildMenu/Tabs/MediumBuildings", "Medium");
+                    return SpokenText.Get(_localization, "Adventure/BuildMenu/Tabs/MediumBuildings", "Medium");
                 case BuildSiteSize.Large:
-                    return GetLocalizedText("Adventure/BuildMenu/Tabs/LargeBuildings", "Large");
+                    return SpokenText.Get(_localization, "Adventure/BuildMenu/Tabs/LargeBuildings", "Large");
                 default:
-                    return GetLocalizedText("Adventure/BuildMenu/Tabs/SmallBuildings", "Small");
+                    return SpokenText.Get(_localization, "Adventure/BuildMenu/Tabs/SmallBuildings", "Small");
             }
         }
 
@@ -1172,7 +1172,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return GetLocalizedText("Adventure/BuildMenu/Cost", "Cost").TrimEnd(':') + ": " + body;
+            return SpokenText.Get(_localization, "Adventure/BuildMenu/Cost", "Cost").TrimEnd(':') + ": " + body;
         }
 
         /// <summary>How long a size takes to build. Fixed for the life of the menu, and asked for
@@ -1206,7 +1206,7 @@ namespace SongsOfConquestAccess.Adapters
                     break;
             }
 
-            string label = GetLocalizedText("Adventure/Tooltips/Build/BuildTimeLabel", "Build time");
+            string label = SpokenText.Get(_localization, "Adventure/Tooltips/Build/BuildTimeLabel", "Build time");
             string value = _localization != null
                 ? SpokenLines.Clean(_localization.GetPluralText("Adventure/Tooltips/Build/BuildTime", rounds, rounds))
                 : rounds + (rounds == 1 ? " round" : " rounds");
@@ -1370,11 +1370,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private string GetLocalizedText(string key, string fallback)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
-        }
-
         private string GetBuildSiteLabel(BuildSiteSize size)
         {
             switch (size)
@@ -1388,7 +1383,7 @@ namespace SongsOfConquestAccess.Adapters
                 case BuildSiteSize.SmallSettlement:
                     return GetBuildSiteName("MapEntities/BuildSite/Small", "small build site");
                 case BuildSiteSize.Town:
-                    return GetLocalizedText("MapEntities/Category/Town", "town");
+                    return SpokenText.Get(_localization, "MapEntities/Category/Town", "town");
                 default:
                     return GetBuildSiteName("MapEntities/BuildSite/Small", "small build site");
             }
@@ -1433,17 +1428,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetButtonLabel(UIButton button)
         {
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
-        // A text mesh the game may have written more than one paragraph into.
-        private static IList<string> GetLines(IUITextMesh textMesh)
-        {
-            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
         }
 
         private static bool IsButtonEnabled(UIButton button)

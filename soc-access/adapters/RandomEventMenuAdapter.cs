@@ -36,7 +36,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 RandomEventMenu.Settings settings = GetSettings();
-                return GetText(settings != null ? settings.HeaderText : null);
+                return UITextMeshTextUtility.Spoken(settings != null ? settings.HeaderText : null);
             }
         }
 
@@ -71,7 +71,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 RandomEventMenu.Settings settings = GetSettings();
                 string label = GetButtonText(settings != null ? settings.ConfirmButton : null);
-                return FirstNonEmpty(label, GetLocalizedText("Common/Confirm"));
+                return FirstNonEmpty(label, SpokenText.Get(GetLocalizationHandler(), "Common/Confirm", string.Empty));
             }
         }
 
@@ -196,11 +196,6 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Click(button);
         }
 
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
         private static string GetActiveMultilineText(IUITextMesh textMesh)
         {
             IUITransform transform = textMesh as IUITransform;
@@ -215,11 +210,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetButtonText(IUIButton button)
         {
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
-        }
-
-        private string GetLocalizedText(string key)
-        {
-            return SpokenLines.Clean(GameText.Get(GetLocalizationHandler(), key, string.Empty));
         }
 
         private static string FirstNonEmpty(string first, string fallback)

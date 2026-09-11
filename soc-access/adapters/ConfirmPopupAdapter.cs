@@ -43,7 +43,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(GetTitle()); }
+            get { return UITextMeshTextUtility.Spoken(GetTitle()); }
         }
 
         public string Body
@@ -60,12 +60,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string PositiveLabel
         {
-            get { return GetLocalizedText("Common/Confirm"); }
+            get { return SpokenText.Get(GetLocalizationHandler(), "Common/Confirm", string.Empty); }
         }
 
         public string NegativeLabel
         {
-            get { return GetLocalizedText("Common/Cancel"); }
+            get { return SpokenText.Get(GetLocalizationHandler(), "Common/Cancel", string.Empty); }
         }
 
         public bool HasPositiveAction
@@ -217,17 +217,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return NativeSelectionUtility.Click(button);
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
-        private string GetLocalizedText(string key)
-        {
-            ILocalizationHandler localizationHandler = GetLocalizationHandler();
-            return SpokenLines.Clean(GameText.Get(localizationHandler, key, string.Empty));
         }
     }
 }

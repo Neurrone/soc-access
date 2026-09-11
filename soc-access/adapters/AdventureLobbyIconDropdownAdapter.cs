@@ -415,7 +415,7 @@ namespace SongsOfConquestAccess.Adapters
                     return string.Empty;
                 }
 
-                return SpokenLines.Clean(GameText.Get(_adapter.GetLocalization(_entry), key, string.Empty));
+                return SpokenText.Get(_adapter.GetLocalization(_entry), key, string.Empty);
             }
 
             private T GetFieldValue<T>(FieldInfo field, T fallback)

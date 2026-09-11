@@ -49,12 +49,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GiftHeader
         {
-            get { return GetText(Reflect.Get<IUITextMesh>(_popup, GiftHeaderField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<IUITextMesh>(_popup, GiftHeaderField)); }
         }
 
         public string RequestHeader
         {
-            get { return GetText(Reflect.Get<IUITextMesh>(_popup, RequestHeaderField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<IUITextMesh>(_popup, RequestHeaderField)); }
         }
 
         public bool IsRequestMenuVisible()
@@ -124,11 +124,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return items;
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static bool IsLiveSceneObject(GameObject gameObject)

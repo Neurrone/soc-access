@@ -61,8 +61,8 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetTitle()
         {
-            string header = GetText(_settings != null ? _settings.HeaderText : null);
-            string level = GetText(_settings != null ? _settings.LevelText : null);
+            string header = UITextMeshTextUtility.Spoken(_settings != null ? _settings.HeaderText : null);
+            string level = UITextMeshTextUtility.Spoken(_settings != null ? _settings.LevelText : null);
             return MenuButtonTextUtility.JoinParts(
                 header,
                 string.IsNullOrWhiteSpace(level) ? string.Empty : ModText.Get(ModStrings.Screens.LevelValue, level));
@@ -71,8 +71,8 @@ namespace SongsOfConquestAccess.Adapters
         public string GetCommanderIdentity()
         {
             return MenuButtonTextUtility.JoinParts(
-                GetText(_settings != null ? _settings.WielderNameText : null),
-                GetText(_settings != null ? _settings.WielderTitleText : null));
+                UITextMeshTextUtility.Spoken(_settings != null ? _settings.WielderNameText : null),
+                UITextMeshTextUtility.Spoken(_settings != null ? _settings.WielderTitleText : null));
         }
 
         /// <summary>The wielder's portrait at the top centre, the image the game hangs the wielder's
@@ -101,7 +101,7 @@ namespace SongsOfConquestAccess.Adapters
         /// <c>CommanderLevelUpMenu.Open</c> from <c>Adventure/CommanderLevelUp/Description</c>.</summary>
         public string GetChooseSkillText()
         {
-            return GetText(_settings != null ? _settings.DescriptionText : null);
+            return UITextMeshTextUtility.Spoken(_settings != null ? _settings.DescriptionText : null);
         }
 
         /// <summary>The close cross the menu's <c>AdventureMenuBackground</c> draws at the top right.
@@ -133,7 +133,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetMaxLevelMessage()
         {
-            return GetText(_settings != null ? _settings.ReachedMaxXPText : null);
+            return UITextMeshTextUtility.Spoken(_settings != null ? _settings.ReachedMaxXPText : null);
         }
 
         public IReadOnlyList<StatItem> GetStats()
@@ -166,7 +166,7 @@ namespace SongsOfConquestAccess.Adapters
             FieldInfo tooltipField)
         {
             UITextMesh textMesh = Reflect.Get<UITextMesh>(statsInfo, textField);
-            string value = GetText(textMesh);
+            string value = UITextMeshTextUtility.Spoken(textMesh);
             UIImage tooltipImage = Reflect.Get<UIImage>(statsInfo, tooltipField);
             Component tooltipComponent = tooltipImage as Component;
             if (string.IsNullOrWhiteSpace(value)
@@ -193,9 +193,9 @@ namespace SongsOfConquestAccess.Adapters
 
             UIButton button = Reflect.Get<UIButton>(component, ButtonField);
             string choiceHeader = GetSkillChoiceHeader(headerIndex);
-            string skillName = GetText(Reflect.Get<UITextMesh>(component, HeaderTextField));
-            string skillLevel = GetText(Reflect.Get<UITextMesh>(component, SkillLevelTextField));
-            IList<string> description = GetLines(Reflect.Get<UITextMesh>(component, DescriptionTextField));
+            string skillName = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(component, HeaderTextField));
+            string skillLevel = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(component, SkillLevelTextField));
+            IList<string> description = UITextMeshTextUtility.SpokenLines(Reflect.Get<UITextMesh>(component, DescriptionTextField));
             Component buttonComponent = button as Component;
 
             choices.Add(new SkillChoice(
@@ -213,7 +213,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             UITextMesh[] headers = _settings != null ? _settings.SkillChoiceHeaders : null;
             return headers != null && index >= 0 && index < headers.Length
-                ? GetText(headers[index])
+                ? UITextMeshTextUtility.Spoken(headers[index])
                 : string.Empty;
         }
 
@@ -247,17 +247,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             AdventureMenuBackground background = _settings != null ? _settings.AdventureMenuBackground : null;
             return Reflect.Get<UIButton>(background, BackgroundCloseButtonField);
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
-        // A text mesh the game may have written more than one paragraph into.
-        private static IList<string> GetLines(IUITextMesh textMesh)
-        {
-            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
         }
 
         public sealed class StatItem

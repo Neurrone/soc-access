@@ -76,7 +76,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string TutorialsToggleLabel
         {
-            get { return GetLocalizedText("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
+            get { return SpokenText.Get("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
         }
 
         /// <summary>The text mesh the panel writes each page's description into - one viewer the game
@@ -211,11 +211,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string Normalize(string value)
         {
             return SpokenLines.Clean(value);
-        }
-
-        private static string GetLocalizedText(string key, string fallback)
-        {
-            return SpokenLines.Clean(GameText.Get(key, fallback ?? string.Empty));
         }
     }
 }

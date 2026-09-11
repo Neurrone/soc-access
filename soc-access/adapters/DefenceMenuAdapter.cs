@@ -115,12 +115,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, MainTitleField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, MainTitleField)); }
         }
 
         public string Subtitle
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, SubTitleField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, SubTitleField)); }
         }
 
         public string SettlementDefendingTroopsLabel
@@ -139,7 +139,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string DefendingTroopsLabel
         {
-            get { return GetLocalizedText("Adventure/TroopManagementMenu/DefendingTroopsHeader", "Defending troops"); }
+            get { return SpokenText.Get(_localization, "Adventure/TroopManagementMenu/DefendingTroopsHeader", "Defending troops"); }
         }
 
         /// <summary>The band the menu draws for the wielder stored in the settlement. Kept, so the
@@ -433,7 +433,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                return GetText(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowersLevelTextField));
+                return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowersLevelTextField));
             }
         }
 
@@ -446,7 +446,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string TowerInfoText
         {
-            get { return GetText(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField)); }
         }
 
         public bool HasVisibleNoTowersHelp()
@@ -563,16 +563,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetButtonLabel(UIButton button)
         {
             return SpokenLines.Clean(MenuButtonTextUtility.GetAllVisibleText(button));
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
-        private string GetLocalizedText(string key, string fallback)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, fallback));
         }
 
         private static bool IsButtonEnabled(UIButton button)

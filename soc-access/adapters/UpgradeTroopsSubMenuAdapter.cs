@@ -146,11 +146,6 @@ namespace SongsOfConquestAccess.Adapters
             return PairValueProperty != null ? PairValueProperty.GetValue(pair, null) : null;
         }
 
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
         private static string JoinVisibleText(UITextMesh[] textMeshes)
         {
             if (textMeshes == null)
@@ -166,7 +161,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string text = GetText(textMeshes[i]);
+                string text = UITextMeshTextUtility.Spoken(textMeshes[i]);
                 if (!string.IsNullOrWhiteSpace(text) && !parts.Contains(text))
                 {
                     parts.Add(text);
@@ -216,12 +211,12 @@ namespace SongsOfConquestAccess.Adapters
 
             public string CurrentTroopName
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_entry, CurrentTextField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, CurrentTextField)); }
             }
 
             public string TargetTroopName
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_entry, TargetTextField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, TargetTextField)); }
             }
 
             /// <summary>The two numbers the card draws under its portraits: how many of the troop
@@ -230,12 +225,12 @@ namespace SongsOfConquestAccess.Adapters
             /// them behind until it does.</summary>
             public string CurrentAmountText
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_entry, CurrentAmountTextField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, CurrentAmountTextField)); }
             }
 
             public string TargetAmountText
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_entry, TargetAmountTextField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, TargetAmountTextField)); }
             }
 
             /// <summary>The two portraits, which the game wires as the shortcuts to none of them and
@@ -361,7 +356,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public string RefusalText
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_entry, PurchaseMessageTextField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, PurchaseMessageTextField)); }
             }
 
             /// <summary>What upgrading the amount the slider is set to would cost.</summary>

@@ -114,7 +114,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, BuildingNameField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, BuildingNameField)); }
         }
 
         public bool IsCustomNameVisible
@@ -124,7 +124,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string CustomName
         {
-            get { return GetText(Reflect.Get<UITextMesh>(GetHeader(), HeaderCustomNameTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GetHeader(), HeaderCustomNameTextField)); }
         }
 
         public string VisitingWielderName
@@ -298,12 +298,12 @@ namespace SongsOfConquestAccess.Adapters
         /// would do, or the game's own reason there is nothing to do.</summary>
         public string DraftDescription
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, PurchaseTroopsDescriptionField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, PurchaseTroopsDescriptionField)); }
         }
 
         public string UpgradeDescription
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, UpgradeTroopsDescriptionField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, UpgradeTroopsDescriptionField)); }
         }
 
         /// <summary>The number the menu stamps on the Upgrade button while something can be upgraded;
@@ -313,7 +313,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 return IsVisible(Reflect.Get<GameObject>(_menu, UpgradesAvailableIndicatorField))
-                    ? GetText(Reflect.Get<UITextMesh>(_menu, UpgradesAvailableNumberField))
+                    ? UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, UpgradesAvailableNumberField))
                     : string.Empty;
             }
         }
@@ -544,11 +544,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetButtonLabel(UIButton button)
         {
             return SpokenLines.Clean(MenuButtonTextUtility.GetAllVisibleText(button));
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static bool IsVisible(Component component)

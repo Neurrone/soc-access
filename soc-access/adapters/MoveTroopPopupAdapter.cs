@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(Reflect.Get<IUITextMesh>(_movable, HeaderTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<IUITextMesh>(_movable, HeaderTextField)); }
         }
 
         /// <summary>The split button's own name, read from the game's localization rather than off the
@@ -70,7 +70,7 @@ namespace SongsOfConquestAccess.Adapters
                 Transform container = component != null ? component.transform.parent : null;
                 if (container == null)
                 {
-                    Add(texts, GetText(amount));
+                    Add(texts, UITextMeshTextUtility.Spoken(amount));
                     return texts;
                 }
 
@@ -82,7 +82,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 for (int i = 0; i < _maxSizeTexts.Length; i++)
                 {
-                    Add(texts, GetText(_maxSizeTexts[i]));
+                    Add(texts, UITextMeshTextUtility.Spoken(_maxSizeTexts[i]));
                 }
 
                 return texts;
@@ -250,12 +250,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string LeftAmount
         {
-            get { return GetText(Reflect.Get<IUITextMesh>(_movable, LeftPortraitAmountField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<IUITextMesh>(_movable, LeftPortraitAmountField)); }
         }
 
         public string RightAmount
         {
-            get { return GetText(Reflect.Get<IUITextMesh>(_movable, RightPortraitAmountField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<IUITextMesh>(_movable, RightPortraitAmountField)); }
         }
 
         public int GetSliderValue()
@@ -333,11 +333,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             object value = CurrentStateField != null ? CurrentStateField.GetValue(_movable) : null;
             return value != null ? value.ToString() : string.Empty;
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static void Add(List<string> texts, string text)

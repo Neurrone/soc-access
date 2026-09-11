@@ -35,7 +35,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(GetTitleText()); }
+            get { return UITextMeshTextUtility.Spoken(GetTitleText()); }
         }
 
         public string Body
@@ -176,11 +176,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return NativeSelectionUtility.Click(button);
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetButtonText(IUIButton button)

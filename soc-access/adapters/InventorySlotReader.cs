@@ -116,7 +116,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string EquipmentLabel
         {
-            get { return GetLocalizedText("Common/CommanderInventory/Equipment", "Equipment"); }
+            get { return SpokenText.Get(_localization, "Common/CommanderInventory/Equipment", "Equipment"); }
         }
 
         public string InventoryLabel
@@ -263,7 +263,7 @@ namespace SongsOfConquestAccess.Adapters
         /// shows itself when the drop is refused with error code 10.</summary>
         public string RearrangeRefusalText
         {
-            get { return GetLocalizedText("Common/CommanderInventory/RearrangeArtifact/CannotRearrangeBecauseOfCommand", string.Empty); }
+            get { return SpokenText.Get(_localization, "Common/CommanderInventory/RearrangeArtifact/CannotRearrangeBecauseOfCommand", string.Empty); }
         }
 
         /// <summary>Whether the game does anything with a plain left click here: only the artifact
@@ -352,7 +352,7 @@ namespace SongsOfConquestAccess.Adapters
         /// artifact's tooltip.</summary>
         public string AutoArrangeText
         {
-            get { return GetLocalizedText("Adventure/TooltipInstruction/AutoArrange", string.Empty); }
+            get { return SpokenText.Get(_localization, "Adventure/TooltipInstruction/AutoArrange", string.Empty); }
         }
 
         /// <summary>Auto-arrange, the game's own middle click (<c>InventoryHUD.AutoArrangeArtifacts</c>).
@@ -641,7 +641,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetInventoryLabel()
         {
-            return GetLocalizedText("Common/CommanderInventory/Inventory", "Inventory");
+            return SpokenText.Get(_localization, "Common/CommanderInventory/Inventory", "Inventory");
         }
 
         /// <summary>The game's own name for a slot. The localization answers a key it does not hold
@@ -673,11 +673,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return formatted;
-        }
-
-        private string GetLocalizedText(string key, string fallback)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, fallback));
         }
     }
 }

@@ -74,7 +74,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string TutorialsToggleLabel
         {
-            get { return GetLocalizedText("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
+            get { return SpokenText.Get("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
         }
 
         /// <summary>The component the game draws the OK button with, or null where the popup has
@@ -147,11 +147,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string Normalize(string value)
         {
             return SpokenLines.Clean(value);
-        }
-
-        private static string GetLocalizedText(string key, string fallback)
-        {
-            return SpokenLines.Clean(GameText.Get(key, fallback ?? string.Empty));
         }
     }
 }

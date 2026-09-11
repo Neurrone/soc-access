@@ -279,11 +279,6 @@ namespace SongsOfConquestAccess.Adapters
             return UITextMeshTextUtility.GetEffectiveButtonText(button);
         }
 
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return UITextMeshTextUtility.GetEffectiveText(textMesh);
-        }
-
         private static string GetActiveText(IUITextMesh textMesh)
         {
             IUITransform transform = textMesh as IUITransform;
@@ -292,7 +287,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return GetText(textMesh);
+            return UITextMeshTextUtility.GetEffectiveText(textMesh);
         }
 
     }

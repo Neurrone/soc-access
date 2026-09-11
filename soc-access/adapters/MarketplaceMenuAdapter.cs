@@ -73,7 +73,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string title = GetText(Reflect.Get<UITextMesh>(_menu, TitleTextField));
+                string title = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, TitleTextField));
                 return string.IsNullOrWhiteSpace(title) ? string.Empty : title;
             }
         }
@@ -82,7 +82,7 @@ namespace SongsOfConquestAccess.Adapters
         /// ("Owning: 2").</summary>
         public string OwningSummary
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, NumberOfMarketplacesTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, NumberOfMarketplacesTextField)); }
         }
 
         /// <summary>One entry per resource the grid trades, in drawn order.</summary>
@@ -133,8 +133,8 @@ namespace SongsOfConquestAccess.Adapters
                 columns.Add(new TradeColumn(
                     column.IsBuyButton,
                     column.Amount,
-                    GetText(NearestByX(bandCaptions, column.Centre)),
-                    GetText(NearestByX(columnCaptions, column.Centre))));
+                    UITextMeshTextUtility.Spoken(NearestByX(bandCaptions, column.Centre)),
+                    UITextMeshTextUtility.Spoken(NearestByX(columnCaptions, column.Centre))));
             }
 
             return columns;
@@ -437,11 +437,6 @@ namespace SongsOfConquestAccess.Adapters
                 default:
                     return resourceType.ToString();
             }
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static T GetFieldValue<T>(object owner, FieldInfo field, T fallback)

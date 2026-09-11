@@ -147,19 +147,19 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The title the menu writes over the window, the same in both stages.</summary>
         public string Title
         {
-            get { return GetText(_settings != null ? _settings.TitleText : null); }
+            get { return UITextMeshTextUtility.Spoken(_settings != null ? _settings.TitleText : null); }
         }
 
         /// <summary>What the menu says about the offer, in the choice stage.</summary>
         public string OfferText
         {
-            get { return GetText(_settings != null ? _settings.InformationText : null); }
+            get { return UITextMeshTextUtility.Spoken(_settings != null ? _settings.InformationText : null); }
         }
 
         /// <summary>What the menu says about moving the troops, in the join stage.</summary>
         public string JoinText
         {
-            get { return GetText(_settings != null ? _settings.JoinText : null); }
+            get { return UITextMeshTextUtility.Spoken(_settings != null ? _settings.JoinText : null); }
         }
 
         /// <summary>The attacking wielder's band across the top of the window.</summary>
@@ -234,7 +234,7 @@ namespace SongsOfConquestAccess.Adapters
                 UITextMesh text = _settings != null ? _settings.YesButtonText : null;
                 if (text != null && text.Active)
                 {
-                    return GetText(text);
+                    return UITextMeshTextUtility.Spoken(text);
                 }
 
                 if (string.IsNullOrWhiteSpace(AcceptGoldAmount))
@@ -253,7 +253,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 UITextMesh amount = _settings != null ? _settings.YesButtonGoldAmount : null;
-                return amount != null && amount.Active ? GetText(amount) : string.Empty;
+                return amount != null && amount.Active ? UITextMeshTextUtility.Spoken(amount) : string.Empty;
             }
         }
 
@@ -398,11 +398,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             object value = StageField != null ? StageField.GetValue(_menu) : null;
             return value != null && value.ToString() == stageName;
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetButtonText(UIButton button)

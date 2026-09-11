@@ -51,7 +51,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetLabel()
         {
-            return GetText(GetCampaignTitle());
+            return UITextMeshTextUtility.Spoken(GetCampaignTitle());
         }
 
         /// <summary>The paragraphs the card draws under its name, apart from the name itself: they
@@ -130,7 +130,7 @@ namespace SongsOfConquestAccess.Adapters
             if (IsActive(GetPurchaseContainer()))
             {
                 return JoinLines(
-                    GetText(GetPartOfDLCLabel()),
+                    UITextMeshTextUtility.Spoken(GetPartOfDLCLabel()),
                     GetAllVisibleText(GetPurchaseContainer(), GetPartOfDLCLabel()));
             }
 
@@ -191,11 +191,6 @@ namespace SongsOfConquestAccess.Adapters
             return _taleButton != null ? PartOfDLCLabelRef(_taleButton) : null;
         }
 
-        private static string GetText(UITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
         // The coming-soon and purchase containers a tale button draws, walked at most once a
         // frame: the status is a live announcement, so the graph polls it on every frame the tale
         // list is up. Static because the reader is, and safe to be: a FrameSweep holds only the
@@ -220,7 +215,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string candidate = GetText(textMesh);
+                string candidate = UITextMeshTextUtility.Spoken(textMesh);
                 if (!string.IsNullOrWhiteSpace(candidate) && !parts.Contains(candidate))
                 {
                     parts.Add(candidate);

@@ -139,7 +139,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string title = GetText(Reflect.Get<UITextMesh>(_menu, HeaderTextField));
+                string title = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, HeaderTextField));
                 return string.IsNullOrWhiteSpace(title)
                     ? ModText.Get(_localization, ModStrings.Scanner.ArtifactMarkets)
                     : title;
@@ -148,7 +148,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Description
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, DescriptionTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, DescriptionTextField)); }
         }
 
         public string EquipmentLabel
@@ -491,7 +491,7 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The name of the artifact the Buy band is about, as the band draws it.</summary>
         public string BuyItemName
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, BuyItemTitleField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, BuyItemTitleField)); }
         }
 
         /// <summary>The word on the Buy button, as the band draws it above it.</summary>
@@ -553,7 +553,7 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The name of the artifact the Sell band is about, as the band draws it.</summary>
         public string SellItemName
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, SellItemTitleField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, SellItemTitleField)); }
         }
 
         /// <summary>Whether the Sell button is drawn at all: the game hides it for an artifact it
@@ -568,7 +568,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string title = GetText(Reflect.Get<UITextMesh>(_menu, SellButtonTitleField));
+                string title = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, SellButtonTitleField));
                 return string.IsNullOrWhiteSpace(title) ? ModText.Get(_localization, ModStrings.Screens.Sell) : title;
             }
         }
@@ -631,7 +631,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                return GetText(text);
+                return UITextMeshTextUtility.Spoken(text);
             }
 
             return string.Empty;
@@ -657,7 +657,7 @@ namespace SongsOfConquestAccess.Adapters
         private static string FirstText(GameObject container)
         {
             UITextMesh text = container == null ? null : container.GetComponentInChildren<UITextMesh>(true);
-            return GetText(text);
+            return UITextMeshTextUtility.Spoken(text);
         }
 
         private static string FirstLine(Tooltip tooltip)
@@ -755,11 +755,6 @@ namespace SongsOfConquestAccess.Adapters
                 SocAccessMod.Instance?.LogWarning("ArtifactMarketMenuAdapter could not get artifact name: " + ex.Message);
                 return _artifactLookup != null ? _artifactLookup.GetLocalizedName(artifact.Type) : artifact.Type.ToString();
             }
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static int CompareSiblingIndex(ArtifactMarketEntry left, ArtifactMarketEntry right)

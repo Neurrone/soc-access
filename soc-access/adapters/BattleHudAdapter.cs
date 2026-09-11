@@ -129,7 +129,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 string label = TooltipLines.First(SpellbookButtonTooltip);
                 return string.IsNullOrWhiteSpace(label)
-                    ? Localize("Common/HUD/SpellbookButton", "Spellbook")
+                    ? SpokenText.Get(_localization, "Common/HUD/SpellbookButton", "Spellbook")
                     : label;
             }
         }
@@ -167,7 +167,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 string label = TooltipLines.First(EndTurnButtonTooltip);
                 return string.IsNullOrWhiteSpace(label)
-                    ? Localize("Battle/Labels/EndTurn", "End turn")
+                    ? SpokenText.Get(_localization, "Battle/Labels/EndTurn", "End turn")
                     : label;
             }
         }
@@ -311,7 +311,7 @@ namespace SongsOfConquestAccess.Adapters
                 ITroopAbilityDefinition ability = current != null && _abilityUtility != null
                     ? _abilityUtility.GetAbilityDefinition(current)
                     : null;
-                string label = ability != null ? Localize(ability.NameKey, null) : null;
+                string label = ability != null ? SpokenText.Get(_localization, ability.NameKey, null) : null;
                 return !string.IsNullOrWhiteSpace(label) ? label : string.Empty;
             }
         }
@@ -834,8 +834,8 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            string spellName = GetText(Reflect.Get<UITextMesh>(instruction, SpellTargetInstructionSpellNameField));
-            string text = GetText(Reflect.Get<UITextMesh>(instruction, SpellTargetInstructionTextField));
+            string spellName = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(instruction, SpellTargetInstructionSpellNameField));
+            string text = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(instruction, SpellTargetInstructionTextField));
             if (!string.IsNullOrWhiteSpace(spellName) && !string.IsNullOrWhiteSpace(text))
             {
                 return spellName + ": " + text;
@@ -954,11 +954,11 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             ICommanderState commander = _facade != null ? _facade.Commanders.Current : null;
-            string name = Localize(spell.NameKey, "Spell");
+            string name = SpokenText.Get(_localization, spell.NameKey, "Spell");
             int tier = GetCurrentSpellTier(spell, commander);
             lines.Add(tier > 0 ? name + ", " + GetTierLabel(tier) : name);
 
-            string lore = Localize(spell.DescriptionKey, string.Empty);
+            string lore = SpokenText.Get(_localization, spell.DescriptionKey, string.Empty);
             if (!string.IsNullOrWhiteSpace(lore))
             {
                 lines.Add(lore);
@@ -983,7 +983,7 @@ namespace SongsOfConquestAccess.Adapters
                     string duration = details.GetLocalizedTierDurationDescription(details.CurrentTier, _localization);
                     if (!string.IsNullOrWhiteSpace(duration))
                     {
-                        lines.Add(Localize("Spells/Spellbook/SpellDurationHeader", "Duration") + ": " + duration);
+                        lines.Add(SpokenText.Get(_localization, "Spells/Spellbook/SpellDurationHeader", "Duration") + ": " + duration);
                     }
                 }
             }
@@ -991,7 +991,7 @@ namespace SongsOfConquestAccess.Adapters
             string cost = FormatSpellCost(spell);
             if (!string.IsNullOrWhiteSpace(cost))
             {
-                lines.Add(Localize("Spells/Spellbook/SpellCostHeader", "Cost") + ": " + cost);
+                lines.Add(SpokenText.Get(_localization, "Spells/Spellbook/SpellCostHeader", "Cost") + ": " + cost);
             }
 
             string castText = BuildSpellCastText(spell, commander, tier);
@@ -1068,13 +1068,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetTierLabel(int tier)
         {
-            return Localize("Spells/Spellbook/SpellTierHeader", "tier " + tier, tier);
+            return SpokenText.Get(_localization, "Spells/Spellbook/SpellTierHeader", "tier " + tier, tier);
         }
 
         private string GetEssenceName(EssenceType type)
         {
             string key = "Units/Types/" + type;
-            string localized = Localize(key, string.Empty);
+            string localized = SpokenText.Get(_localization, key, string.Empty);
             if (!string.IsNullOrWhiteSpace(localized) && localized != key)
             {
                 return localized;
@@ -1100,11 +1100,6 @@ namespace SongsOfConquestAccess.Adapters
         private UIButton GetQueueEntryButton(IQueueHUDEntry entry)
         {
             return Reflect.Get<UIButton>(entry, QueueEntryButtonField);
-        }
-
-        private string Localize(string key, string fallback, params object[] args)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, fallback, args));
         }
 
         private static bool IsButtonVisible(UIButton button)
@@ -1142,11 +1137,6 @@ namespace SongsOfConquestAccess.Adapters
 
             CanvasGroup canvasGroup = gameObject.GetComponent<CanvasGroup>();
             return canvasGroup == null || canvasGroup.alpha > 0.01f;
-        }
-
-        private static string GetText(UITextMesh text)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         /// <summary>
@@ -1210,7 +1200,7 @@ namespace SongsOfConquestAccess.Adapters
                         return string.Empty;
                     }
 
-                    return _adapter.Localize(spell.NameKey, "Spell");
+                    return SpokenText.Get(_adapter._localization, spell.NameKey, "Spell");
                 }
             }
 

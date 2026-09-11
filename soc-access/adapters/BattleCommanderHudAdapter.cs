@@ -191,7 +191,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetEssenceLabel(CombatHudSide side, EssenceType essenceType)
         {
-            return Localize("Units/Types/" + essenceType, FormatEnumName(essenceType.ToString()))
+            return SpokenText.Get(_localization, "Units/Types/" + essenceType, FormatEnumName(essenceType.ToString()))
                 + ", "
                 + GetEssenceAmount(side, essenceType);
         }
@@ -363,7 +363,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            parts.Add(Localize("Units/Types/" + essenceType, FormatEnumName(essenceType.ToString())) + " " + amount);
+            parts.Add(SpokenText.Get(_localization, "Units/Types/" + essenceType, FormatEnumName(essenceType.ToString())) + " " + amount);
         }
 
         private Component GetEssenceTooltipComponent(CombatHudSide side, EssenceType essenceType)
@@ -395,11 +395,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return Reflect.Get<Component>(container, field);
-        }
-
-        private string Localize(string key, string fallback)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, fallback));
         }
 
         private static string FormatEnumName(string name)

@@ -87,7 +87,7 @@ namespace SongsOfConquestAccess.Adapters
         /// that says which faction's research is showing.</summary>
         public string HeaderText
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, HeaderTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, HeaderTextField)); }
         }
 
         /// <summary>The tutorial button the menu draws at the top left.</summary>
@@ -137,7 +137,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 int factionIndex = i + 1;
                 IFactionDefinition faction = factionLookup != null ? factionLookup.GetFaction(factionIndex) : null;
-                string label = Localize(faction != null ? faction.NameKey : null, string.Empty);
+                string label = SpokenText.Get(GetLocalization(), faction != null ? faction.NameKey : null, string.Empty);
                 if (string.IsNullOrWhiteSpace(label))
                 {
                     continue;
@@ -224,7 +224,7 @@ namespace SongsOfConquestAccess.Adapters
                         : null;
                     UIButton button = stackButton.Button;
                     int itemIndex = j;
-                    string name = Localize(stack != null ? stack.NameKey : null, "Research " + (itemIndex + 1));
+                    string name = SpokenText.Get(GetLocalization(), stack != null ? stack.NameKey : null, "Research " + (itemIndex + 1));
                     researchItems.Add(new ResearchItem(
                         name,
                         GetOwnedTier(stack, owned),
@@ -312,11 +312,6 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Select(button as Component);
         }
 
-        private static string GetText(UITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
         private string GetBuildingLabel(ResearchMenuBuildingTabButton tab, int index)
         {
             UITextMesh name = Reflect.Get<UITextMesh>(tab, BuildingTabNameField);
@@ -386,7 +381,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetTierHeader()
         {
-            return Localize("Adventure/KingdomInformationHUD/ResearchTierHeader", "Tier");
+            return SpokenText.Get(GetLocalization(), "Adventure/KingdomInformationHUD/ResearchTierHeader", "Tier");
         }
 
         private Tooltip BuildResearchTooltip(UIButton button)
@@ -470,12 +465,6 @@ namespace SongsOfConquestAccess.Adapters
         private ILocalizationHandler GetLocalization()
         {
             return Reflect.Get<ILocalizationHandler>(_menu, LocalizationField);
-        }
-
-        private string Localize(string key, string fallback)
-        {
-            ILocalizationHandler localization = GetLocalization();
-            return SpokenLines.Clean(GameText.Get(localization, key, fallback ?? string.Empty));
         }
 
         private static bool IsVisible(Component component)

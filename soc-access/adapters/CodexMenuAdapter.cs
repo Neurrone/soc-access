@@ -104,7 +104,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < providers.Length; i++)
             {
                 ICodexProvider provider = providers[i];
-                string label = GetLocalizedText(provider != null ? provider.NameKey : null, provider != null ? provider.NameKey : "Tab " + (i + 1));
+                string label = SpokenText.Get(_localization, provider != null ? provider.NameKey : null, provider != null ? provider.NameKey : "Tab " + (i + 1));
                 items.Add(new TabItem(label, i, i == activeIndex));
             }
 
@@ -338,7 +338,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string TutorialsToggleLabel
         {
-            get { return GetLocalizedText("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
+            get { return SpokenText.Get(_localization, "Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
         }
 
         /// <summary>The tutorials toggle the footer draws, while it draws one.</summary>
@@ -360,7 +360,7 @@ namespace SongsOfConquestAccess.Adapters
         /// 2026-09-06).</summary>
         public string ResetButtonLabel
         {
-            get { return GetLocalizedText("Options/ResetTutorials", string.Empty); }
+            get { return SpokenText.Get(_localization, "Options/ResetTutorials", string.Empty); }
         }
 
         /// <summary>The window's close button, while it is drawn (the game hides it in gamepad
@@ -536,11 +536,6 @@ namespace SongsOfConquestAccess.Adapters
             return index >= 0 && index < entries.Count ? entries[index] : null;
         }
 
-        private string GetLocalizedText(string key, string fallback, params object[] parameters)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, fallback, parameters));
-        }
-
         private static bool IsHeadingTextMesh(UITextMesh textMesh)
         {
             if (textMesh == null)
@@ -710,7 +705,7 @@ namespace SongsOfConquestAccess.Adapters
                 amounts.Add(new EssenceAmount(GetEssenceAmountText(allEssences[i].Item1, allEssences[i].Item2)));
             }
 
-            items.Add(new CodexContentItem(GetLocalizedText("Units/Types/EssenceIntro", "Essence"), amounts, sourceTransform));
+            items.Add(new CodexContentItem(SpokenText.Get(_localization, "Units/Types/EssenceIntro", "Essence"), amounts, sourceTransform));
         }
 
         private static void AddUnitInfoSectionItems(List<CodexContentItem> items, UnitCodexContentInfoSection section)
@@ -738,7 +733,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            string label = GetLocalizedText(labelKey, fallbackLabel);
+            string label = SpokenText.Get(_localization, labelKey, fallbackLabel);
             RectTransform sourceTransform = ((Component)valueText).GetComponent<RectTransform>();
             items.Add(new CodexContentItem(CodexContentItemKind.Text, label + ": " + value, sourceTransform));
         }
@@ -821,7 +816,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetEssenceName(EssenceType essenceType)
         {
-            return GetLocalizedText("Units/Types/" + essenceType, FormatEnumName(essenceType.ToString()));
+            return SpokenText.Get(_localization, "Units/Types/" + essenceType, FormatEnumName(essenceType.ToString()));
         }
 
         private string GetEssenceAmountText(EssenceType essenceType, int count)
@@ -832,7 +827,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             string essenceName = GetEssenceName(essenceType);
-            return GetLocalizedText("Units/Types/" + essenceType + "Multiple", count + " " + essenceName, count);
+            return SpokenText.Get(_localization, "Units/Types/" + essenceType + "Multiple", count + " " + essenceName, count);
         }
 
         private static string FormatEnumName(string value)

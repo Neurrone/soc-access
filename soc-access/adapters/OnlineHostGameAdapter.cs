@@ -43,7 +43,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(_settings != null ? _settings.HostGameHeader : null); }
+            get { return UITextMeshTextUtility.GetEffectiveText(_settings != null ? _settings.HostGameHeader : null); }
         }
 
         /// <summary>The paragraphs of the line the page draws under its heading, kept apart rather
@@ -61,7 +61,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string InviteOnlyLabel
         {
-            get { return GetText(_settings != null ? _settings.HostGameToggleLabel : null); }
+            get { return UITextMeshTextUtility.GetEffectiveText(_settings != null ? _settings.HostGameToggleLabel : null); }
         }
 
         public IUITextMeshInputField InputField
@@ -153,11 +153,6 @@ namespace SongsOfConquestAccess.Adapters
             return button != null
                 ? new StandardMenuButtonAdapter(button, () => MenuButtonAdapterBase.IsButtonVisible(button), () => NativeSelectionUtility.Click(button))
                 : null;
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return UITextMeshTextUtility.GetEffectiveText(textMesh);
         }
 
         private static bool IsLoadedMainMenuScene(MainMenuSceneType sceneType)

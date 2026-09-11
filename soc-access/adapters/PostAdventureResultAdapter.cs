@@ -81,7 +81,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string title = GetText(Reflect.Get<UITextMesh>(_menu, DescriptionTitleField));
+                string title = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, DescriptionTitleField));
                 return !string.IsNullOrWhiteSpace(title) ? title : ModText.Get(ModStrings.Screens.Objectives);
             }
         }
@@ -91,7 +91,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 UITextMesh description = Reflect.Get<UITextMesh>(_menu, DescriptionField);
-                return IsComponentVisible(description) && !string.IsNullOrWhiteSpace(GetText(description));
+                return IsComponentVisible(description) && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(description));
             }
         }
 
@@ -257,7 +257,7 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetObjectiveText(PostAdventureMenuObjectiveEntry entry)
         {
             UITextMesh text = Reflect.Get<UITextMesh>(entry, ObjectiveTextField);
-            return GetText(text);
+            return UITextMeshTextUtility.Spoken(text);
         }
 
         // Which mesh under a canvas says something is fixed once the page is drawn, so the walk
@@ -282,7 +282,7 @@ namespace SongsOfConquestAccess.Adapters
             UITextMesh kept;
             if (_firstTexts.TryGetValue(canvasGroup, out kept) && kept != null)
             {
-                string keptText = GetText(kept);
+                string keptText = UITextMeshTextUtility.Spoken(kept);
                 if (!string.IsNullOrWhiteSpace(keptText))
                 {
                     return keptText;
@@ -292,7 +292,7 @@ namespace SongsOfConquestAccess.Adapters
             UITextMesh[] texts = _canvasTexts.Under(canvasGroup);
             for (int i = 0; i < texts.Length; i++)
             {
-                string candidate = GetText(texts[i]);
+                string candidate = UITextMeshTextUtility.Spoken(texts[i]);
                 if (!string.IsNullOrWhiteSpace(candidate))
                 {
                     _firstTexts[canvasGroup] = texts[i];
@@ -302,11 +302,6 @@ namespace SongsOfConquestAccess.Adapters
 
             _firstTexts[canvasGroup] = null;
             return string.Empty;
-        }
-
-        private static string GetText(UITextMesh text)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         private static bool IsCanvasActive(CanvasGroup canvasGroup)

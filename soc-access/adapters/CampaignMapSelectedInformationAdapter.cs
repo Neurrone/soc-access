@@ -126,7 +126,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetMissionCounter()
         {
-            return GetText(_settings != null ? _settings.MissionCounterText : null);
+            return UITextMeshTextUtility.Spoken(_settings != null ? _settings.MissionCounterText : null);
         }
 
         public string GetMissionCounter(string displayName)
@@ -147,7 +147,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return GetText(_settings.CompletedText);
+            return UITextMeshTextUtility.Spoken(_settings.CompletedText);
         }
 
         public string GetWinConditions()
@@ -241,11 +241,6 @@ namespace SongsOfConquestAccess.Adapters
             return _settings != null && _settings.MainTransform != null
                 ? ((Component)_settings.MainTransform).gameObject
                 : null;
-        }
-
-        private static string GetText(UITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static bool IsGameObjectActive(GameObject gameObject)

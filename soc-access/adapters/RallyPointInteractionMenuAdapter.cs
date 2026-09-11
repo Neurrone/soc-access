@@ -63,7 +63,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, BuildingNameField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, BuildingNameField)); }
         }
 
         /// <summary>The name of the place the recruits are coming from, which the menu writes in a
@@ -71,7 +71,7 @@ namespace SongsOfConquestAccess.Adapters
         /// them.</summary>
         public string SelectedSourceName
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, SelectedTownNameField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, SelectedTownNameField)); }
         }
 
         public Component SelectedSourceLine
@@ -152,11 +152,6 @@ namespace SongsOfConquestAccess.Adapters
             return Reflect.Get<PurchaseTroopsSubMenu>(_menu, PurchaseTroopsSubMenuField);
         }
 
-        private string GetLocalizedText(string key)
-        {
-            return SpokenLines.Clean(GameText.Get(_localization, key, string.Empty));
-        }
-
         private string GetTownName(IMapEntity entity)
         {
             if (entity == null)
@@ -180,11 +175,6 @@ namespace SongsOfConquestAccess.Adapters
 
             string name = _localization != null ? _localization.GetText(entity.NameKey) : entity.NameKey;
             return SpokenLines.Clean(string.IsNullOrWhiteSpace(name) || name == entity.NameKey ? entity.NameKey : name);
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static bool IsVisible(Component component)
@@ -215,7 +205,10 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     if (_entry == null || _entry.MapEntity == null)
                     {
-                        return _adapter.GetLocalizedText("Adventure/PurchaseTroopsMenu/RallyPoint/PurchaseFromAll");
+                        return SpokenText.Get(
+                            _adapter._localization,
+                            "Adventure/PurchaseTroopsMenu/RallyPoint/PurchaseFromAll",
+                            string.Empty);
                     }
 
                     return _adapter.GetTownName(_entry != null ? _entry.MapEntity : null);
@@ -224,7 +217,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Level
             {
-                get { return GetText(Reflect.Get<UITextMesh>(_entry, EntryLevelField)); }
+                get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, EntryLevelField)); }
             }
 
             public bool IsLevelVisible

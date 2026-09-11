@@ -24,7 +24,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(Settings != null ? Settings.Title : null); }
+            get { return UITextMeshTextUtility.Spoken(Settings != null ? Settings.Title : null); }
         }
 
         public string Description
@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string FollowTitle
         {
-            get { return GetText(Settings != null ? Settings.FollowTitle : null); }
+            get { return UITextMeshTextUtility.Spoken(Settings != null ? Settings.FollowTitle : null); }
         }
 
         public bool HasConfirm
@@ -209,11 +209,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsGameObjectActive(GameObject gameObject)
         {
             return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetButtonText(IUIButton button)

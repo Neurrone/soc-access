@@ -67,12 +67,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string SendHeader
         {
-            get { return GetText(Reflect.Get<IUITextMesh>(_popup, SendTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<IUITextMesh>(_popup, SendTextField)); }
         }
 
         public string RequestHeader
         {
-            get { return GetText(Reflect.Get<IUITextMesh>(_popup, RequestTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<IUITextMesh>(_popup, RequestTextField)); }
         }
 
         public bool IsRequestMenuVisible()
@@ -147,11 +147,6 @@ namespace SongsOfConquestAccess.Adapters
         private string GetResourceName(ResourceType type)
         {
             return SpokenLines.Clean(GameText.Get(_localization, "Common/Resource/" + type, string.Empty));
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static bool IsLiveSceneObject(GameObject gameObject)

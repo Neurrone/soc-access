@@ -53,7 +53,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, BuildingNameField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, BuildingNameField)); }
         }
 
         public string WielderName
@@ -236,11 +236,6 @@ namespace SongsOfConquestAccess.Adapters
                 ? InteractingCommanderIdField.GetValue(_menu)
                 : null;
             return value is int ? (int)value : -1;
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
     }
 }

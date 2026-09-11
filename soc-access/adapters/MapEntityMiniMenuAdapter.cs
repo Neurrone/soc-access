@@ -71,13 +71,13 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The entity's type name ("Small Settlement"), drawn BELOW the custom name.</summary>
         public string EntityName
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, NameTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, NameTextField)); }
         }
 
         /// <summary>The entity's own name ("Crowpoint"), drawn ABOVE the type name.</summary>
         public string CustomName
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, CustomNameTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, CustomNameTextField)); }
         }
 
         public bool IsCustomNameVisible
@@ -94,7 +94,7 @@ namespace SongsOfConquestAccess.Adapters
         /// than collapsed.</summary>
         public IList<string> BlueprintDescriptionLines
         {
-            get { return GetLines(Reflect.Get<UITextMesh>(_menu, DescriptionTextField)); }
+            get { return UITextMeshTextUtility.SpokenLines(Reflect.Get<UITextMesh>(_menu, DescriptionTextField)); }
         }
 
         /// <summary>The text the blueprint description is drawn as.</summary>
@@ -162,7 +162,7 @@ namespace SongsOfConquestAccess.Adapters
                 int used;
                 int total;
                 GetUpgradeCounts(out used, out total);
-                return GetLocalizedText("Adventure/MapEntityHUD/Upgrades", "Tier:") + " " + used + " / " + total;
+                return SpokenText.Get(Localization, "Adventure/MapEntityHUD/Upgrades", "Tier:") + " " + used + " / " + total;
             }
         }
 
@@ -189,7 +189,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string SiegeState
         {
-            get { return GetText(Reflect.Get<UITextMesh>(_menu, SiegeStateDescriptionField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, SiegeStateDescriptionField)); }
         }
 
         /// <summary>The text the siege state is drawn as.</summary>
@@ -296,7 +296,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 UITextMesh text = Reflect.Get<UITextMesh>(entry, DescriptionEntryTextField);
                 UIImage icon = Reflect.Get<UIImage>(entry, DescriptionEntryIconField);
-                IList<string> label = GetLines(text);
+                IList<string> label = UITextMeshTextUtility.SpokenLines(text);
                 if (label.Count == 0)
                 {
                     continue;
@@ -391,12 +391,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return Reflect.Get<ILocalizationHandler>(_menu, LocalizationField); }
         }
 
-        private string GetLocalizedText(string key, string fallback)
-        {
-            ILocalizationHandler localization = Localization;
-            return SpokenLines.Clean(GameText.Get(localization, key, fallback ?? string.Empty));
-        }
-
         private void GetUpgradeCounts(out int used, out int total)
         {
             used = 0;
@@ -470,15 +464,15 @@ namespace SongsOfConquestAccess.Adapters
             switch (essenceType)
             {
                 case EssenceType.Order:
-                    return GetLocalizedText("Units/Types/Order", "Order");
+                    return SpokenText.Get(Localization, "Units/Types/Order", "Order");
                 case EssenceType.Creation:
-                    return GetLocalizedText("Units/Types/Creation", "Creation");
+                    return SpokenText.Get(Localization, "Units/Types/Creation", "Creation");
                 case EssenceType.Chaos:
-                    return GetLocalizedText("Units/Types/Chaos", "Chaos");
+                    return SpokenText.Get(Localization, "Units/Types/Chaos", "Chaos");
                 case EssenceType.Arcana:
-                    return GetLocalizedText("Units/Types/Arcana", "Arcana");
+                    return SpokenText.Get(Localization, "Units/Types/Arcana", "Arcana");
                 case EssenceType.Destruction:
-                    return GetLocalizedText("Units/Types/Destruction", "Destruction");
+                    return SpokenText.Get(Localization, "Units/Types/Destruction", "Destruction");
                 default:
                     return SpokenLines.Clean(essenceType.ToString());
             }
@@ -512,17 +506,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool HasTooltipLines(Tooltip tooltip)
         {
             return tooltip != null && tooltip.TextLines != null && tooltip.TextLines.Count > 0;
-        }
-
-        private static string GetText(UITextMesh text)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
-        }
-
-        // A text mesh the game may have written more than one paragraph into.
-        private static IList<string> GetLines(UITextMesh text)
-        {
-            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(text) });
         }
 
         private static bool IsActive(Component component)

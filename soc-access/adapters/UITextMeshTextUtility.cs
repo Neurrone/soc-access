@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using HarmonyLib;
 using SongsOfConquest.Client;
@@ -28,6 +29,20 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return textMesh != null ? textMesh.Text ?? string.Empty : string.Empty;
+        }
+
+        /// <summary>What the text says, ready to be spoken: the effective text split on its line
+        /// breaks and stripped of the game's rich-text tags, joined back with newlines.</summary>
+        public static string Spoken(IUITextMesh textMesh)
+        {
+            return SongsOfConquestAccess.UI.SpokenLines.Clean(GetEffectiveText(textMesh));
+        }
+
+        /// <summary>The lines <see cref="Spoken"/> joins, for a text the game may have written more
+        /// than one paragraph into.</summary>
+        public static IList<string> SpokenLines(IUITextMesh textMesh)
+        {
+            return SongsOfConquestAccess.UI.SpokenLines.Of(new[] { GetEffectiveText(textMesh) });
         }
 
         public static string GetEffectiveButtonText(IUIButton button)

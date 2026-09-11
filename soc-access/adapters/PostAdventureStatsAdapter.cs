@@ -40,22 +40,22 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Header
         {
-            get { return GetText(Settings != null ? Settings.HeaderText : null); }
+            get { return UITextMeshTextUtility.Spoken(Settings != null ? Settings.HeaderText : null); }
         }
 
         public string GraphTitle
         {
-            get { return GetText(Reflect.Get<UITextMesh>(GraphView, GraphTitleTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GraphView, GraphTitleTextField)); }
         }
 
         public string TotalRounds
         {
-            get { return GetText(Reflect.Get<UITextMesh>(GraphView, TotalRoundsTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GraphView, TotalRoundsTextField)); }
         }
 
         public string TotalPlayTime
         {
-            get { return GetText(Reflect.Get<UITextMesh>(GraphView, TotalPlayTimeTextField)); }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GraphView, TotalPlayTimeTextField)); }
         }
 
         public bool IsPresent()
@@ -351,7 +351,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetTeamLabel(PostAdventureStatsMenuTeamEntry entry)
         {
-            return GetText(Reflect.Get<UITextMesh>(entry, TeamNameTextField));
+            return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(entry, TeamNameTextField));
         }
 
         private static UIToggle GetTeamToggle(PostAdventureStatsMenuTeamEntry entry)
@@ -471,11 +471,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return null;
-        }
-
-        private static string GetText(UITextMesh text)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         private static bool IsComponentVisible(Component component)

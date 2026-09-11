@@ -39,7 +39,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(_settings != null ? _settings.HeaderText : null); }
+            get { return UITextMeshTextUtility.Spoken(_settings != null ? _settings.HeaderText : null); }
         }
 
         public string Body
@@ -169,7 +169,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < pool.ActiveItems.Count; i++)
             {
                 IWorldMenuIconTextEntry entry = pool.ActiveItems[i];
-                string amount = NormalizeCostText(GetText(entry != null ? entry.TypeTextMesh : null));
+                string amount = NormalizeCostText(UITextMeshTextUtility.Spoken(entry != null ? entry.TypeTextMesh : null));
                 if (!string.IsNullOrWhiteSpace(amount))
                 {
                     labels.Add(WithResourceName(entry, amount));
@@ -256,11 +256,6 @@ namespace SongsOfConquestAccess.Adapters
                 System.Text.RegularExpressions.Regex.Match(amount ?? string.Empty, @"\d+");
             int value;
             return match.Success && int.TryParse(match.Value, out value) ? value : 0;
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetButtonText(UIButton button)

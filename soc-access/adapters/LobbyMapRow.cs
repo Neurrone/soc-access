@@ -143,7 +143,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpokenLines.Clean(GameText.Get(localization, key, fallback ?? string.Empty));
+            return SpokenText.Get(localization, key, fallback);
         }
 
         public static bool IsVisible(Component component)

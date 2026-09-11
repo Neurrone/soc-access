@@ -119,7 +119,9 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetText(AccessTools.FieldRef<CampaignButton, UITextMesh> fieldRef)
         {
-            return _campaignButton != null ? GetText(fieldRef(_campaignButton)) : string.Empty;
+            return _campaignButton != null
+                ? UITextMeshTextUtility.Spoken(fieldRef(_campaignButton))
+                : string.Empty;
         }
 
         private ICampaignDefinition GetDefinition()
@@ -140,11 +142,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetLocalizedText(string localizationKey, string fallback)
         {
             return CampaignProgress.GetLocalizedText(localizationKey, fallback);
-        }
-
-        private static string GetText(UITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         // The mesh's text as the game wrote it, line breaks and all.

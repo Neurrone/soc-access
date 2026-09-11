@@ -53,12 +53,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(_settings != null ? _settings.HeaderText : null); }
+            get { return UITextMeshTextUtility.Spoken(_settings != null ? _settings.HeaderText : null); }
         }
 
         public string Body
         {
-            get { return GetText(_settings != null ? _settings.BodyText : null); }
+            get { return UITextMeshTextUtility.Spoken(_settings != null ? _settings.BodyText : null); }
         }
 
         public string ConfirmLabel
@@ -228,7 +228,7 @@ namespace SongsOfConquestAccess.Adapters
                 return artifactName;
             }
 
-            return NormalizeChoiceText(GetText(button != null ? button.TypeTextMesh : null));
+            return NormalizeChoiceText(UITextMeshTextUtility.Spoken(button != null ? button.TypeTextMesh : null));
         }
 
         private Tooltip GetChoiceTooltip(IWorldMapChoiceButton button)
@@ -292,11 +292,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return buttons;
-        }
-
-        private static string GetText(IUITextMesh textMesh)
-        {
-            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetButtonText(IUIButton button)
