@@ -1151,18 +1151,33 @@ namespace SongsOfConquestAccess.Adapters
             return GetInventorySlotName(slot.ToString());
         }
 
+        /// <summary>The game's own name for a slot. The localization answers a key it does not hold
+        /// with the key itself, so an echo is no name at all and the slot's own words are said
+        /// instead - as the market's and the trade's copies of this already did.</summary>
         private string GetInventorySlotName(string slotName)
         {
-            if (_localization != null)
+            string key = "InventorySlots/" + slotName;
+            string text = _localization != null ? _localization.GetText(key) : string.Empty;
+            return string.IsNullOrWhiteSpace(text) || text == key
+                ? FormatSlotName(slotName)
+                : SpokenLines.Clean(text);
+        }
+
+        private static string FormatSlotName(string value)
+        {
+            string formatted = string.Empty;
+            for (int i = 0; i < value.Length; i++)
             {
-                string text = _localization.GetText("InventorySlots/" + slotName);
-                if (!string.IsNullOrWhiteSpace(text))
+                char c = value[i];
+                if (i > 0 && char.IsUpper(c))
                 {
-                    return SpokenLines.Clean(text);
+                    formatted += " ";
                 }
+
+                formatted += char.ToLowerInvariant(c);
             }
 
-            return slotName;
+            return formatted;
         }
 
         private static T GetField<T>(object owner, FieldInfo field) where T : class

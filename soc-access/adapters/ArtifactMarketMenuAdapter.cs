@@ -1078,16 +1078,19 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetInventorySlotName(InventorySlot slot)
         {
-            string text = _localization != null ? _localization.GetText("InventorySlots/" + slot) : string.Empty;
-            return string.IsNullOrWhiteSpace(text) || text == "InventorySlots/" + slot
-                ? FormatSlotName(slot)
-                : SpokenLines.Clean(text);
+            return GetInventorySlotName(slot.ToString());
         }
 
+        /// <summary>The game's own name for a slot. The localization answers a key it does not hold
+        /// with the key itself, so an echo is no name at all and the slot's own words are said
+        /// instead.</summary>
         private string GetInventorySlotName(string slotName)
         {
-            string text = _localization != null ? _localization.GetText("InventorySlots/" + slotName) : string.Empty;
-            return string.IsNullOrWhiteSpace(text) ? slotName : SpokenLines.Clean(text);
+            string key = "InventorySlots/" + slotName;
+            string text = _localization != null ? _localization.GetText(key) : string.Empty;
+            return string.IsNullOrWhiteSpace(text) || text == key
+                ? FormatSlotName(slotName)
+                : SpokenLines.Clean(text);
         }
 
         private string GetInventoryLabel()
@@ -1171,9 +1174,8 @@ namespace SongsOfConquestAccess.Adapters
             return leftIndex.CompareTo(rightIndex);
         }
 
-        private static string FormatSlotName(InventorySlot slot)
+        private static string FormatSlotName(string value)
         {
-            string value = slot.ToString();
             string formatted = string.Empty;
             for (int i = 0; i < value.Length; i++)
             {
