@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using System.Collections.Generic;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
@@ -346,6 +346,49 @@ namespace SongsOfConquestAccess.Adapters
         public static void Reset()
         {
             TextsByButton.Clear();
+            _lastButton = null;
+            _lastTexts = null;
+            _lastFrame = -1;
+            _sweepAt = SweepStep;
+        }
+
+        // The button whose set was last handed out, and the frame it was handed out on. A label read
+        // asks for the text meshes and the Unity texts separately, and a standard label asks up to
+        // five times, so without this every one of those re-walked the kept set to check it was still
+        // good (AGENTS.md, Performance). One frame is as long as it is trusted, which is the same
+        // contract FrameSweep keeps.
+        private static UIButton _lastButton;
+        private static ButtonTexts _lastTexts;
+        private static int _lastFrame = -1;
+
+        // A button the game destroys is never asked about again, so its entry would sit in the table
+        // for the rest of the session. Dead keys are swept out whenever the table has grown by
+        // another SweepStep entries, which costs one walk per that many new buttons.
+        private const int SweepStep = 64;
+        private static int _sweepAt = SweepStep;
+
+        private static void SweepDestroyed()
+        {
+            if (TextsByButton.Count < _sweepAt)
+            {
+                return;
+            }
+
+            List<UIButton> destroyed = new List<UIButton>();
+            foreach (KeyValuePair<UIButton, ButtonTexts> pair in TextsByButton)
+            {
+                if (pair.Key == null)
+                {
+                    destroyed.Add(pair.Key);
+                }
+            }
+
+            for (int i = 0; i < destroyed.Count; i++)
+            {
+                TextsByButton.Remove(destroyed[i]);
+            }
+
+            _sweepAt = TextsByButton.Count + SweepStep;
         }
 
         private static UITextMesh[] TextMeshesOf(UIButton button)
@@ -367,10 +410,19 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
+            int frame = Time.frameCount;
+            if (_lastFrame == frame && ReferenceEquals(button, _lastButton))
+            {
+                return _lastTexts;
+            }
+
             Component root = button;
             ButtonTexts texts;
             if (TextsByButton.TryGetValue(button, out texts) && StillDescribes(texts, root))
             {
+                _lastButton = button;
+                _lastTexts = texts;
+                _lastFrame = frame;
                 return texts;
             }
 
@@ -383,7 +435,11 @@ namespace SongsOfConquestAccess.Adapters
                 Texts = root.GetComponentsInChildren<Text>(includeInactive: true),
                 ChildCount = root.transform.childCount,
             };
+            SweepDestroyed();
             TextsByButton[button] = texts;
+            _lastButton = button;
+            _lastTexts = texts;
+            _lastFrame = frame;
             return texts;
         }
 
