@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.InputManagement;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
@@ -88,8 +89,9 @@ namespace SongsOfConquestAccess.Input
             {
                 all = manager.GetAllOverrideableActions();
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                LogOnce.Warn("ModKeybindConflicts: asking the game for its overrideable actions", exception);
                 return null;
             }
 

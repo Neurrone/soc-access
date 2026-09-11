@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using SongsOfConquestAccess.Adapters;
 
 namespace SongsOfConquestAccess.Input
 {
@@ -28,8 +29,9 @@ namespace SongsOfConquestAccess.Input
             {
                 return (GetAsyncKeyState(VkReturn) & 0x8000) != 0;
             }
-            catch (System.Exception)
+            catch (System.Exception exception)
             {
+                LogOnce.Warn("OsKeys.EnterIsDown: asking Windows for the Enter key", exception);
                 return false;
             }
         }
