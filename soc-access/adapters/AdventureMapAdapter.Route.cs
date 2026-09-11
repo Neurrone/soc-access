@@ -49,6 +49,17 @@ namespace SongsOfConquestAccess.Adapters
     /// </summary>
     public sealed partial class AdventureMapAdapter
     {
+        // The selected wielder's route preview for one frame, and the game-read values it is the
+        // answer to. See BuildRoutePreviewInfo.
+        private RoutePreviewInfo _routePreview;
+        private int _routePreviewFrame = -1;
+        private int _routePreviewCommanderId;
+        private int _routePreviewTeamId;
+        private Vector2Int _routePreviewOrigin;
+        private Vector2Int _routePreviewDestination;
+        private float _routePreviewMovesLeft;
+        private bool _routePreviewSecondaryHeld;
+
         private AdventureMapTile.PathIndicatorInfo BuildPathIndicatorForTile(Vector2Int position, ICommanderState selectedCommander, int localTeamId)
         {
             if (selectedCommander == null
@@ -98,20 +109,62 @@ namespace SongsOfConquestAccess.Adapters
             return null;
         }
 
+        /// <summary>
+        /// The route preview for the selected wielder's planned path, kept for one frame.
+        ///
+        /// Building it runs the game's <c>PointsInPath</c> and <c>GetClosestReachablePoint</c> - two
+        /// whole-path searches - and <c>GetTile</c> asks for it once per tile it builds, so a
+        /// scanner snapshot or a skip-navigator sweep paid thousands of searches for one answer that
+        /// cannot differ between them. The key is everything the build reads from the game: the
+        /// commander's id, tile and movement left, the destination it is walking to, the team,
+        /// whether the secondary button is held, and <c>Time.frameCount</c>, which closes the key
+        /// because within one frame nothing the game owns has moved. Every part is read from the
+        /// game on the call, so a step, a new destination, a selection change and a hot reload all
+        /// miss on their own with no hook to tell them to (AGENTS.md, "Screen Resolution"). A miss
+        /// is cached too, so a held button or an unwalkable destination costs one search and not one
+        /// per tile.
+        /// </summary>
         private RoutePreviewInfo BuildRoutePreviewInfo(ICommanderState selectedCommander, int localTeamId)
         {
-            if (IsSecondaryInputHolding())
+            int frame = Time.frameCount;
+            int commanderId = selectedCommander.Id;
+            Vector2Int origin = selectedCommander.Position;
+            Vector2Int destination = selectedCommander.Destination.Destination;
+            float movesLeft = selectedCommander.MovesLeft;
+            bool secondaryHeld = IsSecondaryInputHolding();
+            if (_routePreviewFrame == frame
+                && _routePreviewCommanderId == commanderId
+                && _routePreviewTeamId == localTeamId
+                && _routePreviewOrigin == origin
+                && _routePreviewDestination == destination
+                && _routePreviewMovesLeft == movesLeft
+                && _routePreviewSecondaryHeld == secondaryHeld)
             {
-                return null;
+                return _routePreview;
             }
 
+            RoutePreviewInfo preview = secondaryHeld
+                ? null
+                : BuildRoutePreview(selectedCommander, localTeamId, destination);
+            _routePreview = preview;
+            _routePreviewFrame = frame;
+            _routePreviewCommanderId = commanderId;
+            _routePreviewTeamId = localTeamId;
+            _routePreviewOrigin = origin;
+            _routePreviewDestination = destination;
+            _routePreviewMovesLeft = movesLeft;
+            _routePreviewSecondaryHeld = secondaryHeld;
+            return preview;
+        }
+
+        private RoutePreviewInfo BuildRoutePreview(ICommanderState selectedCommander, int localTeamId, Vector2Int destination)
+        {
             WielderPath path;
             if (!WielderPath.TryBuild(_facade, selectedCommander, localTeamId, out path) || path.Nodes.Length < 2)
             {
                 return null;
             }
 
-            Vector2Int destination = selectedCommander.Destination.Destination;
             PathNode[] drawPath = path.Nodes;
             PathNode reachablePoint = path.ReachablePoint;
 
