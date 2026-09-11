@@ -94,11 +94,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public string GamesLabel
-        {
-            get { return ModText.Get(ModStrings.Common.ListSeparator, Title, ModText.Get(ModStrings.UI.RoleGrid)); }
-        }
-
         public string RegionLabel
         {
             get { return GetDropdownLabel(_settings != null ? _settings.RegionDropdown : null); }

@@ -89,11 +89,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalizedText("Lobby/ChallengeMapMenu/Title", "Challenge Maps"); }
         }
 
-        public string MapsLabel
-        {
-            get { return ModText.Get(ModStrings.Common.ListSeparator, Title, ModText.Get(ModStrings.UI.RoleGrid)); }
-        }
-
         public string NameColumnLabel
         {
             get { return GetLocalizedText("Common/Name", "Name"); }

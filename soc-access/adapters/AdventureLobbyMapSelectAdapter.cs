@@ -180,11 +180,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return _title ?? (_title = GetLocalizedText("Lobby/MapSelect/Title", "Select Map")); }
         }
 
-        public string MapsLabel
-        {
-            get { return ModText.Get(ModStrings.Common.ListSeparator, Title, ModText.Get(ModStrings.UI.RoleGrid)); }
-        }
-
         /// <summary>The map name the preview panel draws beside the table, which the game sets from
         /// the selected map's metadata rather than from the entry's own row text.</summary>
         public string PreviewTitle
