@@ -174,8 +174,10 @@ namespace SongsOfConquestAccess.Localization
                     return Path.Combine(Paths.ConfigPath, ConfigDirectoryName, TranslationsDirectoryName);
                 }
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                SocAccessMod.Instance?.LogWarning(
+                    "Failed to resolve the config translations directory: " + exception.Message);
             }
 
             return null;

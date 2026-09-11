@@ -3811,3 +3811,7 @@ msgctxt "Scanner.CustomCategoryEmpty"
 msgid "Custom category {0} is empty"
 msgstr "La catégorie personnalisée {0} est vide"
 
+#. UI.ModReady
+msgctxt "UI.ModReady"
+msgid "Songs of Conquest Access v{0} ready"
+msgstr "Songs of Conquest Access v{0} prêt"

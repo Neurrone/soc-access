@@ -93,8 +93,13 @@ namespace SongsOfConquestAccess
             // game's own input manager; a Stop step drops the subscription.
             ModKeybindConflicts.Start();
             // Before the ready line, so /speech carries it: the routes install the speech tap.
-            _modRoutes = new ModRoutes(_host, _screenManager, _inputRouter, this);
-            _modRoutes.Register();
+            // Only when the server is actually listening: a player's install would otherwise pay
+            // for two speech rings that nothing can read, as DynamicAssemblyTypesPatches does.
+            if (DevServerUp)
+            {
+                _modRoutes = new ModRoutes(_host, _screenManager, _inputRouter, this);
+                _modRoutes.Register();
+            }
             _harmony = new Harmony(PluginGuid + "." + Guid.NewGuid());
             try
             {
@@ -121,7 +126,9 @@ namespace SongsOfConquestAccess
             Step("dev routes", () => _modRoutes?.Unregister());
             _modRoutes = null;
             Step("update handler", () => _host.SetUpdateHandler(null));
-            Step("routes", _host.UnregisterAllModRoutes);
+            // The route table is not dropped here: the loader drops it itself the moment Stop
+            // returns, on every path that reaches Stop at all, and a mod that threw halfway must
+            // not leave routes standing either.
             Step("coroutines", _host.StopAllCoroutines);
             Step("mod options entries", Adapters.ModOptionsEntries.Remove);
             Step("mod dialogs", UI.ModDialog.CloseAll);
@@ -403,7 +410,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            string message = PluginName + " v" + ModEntry.ModVersion + " ready";
+            string message = ModText.Get(ModStrings.UI.ModReady, ModEntry.ModVersion);
             SpeechPipeline.Output(new SpeechRequest(message, interrupt: true));
             _announcedReady = true;
             Logger.LogInfo(message);

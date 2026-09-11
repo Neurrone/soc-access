@@ -43,11 +43,6 @@ namespace SongsOfConquestAccess.Input
             }
         }
 
-        public override bool IsModified
-        {
-            get { return Ctrl || Shift || Alt; }
-        }
-
         public override bool MatchesKeyDown(
             UnityEngine.InputSystem.Controls.KeyControl keyControl,
             AccessibilityInputRouter.KeyboardStateSnapshot state,

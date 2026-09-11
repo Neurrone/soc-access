@@ -300,11 +300,6 @@ namespace SongsOfConquestAccess
             }
         }
 
-        private static Vector2Int? WorldPositionToTile(object converter, Vector3 worldPosition)
-        {
-            return StoryCameraFocusResolver.TryWorldToTile(converter, worldPosition);
-        }
-
         private sealed class ConversationTargets
         {
             public ConversationTargets(List<StoryCameraFocusTarget> targets)

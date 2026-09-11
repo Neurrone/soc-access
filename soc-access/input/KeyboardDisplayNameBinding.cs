@@ -36,11 +36,6 @@ namespace SongsOfConquestAccess.Input
             }
         }
 
-        public override bool IsModified
-        {
-            get { return Ctrl || Shift || Alt; }
-        }
-
         public override bool MatchesKeyDown(
             KeyControl keyControl,
             AccessibilityInputRouter.KeyboardStateSnapshot state,

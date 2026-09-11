@@ -493,11 +493,8 @@ namespace SongsOfConquestAccess.Input
                 SpeechPipeline.Silence();
                 DispatchClaimedMatches(claimedMatches);
 
-                ActiveBindingState claimedBindingState = new ActiveBindingState(
-                    claimedMatches[0].Action,
-                    claimedMatches[0].Binding,
-                    claimedMatches[0].PressedKey);
-                _activeBindings[claimedMatches[0].Binding.Id] = claimedBindingState;
+                _activeBindings[claimedMatches[0].Binding.Id] =
+                    new ActiveBindingState(claimedMatches[0].PressedKey);
                 return true;
             }
 
@@ -519,8 +516,7 @@ namespace SongsOfConquestAccess.Input
                 SpeechPipeline.Silence();
                 _screenManager.HandleGlobalAction(match.Action);
 
-                ActiveBindingState bindingState = new ActiveBindingState(match.Action, match.Binding, match.PressedKey);
-                _activeBindings[match.Binding.Id] = bindingState;
+                _activeBindings[match.Binding.Id] = new ActiveBindingState(match.PressedKey);
                 return true;
             }
 
@@ -647,16 +643,10 @@ namespace SongsOfConquestAccess.Input
 
         private sealed class ActiveBindingState
         {
-            public ActiveBindingState(InputAction action, InputBinding binding, Key pressedKey)
+            public ActiveBindingState(Key pressedKey)
             {
-                Action = action;
-                Binding = binding;
                 PressedKey = pressedKey;
             }
-
-            public InputAction Action { get; private set; }
-
-            public InputBinding Binding { get; private set; }
 
             public Key PressedKey { get; private set; }
         }

@@ -224,8 +224,10 @@ namespace SongsOfConquestAccess.Dev
                     {
                         active = screen.IsActive();
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        SocAccessMod.Instance?.LogWarning(
+                            "IsActive threw for screen " + screen.Key + ", reported as inactive: " + e);
                         active = false;
                     }
 

@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
@@ -83,7 +83,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            PublishMapCameraFocus("notification.more_information", entry.WorldPosition);
+            PublishMapCameraFocus(entry.WorldPosition);
         }
 
         [HarmonyPatch(typeof(AdventureCameraController), "HandleHotkeyFocusSelected")]
@@ -95,7 +95,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            PublishSelectedCameraFocus(__instance, "camera.handle_hotkey_focus_selected");
+            PublishSelectedCameraFocus(__instance);
         }
 
         [HarmonyPatch(typeof(AdventureCameraController), "OnCommanderSelectionChanged")]
@@ -119,7 +119,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            PublishMapCameraFocus("camera.commander_selection_changed." + payload.SelectionSource, commander.Position);
+            PublishMapCameraFocus(commander.Position);
         }
 
         [HarmonyPatch(typeof(AdventureCameraController), "HandleMapEntityChanged")]
@@ -146,7 +146,7 @@ namespace SongsOfConquestAccess
             bool centeredByHotkey = payload.SelectionSource == SelectionSource.Hotkey;
             if (centeredBySelection || centeredByHotkey)
             {
-                PublishMapCameraFocus("camera.map_entity_changed." + payload.SelectionSource, selectedMapEntity.Position);
+                PublishMapCameraFocus(selectedMapEntity.Position);
             }
         }
 
@@ -159,7 +159,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            PublishMapCameraFocus("town_list.center_camera_on_entry", entry.Town.Position);
+            PublishMapCameraFocus(entry.Town.Position);
         }
 
         [HarmonyPatch(typeof(TeamQueueHUDBehaviour), "HandleNewTurn")]
@@ -199,7 +199,7 @@ namespace SongsOfConquestAccess
             return value is bool && (bool)value;
         }
 
-        private static void PublishSelectedCameraFocus(AdventureCameraController controller, string source)
+        private static void PublishSelectedCameraFocus(AdventureCameraController controller)
         {
             ISelectionHandler selectionHandler = GetSelectionHandler(controller);
             if (selectionHandler == null)
@@ -209,17 +209,17 @@ namespace SongsOfConquestAccess
 
             if (selectionHandler.SelectedCommander != null)
             {
-                PublishMapCameraFocus(source + ".commander", selectionHandler.SelectedCommander.Position);
+                PublishMapCameraFocus(selectionHandler.SelectedCommander.Position);
                 return;
             }
 
             if (selectionHandler.SelectedMapEntity != null)
             {
-                PublishMapCameraFocus(source + ".map_entity", selectionHandler.SelectedMapEntity.Position);
+                PublishMapCameraFocus(selectionHandler.SelectedMapEntity.Position);
             }
         }
 
-        private static void PublishMapCameraFocus(string source, Vector2Int tile)
+        private static void PublishMapCameraFocus(Vector2Int tile)
         {
             AccessibilityEventBus.Publish(new MapCameraFocusEvent(tile));
         }
