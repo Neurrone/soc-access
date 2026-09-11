@@ -66,7 +66,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo SetActiveTabMethod = AccessTools.Method(typeof(CommanderSheetModifierTabNavigation), "SetActiveTab", new[] { AccessTools.Inner(typeof(CommanderSheetModifierTabNavigation), "TabState"), typeof(bool) });
         private static readonly FieldInfo SummaryEntryTextField = AccessTools.Field(typeof(CommanderSheetSummaryEntry), "_textMesh");
         private static readonly FieldInfo InventoryLookupField = AccessTools.Field(typeof(InventoryHUD), "_lookup");
-        private static readonly FieldInfo InventoryCommandProcessorField = AccessTools.Field(typeof(InventoryHUD), "_commandProcessor");
 
         // The showing modifier tab's rows, walked at most once a frame: the build asks for them
         // and each row's live readout asks again. Keyed on the frame rather than held, because the

@@ -33,7 +33,7 @@ namespace SongsOfConquestAccess.Adapters
     /// close cross anywhere on this menu, and Escape is the game's - No in the choice stage, Done in
     /// the join stage (<c>HostileJoinMenu.ReregisterInput</c>).
     /// </summary>
-    public sealed class HostileJoinMenuAdapter : IPresent, IDisposable
+    public sealed class HostileJoinMenuAdapter : IPresent
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(HostileJoinMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(HostileJoinMenu), "_async");
@@ -49,7 +49,6 @@ namespace SongsOfConquestAccess.Adapters
         private readonly ILocalizationHandler _localization;
         private WielderInteract _wielder;
         private TroopHudAdapter _joiningTroops;
-        private bool _disposed;
 
         public HostileJoinMenuAdapter(HostileJoinMenu menu)
         {
@@ -382,16 +381,6 @@ namespace SongsOfConquestAccess.Adapters
         public bool FocusMassMove()
         {
             return NativeSelectionUtility.Select(_settings != null ? _settings.MassMoveButton : null);
-        }
-
-        public void Dispose()
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            _disposed = true;
         }
 
         private bool IsNativeStage(string stageName)

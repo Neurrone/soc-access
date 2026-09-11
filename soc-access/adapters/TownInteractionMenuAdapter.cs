@@ -38,11 +38,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(TownInteractionMenu), "_adventureFacade");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(TownInteractionMenu), "_localizationHandler");
         private static readonly FieldInfo InteractingCommanderIdField = AccessTools.Field(typeof(TownInteractionMenu), "_interactingCommanderId");
-        private static readonly FieldInfo MapEntityField = AccessTools.Field(typeof(TownInteractionMenu), "_mapEntity");
 
         private static readonly FieldInfo HeaderCloseButtonField = AccessTools.Field(typeof(WielderInteractHeader), "_closeButton");
-        private static readonly FieldInfo HeaderPortraitField = AccessTools.Field(typeof(WielderInteractHeader), "_wielderPortrait");
-        private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
         private static readonly FieldInfo HeaderCustomNameContainerField = AccessTools.Field(typeof(WielderInteractHeader), "_customNameContainer");
         private static readonly FieldInfo HeaderCustomNameTextField = AccessTools.Field(typeof(WielderInteractHeader), "_customNameText");
 
@@ -83,15 +80,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetInteractingCommanderId(); }
         }
 
-        public int SettlementMapEntityId
-        {
-            get
-            {
-                IMapEntity mapEntity = Reflect.Get<IMapEntity>(_menu, MapEntityField);
-                return mapEntity != null ? mapEntity.Id : -1;
-            }
-        }
-
         /// <summary>The menu's own LANDING page is drawn: the page this adapter reads. A troop
         /// sub-page over it is a page of its own (<c>IsDraftPresent</c>, <c>IsUpgradePresent</c>),
         /// read by <c>TroopManagementScreenBase</c> through the host interface.</summary>
@@ -125,16 +113,6 @@ namespace SongsOfConquestAccess.Adapters
         public string CustomName
         {
             get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GetHeader(), HeaderCustomNameTextField)); }
-        }
-
-        public string VisitingWielderName
-        {
-            get
-            {
-                int commanderId = GetInteractingCommanderId();
-                string name = commanderId >= 0 && _facade != null ? _facade.Commanders.GetName(commanderId) : string.Empty;
-                return SpokenLines.Clean(name);
-            }
         }
 
         /// <summary>The band the menu hangs across its top: the visiting wielder, their army and the
@@ -172,16 +150,6 @@ namespace SongsOfConquestAccess.Adapters
         public bool ActivateTutorial()
         {
             return NativeSelectionUtility.Click(GetTutorialButton());
-        }
-
-        public Tooltip VisitingWielderTooltip
-        {
-            get { return Tooltip.ForComponent(Reflect.Get<UIImage>(GetHeader(), HeaderPortraitField) as Component, _localization); }
-        }
-
-        public TroopHudAdapter VisitingTroops
-        {
-            get { return new TroopHudAdapter(Reflect.Get<TroopHUD>(GetHeader(), HeaderTroopHudField), _facade, _localization); }
         }
 
         /// <summary>The settlement's own army. Kept: the adapter wakes the game's drag ghost when it

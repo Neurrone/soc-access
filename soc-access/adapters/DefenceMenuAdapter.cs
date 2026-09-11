@@ -123,20 +123,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, SubTitleField)); }
         }
 
-        public string SettlementDefendingTroopsLabel
-        {
-            get
-            {
-                string name = Title;
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    name = Subtitle;
-                }
-
-                return string.IsNullOrWhiteSpace(name) ? "settlement defending troops" : name + " defending troops";
-            }
-        }
-
         public string DefendingTroopsLabel
         {
             get { return SpokenText.Get(_localization, "Adventure/TroopManagementMenu/DefendingTroopsHeader", string.Empty); }
@@ -268,8 +254,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetTutorialButtonLabel()
         {
-            string label = GetButtonLabel(GetTutorialButton());
-            return label;
+            return GetButtonLabel(GetTutorialButton());
         }
 
         public bool IsTutorialButtonVisible()

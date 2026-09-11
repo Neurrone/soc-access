@@ -276,11 +276,6 @@ namespace SongsOfConquestAccess.Adapters
             return slider != null ? Mathf.RoundToInt(slider.SliderMaxLimit) : 0;
         }
 
-        public int GetSliderStep()
-        {
-            return 1;
-        }
-
         public bool SetSliderValue(int value)
         {
             UISlider slider = GetSlider();

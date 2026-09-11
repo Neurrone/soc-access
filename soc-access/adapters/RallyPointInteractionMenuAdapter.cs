@@ -151,14 +151,6 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
-        private bool IsMenuOpen()
-        {
-            return _menu != null
-                && _menu.gameObject != null
-                && _menu.gameObject.activeInHierarchy
-                && Reflect.Get<Async>(_menu, AsyncField) != null;
-        }
-
         private WielderInteractHeader GetHeader()
         {
             return Reflect.Get<WielderInteractHeader>(_menu, HeaderField);

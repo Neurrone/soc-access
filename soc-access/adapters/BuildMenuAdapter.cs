@@ -354,24 +354,6 @@ namespace SongsOfConquestAccess.Adapters
             return items;
         }
 
-        public int SelectedBuildingIndex
-        {
-            get
-            {
-                BuildOnBuildSiteAction selected = CurrentAction;
-                IReadOnlyList<BuildMenuButton> buttons = GetActiveBuildButtons();
-                for (int i = 0; i < buttons.Count; i++)
-                {
-                    if (buttons[i] != null && ReferenceEquals(buttons[i].BuildAction, selected))
-                    {
-                        return i;
-                    }
-                }
-
-                return 0;
-            }
-        }
-
         /// <summary>The name the pane draws for the building it is describing.</summary>
         public string SelectedBuildingName
         {
@@ -484,7 +466,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<SectionMenu> menus = new List<SectionMenu>();
             IReadOnlyList<BuildMenuDescriptionSection> sections = GetActiveDescriptionSections();
-            int index = 0;
             for (int i = 0; i < sections.Count; i++)
             {
                 BuildMenuDescriptionSection section = sections[i];
@@ -508,7 +489,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 menus.Add(new SectionMenu(header, items));
-                index++;
             }
 
             return menus;
@@ -608,16 +588,6 @@ namespace SongsOfConquestAccess.Adapters
 
                 return BuildStructuredCostText();
             }
-        }
-
-        public bool HasCurrentTierCost()
-        {
-            return !string.IsNullOrWhiteSpace(CurrentTierCostBody);
-        }
-
-        public bool HasWarning()
-        {
-            return !string.IsNullOrWhiteSpace(CannotBuyText);
         }
 
         public string CannotBuyText
@@ -1438,17 +1408,6 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
         }
 
-        private bool InvokeNativeHandler(MethodInfo method)
-        {
-            if (_menu == null || method == null)
-            {
-                return false;
-            }
-
-            method.Invoke(_menu, null);
-            return true;
-        }
-
         private bool ActivateBuildSiteNavigation(UIButton button, MethodInfo method)
         {
             if (!MenuButtonAdapterBase.IsButtonEnabledAndDrawn(button))
@@ -1456,11 +1415,13 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            int before = CurrentBuildSite != null ? CurrentBuildSite.Id : -1;
-            if (!InvokeNativeHandler(method))
+            if (_menu == null || method == null)
             {
                 return false;
             }
+
+            int before = CurrentBuildSite != null ? CurrentBuildSite.Id : -1;
+            method.Invoke(_menu, null);
 
             InvalidateFrameSnapshots();
             int after = CurrentBuildSite != null ? CurrentBuildSite.Id : -1;

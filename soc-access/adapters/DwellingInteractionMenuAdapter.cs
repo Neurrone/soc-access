@@ -21,7 +21,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(DwellingInteractionMenu), "_async");
         private static readonly FieldInfo InteractingCommanderIdField = AccessTools.Field(typeof(DwellingInteractionMenu), "_interactingCommanderId");
 
-        private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
         private static readonly FieldInfo HeaderPortraitField = AccessTools.Field(typeof(WielderInteractHeader), "_wielderPortrait");
 
         private static readonly FieldInfo UpgradeTroopsSubMenuField = AccessTools.Field(typeof(DwellingInteractionMenu), "_upgradeTroopsSubMenu");
@@ -100,11 +99,6 @@ namespace SongsOfConquestAccess.Adapters
                 && AsyncField.GetValue(_menu) != null
                 && subMenu != null
                 && subMenu.gameObject.activeInHierarchy;
-        }
-
-        public TroopHudAdapter Troops
-        {
-            get { return new TroopHudAdapter(GetTroopHud(), _facade, _localization); }
         }
 
         /// <summary>The draft sub-page. Kept, so the page's build reads one adapter rather than a new
@@ -208,11 +202,6 @@ namespace SongsOfConquestAccess.Adapters
         private WielderInteractHeader GetHeader()
         {
             return Reflect.Get<WielderInteractHeader>(_menu, WielderInteractHeaderField);
-        }
-
-        private TroopHUD GetTroopHud()
-        {
-            return Reflect.Get<TroopHUD>(GetHeader(), HeaderTroopHudField);
         }
 
         private Component GetWielderPortrait()

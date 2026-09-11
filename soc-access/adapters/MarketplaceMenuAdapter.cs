@@ -93,7 +93,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < TradedResources.Length; i++)
             {
                 ResourceType type = TradedResources[i];
-                resources.Add(new ResourceItem(type, FormatResource(type), GetResourceAmount(type)));
+                resources.Add(new ResourceItem(type, GetResourceName(type), GetResourceAmount(type)));
             }
 
             return resources;
@@ -257,9 +257,10 @@ namespace SongsOfConquestAccess.Adapters
             NativeTooltipUtility.HideTooltip();
         }
 
+        /// <summary>The game's own name for a resource.</summary>
         public string GetResourceName(ResourceType resourceType)
         {
-            return FormatResource(resourceType);
+            return ResourceCosts.Name(_localization, resourceType);
         }
 
         // The grid as the menu laid it out, kept until the menu's own button list is replaced.
@@ -479,11 +480,6 @@ namespace SongsOfConquestAccess.Adapters
         private int TeamId
         {
             get { return GetFieldValue(_menu, TeamIdField, _facade != null && _facade.Teams != null ? _facade.Teams.LocalTeamInControlId : -1); }
-        }
-
-        private string FormatResource(ResourceType resourceType)
-        {
-            return ResourceCosts.Name(_localization, resourceType);
         }
 
         private static T GetFieldValue<T>(object owner, FieldInfo field, T fallback)
