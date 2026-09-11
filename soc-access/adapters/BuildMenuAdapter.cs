@@ -165,38 +165,45 @@ namespace SongsOfConquestAccess.Adapters
             get { return SpokenText.Get(_localization, "Adventure/BuildMenu/Header", "Build"); }
         }
 
-        public string BuildSiteSummary
+        /// <summary>Whether the menu is on a build site at all.</summary>
+        public bool HasBuildSite
+        {
+            get { return CurrentBuildSite != null; }
+        }
+
+        /// <summary>The game's own word for the size of the site the menu is on. Null where there is
+        /// no site, and null where the game has not resolved a size for one - which is a site with
+        /// nothing to say about it rather than a site to throw over.</summary>
+        public string BuildSiteSizeLabel
         {
             get
             {
                 IMapEntity site = CurrentBuildSite;
-                if (site == null)
-                {
-                    return ModText.Get(_localization, ModStrings.Screens.NoBuildSiteSelected);
-                }
-
-                BuildSiteSize? siteSize = site.GetSize();
-                if (!siteSize.HasValue)
-                {
-                    // A site the game has not resolved a size for: it has no summary, rather than
-                    // throwing one and costing the page every line below it.
-                    return string.Empty;
-                }
-
-                Vector2Int position = site.Position;
-                string size = GetBuildSiteLabel(siteSize.Value);
-                int index = SiblingIndex + 1;
-                int count = SiblingCount;
-                List<string> parts = new List<string>();
-                parts.Add(size);
-                if (index > 0 && count > 0)
-                {
-                    parts.Add(ModText.Get(_localization, ModStrings.Common.CountOf, index, count));
-                }
-
-                parts.Add(position.x + ", " + position.y);
-                return string.Join(", ", parts.ToArray());
+                BuildSiteSize? siteSize = site != null ? site.GetSize() : null;
+                return siteSize.HasValue ? GetBuildSiteLabel(siteSize.Value) : null;
             }
+        }
+
+        /// <summary>Where the site the menu is on stands on the map.</summary>
+        public Vector2Int BuildSitePosition
+        {
+            get
+            {
+                IMapEntity site = CurrentBuildSite;
+                return site != null ? site.Position : default(Vector2Int);
+            }
+        }
+
+        /// <summary>Which of the map's build sites this is, counting from one, and how many there
+        /// are.</summary>
+        public int BuildSiteNumber
+        {
+            get { return SiblingIndex + 1; }
+        }
+
+        public int BuildSiteCount
+        {
+            get { return SiblingCount; }
         }
 
         public bool IsTutorialButtonVisible()
@@ -567,7 +574,17 @@ namespace SongsOfConquestAccess.Adapters
             get { return SpokenText.Get(_localization, "Adventure/BuildMenu/Requirements", "Requirements"); }
         }
 
-        public string CurrentTierCostText
+        /// <summary>The game's own heading for a price ("Cost"), without the colon the menu draws
+        /// after it in some of its own labels.</summary>
+        public string CostLabel
+        {
+            get { return SpokenText.Get(_localization, "Adventure/BuildMenu/Cost", string.Empty).TrimEnd(':'); }
+        }
+
+        /// <summary>What the selected tier costs, as the menu draws it and with no heading of its
+        /// own: the drawn price where the purchase area is up, the cost section's own body where a
+        /// higher tier is showing, and the level's structured cost otherwise.</summary>
+        public string CurrentTierCostBody
         {
             get
             {
@@ -576,7 +593,7 @@ namespace SongsOfConquestAccess.Adapters
                     string visibleCost = LargeCostText;
                     if (!string.IsNullOrWhiteSpace(visibleCost))
                     {
-                        return FormatCostText(visibleCost);
+                        return visibleCost;
                     }
                 }
 
@@ -585,17 +602,17 @@ namespace SongsOfConquestAccess.Adapters
                     string sectionCost = GetSectionBody("Adventure/BuildMenu/Cost", "Cost");
                     if (!string.IsNullOrWhiteSpace(sectionCost))
                     {
-                        return FormatCostText(sectionCost);
+                        return sectionCost;
                     }
                 }
 
-                return FormatCostText(BuildStructuredCostText());
+                return BuildStructuredCostText();
             }
         }
 
         public bool HasCurrentTierCost()
         {
-            return !string.IsNullOrWhiteSpace(CurrentTierCostText);
+            return !string.IsNullOrWhiteSpace(CurrentTierCostBody);
         }
 
         public bool HasWarning()
@@ -1165,18 +1182,15 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private string FormatCostText(string body)
+        /// <summary>The game's own heading for how long a build takes ("Build time").</summary>
+        public string BuildTimeLabel
         {
-            if (string.IsNullOrWhiteSpace(body))
-            {
-                return string.Empty;
-            }
-
-            return SpokenText.Get(_localization, "Adventure/BuildMenu/Cost", "Cost").TrimEnd(':') + ": " + body;
+            get { return SpokenText.Get(_localization, "Adventure/Tooltips/Build/BuildTimeLabel", string.Empty); }
         }
 
-        /// <summary>How long a size takes to build. Fixed for the life of the menu, and asked for
-        /// once per size tab on every build, so it is composed once per size.</summary>
+        /// <summary>How long a size takes to build, in the game's own counted words. Fixed for the
+        /// life of the menu, and asked for once per size tab on every build, so it is read once per
+        /// size.</summary>
         private string BuildTimeForSize(BuildSiteSize size)
         {
             string cached;
@@ -1185,12 +1199,12 @@ namespace SongsOfConquestAccess.Adapters
                 return cached;
             }
 
-            string composed = ComposeBuildTimeForSize(size);
+            string composed = ReadBuildTimeForSize(size);
             _buildTimeBySize[size] = composed;
             return composed;
         }
 
-        private string ComposeBuildTimeForSize(BuildSiteSize size)
+        private string ReadBuildTimeForSize(BuildSiteSize size)
         {
             int rounds;
             switch (size)
@@ -1206,11 +1220,9 @@ namespace SongsOfConquestAccess.Adapters
                     break;
             }
 
-            string label = SpokenText.Get(_localization, "Adventure/Tooltips/Build/BuildTimeLabel", "Build time");
-            string value = _localization != null
+            return _localization != null
                 ? SpokenLines.Clean(_localization.GetPluralText("Adventure/Tooltips/Build/BuildTime", rounds, rounds))
-                : rounds + (rounds == 1 ? " round" : " rounds");
-            return label + ": " + value;
+                : string.Empty;
         }
 
         private string FormatRequiredBuilding(RequiredBuilding building)
@@ -1470,8 +1482,8 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Label { get; private set; }
 
-            /// <summary>How long anything of this size takes to build, in the wording the menu's own
-            /// caption uses ("Build time: 2 rounds").</summary>
+            /// <summary>How long anything of this size takes to build, in the game's own counted
+            /// words ("2 rounds").</summary>
             public string BuildTime { get; private set; }
 
             public int Index { get; private set; }

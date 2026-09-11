@@ -257,7 +257,9 @@ namespace SongsOfConquestAccess.Screens
 
             SpellbookAdapter.QuickbarItem it = item;
             ControlId id = ControlId.For(it.Entry, "spellbook:slot/" + index);
-            Func<string> label = () => it.HasSpell ? it.SpellName : ModText.Get(ModStrings.Screens.Empty);
+            Func<string> label = () => it.HasSpell
+                ? SpellCosts.Label(it.SpellName, it.TierLabel, it.Costs)
+                : ModText.Get(ModStrings.Screens.Empty);
             // The slot's click is the game's own, which casts in battle and does not exist on the
             // map: there the node declares no click, and Enter is consumed silently.
             Action activate = it.CanActivate ? () => it.Activate() : (Action)null;
@@ -324,7 +326,9 @@ namespace SongsOfConquestAccess.Screens
 
         private CarryItem PickUp(SpellbookAdapter.QuickbarItem item)
         {
-            return item.CanDrag ? new CarryItem(item.Entry, item.SpellName, SpellCargo) : null;
+            return item.CanDrag
+                ? new CarryItem(item.Entry, SpellCosts.Label(item.SpellName, item.TierLabel, item.Costs), SpellCargo)
+                : null;
         }
 
         /// <summary>A drop on a slot, through the game's own drag: a spell from another slot moves or
@@ -466,7 +470,7 @@ namespace SongsOfConquestAccess.Screens
 
             SpellbookAdapter.SpellItem it = item;
             NodeVtable vtable = GraphNodes.Button(
-                () => it.Label,
+                () => SpellCosts.Label(it.Name, it.TierLabel, it.Costs),
                 () => it.Activate(),
                 () => it.CanCast,
                 it.Tooltip);
@@ -492,7 +496,7 @@ namespace SongsOfConquestAccess.Screens
         {
             return Live.IsAutoPopulateChecked()
                 ? null
-                : new CarryItem(item.Entry, item.Label, SpellCargo);
+                : new CarryItem(item.Entry, SpellCosts.Label(item.Name, item.TierLabel, item.Costs), SpellCargo);
         }
 
         // ---- the close cross ----

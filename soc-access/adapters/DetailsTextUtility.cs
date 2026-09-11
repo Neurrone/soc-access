@@ -8,6 +8,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -130,7 +131,10 @@ namespace SongsOfConquestAccess.Adapters
 
         public void AddUpgradeLevel(string label, int current, int max)
         {
-            Add(label + " " + current + " of " + max);
+            Add(ModText.Get(
+                ModStrings.Common.PhraseSeparator,
+                label,
+                ModText.Get(ModStrings.Common.CountOf, current, max)));
         }
 
         public void AddDualHeaderWithBackground(string leftText, string rightText)

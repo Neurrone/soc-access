@@ -10,6 +10,7 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -192,7 +193,9 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             string name = GetResourceName(type, ParseAmount(amount));
-            return string.IsNullOrWhiteSpace(name) ? amount : SpokenText.JoinMinusSign(SpokenLines.Clean(amount + " " + name));
+            return string.IsNullOrWhiteSpace(name)
+                ? amount
+                : SpokenText.JoinMinusSign(SpokenLines.Clean(ModText.Get(ModStrings.Common.ResourceAmount, amount, name)));
         }
 
         /// <summary>Which resource each drawn icon stands for. <c>WorldConfirmMenu.Setup</c> gives the

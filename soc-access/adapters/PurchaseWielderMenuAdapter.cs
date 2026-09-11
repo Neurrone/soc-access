@@ -301,25 +301,19 @@ namespace SongsOfConquestAccess.Adapters
             return GameObjects.IsLive(text as Component) && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(text));
         }
 
-        /// <summary>The specialization the pane draws, under the game's own caption, one line per
-        /// paragraph of it.</summary>
+        /// <summary>The game's own caption for the specialization block, without the colon the game
+        /// draws after it in some of its own labels.</summary>
+        public string SpecializationHeader
+        {
+            get { return SpokenText.Get(_localization, "Commanders/Tooltip/Specializations", string.Empty).TrimEnd(':'); }
+        }
+
+        /// <summary>The specialization the pane draws, one line per paragraph of it.</summary>
         public IList<string> SpecializationLines
         {
             get
             {
-                IList<string> body = UITextMeshTextUtility.SpokenLines(Reflect.Get<UITextMesh>(GetDetails(), DetailsSpecializationField));
-                if (body.Count == 0)
-                {
-                    return body;
-                }
-
-                string header = SpokenText.Get(_localization, "Commanders/Tooltip/Specializations", string.Empty);
-                if (!string.IsNullOrWhiteSpace(header))
-                {
-                    body[0] = header.TrimEnd(':') + ": " + body[0];
-                }
-
-                return body;
+                return UITextMeshTextUtility.SpokenLines(Reflect.Get<UITextMesh>(GetDetails(), DetailsSpecializationField));
             }
         }
 

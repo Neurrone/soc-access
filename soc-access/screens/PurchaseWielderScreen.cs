@@ -178,7 +178,7 @@ namespace SongsOfConquestAccess.Screens
             if (Live.HasSpecialization())
             {
                 builder.SetRegion("purchase-wielder:specialization");
-                AddParagraphs(builder, "specialization", () => Live.SpecializationLines);
+                AddParagraphs(builder, "specialization", SpecializationLines);
             }
 
             builder.SetRegion("purchase-wielder:purchase");
@@ -224,18 +224,37 @@ namespace SongsOfConquestAccess.Screens
             return lines;
         }
 
-        private static string JoinSentences(List<string> parts)
+        /// <summary>The specialization the pane draws, its first paragraph under the game's own
+        /// caption for the block.</summary>
+        private IList<string> SpecializationLines()
         {
-            List<string> filtered = new List<string>();
-            for (int i = 0; i < parts.Count; i++)
+            IList<string> body = Live.SpecializationLines;
+            string header = Live.SpecializationHeader;
+            if (body.Count > 0 && !string.IsNullOrWhiteSpace(header))
             {
-                if (!string.IsNullOrWhiteSpace(parts[i]))
-                {
-                    filtered.Add(parts[i]);
-                }
+                body[0] = ModText.Get(ModStrings.UI.LabelValue, header, body[0]);
             }
 
-            return string.Join(". ", filtered.ToArray());
+            return body;
+        }
+
+        /// <summary>The parts as sentences, one after another.</summary>
+        private static string JoinSentences(List<string> parts)
+        {
+            string text = null;
+            for (int i = 0; i < parts.Count; i++)
+            {
+                if (string.IsNullOrWhiteSpace(parts[i]))
+                {
+                    continue;
+                }
+
+                text = text == null
+                    ? parts[i]
+                    : ModText.Get(ModStrings.Common.SentenceSeparator, text, parts[i]);
+            }
+
+            return text ?? string.Empty;
         }
 
         private void BuildTroops(GraphBuilder builder)
