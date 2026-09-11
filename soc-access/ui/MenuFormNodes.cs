@@ -88,8 +88,26 @@ namespace SongsOfConquestAccess.UI
             public List<GraphSheet.SheetCell> Cells;
         }
 
+        // The ordinary rows' nodes, on the same terms: built once per ROW LIST, since the reader
+        // hands back the same list until the column is redrawn. The subject is kept with them
+        // because it is what the reconciler keys on, so a row the game re-seated is rebuilt.
+        private IReadOnlyList<MenuRow> _rowSource;
+        private readonly Dictionary<object, RowNodes> _rowNodes = new Dictionary<object, RowNodes>();
+
+        private sealed class RowNodes
+        {
+            public Component Subject;
+            public List<NodeDeclaration> Nodes;
+        }
+
         public void BuildRows(GraphBuilder builder, IReadOnlyList<MenuRow> controls)
         {
+            if (!ReferenceEquals(controls, _rowSource))
+            {
+                _rowNodes.Clear();
+                _rowSource = controls;
+            }
+
             // The rebindable-action rows are a table of their own; stop where they begin so their
             // category captions are the sheet's regions and not empty read-only rows here.
             int end = FirstKeyBindingCaption(controls);
@@ -425,23 +443,88 @@ namespace SongsOfConquestAccess.UI
             return false;
         }
 
+        /// <summary>One ordinary form row, built once per ROW LIST rather than once per frame - the
+        /// key-binding rows' treatment (<see cref="_keyBindingNodes"/>) for the rest of the form.
+        /// Every row asked its adapter for a tooltip as it was declared, and each of those is a
+        /// Tooltip, a VisualTooltipMetadata and two closures the row then reads from when it is
+        /// focused; the Options window's Controls page and the mod's Keybinds tab paid for a
+        /// hundred of them a frame.
+        ///
+        /// Whether the row is DRAWN stays a per-frame question, so a row the game hides leaves the
+        /// tree the frame it does. What is kept is what the row is built as, which is settled by the
+        /// row itself: a row whose widget the reader could not resolve yet keeps nothing, so the
+        /// next build asks again.</summary>
         private void AddRow(GraphBuilder builder, MenuRow control)
         {
             object item = control != null ? control.Item : null;
             Component subject = control != null ? control.Transform : null;
-            if (item == null || subject == null)
+            if (item == null || subject == null || !IsRowVisible(item))
             {
                 return;
             }
 
-            MenuRowToggle toggle = item as MenuRowToggle;
-            if (toggle != null)
+            RowNodes cached;
+            if (!_rowNodes.TryGetValue(item, out cached) || !ReferenceEquals(cached.Subject, subject))
             {
-                if (!toggle.IsVisible())
+                cached = new RowNodes { Subject = subject, Nodes = new List<NodeDeclaration>(1) };
+                BuildRow(cached.Nodes, item, subject);
+                if (cached.Nodes.Count == 0)
                 {
                     return;
                 }
 
+                _rowNodes[item] = cached;
+            }
+
+            for (int i = 0; i < cached.Nodes.Count; i++)
+            {
+                builder.AddItem(cached.Nodes[i]);
+            }
+        }
+
+        /// <summary>Whether the game is drawing this row right now - asked every frame, for every
+        /// kind of row this form knows. A kind it does not know is not a row.</summary>
+        private static bool IsRowVisible(object item)
+        {
+            MenuRowToggle toggle = item as MenuRowToggle;
+            if (toggle != null)
+            {
+                return toggle.IsVisible();
+            }
+
+            MenuRowSlider slider = item as MenuRowSlider;
+            if (slider != null)
+            {
+                return slider.IsVisible();
+            }
+
+            MenuRowDropdown dropdown = item as MenuRowDropdown;
+            if (dropdown != null)
+            {
+                return dropdown.IsVisible();
+            }
+
+            MenuRowTimeInput time = item as MenuRowTimeInput;
+            if (time != null)
+            {
+                return time.IsVisible();
+            }
+
+            MenuRowInput input = item as MenuRowInput;
+            if (input != null)
+            {
+                return input.IsVisible();
+            }
+
+            MenuRowButton button = item as MenuRowButton;
+            return button != null && button.IsVisible();
+        }
+
+        private void BuildRow(List<NodeDeclaration> into, object item, Component subject)
+        {
+            MenuRowToggle toggle = item as MenuRowToggle;
+            if (toggle != null)
+            {
                 NodeVtable vtable = GraphNodes.Checkbox(
                     toggle.GetLabel,
                     toggle.IsChecked,
@@ -449,29 +532,20 @@ namespace SongsOfConquestAccess.UI
                     toggle.IsEnabled,
                     toggle.GetTooltip());
                 vtable.OnFocusVisual = toggle.Focus;
-                builder.AddItem(new DrawnNode(ControlId.For(subject, _rowKey + toggle.Id), vtable, subject));
+                into.Add(new DrawnNode(ControlId.For(subject, _rowKey + toggle.Id), vtable, subject));
                 return;
             }
 
             MenuRowSlider slider = item as MenuRowSlider;
             if (slider != null)
             {
-                if (slider.IsVisible())
-                {
-                    AddSlider(builder, slider, subject);
-                }
-
+                AddSlider(into, slider, subject);
                 return;
             }
 
             MenuRowDropdown dropdown = item as MenuRowDropdown;
             if (dropdown != null)
             {
-                if (!dropdown.IsVisible())
-                {
-                    return;
-                }
-
                 NodeVtable vtable = GraphNodes.ComboBox(
                     dropdown.GetLabel,
                     () => CurrentOption(dropdown),
@@ -479,29 +553,20 @@ namespace SongsOfConquestAccess.UI
                     dropdown.IsEnabled,
                     dropdown.GetTooltip());
                 vtable.OnFocusVisual = dropdown.Focus;
-                builder.AddItem(new DrawnNode(ControlId.For(subject, _rowKey + dropdown.Id), vtable, subject));
+                into.Add(new DrawnNode(ControlId.For(subject, _rowKey + dropdown.Id), vtable, subject));
                 return;
             }
 
             MenuRowTimeInput time = item as MenuRowTimeInput;
             if (time != null)
             {
-                if (time.IsVisible())
-                {
-                    AddTimeRow(builder, time);
-                }
-
+                AddTimeRow(into, time);
                 return;
             }
 
             MenuRowInput input = item as MenuRowInput;
             if (input != null)
             {
-                if (!input.IsVisible())
-                {
-                    return;
-                }
-
                 // The game's own text box: activating it is the request for the keyboard, and the
                 // value reports nothing while the game holds it, because the echo is already
                 // speaking the keys. The tooltip stays in the buffer but is never DRAWN: drawing it
@@ -517,14 +582,14 @@ namespace SongsOfConquestAccess.UI
                     input.IsEnabled,
                     input.GetTooltip());
                 GraphNodes.DoNotDrawTooltip(vtable);
-                builder.AddItem(new DrawnNode(ControlId.For(subject, _rowKey + input.Id), vtable, subject));
+                into.Add(new DrawnNode(ControlId.For(subject, _rowKey + input.Id), vtable, subject));
                 return;
             }
 
             MenuRowButton button = item as MenuRowButton;
-            if (button != null && button.IsVisible())
+            if (button != null)
             {
-                builder.AddItem(new DrawnNode(
+                into.Add(new DrawnNode(
                     ControlId.For(subject, _rowKey + button.Id),
                     Button(button, button.GetLabel),
                     subject));
@@ -540,7 +605,7 @@ namespace SongsOfConquestAccess.UI
         /// walk. The box is one way of setting the same number the arrows set, so it is the row's
         /// activation instead; a row that draws no box has no activation at all.
         /// </summary>
-        private void AddSlider(GraphBuilder builder, MenuRowSlider slider, Component subject)
+        private void AddSlider(List<NodeDeclaration> into, MenuRowSlider slider, Component subject)
         {
             string editorLabel = slider.GetValueEditorLabel != null ? slider.GetValueEditorLabel() : null;
             NodeVtable vtable = GraphNodes.Slider(
@@ -553,7 +618,7 @@ namespace SongsOfConquestAccess.UI
                     ? (Action)null
                     : () => slider.OpenValueEditor());
             vtable.OnFocusVisual = slider.Focus;
-            builder.AddItem(new DrawnNode(ControlId.For(subject, _rowKey + slider.Id), vtable, subject));
+            into.Add(new DrawnNode(ControlId.For(subject, _rowKey + slider.Id), vtable, subject));
         }
 
         /// <summary>The two halves of a time row, each on the game's own field, each named with the
@@ -561,14 +626,14 @@ namespace SongsOfConquestAccess.UI
         /// (<c>Adventure/PostGameMenu/TotalPlayTime/Minutes</c> and <c>.../Seconds</c>, the keys the
         /// lobby's turn-timer rows were first read with). The widget's gamepad slider is switched off
         /// outside gamepad mode, so the two boxes are the whole row.</summary>
-        private void AddTimeRow(GraphBuilder builder, MenuRowTimeInput time)
+        private void AddTimeRow(List<NodeDeclaration> into, MenuRowTimeInput time)
         {
-            AddTimeField(builder, time, time.GetMinutesField, "minutes", true);
-            AddTimeField(builder, time, time.GetSecondsField, "seconds", false);
+            AddTimeField(into, time, time.GetMinutesField, "minutes", true);
+            AddTimeField(into, time, time.GetSecondsField, "seconds", false);
         }
 
         private void AddTimeField(
-            GraphBuilder builder,
+            List<NodeDeclaration> into,
             MenuRowTimeInput time,
             Func<IUITextMeshInputField> getField,
             string part,
@@ -588,7 +653,7 @@ namespace SongsOfConquestAccess.UI
                 time.IsEnabled,
                 time.GetTooltip());
             GraphNodes.DoNotDrawTooltip(vtable);
-            builder.AddItem(new DrawnNode(
+            into.Add(new DrawnNode(
                 ControlId.For(subject, _rowKey + time.Id + "/" + part),
                 vtable,
                 subject));
