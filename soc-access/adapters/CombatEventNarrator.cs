@@ -1,7 +1,6 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Lavapotion.Networking;
@@ -26,9 +25,6 @@ namespace SongsOfConquestAccess.Adapters
 {
     public static class CombatEventNarrator
     {
-        private const int BacteriaDiagnosticLogLimit = 200;
-        private const int MapEntityCreationNarrationDiagnosticLogLimit = 100;
-        private const int CombatNarrationTimingDiagnosticLogLimit = 400;
         private const int CombatNarrationBatchFrames = 15;
 
         private static readonly CombatNarrationPlanner Planner = new CombatNarrationPlanner();
@@ -36,14 +32,7 @@ namespace SongsOfConquestAccess.Adapters
         private static int _currentTurnTroopId = -1;
         private static bool _flushPendingEventsScheduled;
         private static CombatAdapter _activeAdapter;
-        private static int _bacteriaDiagnosticLogCount;
-        private static int _mapEntityCreationNarrationDiagnosticLogCount;
-        private static int _combatNarrationTimingDiagnosticLogCount;
-        private static int _lastCombatNarrationTimingDiagnosticFrame = -1;
-        private static float _lastCombatNarrationTimingDiagnosticTime = -1f;
         private static int _flushScheduleGeneration;
-        private static int _flushScheduledFrame = -1;
-        private static float _flushScheduledTime = -1f;
         private static bool _abilityBatchActive;
         private static bool _wielderEssenceCaptureActive;
         private static readonly Dictionary<int, WielderEssenceGeneration> CapturedWielderEssence =
@@ -71,11 +60,10 @@ namespace SongsOfConquestAccess.Adapters
                 bool isEndTurnResponse = response is EndBattleTurnCommand.Response;
                 bool bufferForSpell = !isSpellResponse && ShouldBufferForSpellResponse(response, adapter);
                 bool bufferForBacteriaSummary = ShouldBufferForBacteriaSummary(response);
-                LogCombatNarrationTimingDiagnostic("response", DescribeResponse(response));
                 if (_abilityBatchActive && isEndTurnResponse)
                 {
                     _abilityBatchActive = false;
-                    FlushPendingEventsImmediately("ability_end_turn");
+                    FlushPendingEventsImmediately();
                 }
 
                 EnqueueResponse(response, adapter);
@@ -95,7 +83,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 else if (isSpellResponse)
                 {
-                    FlushPendingEventsImmediately("spell_response");
+                    FlushPendingEventsImmediately();
                 }
                 else if (_abilityBatchActive)
                 {
@@ -107,7 +95,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 else
                 {
-                    FlushPendingEventsImmediately("non_spell_response");
+                    FlushPendingEventsImmediately();
                 }
             }
             catch (Exception exception)
@@ -169,14 +157,7 @@ namespace SongsOfConquestAccess.Adapters
             _currentTurnTroopId = -1;
             _flushPendingEventsScheduled = false;
             _activeAdapter = null;
-            _bacteriaDiagnosticLogCount = 0;
-            _mapEntityCreationNarrationDiagnosticLogCount = 0;
-            _combatNarrationTimingDiagnosticLogCount = 0;
-            _lastCombatNarrationTimingDiagnosticFrame = -1;
-            _lastCombatNarrationTimingDiagnosticTime = -1f;
             _flushScheduleGeneration = 0;
-            _flushScheduledFrame = -1;
-            _flushScheduledTime = -1f;
             _abilityBatchActive = false;
             _wielderEssenceCaptureActive = false;
             CapturedWielderEssence.Clear();
@@ -185,7 +166,7 @@ namespace SongsOfConquestAccess.Adapters
         public static void FlushPendingEventsForCombatEnd()
         {
             _abilityBatchActive = false;
-            FlushPendingEventsImmediately("combat_ended");
+            FlushPendingEventsImmediately();
         }
 
         /// <summary>Whether this adapter is the one the narration is being read from - so a battle
@@ -400,12 +381,9 @@ namespace SongsOfConquestAccess.Adapters
             if (createdEntity != null && createdEntity.State != null)
             {
                 IMapEntity entity = adapter.GetMapEntity(createdEntity.State.Id);
-                EntityRef entityRef = adapter.CreateEntityRef(entity);
-                MapEntityCreatedEvent mapEntityCreatedEvent = new MapEntityCreatedEvent(entityRef);
-                LogMapEntityCreationResponseDiagnostic(createdEntity, entity, mapEntityCreatedEvent);
                 Enqueue(CombatNarrationItem.Create(
                     CombatNarrationItemKind.MapEntityCreated,
-                    mapEntityCreatedEvent,
+                    new MapEntityCreatedEvent(adapter.CreateEntityRef(entity)),
                     entityId: createdEntity.State.Id));
                 return;
             }
@@ -561,7 +539,6 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                LogBacteriaDiagnostic("added", entry.BacteriaReference, entry.StateId, entry.StateTypeName, adapter);
                 if (IsBattleTroopType(entry.StateTypeName) && entry.BacteriaReference != null)
                 {
                     Enqueue(CombatNarrationItem.CreateBacteriaAddedMarker(
@@ -590,7 +567,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 IBattleTroopState troop = adapter.GetTroop(entry.StateId);
-                LogBacteriaDiagnostic("removed", entry.BacteriaReference, entry.StateId, entry.StateTypeName, adapter);
                 EnqueueBacteriaSummary(CombatNarrationItem.CreateBacteriaRemovalSummary(
                     adapter.CreateBacteriaRef(entry.BacteriaReference),
                     adapter.CreateTroopRef(troop),
@@ -643,7 +619,6 @@ namespace SongsOfConquestAccess.Adapters
                     }
 
                     IBattleTroopState troop = adapter.GetTroop(changeSet.TargetId);
-                    LogBacteriaDiagnostic("modifier applied", bacteria, changeSet.TargetId, changeSet.TargetTypeName, adapter);
                     EnqueueBacteriaSummary(CombatNarrationItem.CreateBacteriaModifierSummary(
                         adapter.CreateBacteriaRef(bacteria),
                         adapter.CreateTroopRef(troop),
@@ -790,142 +765,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return null;
-        }
-
-        private static void LogBacteriaDiagnostic(string action, BacteriaReference bacteria, int stateId, string stateTypeName, CombatAdapter adapter)
-        {
-            if (bacteria == null || _bacteriaDiagnosticLogCount >= BacteriaDiagnosticLogLimit)
-            {
-                return;
-            }
-
-            _bacteriaDiagnosticLogCount++;
-            SocAccessMod.Instance?.LogInfo(
-                "Combat bacteria diagnostic "
-                + action
-                + ": type="
-                + bacteria.BacteriaType
-                + " ("
-                + (int)bacteria.BacteriaType
-                + "), id="
-                + bacteria.Id
-                + ", name=\""
-                + ResolveBacteriaName(adapter, bacteria)
-                + "\", stateId="
-                + stateId
-                + ", stateType="
-                + FormatStateTypeName(stateTypeName));
-
-            if (_bacteriaDiagnosticLogCount == BacteriaDiagnosticLogLimit)
-            {
-                SocAccessMod.Instance?.LogInfo("Combat bacteria diagnostic log limit reached; further bacteria diagnostics suppressed until combat narrator reset.");
-            }
-        }
-
-        private static string ResolveBacteriaName(CombatAdapter adapter, BacteriaReference bacteria)
-        {
-            if (adapter == null || bacteria == null)
-            {
-                return string.Empty;
-            }
-
-            try
-            {
-                BacteriaRef bacteriaRef = adapter.CreateBacteriaRef(bacteria);
-                return bacteriaRef != null ? bacteriaRef.Name : string.Empty;
-            }
-            catch (Exception exception)
-            {
-                return "unavailable: " + exception.Message;
-            }
-        }
-
-        private static string FormatStateTypeName(string stateTypeName)
-        {
-            if (string.IsNullOrWhiteSpace(stateTypeName))
-            {
-                return string.Empty;
-            }
-
-            Type type = Type.GetType(stateTypeName);
-            return type != null ? type.Name : stateTypeName;
-        }
-
-        private static void LogMapEntityCreationResponseDiagnostic(
-            CreateBattleMapEntityCommand.Response response,
-            IMapEntity resolvedEntity,
-            MapEntityCreatedEvent narrationEvent)
-        {
-            if (response == null || response.State == null || !TryBeginMapEntityCreationNarrationDiagnostic())
-            {
-                return;
-            }
-
-            EntityRef entity = narrationEvent != null ? narrationEvent.Entity : null;
-            SocAccessMod.Instance?.LogInfo(
-                "Combat map entity creation response: stateId="
-                + response.State.Id
-                + ", stateBlueprintId="
-                + response.State.BlueprintId
-                + ", statePosition="
-                + FormatDiagnosticPoint(response.State.Position)
-                + ", resolvedId="
-                + (resolvedEntity != null ? resolvedEntity.Id : -1)
-                + ", resolvedBlueprintId="
-                + (resolvedEntity != null ? resolvedEntity.BlueprintId : -1)
-                + ", resolvedPosition="
-                + (resolvedEntity != null ? FormatDiagnosticPoint(resolvedEntity.Position) : string.Empty)
-                + ", resolvedNameKey=\""
-                + (resolvedEntity != null ? resolvedEntity.NameKey : string.Empty)
-                + "\", resolvedName=\""
-                + (entity != null ? entity.Name : string.Empty)
-                + "\", pendingSpeech=\""
-                + (narrationEvent != null ? narrationEvent.GetSpeechText() : string.Empty)
-                + "\"");
-        }
-
-        private static void LogMapEntityCreationNarrationDiagnostic(IAccessibilityEvent accessibilityEvent)
-        {
-            MapEntityCreatedEvent created = accessibilityEvent as MapEntityCreatedEvent;
-            if (created == null || !TryBeginMapEntityCreationNarrationDiagnostic())
-            {
-                return;
-            }
-
-            EntityRef entity = created.Entity;
-            SocAccessMod.Instance?.LogInfo(
-                "Combat map entity creation narration: entityId="
-                + (entity != null ? entity.EntityId : -1)
-                + ", blueprintId="
-                + (entity != null ? entity.BlueprintId : -1)
-                + ", position="
-                + (entity != null ? FormatDiagnosticPoint(entity.Position) : string.Empty)
-                + ", name=\""
-                + (entity != null ? entity.Name : string.Empty)
-                + "\", speech=\""
-                + created.GetSpeechText()
-                + "\"");
-        }
-
-        private static bool TryBeginMapEntityCreationNarrationDiagnostic()
-        {
-            if (_mapEntityCreationNarrationDiagnosticLogCount >= MapEntityCreationNarrationDiagnosticLogLimit)
-            {
-                return false;
-            }
-
-            _mapEntityCreationNarrationDiagnosticLogCount++;
-            if (_mapEntityCreationNarrationDiagnosticLogCount == MapEntityCreationNarrationDiagnosticLogLimit)
-            {
-                SocAccessMod.Instance?.LogInfo("Combat map entity creation narration diagnostic log limit reached.");
-            }
-
-            return true;
-        }
-
-        private static string FormatDiagnosticPoint(Vector2Int point)
-        {
-            return point.x + ", " + point.y;
         }
 
         private static ActorRef CreateActor(CombatAdapter adapter, IBattleTroopState troop)
@@ -1083,28 +922,28 @@ namespace SongsOfConquestAccess.Adapters
             Planner.EnqueueBacteriaSummary(pending, CreateNarrationSnapshot(adapter));
         }
 
+        /// <summary>Wait a bounded number of frames for the rest of an effect's responses, then
+        /// say the batch. The wait is a coroutine on the loader's own behaviour, which
+        /// <c>SocAccessMod.Stop</c> stops wholesale before anything else is torn down, so a wait
+        /// cannot outlive a reload; the generation counter is what makes a wait that was overtaken by
+        /// an immediate flush give up rather than say the batch twice.</summary>
         private static void ScheduleFlushPendingEvents()
         {
             if (_flushPendingEventsScheduled)
             {
-                LogCombatNarrationTimingDiagnostic("flush_already_scheduled", "waitFrames=" + CombatNarrationBatchFrames);
                 return;
             }
 
             SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin == null)
             {
-                LogCombatNarrationTimingDiagnostic("flush_immediate_no_plugin", null);
                 FlushPendingEvents();
                 return;
             }
 
             _flushPendingEventsScheduled = true;
             _flushScheduleGeneration++;
-            _flushScheduledFrame = Time.frameCount;
-            _flushScheduledTime = Time.realtimeSinceStartup;
-            LogCombatNarrationTimingDiagnostic("flush_scheduled", "waitFrames=" + CombatNarrationBatchFrames);
-            plugin.StartCoroutine(FlushPendingEventsAfterResponseBatch(_flushScheduleGeneration, _flushScheduledFrame, _flushScheduledTime));
+            plugin.StartCoroutine(FlushPendingEventsAfterResponseBatch(_flushScheduleGeneration));
         }
 
         private static void RestartScheduledFlushPendingEvents()
@@ -1118,7 +957,7 @@ namespace SongsOfConquestAccess.Adapters
             ScheduleFlushPendingEvents();
         }
 
-        private static IEnumerator FlushPendingEventsAfterResponseBatch(int generation, int scheduledFrame, float scheduledTime)
+        private static IEnumerator FlushPendingEventsAfterResponseBatch(int generation)
         {
             for (int i = 0; i < CombatNarrationBatchFrames; i++)
             {
@@ -1127,26 +966,15 @@ namespace SongsOfConquestAccess.Adapters
 
             if (!_flushPendingEventsScheduled || generation != _flushScheduleGeneration)
             {
-                LogCombatNarrationTimingDiagnostic(
-                    "flush_wait_stale",
-                    "scheduledGeneration=" + generation
-                    + ", currentGeneration=" + _flushScheduleGeneration
-                    + ", elapsedFrames=" + GetElapsedFrames(scheduledFrame)
-                    + ", elapsedSeconds=" + FormatSeconds(GetElapsedSeconds(scheduledTime)));
                 yield break;
             }
 
-            LogCombatNarrationTimingDiagnostic(
-                "flush_wait_complete",
-                "scheduledFrame=" + scheduledFrame
-                + ", elapsedFrames=" + GetElapsedFrames(scheduledFrame)
-                + ", elapsedSeconds=" + FormatSeconds(GetElapsedSeconds(scheduledTime)));
             _flushPendingEventsScheduled = false;
             _abilityBatchActive = false;
             FlushPendingEvents();
         }
 
-        private static void FlushPendingEventsImmediately(string reason)
+        private static void FlushPendingEventsImmediately()
         {
             if (_flushPendingEventsScheduled)
             {
@@ -1154,7 +982,6 @@ namespace SongsOfConquestAccess.Adapters
                 _flushPendingEventsScheduled = false;
             }
 
-            LogCombatNarrationTimingDiagnostic("flush_immediate", "reason=" + reason);
             FlushPendingEvents();
         }
 
@@ -1163,13 +990,10 @@ namespace SongsOfConquestAccess.Adapters
             FlushCapturedWielderEssence(GetAdapter());
             if (!Planner.HasPendingEvents)
             {
-                LogCombatNarrationTimingDiagnostic("flush_skipped_no_pending", null);
                 return;
             }
 
-            LogCombatNarrationTimingDiagnostic("flush_begin", "pending=" + Planner.PendingCount);
             IReadOnlyList<CombatNarrationItem> events = Planner.Flush();
-            LogCombatNarrationTimingDiagnostic("flush_publish_batch", "count=" + events.Count);
             for (int i = 0; i < events.Count; i++)
             {
                 CombatNarrationItem pending = events[i];
@@ -1188,7 +1012,6 @@ namespace SongsOfConquestAccess.Adapters
                     _currentTurnTroopId = -1;
                 }
 
-                LogCombatNarrationTimingDiagnostic("publish", "kind=" + pending.Kind);
                 PublishEvent(pending.Event);
             }
         }
@@ -1415,71 +1238,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            LogMapEntityCreationNarrationDiagnostic(accessibilityEvent);
             AccessibilityEventBus.Publish(accessibilityEvent);
-        }
-
-        private static void LogCombatNarrationTimingDiagnostic(string phase, string detail)
-        {
-            if (_combatNarrationTimingDiagnosticLogCount >= CombatNarrationTimingDiagnosticLogLimit)
-            {
-                return;
-            }
-
-            _combatNarrationTimingDiagnosticLogCount++;
-            int frame = Time.frameCount;
-            float time = Time.realtimeSinceStartup;
-            string frameDelta = _lastCombatNarrationTimingDiagnosticFrame >= 0
-                ? (frame - _lastCombatNarrationTimingDiagnosticFrame).ToString(CultureInfo.InvariantCulture)
-                : "n/a";
-            string secondsDelta = _lastCombatNarrationTimingDiagnosticTime >= 0f
-                ? FormatSeconds(time - _lastCombatNarrationTimingDiagnosticTime)
-                : "n/a";
-
-            SocAccessMod.Instance?.LogInfo(
-                "Combat narration timing: phase=" + phase
-                + ", frame=" + frame
-                + ", deltaFrames=" + frameDelta
-                + ", time=" + FormatSeconds(time)
-                + ", deltaSeconds=" + secondsDelta
-                + ", flushScheduled=" + _flushPendingEventsScheduled
-                + ", abilityBatchActive=" + _abilityBatchActive
-                + ", pending=" + Planner.PendingCount
-                + (string.IsNullOrWhiteSpace(detail) ? string.Empty : ", " + detail));
-
-            _lastCombatNarrationTimingDiagnosticFrame = frame;
-            _lastCombatNarrationTimingDiagnosticTime = time;
-
-            if (_combatNarrationTimingDiagnosticLogCount == CombatNarrationTimingDiagnosticLogLimit)
-            {
-                SocAccessMod.Instance?.LogInfo("Combat narration timing diagnostic reached log limit");
-            }
-        }
-
-        private static string DescribeResponse(ICommandResponse response)
-        {
-            if (response == null)
-            {
-                return "response=null";
-            }
-
-            Type type = response.GetType();
-            return "response=" + (type.FullName ?? type.Name);
-        }
-
-        private static int GetElapsedFrames(int scheduledFrame)
-        {
-            return scheduledFrame >= 0 ? Time.frameCount - scheduledFrame : -1;
-        }
-
-        private static float GetElapsedSeconds(float scheduledTime)
-        {
-            return scheduledTime >= 0f ? Time.realtimeSinceStartup - scheduledTime : -1f;
-        }
-
-        private static string FormatSeconds(float seconds)
-        {
-            return seconds.ToString("0.000", CultureInfo.InvariantCulture);
         }
 
         private sealed class WielderEssenceGeneration
