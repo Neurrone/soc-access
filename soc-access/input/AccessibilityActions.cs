@@ -401,27 +401,22 @@ namespace SongsOfConquestAccess.Input
         }
 
         public static readonly InputAction[] SaveBookmarks =
-            CreateBookmarkActions("save_bookmark", "SaveBookmark", ctrl: true, shift: false, alt: false);
+            CreateBookmarkActions("save_bookmark", ModStrings.Actions.SaveBookmark, ctrl: true, shift: false, alt: false);
 
         public static readonly InputAction[] JumpToBookmarks =
-            CreateBookmarkActions("jump_to_bookmark", "JumpToBookmark", ctrl: false, shift: true, alt: false);
+            CreateBookmarkActions("jump_to_bookmark", ModStrings.Actions.JumpToBookmark, ctrl: false, shift: true, alt: false);
 
         public static readonly InputAction[] SpeakBookmarkDirections =
-            CreateBookmarkActions("speak_bookmark_direction", "SpeakBookmarkDirection", ctrl: false, shift: false, alt: true);
+            CreateBookmarkActions("speak_bookmark_direction", ModStrings.Actions.SpeakBookmarkDirection, ctrl: false, shift: false, alt: true);
 
         public static readonly InputAction[] ToggleBookmarkBeacons =
-            CreateBookmarkActions("toggle_bookmark_beacon", "ToggleBookmarkBeacon", ctrl: true, shift: true, alt: false);
+            CreateBookmarkActions("toggle_bookmark_beacon", ModStrings.Actions.ToggleBookmarkBeacon, ctrl: true, shift: true, alt: false);
 
         public static readonly InputAction[] NON_GLOBAL_ACTIONS = BuildNonGlobalActions();
 
         private static InputAction OneShot(string key, ModString label, InputClaimScope claimScope)
         {
             return new InputAction(key, () => ModText.Get(label), claimScope, InputRepeatPolicy.OneShotUntilRelease());
-        }
-
-        private static InputAction OneShot(string key, string label, InputClaimScope claimScope)
-        {
-            return new InputAction(key, label, claimScope, InputRepeatPolicy.OneShotUntilRelease());
         }
 
         /// <summary>
@@ -439,7 +434,10 @@ namespace SongsOfConquestAccess.Input
                 .AddBinding(new KeyboardBinding(boundKey, shift: shift));
         }
 
-        private static InputAction[] CreateBookmarkActions(string keyPrefix, string labelPrefix, bool ctrl, bool shift, bool alt)
+        /// <summary>Ten actions, one per bookmark slot. The label names the slot the key answers
+        /// for, so it takes the slot number as a placeholder rather than being assembled from an
+        /// English prefix.</summary>
+        private static InputAction[] CreateBookmarkActions(string keyPrefix, ModString label, bool ctrl, bool shift, bool alt)
         {
             Key[] digitKeys =
             {
@@ -458,7 +456,11 @@ namespace SongsOfConquestAccess.Input
             for (int i = 0; i < AdventureBookmarkSlots.All.Length; i++)
             {
                 string slot = AdventureBookmarkSlots.All[i];
-                actions[i] = OneShot(keyPrefix + "_" + slot, labelPrefix + slot, InputClaimScope.FocusedWidget)
+                actions[i] = new InputAction(
+                        keyPrefix + "_" + slot,
+                        () => ModText.Get(label, slot),
+                        InputClaimScope.FocusedWidget,
+                        InputRepeatPolicy.OneShotUntilRelease())
                     .AddBinding(new KeyboardBinding(digitKeys[i], ctrl, shift, alt));
             }
 

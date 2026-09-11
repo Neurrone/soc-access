@@ -1300,6 +1300,11 @@ msgctxt "Actions.HexGridSkipWest"
 msgid "Move to next interesting tile west"
 msgstr "Перейти к следующей интересной клетке на запад"
 
+#. Actions.JumpToBookmark
+msgctxt "Actions.JumpToBookmark"
+msgid "Jump To Bookmark {0}"
+msgstr "Перейти к закладке {0}"
+
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
@@ -1379,6 +1384,11 @@ msgstr "Предыдущий буфер строка"
 msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "Прочитать угрозу"
+
+#. Actions.SaveBookmark
+msgctxt "Actions.SaveBookmark"
+msgid "Save Bookmark {0}"
+msgstr "Сохранить закладку {0}"
 
 #. Actions.ScannerDecreaseLookAroundRadius
 msgctxt "Actions.ScannerDecreaseLookAroundRadius"
@@ -1484,6 +1494,11 @@ msgstr "Отделить {0} отряда"
 msgctxt "Actions.TroopSplit_2"
 msgid "Split Off {0} Troops"
 msgstr "Отделить {0} отрядов"
+
+#. Actions.ToggleBookmarkBeacon
+msgctxt "Actions.ToggleBookmarkBeacon"
+msgid "Toggle Beacon For Bookmark {0}"
+msgstr "Переключить маяк закладки {0}"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -3087,6 +3102,11 @@ msgstr "Не готов"
 msgctxt "Screens.Ready"
 msgid "Ready"
 msgstr "Готов"
+
+#. Actions.SpeakBookmarkDirection
+msgctxt "Actions.SpeakBookmarkDirection"
+msgid "Speak Direction To Bookmark {0}"
+msgstr "Объявить направление к закладке {0}"
 
 #. Actions.SummarizeReachableEntities
 msgctxt "Actions.SummarizeReachableEntities"

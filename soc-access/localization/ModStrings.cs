@@ -266,6 +266,7 @@
             public static readonly ModString HexGridSkipSouthEast = new ModString("Actions.HexGridSkipSouthEast", "Move to next interesting tile south east");
             public static readonly ModString HexGridSkipSouthWest = new ModString("Actions.HexGridSkipSouthWest", "Move to next interesting tile south west");
             public static readonly ModString HexGridSkipWest = new ModString("Actions.HexGridSkipWest", "Move to next interesting tile west");
+            public static readonly ModString JumpToBookmark = new ModString("Actions.JumpToBookmark", "Jump To Bookmark {0}");
             public static readonly ModString LastBufferLine = new ModString("Actions.LastBufferLine", "Last Buffer Line");
             public static readonly ModString MapMoveEast = new ModString("Actions.MapMoveEast", "Map Move East");
             public static readonly ModString MapMoveNorth = new ModString("Actions.MapMoveNorth", "Map Move North");
@@ -282,6 +283,7 @@
             public static readonly ModString PreviousBuffer = new ModString("Actions.PreviousBuffer", "Previous Buffer");
             public static readonly ModString PreviousBufferLine = new ModString("Actions.PreviousBufferLine", "Previous Buffer Line");
             public static readonly ModString ReadThreat = new ModString("Actions.ReadThreat", "Read Threat");
+            public static readonly ModString SaveBookmark = new ModString("Actions.SaveBookmark", "Save Bookmark {0}");
             public static readonly ModString ScannerDecreaseLookAroundRadius = new ModString("Actions.ScannerDecreaseLookAroundRadius", "Decrease Look Around Radius");
             public static readonly ModString ScannerIncreaseLookAroundRadius = new ModString("Actions.ScannerIncreaseLookAroundRadius", "Increase Look Around Radius");
             public static readonly ModString ScannerJumpToResult = new ModString("Actions.ScannerJumpToResult", "Jump To Scanner Result");
@@ -299,11 +301,13 @@
             public static readonly ModString ScannerReturnFromJump = new ModString("Actions.ScannerReturnFromJump", "Return To Tile Before Jump");
             public static readonly ModString ScannerSpeakDistanceAndDirection = new ModString("Actions.ScannerSpeakDistanceAndDirection", "Scanner Result Distance and Direction");
             public static readonly ModString SonarSweep = new ModString("Actions.SonarSweep", "Play Sonar Sweep");
+            public static readonly ModString SpeakBookmarkDirection = new ModString("Actions.SpeakBookmarkDirection", "Speak Direction To Bookmark {0}");
             public static readonly ModString SummarizeReachableEntities = new ModString("Actions.SummarizeReachableEntities", "Summarize Reachable Entities");
             public static readonly ModString SummarizeEnemyResources = new ModString("Actions.SummarizeEnemyResources", "Summarize enemy essence");
             public static readonly ModString SummarizeResources = new ModString("Actions.SummarizeResources", "Summarize Resources");
             /// <summary>The Keybinds row's tooltip: what the gesture does where there are no resources.</summary>
             public static readonly ModString SummarizeResourcesTooltip = new ModString("Actions.SummarizeResourcesTooltip", "Summarizes your essence in combat");
+            public static readonly ModString ToggleBookmarkBeacon = new ModString("Actions.ToggleBookmarkBeacon", "Toggle Beacon For Bookmark {0}");
             public static readonly ModPluralString TroopSplit = new ModPluralString("Actions.TroopSplit", "Split Off {0} Troop", "Split Off {0} Troops");
             public static readonly ModString UiBack = new ModString("Actions.UiBack", "Back");
             /// <summary>The Keybinds row's tooltip for Back: what it does on the two screens with a grid.</summary>

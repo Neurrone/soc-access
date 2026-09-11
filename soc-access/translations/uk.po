@@ -1300,6 +1300,11 @@ msgctxt "Actions.HexGridSkipWest"
 msgid "Move to next interesting tile west"
 msgstr "Перейти до наступної цікавої клітинки на захід"
 
+#. Actions.JumpToBookmark
+msgctxt "Actions.JumpToBookmark"
+msgid "Jump To Bookmark {0}"
+msgstr "Перейти до закладки {0}"
+
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
@@ -1379,6 +1384,11 @@ msgstr "Попередній буфер рядок"
 msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "Прочитати загрозу"
+
+#. Actions.SaveBookmark
+msgctxt "Actions.SaveBookmark"
+msgid "Save Bookmark {0}"
+msgstr "Зберегти закладку {0}"
 
 #. Actions.ScannerDecreaseLookAroundRadius
 msgctxt "Actions.ScannerDecreaseLookAroundRadius"
@@ -1484,6 +1494,11 @@ msgstr "Відокремити {0} війська"
 msgctxt "Actions.TroopSplit_2"
 msgid "Split Off {0} Troops"
 msgstr "Відокремити {0} військ"
+
+#. Actions.ToggleBookmarkBeacon
+msgctxt "Actions.ToggleBookmarkBeacon"
+msgid "Toggle Beacon For Bookmark {0}"
+msgstr "Перемкнути маяк закладки {0}"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -3087,6 +3102,11 @@ msgstr "Не готовий"
 msgctxt "Screens.Ready"
 msgid "Ready"
 msgstr "Готовий"
+
+#. Actions.SpeakBookmarkDirection
+msgctxt "Actions.SpeakBookmarkDirection"
+msgid "Speak Direction To Bookmark {0}"
+msgstr "Оголосити напрямок до закладки {0}"
 
 #. Actions.SummarizeReachableEntities
 msgctxt "Actions.SummarizeReachableEntities"

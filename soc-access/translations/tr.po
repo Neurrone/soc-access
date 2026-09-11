@@ -1280,6 +1280,11 @@ msgctxt "Actions.HexGridSkipWest"
 msgid "Move to next interesting tile west"
 msgstr "Batıdaki bir sonraki ilginç kareye git"
 
+#. Actions.JumpToBookmark
+msgctxt "Actions.JumpToBookmark"
+msgid "Jump To Bookmark {0}"
+msgstr "{0}. yer imine git"
+
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
@@ -1359,6 +1364,11 @@ msgstr "Önceki tampon satır"
 msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "Tehdidi oku"
+
+#. Actions.SaveBookmark
+msgctxt "Actions.SaveBookmark"
+msgid "Save Bookmark {0}"
+msgstr "{0}. yer imini kaydet"
 
 #. Actions.ScannerDecreaseLookAroundRadius
 msgctxt "Actions.ScannerDecreaseLookAroundRadius"
@@ -1454,6 +1464,11 @@ msgstr "Savaşta özünüzü özetler"
 msgctxt "Actions.TroopSplit_0"
 msgid "Split Off {0} Troop"
 msgstr "{0} birlik ayır"
+
+#. Actions.ToggleBookmarkBeacon
+msgctxt "Actions.ToggleBookmarkBeacon"
+msgid "Toggle Beacon For Bookmark {0}"
+msgstr "{0}. yer iminin işaret sesini aç veya kapat"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -3037,6 +3052,11 @@ msgstr "Hazır değil"
 msgctxt "Screens.Ready"
 msgid "Ready"
 msgstr "Hazır"
+
+#. Actions.SpeakBookmarkDirection
+msgctxt "Actions.SpeakBookmarkDirection"
+msgid "Speak Direction To Bookmark {0}"
+msgstr "{0}. yer iminin yönünü seslendir"
 
 #. Actions.SummarizeReachableEntities
 msgctxt "Actions.SummarizeReachableEntities"

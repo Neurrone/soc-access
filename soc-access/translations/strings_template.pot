@@ -1079,6 +1079,11 @@ msgctxt "Actions.HexGridSkipWest"
 msgid "Move to next interesting tile west"
 msgstr ""
 
+#. Actions.JumpToBookmark
+msgctxt "Actions.JumpToBookmark"
+msgid "Jump To Bookmark {0}"
+msgstr ""
+
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
@@ -1157,6 +1162,11 @@ msgstr ""
 #. Actions.ReadThreat
 msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
+msgstr ""
+
+#. Actions.SaveBookmark
+msgctxt "Actions.SaveBookmark"
+msgid "Save Bookmark {0}"
 msgstr ""
 
 #. Actions.ScannerDecreaseLookAroundRadius
@@ -1244,6 +1254,11 @@ msgctxt "Actions.SonarSweep"
 msgid "Play Sonar Sweep"
 msgstr ""
 
+#. Actions.SpeakBookmarkDirection
+msgctxt "Actions.SpeakBookmarkDirection"
+msgid "Speak Direction To Bookmark {0}"
+msgstr ""
+
 #. Actions.SummarizeReachableEntities
 msgctxt "Actions.SummarizeReachableEntities"
 msgid "Summarize Reachable Entities"
@@ -1262,6 +1277,11 @@ msgstr ""
 #. Actions.SummarizeResourcesTooltip
 msgctxt "Actions.SummarizeResourcesTooltip"
 msgid "Summarizes your essence in combat"
+msgstr ""
+
+#. Actions.ToggleBookmarkBeacon
+msgctxt "Actions.ToggleBookmarkBeacon"
+msgid "Toggle Beacon For Bookmark {0}"
 msgstr ""
 
 #. Actions.UiBack

@@ -1290,6 +1290,11 @@ msgctxt "Actions.HexGridSkipWest"
 msgid "Move to next interesting tile west"
 msgstr "Zum nächsten interessanten Feld im Westen bewegen"
 
+#. Actions.JumpToBookmark
+msgctxt "Actions.JumpToBookmark"
+msgid "Jump To Bookmark {0}"
+msgstr "Zu Lesezeichen {0} springen"
+
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
@@ -1369,6 +1374,11 @@ msgstr "Vorheriger Puffer Zeile"
 msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "Bedrohung lesen"
+
+#. Actions.SaveBookmark
+msgctxt "Actions.SaveBookmark"
+msgid "Save Bookmark {0}"
+msgstr "Lesezeichen {0} speichern"
 
 #. Actions.ScannerDecreaseLookAroundRadius
 msgctxt "Actions.ScannerDecreaseLookAroundRadius"
@@ -1469,6 +1479,11 @@ msgstr "{0} Truppe abspalten"
 msgctxt "Actions.TroopSplit_1"
 msgid "Split Off {0} Troops"
 msgstr "{0} Truppen abspalten"
+
+#. Actions.ToggleBookmarkBeacon
+msgctxt "Actions.ToggleBookmarkBeacon"
+msgid "Toggle Beacon For Bookmark {0}"
+msgstr "Beacon für Lesezeichen {0} umschalten"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -3062,6 +3077,11 @@ msgstr "Nicht bereit"
 msgctxt "Screens.Ready"
 msgid "Ready"
 msgstr "Bereit"
+
+#. Actions.SpeakBookmarkDirection
+msgctxt "Actions.SpeakBookmarkDirection"
+msgid "Speak Direction To Bookmark {0}"
+msgstr "Richtung zu Lesezeichen {0} ansagen"
 
 #. Actions.SummarizeReachableEntities
 msgctxt "Actions.SummarizeReachableEntities"

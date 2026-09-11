@@ -1300,6 +1300,11 @@ msgctxt "Actions.HexGridSkipWest"
 msgid "Move to next interesting tile west"
 msgstr "Przejdź do następnego interesującego pola na zachód"
 
+#. Actions.JumpToBookmark
+msgctxt "Actions.JumpToBookmark"
+msgid "Jump To Bookmark {0}"
+msgstr "Przejdź do zakładki {0}"
+
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
@@ -1379,6 +1384,11 @@ msgstr "Poprzedni bufor wiersz"
 msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "Odczytaj zagrożenie"
+
+#. Actions.SaveBookmark
+msgctxt "Actions.SaveBookmark"
+msgid "Save Bookmark {0}"
+msgstr "Zapisz zakładkę {0}"
 
 #. Actions.ScannerDecreaseLookAroundRadius
 msgctxt "Actions.ScannerDecreaseLookAroundRadius"
@@ -1484,6 +1494,11 @@ msgstr "Odłącz {0} oddziały"
 msgctxt "Actions.TroopSplit_2"
 msgid "Split Off {0} Troops"
 msgstr "Odłącz {0} oddziałów"
+
+#. Actions.ToggleBookmarkBeacon
+msgctxt "Actions.ToggleBookmarkBeacon"
+msgid "Toggle Beacon For Bookmark {0}"
+msgstr "Przełącz znacznik dźwiękowy zakładki {0}"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -3087,6 +3102,11 @@ msgstr "Niegotowy"
 msgctxt "Screens.Ready"
 msgid "Ready"
 msgstr "Gotowy"
+
+#. Actions.SpeakBookmarkDirection
+msgctxt "Actions.SpeakBookmarkDirection"
+msgid "Speak Direction To Bookmark {0}"
+msgstr "Odczytaj kierunek do zakładki {0}"
 
 #. Actions.SummarizeReachableEntities
 msgctxt "Actions.SummarizeReachableEntities"

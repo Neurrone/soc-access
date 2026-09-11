@@ -1280,6 +1280,11 @@ msgctxt "Actions.HexGridSkipWest"
 msgid "Move to next interesting tile west"
 msgstr "西の次の注目マスへ移動"
 
+#. Actions.JumpToBookmark
+msgctxt "Actions.JumpToBookmark"
+msgid "Jump To Bookmark {0}"
+msgstr "ブックマーク{0}へ移動"
+
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
@@ -1359,6 +1364,11 @@ msgstr "前 バッファ 行"
 msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "脅威を読み上げ"
+
+#. Actions.SaveBookmark
+msgctxt "Actions.SaveBookmark"
+msgid "Save Bookmark {0}"
+msgstr "ブックマーク{0}を保存"
 
 #. Actions.ScannerDecreaseLookAroundRadius
 msgctxt "Actions.ScannerDecreaseLookAroundRadius"
@@ -1454,6 +1464,11 @@ msgstr "戦闘中は自分のエッセンスを要約します"
 msgctxt "Actions.TroopSplit_0"
 msgid "Split Off {0} Troop"
 msgstr "{0} 部隊を分割"
+
+#. Actions.ToggleBookmarkBeacon
+msgctxt "Actions.ToggleBookmarkBeacon"
+msgid "Toggle Beacon For Bookmark {0}"
+msgstr "ブックマーク{0}のビーコンを切り替え"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -3037,6 +3052,11 @@ msgstr "準備未完了"
 msgctxt "Screens.Ready"
 msgid "Ready"
 msgstr "準備完了"
+
+#. Actions.SpeakBookmarkDirection
+msgctxt "Actions.SpeakBookmarkDirection"
+msgid "Speak Direction To Bookmark {0}"
+msgstr "ブックマーク{0}への方角を読み上げ"
 
 #. Actions.SummarizeReachableEntities
 msgctxt "Actions.SummarizeReachableEntities"

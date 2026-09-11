@@ -1280,6 +1280,11 @@ msgctxt "Actions.HexGridSkipWest"
 msgid "Move to next interesting tile west"
 msgstr "移動到西方向的下一個值得注意的地塊"
 
+#. Actions.JumpToBookmark
+msgctxt "Actions.JumpToBookmark"
+msgid "Jump To Bookmark {0}"
+msgstr "跳至書籤 {0}"
+
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
@@ -1359,6 +1364,11 @@ msgstr "上一個 緩衝區 行"
 msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "讀取威脅"
+
+#. Actions.SaveBookmark
+msgctxt "Actions.SaveBookmark"
+msgid "Save Bookmark {0}"
+msgstr "儲存書籤 {0}"
 
 #. Actions.ScannerDecreaseLookAroundRadius
 msgctxt "Actions.ScannerDecreaseLookAroundRadius"
@@ -1454,6 +1464,11 @@ msgstr "在戰鬥中彙總你的精華"
 msgctxt "Actions.TroopSplit_0"
 msgid "Split Off {0} Troop"
 msgstr "分出 {0} 部隊"
+
+#. Actions.ToggleBookmarkBeacon
+msgctxt "Actions.ToggleBookmarkBeacon"
+msgid "Toggle Beacon For Bookmark {0}"
+msgstr "切換書籤 {0} 的信標"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -3037,6 +3052,11 @@ msgstr "尚未準備"
 msgctxt "Screens.Ready"
 msgid "Ready"
 msgstr "已準備"
+
+#. Actions.SpeakBookmarkDirection
+msgctxt "Actions.SpeakBookmarkDirection"
+msgid "Speak Direction To Bookmark {0}"
+msgstr "朗讀往書籤 {0} 的方向"
 
 #. Actions.SummarizeReachableEntities
 msgctxt "Actions.SummarizeReachableEntities"
