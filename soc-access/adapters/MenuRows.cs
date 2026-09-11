@@ -595,9 +595,10 @@ namespace SongsOfConquestAccess.Adapters
             return component != null && component.gameObject.activeInHierarchy;
         }
 
-        // LAZY, never on a build path: the options are reached only through a Func the node holds,
-        // so the walk is paid when the player opens the dropdown.
-        private static IReadOnlyList<string> DropdownOptions(IUITextMeshDropdown dropdown)
+        /// <summary>The entries the game's dropdown draws, in its own words. LAZY, never on a build
+        /// path: the options are reached only through a Func the node holds, so the walk is paid when
+        /// the player opens the dropdown.</summary>
+        public static IReadOnlyList<string> DropdownOptions(IUITextMeshDropdown dropdown)
         {
             Component component = dropdown as Component;
             TMP_Dropdown tmpDropdown = component != null ? component.GetComponentInChildren<TMP_Dropdown>(true) : null;
@@ -615,7 +616,8 @@ namespace SongsOfConquestAccess.Adapters
             return options;
         }
 
-        private static int DropdownValue(IUITextMeshDropdown dropdown)
+        /// <summary>The entry the dropdown is on, clamped into the list it actually holds.</summary>
+        public static int DropdownValue(IUITextMeshDropdown dropdown)
         {
             if (dropdown == null)
             {
@@ -632,7 +634,9 @@ namespace SongsOfConquestAccess.Adapters
             return value >= count ? count - 1 : value;
         }
 
-        private static bool SetDropdownValue(IUITextMeshDropdown dropdown, int value)
+        /// <summary>Put the dropdown on an entry, clamped; false where it is not taking input.
+        /// </summary>
+        public static bool SetDropdownValue(IUITextMeshDropdown dropdown, int value)
         {
             if (dropdown == null || !dropdown.Active || !dropdown.Interactable)
             {

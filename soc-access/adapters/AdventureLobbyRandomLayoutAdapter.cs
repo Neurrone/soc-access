@@ -14,7 +14,6 @@ using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Map;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -258,24 +257,6 @@ namespace SongsOfConquestAccess.Adapters
             return DropdownGetTextMethod.Invoke(concrete, new object[0]) as Component;
         }
 
-        private static IReadOnlyList<string> GetDropdownOptions(IUITextMeshDropdown dropdown)
-        {
-            Component component = dropdown as Component;
-            TMP_Dropdown tmpDropdown = component != null ? component.GetComponentInChildren<TMP_Dropdown>(true) : null;
-            if (tmpDropdown == null || tmpDropdown.options == null)
-            {
-                return new string[0];
-            }
-
-            List<string> options = new List<string>();
-            for (int i = 0; i < tmpDropdown.options.Count; i++)
-            {
-                options.Add(SpokenLines.Clean(tmpDropdown.options[i].text));
-            }
-
-            return options;
-        }
-
         public sealed class RandomLayoutItem
         {
             private readonly AdventureLobbyRandomLayoutAdapter _owner;
@@ -451,7 +432,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 _dropdown = dropdown;
                 _localization = localization;
-                GetOptions = () => GetDropdownOptions(_dropdown);
+                GetOptions = () => MenuRows.DropdownOptions(_dropdown);
                 GetValue = ReadValue;
                 IsEnabled = () => _dropdown != null && _dropdown.Active && _dropdown.Interactable;
                 IsVisible = () => _dropdown != null && ((Component)_dropdown).gameObject.activeInHierarchy;
@@ -483,22 +464,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool SetValue(int value)
             {
-                if (_dropdown == null || !_dropdown.Active || !_dropdown.Interactable || _dropdown.DropdownValueCount <= 0)
-                {
-                    return false;
-                }
-
-                if (value < 0)
-                {
-                    value = 0;
-                }
-                else if (value >= _dropdown.DropdownValueCount)
-                {
-                    value = _dropdown.DropdownValueCount - 1;
-                }
-
-                _dropdown.DropdownValue = value;
-                return true;
+                return MenuRows.SetDropdownValue(_dropdown, value);
             }
 
             public void Focus()
@@ -517,18 +483,7 @@ namespace SongsOfConquestAccess.Adapters
 
             private int ReadValue()
             {
-                if (_dropdown == null || _dropdown.DropdownValueCount <= 0)
-                {
-                    return 0;
-                }
-
-                int value = _dropdown.DropdownValue;
-                if (value < 0)
-                {
-                    return 0;
-                }
-
-                return value >= _dropdown.DropdownValueCount ? _dropdown.DropdownValueCount - 1 : value;
+                return MenuRows.DropdownValue(_dropdown);
             }
         }
     }

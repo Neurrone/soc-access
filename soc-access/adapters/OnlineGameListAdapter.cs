@@ -158,40 +158,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public int GetRegionValue()
         {
-            UITextMeshDropdown dropdown = _settings != null ? _settings.RegionDropdown : null;
-            if (dropdown == null || dropdown.DropdownValueCount <= 0)
-            {
-                return 0;
-            }
-
-            int value = dropdown.DropdownValue;
-            if (value < 0)
-            {
-                return 0;
-            }
-
-            return value >= dropdown.DropdownValueCount ? dropdown.DropdownValueCount - 1 : value;
+            return MenuRows.DropdownValue(_settings != null ? _settings.RegionDropdown : null);
         }
 
         public bool SetRegionValue(int value)
         {
-            UITextMeshDropdown dropdown = _settings != null ? _settings.RegionDropdown : null;
-            if (dropdown == null || !dropdown.Active || !dropdown.Interactable || dropdown.DropdownValueCount <= 0)
-            {
-                return false;
-            }
-
-            if (value < 0)
-            {
-                value = 0;
-            }
-            else if (value >= dropdown.DropdownValueCount)
-            {
-                value = dropdown.DropdownValueCount - 1;
-            }
-
-            dropdown.DropdownValue = value;
-            return true;
+            return MenuRows.SetDropdownValue(_settings != null ? _settings.RegionDropdown : null, value);
         }
 
         public void FocusRegion()

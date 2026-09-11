@@ -9,7 +9,6 @@ soc-access/adapters/AdventureHudAdapter.cs | 1 | OptionsButtonInstaller installe
 soc-access/adapters/AdventureHudAdapter.cs | 1 | UITextMesh[] texts = container.GetComponentsInChildren<UITextMesh>(false);
 
 
-soc-access/adapters/AdventureLobbyRandomLayoutAdapter.cs | 1 | TMP_Dropdown tmpDropdown = component != null ? component.GetComponentInChildren<TMP_Dropdown>(true) : null;
 
 soc-access/adapters/AdventurePlayerMenuAdapter.cs | 1 | UITextMesh[] texts = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
 soc-access/adapters/AdventurePlayerMenuAdapter.cs | 1 | text = header.GetComponentInChildren<UITextMesh>(includeInactive: true);
