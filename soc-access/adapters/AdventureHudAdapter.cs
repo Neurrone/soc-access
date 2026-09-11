@@ -130,8 +130,17 @@ namespace SongsOfConquestAccess.Adapters
         private EndTurnHUD _endTurnHud;
         private static readonly MethodInfo EndTurnUpdateTooltipMethod = AccessTools.Method(typeof(EndTurnHUD), "UpdateTooltip");
         private TeamQueueHUDBehaviour _teamQueueHud;
-        // Each of these resolvers ends in a whole-scene scan, so a session whose panel is
-        // absent would rescan every frame; the flag makes the miss cost one lookup.
+        // Each of these resolvers ends in a Zenject resolve whose miss is a thrown-and-caught
+        // exception, a whole-scene scan, or both, so a session whose panel is absent would pay it
+        // on every read; the flag makes the miss cost one lookup. Safe as a per-adapter answer
+        // because nothing reads the HUD until AdventureMapAdapter.IsPresent is true, which already
+        // waits for the scene loader to be idle on the adventure - the installers have run by then.
+        private bool _commanderHudSettingsProbed;
+        private bool _resourceHudSettingsProbed;
+        private bool _hudStateSettingsProbed;
+        private bool _hudStateHandlerProbed;
+        private bool _objectivesHudProbed;
+        private bool _objectivesHudSettingsProbed;
         private bool _objectivesHudInstallerProbed;
         private bool _notificationHudProbed;
         private bool _kingdomInformationSettingsProbed;
@@ -140,6 +149,8 @@ namespace SongsOfConquestAccess.Adapters
         private bool _teamQueueHudProbed;
         private UIButton _optionsButton;
         private bool _optionsButtonProbed;
+        // The canvas group each HUD container carries, resolved once. See HudGroupVisible.
+        private readonly Dictionary<GameObject, CanvasGroup> _canvasGroups = new Dictionary<GameObject, CanvasGroup>();
         private List<ObjectiveEntrySnapshot> _objectiveSnapshots;
         private int _objectiveSnapshotsFrame = -1;
         private List<WielderListHUDEntry> _wielderListEntries;
@@ -172,7 +183,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             CommanderHUD.Settings settings = CommanderSettings;
             return settings != null
-                && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.SelectionHUDContainer : null)
+                && HudGroupVisible(HudStateSettings != null ? HudStateSettings.SelectionHUDContainer : null)
                 && GameObjects.IsLive(settings.CommanderContainer as Component)
                 && settings.Portrait != null
                 && settings.Portrait.Commander != null;
@@ -437,7 +448,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             ResourceHUD.Settings settings = ResourceSettings;
             return settings != null
-                && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.ResourceContainer : null)
+                && HudGroupVisible(HudStateSettings != null ? HudStateSettings.ResourceContainer : null)
                 && settings.Container != null
                 && settings.Container.activeInHierarchy;
         }
@@ -679,7 +690,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsNotificationsMenuVisible()
         {
-            return GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.NotificationHUDContainer : null)
+            return HudGroupVisible(HudStateSettings != null ? HudStateSettings.NotificationHUDContainer : null)
                 && GetNotificationEntryCount() > 0;
         }
 
@@ -739,7 +750,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsTownListMenuVisible()
         {
-            return GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.TownListContainer : null)
+            return HudGroupVisible(HudStateSettings != null ? HudStateSettings.TownListContainer : null)
                 && GetTownListEntryCount() > 0;
         }
 
@@ -777,7 +788,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsWielderListMenuVisible()
         {
-            return GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.WielderlistContainer : null)
+            return HudGroupVisible(HudStateSettings != null ? HudStateSettings.WielderlistContainer : null)
                 && GetWielderListEntryCount() > 0;
         }
 
@@ -789,7 +800,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsWielderAmountVisible()
         {
             return IsWielderListMenuVisible()
-                && GameObjects.IsGroupVisible(Reflect.Get<GameObject>(WielderList, WielderAmountContainerField));
+                && HudGroupVisible(Reflect.Get<GameObject>(WielderList, WielderAmountContainerField));
         }
 
         /// <summary>The count the list writes over itself, in the game's own words
@@ -860,7 +871,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsOptionsButtonVisible()
         {
             return IsAdventureHudVisible()
-                && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.OptionsButtonsContainer : null)
+                && HudGroupVisible(HudStateSettings != null ? HudStateSettings.OptionsButtonsContainer : null)
                 && MenuButtonAdapterBase.IsButtonDrawn(GetOptionsButton());
         }
 
@@ -891,7 +902,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsKingdomOverviewMenuVisible()
         {
-            return GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.KingdomOverviewContainer : null)
+            return HudGroupVisible(HudStateSettings != null ? HudStateSettings.KingdomOverviewContainer : null)
                 && KingdomSettings != null;
         }
 
@@ -957,7 +968,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsTeamQueueMenuVisible()
         {
-            return GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.TeamQueueContainer : null)
+            return HudGroupVisible(HudStateSettings != null ? HudStateSettings.TeamQueueContainer : null)
                 && GetTeamQueueEntryCount() > 0;
         }
 
@@ -988,7 +999,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsEndTurnButtonVisible()
         {
             return IsAdventureHudVisible()
-                && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.EndTurnContainer : null)
+                && HudGroupVisible(HudStateSettings != null ? HudStateSettings.EndTurnContainer : null)
                 && MenuButtonAdapterBase.IsButtonDrawn(EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null);
         }
 
@@ -1069,7 +1080,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsRoundTextVisible()
         {
             return IsAdventureHudVisible()
-                && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.TeamQueueContainer : null)
+                && HudGroupVisible(HudStateSettings != null ? HudStateSettings.TeamQueueContainer : null)
                 && !string.IsNullOrWhiteSpace(RoundTextLabel);
         }
 
@@ -1102,8 +1113,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_commanderHudSettings == null)
+                if (_commanderHudSettings == null && !_commanderHudSettingsProbed)
                 {
+                    _commanderHudSettingsProbed = true;
                     _commanderHudSettings = Resolve<CommanderHUD.Settings>();
                     if (_commanderHudSettings == null)
                     {
@@ -1120,8 +1132,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_resourceHudSettings == null)
+                if (_resourceHudSettings == null && !_resourceHudSettingsProbed)
                 {
+                    _resourceHudSettingsProbed = true;
                     _resourceHudSettings = Resolve<ResourceHUD.Settings>();
                     if (_resourceHudSettings == null)
                     {
@@ -1144,8 +1157,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_hudStateSettings == null)
+                if (_hudStateSettings == null && !_hudStateSettingsProbed)
                 {
+                    _hudStateSettingsProbed = true;
                     _hudStateSettings = Resolve<AdventureHUDStateHandler.Settings>();
                     if (_hudStateSettings == null)
                     {
@@ -1162,8 +1176,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_hudStateHandler == null)
+                if (_hudStateHandler == null && !_hudStateHandlerProbed)
                 {
+                    _hudStateHandlerProbed = true;
                     _hudStateHandler = Resolve<AdventureHUDStateHandler>();
                 }
 
@@ -1175,8 +1190,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_objectivesHud == null)
+                if (_objectivesHud == null && !_objectivesHudProbed)
                 {
+                    _objectivesHudProbed = true;
                     _objectivesHud = Resolve<ObjectivesHUD>();
                     if (_objectivesHud == null)
                     {
@@ -1206,8 +1222,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_objectivesHudSettings == null)
+                if (_objectivesHudSettings == null && !_objectivesHudSettingsProbed)
                 {
+                    _objectivesHudSettingsProbed = true;
                     _objectivesHudSettings = Resolve<ObjectivesHUD.Settings>();
                     if (_objectivesHudSettings == null)
                     {
@@ -1516,7 +1533,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             GameObject container = HudStateSettings != null ? HudStateSettings.ObjectivesContainer : null;
-            if (GameObjects.IsGroupVisible(container))
+            if (HudGroupVisible(container))
             {
                 return true;
             }
@@ -1840,6 +1857,33 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Empty;
+        }
+
+        /// <summary>
+        /// <see cref="GameObjects.IsGroupVisible(GameObject)"/> over a HUD container, with the
+        /// container's canvas group resolved once instead of once per read.
+        ///
+        /// Every stop of the map's build asks this, up to twelve times a frame between them, and
+        /// always of the same fixed containers the HUD's settings object holds for as long as the HUD
+        /// lives - which is as long as this adapter does, so the component a container carries cannot
+        /// change under the memo. The MISS is remembered too: a container with no canvas group is the
+        /// common case and would otherwise cost a GetComponent on every read.
+        /// </summary>
+        private bool HudGroupVisible(GameObject container)
+        {
+            if (container == null)
+            {
+                return false;
+            }
+
+            CanvasGroup canvasGroup;
+            if (!_canvasGroups.TryGetValue(container, out canvasGroup))
+            {
+                canvasGroup = container.GetComponent<CanvasGroup>();
+                _canvasGroups.Add(container, canvasGroup);
+            }
+
+            return GameObjects.IsGroupVisible(container, canvasGroup);
         }
 
         private T Resolve<T>() where T : class
