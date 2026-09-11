@@ -1,21 +1,12 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    public sealed class TroopPlacementScannerSpeechContext : IScannerSpeechContext
+    public sealed class TroopPlacementScannerSpeechContext : ScannerSpeechContext
     {
-        private readonly ScannerResult _result;
-        private readonly TroopPlacementTile _tile;
-        private readonly TroopPlacementSnapshot _snapshot;
-        private readonly IReadOnlyList<ScannerDirectionStep> _directions;
-        private readonly int _resultIndex;
-        private readonly int _resultCount;
-        private readonly bool _includeItemName;
-
         public TroopPlacementScannerSpeechContext(
             ScannerResult result,
             TroopPlacementTile tile,
@@ -24,29 +15,16 @@ namespace SongsOfConquestAccess.Scanner
             int resultIndex,
             int resultCount,
             bool includeItemName)
+            : base(
+                result,
+                TroopDeploymentAnnouncementDefinitions.ScannerContent,
+                BuildTileParts(tile, result),
+                () => new TroopPlacementTileSpeechFormatter(snapshot).DescribeCoordinates(tile),
+                directions,
+                resultIndex,
+                resultCount,
+                includeItemName)
         {
-            _result = result;
-            _tile = tile;
-            _snapshot = snapshot;
-            _directions = directions;
-            _resultIndex = resultIndex;
-            _resultCount = resultCount;
-            _includeItemName = includeItemName;
-        }
-
-        public SpeechRequest ToSpeechRequest()
-        {
-            TroopPlacementTileSpeechFormatter formatter = new TroopPlacementTileSpeechFormatter(_snapshot);
-            string text = ScannerResultSpeechFormatter.Compose(
-                ScannerResultSpeechFormatter.ItemName(_result, _includeItemName),
-                ScannerResultContentFormatter.Describe(
-                    TroopDeploymentAnnouncementDefinitions.ScannerContent,
-                    _result,
-                    BuildTileParts()),
-                ScannerSpeechUtility.FormatDirections(_directions),
-                formatter.DescribeCoordinates(_tile),
-                ScannerSpeechUtility.FormatResultCount(_resultIndex, _resultCount));
-            return new SpeechRequest(text, interrupt: false);
         }
 
         /// <summary>
@@ -54,16 +32,16 @@ namespace SongsOfConquestAccess.Scanner
         /// scanner keeps it. A terrain result already names it as its subject,
         /// so it does not get it twice.
         /// </summary>
-        private IEnumerable<AnnouncementPart> BuildTileParts()
+        private static IEnumerable<AnnouncementPart> BuildTileParts(TroopPlacementTile tile, ScannerResult result)
         {
-            if (_tile == null || _tile.Elevation <= 0 || _result == null || _result.Kind == ScannerResultKind.TerrainPoint)
+            if (tile == null || tile.Elevation <= 0 || result == null || result.Kind == ScannerResultKind.TerrainPoint)
             {
                 yield break;
             }
 
             yield return new AnnouncementPart(
                 TroopDeploymentAnnouncementDefinitions.TileKeys.Elevation,
-                ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, _tile.Elevation));
+                ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation));
         }
     }
 }

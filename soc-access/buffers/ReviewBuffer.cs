@@ -19,6 +19,14 @@ namespace SongsOfConquestAccess.Buffers
 
     public sealed class ReviewBuffer
     {
+        /// <summary>
+        /// How many lines a buffer keeps. A session can announce without limit, so the oldest line
+        /// is dropped once the buffer is full; the cursor moves down with it and keeps pointing at
+        /// the line it was on. Generous enough that reviewing a whole battle or a whole turn still
+        /// reaches the start of it.
+        /// </summary>
+        public const int MaxLines = 2000;
+
         private readonly List<string> _lines = new List<string>();
 
         public ReviewBuffer(ReviewBufferKind kind, bool followLatest)
@@ -164,6 +172,13 @@ namespace SongsOfConquestAccess.Buffers
             }
 
             _lines.Add(line.Trim());
+            if (_lines.Count > MaxLines)
+            {
+                int dropped = _lines.Count - MaxLines;
+                _lines.RemoveRange(0, dropped);
+                CurrentLineIndex = CurrentLineIndex > dropped ? CurrentLineIndex - dropped : 0;
+            }
+
             return true;
         }
 

@@ -47,11 +47,6 @@ namespace SongsOfConquestAccess.Audio.Synth
             Refill();
         }
 
-        public int SampleRate
-        {
-            get { return _sampleRate; }
-        }
-
         /// <summary>A grain over the next <paramref name="seconds"/> of pool, advancing the cursor.</summary>
         public BufferGrain Take(double seconds)
         {

@@ -1,19 +1,11 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    public sealed class AdventureScannerSpeechContext : IScannerSpeechContext
+    public sealed class AdventureScannerSpeechContext : ScannerSpeechContext
     {
-        private readonly ScannerResult _result;
-        private readonly AdventureMapTile _tile;
-        private readonly IReadOnlyList<ScannerDirectionStep> _directions;
-        private readonly int _resultIndex;
-        private readonly int _resultCount;
-        private readonly bool _includeItemName;
-
         public AdventureScannerSpeechContext(
             ScannerResult result,
             AdventureMapTile tile,
@@ -21,28 +13,16 @@ namespace SongsOfConquestAccess.Scanner
             int resultIndex,
             int resultCount,
             bool includeItemName)
+            : base(
+                result,
+                AdventureMapAnnouncementDefinitions.ScannerContent,
+                BuildTileParts(tile),
+                () => new AdventureMapTileSpeechFormatter().DescribeCoordinates(tile),
+                directions,
+                resultIndex,
+                resultCount,
+                includeItemName)
         {
-            _result = result;
-            _tile = tile;
-            _directions = directions;
-            _resultIndex = resultIndex;
-            _resultCount = resultCount;
-            _includeItemName = includeItemName;
-        }
-
-        public SpeechRequest ToSpeechRequest()
-        {
-            AdventureMapTileSpeechFormatter formatter = new AdventureMapTileSpeechFormatter();
-            string text = ScannerResultSpeechFormatter.Compose(
-                ScannerResultSpeechFormatter.ItemName(_result, _includeItemName),
-                ScannerResultContentFormatter.Describe(
-                    AdventureMapAnnouncementDefinitions.ScannerContent,
-                    _result,
-                    BuildTileParts(_tile)),
-                ScannerSpeechUtility.FormatDirections(_directions),
-                formatter.DescribeCoordinates(_tile),
-                ScannerSpeechUtility.FormatResultCount(_resultIndex, _resultCount));
-            return new SpeechRequest(text, interrupt: false);
         }
 
         /// <summary>

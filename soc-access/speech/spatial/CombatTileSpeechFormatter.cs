@@ -60,7 +60,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 }
             }
 
-            return string.Join(", ", parts.ToArray());
+            return ModText.JoinListWithCommas(parts);
         }
 
         public string DescribeTroop(CombatTile tile)
@@ -96,8 +96,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     ModText.Get(ModStrings.Spatial.Enemy)));
             }
 
-            AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.TroopName, _adapter.GetTroopNameForSpeech(tile.Troop));
-            AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.Health, _adapter.GetTroopHealthForSpeech(tile.Troop));
+            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.TroopName, _adapter.GetTroopNameForSpeech(tile.Troop));
+            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.Health, _adapter.GetTroopHealthForSpeech(tile.Troop));
 
             BeamFacing? facing = _adapter.PerformsBeamAttacks(tile.Troop) ? _adapter.GetBeamFacing(tile.Troop) : null;
             if (facing.HasValue)
@@ -125,8 +125,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     ModText.Get(ModStrings.Scanner.Attackable)));
             }
 
-            AddIfPresent(parts, CombatAnnouncementDefinitions.EntityKeys.EntityName, _adapter.GetEntityNameForSpeech(tile.Entity));
-            AddIfPresent(parts, CombatAnnouncementDefinitions.EntityKeys.Health, _adapter.GetEntityHealthForSpeech(tile.Entity));
+            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.EntityKeys.EntityName, _adapter.GetEntityNameForSpeech(tile.Entity));
+            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.EntityKeys.Health, _adapter.GetEntityHealthForSpeech(tile.Entity));
             return ConfigurableAnnouncementComposer.Compose(CombatAnnouncementDefinitions.Entity, parts);
         }
 
@@ -221,15 +221,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 }
             }
 
-            return string.Join(", ", parts.ToArray());
-        }
-
-        private static void AddIfPresent(List<AnnouncementPart> parts, string key, string text)
-        {
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                parts.Add(new AnnouncementPart(key, text));
-            }
+            return ModText.JoinListWithCommas(parts);
         }
 
         private static void AddTilePartIfPresent(string key, string text, out AnnouncementPart part)

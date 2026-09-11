@@ -26,20 +26,12 @@ namespace SongsOfConquestAccess.Scanner
         public static string Compose(string item, string content, string direction, string coordinates, string resultPosition)
         {
             List<AnnouncementPart> parts = new List<AnnouncementPart>();
-            AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Item, item);
-            AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Content, content);
-            AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Direction, direction);
-            AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Coordinates, coordinates);
-            AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.ResultPosition, resultPosition);
+            AnnouncementPart.AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Item, item);
+            AnnouncementPart.AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Content, content);
+            AnnouncementPart.AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Direction, direction);
+            AnnouncementPart.AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Coordinates, coordinates);
+            AnnouncementPart.AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.ResultPosition, resultPosition);
             return ConfigurableAnnouncementComposer.Compose(ScannerAnnouncementDefinitions.Result, parts);
-        }
-
-        private static void AddIfPresent(List<AnnouncementPart> parts, string key, string text)
-        {
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                parts.Add(new AnnouncementPart(key, text));
-            }
         }
     }
 }

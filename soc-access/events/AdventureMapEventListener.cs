@@ -28,21 +28,16 @@ namespace SongsOfConquestAccess.Events
         private readonly AdventureMapRevealedRegistry _revealedRegistry;
         private readonly Dictionary<int, bool> _lastVisibleNonLocalCommanders = new Dictionary<int, bool>();
         private readonly Dictionary<int, bool> _announcedVisibleNonLocalCommanders = new Dictionary<int, bool>();
-        private readonly Dictionary<string, DiscoveryCount> _pendingDiscoveryCounts =
-            new Dictionary<string, DiscoveryCount>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, string> _pendingDiscoveryLabelsByKey = new Dictionary<string, string>();
-        private readonly Dictionary<string, PendingRevealedEntry> _pendingRevealedEntriesByKey =
-            new Dictionary<string, PendingRevealedEntry>();
-        private readonly List<string> _pendingDiscoveryOrder = new List<string>();
-        private readonly List<string> _pendingDiscoveryKeyOrder = new List<string>();
-        private readonly Dictionary<string, DiscoveryCount> _pendingHiddenWielderCounts =
-            new Dictionary<string, DiscoveryCount>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, string> _pendingHiddenWielderLabelsByKey = new Dictionary<string, string>();
-        private readonly List<string> _pendingHiddenWielderOrder = new List<string>();
+        private readonly PendingAnnouncementLedger _pendingDiscoveries = new PendingAnnouncementLedger();
+        private readonly PendingAnnouncementLedger _pendingHiddenWielders = new PendingAnnouncementLedger();
         private readonly HashSet<int> _discoveredMapEntityIds = new HashSet<int>();
         private readonly Dictionary<int, string> _discoveredMapEntityLabelsById = new Dictionary<int, string>();
         private readonly HashSet<int> _knownLocalCommanderIds = new HashSet<int>();
-        private byte[] _lastExploration;
+        private readonly HashSet<int> _seenNonLocalCommanderIds = new HashSet<int>();
+        private readonly List<int> _staleNonLocalCommanderIds = new List<int>();
+        private int _lastExplorationLength = -1;
+        private long _lastDiscoverySweepKey;
+        private bool _hasDiscoverySweepKey;
         private bool _attached;
 
         public AdventureMapEventListener(
@@ -183,7 +178,8 @@ namespace SongsOfConquestAccess.Events
             }
 
             ClearPendingDiscoveries();
-            _lastExploration = null;
+            _lastExplorationLength = -1;
+            _hasDiscoverySweepKey = false;
             _lastVisibleNonLocalCommanders.Clear();
             _announcedVisibleNonLocalCommanders.Clear();
             _discoveredMapEntityIds.Clear();
@@ -426,24 +422,14 @@ namespace SongsOfConquestAccess.Events
         private void HandleFogUpdated()
         {
             RaiseMapChanged();
-            byte[] currentExploration = GetLocalExplorationSnapshot();
-            if (currentExploration == null || currentExploration.Length == 0)
+            int explorationLength = GetLocalExplorationLength();
+            if (explorationLength <= 0 || _lastExplorationLength != explorationLength)
             {
-                _lastExploration = currentExploration;
+                _lastExplorationLength = explorationLength;
                 RefreshMapEntityDiscoveryBaseline();
                 RefreshNonLocalCommanderVisibilityBaseline();
                 return;
             }
-
-            if (_lastExploration == null || _lastExploration.Length != currentExploration.Length)
-            {
-                _lastExploration = currentExploration;
-                RefreshMapEntityDiscoveryBaseline();
-                RefreshNonLocalCommanderVisibilityBaseline();
-                return;
-            }
-
-            _lastExploration = currentExploration;
 
             bool added = AddKnownMapEntityDiscoveries();
             added = RefreshNonLocalCommanderVisibility(announceTransitions: true) || added;
@@ -455,7 +441,7 @@ namespace SongsOfConquestAccess.Events
 
         private void CaptureDiscoveryBaseline()
         {
-            _lastExploration = GetLocalExplorationSnapshot();
+            _lastExplorationLength = GetLocalExplorationLength();
             RefreshMapEntityDiscoveryBaseline();
             RefreshNonLocalCommanderVisibilityBaseline();
         }
@@ -488,12 +474,30 @@ namespace SongsOfConquestAccess.Events
             }
         }
 
+        /// <summary>
+        /// Walks every map entity looking for newly identifiable ones. The fog manager raises
+        /// onFogUpdated every frame while a fog actor is moving, so the walk is gated on a key read
+        /// from the game each call: how much of the map is explored, where every commander stands,
+        /// and which commander is selected. Those are the sweep's inputs - a tile becomes known when
+        /// it is explored, and an entity's label comes from the scouting detail level, which the
+        /// game computes from the local partnership's commander positions. They change once per tile
+        /// step where the fog event fires once per frame.
+        /// </summary>
         private bool AddKnownMapEntityDiscoveries()
         {
             if (_facade == null || _facade.MapEntities == null)
             {
                 return false;
             }
+
+            long sweepKey = GetDiscoverySweepKey();
+            if (_hasDiscoverySweepKey && sweepKey == _lastDiscoverySweepKey)
+            {
+                return false;
+            }
+
+            _lastDiscoverySweepKey = sweepKey;
+            _hasDiscoverySweepKey = true;
 
             IEnumerable<IMapEntity> entities = _facade.MapEntities.All;
             if (entities == null)
@@ -554,6 +558,60 @@ namespace SongsOfConquestAccess.Events
                 AdventureMapRevealedKind.MapEntity);
         }
 
+        private long GetDiscoverySweepKey()
+        {
+            long key = 17;
+            key = Mix(key, GetLocalTeamId());
+
+            byte[] exploration = GetLocalExploration();
+            key = Mix(key, exploration == null ? -1 : exploration.Length);
+            int exploredCount = 0;
+            if (exploration != null)
+            {
+                for (int i = 0; i < exploration.Length; i++)
+                {
+                    if (exploration[i] != 0)
+                    {
+                        exploredCount++;
+                    }
+                }
+            }
+
+            key = Mix(key, exploredCount);
+
+            ICommanderState selected = _selectionHandler != null ? _selectionHandler.SelectedCommander : null;
+            key = Mix(key, selected != null ? selected.Id : -1);
+
+            IEnumerable<ICommanderState> commanders = _facade != null && _facade.Commanders != null
+                ? _facade.Commanders.All
+                : null;
+            if (commanders != null)
+            {
+                foreach (ICommanderState commander in commanders)
+                {
+                    if (commander == null)
+                    {
+                        continue;
+                    }
+
+                    key = Mix(key, commander.Id);
+                    key = Mix(key, commander.Position.x);
+                    key = Mix(key, commander.Position.y);
+                    key = Mix(key, commander.IsAlive ? 1 : 0);
+                }
+            }
+
+            return key;
+        }
+
+        private static long Mix(long key, int value)
+        {
+            unchecked
+            {
+                return (key * 1099511628211L) ^ value;
+            }
+        }
+
         private bool ShouldConsiderMapEntityDiscovery(IMapEntity entity)
         {
             return entity != null
@@ -586,7 +644,8 @@ namespace SongsOfConquestAccess.Events
                 return false;
             }
 
-            HashSet<int> seen = new HashSet<int>();
+            HashSet<int> seen = _seenNonLocalCommanderIds;
+            seen.Clear();
             bool added = false;
             foreach (ICommanderState commander in commanders)
             {
@@ -670,7 +729,8 @@ namespace SongsOfConquestAccess.Events
 
         private void RemoveStaleCommanderVisibility(HashSet<int> seen)
         {
-            List<int> stale = new List<int>();
+            List<int> stale = _staleNonLocalCommanderIds;
+            stale.Clear();
             foreach (int commanderId in _lastVisibleNonLocalCommanders.Keys)
             {
                 if (seen == null || !seen.Contains(commanderId))
@@ -702,161 +762,48 @@ namespace SongsOfConquestAccess.Events
             int stableReference,
             AdventureMapRevealedKind kind)
         {
-            if (string.IsNullOrWhiteSpace(label))
+            if (!_pendingDiscoveries.Add(objectKey, label))
             {
                 return false;
             }
 
-            if (!string.IsNullOrWhiteSpace(objectKey))
-            {
-                if (_pendingDiscoveryLabelsByKey.ContainsKey(objectKey))
-                {
-                    return false;
-                }
-
-                _pendingDiscoveryLabelsByKey[objectKey] = label;
-                _pendingRevealedEntriesByKey[objectKey] = new PendingRevealedEntry(
-                    objectKey,
-                    label,
-                    position,
-                    stableReference,
-                    kind);
-                _pendingDiscoveryKeyOrder.Add(objectKey);
-            }
-
-            DiscoveryCount count;
-            if (_pendingDiscoveryCounts.TryGetValue(label, out count))
-            {
-                count.Count++;
-                _pendingDiscoveryCounts[label] = count;
-            }
-            else
-            {
-                _pendingDiscoveryCounts[label] = new DiscoveryCount(label, 1);
-                _pendingDiscoveryOrder.Add(label);
-            }
-
+            _pendingDiscoveries.SetEntry(
+                objectKey,
+                new PendingRevealedEntry(objectKey, label, position, stableReference, kind));
             return true;
         }
 
         private bool RemovePendingDiscovery(string objectKey)
         {
-            if (string.IsNullOrWhiteSpace(objectKey))
-            {
-                return false;
-            }
-
-            string label;
-            if (!_pendingDiscoveryLabelsByKey.TryGetValue(objectKey, out label))
-            {
-                return false;
-            }
-
-            _pendingDiscoveryLabelsByKey.Remove(objectKey);
-            _pendingRevealedEntriesByKey.Remove(objectKey);
-            _pendingDiscoveryKeyOrder.Remove(objectKey);
-            DiscoveryCount count;
-            if (!_pendingDiscoveryCounts.TryGetValue(label, out count))
-            {
-                return true;
-            }
-
-            if (count.Count <= 1)
-            {
-                _pendingDiscoveryCounts.Remove(label);
-                _pendingDiscoveryOrder.Remove(label);
-            }
-            else
-            {
-                count.Count--;
-                _pendingDiscoveryCounts[label] = count;
-            }
-
-            return true;
+            return _pendingDiscoveries.Remove(objectKey);
         }
 
         private bool AddPendingHiddenWielder(string objectKey, string label)
         {
-            if (string.IsNullOrWhiteSpace(label))
-            {
-                return false;
-            }
-
-            if (!string.IsNullOrWhiteSpace(objectKey))
-            {
-                if (_pendingHiddenWielderLabelsByKey.ContainsKey(objectKey))
-                {
-                    return false;
-                }
-
-                _pendingHiddenWielderLabelsByKey[objectKey] = label;
-            }
-
-            DiscoveryCount count;
-            if (_pendingHiddenWielderCounts.TryGetValue(label, out count))
-            {
-                count.Count++;
-                _pendingHiddenWielderCounts[label] = count;
-            }
-            else
-            {
-                _pendingHiddenWielderCounts[label] = new DiscoveryCount(label, 1);
-                _pendingHiddenWielderOrder.Add(label);
-            }
-
-            return true;
+            return _pendingHiddenWielders.Add(objectKey, label);
         }
 
         private bool RemovePendingHiddenWielder(string objectKey)
         {
-            if (string.IsNullOrWhiteSpace(objectKey))
-            {
-                return false;
-            }
-
-            string label;
-            if (!_pendingHiddenWielderLabelsByKey.TryGetValue(objectKey, out label))
-            {
-                return false;
-            }
-
-            _pendingHiddenWielderLabelsByKey.Remove(objectKey);
-            DiscoveryCount count;
-            if (!_pendingHiddenWielderCounts.TryGetValue(label, out count))
-            {
-                return true;
-            }
-
-            if (count.Count <= 1)
-            {
-                _pendingHiddenWielderCounts.Remove(label);
-                _pendingHiddenWielderOrder.Remove(label);
-            }
-            else
-            {
-                count.Count--;
-                _pendingHiddenWielderCounts[label] = count;
-            }
-
-            return true;
+            return _pendingHiddenWielders.Remove(objectKey);
         }
 
         private void FlushPendingDiscoveriesIfReady()
         {
-            if ((_pendingDiscoveryOrder.Count == 0 && _pendingHiddenWielderOrder.Count == 0)
+            if ((_pendingDiscoveries.IsEmpty && _pendingHiddenWielders.IsEmpty)
                 || IsMovementInProgress())
             {
                 return;
             }
 
             RevalidatePendingMapEntityDiscoveries();
-            if (_pendingDiscoveryOrder.Count == 0 && _pendingHiddenWielderOrder.Count == 0)
+            if (_pendingDiscoveries.IsEmpty && _pendingHiddenWielders.IsEmpty)
             {
                 return;
             }
 
-            List<string> discoveredItems = BuildPendingItems(_pendingDiscoveryOrder, _pendingDiscoveryCounts);
-            List<string> hiddenWielders = BuildPendingItems(_pendingHiddenWielderOrder, _pendingHiddenWielderCounts);
+            List<string> discoveredItems = _pendingDiscoveries.BuildItems();
+            List<string> hiddenWielders = _pendingHiddenWielders.BuildItems();
             AddPendingDiscoveriesToRevealedRegistry();
             ApplyFlushedCommanderVisibilityStates();
             ClearPendingDiscoveries();
@@ -873,11 +820,12 @@ namespace SongsOfConquestAccess.Events
 
         private void RevalidatePendingMapEntityDiscoveries()
         {
-            for (int i = _pendingDiscoveryKeyOrder.Count - 1; i >= 0; i--)
+            IReadOnlyList<string> keys = _pendingDiscoveries.KeyOrder;
+            for (int i = keys.Count - 1; i >= 0; i--)
             {
-                string key = _pendingDiscoveryKeyOrder[i];
+                string key = keys[i];
                 PendingRevealedEntry entry;
-                if (!_pendingRevealedEntriesByKey.TryGetValue(key, out entry)
+                if (!_pendingDiscoveries.TryGetEntry(key, out entry)
                     || entry.Kind != AdventureMapRevealedKind.MapEntity)
                 {
                     continue;
@@ -902,105 +850,26 @@ namespace SongsOfConquestAccess.Events
                 bool labelChanged = !string.IsNullOrWhiteSpace(label) && !LabelsMatch(entry.Label, label);
                 if (revealTile != entry.Position || labelChanged)
                 {
-                    _pendingRevealedEntriesByKey[key] = new PendingRevealedEntry(
+                    _pendingDiscoveries.SetEntry(key, new PendingRevealedEntry(
                         entry.Key,
                         labelChanged ? label : entry.Label,
                         revealTile,
                         entry.StableReference,
-                        entry.Kind);
+                        entry.Kind));
                 }
 
                 if (labelChanged)
                 {
-                    ReplacePendingDiscoveryLabel(key, label);
+                    _pendingDiscoveries.ReplaceLabel(key, label);
                     _discoveredMapEntityLabelsById[entry.StableReference] = label;
                 }
             }
         }
 
-        private static List<string> BuildPendingItems(List<string> order, Dictionary<string, DiscoveryCount> counts)
-        {
-            List<string> items = new List<string>();
-            if (order == null || counts == null)
-            {
-                return items;
-            }
-
-            for (int i = 0; i < order.Count; i++)
-            {
-                DiscoveryCount count;
-                if (!counts.TryGetValue(order[i], out count))
-                {
-                    continue;
-                }
-
-                items.Add(count.Count <= 1
-                    ? count.Label
-                    : ModText.Get(ModStrings.Common.ResourceAmount, count.Count, count.Label));
-            }
-
-            return items;
-        }
-
         private void ClearPendingDiscoveries()
         {
-            _pendingDiscoveryCounts.Clear();
-            _pendingDiscoveryLabelsByKey.Clear();
-            _pendingRevealedEntriesByKey.Clear();
-            _pendingDiscoveryOrder.Clear();
-            _pendingDiscoveryKeyOrder.Clear();
-            _pendingHiddenWielderCounts.Clear();
-            _pendingHiddenWielderLabelsByKey.Clear();
-            _pendingHiddenWielderOrder.Clear();
-        }
-
-        private bool ReplacePendingDiscoveryLabel(string objectKey, string newLabel)
-        {
-            if (string.IsNullOrWhiteSpace(objectKey) || string.IsNullOrWhiteSpace(newLabel))
-            {
-                return false;
-            }
-
-            string oldLabel;
-            if (!_pendingDiscoveryLabelsByKey.TryGetValue(objectKey, out oldLabel)
-                || LabelsMatch(oldLabel, newLabel))
-            {
-                return false;
-            }
-
-            DecrementPendingDiscoveryCount(oldLabel);
-            _pendingDiscoveryLabelsByKey[objectKey] = newLabel;
-
-            DiscoveryCount count;
-            if (_pendingDiscoveryCounts.TryGetValue(newLabel, out count))
-            {
-                _pendingDiscoveryCounts[newLabel] = new DiscoveryCount(newLabel, count.Count + 1);
-            }
-            else
-            {
-                _pendingDiscoveryCounts[newLabel] = new DiscoveryCount(newLabel, 1);
-                _pendingDiscoveryOrder.Add(newLabel);
-            }
-
-            return true;
-        }
-
-        private void DecrementPendingDiscoveryCount(string label)
-        {
-            DiscoveryCount count;
-            if (string.IsNullOrWhiteSpace(label) || !_pendingDiscoveryCounts.TryGetValue(label, out count))
-            {
-                return;
-            }
-
-            if (count.Count <= 1)
-            {
-                _pendingDiscoveryCounts.Remove(label);
-                _pendingDiscoveryOrder.Remove(label);
-                return;
-            }
-
-            _pendingDiscoveryCounts[label] = new DiscoveryCount(label, count.Count - 1);
+            _pendingDiscoveries.Clear();
+            _pendingHiddenWielders.Clear();
         }
 
         private void AddPendingDiscoveriesToRevealedRegistry()
@@ -1010,10 +879,11 @@ namespace SongsOfConquestAccess.Events
                 return;
             }
 
-            for (int i = 0; i < _pendingDiscoveryKeyOrder.Count; i++)
+            IReadOnlyList<string> keys = _pendingDiscoveries.KeyOrder;
+            for (int i = 0; i < keys.Count; i++)
             {
                 PendingRevealedEntry entry;
-                if (!_pendingRevealedEntriesByKey.TryGetValue(_pendingDiscoveryKeyOrder[i], out entry))
+                if (!_pendingDiscoveries.TryGetEntry(keys[i], out entry))
                 {
                     continue;
                 }
@@ -1029,10 +899,11 @@ namespace SongsOfConquestAccess.Events
 
         private void ApplyFlushedCommanderVisibilityStates()
         {
-            for (int i = 0; i < _pendingDiscoveryKeyOrder.Count; i++)
+            IReadOnlyList<string> keys = _pendingDiscoveries.KeyOrder;
+            for (int i = 0; i < keys.Count; i++)
             {
                 PendingRevealedEntry entry;
-                if (_pendingRevealedEntriesByKey.TryGetValue(_pendingDiscoveryKeyOrder[i], out entry)
+                if (_pendingDiscoveries.TryGetEntry(keys[i], out entry)
                     && entry.Kind == AdventureMapRevealedKind.Wielder
                     && TryParseCommanderDiscoveryKey(entry.Key, out int commanderId))
                 {
@@ -1040,7 +911,7 @@ namespace SongsOfConquestAccess.Events
                 }
             }
 
-            foreach (string key in _pendingHiddenWielderLabelsByKey.Keys)
+            foreach (string key in _pendingHiddenWielders.KeyOrder)
             {
                 if (TryParseCommanderDiscoveryKey(key, out int commanderId))
                 {
@@ -1062,16 +933,11 @@ namespace SongsOfConquestAccess.Events
                 StringComparison.Ordinal);
         }
 
+        // The game's Get is a dictionary TryGetValue (AbstractMapEntityManager.Get), so an id it
+        // does not know answers null rather than throwing.
         private IMapEntity TryGetMapEntity(int id)
         {
-            try
-            {
-                return _facade != null && _facade.MapEntities != null ? _facade.MapEntities.Get(id) : null;
-            }
-            catch
-            {
-                return null;
-            }
+            return _facade != null && _facade.MapEntities != null ? _facade.MapEntities.Get(id) : null;
         }
 
         private static string CommanderDiscoveryKey(int commanderId)
@@ -1095,19 +961,24 @@ namespace SongsOfConquestAccess.Events
                 return false;
             }
 
-            try
-            {
-                HumanAdventureController.State state = _humanAdventureControllerFacade.StateMachine.CurrentStateType;
-                return state == HumanAdventureController.State.CommanderMoveToPoint
-                    || state == HumanAdventureController.State.WaitForCommanderToFinish;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            // CurrentStateType is a plain field read on the game's StateMachine, and the two
+            // objects that lead to it are null-checked above, so there is nothing here to throw.
+            HumanAdventureController.State state = _humanAdventureControllerFacade.StateMachine.CurrentStateType;
+            return state == HumanAdventureController.State.CommanderMoveToPoint
+                || state == HumanAdventureController.State.WaitForCommanderToFinish;
         }
 
-        private byte[] GetLocalExplorationSnapshot()
+        /// <summary>
+        /// The length of the local team's exploration array, or -1 when the game has none. Only the
+        /// length was ever compared against the previous update, so the array is read, never copied.
+        /// </summary>
+        private int GetLocalExplorationLength()
+        {
+            byte[] exploration = GetLocalExploration();
+            return exploration == null ? -1 : exploration.Length;
+        }
+
+        private byte[] GetLocalExploration()
         {
             int localTeamId = GetLocalTeamId();
             if (localTeamId < 0 || _facade == null || _facade.Level == null)
@@ -1115,15 +986,7 @@ namespace SongsOfConquestAccess.Events
                 return null;
             }
 
-            byte[] exploration = _facade.Level.GetExplorationForTeam(localTeamId);
-            if (exploration == null)
-            {
-                return null;
-            }
-
-            byte[] copy = new byte[exploration.Length];
-            Array.Copy(exploration, copy, exploration.Length);
-            return copy;
+            return _facade.Level.GetExplorationForTeam(localTeamId);
         }
 
         private int GetLocalTeamId()
@@ -1143,14 +1006,10 @@ namespace SongsOfConquestAccess.Events
                 return false;
             }
 
-            try
-            {
-                return _fogManager.IsVisible(point);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            // FogRenderer.GetFog answers 0 for a point outside the fog area and for a renderer
+            // that is not valid yet, so an off-map point is false rather than a throw. The same
+            // call is already made unguarded in ShouldPublishCommanderPositionEvent.
+            return _fogManager.IsVisible(point);
         }
 
         private bool ShouldPublishCommanderPositionEvent(ICommanderState commander, UnityEngine.Vector2Int tile)
@@ -1192,21 +1051,170 @@ namespace SongsOfConquestAccess.Events
             return AdventureMapEntityLabel.GetMapEntityName(_facade, _selectionHandler, _localizationHandler, entity);
         }
 
-        private string Localize(string key)
+        /// <summary>
+        /// One queue of announcements waiting for movement to finish: a line per distinct label
+        /// with how many objects carry it, in the order the labels first appeared, and the object
+        /// keys that contributed so one can be withdrawn again before the queue is spoken. The
+        /// listener keeps two, one for what was revealed and one for the wielders that went out of
+        /// sight, and a key never belongs to both at once.
+        /// </summary>
+        private sealed class PendingAnnouncementLedger
         {
-            if (string.IsNullOrWhiteSpace(key) || _localizationHandler == null)
+            private readonly Dictionary<string, DiscoveryCount> _countsByLabel =
+                new Dictionary<string, DiscoveryCount>(StringComparer.OrdinalIgnoreCase);
+            private readonly Dictionary<string, string> _labelsByKey = new Dictionary<string, string>();
+            private readonly Dictionary<string, PendingRevealedEntry> _entriesByKey =
+                new Dictionary<string, PendingRevealedEntry>();
+            private readonly List<string> _labelOrder = new List<string>();
+            private readonly List<string> _keyOrder = new List<string>();
+
+            public bool IsEmpty
             {
-                return string.Empty;
+                get { return _labelOrder.Count == 0; }
             }
 
-            try
+            /// <summary>The object keys in the order they were added.</summary>
+            public IReadOnlyList<string> KeyOrder
             {
-                string text = _localizationHandler.GetText(key);
-                return string.IsNullOrWhiteSpace(text) || text == key ? string.Empty : text;
+                get { return _keyOrder; }
             }
-            catch (Exception)
+
+            public bool Add(string objectKey, string label)
             {
-                return string.Empty;
+                if (string.IsNullOrWhiteSpace(label))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(objectKey))
+                {
+                    if (_labelsByKey.ContainsKey(objectKey))
+                    {
+                        return false;
+                    }
+
+                    _labelsByKey[objectKey] = label;
+                    _keyOrder.Add(objectKey);
+                }
+
+                Increment(label);
+                return true;
+            }
+
+            /// <summary>Attaches what the revealed registry needs; ignored for a key that is not queued.</summary>
+            public void SetEntry(string objectKey, PendingRevealedEntry entry)
+            {
+                if (string.IsNullOrWhiteSpace(objectKey) || !_labelsByKey.ContainsKey(objectKey))
+                {
+                    return;
+                }
+
+                _entriesByKey[objectKey] = entry;
+            }
+
+            public bool TryGetEntry(string objectKey, out PendingRevealedEntry entry)
+            {
+                entry = default(PendingRevealedEntry);
+                return !string.IsNullOrWhiteSpace(objectKey) && _entriesByKey.TryGetValue(objectKey, out entry);
+            }
+
+            public bool Remove(string objectKey)
+            {
+                if (string.IsNullOrWhiteSpace(objectKey))
+                {
+                    return false;
+                }
+
+                string label;
+                if (!_labelsByKey.TryGetValue(objectKey, out label))
+                {
+                    return false;
+                }
+
+                _labelsByKey.Remove(objectKey);
+                _entriesByKey.Remove(objectKey);
+                _keyOrder.Remove(objectKey);
+                Decrement(label);
+                return true;
+            }
+
+            /// <summary>Moves one queued object to a different label, keeping the counts right.</summary>
+            public bool ReplaceLabel(string objectKey, string newLabel)
+            {
+                if (string.IsNullOrWhiteSpace(objectKey) || string.IsNullOrWhiteSpace(newLabel))
+                {
+                    return false;
+                }
+
+                string oldLabel;
+                if (!_labelsByKey.TryGetValue(objectKey, out oldLabel) || LabelsMatch(oldLabel, newLabel))
+                {
+                    return false;
+                }
+
+                Decrement(oldLabel);
+                _labelsByKey[objectKey] = newLabel;
+                Increment(newLabel);
+                return true;
+            }
+
+            public List<string> BuildItems()
+            {
+                List<string> items = new List<string>();
+                for (int i = 0; i < _labelOrder.Count; i++)
+                {
+                    DiscoveryCount count;
+                    if (!_countsByLabel.TryGetValue(_labelOrder[i], out count))
+                    {
+                        continue;
+                    }
+
+                    items.Add(count.Count <= 1
+                        ? count.Label
+                        : ModText.Get(ModStrings.Common.ResourceAmount, count.Count, count.Label));
+                }
+
+                return items;
+            }
+
+            public void Clear()
+            {
+                _countsByLabel.Clear();
+                _labelsByKey.Clear();
+                _entriesByKey.Clear();
+                _labelOrder.Clear();
+                _keyOrder.Clear();
+            }
+
+            private void Increment(string label)
+            {
+                DiscoveryCount count;
+                if (_countsByLabel.TryGetValue(label, out count))
+                {
+                    _countsByLabel[label] = new DiscoveryCount(label, count.Count + 1);
+                    return;
+                }
+
+                _countsByLabel[label] = new DiscoveryCount(label, 1);
+                _labelOrder.Add(label);
+            }
+
+            private void Decrement(string label)
+            {
+                DiscoveryCount count;
+                if (string.IsNullOrWhiteSpace(label) || !_countsByLabel.TryGetValue(label, out count))
+                {
+                    return;
+                }
+
+                if (count.Count <= 1)
+                {
+                    _countsByLabel.Remove(label);
+                    _labelOrder.Remove(label);
+                    return;
+                }
+
+                _countsByLabel[label] = new DiscoveryCount(label, count.Count - 1);
             }
         }
 

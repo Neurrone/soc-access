@@ -1,3 +1,4 @@
+using System;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.UI;
 
@@ -42,7 +43,7 @@ namespace SongsOfConquestAccess.Buffers
                 return;
             }
 
-            string text = SpokenLines.Clean(accessibilityEvent.GetSpeechText());
+            string text = SpokenLines.Clean(AccessibilityEventBus.TextOf(accessibilityEvent));
             if (string.IsNullOrWhiteSpace(text))
             {
                 return;
@@ -65,7 +66,7 @@ namespace SongsOfConquestAccess.Buffers
             string kind = accessibilityEvent != null ? accessibilityEvent.Kind : null;
             MapWielderMovedEvent moved = accessibilityEvent as MapWielderMovedEvent;
             return !string.IsNullOrWhiteSpace(kind)
-                && (kind.StartsWith("notification.")
+                && (kind.StartsWith(AccessibilityEvents.Notification.Prefix, StringComparison.Ordinal)
                     || kind == AccessibilityEvents.Map.WielderTeleported
                     || kind == AccessibilityEvents.Map.DiscoveryRevealed
                     || kind == AccessibilityEvents.Map.WieldersNoLongerVisible
@@ -75,7 +76,7 @@ namespace SongsOfConquestAccess.Buffers
         private static bool IsCombatEvent(string kind)
         {
             return !string.IsNullOrWhiteSpace(kind)
-                && kind.StartsWith("combat.");
+                && kind.StartsWith(AccessibilityEvents.Combat.Prefix, StringComparison.Ordinal);
         }
     }
 }

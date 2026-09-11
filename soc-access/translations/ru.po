@@ -3845,3 +3845,35 @@ msgstr "Своя категория {0} пуста"
 msgctxt "UI.ModReady"
 msgid "Songs of Conquest Access v{0} ready"
 msgstr "Songs of Conquest Access v{0} готов"
+||||||| 7718d7c
+
+#. Spatial.Coordinates
+msgctxt "Spatial.Coordinates"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
+
+#. Common.Sentence
+msgctxt "Common.Sentence"
+msgid "{0}."
+msgstr "{0}."
+
+#. Common.SentenceSeparator
+msgctxt "Common.SentenceSeparator"
+msgid "{0}. {1}"
+msgstr "{0}. {1}"
+
+#. Common.ClauseSeparator
+msgctxt "Common.ClauseSeparator"
+msgid "{0}; {1}"
+msgstr "{0}; {1}"
+
+#. Common.PhraseSeparator
+msgctxt "Common.PhraseSeparator"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
+#. Spatial.MovementOfMax
+msgctxt "Spatial.MovementOfMax"
+msgid "{0} / {1}"
+msgstr "{0} / {1}"
+
