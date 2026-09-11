@@ -246,12 +246,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsMoveToDefenceEnabled()
         {
-            return IsButtonEnabled(GetMoveToDefenceButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetMoveToDefenceButton());
         }
 
         public bool IsMoveToWielderEnabled()
         {
-            return IsButtonEnabled(GetMoveToWielderButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetMoveToWielderButton());
         }
 
         public Tooltip MoveToDefenceTooltip
@@ -330,12 +330,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsDraftEnabled()
         {
-            return IsButtonEnabled(GetDraftButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetDraftButton());
         }
 
         public bool IsUpgradeEnabled()
         {
-            return IsButtonEnabled(GetUpgradeButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetUpgradeButton());
         }
 
         public Tooltip DraftTooltip
@@ -544,11 +544,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetButtonLabel(UIButton button)
         {
             return SpokenLines.Clean(MenuButtonTextUtility.GetAllVisibleText(button));
-        }
-
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return button != null && button.Active && button.Interactable && GameObjects.IsLive(button as Component);
         }
 
     }

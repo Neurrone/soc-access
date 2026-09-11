@@ -233,7 +233,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsLevelUpButtonVisible()
         {
-            return IsSelectionHudVisible() && IsButtonVisible(GetLevelUpButton());
+            return IsSelectionHudVisible() && MenuButtonAdapterBase.IsButtonDrawn(GetLevelUpButton());
         }
 
         public string LevelUpButtonLabel
@@ -253,7 +253,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsLevelUpButtonEnabled()
         {
-            return IsButtonInteractable(GetLevelUpButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetLevelUpButton());
         }
 
         public bool IsEssenceMenuVisible()
@@ -327,7 +327,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsInventoryButtonVisible()
         {
-            return IsSelectionHudVisible() && IsButtonVisible(CommanderSettings != null ? CommanderSettings.InventoryButton : null);
+            return IsSelectionHudVisible() && MenuButtonAdapterBase.IsButtonDrawn(CommanderSettings != null ? CommanderSettings.InventoryButton : null);
         }
 
         public string InventoryButtonLabel
@@ -357,7 +357,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsInventoryButtonEnabled()
         {
-            return IsButtonInteractable(CommanderSettings != null ? CommanderSettings.InventoryButton : null);
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(CommanderSettings != null ? CommanderSettings.InventoryButton : null);
         }
 
         public Tooltip InventoryButtonTooltip
@@ -367,12 +367,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsMoveToDestinationButtonVisible()
         {
-            return IsSelectionHudVisible() && IsButtonVisible(GetMoveToDestinationButton());
+            return IsSelectionHudVisible() && MenuButtonAdapterBase.IsButtonDrawn(GetMoveToDestinationButton());
         }
 
         public bool IsMoveToDestinationButtonEnabled()
         {
-            return IsButtonInteractable(GetMoveToDestinationButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetMoveToDestinationButton());
         }
 
         public string MoveToDestinationButtonLabel
@@ -397,7 +397,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsSpellbookButtonVisible()
         {
-            return IsSelectionHudVisible() && IsButtonVisible(CommanderSettings != null ? CommanderSettings.SpellbookButton : null);
+            return IsSelectionHudVisible() && MenuButtonAdapterBase.IsButtonDrawn(CommanderSettings != null ? CommanderSettings.SpellbookButton : null);
         }
 
         public string SpellbookButtonLabel
@@ -425,7 +425,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsSpellbookButtonEnabled()
         {
-            return IsButtonInteractable(CommanderSettings != null ? CommanderSettings.SpellbookButton : null);
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(CommanderSettings != null ? CommanderSettings.SpellbookButton : null);
         }
 
         public Tooltip SpellbookButtonTooltip
@@ -861,12 +861,12 @@ namespace SongsOfConquestAccess.Adapters
         {
             return IsAdventureHudVisible()
                 && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.OptionsButtonsContainer : null)
-                && IsButtonVisible(GetOptionsButton());
+                && MenuButtonAdapterBase.IsButtonDrawn(GetOptionsButton());
         }
 
         public bool IsOptionsButtonEnabled()
         {
-            return IsButtonInteractable(GetOptionsButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetOptionsButton());
         }
 
         public string OptionsButtonLabel
@@ -902,12 +902,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsKingdomOverviewItemVisible(int index)
         {
-            return IsButtonVisible(GetKingdomOverviewButton(index));
+            return MenuButtonAdapterBase.IsButtonDrawn(GetKingdomOverviewButton(index));
         }
 
         public bool IsKingdomOverviewItemEnabled(int index)
         {
-            return IsButtonInteractable(GetKingdomOverviewButton(index));
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetKingdomOverviewButton(index));
         }
 
         public void FocusKingdomOverviewItem(int index)
@@ -927,12 +927,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsBugReportButtonVisible()
         {
-            return IsButtonVisible(KingdomSettings != null ? KingdomSettings.BugReportButton : null);
+            return MenuButtonAdapterBase.IsButtonDrawn(KingdomSettings != null ? KingdomSettings.BugReportButton : null);
         }
 
         public bool IsBugReportButtonEnabled()
         {
-            return IsButtonInteractable(KingdomSettings != null ? KingdomSettings.BugReportButton : null);
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(KingdomSettings != null ? KingdomSettings.BugReportButton : null);
         }
 
         public string BugReportButtonLabel
@@ -989,12 +989,12 @@ namespace SongsOfConquestAccess.Adapters
         {
             return IsAdventureHudVisible()
                 && GameObjects.IsGroupVisible(HudStateSettings != null ? HudStateSettings.EndTurnContainer : null)
-                && IsButtonVisible(EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null);
+                && MenuButtonAdapterBase.IsButtonDrawn(EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null);
         }
 
         public bool IsEndTurnButtonEnabled()
         {
-            return IsButtonInteractable(EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null);
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null);
         }
 
         public string EndTurnButtonLabel
@@ -1902,18 +1902,13 @@ namespace SongsOfConquestAccess.Adapters
 
             for (int i = 0; i < buttons.Length; i++)
             {
-                if (IsButtonVisible(buttons[i]))
+                if (MenuButtonAdapterBase.IsButtonDrawn(buttons[i]))
                 {
                     return buttons[i];
                 }
             }
 
             return null;
-        }
-
-        private static bool IsButtonInteractable(UIButton button)
-        {
-            return IsButtonVisible(button) && button.Interactable;
         }
 
         private string Localize(string key, string fallback)
@@ -1937,17 +1932,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return string.Empty;
             }
-        }
-
-        private static bool IsButtonVisible(UIButton button)
-        {
-            if (button == null || !button.Active)
-            {
-                return false;
-            }
-
-            GameObject gameObject = ((Component)button).gameObject;
-            return gameObject != null && gameObject.activeInHierarchy;
         }
 
         private string GetCommanderName(ICommanderState commander)

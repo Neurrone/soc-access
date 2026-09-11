@@ -112,7 +112,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool ActivateOk()
         {
-            return InvokeButton(OkButtonRef(SimplePopup));
+            return NativeSelectionUtility.Click(OkButtonRef(SimplePopup));
         }
 
         public void ToggleTutorials()
@@ -127,21 +127,6 @@ namespace SongsOfConquestAccess.Adapters
         private TutorialSimplePopup SimplePopup
         {
             get { return _menu != null ? SimplePopupRef(_menu) : null; }
-        }
-
-        private static bool InvokeButton(UIButton button)
-        {
-            if (!IsButtonAvailable(button))
-            {
-                return false;
-            }
-
-            return NativeSelectionUtility.Click(button);
-        }
-
-        private static bool IsButtonAvailable(UIButton button)
-        {
-            return button != null && button.Active && button.Interactable;
         }
 
         private static string Normalize(string value)

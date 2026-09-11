@@ -184,12 +184,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsButtonVisible(UIButton button)
         {
-            return button != null && button.Active && button.gameObject != null && button.gameObject.activeInHierarchy;
+            return MenuButtonAdapterBase.IsButtonDrawn(button);
         }
 
         public bool IsButtonEnabled(UIButton button)
         {
-            return IsButtonVisible(button) && button.Interactable;
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(button);
         }
 
         public bool ActivateButton(UIButton button)

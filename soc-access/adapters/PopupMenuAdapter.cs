@@ -102,12 +102,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPositiveActionEnabled
         {
-            get { return IsButtonEnabled(PositiveButton); }
+            get { return MenuButtonAdapterBase.IsButtonEnabled(PositiveButton); }
         }
 
         public bool IsNegativeActionEnabled
         {
-            get { return IsButtonEnabled(NegativeButton); }
+            get { return MenuButtonAdapterBase.IsButtonEnabled(NegativeButton); }
         }
 
         public bool HasInputField
@@ -230,9 +230,9 @@ namespace SongsOfConquestAccess.Adapters
             switch (action)
             {
                 case DialogAction.Positive:
-                    return InvokeButton(PositiveButton);
+                    return NativeSelectionUtility.Click(PositiveButton);
                 case DialogAction.Negative:
-                    return InvokeButton(NegativeButton);
+                    return NativeSelectionUtility.Click(NegativeButton);
                 default:
                     return false;
             }
@@ -243,14 +243,13 @@ namespace SongsOfConquestAccess.Adapters
             return button == null ? null : button.MonoTransform;
         }
 
+        /// <summary>The button's own active flag is the whole answer here, unlike the other popup
+        /// adapters, which also ask whether the object is drawn: the game sets Active per button as it
+        /// composes each popup (one-button popups switch the negative button off), and the popup's own
+        /// container carries the shown/hidden state, which <see cref="IsPresent"/> reads.</summary>
         private static bool IsButtonActive(IUIButton button)
         {
             return button != null && button.Active;
-        }
-
-        private static bool IsButtonEnabled(IUIButton button)
-        {
-            return IsButtonActive(button) && button.Interactable;
         }
 
         private static Selectable GetSelectable(IUIButton button)
@@ -262,16 +261,6 @@ namespace SongsOfConquestAccess.Adapters
 
             IUISelectableHolder holder = button;
             return holder.GetSelectable();
-        }
-
-        private static bool InvokeButton(IUIButton button)
-        {
-            if (button == null || !button.Active || !button.Interactable)
-            {
-                return false;
-            }
-
-            return NativeSelectionUtility.Click(button);
         }
 
         private static string GetButtonText(IUIButton button)

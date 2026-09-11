@@ -64,7 +64,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsVisible
         {
-            get { return (_isVisible == null || _isVisible()) && IsButtonVisible(_button); }
+            get { return (_isVisible == null || _isVisible()) && MenuButtonAdapterBase.IsButtonDrawn(_button); }
         }
 
         public bool IsEnabled
@@ -120,17 +120,6 @@ namespace SongsOfConquestAccess.Adapters
         public void RefreshTooltip()
         {
             RefreshTooltip(_portrait);
-        }
-
-        private static bool IsButtonVisible(UIButton button)
-        {
-            if (button == null || !button.Active)
-            {
-                return false;
-            }
-
-            GameObject gameObject = ((Component)button).gameObject;
-            return gameObject != null && gameObject.activeInHierarchy;
         }
     }
 }

@@ -152,12 +152,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsAiControlButtonVisible(CombatHudSide side)
         {
-            return IsButtonVisible(GetAiControlButton(side));
+            return MenuButtonAdapterBase.IsButtonDrawn(GetAiControlButton(side));
         }
 
         public bool IsAiControlButtonEnabled(CombatHudSide side)
         {
-            return IsButtonInteractable(GetAiControlButton(side));
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetAiControlButton(side));
         }
 
         public string GetAiControlButtonLabel(CombatHudSide side)
@@ -285,7 +285,7 @@ namespace SongsOfConquestAccess.Adapters
 
             for (int i = 0; i < buttons.Length; i++)
             {
-                if (IsButtonVisible(buttons[i]))
+                if (MenuButtonAdapterBase.IsButtonDrawn(buttons[i]))
                 {
                     return buttons[i];
                 }
@@ -405,16 +405,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return Regex.Replace(name, "([a-z])([A-Z])", "$1 $2");
-        }
-
-        private static bool IsButtonVisible(UIButton button)
-        {
-            return button != null && button.Active && GameObjects.IsLive(button as Component);
-        }
-
-        private static bool IsButtonInteractable(UIButton button)
-        {
-            return IsButtonVisible(button) && button.Interactable;
         }
     }
 }

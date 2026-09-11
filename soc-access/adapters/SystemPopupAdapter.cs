@@ -65,22 +65,22 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasPositiveAction
         {
-            get { return IsButtonActive(GetConfirmButton()); }
+            get { return MenuButtonAdapterBase.IsButtonVisible(GetConfirmButton()); }
         }
 
         public bool HasNegativeAction
         {
-            get { return IsButtonActive(GetCancelButton()); }
+            get { return MenuButtonAdapterBase.IsButtonVisible(GetCancelButton()); }
         }
 
         public bool IsPositiveActionEnabled
         {
-            get { return IsButtonEnabled(GetConfirmButton()); }
+            get { return MenuButtonAdapterBase.IsButtonEnabledAndVisible(GetConfirmButton()); }
         }
 
         public bool IsNegativeActionEnabled
         {
-            get { return IsButtonEnabled(GetCancelButton()); }
+            get { return MenuButtonAdapterBase.IsButtonEnabledAndVisible(GetCancelButton()); }
         }
 
         public bool HasInputField
@@ -189,9 +189,9 @@ namespace SongsOfConquestAccess.Adapters
             switch (action)
             {
                 case DialogAction.Positive:
-                    return InvokeButton(GetConfirmButton());
+                    return NativeSelectionUtility.Click(GetConfirmButton());
                 case DialogAction.Negative:
-                    return InvokeButton(GetCancelButton());
+                    return NativeSelectionUtility.Click(GetCancelButton());
                 default:
                     return false;
             }
@@ -220,26 +220,6 @@ namespace SongsOfConquestAccess.Adapters
         private UIButton GetCancelButton()
         {
             return _popup != null ? CancelButtonRef(_popup) : null;
-        }
-
-        private static bool IsButtonActive(UIButton button)
-        {
-            return button != null && button.Active && MenuButtonAdapterBase.IsButtonVisible(button);
-        }
-
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return IsButtonActive(button) && button.Interactable;
-        }
-
-        private static bool InvokeButton(UIButton button)
-        {
-            if (button == null || !button.Active || !button.Interactable)
-            {
-                return false;
-            }
-
-            return NativeSelectionUtility.Click(button);
         }
 
         private static string GetButtonText(IUIButton button)

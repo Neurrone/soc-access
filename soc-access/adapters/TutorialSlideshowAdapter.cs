@@ -171,7 +171,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool ActivateClose()
         {
-            return InvokeButton(CloseButtonRef(_menu));
+            return NativeSelectionUtility.Click(CloseButtonRef(_menu));
         }
 
         public void ToggleTutorials()
@@ -181,21 +181,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 toggle.ToggleValue = !toggle.ToggleValue;
             }
-        }
-
-        private static bool InvokeButton(UIButton button)
-        {
-            if (!IsButtonAvailable(button))
-            {
-                return false;
-            }
-
-            return NativeSelectionUtility.Click(button);
-        }
-
-        private static bool IsButtonAvailable(UIButton button)
-        {
-            return button != null && button.Active && button.Interactable;
         }
 
         private ITutorialEntry CurrentTutorial

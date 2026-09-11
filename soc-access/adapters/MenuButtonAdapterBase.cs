@@ -54,7 +54,7 @@ namespace SongsOfConquestAccess.Adapters
                 return _activate();
             }
 
-            return InvokeButton(Button);
+            return NativeSelectionUtility.Click(Button);
         }
 
         public static bool IsButtonVisible(UIButton button)
@@ -74,14 +74,32 @@ namespace SongsOfConquestAccess.Adapters
             return selectable != null && selectable.isActiveAndEnabled;
         }
 
-        protected static bool InvokeButton(UIButton button)
+        /// <summary>The button's object is drawn. <c>IUIButton.Active</c> is the object's OWN active
+        /// flag, so a button under a hidden parent still reports true for it; this is the question
+        /// that asks the hierarchy.</summary>
+        public static bool IsButtonDrawn(UIButton button)
         {
-            if (button == null || !button.Active || !button.Interactable)
-            {
-                return false;
-            }
+            return GameObjects.IsLive(button as Component);
+        }
 
-            return NativeSelectionUtility.Click(button);
+        /// <summary>The game says the button can be pressed. It says nothing about the button being
+        /// drawn: see <see cref="IsButtonDrawn"/> and <see cref="IsButtonVisible"/>.</summary>
+        public static bool IsButtonEnabled(IUIButton button)
+        {
+            return button != null && button.Active && button.Interactable;
+        }
+
+        /// <summary>The button can be pressed and its object is drawn.</summary>
+        public static bool IsButtonEnabledAndDrawn(UIButton button)
+        {
+            return IsButtonEnabled(button) && IsButtonDrawn(button);
+        }
+
+        /// <summary>The button can be pressed and is visible by the stricter rule of
+        /// <see cref="IsButtonVisible"/>: the selectable behind it is active and enabled too.</summary>
+        public static bool IsButtonEnabledAndVisible(UIButton button)
+        {
+            return IsButtonVisible(button) && button.Interactable;
         }
 
         protected abstract string BuildLabel();

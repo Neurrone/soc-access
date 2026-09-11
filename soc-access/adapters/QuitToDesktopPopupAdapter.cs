@@ -52,12 +52,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasConfirm
         {
-            get { return IsButtonActive(Settings != null ? Settings.ConfirmButton : null); }
+            get { return MenuButtonAdapterBase.IsButtonVisible(Settings != null ? Settings.ConfirmButton : null); }
         }
 
         public bool HasCancel
         {
-            get { return IsButtonActive(Settings != null ? Settings.CancelButton : null); }
+            get { return MenuButtonAdapterBase.IsButtonVisible(Settings != null ? Settings.CancelButton : null); }
         }
 
         public bool HasSteamFollow
@@ -67,7 +67,7 @@ namespace SongsOfConquestAccess.Adapters
                 QuitToDesktopPopup.Settings settings = Settings;
                 return settings != null
                     && IsGameObjectActive(settings.SteamFollowContainer)
-                    && IsButtonActive(settings.OpenSteamPageButton);
+                    && MenuButtonAdapterBase.IsButtonVisible(settings.OpenSteamPageButton);
             }
         }
 
@@ -143,17 +143,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool ActivateConfirm()
         {
-            return InvokeButton(Settings != null ? Settings.ConfirmButton : null);
+            return NativeSelectionUtility.Click(Settings != null ? Settings.ConfirmButton : null);
         }
 
         public bool ActivateCancel()
         {
-            return InvokeButton(Settings != null ? Settings.CancelButton : null);
+            return NativeSelectionUtility.Click(Settings != null ? Settings.CancelButton : null);
         }
 
         public bool ActivateSteamFollow()
         {
-            return InvokeButton(Settings != null ? Settings.OpenSteamPageButton : null);
+            return NativeSelectionUtility.Click(Settings != null ? Settings.OpenSteamPageButton : null);
         }
 
         private QuitToDesktopPopup.Settings Settings
@@ -184,21 +184,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 NativeSelectionUtility.Select(selectable);
             }
-        }
-
-        private static bool InvokeButton(UIButton button)
-        {
-            if (button == null || !button.Active || !button.Interactable)
-            {
-                return false;
-            }
-
-            return NativeSelectionUtility.Click(button);
-        }
-
-        private static bool IsButtonActive(UIButton button)
-        {
-            return button != null && button.Active && MenuButtonAdapterBase.IsButtonVisible(button);
         }
 
         private static bool IsTransformActive(IUITransform transform)

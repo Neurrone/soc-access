@@ -322,12 +322,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsAcceptButtonEnabled()
         {
-            return IsButtonEnabled(Reflect.Get<UIButton>(_menu, ConfirmButtonField));
+            return MenuButtonAdapterBase.IsButtonEnabled(Reflect.Get<UIButton>(_menu, ConfirmButtonField));
         }
 
         public bool IsAcceptButtonVisible()
         {
-            return IsButtonVisible(Reflect.Get<UIButton>(_menu, ConfirmButtonField));
+            return MenuButtonAdapterBase.IsButtonDrawn(Reflect.Get<UIButton>(_menu, ConfirmButtonField));
         }
 
         public Tooltip AcceptButtonTooltip
@@ -354,12 +354,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsRedoManualBattleButtonEnabled()
         {
-            return IsButtonEnabled(Reflect.Get<UIButton>(_menu, RedoManualBattleButtonField));
+            return MenuButtonAdapterBase.IsButtonEnabled(Reflect.Get<UIButton>(_menu, RedoManualBattleButtonField));
         }
 
         public bool IsRedoManualBattleButtonVisible()
         {
-            return IsButtonVisible(Reflect.Get<UIButton>(_menu, RedoManualBattleButtonField));
+            return MenuButtonAdapterBase.IsButtonDrawn(Reflect.Get<UIButton>(_menu, RedoManualBattleButtonField));
         }
 
         public Tooltip RedoManualBattleButtonTooltip
@@ -587,16 +587,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetButtonLabel(UIButton button)
         {
             return MenuButtonTextUtility.GetStandardButtonLabel(button);
-        }
-
-        private static bool IsButtonVisible(UIButton button)
-        {
-            return button != null && button.Active && button.gameObject.activeInHierarchy;
-        }
-
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return button != null && button.Active && button.Interactable;
         }
 
         private T GetFieldValue<T>(FieldInfo field)

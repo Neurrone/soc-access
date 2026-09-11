@@ -79,7 +79,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 CustomMessageMenu.Settings settings = GetSettings();
-                return IsButtonActive(settings != null ? settings.PositiveButton : null);
+                return MenuButtonAdapterBase.IsButtonVisible(settings != null ? settings.PositiveButton : null);
             }
         }
 
@@ -88,7 +88,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 CustomMessageMenu.Settings settings = GetSettings();
-                return IsButtonActive(settings != null ? settings.NegativeButton : null);
+                return MenuButtonAdapterBase.IsButtonVisible(settings != null ? settings.NegativeButton : null);
             }
         }
 
@@ -97,7 +97,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 CustomMessageMenu.Settings settings = GetSettings();
-                return IsButtonEnabled(settings != null ? settings.PositiveButton : null);
+                return MenuButtonAdapterBase.IsButtonEnabledAndVisible(settings != null ? settings.PositiveButton : null);
             }
         }
 
@@ -106,7 +106,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 CustomMessageMenu.Settings settings = GetSettings();
-                return IsButtonEnabled(settings != null ? settings.NegativeButton : null);
+                return MenuButtonAdapterBase.IsButtonEnabledAndVisible(settings != null ? settings.NegativeButton : null);
             }
         }
 
@@ -198,19 +198,9 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
         }
 
-        private static bool IsButtonActive(UIButton button)
-        {
-            return button != null && button.Active && MenuButtonAdapterBase.IsButtonVisible(button);
-        }
-
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return IsButtonActive(button) && button.Interactable;
-        }
-
         private static bool InvokeButton(UIButton button)
         {
-            if (!IsButtonEnabled(button))
+            if (!MenuButtonAdapterBase.IsButtonEnabledAndVisible(button))
             {
                 return false;
             }

@@ -191,7 +191,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsMoveAllLeftEnabled()
         {
             UIButton button = Reflect.Get<UIButton>(_movable, MoveAllButtonLeftField);
-            return IsButtonEnabled(button);
+            return MenuButtonAdapterBase.IsButtonEnabled(button);
         }
 
         public Tooltip MoveAllLeftTooltip
@@ -206,7 +206,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsSplitEqualEnabled()
         {
-            return IsButtonEnabled(Reflect.Get<UIButton>(_movable, SplitHalfButtonField));
+            return MenuButtonAdapterBase.IsButtonEnabled(Reflect.Get<UIButton>(_movable, SplitHalfButtonField));
         }
 
         public Tooltip SplitEqualTooltip
@@ -221,7 +221,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsMoveAllRightEnabled()
         {
-            return IsButtonEnabled(Reflect.Get<UIButton>(_movable, MoveAllButtonRightField));
+            return MenuButtonAdapterBase.IsButtonEnabled(Reflect.Get<UIButton>(_movable, MoveAllButtonRightField));
         }
 
         public Tooltip MoveAllRightTooltip
@@ -341,11 +341,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 texts.Add(text);
             }
-        }
-
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return button != null && button.Active && button.Interactable;
         }
     }
 }

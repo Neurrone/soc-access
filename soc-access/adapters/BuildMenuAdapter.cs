@@ -306,7 +306,7 @@ namespace SongsOfConquestAccess.Adapters
                 BuildTimeForSize(size),
                 index,
                 size,
-                IsButtonEnabled(button),
+                MenuButtonAdapterBase.IsButtonEnabledAndDrawn(button),
                 SelectedCategory == size,
                 button as Component);
         }
@@ -624,7 +624,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsBuildButtonEnabled()
         {
-            return IsButtonEnabled(GetPurchaseButton()) && IsBuildButtonVisible();
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetPurchaseButton()) && IsBuildButtonVisible();
         }
 
         public string BuildButtonLabel
@@ -678,12 +678,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPreviousBuildSiteEnabled()
         {
-            return IsButtonEnabled(GetPreviousBuildSiteButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetPreviousBuildSiteButton());
         }
 
         public bool IsNextBuildSiteEnabled()
         {
-            return IsButtonEnabled(GetNextBuildSiteButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetNextBuildSiteButton());
         }
 
         public bool IsAutoSelectVisible()
@@ -1430,11 +1430,6 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
         }
 
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return button != null && button.Active && button.Interactable && GameObjects.IsLive(button as Component);
-        }
-
         private bool InvokeNativeHandler(MethodInfo method)
         {
             if (_menu == null || method == null)
@@ -1448,7 +1443,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool ActivateBuildSiteNavigation(UIButton button, MethodInfo method)
         {
-            if (!IsButtonEnabled(button))
+            if (!MenuButtonAdapterBase.IsButtonEnabledAndDrawn(button))
             {
                 return false;
             }

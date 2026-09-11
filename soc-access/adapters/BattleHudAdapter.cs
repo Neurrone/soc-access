@@ -103,7 +103,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsSpellbookButtonVisible()
         {
             UIButton button = GetSpellbookButton();
-            return IsButtonVisible(button);
+            return MenuButtonAdapterBase.IsButtonDrawn(button);
         }
 
         /// <summary>Whether the Spells button the game is drawing belongs to this side. There is one
@@ -117,7 +117,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsSpellbookButtonEnabled()
         {
             SpellsHUD spellsHud = GetSpellsHud();
-            return spellsHud != null && spellsHud.IsInteractable() && IsButtonInteractable(spellsHud.SpellbookButton);
+            return spellsHud != null && spellsHud.IsInteractable() && MenuButtonAdapterBase.IsButtonEnabledAndDrawn(spellsHud.SpellbookButton);
         }
 
         public string SpellbookButtonLabel
@@ -151,12 +151,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsEndTurnButtonVisible()
         {
-            return IsButtonVisible(GetEndTurnButton());
+            return MenuButtonAdapterBase.IsButtonDrawn(GetEndTurnButton());
         }
 
         public bool IsEndTurnButtonEnabled()
         {
-            return IsButtonInteractable(GetEndTurnButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetEndTurnButton());
         }
 
         public string EndTurnButtonLabel
@@ -190,12 +190,12 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsOptionsButtonVisible()
         {
             return GameObjects.IsGroupVisible(_settings != null ? _settings.OptionsButtonsContainer : null)
-                && IsButtonVisible(GetOptionsButton());
+                && MenuButtonAdapterBase.IsButtonDrawn(GetOptionsButton());
         }
 
         public bool IsOptionsButtonEnabled()
         {
-            return IsButtonInteractable(GetOptionsButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetOptionsButton());
         }
 
         public string OptionsButtonLabel
@@ -263,7 +263,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsCancelSpellButtonVisible()
         {
-            return IsButtonVisible(GetCancelSpellButton());
+            return MenuButtonAdapterBase.IsButtonDrawn(GetCancelSpellButton());
         }
 
         /// <summary>Whether the Cancel spell button, which the game draws in the Spells spot while a
@@ -275,7 +275,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsCancelSpellButtonEnabled()
         {
-            return IsButtonInteractable(GetCancelSpellButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetCancelSpellButton());
         }
 
         public void FocusCancelSpellButton()
@@ -295,12 +295,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsAbilityButtonVisible()
         {
-            return IsButtonVisible(GetAbilityButton());
+            return MenuButtonAdapterBase.IsButtonDrawn(GetAbilityButton());
         }
 
         public bool IsAbilityButtonEnabled()
         {
-            return IsButtonInteractable(GetAbilityButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetAbilityButton());
         }
 
         public string AbilityButtonLabel
@@ -333,12 +333,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsCancelAbilityButtonVisible()
         {
-            return IsButtonVisible(GetCancelAbilityButton());
+            return MenuButtonAdapterBase.IsButtonDrawn(GetCancelAbilityButton());
         }
 
         public bool IsCancelAbilityButtonEnabled()
         {
-            return IsButtonInteractable(GetCancelAbilityButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetCancelAbilityButton());
         }
 
         public void FocusCancelAbilityButton()
@@ -546,26 +546,26 @@ namespace SongsOfConquestAccess.Adapters
 
             if (_stateHandler.AttackerSpellsHUD != null
                 && _stateHandler.AttackerSpellsHUD.IsInteractable()
-                && IsButtonVisible(_stateHandler.AttackerSpellsHUD.SpellbookButton))
+                && MenuButtonAdapterBase.IsButtonDrawn(_stateHandler.AttackerSpellsHUD.SpellbookButton))
             {
                 return _stateHandler.AttackerSpellsHUD;
             }
 
             if (_stateHandler.DefenderSpellsHUD != null
                 && _stateHandler.DefenderSpellsHUD.IsInteractable()
-                && IsButtonVisible(_stateHandler.DefenderSpellsHUD.SpellbookButton))
+                && MenuButtonAdapterBase.IsButtonDrawn(_stateHandler.DefenderSpellsHUD.SpellbookButton))
             {
                 return _stateHandler.DefenderSpellsHUD;
             }
 
             if (_stateHandler.AttackerSpellsHUD != null
-                && IsButtonVisible(_stateHandler.AttackerSpellsHUD.SpellbookButton))
+                && MenuButtonAdapterBase.IsButtonDrawn(_stateHandler.AttackerSpellsHUD.SpellbookButton))
             {
                 return _stateHandler.AttackerSpellsHUD;
             }
 
             if (_stateHandler.DefenderSpellsHUD != null
-                && IsButtonVisible(_stateHandler.DefenderSpellsHUD.SpellbookButton))
+                && MenuButtonAdapterBase.IsButtonDrawn(_stateHandler.DefenderSpellsHUD.SpellbookButton))
             {
                 return _stateHandler.DefenderSpellsHUD;
             }
@@ -626,12 +626,12 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            if (IsButtonVisible(GetCancelSpellButton(_stateHandler.AttackerSpellsHUD)))
+            if (MenuButtonAdapterBase.IsButtonDrawn(GetCancelSpellButton(_stateHandler.AttackerSpellsHUD)))
             {
                 return _stateHandler.AttackerSpellsHUD;
             }
 
-            if (IsButtonVisible(GetCancelSpellButton(_stateHandler.DefenderSpellsHUD)))
+            if (MenuButtonAdapterBase.IsButtonDrawn(GetCancelSpellButton(_stateHandler.DefenderSpellsHUD)))
             {
                 return _stateHandler.DefenderSpellsHUD;
             }
@@ -1100,22 +1100,6 @@ namespace SongsOfConquestAccess.Adapters
         private UIButton GetQueueEntryButton(IQueueHUDEntry entry)
         {
             return Reflect.Get<UIButton>(entry, QueueEntryButtonField);
-        }
-
-        private static bool IsButtonVisible(UIButton button)
-        {
-            if (button == null || !button.Active)
-            {
-                return false;
-            }
-
-            Component component = button as Component;
-            return component == null || GameObjects.IsLive(component.gameObject);
-        }
-
-        private static bool IsButtonInteractable(UIButton button)
-        {
-            return IsButtonVisible(button) && button.Interactable;
         }
 
         /// <summary>

@@ -70,22 +70,22 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasPositiveAction
         {
-            get { return IsButtonActive(GetYesButton()); }
+            get { return MenuButtonAdapterBase.IsButtonVisible(GetYesButton()); }
         }
 
         public bool HasNegativeAction
         {
-            get { return IsButtonActive(GetNoButton()); }
+            get { return MenuButtonAdapterBase.IsButtonVisible(GetNoButton()); }
         }
 
         public bool IsPositiveActionEnabled
         {
-            get { return IsButtonEnabled(GetYesButton()); }
+            get { return MenuButtonAdapterBase.IsButtonEnabledAndVisible(GetYesButton()); }
         }
 
         public bool IsNegativeActionEnabled
         {
-            get { return IsButtonEnabled(GetNoButton()); }
+            get { return MenuButtonAdapterBase.IsButtonEnabledAndVisible(GetNoButton()); }
         }
 
         /// <summary>True: <c>ConfirmPopup.Show</c> registers <c>InputActions.UI.ExitMenu</c> on
@@ -156,9 +156,9 @@ namespace SongsOfConquestAccess.Adapters
             switch (action)
             {
                 case DialogAction.Positive:
-                    return InvokeButton(GetYesButton());
+                    return NativeSelectionUtility.Click(GetYesButton());
                 case DialogAction.Negative:
-                    return InvokeButton(GetNoButton());
+                    return NativeSelectionUtility.Click(GetNoButton());
                 default:
                     return false;
             }
@@ -197,26 +197,6 @@ namespace SongsOfConquestAccess.Adapters
         private ILocalizationHandler GetLocalizationHandler()
         {
             return _popup != null ? LocalizationHandlerRef(_popup) : null;
-        }
-
-        private static bool IsButtonActive(UIButton button)
-        {
-            return button != null && button.Active && MenuButtonAdapterBase.IsButtonVisible(button);
-        }
-
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return IsButtonActive(button) && button.Interactable;
-        }
-
-        private static bool InvokeButton(UIButton button)
-        {
-            if (button == null || !button.Active || !button.Interactable)
-            {
-                return false;
-            }
-
-            return NativeSelectionUtility.Click(button);
         }
     }
 }

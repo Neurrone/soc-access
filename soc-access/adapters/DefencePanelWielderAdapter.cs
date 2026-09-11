@@ -220,17 +220,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsStoreEnabled()
         {
-            return IsButtonEnabled(GetStoreButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetStoreButton());
         }
 
         public bool IsEjectEnabled()
         {
-            return IsButtonEnabled(GetEjectButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetEjectButton());
         }
 
         public bool IsTradeEnabled()
         {
-            return IsButtonEnabled(GetTradeButton());
+            return MenuButtonAdapterBase.IsButtonEnabledAndDrawn(GetTradeButton());
         }
 
         public Tooltip StoreTooltip
@@ -332,11 +332,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Join(". ", parts.ToArray());
-        }
-
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return button != null && button.Active && button.Interactable && GameObjects.IsLive(button as Component);
         }
     }
 }

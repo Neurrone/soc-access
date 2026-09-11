@@ -62,7 +62,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasPositiveAction
         {
-            get { return IsButtonActive(GetOkButton()); }
+            get { return MenuButtonAdapterBase.IsButtonVisible(GetOkButton()); }
         }
 
         public bool HasNegativeAction
@@ -72,7 +72,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPositiveActionEnabled
         {
-            get { return IsButtonEnabled(GetOkButton()); }
+            get { return MenuButtonAdapterBase.IsButtonEnabledAndVisible(GetOkButton()); }
         }
 
         public bool IsNegativeActionEnabled
@@ -135,7 +135,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool ActivateAction(DialogAction action)
         {
-            return action == DialogAction.Positive && InvokeButton(GetOkButton());
+            return action == DialogAction.Positive && NativeSelectionUtility.Click(GetOkButton());
         }
 
         private UITransform GetContainer()
@@ -156,26 +156,6 @@ namespace SongsOfConquestAccess.Adapters
         private UIButton GetOkButton()
         {
             return _popup != null ? OkButtonRef(_popup) : null;
-        }
-
-        private static bool IsButtonActive(UIButton button)
-        {
-            return button != null && button.Active && MenuButtonAdapterBase.IsButtonVisible(button);
-        }
-
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return IsButtonActive(button) && button.Interactable;
-        }
-
-        private static bool InvokeButton(UIButton button)
-        {
-            if (button == null || !button.Active || !button.Interactable)
-            {
-                return false;
-            }
-
-            return NativeSelectionUtility.Click(button);
         }
 
         private static string GetButtonText(IUIButton button)

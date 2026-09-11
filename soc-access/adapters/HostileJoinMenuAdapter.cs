@@ -267,7 +267,7 @@ namespace SongsOfConquestAccess.Adapters
         /// cannot afford the price.</summary>
         public bool IsAcceptEnabled()
         {
-            return IsButtonEnabled(_settings != null ? _settings.YesButton : null);
+            return MenuButtonAdapterBase.IsButtonEnabled(_settings != null ? _settings.YesButton : null);
         }
 
         public bool ActivateAccept()
@@ -292,7 +292,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsRejectEnabled()
         {
-            return IsButtonEnabled(_settings != null ? _settings.NoButton : null);
+            return MenuButtonAdapterBase.IsButtonEnabled(_settings != null ? _settings.NoButton : null);
         }
 
         public bool ActivateReject()
@@ -319,7 +319,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsDoneEnabled()
         {
-            return IsButtonEnabled(_settings != null ? _settings.DoneButton : null);
+            return MenuButtonAdapterBase.IsButtonEnabled(_settings != null ? _settings.DoneButton : null);
         }
 
         public bool ActivateDone()
@@ -371,7 +371,7 @@ namespace SongsOfConquestAccess.Adapters
         /// is empty.</summary>
         public bool IsMassMoveEnabled()
         {
-            return IsButtonEnabled(_settings != null ? _settings.MassMoveButton : null);
+            return MenuButtonAdapterBase.IsButtonEnabled(_settings != null ? _settings.MassMoveButton : null);
         }
 
         public bool ActivateMassMove()
@@ -403,11 +403,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetButtonText(UIButton button)
         {
             return MenuButtonTextUtility.GetStandardButtonLabel(button);
-        }
-
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return button != null && button.Active && button.Interactable;
         }
     }
 }

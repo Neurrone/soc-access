@@ -85,7 +85,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 RandomEventMenu.Settings settings = GetSettings();
-                return IsButtonActive(settings != null ? settings.ConfirmButton : null);
+                return MenuButtonAdapterBase.IsButtonVisible(settings != null ? settings.ConfirmButton : null);
             }
         }
 
@@ -96,7 +96,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPositiveActionEnabled
         {
-            get { return IsButtonEnabled(GetConfirmButton()); }
+            get { return MenuButtonAdapterBase.IsButtonEnabledAndVisible(GetConfirmButton()); }
         }
 
         public bool IsNegativeActionEnabled
@@ -157,7 +157,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool ActivateAction(DialogAction action)
         {
-            return action == DialogAction.Positive && InvokeButton(GetConfirmButton());
+            return action == DialogAction.Positive && NativeSelectionUtility.Click(GetConfirmButton());
         }
 
         private RandomEventMenu.Settings GetSettings()
@@ -174,26 +174,6 @@ namespace SongsOfConquestAccess.Adapters
         private ILocalizationHandler GetLocalizationHandler()
         {
             return _menu != null ? LocalizationHandlerRef(_menu) : null;
-        }
-
-        private static bool IsButtonActive(UIButton button)
-        {
-            return button != null && button.Active && MenuButtonAdapterBase.IsButtonVisible(button);
-        }
-
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return IsButtonActive(button) && button.Interactable;
-        }
-
-        private static bool InvokeButton(UIButton button)
-        {
-            if (button == null || !button.Active || !button.Interactable)
-            {
-                return false;
-            }
-
-            return NativeSelectionUtility.Click(button);
         }
 
         private static string GetActiveMultilineText(IUITextMesh textMesh)

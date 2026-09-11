@@ -354,16 +354,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private static bool ClickButton(UIButton button)
-        {
-            if (button == null || !button.Active || !button.Interactable)
-            {
-                return false;
-            }
-
-            return NativeSelectionUtility.Click(button);
-        }
-
         /// <summary>The game's own Options button on the main menu, or null while the menu is not
         /// loaded. Cached, and looked for again only every <see cref="RescanFrames"/> frames, because
         /// the scan behind it walks every loaded object of its type and this runs on the pump.
@@ -493,7 +483,7 @@ namespace SongsOfConquestAccess.Adapters
             private readonly UITextMesh _label;
 
             public HeaderEntry(UIButton button, UITextMesh label)
-                : base(button, null, () => ClickButton(button))
+                : base(button, null, () => NativeSelectionUtility.Click(button))
             {
                 _label = label;
             }
