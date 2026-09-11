@@ -357,10 +357,23 @@ namespace SongsOfConquestAccess
             }
 
             AnnouncementGroupConfig config = GetAnnouncementConfig(group);
-            string orderCsv = config != null && config.Order != null
-                ? config.Order.Value
-                : group.DefaultOrderCsv;
-            return MergeAnnouncementOrder(group, orderCsv);
+            if (config == null || config.Order == null)
+            {
+                return MergeAnnouncementOrder(group, group.DefaultOrderCsv);
+            }
+
+            // The merge is a Split, a List, a HashSet and an IndexOf, and this is the order
+            // source for every tile read. Key the memo on the saved CSV itself: every write to
+            // Order.Value - the two setters, the version migration, an edit to the config file -
+            // drops it without a hook to remember.
+            string orderCsv = config.Order.Value;
+            if (config.MergedOrder == null || !string.Equals(config.MergedOrderSource, orderCsv, StringComparison.Ordinal))
+            {
+                config.MergedOrderSource = orderCsv;
+                config.MergedOrder = MergeAnnouncementOrder(group, orderCsv);
+            }
+
+            return config.MergedOrder;
         }
 
         public static bool GetAnnouncementElementEnabled(AnnouncementGroupDefinition group, AnnouncementElementDefinition element)
@@ -1110,6 +1123,8 @@ namespace SongsOfConquestAccess
         {
             public ConfigEntry<int> Version { get; set; }
             public ConfigEntry<string> Order { get; set; }
+            public string MergedOrderSource { get; set; }
+            public IReadOnlyList<string> MergedOrder { get; set; }
             public Dictionary<string, AnnouncementElementConfig> Elements { get; private set; } =
                 new Dictionary<string, AnnouncementElementConfig>();
         }
