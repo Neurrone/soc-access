@@ -146,7 +146,7 @@ namespace SongsOfConquestAccess.Screens
             AddDrawn(drawn, Live.RestartMapButton);
             AddDrawn(drawn, Live.QuitToMainButton);
             AddDrawn(drawn, Live.LoadButton);
-            SortByLeftEdge(drawn);
+            DrawnOrder.SortByKey(drawn);
             for (int i = 0; i < drawn.Count; i++)
             {
                 AddButton(builder, "button/" + i, drawn[i].Value);
@@ -162,27 +162,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            Component component = button as Component;
-            float left = component != null && component.transform != null ? component.transform.position.x : 0f;
-            drawn.Add(new KeyValuePair<float, UIButton>(left, button));
-        }
-
-        /// <summary>Stable insertion sort, so two buttons at one x keep the order the menu declares
-        /// them in.</summary>
-        private static void SortByLeftEdge(List<KeyValuePair<float, UIButton>> drawn)
-        {
-            for (int i = 1; i < drawn.Count; i++)
-            {
-                KeyValuePair<float, UIButton> moving = drawn[i];
-                int j = i - 1;
-                while (j >= 0 && drawn[j].Key > moving.Key)
-                {
-                    drawn[j + 1] = drawn[j];
-                    j--;
-                }
-
-                drawn[j + 1] = moving;
-            }
+            drawn.Add(new KeyValuePair<float, UIButton>(DrawnOrder.LeftOf(button as Component), button));
         }
 
         private void AddButton(GraphBuilder builder, string key, UIButton button)

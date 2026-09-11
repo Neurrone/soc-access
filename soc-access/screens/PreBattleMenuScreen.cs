@@ -414,7 +414,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            drawn.Sort((left, right) => left.Key.CompareTo(right.Key));
+            DrawnOrder.SortByKey(drawn);
             builder.BeginStop(ButtonsStop);
             for (int i = 0; i < drawn.Count; i++)
             {
@@ -441,13 +441,8 @@ namespace SongsOfConquestAccess.Screens
             NodeVtable vtable = GraphNodes.Button(label, () => activate(), enabled, tooltip);
             vtable.OnFocusVisual = focus;
             into.Add(new KeyValuePair<float, NodeDeclaration>(
-                Left(button),
+                DrawnOrder.LeftOf(button),
                 new DrawnNode(ControlId.For(button, "pre-battle:" + key), vtable, button)));
-        }
-
-        private static float Left(Component button)
-        {
-            return button != null && button.transform != null ? button.transform.position.x : 0f;
         }
 
         /// <summary>The hint the menu draws under the board ("Drag troops to rearrange"), a stop of

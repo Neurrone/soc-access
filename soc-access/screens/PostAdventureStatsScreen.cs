@@ -158,7 +158,7 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>One tick per team, in the order the menu draws them down the page.</summary>
         private void BuildTeams(GraphBuilder builder)
         {
-            List<PostAdventureStatsAdapter.TeamOption> teams = DrawnOrder(Live.GetTeamOptions());
+            List<PostAdventureStatsAdapter.TeamOption> teams = InDrawnOrder(Live.GetTeamOptions());
             for (int i = 0; i < teams.Count; i++)
             {
                 PostAdventureStatsAdapter.TeamOption team = teams[i];
@@ -186,7 +186,7 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The teams top to bottom as the menu draws them, measured off each entry's own
         /// transform every build; the insertion sort is stable, so two entries at one y keep the
         /// order the menu spawned them in.</summary>
-        private static List<PostAdventureStatsAdapter.TeamOption> DrawnOrder(
+        private static List<PostAdventureStatsAdapter.TeamOption> InDrawnOrder(
             IReadOnlyList<PostAdventureStatsAdapter.TeamOption> teams)
         {
             List<PostAdventureStatsAdapter.TeamOption> drawn = new List<PostAdventureStatsAdapter.TeamOption>();
@@ -203,22 +203,7 @@ namespace SongsOfConquestAccess.Screens
                 tops.Add(team.Entry.transform != null ? team.Entry.transform.position.y : 0f);
             }
 
-            for (int i = 1; i < drawn.Count; i++)
-            {
-                PostAdventureStatsAdapter.TeamOption moving = drawn[i];
-                float top = tops[i];
-                int j = i - 1;
-                while (j >= 0 && tops[j] < top)
-                {
-                    drawn[j + 1] = drawn[j];
-                    tops[j + 1] = tops[j];
-                    j--;
-                }
-
-                drawn[j + 1] = moving;
-                tops[j + 1] = top;
-            }
-
+            DrawnOrder.SortDescending(drawn, tops);
             return drawn;
         }
 

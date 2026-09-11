@@ -171,7 +171,7 @@ namespace SongsOfConquestAccess.Screens
                 builder.PushContext(caption);
             }
 
-            List<LevelUpMenuAdapter.SkillChoice> choices = DrawnOrder(Live.GetSkillChoices());
+            List<LevelUpMenuAdapter.SkillChoice> choices = InDrawnOrder(Live.GetSkillChoices());
             for (int i = 0; i < choices.Count; i++)
             {
                 LevelUpMenuAdapter.SkillChoice choice = choices[i];
@@ -216,7 +216,7 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The cards left to right as the menu draws them, measured off each card's own
         /// transform every build; the insertion sort is stable, so two cards at one x keep the
         /// settings' order.</summary>
-        private static List<LevelUpMenuAdapter.SkillChoice> DrawnOrder(
+        private static List<LevelUpMenuAdapter.SkillChoice> InDrawnOrder(
             IReadOnlyList<LevelUpMenuAdapter.SkillChoice> choices)
         {
             List<LevelUpMenuAdapter.SkillChoice> drawn = new List<LevelUpMenuAdapter.SkillChoice>();
@@ -233,22 +233,7 @@ namespace SongsOfConquestAccess.Screens
                 lefts.Add(choice.Button != null ? choice.Button.transform.position.x : 0f);
             }
 
-            for (int i = 1; i < drawn.Count; i++)
-            {
-                LevelUpMenuAdapter.SkillChoice moving = drawn[i];
-                float left = lefts[i];
-                int j = i - 1;
-                while (j >= 0 && lefts[j] > left)
-                {
-                    drawn[j + 1] = drawn[j];
-                    lefts[j + 1] = lefts[j];
-                    j--;
-                }
-
-                drawn[j + 1] = moving;
-                lefts[j + 1] = left;
-            }
-
+            DrawnOrder.SortAscending(drawn, lefts);
             return drawn;
         }
 

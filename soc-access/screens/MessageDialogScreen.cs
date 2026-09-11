@@ -346,20 +346,9 @@ namespace SongsOfConquestAccess.Screens
                 actions.Add(DialogAction.Negative);
             }
 
-            if (actions.Count == 2 && Left(actions[1]) < Left(actions[0]))
-            {
-                DialogAction first = actions[0];
-                actions[0] = actions[1];
-                actions[1] = first;
-            }
+            DrawnOrder.SortByLeft(actions, action => Live.ButtonOf(action));
 
             return actions;
-        }
-
-        private float Left(DialogAction action)
-        {
-            Component button = Live.ButtonOf(action);
-            return button != null ? button.transform.position.x : 0f;
         }
 
         private IUITextMeshInputField InputField

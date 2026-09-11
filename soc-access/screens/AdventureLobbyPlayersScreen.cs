@@ -243,7 +243,7 @@ namespace SongsOfConquestAccess.Screens
             AddAction(actions, lefts, slot, LeaveColumn, slot.LeaveButton);
             AddAction(actions, lefts, slot, KickColumn, slot.KickButton);
             AddAction(actions, lefts, slot, ToggleAiColumn, slot.ToggleAiButton);
-            SortByLeft(actions, lefts);
+            DrawnOrder.SortAscending(actions, lefts);
             cells.AddRange(actions);
             return cells;
         }
@@ -294,7 +294,7 @@ namespace SongsOfConquestAccess.Screens
                 () => it.IsEnabled,
                 it.Tooltip);
             cells.Add(new GraphSheet.SheetCell(column, 0, Cell(vtable, slot, it)));
-            lefts.Add(Left(it.Button));
+            lefts.Add(DrawnOrder.LeftOf(it.Button));
         }
 
         /// <summary>What every cell of a row shares: the game's own focus visual, and one type-ahead
@@ -347,7 +347,7 @@ namespace SongsOfConquestAccess.Screens
                 Add(nodes, lefts, new DrawnNode(
                     ControlId.For(name, "lobby:game-name"),
                     GraphNodes.Text(() => panel.GameName),
-                    name), Left(name));
+                    name), DrawnOrder.LeftOf(name));
             }
 
             Component gameCode = panel.GameCodeField;
@@ -365,7 +365,7 @@ namespace SongsOfConquestAccess.Screens
                 // "standing down" to every key. Its tooltip is still in the review buffer.
                 GraphNodes.DoNotDrawTooltip(code);
                 Add(nodes, lefts, new DrawnNode(
-                    ControlId.For(gameCode, "lobby:game-code"), code, gameCode), Left(gameCode));
+                    ControlId.For(gameCode, "lobby:game-code"), code, gameCode), DrawnOrder.LeftOf(gameCode));
             }
 
             AddToggle(nodes, lefts, "lobby:invites-only", panel.InvitesOnly);
@@ -379,7 +379,7 @@ namespace SongsOfConquestAccess.Screens
                     GraphNodes.Text(() => panel.XboxCrossplayInformation)), float.MaxValue);
             }
 
-            SortByLeft(nodes, lefts);
+            DrawnOrder.SortAscending(nodes, lefts);
             for (int i = 0; i < nodes.Count; i++)
             {
                 builder.AddItem(nodes[i]);
@@ -512,7 +512,7 @@ namespace SongsOfConquestAccess.Screens
                 () => it.IsEnabled,
                 it.Tooltip);
             vtable.OnFocusVisual = it.Focus;
-            Add(nodes, lefts, new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button), Left(it.Button));
+            Add(nodes, lefts, new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button), DrawnOrder.LeftOf(it.Button));
         }
 
         private void AddToggle(
@@ -540,7 +540,7 @@ namespace SongsOfConquestAccess.Screens
                 () => it.IsEnabled,
                 it.Tooltip);
             vtable.OnFocusVisual = it.Focus;
-            Add(nodes, lefts, new DrawnNode(ControlId.For(subject, key), vtable, subject), Left(subject));
+            Add(nodes, lefts, new DrawnNode(ControlId.For(subject, key), vtable, subject), DrawnOrder.LeftOf(subject));
         }
 
         // ---- the header band ----
@@ -575,33 +575,6 @@ namespace SongsOfConquestAccess.Screens
         {
             items.Add(item);
             lefts.Add(left);
-        }
-
-        /// <summary>Put a band's controls in the order the game draws them, left to right. An
-        /// insertion sort: the bands here are a handful of controls and the order must be stable
-        /// where two of them share a rectangle's left edge.</summary>
-        private static void SortByLeft<T>(List<T> items, List<float> lefts)
-        {
-            for (int i = 1; i < items.Count; i++)
-            {
-                T item = items[i];
-                float left = lefts[i];
-                int j = i - 1;
-                while (j >= 0 && lefts[j] > left)
-                {
-                    items[j + 1] = items[j];
-                    lefts[j + 1] = lefts[j];
-                    j--;
-                }
-
-                items[j + 1] = item;
-                lefts[j + 1] = left;
-            }
-        }
-
-        private static float Left(Component component)
-        {
-            return component != null ? component.transform.position.x : 0f;
         }
 
         /// <summary>The row's identity, minted once per position and handed back as the same string

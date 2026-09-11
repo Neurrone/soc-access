@@ -315,21 +315,16 @@ namespace SongsOfConquestAccess.Screens
             Component accept = Live.IsAcceptButtonVisible() ? Live.AcceptButton : null;
             if (accept != null)
             {
-                drawn.Add(new KeyValuePair<float, NodeDeclaration>(Left(accept), AcceptNode(accept)));
+                drawn.Add(new KeyValuePair<float, NodeDeclaration>(DrawnOrder.LeftOf(accept), AcceptNode(accept)));
             }
 
             Component redo = Live.IsRedoManualBattleButtonVisible() ? Live.RedoManualBattleButton : null;
             if (redo != null)
             {
-                drawn.Add(new KeyValuePair<float, NodeDeclaration>(Left(redo), RedoNode(redo)));
+                drawn.Add(new KeyValuePair<float, NodeDeclaration>(DrawnOrder.LeftOf(redo), RedoNode(redo)));
             }
 
-            if (drawn.Count == 2 && drawn[1].Key < drawn[0].Key)
-            {
-                KeyValuePair<float, NodeDeclaration> first = drawn[0];
-                drawn[0] = drawn[1];
-                drawn[1] = first;
-            }
+            DrawnOrder.SortByKey(drawn);
 
             for (int i = 0; i < drawn.Count; i++)
             {
@@ -363,11 +358,6 @@ namespace SongsOfConquestAccess.Screens
                 kind: AnnouncementKinds.Label);
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
             return new DrawnNode(ControlId.For(button, "post-battle:redo"), vtable, button);
-        }
-
-        private static float Left(Component button)
-        {
-            return button != null && button.transform != null ? button.transform.position.x : 0f;
         }
 
         // ---- the lines the menu gives nothing to key on ----

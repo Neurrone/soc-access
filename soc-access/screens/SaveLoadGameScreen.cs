@@ -339,7 +339,7 @@ namespace SongsOfConquestAccess.Screens
             Add(buttons, Live.LoadAsOnlineButton);
             Add(buttons, Live.LoadButton);
             Add(buttons, Live.SaveButton);
-            SortByDrawnTop(buttons);
+            DrawnOrder.SortByTop(buttons, item => item.Button);
             for (int i = 0; i < buttons.Count; i++)
             {
                 AddButton(builder, buttons[i]);
@@ -355,33 +355,6 @@ namespace SongsOfConquestAccess.Screens
             if (button != null && button.Button != null && button.IsVisible())
             {
                 buttons.Add(button);
-            }
-        }
-
-        // The same insertion sort as the rows', over the button column.
-        private static void SortByDrawnTop(List<SaveLoadGameMenuAdapter.ButtonItem> items)
-        {
-            List<float> tops = new List<float>(items.Count);
-            for (int i = 0; i < items.Count; i++)
-            {
-                Component component = items[i].Button;
-                tops.Add(component != null ? component.transform.position.y : 0f);
-            }
-
-            for (int i = 1; i < items.Count; i++)
-            {
-                SaveLoadGameMenuAdapter.ButtonItem moving = items[i];
-                float top = tops[i];
-                int j = i - 1;
-                while (j >= 0 && tops[j] < top)
-                {
-                    items[j + 1] = items[j];
-                    tops[j + 1] = tops[j];
-                    j--;
-                }
-
-                items[j + 1] = moving;
-                tops[j + 1] = top;
             }
         }
 

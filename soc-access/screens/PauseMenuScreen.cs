@@ -76,7 +76,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.BeginStop(MenuStop);
-            List<PauseMenuAdapter.Item> items = DrawnOrder(Live.Items);
+            List<PauseMenuAdapter.Item> items = InDrawnOrder(Live.Items);
             for (int i = 0; i < items.Count; i++)
             {
                 PauseMenuAdapter.Item item = items[i];
@@ -97,7 +97,7 @@ namespace SongsOfConquestAccess.Screens
         /// transform every build; the insertion sort is stable, so two buttons at one height keep the
         /// adapter's order.
         /// </summary>
-        private static List<PauseMenuAdapter.Item> DrawnOrder(IReadOnlyList<PauseMenuAdapter.Item> items)
+        private static List<PauseMenuAdapter.Item> InDrawnOrder(IReadOnlyList<PauseMenuAdapter.Item> items)
         {
             List<PauseMenuAdapter.Item> drawn = new List<PauseMenuAdapter.Item>();
             List<float> tops = new List<float>();
@@ -113,22 +113,7 @@ namespace SongsOfConquestAccess.Screens
                 tops.Add(Top(item));
             }
 
-            for (int i = 1; i < drawn.Count; i++)
-            {
-                PauseMenuAdapter.Item moving = drawn[i];
-                float top = tops[i];
-                int j = i - 1;
-                while (j >= 0 && tops[j] < top)
-                {
-                    drawn[j + 1] = drawn[j];
-                    tops[j + 1] = tops[j];
-                    j--;
-                }
-
-                drawn[j + 1] = moving;
-                tops[j + 1] = top;
-            }
-
+            DrawnOrder.SortDescending(drawn, tops);
             return drawn;
         }
 

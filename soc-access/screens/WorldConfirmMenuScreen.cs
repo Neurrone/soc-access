@@ -177,12 +177,7 @@ namespace SongsOfConquestAccess.Screens
                     Vtable(cancel, () => Live.CancelLabel, () => Live.ActivateCancel(), null)));
             }
 
-            if (buttons.Count == 2 && Left(buttons[1].Component) < Left(buttons[0].Component))
-            {
-                DrawnButton first = buttons[0];
-                buttons[0] = buttons[1];
-                buttons[1] = first;
-            }
+            DrawnOrder.SortByLeft(buttons, button => button.Component);
 
             for (int i = 0; i < buttons.Count; i++)
             {
@@ -201,11 +196,6 @@ namespace SongsOfConquestAccess.Screens
             // its own Confirm key would press.
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(component);
             return vtable;
-        }
-
-        private static float Left(Component component)
-        {
-            return component != null ? component.transform.position.x : 0f;
         }
 
         private struct DrawnButton

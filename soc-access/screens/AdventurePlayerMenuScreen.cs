@@ -139,11 +139,17 @@ namespace SongsOfConquestAccess.Screens
                 AdventurePlayerMenuAdapter.PlayerItem player = players[i];
                 if (player != null && player.Entry != null)
                 {
-                    bands.Add(new Band(null, null, player, Top(player.Entry)));
+                    bands.Add(new Band(null, null, player, DrawnOrder.TopOf(player.Entry)));
                 }
             }
 
-            SortByTop(bands);
+            List<float> tops = new List<float>(bands.Count);
+            for (int i = 0; i < bands.Count; i++)
+            {
+                tops.Add(bands[i].Top);
+            }
+
+            DrawnOrder.SortDescending(bands, tops);
 
             ControlId first = null;
             bool captioned = false;
@@ -194,7 +200,7 @@ namespace SongsOfConquestAccess.Screens
         {
             if (caption != null && caption.IsVisible && !string.IsNullOrWhiteSpace(caption.Text))
             {
-                bands.Add(new Band(caption, regionKey, null, Top(caption.Component)));
+                bands.Add(new Band(caption, regionKey, null, DrawnOrder.TopOf(caption.Component)));
             }
         }
 
@@ -365,30 +371,6 @@ namespace SongsOfConquestAccess.Screens
                 Player = player;
                 Top = top;
             }
-        }
-
-        /// <summary>Put the captions and the rows in the order the menu draws them, top to bottom. An
-        /// insertion sort: there are a handful of lines and the order must be stable where two of them
-        /// share a top edge.</summary>
-        private static void SortByTop(List<Band> bands)
-        {
-            for (int i = 1; i < bands.Count; i++)
-            {
-                Band band = bands[i];
-                int j = i - 1;
-                while (j >= 0 && bands[j].Top < band.Top)
-                {
-                    bands[j + 1] = bands[j];
-                    j--;
-                }
-
-                bands[j + 1] = band;
-            }
-        }
-
-        private static float Top(Component component)
-        {
-            return component != null ? component.transform.position.y : 0f;
         }
     }
 }
