@@ -1210,16 +1210,6 @@ msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
 msgstr "Sprawdź heks walki"
 
-#. Actions.CombatNextRelevantTile
-msgctxt "Actions.CombatNextRelevantTile"
-msgid "Next Relevant Combat Tile"
-msgstr "Następne istotne pole walki"
-
-#. Actions.CombatPreviousRelevantTile
-msgctxt "Actions.CombatPreviousRelevantTile"
-msgid "Previous Relevant Combat Tile"
-msgstr "Poprzednie istotne pole walki"
-
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
@@ -1467,13 +1457,18 @@ msgstr "Odtwórz omiatanie sonarem"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize Enemy Resources"
-msgstr "Podsumuj zasoby wroga"
+msgid "Summarize enemy essence"
+msgstr "Podsumuj esencję wroga"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
 msgstr "Podsumuj zasoby"
+
+#. Actions.SummarizeResourcesTooltip
+msgctxt "Actions.SummarizeResourcesTooltip"
+msgid "Summarizes your essence in combat"
+msgstr "W walce podsumowuje twoją esencję"
 
 #. Actions.TroopSplit_0
 msgctxt "Actions.TroopSplit_0"
@@ -1502,13 +1497,13 @@ msgstr "Rozpocznij przeciąganie"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Coarse Decrease"
-msgstr "Zmniejsz o duży krok"
+msgid "Step down"
+msgstr "Krok w dół"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Coarse Increase"
-msgstr "Zwiększ o duży krok"
+msgid "Step up"
+msgstr "Krok w górę"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"
@@ -1532,8 +1527,8 @@ msgstr "W lewo"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click"
-msgstr "Lewy przycisk myszy"
+msgid "Left click or complete drag"
+msgstr "Lewy klik lub zakończ przeciąganie"
 
 #. Actions.UiNext
 msgctxt "Actions.UiNext"

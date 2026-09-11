@@ -1210,16 +1210,6 @@ msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
 msgstr "Оглянути бойовий гекс"
 
-#. Actions.CombatNextRelevantTile
-msgctxt "Actions.CombatNextRelevantTile"
-msgid "Next Relevant Combat Tile"
-msgstr "Наступна важлива бойова клітинка"
-
-#. Actions.CombatPreviousRelevantTile
-msgctxt "Actions.CombatPreviousRelevantTile"
-msgid "Previous Relevant Combat Tile"
-msgstr "Попередня важлива бойова клітинка"
-
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
@@ -1467,13 +1457,18 @@ msgstr "Відтворити сонарне сканування"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize Enemy Resources"
-msgstr "Підсумувати ресурси ворога"
+msgid "Summarize enemy essence"
+msgstr "Підсумувати ворожу есенцію"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
 msgstr "Підсумувати ресурси"
+
+#. Actions.SummarizeResourcesTooltip
+msgctxt "Actions.SummarizeResourcesTooltip"
+msgid "Summarizes your essence in combat"
+msgstr "У бою підсумовує вашу есенцію"
 
 #. Actions.TroopSplit_0
 msgctxt "Actions.TroopSplit_0"
@@ -1502,13 +1497,13 @@ msgstr "Почати перетягування"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Coarse Decrease"
-msgstr "Зменшити з великим кроком"
+msgid "Step down"
+msgstr "Крок вниз"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Coarse Increase"
-msgstr "Збільшити з великим кроком"
+msgid "Step up"
+msgstr "Крок вгору"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"
@@ -1532,8 +1527,8 @@ msgstr "Ліворуч"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click"
-msgstr "Лівий клік"
+msgid "Left click or complete drag"
+msgstr "Лівий клік або завершити перетягування"
 
 #. Actions.UiNext
 msgctxt "Actions.UiNext"

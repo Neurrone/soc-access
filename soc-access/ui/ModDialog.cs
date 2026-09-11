@@ -326,7 +326,7 @@ namespace SongsOfConquestAccess.UI
         /// input action. The chip is drawn separately by <see cref="ShowBinding"/>, since it is
         /// what a rebind or a clear redraws.
         /// </summary>
-        public IUIKeyBinding AddKeyBinding(string label, string plusTooltip, Action rebind)
+        public IUIKeyBinding AddKeyBinding(string label, string plusTooltip, Action rebind, string tooltip = null)
         {
             IUIKeyBinding widget = _controller.AddKeyBinding();
             if (widget == null)
@@ -335,6 +335,12 @@ namespace SongsOfConquestAccess.UI
             }
 
             widget.Text = label;
+            // The row's own tooltip, on the widget's transform, which is where the row reader asks.
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                widget.Tooltip = new TooltipDescription(tooltip);
+            }
+
             widget.AddPlusButton(plusTooltip, true, rebind);
             return widget;
         }

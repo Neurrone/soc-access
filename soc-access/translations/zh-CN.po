@@ -1190,16 +1190,6 @@ msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
 msgstr "检查战斗六角格"
 
-#. Actions.CombatNextRelevantTile
-msgctxt "Actions.CombatNextRelevantTile"
-msgid "Next Relevant Combat Tile"
-msgstr "下一个相关战斗格"
-
-#. Actions.CombatPreviousRelevantTile
-msgctxt "Actions.CombatPreviousRelevantTile"
-msgid "Previous Relevant Combat Tile"
-msgstr "上一个相关战斗格"
-
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
@@ -1447,13 +1437,18 @@ msgstr "播放声呐扫描"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize Enemy Resources"
-msgstr "汇总敌方资源"
+msgid "Summarize enemy essence"
+msgstr "汇总敌方精华"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
 msgstr "汇总资源"
+
+#. Actions.SummarizeResourcesTooltip
+msgctxt "Actions.SummarizeResourcesTooltip"
+msgid "Summarizes your essence in combat"
+msgstr "在战斗中汇总你的精华"
 
 #. Actions.TroopSplit_0
 msgctxt "Actions.TroopSplit_0"
@@ -1472,13 +1467,13 @@ msgstr "开始拖动"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Coarse Decrease"
-msgstr "大幅减小"
+msgid "Step down"
+msgstr "下调一档"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Coarse Increase"
-msgstr "大幅增大"
+msgid "Step up"
+msgstr "上调一档"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"
@@ -1502,8 +1497,8 @@ msgstr "向左移动"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click"
-msgstr "左键点击"
+msgid "Left click or complete drag"
+msgstr "左键点击或完成拖动"
 
 #. Actions.UiNext
 msgctxt "Actions.UiNext"

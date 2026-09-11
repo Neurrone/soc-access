@@ -1190,16 +1190,6 @@ msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
 msgstr "전투 육각 조사"
 
-#. Actions.CombatNextRelevantTile
-msgctxt "Actions.CombatNextRelevantTile"
-msgid "Next Relevant Combat Tile"
-msgstr "다음 관련 전투 칸"
-
-#. Actions.CombatPreviousRelevantTile
-msgctxt "Actions.CombatPreviousRelevantTile"
-msgid "Previous Relevant Combat Tile"
-msgstr "이전 관련 전투 칸"
-
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
@@ -1447,13 +1437,18 @@ msgstr "소나 스윕 재생"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize Enemy Resources"
-msgstr "적 자원 요약"
+msgid "Summarize enemy essence"
+msgstr "적 에센스 요약"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
 msgstr "자원 요약"
+
+#. Actions.SummarizeResourcesTooltip
+msgctxt "Actions.SummarizeResourcesTooltip"
+msgid "Summarizes your essence in combat"
+msgstr "전투 중에는 내 에센스를 요약합니다"
 
 #. Actions.TroopSplit_0
 msgctxt "Actions.TroopSplit_0"
@@ -1472,13 +1467,13 @@ msgstr "끌기 시작"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Coarse Decrease"
-msgstr "크게 감소"
+msgid "Step down"
+msgstr "한 단계 내리기"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Coarse Increase"
-msgstr "크게 증가"
+msgid "Step up"
+msgstr "한 단계 올리기"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"
@@ -1502,8 +1497,8 @@ msgstr "왼쪽으로 이동"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click"
-msgstr "왼쪽 클릭"
+msgid "Left click or complete drag"
+msgstr "왼쪽 클릭 또는 끌기 완료"
 
 #. Actions.UiNext
 msgctxt "Actions.UiNext"

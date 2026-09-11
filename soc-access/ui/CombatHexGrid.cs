@@ -171,8 +171,6 @@ namespace SongsOfConquestAccess.UI
                 || (CanNavigateEnemyActingTroops()
                     && (actionKey == AccessibilityActions.CombatNextEnemyTroop.Key
                         || actionKey == AccessibilityActions.CombatPreviousEnemyTroop.Key))
-                || actionKey == AccessibilityActions.CombatNextRelevantTile.Key
-                || actionKey == AccessibilityActions.CombatPreviousRelevantTile.Key
                 || actionKey == AccessibilityActions.CombatFocusTimeline.Key
                 || actionKey == AccessibilityActions.ReadThreat.Key
                 || IsScannerAction(actionKey);
@@ -293,16 +291,6 @@ namespace SongsOfConquestAccess.UI
             {
                 CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
                 return screen != null && screen.NavigateEnemyActingTroop(-1);
-            }
-
-            if (action.Key == AccessibilityActions.CombatNextRelevantTile.Key)
-            {
-                return MoveOrdered(1);
-            }
-
-            if (action.Key == AccessibilityActions.CombatPreviousRelevantTile.Key)
-            {
-                return MoveOrdered(-1);
             }
 
             if (action.Key == AccessibilityActions.CombatFocusTimeline.Key)
@@ -546,34 +534,6 @@ namespace SongsOfConquestAccess.UI
             SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.ExitedInspectMode), interrupt: false));
             FocusCurrentTile(updateNativeFocus: true);
             return true;
-        }
-
-        private bool MoveOrdered(int delta)
-        {
-            if (_inspectContext == null)
-            {
-                return true;
-            }
-
-            _inspectContext.FinalizeOrdering();
-            List<Vector2Int> ordered = _inspectContext.OrderedTiles;
-            if (ordered == null || ordered.Count == 0)
-            {
-                return true;
-            }
-
-            int currentIndex = 0;
-            for (int i = 0; i < ordered.Count; i++)
-            {
-                if (ordered[i] == _cursor)
-                {
-                    currentIndex = i;
-                    break;
-                }
-            }
-
-            int nextIndex = Mod(currentIndex + delta, ordered.Count);
-            return SetCursor(ordered[nextIndex]);
         }
 
         private bool SetCursor(Vector2Int point)

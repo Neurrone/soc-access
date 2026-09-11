@@ -335,7 +335,8 @@ namespace SongsOfConquestAccess.Adapters
                 () => FocusRow(widget, component, source),
                 () => PlusTooltipText(widget),
                 () => Tooltip.ForComponent(PlusButton(widget) as Component, null),
-                () => Tooltip.ForComponent(ChipButton(widget) as Component, null));
+                () => Tooltip.ForComponent(ChipButton(widget) as Component, null),
+                () => Tooltip.ForComponent(component, null));
         }
 
         // The row is not a Selectable of its own, and the panel's AutoScrollToSelected only follows
@@ -957,7 +958,8 @@ namespace SongsOfConquestAccess.Adapters
             Action focus,
             Func<string> getPlusLabel,
             Func<Tooltip> getPlusTooltip,
-            Func<Tooltip> getClearTooltip)
+            Func<Tooltip> getClearTooltip,
+            Func<Tooltip> getTooltip)
         {
             Id = id;
             GetActionName = getActionName;
@@ -971,6 +973,7 @@ namespace SongsOfConquestAccess.Adapters
             GetPlusLabel = getPlusLabel;
             GetPlusTooltip = getPlusTooltip;
             GetClearTooltip = getClearTooltip;
+            GetTooltip = getTooltip;
         }
 
         public string Id { get; private set; }
@@ -1007,5 +1010,9 @@ namespace SongsOfConquestAccess.Adapters
 
         /// <summary>The chip's own tooltip ("Remove binding") where it is an override chip.</summary>
         public Func<Tooltip> GetClearTooltip { get; private set; }
+
+        /// <summary>The row's own tooltip - what the gesture does, where the mod gave its row
+        /// one; the game's rows draw none.</summary>
+        public Func<Tooltip> GetTooltip { get; private set; }
     }
 }

@@ -969,11 +969,6 @@ msgctxt "Actions.CombatNextEnemyTroop"
 msgid "Next Enemy Troop"
 msgstr ""
 
-#. Actions.CombatNextRelevantTile
-msgctxt "Actions.CombatNextRelevantTile"
-msgid "Next Relevant Combat Tile"
-msgstr ""
-
 #. Actions.CombatPreviousActingTroop
 msgctxt "Actions.CombatPreviousActingTroop"
 msgid "Previous Acting Troop"
@@ -982,11 +977,6 @@ msgstr ""
 #. Actions.CombatPreviousEnemyTroop
 msgctxt "Actions.CombatPreviousEnemyTroop"
 msgid "Previous Enemy Troop"
-msgstr ""
-
-#. Actions.CombatPreviousRelevantTile
-msgctxt "Actions.CombatPreviousRelevantTile"
-msgid "Previous Relevant Combat Tile"
 msgstr ""
 
 #. Actions.DescribePosition
@@ -1261,12 +1251,17 @@ msgstr ""
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize Enemy Resources"
+msgid "Summarize enemy essence"
 msgstr ""
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
+msgstr ""
+
+#. Actions.SummarizeResourcesTooltip
+msgctxt "Actions.SummarizeResourcesTooltip"
+msgid "Summarizes your essence in combat"
 msgstr ""
 
 #. Actions.UiBack
@@ -1286,12 +1281,12 @@ msgstr ""
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Coarse Decrease"
+msgid "Step down"
 msgstr ""
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Coarse Increase"
+msgid "Step up"
 msgstr ""
 
 #. Actions.UiDown
@@ -1316,7 +1311,7 @@ msgstr ""
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click"
+msgid "Left click or complete drag"
 msgstr ""
 
 #. Actions.UiNext

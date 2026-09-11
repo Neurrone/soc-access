@@ -14,7 +14,8 @@ namespace SongsOfConquestAccess.Input
         // router checks screen-claimed actions first, then global actions, so
         // screens can own keys before global fallbacks see them.
         public static readonly InputAction SummarizeResources = OneShot("summarize_resources", ModStrings.Actions.SummarizeResources, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.R, ctrl: true));
+            .AddBinding(new KeyboardBinding(Key.R, ctrl: true))
+            .Describe(() => ModText.Get(ModStrings.Actions.SummarizeResourcesTooltip));
 
         public static readonly InputAction SummarizeEnemyResources = OneShot("summarize_enemy_resources", ModStrings.Actions.SummarizeEnemyResources, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.R, alt: true));
@@ -337,12 +338,6 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction CombatPreviousEnemyTroop = OneShot("combat_previous_enemy_troop", ModStrings.Actions.CombatPreviousEnemyTroop, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Period, shift: true));
 
-        public static readonly InputAction CombatNextRelevantTile = OneShot("combat_next_relevant_tile", ModStrings.Actions.CombatNextRelevantTile, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.W));
-
-        public static readonly InputAction CombatPreviousRelevantTile = OneShot("combat_previous_relevant_tile", ModStrings.Actions.CombatPreviousRelevantTile, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.W, shift: true));
-
         public static readonly InputAction CombatFocusTimeline = OneShot("combat_focus_timeline", ModStrings.Actions.CombatFocusTimeline, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.T));
 
@@ -578,8 +573,6 @@ namespace SongsOfConquestAccess.Input
                 CombatFocusActingTroop,
                 CombatNextEnemyTroop,
                 CombatPreviousEnemyTroop,
-                CombatNextRelevantTile,
-                CombatPreviousRelevantTile,
                 CombatFocusTimeline,
                 ReadThreat,
                 UiUp,

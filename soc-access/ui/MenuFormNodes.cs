@@ -213,7 +213,7 @@ namespace SongsOfConquestAccess.UI
             KeyBindingNodes nodes;
             if (!_keyBindingNodes.TryGetValue(binding, out nodes) || nodes.Overridden != overridden)
             {
-                NodeVtable name = GraphNodes.Text(binding.GetActionName);
+                NodeVtable name = GraphNodes.Text(binding.GetActionName, null, binding.GetTooltip());
                 name.OnFocusVisual = binding.Focus;
                 nodes = new KeyBindingNodes
                 {

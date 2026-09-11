@@ -1200,16 +1200,6 @@ msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
 msgstr "Kampfhex untersuchen"
 
-#. Actions.CombatNextRelevantTile
-msgctxt "Actions.CombatNextRelevantTile"
-msgid "Next Relevant Combat Tile"
-msgstr "Nächstes relevantes Kampffeld"
-
-#. Actions.CombatPreviousRelevantTile
-msgctxt "Actions.CombatPreviousRelevantTile"
-msgid "Previous Relevant Combat Tile"
-msgstr "Vorheriges relevantes Kampffeld"
-
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
@@ -1457,13 +1447,18 @@ msgstr "Sonar-Sweep abspielen"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize Enemy Resources"
-msgstr "Feindliche Ressourcen zusammenfassen"
+msgid "Summarize enemy essence"
+msgstr "Feindliche Essenz zusammenfassen"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
 msgstr "Ressourcen zusammenfassen"
+
+#. Actions.SummarizeResourcesTooltip
+msgctxt "Actions.SummarizeResourcesTooltip"
+msgid "Summarizes your essence in combat"
+msgstr "Fasst im Kampf deine Essenz zusammen"
 
 #. Actions.TroopSplit_0
 msgctxt "Actions.TroopSplit_0"
@@ -1487,13 +1482,13 @@ msgstr "Ziehen beginnen"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Coarse Decrease"
-msgstr "Grob verringern"
+msgid "Step down"
+msgstr "Schritt nach unten"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Coarse Increase"
-msgstr "Grob erhöhen"
+msgid "Step up"
+msgstr "Schritt nach oben"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"
@@ -1517,8 +1512,8 @@ msgstr "Nach links"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click"
-msgstr "Linksklick"
+msgid "Left click or complete drag"
+msgstr "Linksklick oder Ziehen abschließen"
 
 #. Actions.UiNext
 msgctxt "Actions.UiNext"

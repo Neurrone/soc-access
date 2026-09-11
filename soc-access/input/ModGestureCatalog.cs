@@ -185,8 +185,6 @@ namespace SongsOfConquestAccess.Input
                 AccessibilityActions.CombatFocusActingTroop,
                 AccessibilityActions.CombatNextEnemyTroop,
                 AccessibilityActions.CombatPreviousEnemyTroop,
-                AccessibilityActions.CombatNextRelevantTile,
-                AccessibilityActions.CombatPreviousRelevantTile,
                 AccessibilityActions.CombatFocusTimeline,
                 AccessibilityActions.ReadThreat,
                 AccessibilityActions.SummarizeEnemyResources,

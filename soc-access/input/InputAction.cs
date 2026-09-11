@@ -47,6 +47,16 @@ namespace SongsOfConquestAccess.Input
             get { return _getLabel(); }
         }
 
+        /// <summary>What the gesture does, where its label alone would not say - the Keybinds row's
+        /// tooltip. Null for the many actions whose label is the whole story.</summary>
+        public System.Func<string> GetDescription { get; private set; }
+
+        public InputAction Describe(System.Func<string> getDescription)
+        {
+            GetDescription = getDescription;
+            return this;
+        }
+
         public InputClaimScope ClaimScope { get; private set; }
 
         public InputRepeatPolicy RepeatPolicy { get; private set; }

@@ -244,10 +244,8 @@
             public static readonly ModString CombatInspect = new ModString("Actions.CombatInspect", "Inspect Combat Hex");
             public static readonly ModString CombatNextActingTroop = new ModString("Actions.CombatNextActingTroop", "Next Acting Troop");
             public static readonly ModString CombatNextEnemyTroop = new ModString("Actions.CombatNextEnemyTroop", "Next Enemy Troop");
-            public static readonly ModString CombatNextRelevantTile = new ModString("Actions.CombatNextRelevantTile", "Next Relevant Combat Tile");
             public static readonly ModString CombatPreviousActingTroop = new ModString("Actions.CombatPreviousActingTroop", "Previous Acting Troop");
             public static readonly ModString CombatPreviousEnemyTroop = new ModString("Actions.CombatPreviousEnemyTroop", "Previous Enemy Troop");
-            public static readonly ModString CombatPreviousRelevantTile = new ModString("Actions.CombatPreviousRelevantTile", "Previous Relevant Combat Tile");
             public static readonly ModString DescribePosition = new ModString("Actions.DescribePosition", "Describe map");
             public static readonly ModString Dismiss = new ModString("Actions.Dismiss", "Dismiss");
             public static readonly ModString FirstBufferLine = new ModString("Actions.FirstBufferLine", "First Buffer Line");
@@ -302,19 +300,21 @@
             public static readonly ModString ScannerSpeakDistanceAndDirection = new ModString("Actions.ScannerSpeakDistanceAndDirection", "Scanner Result Distance and Direction");
             public static readonly ModString SonarSweep = new ModString("Actions.SonarSweep", "Play Sonar Sweep");
             public static readonly ModString SummarizeReachableEntities = new ModString("Actions.SummarizeReachableEntities", "Summarize Reachable Entities");
-            public static readonly ModString SummarizeEnemyResources = new ModString("Actions.SummarizeEnemyResources", "Summarize Enemy Resources");
+            public static readonly ModString SummarizeEnemyResources = new ModString("Actions.SummarizeEnemyResources", "Summarize enemy essence");
             public static readonly ModString SummarizeResources = new ModString("Actions.SummarizeResources", "Summarize Resources");
+            /// <summary>The Keybinds row's tooltip: what the gesture does where there are no resources.</summary>
+            public static readonly ModString SummarizeResourcesTooltip = new ModString("Actions.SummarizeResourcesTooltip", "Summarizes your essence in combat");
             public static readonly ModPluralString TroopSplit = new ModPluralString("Actions.TroopSplit", "Split Off {0} Troop", "Split Off {0} Troops");
             public static readonly ModString UiBack = new ModString("Actions.UiBack", "Back");
             public static readonly ModString UiCarry = new ModString("Actions.UiCarry", "Start drag");
             public static readonly ModString UiClearSearch = new ModString("Actions.UiClearSearch", "Clear typeahead");
-            public static readonly ModString UiCoarseDecrease = new ModString("Actions.UiCoarseDecrease", "Coarse Decrease");
-            public static readonly ModString UiCoarseIncrease = new ModString("Actions.UiCoarseIncrease", "Coarse Increase");
+            public static readonly ModString UiCoarseDecrease = new ModString("Actions.UiCoarseDecrease", "Step down");
+            public static readonly ModString UiCoarseIncrease = new ModString("Actions.UiCoarseIncrease", "Step up");
             public static readonly ModString UiDown = new ModString("Actions.UiDown", "Move Down");
             public static readonly ModString UiEnd = new ModString("Actions.UiEnd", "Last Item");
             public static readonly ModString UiHome = new ModString("Actions.UiHome", "First Item");
             public static readonly ModString UiLeft = new ModString("Actions.UiLeft", "Move Left");
-            public static readonly ModString UiLeftClick = new ModString("Actions.UiLeftClick", "Left click");
+            public static readonly ModString UiLeftClick = new ModString("Actions.UiLeftClick", "Left click or complete drag");
             public static readonly ModString UiNext = new ModString("Actions.UiNext", "Next Stop");
             public static readonly ModString UiPrev = new ModString("Actions.UiPrev", "Previous Stop");
             public static readonly ModString UiRegionNext = new ModString("Actions.UiRegionNext", "Next Region");

@@ -1190,16 +1190,6 @@ msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
 msgstr "戦闘ヘックスを調査"
 
-#. Actions.CombatNextRelevantTile
-msgctxt "Actions.CombatNextRelevantTile"
-msgid "Next Relevant Combat Tile"
-msgstr "次の関連戦闘マス"
-
-#. Actions.CombatPreviousRelevantTile
-msgctxt "Actions.CombatPreviousRelevantTile"
-msgid "Previous Relevant Combat Tile"
-msgstr "前の関連戦闘マス"
-
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
@@ -1447,13 +1437,18 @@ msgstr "ソナースイープを再生"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize Enemy Resources"
-msgstr "敵の資源を要約"
+msgid "Summarize enemy essence"
+msgstr "敵のエッセンスを要約"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
 msgstr "資源を要約"
+
+#. Actions.SummarizeResourcesTooltip
+msgctxt "Actions.SummarizeResourcesTooltip"
+msgid "Summarizes your essence in combat"
+msgstr "戦闘中は自分のエッセンスを要約します"
 
 #. Actions.TroopSplit_0
 msgctxt "Actions.TroopSplit_0"
@@ -1472,13 +1467,13 @@ msgstr "ドラッグ開始"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Coarse Decrease"
-msgstr "大きく減少"
+msgid "Step down"
+msgstr "一段階下げる"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Coarse Increase"
-msgstr "大きく増加"
+msgid "Step up"
+msgstr "一段階上げる"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"
@@ -1502,8 +1497,8 @@ msgstr "左へ移動"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click"
-msgstr "左クリック"
+msgid "Left click or complete drag"
+msgstr "左クリックまたはドラッグ完了"
 
 #. Actions.UiNext
 msgctxt "Actions.UiNext"

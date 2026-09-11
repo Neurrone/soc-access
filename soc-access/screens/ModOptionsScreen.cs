@@ -354,7 +354,8 @@ namespace SongsOfConquestAccess.Screens
             widget = dialog.AddKeyBinding(
                 action.Label,
                 GameText.Get("Hotkeys/Add", null),
-                () => ModKeyCapture.Rebind(action, () => ShowBinding(dialog, widget, action)));
+                () => ModKeyCapture.Rebind(action, () => ShowBinding(dialog, widget, action)),
+                action.GetDescription != null ? action.GetDescription() : null);
             ShowBinding(dialog, widget, action);
         }
 

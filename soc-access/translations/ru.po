@@ -1210,16 +1210,6 @@ msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
 msgstr "Осмотреть боевой гекс"
 
-#. Actions.CombatNextRelevantTile
-msgctxt "Actions.CombatNextRelevantTile"
-msgid "Next Relevant Combat Tile"
-msgstr "Следующая важная боевая клетка"
-
-#. Actions.CombatPreviousRelevantTile
-msgctxt "Actions.CombatPreviousRelevantTile"
-msgid "Previous Relevant Combat Tile"
-msgstr "Предыдущая важная боевая клетка"
-
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
@@ -1467,13 +1457,18 @@ msgstr "Воспроизвести сонарный обзор"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize Enemy Resources"
-msgstr "Сводка ресурсов врага"
+msgid "Summarize enemy essence"
+msgstr "Сводка вражеской эссенции"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
 msgstr "Сводка ресурсов"
+
+#. Actions.SummarizeResourcesTooltip
+msgctxt "Actions.SummarizeResourcesTooltip"
+msgid "Summarizes your essence in combat"
+msgstr "В бою подводит сводку вашей эссенции"
 
 #. Actions.TroopSplit_0
 msgctxt "Actions.TroopSplit_0"
@@ -1502,13 +1497,13 @@ msgstr "Начать перетаскивание"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Coarse Decrease"
-msgstr "Уменьшить с большим шагом"
+msgid "Step down"
+msgstr "Шаг вниз"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Coarse Increase"
-msgstr "Увеличить с большим шагом"
+msgid "Step up"
+msgstr "Шаг вверх"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"
@@ -1532,8 +1527,8 @@ msgstr "Влево"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click"
-msgstr "Левый щелчок"
+msgid "Left click or complete drag"
+msgstr "Левый клик или завершить перетаскивание"
 
 #. Actions.UiNext
 msgctxt "Actions.UiNext"

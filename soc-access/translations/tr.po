@@ -1190,16 +1190,6 @@ msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
 msgstr "Savaş altıgenini incele"
 
-#. Actions.CombatNextRelevantTile
-msgctxt "Actions.CombatNextRelevantTile"
-msgid "Next Relevant Combat Tile"
-msgstr "Sonraki ilgili savaş karesi"
-
-#. Actions.CombatPreviousRelevantTile
-msgctxt "Actions.CombatPreviousRelevantTile"
-msgid "Previous Relevant Combat Tile"
-msgstr "Önceki ilgili savaş karesi"
-
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
@@ -1447,13 +1437,18 @@ msgstr "Sonar taramasını çal"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize Enemy Resources"
-msgstr "Düşman kaynaklarını özetle"
+msgid "Summarize enemy essence"
+msgstr "Düşman özünü özetle"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
 msgstr "Kaynakları özetle"
+
+#. Actions.SummarizeResourcesTooltip
+msgctxt "Actions.SummarizeResourcesTooltip"
+msgid "Summarizes your essence in combat"
+msgstr "Savaşta özünüzü özetler"
 
 #. Actions.TroopSplit_0
 msgctxt "Actions.TroopSplit_0"
@@ -1472,13 +1467,13 @@ msgstr "Sürüklemeyi başlat"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Coarse Decrease"
-msgstr "Büyük adımla azalt"
+msgid "Step down"
+msgstr "Bir adım aşağı"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Coarse Increase"
-msgstr "Büyük adımla artır"
+msgid "Step up"
+msgstr "Bir adım yukarı"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"
@@ -1502,8 +1497,8 @@ msgstr "Sola git"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click"
-msgstr "Sol tık"
+msgid "Left click or complete drag"
+msgstr "Sol tık veya sürüklemeyi tamamla"
 
 #. Actions.UiNext
 msgctxt "Actions.UiNext"
