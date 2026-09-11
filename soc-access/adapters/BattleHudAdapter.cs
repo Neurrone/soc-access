@@ -129,7 +129,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 string label = TooltipLines.First(SpellbookButtonTooltip);
                 return string.IsNullOrWhiteSpace(label)
-                    ? SpokenText.Get(_localization, "Common/HUD/SpellbookButton", "Spellbook")
+                    ? SpokenText.Get(_localization, "Common/HUD/SpellbookButton", string.Empty)
                     : label;
             }
         }
@@ -167,7 +167,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 string label = TooltipLines.First(EndTurnButtonTooltip);
                 return string.IsNullOrWhiteSpace(label)
-                    ? SpokenText.Get(_localization, "Battle/Labels/EndTurn", "End turn")
+                    ? SpokenText.Get(_localization, "Battle/Labels/EndTurn", string.Empty)
                     : label;
             }
         }
@@ -934,73 +934,40 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private Tooltip GetQuickbarTooltip(QuickbarEntry entry)
+        /// <summary>Everything a spell's tooltip says, read from the game WHEN THE TOOLTIP IS READ
+        /// and never when the build asks whether there is one: the game recomposes the tier details
+        /// on the way through. <see cref="UI.SpellTooltipText"/> turns it into lines.</summary>
+        private SpellTooltipFacts ReadSpellTooltipFacts(ISpellDefinition spell)
         {
-            if (entry == null || entry.Spell == null)
-            {
-                return null;
-            }
-
-            ISpellDefinition capturedSpell = entry.Spell;
-            return new Tooltip(() => BuildSpellTooltipLines(capturedSpell), null);
-        }
-
-        private IReadOnlyList<string> BuildSpellTooltipLines(ISpellDefinition spell)
-        {
-            List<string> lines = new List<string>();
+            SpellTooltipFacts facts = new SpellTooltipFacts();
             if (spell == null)
             {
-                return lines;
+                return facts;
             }
 
             ICommanderState commander = _facade != null ? _facade.Commanders.Current : null;
-            string name = SpokenText.Get(_localization, spell.NameKey, "Spell");
+            facts.Name = SpokenText.Get(_localization, spell.NameKey, string.Empty);
             int tier = GetCurrentSpellTier(spell, commander);
-            lines.Add(tier > 0 ? name + ", " + GetTierLabel(tier) : name);
-
-            string lore = SpokenText.Get(_localization, spell.DescriptionKey, string.Empty);
-            if (!string.IsNullOrWhiteSpace(lore))
-            {
-                lines.Add(lore);
-            }
+            facts.TierLabel = tier > 0 ? GetTierLabel(tier) : string.Empty;
+            facts.Lore = SpokenText.Get(_localization, spell.DescriptionKey, string.Empty);
 
             if (_spellsLookup != null && commander != null && _localization != null)
             {
                 SpellDetails details = _spellsLookup.GetDetails((SpellTypes)spell.Id, commander);
                 if (details != null)
                 {
-                    string description = details.GetLocalizedTierDescription(details.CurrentTier, _localization);
-                    if (!string.IsNullOrWhiteSpace(description))
-                    {
-                        string header = _localization.GetText("Spells/Spellbook/SpellDescriptionHeader")
-                            + " ("
-                            + _localization.GetText("Spells/Spellbook/SpellTierHeader", details.CurrentTier)
-                            + ")";
-                        lines.Add(header);
-                        lines.Add(description);
-                    }
-
-                    string duration = details.GetLocalizedTierDurationDescription(details.CurrentTier, _localization);
-                    if (!string.IsNullOrWhiteSpace(duration))
-                    {
-                        lines.Add(SpokenText.Get(_localization, "Spells/Spellbook/SpellDurationHeader", "Duration") + ": " + duration);
-                    }
+                    facts.TierDescription = details.GetLocalizedTierDescription(details.CurrentTier, _localization);
+                    facts.DescriptionHeader = _localization.GetText("Spells/Spellbook/SpellDescriptionHeader");
+                    facts.DescriptionTierLabel = _localization.GetText("Spells/Spellbook/SpellTierHeader", details.CurrentTier);
+                    facts.Duration = details.GetLocalizedTierDurationDescription(details.CurrentTier, _localization);
+                    facts.DurationHeader = SpokenText.Get(_localization, "Spells/Spellbook/SpellDurationHeader", string.Empty);
                 }
             }
 
-            string cost = FormatSpellCost(spell);
-            if (!string.IsNullOrWhiteSpace(cost))
-            {
-                lines.Add(SpokenText.Get(_localization, "Spells/Spellbook/SpellCostHeader", "Cost") + ": " + cost);
-            }
-
-            string castText = BuildSpellCastText(spell, commander, tier);
-            if (!string.IsNullOrWhiteSpace(castText))
-            {
-                lines.Add(castText);
-            }
-
-            return lines;
+            facts.Cost = ReadSpellCost(spell);
+            facts.CostHeader = SpokenText.Get(_localization, "Spells/Spellbook/SpellCostHeader", string.Empty);
+            facts.CastText = BuildSpellCastText(spell, commander, tier);
+            return facts;
         }
 
         private string BuildSpellCastText(ISpellDefinition spell, ICommanderState commander, int tier)
@@ -1049,31 +1016,28 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private string FormatSpellCost(ISpellDefinition spell)
+        private List<EssenceCost> ReadSpellCost(ISpellDefinition spell)
         {
-            if (spell == null || spell.Cost == null || spell.Cost.Count == 0)
+            List<EssenceCost> costs = new List<EssenceCost>();
+            if (spell == null || spell.Cost == null)
             {
-                return string.Empty;
+                return costs;
             }
 
-            List<string> parts = new List<string>();
             for (int i = 0; i < spell.Cost.Count; i++)
             {
                 SpellCostEntry cost = spell.Cost[i];
-                parts.Add(cost.Amount + " " + GetEssenceName(cost.Type));
+                costs.Add(new EssenceCost(cost.Amount, EssenceText.Name(_localization, cost.Type)));
             }
 
-            return string.Join(", ", parts.ToArray());
+            return costs;
         }
 
+        /// <summary>The game's own words for a spell tier, as the spellbook's header says them.
+        /// </summary>
         public string GetTierLabel(int tier)
         {
-            return SpokenText.Get(_localization, "Spells/Spellbook/SpellTierHeader", "tier " + tier, tier);
-        }
-
-        private string GetEssenceName(EssenceType type)
-        {
-            return EssenceText.Name(_localization, type);
+            return SpokenText.Get(_localization, "Spells/Spellbook/SpellTierHeader", string.Empty, tier);
         }
 
         private UIButton GetQueueEntryButton(IQueueHUDEntry entry)
@@ -1142,7 +1106,7 @@ namespace SongsOfConquestAccess.Adapters
                         return string.Empty;
                     }
 
-                    return SpokenText.Get(_adapter._localization, spell.NameKey, "Spell");
+                    return SpokenText.Get(_adapter._localization, spell.NameKey, string.Empty);
                 }
             }
 
@@ -1195,10 +1159,43 @@ namespace SongsOfConquestAccess.Adapters
                 return NativeSelectionUtility.Click(_adapter.GetQuickbarEntryButton(_entry));
             }
 
-            public Tooltip Tooltip
+            /// <summary>What the spell's tooltip says, read at the moment it is read.</summary>
+            public SpellTooltipFacts ReadTooltipFacts()
             {
-                get { return _adapter.GetQuickbarTooltip(_entry); }
+                return _adapter.ReadSpellTooltipFacts(_entry != null ? _entry.Spell : null);
             }
+        }
+
+        /// <summary>A spell's tooltip as the game answers it: every piece is the game's own text, and
+        /// none of it is joined up here.</summary>
+        public sealed class SpellTooltipFacts
+        {
+            public string Name = string.Empty;
+            public string TierLabel = string.Empty;
+            public string Lore = string.Empty;
+            public string DescriptionHeader = string.Empty;
+            public string DescriptionTierLabel = string.Empty;
+            public string TierDescription = string.Empty;
+            public string DurationHeader = string.Empty;
+            public string Duration = string.Empty;
+            public string CostHeader = string.Empty;
+            public string CastText = string.Empty;
+            public List<EssenceCost> Cost = new List<EssenceCost>();
+        }
+
+        /// <summary>One essence a spell costs: how much, and the game's word for the essence.
+        /// </summary>
+        public struct EssenceCost
+        {
+            public EssenceCost(int amount, string essenceName)
+            {
+                Amount = amount;
+                EssenceName = essenceName ?? string.Empty;
+            }
+
+            public int Amount { get; private set; }
+
+            public string EssenceName { get; private set; }
         }
 
         public sealed class QueueItem

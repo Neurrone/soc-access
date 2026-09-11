@@ -3847,3 +3847,13 @@ msgctxt "Spatial.MovementOfMax"
 msgid "{0} / {1}"
 msgstr "{0} / {1}"
 
+
+#. Common.Parenthetical
+msgctxt "Common.Parenthetical"
+msgid "{0} ({1})"
+msgstr "{0} ({1})"
+
+#. Combat.Spell
+msgctxt "Combat.Spell"
+msgid "Spell"
+msgstr "Zauber"

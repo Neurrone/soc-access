@@ -2640,32 +2640,6 @@ namespace SongsOfConquestAccess.Adapters
             return ids;
         }
 
-        public string BuildLocalEssenceSummary()
-        {
-            CombatHudSide? side = GetLocalCombatHudSide();
-            if (!side.HasValue)
-            {
-                return string.Empty;
-            }
-
-            return Hud != null && Hud.Commanders != null
-                ? Hud.Commanders.BuildEssenceSummary(side.Value, requireVisible: false)
-                : string.Empty;
-        }
-
-        public string BuildEnemyEssenceSummary()
-        {
-            CombatHudSide? side = GetEnemyCombatHudSide();
-            if (!side.HasValue)
-            {
-                return string.Empty;
-            }
-
-            return Hud != null && Hud.Commanders != null
-                ? Hud.Commanders.BuildEssenceSummary(side.Value, requireVisible: true)
-                : string.Empty;
-        }
-
         public bool IsActingTroop(IBattleTroopState troop)
         {
             IBattleTroopState current = GetCurrentTroop();
@@ -2683,7 +2657,8 @@ namespace SongsOfConquestAccess.Adapters
             return BattleFacadeState.LocalTeamId(_facade);
         }
 
-        private CombatHudSide? GetLocalCombatHudSide()
+        /// <summary>Which side's HUD column is the local player's, where either is.</summary>
+        public CombatHudSide? GetLocalCombatHudSide()
         {
             if (Hud == null || Hud.Commanders == null)
             {
@@ -2709,7 +2684,7 @@ namespace SongsOfConquestAccess.Adapters
             return null;
         }
 
-        private CombatHudSide? GetEnemyCombatHudSide()
+        public CombatHudSide? GetEnemyCombatHudSide()
         {
             CombatHudSide? localSide = GetLocalCombatHudSide();
             if (!localSide.HasValue)

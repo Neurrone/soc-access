@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -188,29 +188,6 @@ namespace SongsOfConquestAccess.Adapters
                 && (innerContainer == null || GameObjects.IsLive(innerContainer.gameObject));
         }
 
-        public string GetEssenceLabel(CombatHudSide side, EssenceType essenceType)
-        {
-            return EssenceText.Name(_localization, essenceType)
-                + ", "
-                + GetEssenceAmount(side, essenceType);
-        }
-
-        public string BuildEssenceSummary(CombatHudSide side, bool requireVisible)
-        {
-            if (requireVisible && !IsEssenceMenuVisible(side))
-            {
-                return string.Empty;
-            }
-
-            List<string> parts = new List<string>();
-            AddEssenceSummaryPart(parts, side, EssenceType.Order);
-            AddEssenceSummaryPart(parts, side, EssenceType.Creation);
-            AddEssenceSummaryPart(parts, side, EssenceType.Chaos);
-            AddEssenceSummaryPart(parts, side, EssenceType.Arcana);
-            AddEssenceSummaryPart(parts, side, EssenceType.Destruction);
-            return string.Join(", ", parts.ToArray());
-        }
-
         public int GetCommanderTeamId(CombatHudSide side)
         {
             ICommanderState commander = GetCommander(GetCommanderHud(side));
@@ -336,7 +313,8 @@ namespace SongsOfConquestAccess.Adapters
                 : _settings.DefenderAIAutoBattleContainer;
         }
 
-        private int GetEssenceAmount(CombatHudSide side, EssenceType essenceType)
+        /// <summary>What the side's wallet holds of one essence.</summary>
+        public int GetEssenceAmount(CombatHudSide side, EssenceType essenceType)
         {
             ICommanderState commander = Reflect.Get<ICommanderState>(GetEssenceContainer(side), BattleEssenceCommanderField);
             if (commander == null || commander.GetIsEmpty() || commander.EssenceWallet == null)
@@ -352,17 +330,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return 0;
             }
-        }
-
-        private void AddEssenceSummaryPart(List<string> parts, CombatHudSide side, EssenceType essenceType)
-        {
-            int amount = GetEssenceAmount(side, essenceType);
-            if (amount <= 0)
-            {
-                return;
-            }
-
-            parts.Add(EssenceText.Name(_localization, essenceType) + " " + amount);
         }
 
         private Component GetEssenceTooltipComponent(CombatHudSide side, EssenceType essenceType)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Battle;
@@ -451,10 +451,12 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 NodeVtable vtable = GraphNodes.Button(
-                    () => BuildQuickbarItemLabel(item),
+                    () => BuildQuickbarItemLabel(hud, item),
                     () => ActivateQuickbarItem(item),
                     () => item.IsEnabled,
-                    item.Tooltip);
+                    // The spell's details are read when the tooltip is read, never when the build
+                    // asks whether there is one.
+                    new Tooltip(() => SpellTooltipText.Lines(item.ReadTooltipFacts()), null));
                 vtable.OnFocusVisual = item.Focus;
                 vtable.OnBlurVisual = item.Unfocus;
                 builder.AddItem(new SyntheticNode(ControlId.Structural(QuickbarKeyPrefix + item.Index), vtable));
@@ -463,14 +465,20 @@ namespace SongsOfConquestAccess.Screens
             builder.PopContext();
         }
 
-        private string BuildQuickbarItemLabel(BattleHudAdapter.QuickbarItem item)
+        /// <summary>A quickbar slot: the spell's name with the tier the wielder can cast it at, as
+        /// the spellbook titles it.</summary>
+        private static string BuildQuickbarItemLabel(BattleHudAdapter hud, BattleHudAdapter.QuickbarItem item)
         {
             if (item == null || !item.HasSpell)
             {
                 return string.Empty;
             }
 
-            return item.SpellName + ", " + GameText.Get("Spells/Spellbook/SpellTierHeader", "tier " + item.SpellTier, item.SpellTier);
+            return ModText.JoinListWithCommas(new[]
+            {
+                SpellTooltipText.Name(item.SpellName),
+                hud.GetTierLabel(item.SpellTier)
+            });
         }
 
         /// <summary>Casting from the quickbar puts the game into targeting, and the target is a place
@@ -580,9 +588,22 @@ namespace SongsOfConquestAccess.Screens
             EssenceRows.Build(
                 builder,
                 key,
-                essence => commanders.GetEssenceLabel(side, essence),
+                essence => BuildEssenceLabel(commanders, side, essence),
                 essence => commanders.GetEssenceTooltip(side, essence),
                 essence => commanders.FocusEssence(side, essence));
+        }
+
+        /// <summary>One essence counter: the game's word for the essence and what the side holds of
+        /// it.</summary>
+        private static string BuildEssenceLabel(
+            BattleCommanderHudAdapter commanders,
+            CombatHudSide side,
+            EssenceType essence)
+        {
+            return ModText.Get(
+                ModStrings.Common.ListSeparator,
+                EssenceText.Name(commanders.Localization, essence),
+                commanders.GetEssenceAmount(side, essence));
         }
 
         // ---- the current troop ----
@@ -1020,25 +1041,56 @@ namespace SongsOfConquestAccess.Screens
 
         public bool SummarizeResources()
         {
-            string summary = Live != null ? Live.BuildLocalEssenceSummary() : string.Empty;
+            string summary = BuildEssenceSummary(
+                Live != null ? Live.GetLocalCombatHudSide() : null,
+                requireVisible: false);
             if (string.IsNullOrWhiteSpace(summary))
             {
                 return false;
             }
 
-            SpeechPipeline.Output(new SpeechRequest(summary, interrupt: false));
+            Speak(summary);
             return true;
         }
 
         public bool SummarizeEnemyResources()
         {
-            string summary = Live != null ? Live.BuildEnemyEssenceSummary() : string.Empty;
-            if (!string.IsNullOrWhiteSpace(summary))
+            Speak(BuildEssenceSummary(
+                Live != null ? Live.GetEnemyCombatHudSide() : null,
+                requireVisible: true));
+            return true;
+        }
+
+        /// <summary>What a side's wielder is holding, essence by essence and only where there is any
+        /// of it. The enemy's is answered only while the game is drawing their counters.</summary>
+        private string BuildEssenceSummary(CombatHudSide? side, bool requireVisible)
+        {
+            BattleCommanderHudAdapter commanders = Live != null && Live.Hud != null ? Live.Hud.Commanders : null;
+            if (commanders == null || !side.HasValue)
             {
-                SpeechPipeline.Output(new SpeechRequest(summary, interrupt: false));
+                return string.Empty;
             }
 
-            return true;
+            if (requireVisible && !commanders.IsEssenceMenuVisible(side.Value))
+            {
+                return string.Empty;
+            }
+
+            List<string> parts = new List<string>();
+            for (int i = 0; i < EssenceRows.RowOrder.Length; i++)
+            {
+                EssenceType essence = EssenceRows.RowOrder[i];
+                int amount = commanders.GetEssenceAmount(side.Value, essence);
+                if (amount > 0)
+                {
+                    parts.Add(ModText.Get(
+                        ModStrings.Common.PhraseSeparator,
+                        EssenceText.Name(commanders.Localization, essence),
+                        amount));
+                }
+            }
+
+            return ModText.JoinListWithCommas(parts);
         }
 
         /// <summary>Put the cursor on the board without a word: the instruction the aiming state

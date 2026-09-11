@@ -64,6 +64,11 @@ msgctxt "Common.PhraseSeparator"
 msgid "{0} {1}"
 msgstr ""
 
+#. Common.Parenthetical
+msgctxt "Common.Parenthetical"
+msgid "{0} ({1})"
+msgstr ""
+
 #. TeamColors.Black
 msgctxt "TeamColors.Black"
 msgid "black"
@@ -1837,6 +1842,11 @@ msgstr ""
 #. Combat.YourTroops
 msgctxt "Combat.YourTroops"
 msgid "your troops"
+msgstr ""
+
+#. Combat.Spell
+msgctxt "Combat.Spell"
+msgid "Spell"
 msgstr ""
 
 #. UI.Blank

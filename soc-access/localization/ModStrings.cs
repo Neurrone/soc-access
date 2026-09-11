@@ -17,6 +17,7 @@
             public static readonly ModString SentenceSeparator = new ModString("Common.SentenceSeparator", "{0}. {1}");
             public static readonly ModString ClauseSeparator = new ModString("Common.ClauseSeparator", "{0}; {1}");
             public static readonly ModString PhraseSeparator = new ModString("Common.PhraseSeparator", "{0} {1}");
+            public static readonly ModString Parenthetical = new ModString("Common.Parenthetical", "{0} ({1})");
         }
 
         public static class TeamColors
@@ -430,6 +431,7 @@
             public static readonly ModString YourRangedTroops = new ModString("Combat.YourRangedTroops", "your ranged troops");
             public static readonly ModString YourTroops = new ModString("Combat.YourTroops", "your troops");
             public static readonly ModPluralString BoltAt = new ModPluralString("Combat.BoltAt", "{0} bolt at {1}", "{0} bolts at {1}");
+            public static readonly ModString Spell = new ModString("Combat.Spell", "Spell");
         }
 
         public static class UI
