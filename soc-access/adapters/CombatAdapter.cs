@@ -343,6 +343,7 @@ namespace SongsOfConquestAccess.Adapters
         public void Dispose()
         {
             DetachAbilityTargetingBegin();
+            ClearFocusedTileOverlay();
             EndCombat();
         }
 

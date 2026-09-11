@@ -227,6 +227,7 @@ namespace SongsOfConquestAccess.Adapters
             AdventureMapEventListener listener = _eventListener;
             _eventListener = null;
             listener?.Detach();
+            ClearFocusedTileOverlay();
         }
 
         public object SourceKey { get; private set; }

@@ -555,6 +555,7 @@ namespace SongsOfConquestAccess.Adapters
         public void Dispose()
         {
             RemoveDeploymentChangedHandler();
+            ClearFocusedTileOverlay();
         }
 
         public void SetFocusedTileOverlay(Vector2Int tile)
