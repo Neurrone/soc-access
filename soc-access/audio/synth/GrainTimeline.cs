@@ -4,6 +4,7 @@
 // The output-stage limiter and the pan-aware padding are this repo's.
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Audio.Synth
 {
@@ -76,7 +77,7 @@ namespace SongsOfConquestAccess.Audio.Synth
                 return;
             }
 
-            _placements.Add(new Placement(grain, startFrame, frameCount, rate, Clamp(pan, -1f, 1f), gain));
+            _placements.Add(new Placement(grain, startFrame, frameCount, rate, Mathf.Clamp(pan, -1f, 1f), gain));
         }
 
         /// <summary>
@@ -259,7 +260,7 @@ namespace SongsOfConquestAccess.Audio.Synth
         /// <summary>Constant-power pan law: left^2 + right^2 == 1 for any pan.</summary>
         public static void PanGains(float pan, out float left, out float right)
         {
-            double angle = (Clamp(pan, -1f, 1f) + 1.0) * Math.PI / 4.0;
+            double angle = (Mathf.Clamp(pan, -1f, 1f) + 1.0) * Math.PI / 4.0;
             left = (float)Math.Cos(angle);
             right = (float)Math.Sin(angle);
         }
@@ -275,16 +276,6 @@ namespace SongsOfConquestAccess.Audio.Synth
             float headroom = LimiterCeiling - LimiterThreshold;
             float limited = LimiterThreshold + headroom * (float)Math.Tanh((magnitude - LimiterThreshold) / headroom);
             return value < 0f ? -limited : limited;
-        }
-
-        private static float Clamp(float value, float min, float max)
-        {
-            if (value < min)
-            {
-                return min;
-            }
-
-            return value > max ? max : value;
         }
 
         private struct Placement

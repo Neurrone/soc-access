@@ -238,11 +238,11 @@ namespace SongsOfConquestAccess.Audio
 
             int dx = voice.Target.x - listener.x;
             int dy = voice.Target.y - listener.y;
-            float pan = Clamp(dx / (float)PanSaturationTiles, -1f, 1f);
+            float pan = Mathf.Clamp(dx / (float)PanSaturationTiles, -1f, 1f);
             int semitones = Math.Max(-PitchMaxSemitones, Math.Min(PitchMaxSemitones, dy));
             float pitch = Mathf.Pow(2f, semitones / 12f);
             float distance = Mathf.Sqrt(dx * dx + dy * dy);
-            float volume = Clamp(1f - distance / AudibleDistanceTiles, 0f, 1f);
+            float volume = Mathf.Clamp(1f - distance / AudibleDistanceTiles, 0f, 1f);
 
             voice.Source.panStereo = pan;
             voice.Source.pitch = pitch;
@@ -251,16 +251,6 @@ namespace SongsOfConquestAccess.Audio
             {
                 voice.Source.Stop();
             }
-        }
-
-        private static float Clamp(float value, float min, float max)
-        {
-            if (value < min)
-            {
-                return min;
-            }
-
-            return value > max ? max : value;
         }
 
         private sealed class BeaconVoice

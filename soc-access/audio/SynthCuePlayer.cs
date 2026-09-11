@@ -37,7 +37,7 @@ namespace SongsOfConquestAccess.Audio
                     return;
                 }
 
-                float pan = Quantize(Clamp(panOffset, -1f, 1f), PanQuantizeSteps);
+                float pan = Quantize(Mathf.Clamp(panOffset, -1f, 1f), PanQuantizeSteps);
                 float gain = Quantize(gainScale < 0f ? 0f : gainScale, GainQuantizeSteps);
                 float semitones = Quantize(rateSemitoneOffset, SemitoneQuantizeSteps);
 
@@ -263,16 +263,6 @@ namespace SongsOfConquestAccess.Audio
         private static float Quantize(float value, float steps)
         {
             return (float)Math.Round(value * steps) / steps;
-        }
-
-        private static float Clamp(float value, float min, float max)
-        {
-            if (value < min)
-            {
-                return min;
-            }
-
-            return value > max ? max : value;
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Audio.Synth
 {
@@ -62,7 +63,7 @@ namespace SongsOfConquestAccess.Audio.Synth
                 Grain inner = CreateGrain(segment, durationSeconds);
                 AdsrGrain enveloped = new AdsrGrain(inner, attackSeconds, 0f, 1f, sustainSeconds, releaseSeconds);
 
-                float pan = Clamp(segment.Pan + panOffset, -1f, 1f);
+                float pan = Mathf.Clamp(segment.Pan + panOffset, -1f, 1f);
                 float rate = SemitoneMath.ToRate(segment.RateSemitones + rateSemitoneOffset);
                 float gain = segment.Gain * spec.MasterGain * gainScale;
                 timeline.Add(enveloped, segment.StartMs / 1000f, rate, pan, gain);
@@ -123,16 +124,6 @@ namespace SongsOfConquestAccess.Audio.Synth
         {
             byte[] bytes = BitConverter.GetBytes(value);
             return BitConverter.ToUInt32(bytes, 0);
-        }
-
-        private static float Clamp(float value, float min, float max)
-        {
-            if (value < min)
-            {
-                return min;
-            }
-
-            return value > max ? max : value;
         }
     }
 }
