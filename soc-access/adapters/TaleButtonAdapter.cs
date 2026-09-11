@@ -121,7 +121,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 string comingSoon = GetAllVisibleText(GetComingSoonContainer());
                 return string.IsNullOrWhiteSpace(comingSoon)
-                    ? CampaignProgress.GetLocalizedText("Common/ComingSoon", "coming soon")
+                    ? CampaignProgress.GetLocalizedText("Common/ComingSoon", string.Empty)
                     : comingSoon;
             }
 

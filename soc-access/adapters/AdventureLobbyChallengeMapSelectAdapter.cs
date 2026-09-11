@@ -94,7 +94,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetLocalizedText("Lobby/ChallengeMapMenu/Title", "Challenge Maps"); }
+            get { return GetLocalizedText("Lobby/ChallengeMapMenu/Title", string.Empty); }
         }
 
         public string NameColumnLabel
@@ -109,7 +109,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string CompletedColumnLabel
         {
-            get { return GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", "Completed"); }
+            get { return GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", string.Empty); }
         }
 
         /// <summary>The map name the preview panel draws for the selected challenge.</summary>
@@ -405,12 +405,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string CompletedLabel
         {
-            get { return _completedLabel ?? (_completedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", "Completed")); }
+            get { return _completedLabel ?? (_completedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", string.Empty)); }
         }
 
         public string NotCompletedLabel
         {
-            get { return _notCompletedLabel ?? (_notCompletedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", "Not completed")); }
+            get { return _notCompletedLabel ?? (_notCompletedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", string.Empty)); }
         }
 
         public string Description

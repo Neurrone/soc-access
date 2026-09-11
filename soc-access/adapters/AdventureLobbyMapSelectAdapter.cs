@@ -177,7 +177,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return _title ?? (_title = GetLocalizedText("Lobby/MapSelect/Title", "Select Map")); }
+            get { return _title ?? (_title = GetLocalizedText("Lobby/MapSelect/Title", string.Empty)); }
         }
 
         /// <summary>The map name the preview panel draws beside the table, which the game sets from
@@ -390,7 +390,7 @@ namespace SongsOfConquestAccess.Adapters
                 case 5:
                     return GetLocalizedText("Common/Size", "Size");
                 case 6:
-                    return GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", "Completed");
+                    return GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", string.Empty);
                 default:
                     return string.Empty;
             }
@@ -561,11 +561,11 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (index == 0)
             {
-                return GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", "Completed");
+                return GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", string.Empty);
             }
 
             return index == 1
-                ? GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", "Not completed")
+                ? GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", string.Empty)
                 : string.Empty;
         }
 
@@ -816,12 +816,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string CompletedLabel
         {
-            get { return _completedLabel ?? (_completedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", "Completed")); }
+            get { return _completedLabel ?? (_completedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", string.Empty)); }
         }
 
         public string NotCompletedLabel
         {
-            get { return _notCompletedLabel ?? (_notCompletedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", "Not completed")); }
+            get { return _notCompletedLabel ?? (_notCompletedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", string.Empty)); }
         }
 
         public string Description
@@ -839,17 +839,17 @@ namespace SongsOfConquestAccess.Adapters
             MapProviderData data = _entry.MapData;
             if (data.exclusiveAddon == Addon.Vanir || data.name == "BarrenFrontier")
             {
-                return GetLocalizedText("MainMenu/VanirDLC/Title", "Vanir");
+                return GetLocalizedText("MainMenu/VanirDLC/Title", string.Empty);
             }
 
             if (data.exclusiveAddon == Addon.Roots || data.name == "Invasive")
             {
-                return GetLocalizedText("MainMenu/RootsDLC/Title", "Roots");
+                return GetLocalizedText("MainMenu/RootsDLC/Title", string.Empty);
             }
 
             if (data.exclusiveAddon == Addon.Yulan || data.name == "FreeYulan")
             {
-                return GetLocalizedText("MainMenu/YulanDLC/Title", "Yulan");
+                return GetLocalizedText("MainMenu/YulanDLC/Title", string.Empty);
             }
 
             return GetLocalizedText("DataTypes/MapProviderType/" + data.type, data.type.ToString());

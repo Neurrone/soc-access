@@ -87,7 +87,7 @@ namespace SongsOfConquestAccess.Adapters
                 string title = UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.TitleText : null);
                 if (string.IsNullOrWhiteSpace(title))
                 {
-                    title = GameText.Get(_localization, "Lobby/GameList/Title", "Game List");
+                    title = GameText.Get(_localization, "Lobby/GameList/Title", string.Empty);
                 }
 
                 return title;
