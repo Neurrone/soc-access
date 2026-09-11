@@ -326,50 +326,35 @@ namespace SongsOfConquestAccess.Adapters
 
             private string GetColorLabel()
             {
-                int color = GetFieldValue(EntryReturnColorField, -1);
-                if (color < 0)
-                {
-                    return string.Empty;
-                }
-
-                TeamColor teamColor = TeamColorExtensions.GetTeamColorFromIndex(color);
-                return TeamColorText.Get(teamColor);
+                return LobbyLabels.Color(GetFieldValue(EntryReturnColorField, -1));
             }
 
             private string GetFactionLabel()
             {
-                int factionId = GetFieldValue(EntryFactionIdField, -1);
-                if (factionId == 99)
-                {
-                    return Localize("Factions/Random/Name");
-                }
-
                 IFactionLookup lookup = _entry != null && EntryFactionLookupField != null
                     ? EntryFactionLookupField.GetValue(_entry) as IFactionLookup
                     : null;
-                IFactionDefinition faction = lookup != null ? lookup.GetFaction(factionId) : null;
-                return faction != null ? Localize(faction.NameKey) : string.Empty;
+                return LobbyLabels.Faction(
+                    _adapter.GetLocalization(_entry),
+                    lookup,
+                    GetFieldValue(EntryFactionIdField, -1));
             }
 
             private string GetWielderLabel()
             {
-                CommanderReference reference = GetFieldValue(EntryWielderRefField, CommanderReference.Random);
-                if (reference == CommanderReference.Random)
-                {
-                    return Localize("Factions/Random/Name");
-                }
-
                 IWielderLookup lookup = _entry != null && EntryWielderLookupField != null
                     ? EntryWielderLookupField.GetValue(_entry) as IWielderLookup
                     : null;
-                ICommanderDefinition wielder = lookup != null ? lookup.Get(reference) : null;
-                return wielder != null ? Localize(wielder.NameKey) : string.Empty;
+                return LobbyLabels.Wielder(
+                    _adapter.GetLocalization(_entry),
+                    lookup,
+                    GetFieldValue(EntryWielderRefField, CommanderReference.Random));
             }
 
             private string GetAiDifficultyLabel()
             {
                 AiDifficulty difficulty = GetFieldValue(EntryAiDifficultyField, AiDifficulty.Worthy);
-                string label = Localize("Common/AiMode/" + difficulty);
+                string label = LobbyLabels.AiDifficulty(_adapter.GetLocalization(_entry), difficulty);
                 return !string.IsNullOrWhiteSpace(label) ? label : LastTooltipLine();
             }
 
@@ -396,16 +381,6 @@ namespace SongsOfConquestAccess.Adapters
                     ? EntryPartnershipTextField.GetValue(_entry) as UITextMesh
                     : null;
                 return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
-            }
-
-            private string Localize(string key)
-            {
-                if (string.IsNullOrWhiteSpace(key))
-                {
-                    return string.Empty;
-                }
-
-                return SpokenText.Get(_adapter.GetLocalization(_entry), key, string.Empty);
             }
 
             private T GetFieldValue<T>(FieldInfo field, T fallback)

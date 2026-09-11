@@ -561,26 +561,15 @@ namespace SongsOfConquestAccess.Adapters
                     return string.Empty;
                 }
 
-                if (team.FactionIndex == 99)
-                {
-                    return Localize("Factions/Random/Name");
-                }
-
-                IFactionLookup factionLookup = Reflect.Get<IFactionLookup>(_entry, FactionLookupField);
-                IFactionDefinition faction = factionLookup != null ? factionLookup.GetFaction(team.FactionIndex) : null;
-                return faction != null ? Localize(faction.NameKey) : string.Empty;
+                return LobbyLabels.Faction(
+                    _adapter != null ? _adapter._localization : null,
+                    Reflect.Get<IFactionLookup>(_entry, FactionLookupField),
+                    team.FactionIndex);
             }
 
             private string GetColorLabel()
             {
-                int color = GetTeamColorIndex();
-                if (color < 0)
-                {
-                    return string.Empty;
-                }
-
-                TeamColor teamColor = TeamColorExtensions.GetTeamColorFromIndex(color);
-                return TeamColorText.Get(teamColor);
+                return LobbyLabels.Color(GetTeamColorIndex());
             }
 
             private int GetTeamColorIndex()
@@ -605,20 +594,20 @@ namespace SongsOfConquestAccess.Adapters
                     return string.Empty;
                 }
 
-                if (team.StartingCommander == CommanderReference.Random)
-                {
-                    return Localize("Factions/Random/Name");
-                }
-
-                bool locked = GameObjects.IsLive(Reflect.Get<Image>(_entry, WielderLockedIconField));
+                bool locked = team.StartingCommander != CommanderReference.Random
+                    && GameObjects.IsLive(Reflect.Get<Image>(_entry, WielderLockedIconField));
                 if (locked)
                 {
-                    return Localize("Lobby/PlayerSetting/SettingUnknown");
+                    return SpokenText.Get(
+                        _adapter != null ? _adapter._localization : null,
+                        "Lobby/PlayerSetting/SettingUnknown",
+                        string.Empty);
                 }
 
-                IWielderLookup wielderLookup = Reflect.Get<IWielderLookup>(_entry, WielderLookupField);
-                ICommanderDefinition commander = wielderLookup != null ? wielderLookup.Get(team.StartingCommander) : null;
-                return commander != null ? Localize(commander.NameKey) : string.Empty;
+                return LobbyLabels.Wielder(
+                    _adapter != null ? _adapter._localization : null,
+                    Reflect.Get<IWielderLookup>(_entry, WielderLookupField),
+                    team.StartingCommander);
             }
 
             private string GetPartnershipNumber()
@@ -635,7 +624,9 @@ namespace SongsOfConquestAccess.Adapters
                     return string.Empty;
                 }
 
-                return Localize("Common/AiMode/" + team.AiDifficulty);
+                return LobbyLabels.AiDifficulty(
+                    _adapter != null ? _adapter._localization : null,
+                    team.AiDifficulty);
             }
 
             private LobbyButtonItem BuildButton(FieldInfo field)
@@ -691,16 +682,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 return _entry as Component;
-            }
-
-            private string Localize(string key)
-            {
-                if (string.IsNullOrWhiteSpace(key))
-                {
-                    return string.Empty;
-                }
-
-                return SpokenText.Get(_adapter != null ? _adapter._localization : null, key, string.Empty);
             }
         }
 
