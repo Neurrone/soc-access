@@ -121,6 +121,10 @@ namespace SongsOfConquestAccess.Adapters
         // every adventure the game loads (AGENTS.md, Screen Resolution).
         private AdventureMapEventListener _eventListener;
 
+        // What LogFailureOnce has already said, so it says each thing once. Per adapter, so it needs
+        // no reset: the adapter dies with the adventure.
+        private readonly HashSet<string> _loggedFailures = new HashSet<string>(StringComparer.Ordinal);
+
         public AdventureMapAdapter(AdventureViewInstaller installer, AdventureMapRevealedRegistry revealedRegistry = null)
             : this(
                 installer,
@@ -237,6 +241,24 @@ namespace SongsOfConquestAccess.Adapters
             ClearFocusedTileOverlay();
         }
 
+        /// <summary>
+        /// A guarded game call that threw, reported ONCE per adapter instance and per subject.
+        ///
+        /// Almost every one of these sits on a path the map walks per tile or per frame - a scanner
+        /// snapshot reads thousands of tiles - so a warning per failure would bury the log it exists
+        /// to fill. Once per adapter is once per adventure, because the adapter lives exactly as long
+        /// as the adventure it wraps, so a new game and a hot reload each say it again.
+        /// </summary>
+        private void LogFailureOnce(string subject, Exception exception)
+        {
+            if (!_loggedFailures.Add(subject))
+            {
+                return;
+            }
+
+            SocAccessMod.Instance?.LogWarning("AdventureMapAdapter: " + subject + " threw: " + exception);
+        }
+
         public object SourceKey { get; private set; }
 
         public AdventureHudAdapter Hud { get; private set; }
@@ -285,7 +307,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to read map file name for bookmarks: " + exception.Message);
+                LogFailureOnce("reading the map file name for bookmarks", exception);
             }
 
             uint mapRandomSeed = _facade.MapSettings != null ? _facade.MapSettings.RandomSeed : 0;
@@ -320,8 +342,12 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return container.Resolve(type);
             }
-            catch
+            catch (Exception exception)
             {
+                // A binding the adventure does not have is an answer rather than a failure, but it
+                // is still worth saying: this runs once per adapter, at construction.
+                SocAccessMod.Instance?.LogWarning(
+                    "AdventureMapAdapter could not resolve " + typeName + ": " + exception.Message);
                 return null;
             }
         }
@@ -531,7 +557,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not read the initial tile: " + exception.Message);
+                LogFailureOnce("reading the initial tile", exception);
                 return Vector2Int.zero;
             }
         }
@@ -2158,16 +2184,11 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        // No guard: MapEntities.Get is a dictionary TryGetValue (AbstractMapEntityManager.Get:36)
+        // behind the two null checks this already makes, so there is nothing here that can throw.
         private IMapEntity TryGetMapEntity(int id)
         {
-            try
-            {
-                return _facade != null && _facade.MapEntities != null ? _facade.MapEntities.Get(id) : null;
-            }
-            catch
-            {
-                return null;
-            }
+            return _facade != null && _facade.MapEntities != null ? _facade.MapEntities.Get(id) : null;
         }
 
         private bool TryGetMapEntityIdentityTile(
@@ -2368,8 +2389,9 @@ namespace SongsOfConquestAccess.Adapters
                 MapEntityPreVisitDetails preVisit = details as MapEntityPreVisitDetails;
                 return preVisit != null ? preVisit.Hint : MapEntityPreVisitDetails.PreVisitHint.None;
             }
-            catch
+            catch (Exception exception)
             {
+                LogFailureOnce("reading a map entity's pre-visit hint", exception);
                 return MapEntityPreVisitDetails.PreVisitHint.None;
             }
         }
@@ -2538,8 +2560,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _fogManager == null || (GetFog(point) == 0 && !_fogManager.IsVisible(point));
             }
-            catch
+            catch (Exception exception)
             {
+                LogFailureOnce("reading whether a point is unexplored", exception);
                 return false;
             }
         }
@@ -2631,8 +2654,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade.Level.IsValidMoveDestination(teamId, point);
             }
-            catch
+            catch (Exception exception)
             {
+                LogFailureOnce("reading whether an unexplored point can be moved to", exception);
                 return false;
             }
         }
@@ -2648,8 +2672,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return float.IsPositiveInfinity(_facade.Level.GetStaticTravelCost(localTeamId, point));
             }
-            catch
+            catch (Exception exception)
             {
+                LogFailureOnce("reading a point's static travel cost", exception);
                 return false;
             }
         }
@@ -2665,8 +2690,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return !_facade.Level.IsValidMoveDestination(localTeamId, point);
             }
-            catch
+            catch (Exception exception)
             {
+                LogFailureOnce("reading whether a point can be moved to", exception);
                 return false;
             }
         }
@@ -2915,7 +2941,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to set focused tile overlay: " + exception.Message);
+                LogFailureOnce("moving the focused tile overlay", exception);
             }
         }
 
@@ -3130,7 +3156,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to keep focused tile in view: " + exception.Message);
+                LogFailureOnce("keeping the focused tile in view", exception);
             }
         }
 
@@ -3149,7 +3175,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to move camera to focused tile: " + exception.Message);
+                LogFailureOnce("moving the camera to the focused tile", exception);
             }
         }
 
@@ -3169,7 +3195,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to clear focused tile overlay: " + exception.Message);
+                LogFailureOnce("clearing the focused tile overlay", exception);
             }
         }
 
@@ -3391,7 +3417,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 catch (Exception exception)
                 {
-                    SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to resolve camera center tile: " + exception.Message);
+                    LogFailureOnce("resolving the camera centre tile", exception);
                 }
             }
 
@@ -3432,7 +3458,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 catch (Exception exception)
                 {
-                    SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to resolve tile world position: " + exception.Message);
+                    LogFailureOnce("resolving a tile world position", exception);
                 }
             }
 
@@ -3442,24 +3468,20 @@ namespace SongsOfConquestAccess.Adapters
         private bool ShouldShowFocusedTileTooltip(Vector2Int tile)
         {
             int localTeamId = GetLocalTeamId();
-            try
+            // GetAt cannot throw; see GetRawMapEntityAt.
+            IMapEntity entity = _facade.MapEntities.GetAt(tile);
+            if (entity != null)
             {
-                IMapEntity entity = _facade.MapEntities.GetAt(tile);
-                if (entity != null)
-                {
-                    return CanExposeMapEntityTooltipDetails(entity);
-                }
-            }
-            catch (Exception)
-            {
+                return CanExposeMapEntityTooltipDetails(entity);
             }
 
             try
             {
                 return _facade.Commanders.ExistsAtPoint(localTeamId, tile);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                LogFailureOnce("reading whether a commander stands on a tile", exception);
                 return false;
             }
         }
@@ -3480,8 +3502,9 @@ namespace SongsOfConquestAccess.Adapters
                     return detailsTile;
                 }
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                LogFailureOnce("finding the tile a map entity's tooltip belongs to", exception);
             }
 
             return focusedTile;
@@ -3500,7 +3523,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to get focused tile tooltip details: " + exception.Message);
+                LogFailureOnce("reading a tile tooltip details", exception);
                 return null;
             }
         }
@@ -3568,7 +3591,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to read fog readiness: " + exception.Message);
+                LogFailureOnce("reading fog readiness", exception);
                 return false;
             }
         }
@@ -3647,8 +3670,12 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _fogManager.GetFog(position.x, position.y);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                // Reachable while the adventure scene is torn down: the fog renderer lets its
+                // buffers go before the scene is unloaded. IsPresent now gates on the scene loader
+                // being idle, so this should stay silent; once is enough to say that it did not.
+                LogFailureOnce("reading the fog over a tile", exception);
                 return 0;
             }
         }
@@ -3741,7 +3768,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to read commander destination path: " + exception.Message);
+                LogFailureOnce("reading a commander destination path", exception);
             }
         }
 
@@ -3807,16 +3834,12 @@ namespace SongsOfConquestAccess.Adapters
             return _facade.Teams.IsInPartnership(localTeamId, owningTeamId) ? "friendly" : "enemy";
         }
 
+        // No guard: MapEntities.GetAt asks the entity cache for the id at the point
+        // (AbstractMapEntityMapCache.GetIdAt:323 answers -1 for a point outside the map) and then
+        // looks that id up in the same dictionary, so an off-map point answers null, not an throw.
         private IMapEntity GetRawMapEntityAt(Vector2Int position)
         {
-            try
-            {
-                return _facade.MapEntities.GetAt(position);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            return _facade.MapEntities.GetAt(position);
         }
 
         private static string FormatTile(Vector2Int tile)
@@ -3863,8 +3886,9 @@ namespace SongsOfConquestAccess.Adapters
                         return 0;
                 }
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                LogFailureOnce("reading a tile's map layer", exception);
                 return 0;
             }
         }
@@ -3899,8 +3923,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return GetGroundTerrain(_facade.Level.GetGroundType(position));
             }
-            catch
+            catch (Exception exception)
             {
+                LogFailureOnce("reading a tile's ground type", exception);
                 return AdventureTerrainKind.Unknown;
             }
         }
@@ -3911,8 +3936,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade.Level.GetDecoration(position);
             }
-            catch
+            catch (Exception exception)
             {
+                LogFailureOnce("reading a tile's decoration", exception);
                 return 0;
             }
         }
@@ -4009,7 +4035,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to read whether a map entity was visited: " + exception.Message);
+                LogFailureOnce("reading whether a map entity was visited", exception);
             }
         }
 
