@@ -284,7 +284,7 @@ namespace SongsOfConquestAccess.Adapters
             UIButton offButton = MapSettingsMixedFactionsClientOffButtonField != null
                 ? MapSettingsMixedFactionsClientOffButtonField.GetValue(settings) as UIButton
                 : null;
-            return toggle != null ? new MixedFactionsItem(settings, toggle, container, onButton, offButton, _localization) : null;
+            return toggle != null ? new MixedFactionsItem(toggle, container, onButton, offButton, _localization) : null;
         }
 
         public LobbyButtonItem GetSetReadyButton()
@@ -784,7 +784,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsGameNameVisible
             {
-                get { return IsVisible(GetField<Component>(MultiplayerGameNameLabelField)) && !string.IsNullOrWhiteSpace(GameName); }
+                get { return IsVisibleComponent(GetField<Component>(MultiplayerGameNameLabelField)) && !string.IsNullOrWhiteSpace(GameName); }
             }
 
             public string GameCode
@@ -798,7 +798,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsGameCodeVisible
             {
-                get { return IsVisible(GetField<Component>(MultiplayerGameCodeInputField)) && !string.IsNullOrWhiteSpace(GameCode); }
+                get { return IsVisibleComponent(GetField<Component>(MultiplayerGameCodeInputField)) && !string.IsNullOrWhiteSpace(GameCode); }
             }
 
             public string CopyGameCodeLabel
@@ -862,7 +862,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    return IsVisible(GetField<Component>(MultiplayerXboxCrossplayInformationField))
+                    return IsVisibleComponent(GetField<Component>(MultiplayerXboxCrossplayInformationField))
                         && !string.IsNullOrWhiteSpace(XboxCrossplayInformation);
                 }
             }
@@ -1048,7 +1048,6 @@ namespace SongsOfConquestAccess.Adapters
             private readonly ILocalizationHandler _localization;
 
             public MixedFactionsItem(
-                LobbyMapSettings settings,
                 UIToggle toggle,
                 GameObject hostContainer,
                 UIButton clientOnButton,
@@ -1118,11 +1117,6 @@ namespace SongsOfConquestAccess.Adapters
                     _toggle.ToggleValue = !_toggle.ToggleValue;
                 }
             }
-        }
-
-        private static bool IsVisible(Component component)
-        {
-            return IsVisibleComponent(component);
         }
 
         /// <summary>
