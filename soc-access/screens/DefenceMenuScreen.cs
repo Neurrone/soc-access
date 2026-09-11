@@ -81,14 +81,7 @@ namespace SongsOfConquestAccess.Screens
 
                 string title = Live.Title;
                 string subtitle = Live.Subtitle;
-                if (string.IsNullOrWhiteSpace(subtitle) || SameText(title, subtitle))
-                {
-                    return string.IsNullOrWhiteSpace(title) ? null : title;
-                }
-
-                return string.IsNullOrWhiteSpace(title)
-                    ? subtitle
-                    : ModText.Get(ModStrings.Common.ListSeparator, title, subtitle);
+                return TroopHudRows.NameWithPlace(title, subtitle);
             }
         }
 
@@ -338,14 +331,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.AddItem(new DrawnNode(ControlId.Structural(key), GraphNodes.Text(text), panel));
-        }
-
-        private static bool SameText(string left, string right)
-        {
-            return string.Equals(
-                (left ?? string.Empty).Trim(),
-                (right ?? string.Empty).Trim(),
-                System.StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }
