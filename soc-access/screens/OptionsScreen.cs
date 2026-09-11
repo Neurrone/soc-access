@@ -28,13 +28,14 @@ namespace SongsOfConquestAccess.Screens
     /// the way in - and not a row of its own, because there is nothing there to operate. A caption
     /// with no rows under it stays a read-only row, so the page still reads what it draws.
     ///
-    /// The Controls page adds a fourth place to be: the rebindable-action rows, drawn by
-    /// <c>MenuFactoryController.AddKeyBinding</c>, are a TABLE of their own stop
-    /// (<see cref="MenuFormNodes.BuildKeyBindingSheet"/>) - one row per action with the gesture name,
-    /// the binding chip and a "+" - and the category captions there are the table's row-group regions.
-    /// The chip clears an override; the "+" starts the game's capture. Every other page draws no key
-    /// bindings, so that stop is empty and dropped. "Reset all" stays an ordinary factory button the
-    /// rows above read, and its confirmation is a dialog the mod already handles.
+    /// The Controls page's rebindable-action rows, drawn by <c>MenuFactoryController.AddKeyBinding</c>,
+    /// are a TABLE at the foot of the settings stop (<see cref="MenuFormNodes.BuildKeyBindingSheet"/>)
+    /// - one row per action with the gesture name, the binding chip and a "+" - and the category
+    /// captions there are the table's row-group regions. The chip clears an override; the "+" starts
+    /// the game's capture. The arrows walk from "Reset all" into the first row, since a table on the
+    /// same page is not another place to be. Every other page draws no key bindings. "Reset all"
+    /// stays an ordinary factory button the rows above read, and its confirmation is a dialog the
+    /// mod already handles.
     ///
     /// Scrolling into view is the game's: the content panel's own <c>AutoScrollToSelected</c> follows
     /// the natively selected row, so every row's focus visual is its adapter <c>Focus</c>.
@@ -46,7 +47,6 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string TabsStop = "options-tabs";
         private const string RowsStop = "options-rows";
-        private const string KeyBindingsStop = "options-keybindings";
         private const string ButtonsStop = "options-buttons";
 
         /// <summary>The rows of the form, declared the way every settings form the game draws is
@@ -105,8 +105,6 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(RowsStop);
             _rows.BuildRows(builder, controls);
-
-            builder.BeginStop(KeyBindingsStop);
             _rows.BuildKeyBindingSheet(builder, controls);
 
             builder.BeginStop(ButtonsStop);

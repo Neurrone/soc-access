@@ -629,11 +629,6 @@
             /// is empty or unreadable: the next key pressed becomes the binding, with no way to cancel.
             /// </summary>
             public static readonly ModString CaptureNoCancel = new ModString("Screens.CaptureNoCancel", "The next key you press becomes the binding.");
-            /// <summary>Usage hint on a key-binding row's "+" cell: the gesture that starts a rebind.</summary>
-            public static readonly ModString KeyBindingSetHint = new ModString("Screens.KeyBindingSetHint", "{0} to set a new key");
-            /// <summary>Usage hint on an overridden key-binding row's chip: the gesture that clears the
-            /// override back to the game's default.</summary>
-            public static readonly ModString KeyBindingClearHint = new ModString("Screens.KeyBindingClearHint", "{0} to restore the default");
             /// <summary>The Keybinds tab: the mod's own gestures as a rebindable table.</summary>
             public static readonly ModString Keybinds = new ModString("Screens.Keybinds", "Keybinds");
             /// <summary>The Keybinds tab region for the global and review-buffer gestures.</summary>
@@ -642,15 +637,11 @@
             public static readonly ModString Bookmarks = new ModString("Screens.Bookmarks", "Bookmarks");
             /// <summary>The Keybinds tab region for the battle hex-grid gestures.</summary>
             public static readonly ModString HexGrid = new ModString("Screens.HexGrid", "Hex grid");
-            /// <summary>The "+" cell of a mod-gesture row: starts a capture for a new key.</summary>
-            public static readonly ModString KeybindRebind = new ModString("Screens.KeybindRebind", "Rebind");
             /// <summary>Spoken, queued, when a mod-gesture capture starts: the next key becomes the
             /// binding.</summary>
             public static readonly ModString KeybindPressKey = new ModString("Screens.KeybindPressKey", "Press a key for {0}");
             /// <summary>Spoken, queued, once a mod gesture is rebound: the gesture and its new chord.</summary>
             public static readonly ModString KeybindSet = new ModString("Screens.KeybindSet", "{0} is now {1}");
-            /// <summary>The chip of a mod-gesture row with no binding at all.</summary>
-            public static readonly ModString KeybindUnbound = new ModString("Screens.KeybindUnbound", "unbound");
             /// <summary>Warned, queued, when a mod gesture and a game hotkey share a chord: on a mod
             /// screen the mod's gesture wins and the game's does not fire.</summary>
             public static readonly ModString KeybindShadowed = new ModString("Screens.KeybindShadowed", "While the mod's {0} is active, the game's {1} will not fire.");

@@ -3706,16 +3706,6 @@ msgctxt "Screens.CaptureNoCancel"
 msgid "The next key you press becomes the binding."
 msgstr "次に押したキーが割り当てになります。"
 
-#. Screens.KeyBindingSetHint
-msgctxt "Screens.KeyBindingSetHint"
-msgid "{0} to set a new key"
-msgstr "{0} で新しいキーを設定"
-
-#. Screens.KeyBindingClearHint
-msgctxt "Screens.KeyBindingClearHint"
-msgid "{0} to restore the default"
-msgstr "{0} で既定に戻す"
-
 #. Screens.Keybinds
 msgctxt "Screens.Keybinds"
 msgid "Keybinds"
@@ -3736,11 +3726,6 @@ msgctxt "Screens.HexGrid"
 msgid "Hex grid"
 msgstr "ヘクスグリッド"
 
-#. Screens.KeybindRebind
-msgctxt "Screens.KeybindRebind"
-msgid "Rebind"
-msgstr "再割り当て"
-
 #. Screens.KeybindPressKey
 msgctxt "Screens.KeybindPressKey"
 msgid "Press a key for {0}"
@@ -3750,11 +3735,6 @@ msgstr "{0} のキーを押してください"
 msgctxt "Screens.KeybindSet"
 msgid "{0} is now {1}"
 msgstr "{0} は現在 {1} です"
-
-#. Screens.KeybindUnbound
-msgctxt "Screens.KeybindUnbound"
-msgid "unbound"
-msgstr "未割り当て"
 
 #. Screens.KeybindShadowed
 msgctxt "Screens.KeybindShadowed"

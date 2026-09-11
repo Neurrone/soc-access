@@ -46,7 +46,18 @@ namespace SongsOfConquestAccess.Adapters
         public OptionsMenuAdapter(OptionsMenu menu)
         {
             _menu = menu;
-            _keyBindings = new KeyBindingSource { Resolve = ResolveBinding };
+            _keyBindings = new KeyBindingSource { Resolve = ResolveBinding, RefreshScroll = RefreshScroll };
+        }
+
+        // The window's own scroller, measured again after a rebind replaced a row's chip - what
+        // DrawContent does once after drawing the page.
+        private void RefreshScroll()
+        {
+            OptionsMenu.Settings settings = Settings;
+            if (settings != null && settings.autoScroller != null)
+            {
+                settings.autoScroller.Refresh();
+            }
         }
 
         public object SourceKey
@@ -129,8 +140,22 @@ namespace SongsOfConquestAccess.Adapters
                 return new MenuRow[0];
             }
 
-            return MenuRows.Read(Factory, _keyBindings);
+            if (_rows == null)
+            {
+                IMenuFactoryCollection factory = Factory;
+                if (factory == null)
+                {
+                    return new MenuRow[0];
+                }
+
+                _rows = new MenuRowMemo(factory, settings.contentParent.MonoTransform, _keyBindings);
+            }
+
+            return _rows.Rows;
         }
+
+        // The rows of the page showing, re-read only when the column is redrawn (a tab switch).
+        private MenuRowMemo _rows;
 
         // widget -> the binding it holds, for a row that needs the input manager's own text as a
         // fallback. Null for an unknown widget; the reverse map is rebuilt at most once per frame.

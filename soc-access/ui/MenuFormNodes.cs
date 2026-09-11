@@ -55,6 +55,22 @@ namespace SongsOfConquestAccess.UI
 
         private readonly GameTextEditor _editor = new GameTextEditor();
 
+        // The key-binding rows' nodes, built once per ROW LIST rather than once per frame: the
+        // reader hands back the same list until the column is redrawn, so its identity is the
+        // "same rows" answer, and a row's nodes are rebuilt when its chip changes shape (a rebind
+        // makes it a button, a clear a dead label). Composing 65 rows of vtables and closures every
+        // frame was a third of the Controls page's build (2026-09-11).
+        private IReadOnlyList<MenuRow> _keyBindingSource;
+        private readonly Dictionary<MenuRowKeyBinding, KeyBindingNodes> _keyBindingNodes =
+            new Dictionary<MenuRowKeyBinding, KeyBindingNodes>();
+
+        private sealed class KeyBindingNodes
+        {
+            public bool Overridden;
+            public NodeVtable Name;
+            public List<GraphSheet.SheetCell> Cells;
+        }
+
         public void BuildRows(GraphBuilder builder, IReadOnlyList<MenuRow> controls)
         {
             // The rebindable-action rows are a table of their own; stop where they begin so their
@@ -131,8 +147,10 @@ namespace SongsOfConquestAccess.UI
         /// The rebindable-action rows of the Controls page as a table: one region per category
         /// caption, one row per action. The primary cell is the gesture name; a binding cell reads the
         /// current hotkey (or "not bound") and is a button that CLEARS the override where the row has
-        /// one; a "+" cell starts the game's capture. Does nothing for a form that draws no key
-        /// bindings, so the stop it is given stays empty and is dropped.
+        /// one; a "+" cell starts the capture - the game's for the Options window, the mod's for its
+        /// own Keybinds tab, which draws the same widget. Emitted into the stop the rows above it are
+        /// in, so the table is reached with the arrows like any row and not by a Tab of its own. Does
+        /// nothing for a form that draws no key bindings.
         /// </summary>
         public void BuildKeyBindingSheet(GraphBuilder builder, IReadOnlyList<MenuRow> controls)
         {
@@ -140,6 +158,12 @@ namespace SongsOfConquestAccess.UI
             if (start < 0)
             {
                 return;
+            }
+
+            if (!ReferenceEquals(controls, _keyBindingSource))
+            {
+                _keyBindingNodes.Clear();
+                _keyBindingSource = controls;
             }
 
             GraphSheet sheet = new GraphSheet(builder, _prefix + ":keybind:");
@@ -151,14 +175,16 @@ namespace SongsOfConquestAccess.UI
                 MenuRowText caption = item as MenuRowText;
                 if (caption != null)
                 {
-                    if (!caption.IsVisible() || string.IsNullOrWhiteSpace(caption.GetText()))
+                    // Read once: the caption's text is the game's, tags stripped on every read.
+                    string label = caption.IsVisible() ? caption.GetText() : null;
+                    if (string.IsNullOrWhiteSpace(label))
                     {
                         continue;
                     }
 
                     // Three columns - name, binding, "+" - so the region reads as a table and the
                     // caption names it.
-                    sheet.Region(caption.GetText(), new string[3]);
+                    sheet.Region(label, new string[3]);
                     regionOpen = true;
                     continue;
                 }
@@ -179,41 +205,46 @@ namespace SongsOfConquestAccess.UI
             }
 
             sheet.Finish();
-            if (sheet.FirstRow != null)
-            {
-                builder.LandStopOn(sheet.FirstRow);
-            }
         }
 
         private void AddKeyBindingRow(GraphSheet sheet, MenuRow row, MenuRowKeyBinding binding)
         {
-            NodeVtable name = GraphNodes.Text(binding.GetActionName);
-            name.OnFocusVisual = binding.Focus;
-
-            List<GraphSheet.SheetCell> cells = new List<GraphSheet.SheetCell>
+            bool overridden = binding.HasOverride();
+            KeyBindingNodes nodes;
+            if (!_keyBindingNodes.TryGetValue(binding, out nodes) || nodes.Overridden != overridden)
             {
-                new GraphSheet.SheetCell(1, 0, BindingCell(binding)),
-                new GraphSheet.SheetCell(2, 0, PlusCell(binding)),
-            };
+                NodeVtable name = GraphNodes.Text(binding.GetActionName);
+                name.OnFocusVisual = binding.Focus;
+                nodes = new KeyBindingNodes
+                {
+                    Overridden = overridden,
+                    Name = name,
+                    Cells = new List<GraphSheet.SheetCell>
+                    {
+                        new GraphSheet.SheetCell(1, 0, BindingCell(binding, overridden)),
+                        new GraphSheet.SheetCell(2, 0, PlusCell(binding)),
+                    },
+                };
+                _keyBindingNodes[binding] = nodes;
+            }
 
             // The row's identity across rebuilds; the widget it is drawn as is the scroll anchor and
             // the existence evidence.
-            sheet.RowAt(name, binding.Id, cells, row.Transform);
+            sheet.RowAt(nodes.Name, binding.Id, nodes.Cells, row.Transform);
         }
 
         /// <summary>The binding chip: the current hotkey or "not bound". A BUTTON that clears the
         /// override where the row has one - the game's chip is a dead label otherwise - and its text
         /// is watched live so a rebind or clear the game redraws is spoken with no polling.</summary>
-        private static NodeVtable BindingCell(MenuRowKeyBinding binding)
+        private static NodeVtable BindingCell(MenuRowKeyBinding binding, bool overridden)
         {
             Func<string> text = () => KeyBindingText.Display(
                 binding.GetBindingText(), ModText.Get(ModStrings.Screens.NotBound));
 
             NodeVtable vtable;
-            if (binding.HasOverride())
+            if (overridden)
             {
                 vtable = GraphNodes.Button(text, () => binding.ClearOverride(), null, binding.GetClearTooltip());
-                NodeHints.Add(vtable, ModStrings.Screens.KeyBindingClearHint, AccessibilityActions.UiLeftClick.Key, 0);
             }
             else
             {
@@ -245,7 +276,6 @@ namespace SongsOfConquestAccess.UI
                 },
                 null,
                 binding.GetPlusTooltip());
-            NodeHints.Add(vtable, ModStrings.Screens.KeyBindingSetHint, AccessibilityActions.UiLeftClick.Key, 0);
             vtable.SearchText = binding.GetActionName;
             vtable.OnFocusVisual = binding.Focus;
             return vtable;
@@ -257,6 +287,13 @@ namespace SongsOfConquestAccess.UI
         /// fallback for when the popup cannot be read.</summary>
         private static void AnnounceCapture()
         {
+            // The mod's own capture (a Keybinds-tab row) spoke its prompt when it was armed; there
+            // is no game popup to read for it.
+            if (ModKeyCapture.IsArmed)
+            {
+                return;
+            }
+
             List<string> lines = new List<string>();
             ConfirmPopup popup = KeyCaptureFocus.Popup;
             if (popup != null)

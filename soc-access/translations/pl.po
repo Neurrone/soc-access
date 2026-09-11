@@ -3766,16 +3766,6 @@ msgctxt "Screens.CaptureNoCancel"
 msgid "The next key you press becomes the binding."
 msgstr "Następny naciśnięty klawisz stanie się przypisaniem."
 
-#. Screens.KeyBindingSetHint
-msgctxt "Screens.KeyBindingSetHint"
-msgid "{0} to set a new key"
-msgstr "{0}, aby ustawić nowy klawisz"
-
-#. Screens.KeyBindingClearHint
-msgctxt "Screens.KeyBindingClearHint"
-msgid "{0} to restore the default"
-msgstr "{0}, aby przywrócić ustawienie domyślne"
-
 #. Screens.Keybinds
 msgctxt "Screens.Keybinds"
 msgid "Keybinds"
@@ -3796,11 +3786,6 @@ msgctxt "Screens.HexGrid"
 msgid "Hex grid"
 msgstr "Siatka heksagonalna"
 
-#. Screens.KeybindRebind
-msgctxt "Screens.KeybindRebind"
-msgid "Rebind"
-msgstr "Zmień przypisanie"
-
 #. Screens.KeybindPressKey
 msgctxt "Screens.KeybindPressKey"
 msgid "Press a key for {0}"
@@ -3810,11 +3795,6 @@ msgstr "Naciśnij klawisz dla {0}"
 msgctxt "Screens.KeybindSet"
 msgid "{0} is now {1}"
 msgstr "{0} to teraz {1}"
-
-#. Screens.KeybindUnbound
-msgctxt "Screens.KeybindUnbound"
-msgid "unbound"
-msgstr "nieprzypisane"
 
 #. Screens.KeybindShadowed
 msgctxt "Screens.KeybindShadowed"

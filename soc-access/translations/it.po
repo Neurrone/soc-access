@@ -3736,16 +3736,6 @@ msgctxt "Screens.CaptureNoCancel"
 msgid "The next key you press becomes the binding."
 msgstr "Il prossimo tasto che premi diventa l'assegnazione."
 
-#. Screens.KeyBindingSetHint
-msgctxt "Screens.KeyBindingSetHint"
-msgid "{0} to set a new key"
-msgstr "{0} per impostare un nuovo tasto"
-
-#. Screens.KeyBindingClearHint
-msgctxt "Screens.KeyBindingClearHint"
-msgid "{0} to restore the default"
-msgstr "{0} per ripristinare l'impostazione predefinita"
-
 #. Screens.Keybinds
 msgctxt "Screens.Keybinds"
 msgid "Keybinds"
@@ -3766,11 +3756,6 @@ msgctxt "Screens.HexGrid"
 msgid "Hex grid"
 msgstr "Griglia esagonale"
 
-#. Screens.KeybindRebind
-msgctxt "Screens.KeybindRebind"
-msgid "Rebind"
-msgstr "Riassegna"
-
 #. Screens.KeybindPressKey
 msgctxt "Screens.KeybindPressKey"
 msgid "Press a key for {0}"
@@ -3780,11 +3765,6 @@ msgstr "Premi un tasto per {0}"
 msgctxt "Screens.KeybindSet"
 msgid "{0} is now {1}"
 msgstr "{0} ora è {1}"
-
-#. Screens.KeybindUnbound
-msgctxt "Screens.KeybindUnbound"
-msgid "unbound"
-msgstr "non assegnato"
 
 #. Screens.KeybindShadowed
 msgctxt "Screens.KeybindShadowed"

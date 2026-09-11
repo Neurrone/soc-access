@@ -1,3 +1,4 @@
+using System;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
@@ -19,6 +20,7 @@ namespace SongsOfConquestAccess.Input
     public static class ModKeyCapture
     {
         private static InputAction _action;
+        private static Action _applied;
 
         public static bool IsArmed
         {
@@ -31,8 +33,9 @@ namespace SongsOfConquestAccess.Input
         }
 
         /// <summary>Arm the capture for one action and speak the prompt QUEUED, so it follows rather
-        /// than cuts off whatever the "+" activation itself said.</summary>
-        public static void Rebind(InputAction action)
+        /// than cuts off whatever the "+" activation itself said. <paramref name="applied"/> runs
+        /// once the new chord is in force - the drawn row redrawing its chip.</summary>
+        public static void Rebind(InputAction action, Action applied = null)
         {
             if (action == null)
             {
@@ -40,6 +43,7 @@ namespace SongsOfConquestAccess.Input
             }
 
             _action = action;
+            _applied = applied;
             SpeechPipeline.Output(new SpeechRequest(
                 ModText.Get(ModStrings.Screens.KeybindPressKey, action.Label),
                 interrupt: false));
@@ -50,6 +54,7 @@ namespace SongsOfConquestAccess.Input
         public static void Cancel()
         {
             _action = null;
+            _applied = null;
         }
 
         /// <summary>The router hands over the first non-modifier key while armed. Apply and persist the
@@ -57,13 +62,19 @@ namespace SongsOfConquestAccess.Input
         public static void Complete(KeyboardBinding binding)
         {
             InputAction action = _action;
+            Action applied = _applied;
             _action = null;
+            _applied = null;
             if (action == null || binding == null)
             {
                 return;
             }
 
             ModSettings.SetKeybindOverride(action.Key, new InputBinding[] { binding });
+            if (applied != null)
+            {
+                applied();
+            }
 
             string chord = ChordNames.Of(binding);
             SpeechPipeline.Output(new SpeechRequest(

@@ -3706,16 +3706,6 @@ msgctxt "Screens.CaptureNoCancel"
 msgid "The next key you press becomes the binding."
 msgstr "你按下的下一個按鍵將成為綁定。"
 
-#. Screens.KeyBindingSetHint
-msgctxt "Screens.KeyBindingSetHint"
-msgid "{0} to set a new key"
-msgstr "{0} 設定新按鍵"
-
-#. Screens.KeyBindingClearHint
-msgctxt "Screens.KeyBindingClearHint"
-msgid "{0} to restore the default"
-msgstr "{0} 恢復預設"
-
 #. Screens.Keybinds
 msgctxt "Screens.Keybinds"
 msgid "Keybinds"
@@ -3736,11 +3726,6 @@ msgctxt "Screens.HexGrid"
 msgid "Hex grid"
 msgstr "六邊形網格"
 
-#. Screens.KeybindRebind
-msgctxt "Screens.KeybindRebind"
-msgid "Rebind"
-msgstr "重新綁定"
-
 #. Screens.KeybindPressKey
 msgctxt "Screens.KeybindPressKey"
 msgid "Press a key for {0}"
@@ -3750,11 +3735,6 @@ msgstr "請按一個鍵來綁定 {0}"
 msgctxt "Screens.KeybindSet"
 msgid "{0} is now {1}"
 msgstr "{0} 現在是 {1}"
-
-#. Screens.KeybindUnbound
-msgctxt "Screens.KeybindUnbound"
-msgid "unbound"
-msgstr "未綁定"
 
 #. Screens.KeybindShadowed
 msgctxt "Screens.KeybindShadowed"

@@ -3766,16 +3766,6 @@ msgctxt "Screens.CaptureNoCancel"
 msgid "The next key you press becomes the binding."
 msgstr "Наступна натиснута клавіша стане прив'язкою."
 
-#. Screens.KeyBindingSetHint
-msgctxt "Screens.KeyBindingSetHint"
-msgid "{0} to set a new key"
-msgstr "{0}, щоб призначити нову клавішу"
-
-#. Screens.KeyBindingClearHint
-msgctxt "Screens.KeyBindingClearHint"
-msgid "{0} to restore the default"
-msgstr "{0}, щоб відновити типове значення"
-
 #. Screens.Keybinds
 msgctxt "Screens.Keybinds"
 msgid "Keybinds"
@@ -3796,11 +3786,6 @@ msgctxt "Screens.HexGrid"
 msgid "Hex grid"
 msgstr "Гексагональна сітка"
 
-#. Screens.KeybindRebind
-msgctxt "Screens.KeybindRebind"
-msgid "Rebind"
-msgstr "Перепризначити"
-
 #. Screens.KeybindPressKey
 msgctxt "Screens.KeybindPressKey"
 msgid "Press a key for {0}"
@@ -3810,11 +3795,6 @@ msgstr "Натисніть клавішу для «{0}»"
 msgctxt "Screens.KeybindSet"
 msgid "{0} is now {1}"
 msgstr "{0} тепер {1}"
-
-#. Screens.KeybindUnbound
-msgctxt "Screens.KeybindUnbound"
-msgid "unbound"
-msgstr "не призначено"
 
 #. Screens.KeybindShadowed
 msgctxt "Screens.KeybindShadowed"

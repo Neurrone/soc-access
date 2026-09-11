@@ -3706,16 +3706,6 @@ msgctxt "Screens.CaptureNoCancel"
 msgid "The next key you press becomes the binding."
 msgstr "다음에 누르는 키가 단축키로 지정됩니다."
 
-#. Screens.KeyBindingSetHint
-msgctxt "Screens.KeyBindingSetHint"
-msgid "{0} to set a new key"
-msgstr "새 키를 지정하려면 {0}"
-
-#. Screens.KeyBindingClearHint
-msgctxt "Screens.KeyBindingClearHint"
-msgid "{0} to restore the default"
-msgstr "기본값으로 되돌리려면 {0}"
-
 #. Screens.Keybinds
 msgctxt "Screens.Keybinds"
 msgid "Keybinds"
@@ -3736,11 +3726,6 @@ msgctxt "Screens.HexGrid"
 msgid "Hex grid"
 msgstr "헥스 그리드"
 
-#. Screens.KeybindRebind
-msgctxt "Screens.KeybindRebind"
-msgid "Rebind"
-msgstr "다시 지정"
-
 #. Screens.KeybindPressKey
 msgctxt "Screens.KeybindPressKey"
 msgid "Press a key for {0}"
@@ -3750,11 +3735,6 @@ msgstr "{0}에 사용할 키를 누르세요"
 msgctxt "Screens.KeybindSet"
 msgid "{0} is now {1}"
 msgstr "{0}이(가) 이제 {1}입니다"
-
-#. Screens.KeybindUnbound
-msgctxt "Screens.KeybindUnbound"
-msgid "unbound"
-msgstr "지정 안 됨"
 
 #. Screens.KeybindShadowed
 msgctxt "Screens.KeybindShadowed"

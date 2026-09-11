@@ -292,9 +292,14 @@ namespace SongsOfConquestAccess.Adapters
                 return chip != null && chip.Interactable;
             };
 
+            // The label is set once when the row is drawn and the row record lives as long as the
+            // drawn column, so it is read once: the sheet asks for it on every vertical edge it wires
+            // (four times per row per build), and the tag strip behind it was 0.9 ms of the Controls
+            // page's build (2026-09-11).
+            string actionName = null;
             return new MenuRowKeyBinding(
                 id,
-                () => ActionText(widget),
+                () => actionName ?? (actionName = ActionText(widget)),
                 () =>
                 {
                     // The chip carries the exact drawn text - modifiers included for an override; the
@@ -322,10 +327,33 @@ namespace SongsOfConquestAccess.Adapters
                 () => hasOverride() && NativeSelectionUtility.Click(ChipButton(widget)),
                 () => KeyCaptureFocus.IsCapturing() && source != null && ReferenceEquals(source.LastRebindWidget, widget),
                 () => component != null && component.gameObject.activeInHierarchy,
-                () => NativeSelectionUtility.Select(component),
+                () => FocusRow(widget, component, source),
                 () => PlusTooltipText(widget),
                 () => Tooltip.ForComponent(PlusButton(widget) as Component, null),
                 () => Tooltip.ForComponent(ChipButton(widget) as Component, null));
+        }
+
+        // The row is not a Selectable of its own, and the panel's AutoScrollToSelected only follows
+        // the Selectable it registered for the row when it measured the column: the first under the
+        // row, which is the chip (Buttons/EntryPrefab(Clone) is drawn before PlusButton, measured
+        // 2026-09-11), given a UISelectionProxy as it was registered. Selecting the row object
+        // itself fires no ISelectHandler the scroller listens to, so the row never scrolled into
+        // view. A chip drawn since the column was measured (a rebind replaces it) carries no proxy,
+        // so the column is measured again first, or that row would not scroll either.
+        private static bool FocusRow(IUIKeyBinding widget, Component row, KeyBindingSource source)
+        {
+            UIButton chip = ChipButton(widget);
+            if (chip == null)
+            {
+                return NativeSelectionUtility.Select(row);
+            }
+
+            if (chip.GetComponent<UISelectionProxy>() == null && source != null && source.RefreshScroll != null)
+            {
+                source.RefreshScroll();
+            }
+
+            return NativeSelectionUtility.Select(chip);
         }
 
         // The action label the game draws. It is NOT on IUIKeyBinding.Text - the game leaves that
@@ -890,6 +918,10 @@ namespace SongsOfConquestAccess.Adapters
     {
         public Func<IUIKeyBinding, BindingContainer> Resolve;
         public IUIKeyBinding LastRebindWidget;
+
+        /// <summary>Have the panel's scroller measure the content column again - asked from a row's
+        /// focus when its chip was redrawn since the last measure.</summary>
+        public Action RefreshScroll;
     }
 
     /// <summary>

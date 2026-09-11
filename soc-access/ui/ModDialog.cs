@@ -74,6 +74,7 @@ namespace SongsOfConquestAccess.UI
         private AutoScrollToSelected _autoScroller;
         private UIButton _closeButton;
         private IMenuFactoryCollection _factory;
+        private MenuRowMemo _rows;
         private MenuFactoryController _controller;
         private UIButton _tabPrefab;
         private Color _selectedTabColor;
@@ -158,7 +159,7 @@ namespace SongsOfConquestAccess.UI
         /// <summary>The rows this dialog has drawn, read the way Options is read.</summary>
         public IReadOnlyList<MenuRow> Rows
         {
-            get { return MenuRows.Read(_factory); }
+            get { return _rows != null ? _rows.Rows : MenuRows.Read(_factory); }
         }
 
         /// <summary>The panel's own close button, as a row.</summary>
@@ -319,6 +320,60 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>
+        /// The game's own key-binding row - the label, a binding chip and the "+" - drawn for a
+        /// gesture of the mod's. The widget takes plain text and callbacks
+        /// (<c>OptionsMenuKeyBindContent.Draw</c> hands it the same), so nothing about it needs a game
+        /// input action. The chip is drawn separately by <see cref="ShowBinding"/>, since it is
+        /// what a rebind or a clear redraws.
+        /// </summary>
+        public IUIKeyBinding AddKeyBinding(string label, string plusTooltip, Action rebind)
+        {
+            IUIKeyBinding widget = _controller.AddKeyBinding();
+            if (widget == null)
+            {
+                return null;
+            }
+
+            widget.Text = label;
+            widget.AddPlusButton(plusTooltip, true, rebind);
+            return widget;
+        }
+
+        /// <summary>
+        /// Draw a key-binding row's chip the way the game does (<c>SetupBindButton</c>, decompiled):
+        /// a dead label for the default, an interactable "remove" button for an override. Redraws in
+        /// place, so the rest of the column and its scroll position stay; the row's focus has the
+        /// scroller measure the new chip when it is next reached.
+        /// </summary>
+        public void ShowBinding(IUIKeyBinding widget, string id, string text, bool overridden, string removeTooltip, Action remove)
+        {
+            if (widget == null)
+            {
+                return;
+            }
+
+            widget.ClearButtons();
+            if (overridden)
+            {
+                widget.AddOverrideButton(new ActionReference(id), text, removeTooltip, null, remove);
+            }
+            else
+            {
+                widget.AddDefaultBinding(text);
+            }
+        }
+
+        /// <summary>Let the panel's scroller measure the column again - after a control inside a
+        /// row was replaced, which a redraw of the whole column would also do.</summary>
+        private void RefreshScroll()
+        {
+            if (_autoScroller != null)
+            {
+                _autoScroller.Refresh();
+            }
+        }
+
+        /// <summary>
         /// Start a row of controls drawn side by side. Only ever TWO of them: a toggle is a
         /// full-width row with its box at the right, and four controls in one layout gave each
         /// toggle 381 px of a 486 px column and squeezed both buttons to nothing (measured
@@ -424,6 +479,9 @@ namespace SongsOfConquestAccess.UI
             DiContainer own = container.CreateSubContainer();
             installer.FactorySettings.Install(own, null);
             _factory = own.Resolve<IMenuFactoryCollection>();
+            // No rebindable game actions here; the source only lends the key-binding rows the
+            // scroller refresh their focus asks for after a chip was redrawn.
+            _rows = new MenuRowMemo(_factory, content, new KeyBindingSource { RefreshScroll = RefreshScroll });
             _controller = new MenuFactoryController(
                 _factory,
                 container.Resolve<IClientSettings>(),

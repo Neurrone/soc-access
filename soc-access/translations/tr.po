@@ -3706,16 +3706,6 @@ msgctxt "Screens.CaptureNoCancel"
 msgid "The next key you press becomes the binding."
 msgstr "Basacağınız bir sonraki tuş atama olur."
 
-#. Screens.KeyBindingSetHint
-msgctxt "Screens.KeyBindingSetHint"
-msgid "{0} to set a new key"
-msgstr "Yeni tuş atamak için {0}"
-
-#. Screens.KeyBindingClearHint
-msgctxt "Screens.KeyBindingClearHint"
-msgid "{0} to restore the default"
-msgstr "Varsayılana döndürmek için {0}"
-
 #. Screens.Keybinds
 msgctxt "Screens.Keybinds"
 msgid "Keybinds"
@@ -3736,11 +3726,6 @@ msgctxt "Screens.HexGrid"
 msgid "Hex grid"
 msgstr "Altıgen ızgara"
 
-#. Screens.KeybindRebind
-msgctxt "Screens.KeybindRebind"
-msgid "Rebind"
-msgstr "Yeniden ata"
-
 #. Screens.KeybindPressKey
 msgctxt "Screens.KeybindPressKey"
 msgid "Press a key for {0}"
@@ -3750,11 +3735,6 @@ msgstr "{0} için bir tuşa basın"
 msgctxt "Screens.KeybindSet"
 msgid "{0} is now {1}"
 msgstr "{0} artık {1}"
-
-#. Screens.KeybindUnbound
-msgctxt "Screens.KeybindUnbound"
-msgid "unbound"
-msgstr "atanmamış"
 
 #. Screens.KeybindShadowed
 msgctxt "Screens.KeybindShadowed"

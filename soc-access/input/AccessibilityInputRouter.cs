@@ -366,16 +366,19 @@ namespace SongsOfConquestAccess.Input
             }
 
             // THE MOD'S OWN CAPTURE grabs the next key while it is armed - the reverse of the
-            // stand-down above. A pure modifier keydown is not a binding, so it is swallowed and the
-            // capture waits; the first real key becomes the gesture's chord, with no cancel, matching
-            // the game's own rebind. No text field is up to catch these keys, which is why the router
-            // has to.
+            // stand-down above. A pure modifier keydown is not a binding, so the capture waits; the
+            // first real key becomes the gesture's chord, with no cancel, matching the game's own
+            // rebind. No text field is up to catch these keys, which is why the router has to.
+            //
+            // The modifier press is NOT marked handled: a handled event is one the input system
+            // skips, so its key state never updates and Ctrl+R would arrive as a bare R when the
+            // modifier flags are read off the keyboard below.
             if (ModKeyCapture.IsArmed)
             {
                 Key captureKey = keyControl.keyCode;
                 if (IsModifierKey(captureKey))
                 {
-                    return true;
+                    return false;
                 }
 
                 KeyboardStateSnapshot captureState = KeyboardStateSnapshot.Capture();
@@ -436,8 +439,8 @@ namespace SongsOfConquestAccess.Input
             return false;
         }
 
-        // A modifier pressed on its own is not a binding: the mod's capture ignores it and waits for
-        // the key it modifies. AltGr and the platform (Windows/Command) keys are included so a chord
+        // A modifier pressed on its own is not a binding: the mod's capture lets it through and waits
+        // for the key it modifies. AltGr and the platform (Windows/Command) keys are included so a chord
         // that leans on them is never mistaken for a bare modifier press.
         private static bool IsModifierKey(Key key)
         {
