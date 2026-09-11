@@ -933,16 +933,11 @@ namespace SongsOfConquestAccess.Events
                 StringComparison.Ordinal);
         }
 
+        // The game's Get is a dictionary TryGetValue (AbstractMapEntityManager.Get), so an id it
+        // does not know answers null rather than throwing.
         private IMapEntity TryGetMapEntity(int id)
         {
-            try
-            {
-                return _facade != null && _facade.MapEntities != null ? _facade.MapEntities.Get(id) : null;
-            }
-            catch
-            {
-                return null;
-            }
+            return _facade != null && _facade.MapEntities != null ? _facade.MapEntities.Get(id) : null;
         }
 
         private static string CommanderDiscoveryKey(int commanderId)
@@ -966,16 +961,11 @@ namespace SongsOfConquestAccess.Events
                 return false;
             }
 
-            try
-            {
-                HumanAdventureController.State state = _humanAdventureControllerFacade.StateMachine.CurrentStateType;
-                return state == HumanAdventureController.State.CommanderMoveToPoint
-                    || state == HumanAdventureController.State.WaitForCommanderToFinish;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            // CurrentStateType is a plain field read on the game's StateMachine, and the two
+            // objects that lead to it are null-checked above, so there is nothing here to throw.
+            HumanAdventureController.State state = _humanAdventureControllerFacade.StateMachine.CurrentStateType;
+            return state == HumanAdventureController.State.CommanderMoveToPoint
+                || state == HumanAdventureController.State.WaitForCommanderToFinish;
         }
 
         /// <summary>
@@ -1016,14 +1006,10 @@ namespace SongsOfConquestAccess.Events
                 return false;
             }
 
-            try
-            {
-                return _fogManager.IsVisible(point);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            // FogRenderer.GetFog answers 0 for a point outside the fog area and for a renderer
+            // that is not valid yet, so an off-map point is false rather than a throw. The same
+            // call is already made unguarded in ShouldPublishCommanderPositionEvent.
+            return _fogManager.IsVisible(point);
         }
 
         private bool ShouldPublishCommanderPositionEvent(ICommanderState commander, UnityEngine.Vector2Int tile)
