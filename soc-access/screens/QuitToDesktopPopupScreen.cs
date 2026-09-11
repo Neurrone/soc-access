@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquestAccess.Adapters;
@@ -118,7 +118,7 @@ namespace SongsOfConquestAccess.Screens
                     GraphNodes.Text(() => Live.Title)));
             }
 
-            if (!string.IsNullOrWhiteSpace(Live.Description))
+            if (Live.HasDescription)
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "quit:body");
                 NodeVtable body = GraphNodes.Paragraphs(() => Live.DescriptionLines);

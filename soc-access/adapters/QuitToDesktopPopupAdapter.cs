@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Menu.Popup;
@@ -29,20 +29,29 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Description
         {
-            get { return string.Join(" ", DescriptionLines); }
+            get { return _description.Joined(RawDescription); }
         }
 
         /// <summary>The paragraphs the popup wrote its message in, kept apart rather than
         /// collapsed.</summary>
         public IList<string> DescriptionLines
         {
-            get
-            {
-                return SpokenLines.Of(new[]
-                {
-                    UITextMeshTextUtility.GetEffectiveText(Settings != null ? Settings.Description : null),
-                });
-            }
+            get { return _description.Lines(RawDescription); }
+        }
+
+        /// <summary>Whether the popup wrote any message at all.</summary>
+        public bool HasDescription
+        {
+            get { return _description.HasAny(RawDescription); }
+        }
+
+        // The message, split at most once a frame: the guard and the node both ask for it
+        // (AGENTS.md, Performance).
+        private readonly BodyText _description = new BodyText();
+
+        private string RawDescription
+        {
+            get { return UITextMeshTextUtility.GetEffectiveText(Settings != null ? Settings.Description : null); }
         }
 
         public string FollowTitle
