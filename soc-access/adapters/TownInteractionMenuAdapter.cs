@@ -25,6 +25,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo HeaderField = AccessTools.Field(typeof(TownInteractionMenu), "_wielderInteractHeader");
         private static readonly FieldInfo BackToTopButtonField = AccessTools.Field(typeof(TownInteractionMenu), "_backToTopButton");
         private static readonly FieldInfo TutorialButtonField = AccessTools.Field(typeof(TownInteractionMenu), "_tutorialButton");
+        private static readonly FieldInfo RecruitmentPoolField = AccessTools.Field(typeof(TownInteractionMenu), "_recruitmentPool");
         private static readonly FieldInfo LandingPageContainerField = AccessTools.Field(typeof(TownInteractionMenu), "_landingPageContainer");
         private static readonly FieldInfo BuildingNameField = AccessTools.Field(typeof(TownInteractionMenu), "_buildingName");
         private static readonly FieldInfo PurchaseTroopsButtonField = AccessTools.Field(typeof(TownInteractionMenu), "_purchaseTroopsButton");
@@ -445,12 +446,30 @@ namespace SongsOfConquestAccess.Adapters
             NativeTooltipUtility.HideTooltip();
         }
 
+        /// <summary>Whether the building this menu is about is still in the game. A menu holds its
+        /// recruitment pool - and with it the map entity - from one Show to the next and does not
+        /// clear it on Close, so a menu left open over an entity that has gone (a save loaded under
+        /// it, the building destroyed) keeps every other sign of being up: its object is still
+        /// active, its sub-page is still drawn, and its Async is still uncompleted because Close
+        /// never ran. The entity's own IsDisposed is what the game changes
+        /// (<c>AbstractMapEntity.Dispose</c>), so that is what is read.</summary>
+        private bool IsEntityAlive()
+        {
+            IRecruitmentPoolComponent pool = Reflect.Get<IRecruitmentPoolComponent>(_menu, RecruitmentPoolField);
+            IMapEntity entity = pool != null ? pool.MapEntity : null;
+            return entity != null && !entity.IsDisposed;
+        }
+
+        /// <summary>The menu object is up AND it is still about a building that exists: the landing
+        /// page, the draft page and the upgrade page are all pages of THIS town, so a town that has
+        /// gone takes all three with it.</summary>
         private bool IsMenuOpen()
         {
             return _menu != null
                 && _menu.gameObject != null
                 && _menu.gameObject.activeInHierarchy
-                && Reflect.Get<Async>(_menu, AsyncField) != null;
+                && Reflect.Get<Async>(_menu, AsyncField) != null
+                && IsEntityAlive();
         }
 
         private WielderInteractHeader GetHeader()

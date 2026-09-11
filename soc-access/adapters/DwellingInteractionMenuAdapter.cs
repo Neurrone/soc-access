@@ -5,6 +5,8 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common.Entities;
+using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -23,6 +25,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static readonly FieldInfo HeaderPortraitField = AccessTools.Field(typeof(WielderInteractHeader), "_wielderPortrait");
 
+        private static readonly FieldInfo RecruitmentPoolField = AccessTools.Field(typeof(DwellingInteractionMenu), "_recruitmentPool");
         private static readonly FieldInfo UpgradeTroopsSubMenuField = AccessTools.Field(typeof(DwellingInteractionMenu), "_upgradeTroopsSubMenu");
         private static readonly FieldInfo BackToTopButtonField = AccessTools.Field(typeof(DwellingInteractionMenu), "_backToTopButton");
 
@@ -80,6 +83,7 @@ namespace SongsOfConquestAccess.Adapters
                 && _menu.gameObject.activeInHierarchy
                 && AsyncField != null
                 && AsyncField.GetValue(_menu) != null
+                && IsEntityAlive()
                 && subMenu != null
                 && subMenu.gameObject.activeInHierarchy;
         }
@@ -97,8 +101,23 @@ namespace SongsOfConquestAccess.Adapters
                 && _menu.gameObject.activeInHierarchy
                 && AsyncField != null
                 && AsyncField.GetValue(_menu) != null
+                && IsEntityAlive()
                 && subMenu != null
                 && subMenu.gameObject.activeInHierarchy;
+        }
+
+        /// <summary>Whether the building this menu is about is still in the game. A menu holds its
+        /// recruitment pool - and with it the map entity - from one Show to the next and does not
+        /// clear it on Close, so a menu left open over an entity that has gone (a save loaded under
+        /// it, the building destroyed) keeps every other sign of being up: its object is still
+        /// active, its sub-page is still drawn, and its Async is still uncompleted because Close
+        /// never ran. The entity's own IsDisposed is what the game changes
+        /// (<c>AbstractMapEntity.Dispose</c>), so that is what is read.</summary>
+        private bool IsEntityAlive()
+        {
+            IRecruitmentPoolComponent pool = Reflect.Get<IRecruitmentPoolComponent>(_menu, RecruitmentPoolField);
+            IMapEntity entity = pool != null ? pool.MapEntity : null;
+            return entity != null && !entity.IsDisposed;
         }
 
         /// <summary>The draft sub-page. Kept, so the page's build reads one adapter rather than a new
