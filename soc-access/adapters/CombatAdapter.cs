@@ -2529,7 +2529,7 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            string localizedDescriptionFormat = LocalizeModifierDescriptionFormat(
+            string nameKey = ModifierLocalizationKey(
                 modifier.Type,
                 modifier.ApplicationType,
                 modifier.AmountToAdd,
@@ -2539,12 +2539,17 @@ namespace SongsOfConquestAccess.Adapters
                 modifier.Type,
                 modifier.ApplicationType,
                 modifier.AmountToAdd,
-                localizedDescriptionFormat,
+                LocalizeText(nameKey + "/Description"),
                 formatAmount,
-                displayAmountMultiplier);
+                displayAmountMultiplier,
+                LocalizeText(nameKey));
         }
 
-        private string LocalizeModifierDescriptionFormat(
+        /// <summary>The game's own key for a modifier, which names it and, with "/Description"
+        /// after it, describes it (<c>BacteriaModifierExtensions.GetModifierLocalizedNameKey</c>).
+        /// Blessed by a negative amount is the game's Cursed, which it counts the other way up.
+        /// </summary>
+        private static string ModifierLocalizationKey(
             BacteriaModifierType modifierType,
             BacteriaModifierApplicationType applicationType,
             int amount,
@@ -2554,17 +2559,16 @@ namespace SongsOfConquestAccess.Adapters
             formatAmount = modifierType != BacteriaModifierType.TroopIgnoreZoneOfControl;
             displayAmountMultiplier = 1;
 
-            string modifierName = modifierType.ToString().Replace("Troop", string.Empty);
             if (modifierType == BacteriaModifierType.TroopBlessed
                 && amount < 0
                 && applicationType != BacteriaModifierApplicationType.Percentage
                 && !BacteriaModifierExtensions.IsPercentageBased(modifierType))
             {
-                modifierName = "Cursed";
                 displayAmountMultiplier = -1;
+                return "Modifiers/Cursed";
             }
 
-            return LocalizeText("Modifiers/" + modifierName + "/Description");
+            return "Modifiers/" + modifierType.ToString().Replace("Troop", string.Empty);
         }
 
         public BacteriaRef CreateBacteriaRef(BacteriaReference bacteriaReference)

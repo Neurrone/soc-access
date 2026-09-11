@@ -69,6 +69,11 @@ msgctxt "Common.Parenthetical"
 msgid "{0} ({1})"
 msgstr ""
 
+#. Common.PositiveAmount
+msgctxt "Common.PositiveAmount"
+msgid "+{0}"
+msgstr ""
+
 #. TeamColors.Black
 msgctxt "TeamColors.Black"
 msgid "black"

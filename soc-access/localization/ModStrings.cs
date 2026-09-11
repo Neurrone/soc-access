@@ -18,6 +18,7 @@
             public static readonly ModString ClauseSeparator = new ModString("Common.ClauseSeparator", "{0}; {1}");
             public static readonly ModString PhraseSeparator = new ModString("Common.PhraseSeparator", "{0} {1}");
             public static readonly ModString Parenthetical = new ModString("Common.Parenthetical", "{0} ({1})");
+            public static readonly ModString PositiveAmount = new ModString("Common.PositiveAmount", "+{0}");
         }
 
         public static class TeamColors

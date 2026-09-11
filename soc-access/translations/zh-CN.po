@@ -3827,3 +3827,8 @@ msgstr "{0} ({1})"
 msgctxt "Combat.Spell"
 msgid "Spell"
 msgstr "法术"
+
+#. Common.PositiveAmount
+msgctxt "Common.PositiveAmount"
+msgid "+{0}"
+msgstr "+{0}"
