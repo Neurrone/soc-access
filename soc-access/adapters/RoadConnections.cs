@@ -41,13 +41,14 @@ namespace SongsOfConquestAccess.Adapters
             new Neighbour(-1, 1, ScannerDirection.Northwest)
         };
 
-        private static readonly ScannerDirection[] Empty = new ScannerDirection[0];
+        /// <summary>No roads lead anywhere from here, for a caller that cannot answer at all.</summary>
+        public static readonly ScannerDirection[] None = new ScannerDirection[0];
 
         public static IReadOnlyList<ScannerDirection> Compute(Vector2Int origin, Func<Vector2Int, bool> isRoad)
         {
             if (isRoad == null)
             {
-                return Empty;
+                return None;
             }
 
             List<ScannerDirection> directions = new List<ScannerDirection>(Neighbours.Length);

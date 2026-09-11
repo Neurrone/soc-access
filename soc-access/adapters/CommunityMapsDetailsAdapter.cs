@@ -54,14 +54,14 @@ namespace SongsOfConquestAccess.Adapters
         public CommunityMapsDetailsAdapter(Details details)
         {
             _details = details;
-            _voteUpLabel = Translate("Vote up");
-            _voteDownLabel = Translate("Vote down");
-            _reportLabel = Translate("Report");
-            _downloadsLabel = Translate("Downloads");
-            _backLabel = FindTopBarText("Back / Exit");
+            _voteUpLabel = CommunityMapsText.Translate("Vote up");
+            _voteDownLabel = CommunityMapsText.Translate("Vote down");
+            _reportLabel = CommunityMapsText.Translate("Report");
+            _downloadsLabel = CommunityMapsText.Translate("Downloads");
+            _backLabel = CommunityMapsText.FindTopBar("Back / Exit");
             if (string.IsNullOrWhiteSpace(_backLabel))
             {
-                _backLabel = Translate("Back");
+                _backLabel = CommunityMapsText.Translate("Back");
             }
         }
 
@@ -73,15 +73,15 @@ namespace SongsOfConquestAccess.Adapters
                 && _details.ModDetailsPanel.activeInHierarchy;
         }
 
-        public string Title { get { return GetText(Reflect.Cast<TMP_Text>(_details, NameField)); } }
+        public string Title { get { return CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_details, NameField)); } }
 
-        public string Summary { get { return GetText(Reflect.Cast<TMP_Text>(_details, SummaryField)); } }
+        public string Summary { get { return CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_details, SummaryField)); } }
 
-        public string Description { get { return GetText(Reflect.Cast<TMP_Text>(_details, DescriptionField)); } }
+        public string Description { get { return CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_details, DescriptionField)); } }
 
         public string DescriptionLabel { get { return FindHeaderLabel(Reflect.Cast<TMP_Text>(_details, DescriptionField)); } }
 
-        public string SubscribeLabel { get { return GetText(Reflect.Cast<TMP_Text>(_details, SubscribeTextField)); } }
+        public string SubscribeLabel { get { return CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_details, SubscribeTextField)); } }
 
         public string BackLabel { get { return _backLabel; } }
 
@@ -90,8 +90,8 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<ActionItem> GetVoteActions()
         {
             List<ActionItem> actions = new List<ActionItem>();
-            AddAction(actions, "vote-up", _voteUpLabel, GetText(Reflect.Cast<TMP_Text>(_details, UpVotesField)), () => IsVoteUpSelected, RatePositive);
-            AddAction(actions, "vote-down", _voteDownLabel, GetText(Reflect.Cast<TMP_Text>(_details, DownVotesField)), () => IsVoteDownSelected, RateNegative);
+            AddAction(actions, "vote-up", _voteUpLabel, CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_details, UpVotesField)), () => IsVoteUpSelected, RatePositive);
+            AddAction(actions, "vote-down", _voteDownLabel, CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_details, DownVotesField)), () => IsVoteDownSelected, RateNegative);
             return actions;
         }
 
@@ -118,7 +118,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < nativeTags.Length; i++)
             {
                 TMP_Text[] texts = _tagTexts.Under(nativeTags[i]);
-                string label = GetText(texts.Length > 0 ? texts[0] : null);
+                string label = CommunityMapsText.Of(texts.Length > 0 ? texts[0] : null);
                 if (!string.IsNullOrWhiteSpace(label))
                 {
                     tags.Add(new TagItem(i, label));
@@ -148,17 +148,6 @@ namespace SongsOfConquestAccess.Adapters
 
             _details.Close();
             return true;
-        }
-
-        public string Translate(string key)
-        {
-            TranslationManager manager = CommunityMapsSources.Translations;
-            if (manager == null || string.IsNullOrWhiteSpace(key))
-            {
-                return key ?? string.Empty;
-            }
-
-            return SpokenLines.Clean(manager.Get(key));
         }
 
         public bool Report()
@@ -206,7 +195,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddDetail(List<DetailItem> details, string id, TMP_Text valueText)
         {
-            string value = GetText(valueText);
+            string value = CommunityMapsText.Of(valueText);
             if (string.IsNullOrWhiteSpace(value))
             {
                 return;
@@ -313,37 +302,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                return GetText(child.GetComponentInChildren<TMP_Text>(false)).TrimEnd(':');
-            }
-
-            return string.Empty;
-        }
-
-        private static string FindTopBarText(string transformName)
-        {
-            if (string.IsNullOrWhiteSpace(transformName))
-            {
-                return string.Empty;
-            }
-
-            NavBar navBar = CommunityMapsSources.NavBar;
-            TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
-            if (texts != null)
-            {
-                for (int i = 0; i < texts.Length; i++)
-                {
-                    TMP_Text text = texts[i];
-                    if (text == null || text.transform.parent == null || text.transform.parent.name != transformName)
-                    {
-                        continue;
-                    }
-
-                    string value = GetText(text);
-                    if (!string.IsNullOrWhiteSpace(value))
-                    {
-                        return value;
-                    }
-                }
+                return CommunityMapsText.Of(child.GetComponentInChildren<TMP_Text>(false)).TrimEnd(':');
             }
 
             return string.Empty;
@@ -361,7 +320,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 Transform header = current.Find("Header");
                 TMP_Text headerText = header != null ? header.GetComponentInChildren<TMP_Text>(false) : null;
-                string label = GetText(headerText);
+                string label = CommunityMapsText.Of(headerText);
                 if (!string.IsNullOrWhiteSpace(label))
                 {
                     return label.TrimEnd(':');
@@ -371,13 +330,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Empty;
-        }
-
-        private static string GetText(TMP_Text text)
-        {
-            return text != null && text.gameObject.activeInHierarchy
-                ? SpokenLines.Clean(text.text)
-                : string.Empty;
         }
 
         private static string StripGeneratedSuffix(string name)

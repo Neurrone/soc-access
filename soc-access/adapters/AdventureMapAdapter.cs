@@ -45,7 +45,6 @@ namespace SongsOfConquestAccess.Adapters
 
         private const ushort ObjectiveBeaconBlueprintId = 50;
         private const ushort FallenBeaconBlueprintId = 158;
-        private static readonly ScannerDirection[] NoRoadDirections = new ScannerDirection[0];
         // The names ReactiveAdventureMenuSystem waits under while it shows a story page
         // (RegisterCommandWaiter composes them as "<type name>_<name>").
         private static readonly string MessageTriggerWait =
@@ -818,7 +817,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 1; i < drawPath.Length; i++)
             {
                 PathNode node = drawPath[i];
-                Vector2Int point = ToVector2Int(node);
+                Vector2Int point = WielderPath.ToVector2Int(node);
                 RouteTileInfo tileInfo = preview.GetOrCreate(point);
                 tileInfo.Kind = point == destination
                     ? AdventureMapTile.PathIndicatorKind.Destination
@@ -852,7 +851,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            Vector2Int reachablePoint = ToVector2Int(preview.ReachablePoint);
+            Vector2Int reachablePoint = WielderPath.ToVector2Int(preview.ReachablePoint);
             if (preview.ReachableIndex >= 0
                 && preview.ReachableIndex < drawPath.Length - 1
                 && reachablePoint != preview.Destination)
@@ -873,7 +872,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (i > 0 && nextNumber != number)
                 {
                     PathNode markerNode = nonReachable[i - 1];
-                    preview.GetOrCreate(ToVector2Int(markerNode)).FurthestReachableTurns = Math.Max(2, nextNumber);
+                    preview.GetOrCreate(WielderPath.ToVector2Int(markerNode)).FurthestReachableTurns = Math.Max(2, nextNumber);
                     number = nextNumber;
                 }
             }
@@ -885,7 +884,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (remainingInSegment < 0.5f)
                 {
                     number++;
-                    preview.GetOrCreate(ToVector2Int(previousToFinal)).FurthestReachableTurns = Math.Max(2, number);
+                    preview.GetOrCreate(WielderPath.ToVector2Int(previousToFinal)).FurthestReachableTurns = Math.Max(2, number);
                 }
             }
         }
@@ -914,7 +913,7 @@ namespace SongsOfConquestAccess.Adapters
                 int currentCost = Mathf.FloorToInt(drawPath[i].travelCost);
                 if (currentCost > previousCost)
                 {
-                    preview.GetOrCreate(ToVector2Int(drawPath[i])).CostMark = currentCost;
+                    preview.GetOrCreate(WielderPath.ToVector2Int(drawPath[i])).CostMark = currentCost;
                     previousCost = currentCost;
                 }
             }
@@ -980,7 +979,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            Vector2Int reachable = ToVector2Int(reachablePoint);
+            Vector2Int reachable = WielderPath.ToVector2Int(reachablePoint);
             if (reachable == destination)
             {
                 return true;
@@ -997,11 +996,6 @@ namespace SongsOfConquestAccess.Adapters
                 && _inputManager.Screen.Secondary != null
                 && _inputManager.Screen.Secondary.IsActive
                 && _inputManager.Screen.Secondary.IsHolding;
-        }
-
-        private static Vector2Int ToVector2Int(PathNode node)
-        {
-            return new Vector2Int(node.point.x, node.point.y);
         }
 
         private sealed class RoutePreviewInfo
@@ -3650,7 +3644,7 @@ namespace SongsOfConquestAccess.Adapters
             // road simply carries on nowhere rather than faulting a whole tile announcement.
             if (!IsFogReady())
             {
-                return NoRoadDirections;
+                return RoadConnections.None;
             }
 
             return RoadConnections.Compute(position, tile => IsRoadTile(tile, localTeamId));

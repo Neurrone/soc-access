@@ -32,7 +32,7 @@ namespace SongsOfConquestAccess.Adapters
         public CommunityMapsSearchFilterAdapter(object searchPanel)
         {
             _searchPanel = searchPanel;
-            _title = FindTopBarText("Search & filter");
+            _title = CommunityMapsText.FindTopBar("Search & filter");
         }
 
         public bool IsPresent()
@@ -57,7 +57,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 TMP_InputField field = SearchField;
                 TMP_Text placeholder = field != null ? field.placeholder as TMP_Text : null;
-                return GetText(placeholder);
+                return CommunityMapsText.Of(placeholder);
             }
         }
 
@@ -352,44 +352,7 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetButtonLabel(Button button)
         {
             TMP_Text[] texts = button != null ? ButtonTexts.Under(button.transform) : null;
-            return GetText(texts != null && texts.Length > 0 ? texts[0] : null);
-        }
-
-        private static string GetText(TMP_Text text)
-        {
-            return text != null && text.gameObject.activeInHierarchy
-                ? SpokenLines.Clean(text.text)
-                : string.Empty;
-        }
-
-        private static string FindTopBarText(string transformName)
-        {
-            if (string.IsNullOrWhiteSpace(transformName))
-            {
-                return string.Empty;
-            }
-
-            NavBar navBar = CommunityMapsSources.NavBar;
-            TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
-            if (texts != null)
-            {
-                for (int i = 0; i < texts.Length; i++)
-                {
-                    TMP_Text text = texts[i];
-                    if (text == null || text.transform.parent == null || text.transform.parent.name != transformName)
-                    {
-                        continue;
-                    }
-
-                    string value = GetText(text);
-                    if (!string.IsNullOrWhiteSpace(value))
-                    {
-                        return value;
-                    }
-                }
-            }
-
-            return string.Empty;
+            return CommunityMapsText.Of(texts != null && texts.Length > 0 ? texts[0] : null);
         }
 
         public sealed class CategoryItem

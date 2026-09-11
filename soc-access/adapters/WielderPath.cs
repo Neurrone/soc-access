@@ -154,7 +154,8 @@ namespace SongsOfConquestAccess.Adapters
                 && Mathf.Abs(left.travelCost - right.travelCost) < 0.001f;
         }
 
-        private static Vector2Int ToVector2Int(PathNode node)
+        /// <summary>The tile a path node sits on.</summary>
+        public static Vector2Int ToVector2Int(PathNode node)
         {
             return new Vector2Int(node.point.x, node.point.y);
         }

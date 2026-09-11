@@ -70,16 +70,16 @@ namespace SongsOfConquestAccess.Adapters
         public CommunityMapsHomeAdapter(Home home)
         {
             _home = home;
-            _browseLabel = Translate("Browse");
-            _collectionLabel = Translate("Collection");
-            _featuredLabel = Translate("Featured maps & mods");
-            _searchFilterLabel = FindTopBarText("Search & filter");
-            _moreOptionsLabel = Translate("More options");
-            _subscribeLabel = Translate("Subscribe");
-            _unsubscribeLabel = Translate("Unsubscribe");
-            _loadingLabel = Translate("Loading");
-            _errorLabel = Translate("Error");
-            _downloadsLabel = Translate("Downloads");
+            _browseLabel = CommunityMapsText.Translate("Browse");
+            _collectionLabel = CommunityMapsText.Translate("Collection");
+            _featuredLabel = CommunityMapsText.Translate("Featured maps & mods");
+            _searchFilterLabel = CommunityMapsText.FindTopBar("Search & filter");
+            _moreOptionsLabel = CommunityMapsText.Translate("More options");
+            _subscribeLabel = CommunityMapsText.Translate("Subscribe");
+            _unsubscribeLabel = CommunityMapsText.Translate("Unsubscribe");
+            _loadingLabel = CommunityMapsText.Translate("Loading");
+            _errorLabel = CommunityMapsText.Translate("Error");
+            _downloadsLabel = CommunityMapsText.Translate("Downloads");
         }
 
         public bool IsPresent()
@@ -143,14 +143,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public string FeaturedName
         {
-            get { return GetText(Reflect.Cast<TMP_Text>(_home, FeaturedNameField)); }
+            get { return CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_home, FeaturedNameField)); }
         }
 
         public string FeaturedSubscribeLabel
         {
             get
             {
-                string text = GetText(Reflect.Cast<TMP_Text>(_home, FeaturedSubscribeTextField));
+                string text = CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_home, FeaturedSubscribeTextField));
                 return !string.IsNullOrWhiteSpace(text) ? text : _subscribeLabel;
             }
         }
@@ -468,18 +468,6 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        public string Translate(string key)
-        {
-            TranslationManager manager = CommunityMapsSources.Translations;
-            if (manager == null || string.IsNullOrWhiteSpace(key))
-            {
-                return key ?? string.Empty;
-            }
-
-            string translated = manager.Get(key);
-            return SpokenLines.Clean(translated);
-        }
-
         private bool PageFeatured(bool right)
         {
             if (_home == null || PageFeaturedRowMethod == null)
@@ -554,7 +542,7 @@ namespace SongsOfConquestAccess.Adapters
             TMP_Text kept;
             if (row != null && _rowLabelTexts.TryGetValue(row, out kept))
             {
-                return kept != null ? GetText(kept) : string.Empty;
+                return kept != null ? CommunityMapsText.Of(kept) : string.Empty;
             }
 
             TMP_Text found = FindRowLabelText(row);
@@ -563,7 +551,7 @@ namespace SongsOfConquestAccess.Adapters
                 _rowLabelTexts[row] = found;
             }
 
-            return found != null ? GetText(found) : string.Empty;
+            return found != null ? CommunityMapsText.Of(found) : string.Empty;
         }
 
         private static TMP_Text FindRowLabelText(ModListRow row)
@@ -589,7 +577,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                if (!string.IsNullOrWhiteSpace(GetText(text)))
+                if (!string.IsNullOrWhiteSpace(CommunityMapsText.Of(text)))
                 {
                     return text;
                 }
@@ -614,7 +602,7 @@ namespace SongsOfConquestAccess.Adapters
                 TMP_Text[] siblingTexts = sibling.GetComponentsInChildren<TMP_Text>(false);
                 for (int textIndex = 0; textIndex < siblingTexts.Length; textIndex++)
                 {
-                    if (!string.IsNullOrWhiteSpace(GetText(siblingTexts[textIndex])))
+                    if (!string.IsNullOrWhiteSpace(CommunityMapsText.Of(siblingTexts[textIndex])))
                     {
                         return siblingTexts[textIndex];
                     }
@@ -642,7 +630,7 @@ namespace SongsOfConquestAccess.Adapters
                             continue;
                         }
 
-                        if (!string.IsNullOrWhiteSpace(GetText(text)))
+                        if (!string.IsNullOrWhiteSpace(CommunityMapsText.Of(text)))
                         {
                             return text;
                         }
@@ -655,36 +643,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return null;
-        }
-
-        private static string FindTopBarText(string transformName)
-        {
-            if (string.IsNullOrWhiteSpace(transformName))
-            {
-                return string.Empty;
-            }
-
-            NavBar navBar = CommunityMapsSources.NavBar;
-            TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
-            if (texts != null)
-            {
-                for (int i = 0; i < texts.Length; i++)
-                {
-                    TMP_Text text = texts[i];
-                    if (text == null || text.transform.parent == null || text.transform.parent.name != transformName)
-                    {
-                        continue;
-                    }
-
-                    string value = GetText(text);
-                    if (!string.IsNullOrWhiteSpace(value))
-                    {
-                        return value;
-                    }
-                }
-            }
-
-            return string.Empty;
         }
 
         private string GetRowStatus(ModListRow row)
@@ -707,7 +665,7 @@ namespace SongsOfConquestAccess.Adapters
         private string GetItemLabel(ListItem item)
         {
             TMP_Text title = Reflect.Cast<TMP_Text>(item, "title");
-            return GetText(title);
+            return CommunityMapsText.Of(title);
         }
 
         private string GetProgressText(ListItem item)
@@ -719,7 +677,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             TMP_Text text = Reflect.Cast<TMP_Text>(progressTab, "progressBarText");
-            return GetText(text);
+            return CommunityMapsText.Of(text);
         }
 
         private void ScrollIntoView(RectTransform source)
@@ -736,15 +694,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             ScrollRect scrollRect = HomeScrollRectField != null ? HomeScrollRectField.GetValue(_home) as ScrollRect : null;
-            if (scrollRect == null || scrollRect.content == null)
-            {
-                return;
-            }
-
-            RectTransform viewport = scrollRect.viewport != null
-                ? scrollRect.viewport
-                : ((Component)scrollRect).GetComponent<RectTransform>();
-            if (viewport == null)
+            if (scrollRect == null)
             {
                 return;
             }
@@ -754,31 +704,7 @@ namespace SongsOfConquestAccess.Adapters
                 _lastScrolledItem = item;
             }
 
-            Canvas.ForceUpdateCanvases();
-
-            Bounds itemBounds = RectTransformUtility.CalculateRelativeRectTransformBounds(viewport, source);
-            Rect viewportRect = viewport.rect;
-            float scrollableHeight = scrollRect.content.rect.height - viewportRect.height;
-            if (scrollableHeight <= 0f)
-            {
-                return;
-            }
-
-            float normalized = scrollRect.verticalNormalizedPosition;
-            if (itemBounds.max.y > viewportRect.max.y)
-            {
-                normalized += (itemBounds.max.y - viewportRect.max.y) / scrollableHeight;
-            }
-            else if (itemBounds.min.y < viewportRect.min.y)
-            {
-                normalized -= (viewportRect.min.y - itemBounds.min.y) / scrollableHeight;
-            }
-            else
-            {
-                return;
-            }
-
-            scrollRect.verticalNormalizedPosition = Mathf.Clamp01(normalized);
+            ScrollView.Reveal(scrollRect, source);
         }
 
         private static bool SelectViaModIoNavigation(Selectable selectable)
@@ -874,13 +800,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return field;
-        }
-
-        private static string GetText(TMP_Text text)
-        {
-            return text != null && text.gameObject.activeInHierarchy
-                ? SpokenLines.Clean(text.text)
-                : string.Empty;
         }
 
         private static bool InvokeStaticBool(string typeName, string methodName)

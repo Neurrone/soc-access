@@ -99,7 +99,7 @@ namespace SongsOfConquestAccess.Adapters
             _labelsRead = true;
             // The summary is one of the panel's texts, so the snapshot below is taken again with it.
             _snapshotTaken = false;
-            _backLabel = FindTopBarText("Back / Exit");
+            _backLabel = CommunityMapsText.FindTopBar("Back / Exit");
             if (string.IsNullOrWhiteSpace(_backLabel))
             {
                 _backLabel = ModText.Get(ModStrings.Screens.Back);
@@ -260,7 +260,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 TMP_Text title = Reflect.Typed<TMP_Text>(component, "title");
-                if (string.IsNullOrWhiteSpace(GetText(title)))
+                if (string.IsNullOrWhiteSpace(CommunityMapsText.Of(title)))
                 {
                     continue;
                 }
@@ -380,8 +380,8 @@ namespace SongsOfConquestAccess.Adapters
             if (endOfResults != null && endOfResults.activeInHierarchy)
             {
                 List<string> lines = new List<string>();
-                AddIfNotEmpty(lines, GetText(Reflect.Cast<TMP_Text>(_results, EndOfResultsHeaderField)));
-                AddIfNotEmpty(lines, GetText(Reflect.Cast<TMP_Text>(_results, EndOfResultsTextField)));
+                AddIfNotEmpty(lines, CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_results, EndOfResultsHeaderField)));
+                AddIfNotEmpty(lines, CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_results, EndOfResultsTextField)));
                 return string.Join("\n", lines.ToArray());
             }
 
@@ -397,9 +397,9 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             List<string> parts = new List<string>();
-            AddIfNotEmpty(parts, GetCategoryLabel(GetText(Reflect.Cast<TMP_Text>(_results, MainTagCategoryNameField))));
-            AddIfNotEmpty(parts, GetTagLabel(GetText(Reflect.Cast<TMP_Text>(_results, MainTagNameField))));
-            AddIfNotEmpty(parts, GetText(Reflect.Cast<TMP_Text>(_results, OtherTagsTextField)));
+            AddIfNotEmpty(parts, GetCategoryLabel(CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_results, MainTagCategoryNameField))));
+            AddIfNotEmpty(parts, GetTagLabel(CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_results, MainTagNameField))));
+            AddIfNotEmpty(parts, CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_results, OtherTagsTextField)));
             return string.Join(" ", parts.ToArray());
         }
 
@@ -407,7 +407,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             GameObject phrase = Reflect.Cast<GameObject>(_results, SearchPhraseField);
             return phrase != null && phrase.activeInHierarchy
-                ? GetText(Reflect.Cast<TMP_Text>(_results, SearchPhraseTextField))
+                ? CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_results, SearchPhraseTextField))
                 : string.Empty;
         }
 
@@ -423,7 +423,7 @@ namespace SongsOfConquestAccess.Adapters
             TMP_Text text = overlay != null && OverlaySubscribeTextField != null
                 ? OverlaySubscribeTextField.GetValue(overlay) as TMP_Text
                 : null;
-            return GetText(text);
+            return CommunityMapsText.Of(text);
         }
 
         // Under EnsureOverlay, which re-reads only when the overlay card or the row it
@@ -497,7 +497,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string value = GetText(text);
+                string value = CommunityMapsText.Of(text);
                 if (!string.IsNullOrWhiteSpace(value) && text.fontSize >= 30f)
                 {
                     return value;
@@ -553,7 +553,7 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetSelectableLabel(Selectable selectable)
         {
             TMP_Text text = selectable != null ? selectable.GetComponentInChildren<TMP_Text>(false) : null;
-            return GetText(text);
+            return CommunityMapsText.Of(text);
         }
 
         // Under EnsureOverlay, which re-reads only when the overlay card or the row it
@@ -561,7 +561,7 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetButtonLabel(Button button)
         {
             TMP_Text text = button != null ? button.GetComponentInChildren<TMP_Text>(false) : null;
-            return GetText(text);
+            return CommunityMapsText.Of(text);
         }
 
         // Under EnsureSnapshot as well, for the footer the browser draws under the results.
@@ -576,17 +576,10 @@ namespace SongsOfConquestAccess.Adapters
             TMP_Text[] texts = parent.GetComponentsInChildren<TMP_Text>(false);
             for (int i = 0; i < texts.Length; i++)
             {
-                AddIfNotEmpty(lines, GetText(texts[i]));
+                AddIfNotEmpty(lines, CommunityMapsText.Of(texts[i]));
             }
 
             return string.Join("\n", lines.ToArray());
-        }
-
-        private static string GetText(TMP_Text text)
-        {
-            return text != null && text.gameObject.activeInHierarchy
-                ? SpokenLines.Clean(text.text)
-                : string.Empty;
         }
 
         private static string GetCategoryLabel(string categoryName)
@@ -609,36 +602,6 @@ namespace SongsOfConquestAccess.Adapters
 
             string key = "ModBrowser/Tag/" + tagName.Replace(" ", string.Empty);
             return GameText.Get(key, tagName);
-        }
-
-        private static string FindTopBarText(string transformName)
-        {
-            if (string.IsNullOrWhiteSpace(transformName))
-            {
-                return string.Empty;
-            }
-
-            NavBar navBar = CommunityMapsSources.NavBar;
-            TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
-            if (texts != null)
-            {
-                for (int i = 0; i < texts.Length; i++)
-                {
-                    TMP_Text text = texts[i];
-                    if (text == null || text.transform.parent == null || text.transform.parent.name != transformName)
-                    {
-                        continue;
-                    }
-
-                    string value = GetText(text);
-                    if (!string.IsNullOrWhiteSpace(value))
-                    {
-                        return value;
-                    }
-                }
-            }
-
-            return string.Empty;
         }
 
         private static void AddIfNotEmpty(List<string> parts, string value)
@@ -757,13 +720,13 @@ namespace SongsOfConquestAccess.Adapters
                 Transform textLayout = dropdown.transform.Find("Text Layout");
                 Transform labelTransform = textLayout != null ? textLayout.Find("Sort by:") : null;
                 TMP_Text label = labelTransform != null ? labelTransform.GetComponent<TMP_Text>() : null;
-                string value = GetText(label);
+                string value = CommunityMapsText.Of(label);
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     return value;
                 }
 
-                return GetText(dropdown.captionText);
+                return CommunityMapsText.Of(dropdown.captionText);
             }
         }
 
@@ -789,7 +752,7 @@ namespace SongsOfConquestAccess.Adapters
             /// pooled row's text without the walk being made again.</summary>
             public string Label
             {
-                get { return GetText(_title); }
+                get { return CommunityMapsText.Of(_title); }
             }
 
             public Component NativeComponent { get; private set; }

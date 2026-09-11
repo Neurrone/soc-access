@@ -289,45 +289,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            ScrollRect scrollRect = GetSettingsField<ScrollRect>("ContentParentScrollRect");
-            if (scrollRect == null || scrollRect.content == null)
-            {
-                return;
-            }
-
-            RectTransform viewport = scrollRect.viewport != null
-                ? scrollRect.viewport
-                : ((Component)scrollRect).GetComponent<RectTransform>();
-            if (viewport == null)
-            {
-                return;
-            }
-
-            Canvas.ForceUpdateCanvases();
-
-            Bounds itemBounds = RectTransformUtility.CalculateRelativeRectTransformBounds(viewport, item.SourceTransform);
-            Rect viewportRect = viewport.rect;
-            float scrollableHeight = scrollRect.content.rect.height - viewportRect.height;
-            if (scrollableHeight <= 0f)
-            {
-                return;
-            }
-
-            float normalized = scrollRect.verticalNormalizedPosition;
-            if (itemBounds.max.y > viewportRect.max.y)
-            {
-                normalized += (itemBounds.max.y - viewportRect.max.y) / scrollableHeight;
-            }
-            else if (itemBounds.min.y < viewportRect.min.y)
-            {
-                normalized -= (viewportRect.min.y - itemBounds.min.y) / scrollableHeight;
-            }
-            else
-            {
-                return;
-            }
-
-            scrollRect.verticalNormalizedPosition = Mathf.Clamp01(normalized);
+            ScrollView.Reveal(GetSettingsField<ScrollRect>("ContentParentScrollRect"), item.SourceTransform);
         }
 
         public bool IsTutorialSettingsVisible()

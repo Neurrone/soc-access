@@ -46,12 +46,12 @@ namespace SongsOfConquestAccess.Adapters
         public CommunityMapsCollectionAdapter(Collection collection)
         {
             _collection = collection;
-            _browseLabel = Translate("Browse");
-            _collectionLabel = Translate("Collection");
-            _searchFilterLabel = FindTopBarText("Search & filter");
-            _downloadsLabel = Translate("Downloads");
-            _moreOptionsLabel = Translate("More options");
-            _unsubscribeLabel = Translate("Unsubscribe");
+            _browseLabel = CommunityMapsText.Translate("Browse");
+            _collectionLabel = CommunityMapsText.Translate("Collection");
+            _searchFilterLabel = CommunityMapsText.FindTopBar("Search & filter");
+            _downloadsLabel = CommunityMapsText.Translate("Downloads");
+            _moreOptionsLabel = CommunityMapsText.Translate("More options");
+            _unsubscribeLabel = CommunityMapsText.Translate("Unsubscribe");
         }
 
         public bool IsPresent()
@@ -66,7 +66,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string title = GetText(Reflect.Cast<TMP_Text>(_collection, TitleField));
+                string title = CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_collection, TitleField));
                 return !string.IsNullOrWhiteSpace(title) ? title : _collectionLabel;
             }
         }
@@ -111,7 +111,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 TMP_InputField field = SearchField;
                 TMP_Text placeholder = field != null ? field.placeholder as TMP_Text : null;
-                string label = GetText(placeholder);
+                string label = CommunityMapsText.Of(placeholder);
                 return !string.IsNullOrWhiteSpace(label) ? label : string.Empty;
             }
         }
@@ -123,7 +123,7 @@ namespace SongsOfConquestAccess.Adapters
                 Button button = Reflect.Cast<Button>(_collection, CheckForUpdatesButtonField);
                 return new ButtonAction(
                     "check-updates",
-                    GetText(Reflect.Cast<TMP_Text>(_collection, CheckForUpdatesTextField)),
+                    CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_collection, CheckForUpdatesTextField)),
                     FocusCheckForUpdates,
                     CheckForUpdates,
                     () => button != null && button.gameObject.activeInHierarchy && button.interactable,
@@ -412,19 +412,19 @@ namespace SongsOfConquestAccess.Adapters
 
         private CollectionItem BuildCollectionItem(int index, ListItem item)
         {
-            string title = GetText(Reflect.Cast<TMP_Text>(item, "title"));
+            string title = CommunityMapsText.Of(Reflect.Cast<TMP_Text>(item, "title"));
             if (string.IsNullOrWhiteSpace(title))
             {
                 return null;
             }
 
             List<string> statusParts = new List<string>();
-            AddIfNotEmpty(statusParts, GetText(Reflect.Cast<TMP_Text>(item, "subscriptionStatus")));
-            AddIfNotEmpty(statusParts, GetText(Reflect.Cast<TMP_Text>(item, "installStatus")));
-            AddIfNotEmpty(statusParts, GetText(Reflect.Cast<TMP_Text>(item, "errorInstallingText")));
+            AddIfNotEmpty(statusParts, CommunityMapsText.Of(Reflect.Cast<TMP_Text>(item, "subscriptionStatus")));
+            AddIfNotEmpty(statusParts, CommunityMapsText.Of(Reflect.Cast<TMP_Text>(item, "installStatus")));
+            AddIfNotEmpty(statusParts, CommunityMapsText.Of(Reflect.Cast<TMP_Text>(item, "errorInstallingText")));
             AddProgress(statusParts, item);
-            AddIfNotEmpty(statusParts, GetText(Reflect.Cast<TMP_Text>(item, "fileSize")));
-            AddIfNotEmpty(statusParts, GetText(Reflect.Cast<TMP_Text>(item, "otherSubscribersText")));
+            AddIfNotEmpty(statusParts, CommunityMapsText.Of(Reflect.Cast<TMP_Text>(item, "fileSize")));
+            AddIfNotEmpty(statusParts, CommunityMapsText.Of(Reflect.Cast<TMP_Text>(item, "otherSubscribersText")));
 
             return new CollectionItem(
                 index,
@@ -444,8 +444,8 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            string text = GetText(Reflect.Cast<TMP_Text>(item, "progressBarText"));
-            string percent = GetText(Reflect.Cast<TMP_Text>(item, "progressBarPercentageText"));
+            string text = CommunityMapsText.Of(Reflect.Cast<TMP_Text>(item, "progressBarText"));
+            string percent = CommunityMapsText.Of(Reflect.Cast<TMP_Text>(item, "progressBarPercentageText"));
             if (string.IsNullOrWhiteSpace(text))
             {
                 AddIfNotEmpty(parts, percent);
@@ -522,7 +522,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            string caption = GetText(dropdown.captionText);
+            string caption = CommunityMapsText.Of(dropdown.captionText);
             TMP_Text[] texts = dropdown.GetComponentsInChildren<TMP_Text>(false);
             for (int i = 0; i < texts.Length; i++)
             {
@@ -532,7 +532,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string value = GetText(text);
+                string value = CommunityMapsText.Of(text);
                 if (!string.IsNullOrWhiteSpace(value) && value != caption)
                 {
                     return value;
@@ -540,54 +540,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return caption;
-        }
-
-        private static string FindTopBarText(string transformName)
-        {
-            if (string.IsNullOrWhiteSpace(transformName))
-            {
-                return string.Empty;
-            }
-
-            NavBar navBar = CommunityMapsSources.NavBar;
-            TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
-            if (texts != null)
-            {
-                for (int i = 0; i < texts.Length; i++)
-                {
-                    TMP_Text text = texts[i];
-                    if (text == null || text.transform.parent == null || text.transform.parent.name != transformName)
-                    {
-                        continue;
-                    }
-
-                    string value = GetText(text);
-                    if (!string.IsNullOrWhiteSpace(value))
-                    {
-                        return value;
-                    }
-                }
-            }
-
-            return string.Empty;
-        }
-
-        private static string Translate(string key)
-        {
-            TranslationManager manager = CommunityMapsSources.Translations;
-            if (manager == null || string.IsNullOrWhiteSpace(key))
-            {
-                return key ?? string.Empty;
-            }
-
-            return SpokenLines.Clean(manager.Get(key));
-        }
-
-        private static string GetText(TMP_Text text)
-        {
-            return text != null && text.gameObject.activeInHierarchy
-                ? SpokenLines.Clean(text.text)
-                : string.Empty;
         }
 
         private static bool SelectViaModIoNavigation(Selectable selectable)

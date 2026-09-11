@@ -104,7 +104,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 ScannerDirection direction;
                 if (!ScannerDirectionUtility.TryGetStepDirection(
-                    ToVector2Int(path[i]) - ToVector2Int(path[i - 1]),
+                    WielderPath.ToVector2Int(path[i]) - WielderPath.ToVector2Int(path[i - 1]),
                     out direction))
                 {
                     continue;
@@ -318,11 +318,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 turns.Add(new WielderRouteTurn(travelTurns, cost));
             }
-        }
-
-        private static Vector2Int ToVector2Int(PathNode node)
-        {
-            return new Vector2Int(node.point.x, node.point.y);
         }
     }
 
