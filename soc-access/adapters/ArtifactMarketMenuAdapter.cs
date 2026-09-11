@@ -79,9 +79,9 @@ namespace SongsOfConquestAccess.Adapters
         // key is read off the game every frame (the wielder the panel is showing, the pooled cells,
         // and what is in each of them), so a sale, a purchase, a move and an auto-arrange all
         // rebuild with nothing having to say so (AGENTS.md, Screen Resolution).
-        private readonly SlotSnapshot _equipment = new SlotSnapshot();
+        private readonly SlotSnapshot<InventorySlotInfo> _equipment = new SlotSnapshot<InventorySlotInfo>();
 
-        private readonly SlotSnapshot _backpack = new SlotSnapshot();
+        private readonly SlotSnapshot<InventorySlotInfo> _backpack = new SlotSnapshot<InventorySlotInfo>();
 
         // The nine rows the game writes for a mouse. They are the same for every slot and for the
         // menu's whole life, so they are looked up once instead of nine times a slot a frame.

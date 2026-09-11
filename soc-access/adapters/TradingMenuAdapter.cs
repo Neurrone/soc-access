@@ -230,9 +230,9 @@ namespace SongsOfConquestAccess.Adapters
             // and what is in each of them), so a move, an auto-arrange, a trade across the menu and
             // a menu reopened over other wielders all rebuild with nothing having to say so
             // (AGENTS.md, Screen Resolution).
-            private readonly SlotSnapshot _equipment = new SlotSnapshot();
+            private readonly SlotSnapshot<InventorySlotInfo> _equipment = new SlotSnapshot<InventorySlotInfo>();
 
-            private readonly SlotSnapshot _backpack = new SlotSnapshot();
+            private readonly SlotSnapshot<InventorySlotInfo> _backpack = new SlotSnapshot<InventorySlotInfo>();
 
             private readonly TradingMenuAdapter _owner;
             private readonly bool _left;

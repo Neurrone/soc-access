@@ -82,9 +82,9 @@ namespace SongsOfConquestAccess.Adapters
         // key is read off the game every frame (the wielder the sheet shows, the HUD, the pooled
         // cells and what is in each of them), so an equip, an unequip, a move and an auto-arrange
         // all rebuild with nothing having to say so (AGENTS.md, Screen Resolution).
-        private readonly SlotSnapshot _equipment = new SlotSnapshot();
+        private readonly SlotSnapshot<InventorySlotInfo> _equipment = new SlotSnapshot<InventorySlotInfo>();
 
-        private readonly SlotSnapshot _backpack = new SlotSnapshot();
+        private readonly SlotSnapshot<InventorySlotInfo> _backpack = new SlotSnapshot<InventorySlotInfo>();
 
         // The three bands whose rows are COMPOSED rather than read: the wielder's skills, their
         // powers and their specializations. Each row costs a localization lookup, a tooltip over the
@@ -92,11 +92,11 @@ namespace SongsOfConquestAccess.Adapters
         // the wielder does or a skill goes up, and both of those are in the key. The stats band is
         // not here because its key would cost what the band does, and the modifier band is not
         // because its rows ARE the game's own text, read live off the showing tab.
-        private readonly BandMemo _skillRows = new BandMemo();
+        private readonly SlotSnapshot<LabeledItem> _skillRows = new SlotSnapshot<LabeledItem>();
 
-        private readonly BandMemo _powerRows = new BandMemo();
+        private readonly SlotSnapshot<LabeledItem> _powerRows = new SlotSnapshot<LabeledItem>();
 
-        private readonly BandMemo _specializationRows = new BandMemo();
+        private readonly SlotSnapshot<LabeledItem> _specializationRows = new SlotSnapshot<LabeledItem>();
 
         private readonly CommanderSheet _sheet;
         private readonly IClientAdventureFacade _facade;
@@ -130,55 +130,6 @@ namespace SongsOfConquestAccess.Adapters
             _factionLookup = GetField<IFactionLookup>(_specialization, FactionLookupField);
             _statsInfo = GetField<CommanderStatsInfo>(_specialization, StatsInfoField);
             _modifierTabs = GetField<CommanderSheetModifierTabNavigation>(sheet, ModifierTabsField);
-        }
-
-        /// <summary>One band's rows and the key they were built from - the same bargain
-        /// <see cref="SlotSnapshot"/> makes for the artifact lists, over the rows of a band. The
-        /// caller writes this frame's numbers into <see cref="BeginKey"/> and asks
-        /// <see cref="Unchanged"/> whether what it built last time still describes the game.</summary>
-        private sealed class BandMemo
-        {
-            private readonly List<int> _key = new List<int>();
-
-            private readonly List<int> _read = new List<int>();
-
-            private IReadOnlyList<LabeledItem> _rows;
-
-            /// <summary>The list this frame's key is written into, emptied for the caller.</summary>
-            public List<int> BeginKey()
-            {
-                _read.Clear();
-                return _read;
-            }
-
-            /// <summary>The rows built for the key just read, or null where the game has moved since.
-            /// </summary>
-            public IReadOnlyList<LabeledItem> Unchanged()
-            {
-                if (_rows == null || _key.Count != _read.Count)
-                {
-                    return null;
-                }
-
-                for (int i = 0; i < _key.Count; i++)
-                {
-                    if (_key[i] != _read[i])
-                    {
-                        return null;
-                    }
-                }
-
-                return _rows;
-            }
-
-            /// <summary>Hold these rows for the key just read, and answer with them.</summary>
-            public IReadOnlyList<LabeledItem> Keep(List<LabeledItem> rows)
-            {
-                _key.Clear();
-                _key.AddRange(_read);
-                _rows = rows;
-                return rows;
-            }
         }
 
         public object SourceKey
@@ -450,7 +401,7 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<LabeledItem> GetSkills(bool powers)
         {
             ICommanderState commander = GetCommander();
-            BandMemo memo = powers ? _powerRows : _skillRows;
+            SlotSnapshot<LabeledItem> memo = powers ? _powerRows : _skillRows;
             List<int> key = memo.BeginKey();
             key.Add(CommanderId);
             IList<SkillReference> held = commander != null ? commander.Skills as IList<SkillReference> : null;

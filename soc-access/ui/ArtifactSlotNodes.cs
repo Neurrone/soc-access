@@ -57,7 +57,7 @@ namespace SongsOfConquestAccess.UI
         /// hints; every one of them reads the game when it is READ, so rebuilding them for a column
         /// whose slots have not moved bought nothing but the allocation. The adapter already answers
         /// with the same list while the game's own inventory is unchanged
-        /// (<see cref="SlotSnapshot"/>), so that list's identity is the key - plus, for the equipment,
+        /// (<see cref="SlotSnapshot{T}"/>), so that list's identity is the key - plus, for the equipment,
         /// the two-hander answer, because it decides whether the two hands are one node or two.
         ///
         /// On a hit the contributor re-adds the same declarations: the context, the row and the
