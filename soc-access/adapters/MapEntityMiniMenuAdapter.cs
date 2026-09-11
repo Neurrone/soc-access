@@ -155,14 +155,33 @@ namespace SongsOfConquestAccess.Adapters
                 && facade.Commands.CanEjectCommander(entity.Id).success;
         }
 
-        public string UpgradeSummary
+        /// <summary>The game's own caption for the row of upgrade slots.</summary>
+        public string UpgradeCaption
+        {
+            get { return SpokenText.Get(Localization, "Adventure/MapEntityHUD/Upgrades", "Tier:"); }
+        }
+
+        /// <summary>How many of the entity's upgrade tiers the game has drawn as built.</summary>
+        public int UpgradeTiersBuilt
         {
             get
             {
                 int used;
                 int total;
                 GetUpgradeCounts(out used, out total);
-                return SpokenText.Get(Localization, "Adventure/MapEntityHUD/Upgrades", "Tier:") + " " + used + " / " + total;
+                return used;
+            }
+        }
+
+        /// <summary>How many upgrade tiers the entity has slots for.</summary>
+        public int UpgradeTiersTotal
+        {
+            get
+            {
+                int used;
+                int total;
+                GetUpgradeCounts(out used, out total);
+                return total;
             }
         }
 

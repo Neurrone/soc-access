@@ -354,17 +354,30 @@ namespace SongsOfConquestAccess.Screens
         {
             AdventurePlayerMenuAdapter.PlayerItem it = player;
             ResourceType lead = ResourceSummaryOrder[0];
-            NodeVtable vtable = GraphNodes.Text(() => it.GetResourceLabel(lead));
+            NodeVtable vtable = GraphNodes.Text(() => ResourceLabel(it, lead));
             for (int i = 1; i < ResourceSummaryOrder.Length; i++)
             {
                 ResourceType type = ResourceSummaryOrder[i];
-                vtable.Announcements.Add(GraphNodes.ValuePart(() => it.GetResourceLabel(type), watch: false));
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => ResourceLabel(it, type), watch: false));
             }
 
             vtable.OnFocusVisual = () => it.FocusResource(lead);
             builder.AddItem(new SyntheticNode(
                 ControlId.Structural("adventure-players:resources/" + it.TeamId),
                 vtable));
+        }
+
+        /// <summary>One entry of an ally's treasury band: the resource's name, what the band draws
+        /// beside it and the income it draws under it. Said the same way as the kingdom HUD's own
+        /// strip, which is why the wording is shared.</summary>
+        private static string ResourceLabel(
+            AdventurePlayerMenuAdapter.PlayerItem player,
+            ResourceType resource)
+        {
+            return ResourceStrip.Label(
+                player.GetResourceName(resource),
+                player.GetResourceAmountSpoken(resource),
+                player.GetResourceIncomeSpoken(resource));
         }
 
         // ---- the close ----

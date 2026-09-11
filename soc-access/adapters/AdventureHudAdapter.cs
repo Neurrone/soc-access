@@ -194,38 +194,47 @@ namespace SongsOfConquestAccess.Adapters
             return IsSelectionHudVisible() && GameObjects.IsLive(GetExperienceBar());
         }
 
-        public string ExperienceLabel
+        /// <summary>The game's own caption for experience.</summary>
+        public string ExperienceCaption
         {
-            get
+            get { return Localize("Commanders/Tooltip/Experience", "Experience"); }
+        }
+
+        /// <summary>The game's own caption for a wielder's level.</summary>
+        public string LevelCaption
+        {
+            get { return Localize("Commanders/Tooltip/Level", "Level"); }
+        }
+
+        /// <summary>
+        /// The level the selected wielder is on, the experience it has and the experience the next
+        /// level asks for. False where no wielder is selected, which is the whole of "there is
+        /// nothing to count".
+        /// </summary>
+        public bool TryGetExperience(out int level, out int current, out int nextLevelExperience)
+        {
+            level = 0;
+            current = 0;
+            nextLevelExperience = 0;
+            CommanderHUDPortrait portrait = CommanderSettings != null ? CommanderSettings.Portrait : null;
+            ICommanderState commander = portrait != null ? portrait.Commander : null;
+            if (commander == null || commander.Stats == null)
             {
-                CommanderHUDPortrait portrait = CommanderSettings != null ? CommanderSettings.Portrait : null;
-                ICommanderState commander = portrait != null ? portrait.Commander : null;
-                if (commander == null || commander.Stats == null)
-                {
-                    return Localize("Commanders/Tooltip/Experience", "Experience");
-                }
-
-                int level = commander.GetLevel();
-                string levelText = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GetExperienceBar(), ExperienceBarLevelTextField));
-                int parsedLevel;
-                if (!string.IsNullOrWhiteSpace(levelText) && int.TryParse(levelText, out parsedLevel))
-                {
-                    level = parsedLevel;
-                }
-
-                int current = commander.Stats.Experience;
-                int nextLevelExperience = CommanderLevelUtility.GetExperienceForLevel(level + 1);
-                string levelLabel = Localize("Commanders/Tooltip/Level", "Level");
-                return Localize("Commanders/Tooltip/Experience", "Experience")
-                    + ", "
-                    + levelLabel
-                    + " "
-                    + level
-                    + ", "
-                    + current
-                    + " / "
-                    + nextLevelExperience;
+                return false;
             }
+
+            level = commander.GetLevel();
+            // The bar's own level text wins where it says anything: it is what the player can see.
+            string levelText = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GetExperienceBar(), ExperienceBarLevelTextField));
+            int parsedLevel;
+            if (!string.IsNullOrWhiteSpace(levelText) && int.TryParse(levelText, out parsedLevel))
+            {
+                level = parsedLevel;
+            }
+
+            current = commander.Stats.Experience;
+            nextLevelExperience = CommanderLevelUtility.GetExperienceForLevel(level + 1);
+            return true;
         }
 
         public void FocusExperience()
@@ -453,17 +462,20 @@ namespace SongsOfConquestAccess.Adapters
                 && settings.Container.activeInHierarchy;
         }
 
-        public string GetResourceLabel(ResourceType resourceType)
+        /// <summary>The amount the strip draws beside a resource, empty where it draws none.</summary>
+        public string GetResourceAmountText(ResourceType resourceType)
         {
             ResourceHUD.ResourceEntry entry = GetResourceEntry(resourceType);
-            string name = GetResourceName(resourceType);
-            string amount = UITextMeshTextUtility.Spoken(entry != null ? entry.AmountText : null);
-            string income = entry != null && GameObjects.IsLive(entry.IncomeText)
+            return UITextMeshTextUtility.Spoken(entry != null ? entry.AmountText : null);
+        }
+
+        /// <summary>The income the strip draws under a resource, empty where it draws none.</summary>
+        public string GetResourceIncomeText(ResourceType resourceType)
+        {
+            ResourceHUD.ResourceEntry entry = GetResourceEntry(resourceType);
+            return entry != null && GameObjects.IsLive(entry.IncomeText)
                 ? UITextMeshTextUtility.Spoken(entry.IncomeText)
                 : string.Empty;
-
-            string label = string.IsNullOrWhiteSpace(amount) ? name : name + " " + amount;
-            return string.IsNullOrWhiteSpace(income) ? label : label + ", " + income;
         }
 
         public int GetResourceAmount(ResourceType resourceType)
@@ -508,72 +520,69 @@ namespace SongsOfConquestAccess.Adapters
             return GetObjectiveSnapshot(index) != null;
         }
 
-        public string GetObjectiveLabel(int index)
+        /// <summary>What the objectives panel draws this entry as, empty where it draws nothing.
+        /// </summary>
+        public string GetObjectiveText(int index)
         {
             ObjectiveEntrySnapshot snapshot = GetObjectiveSnapshot(index);
-            if (snapshot == null)
-            {
-                return string.Empty;
-            }
-
-            string label = UITextMeshTextUtility.Spoken(snapshot.Text);
-            if (string.IsNullOrWhiteSpace(label))
-            {
-                return string.Empty;
-            }
-
-            List<string> parts = new List<string>();
-            if (snapshot.IsLoseCondition)
-            {
-                parts.Add(ModText.Get(ModStrings.Screens.LoseCondition));
-            }
-            else
-            {
-                parts.Add(ModText.Get(snapshot.IsComplete ? ModStrings.Screens.ObjectiveCompleted : ModStrings.Screens.ObjectiveIncomplete));
-                if (!snapshot.CanBeCompleted)
-                {
-                    parts.Add(ModText.Get(ModStrings.Screens.ObjectiveCannotBeCompleted));
-                }
-            }
-            parts.Add(label);
-            AddObjectiveMarkerDetails(parts, snapshot);
-            return string.Join(", ", parts.ToArray());
+            return snapshot != null ? UITextMeshTextUtility.Spoken(snapshot.Text) : string.Empty;
         }
 
-        private void AddObjectiveMarkerDetails(List<string> parts, ObjectiveEntrySnapshot snapshot)
+        /// <summary>Whether this entry is a lose condition rather than something to achieve.</summary>
+        public bool IsObjectiveLoseCondition(int index)
         {
+            ObjectiveEntrySnapshot snapshot = GetObjectiveSnapshot(index);
+            return snapshot != null && snapshot.IsLoseCondition;
+        }
+
+        /// <summary>Whether every objective of this entry has reached full progress.</summary>
+        public bool IsObjectiveComplete(int index)
+        {
+            ObjectiveEntrySnapshot snapshot = GetObjectiveSnapshot(index);
+            return snapshot != null && snapshot.IsComplete;
+        }
+
+        /// <summary>Whether the game still counts this entry as achievable.</summary>
+        public bool CanObjectiveBeCompleted(int index)
+        {
+            ObjectiveEntrySnapshot snapshot = GetObjectiveSnapshot(index);
+            return snapshot != null && snapshot.CanBeCompleted;
+        }
+
+        /// <summary>
+        /// Where this entry's marker stands relative to the selected wielder, in tiles, together with
+        /// the size of the map it stands on. Answers false unless the entry has exactly ONE unfinished
+        /// objective with a location and there is a living wielder selected to measure from.
+        /// </summary>
+        public bool TryGetObjectiveMarkerOffset(int index, out Vector2Int offset, out Vector2Int mapSize)
+        {
+            offset = Vector2Int.zero;
+            mapSize = Vector2Int.zero;
+            ObjectiveEntrySnapshot snapshot = GetObjectiveSnapshot(index);
             Objective objective;
-            if (!TryGetSingleObjectiveMarker(snapshot, out objective))
+            if (snapshot == null || !TryGetSingleObjectiveMarker(snapshot, out objective))
             {
-                return;
+                return false;
             }
 
             ICommanderState selectedCommander = SelectionHandler != null ? SelectionHandler.SelectedCommander : null;
             if (selectedCommander == null || !selectedCommander.IsAlive)
             {
-                return;
+                return false;
             }
 
             int mapWidth = _map != null && _map.Facade != null && _map.Facade.Level != null ? _map.Facade.Level.Width : 0;
             int mapHeight = _map != null && _map.Facade != null && _map.Facade.Level != null ? _map.Facade.Level.Height : 0;
             if (mapWidth <= 0 || mapHeight <= 0)
             {
-                return;
+                return false;
             }
 
-            int x = objective.location.x - selectedCommander.Position.x;
-            int y = objective.location.y - selectedCommander.Position.y;
-            string descriptor = GetObjectiveMarkerDistanceDescriptor(x, y, mapWidth, mapHeight);
-            string direction = GetObjectiveMarkerDirection(x, y);
-            if (!string.IsNullOrWhiteSpace(descriptor))
-            {
-                parts.Add(descriptor);
-            }
-
-            if (!string.IsNullOrWhiteSpace(direction))
-            {
-                parts.Add(direction);
-            }
+            offset = new Vector2Int(
+                objective.location.x - selectedCommander.Position.x,
+                objective.location.y - selectedCommander.Position.y);
+            mapSize = new Vector2Int(mapWidth, mapHeight);
+            return true;
         }
 
         private static bool TryGetSingleObjectiveMarker(ObjectiveEntrySnapshot snapshot, out Objective objective)
@@ -603,66 +612,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return objective != null;
-        }
-
-        private static string GetObjectiveMarkerDistanceDescriptor(int x, int y, int mapWidth, int mapHeight)
-        {
-            float normalizedX = x / (float)mapWidth;
-            float normalizedY = y / (float)mapHeight;
-            float distance = Mathf.Sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
-            if (distance <= 0.10f)
-            {
-                return ModText.Get(ModStrings.Screens.ObjectiveMarkerNearby);
-            }
-
-            if (distance <= 0.25f)
-            {
-                return ModText.Get(ModStrings.Screens.ObjectiveMarkerSomeDistance);
-            }
-
-            return ModText.Get(ModStrings.Screens.ObjectiveMarkerFarAway);
-        }
-
-        private static string GetObjectiveMarkerDirection(int x, int y)
-        {
-            if (x == 0 && y == 0)
-            {
-                return ModText.Get(ModStrings.Spatial.Here);
-            }
-
-            if (y > 0)
-            {
-                if (x > 0)
-                {
-                    return ModText.Get(ModStrings.Scanner.Northeast);
-                }
-
-                if (x < 0)
-                {
-                    return ModText.Get(ModStrings.Scanner.Northwest);
-                }
-
-                return ModText.Get(ModStrings.Scanner.North);
-            }
-
-            if (y < 0)
-            {
-                if (x > 0)
-                {
-                    return ModText.Get(ModStrings.Scanner.Southeast);
-                }
-
-                if (x < 0)
-                {
-                    return ModText.Get(ModStrings.Scanner.Southwest);
-                }
-
-                return ModText.Get(ModStrings.Scanner.South);
-            }
-
-            return x > 0
-                ? ModText.Get(ModStrings.Scanner.East)
-                : ModText.Get(ModStrings.Scanner.West);
         }
 
         public void FocusObjective(int index)

@@ -3439,6 +3439,16 @@ msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr ""
 
+#. Screens.WielderExperience
+msgctxt "Screens.WielderExperience"
+msgid "{0}, {1} {2}, {3} / {4}"
+msgstr ""
+
+#. Screens.UpgradeTiers
+msgctxt "Screens.UpgradeTiers"
+msgid "{0} {1} / {2}"
+msgstr ""
+
 #. Scanner.All
 msgctxt "Scanner.All"
 msgid "All"

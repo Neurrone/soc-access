@@ -3847,3 +3847,13 @@ msgctxt "Spatial.MovementOfMax"
 msgid "{0} / {1}"
 msgstr "{0} / {1}"
 
+
+#. Screens.WielderExperience
+msgctxt "Screens.WielderExperience"
+msgid "{0}, {1} {2}, {3} / {4}"
+msgstr "{0}, {1} {2}, {3} / {4}"
+
+#. Screens.UpgradeTiers
+msgctxt "Screens.UpgradeTiers"
+msgid "{0} {1} / {2}"
+msgstr "{0} {1} / {2}"

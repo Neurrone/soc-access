@@ -431,16 +431,22 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            public string GetResourceLabel(ResourceType resourceType)
+            public string GetResourceName(ResourceType resourceType)
             {
-                string name = ResourceCosts.Name(_adapter != null ? _adapter._localization : null, resourceType);
-                string amount = UITextMeshTextUtility.Spoken(GetResourceAmountText(resourceType));
-                string income = GameObjects.IsLive(GetResourceIncomeText(resourceType))
-                    ? UITextMeshTextUtility.Spoken(GetResourceIncomeText(resourceType))
-                    : string.Empty;
+                return ResourceCosts.Name(_adapter != null ? _adapter._localization : null, resourceType);
+            }
 
-                string label = string.IsNullOrWhiteSpace(amount) ? name : name + " " + amount;
-                return string.IsNullOrWhiteSpace(income) ? label : label + ", " + income;
+            /// <summary>The amount the band draws beside a resource, empty where it draws none.</summary>
+            public string GetResourceAmountSpoken(ResourceType resourceType)
+            {
+                return UITextMeshTextUtility.Spoken(GetResourceAmountText(resourceType));
+            }
+
+            /// <summary>The income the band draws under a resource, empty where it draws none.</summary>
+            public string GetResourceIncomeSpoken(ResourceType resourceType)
+            {
+                UITextMesh income = GetResourceIncomeText(resourceType);
+                return GameObjects.IsLive(income) ? UITextMeshTextUtility.Spoken(income) : string.Empty;
             }
 
             public void FocusResource(ResourceType resourceType)

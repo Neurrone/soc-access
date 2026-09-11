@@ -130,7 +130,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (Live.IsUpgradeSummaryVisible)
             {
-                AddText(builder, "upgrades", Live.UpgradesComponent, () => Live.UpgradeSummary);
+                AddText(builder, "upgrades", Live.UpgradesComponent, UpgradeSummary);
             }
 
             if (Live.IsSiegeStateVisible)
@@ -187,6 +187,17 @@ namespace SongsOfConquestAccess.Screens
                     vtable,
                     it.Component));
             }
+        }
+
+        /// <summary>How many of the entity's upgrade tiers are built, under the game's own caption for
+        /// the row of slots it counts them off.</summary>
+        private string UpgradeSummary()
+        {
+            return ModText.Get(
+                ModStrings.Screens.UpgradeTiers,
+                Live.UpgradeCaption,
+                Live.UpgradeTiersBuilt,
+                Live.UpgradeTiersTotal);
         }
 
         /// <summary>How far a raze or a conversion has got, counted off the round dots the game draws

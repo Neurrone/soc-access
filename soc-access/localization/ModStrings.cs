@@ -785,6 +785,15 @@
             public static readonly ModString AnnouncementVisited = new ModString("Screens.AnnouncementVisited", "Visited");
             public static readonly ModString AnnouncementWielder = new ModString("Screens.AnnouncementWielder", "Wielder");
             public static readonly ModString AnnouncementZoneOfControl = new ModString("Screens.AnnouncementZoneOfControl", "Zone of control");
+
+            /// <summary>The selected wielder's experience bar as one line: {0} is the game's caption
+            /// for experience, {1} its caption for level, {2} the level reached, {3} the experience
+            /// earned and {4} the experience the next level asks for.</summary>
+            public static readonly ModString WielderExperience = new ModString("Screens.WielderExperience", "{0}, {1} {2}, {3} / {4}");
+
+            /// <summary>How many of a map entity's upgrade tiers are built: {0} is the game's own
+            /// caption for the row, {1} the tiers built and {2} the tiers it has.</summary>
+            public static readonly ModString UpgradeTiers = new ModString("Screens.UpgradeTiers", "{0} {1} / {2}");
         }
 
         public static class Scanner
