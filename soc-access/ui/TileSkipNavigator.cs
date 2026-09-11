@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
@@ -43,6 +45,21 @@ namespace SongsOfConquestAccess.UI
             }
 
             return new TileSkipResult(lastValid, Math.Max(0, matchingTiles - 1));
+        }
+
+        /// <summary>What the skip passed over, said before the tile it landed on: queued rather than
+        /// interrupting, so one keypress is heard as one sentence. A skip that passed nothing says
+        /// nothing.</summary>
+        public static void SpeakSkipped(int skippedCount)
+        {
+            if (skippedCount <= 0)
+            {
+                return;
+            }
+
+            SpeechPipeline.Output(new SpeechRequest(
+                ModText.Plural(ModStrings.Spatial.SkippedTileCount, skippedCount, skippedCount),
+                interrupt: false));
         }
     }
 

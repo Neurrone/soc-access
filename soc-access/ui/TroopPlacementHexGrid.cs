@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
@@ -26,28 +27,22 @@ namespace SongsOfConquestAccess.UI
     /// </summary>
     public sealed class TroopPlacementHexGrid
     {
-        private const string ScannerWrapCueKey = "Common_ClickUnfold";
-        private static readonly Vector2Int CenterTile = new Vector2Int(6, 4);
-
         private readonly PreBattleMenuAdapter _adapter;
         private TroopPlacementSnapshot _snapshot;
         private Vector2Int _cursor;
-        private readonly ScannerController _scanner;
-        private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
+        private readonly HexGridScanner _scanner;
 
         public TroopPlacementHexGrid(PreBattleMenuAdapter adapter)
         {
             _adapter = adapter;
             RefreshSnapshot();
             _cursor = GetInitialCursor();
-            _scanner = new ScannerController(
+            _scanner = new HexGridScanner(
                 origin => ScannerCustomCategorySynthesizer.ApplyFromSettings(
                     _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null),
-                () => _cursor,
                 (result, cursorHint) => _adapter != null
                     ? _adapter.TryRefreshScannerResult(result, cursorHint)
                     : ScannerResultRefresh.Invalid,
-                JumpToScannerResult,
                 (result, directions, index, count, includeItemName) => new TroopPlacementScannerSpeechContext(
                     result,
                     GetScannerTile(result),
@@ -56,7 +51,9 @@ namespace SongsOfConquestAccess.UI
                     index,
                     count,
                     includeItemName),
-                ScannerDirectionMode.Hex);
+                () => _cursor,
+                SetCursor,
+                PlayTileCuesFor);
         }
 
         public string GetLabel()
@@ -96,20 +93,8 @@ namespace SongsOfConquestAccess.UI
 
         public bool ClaimsAction(string actionKey)
         {
-            return actionKey == AccessibilityActions.HexGridWest.Key
-                || actionKey == AccessibilityActions.HexGridEast.Key
-                || actionKey == AccessibilityActions.HexGridNorthWest.Key
-                || actionKey == AccessibilityActions.HexGridNorthEast.Key
-                || actionKey == AccessibilityActions.HexGridSouthWest.Key
-                || actionKey == AccessibilityActions.HexGridSouthEast.Key
-                || actionKey == AccessibilityActions.HexGridFocusCenterTile.Key
-                || actionKey == AccessibilityActions.HexGridSkipWest.Key
-                || actionKey == AccessibilityActions.HexGridSkipEast.Key
-                || actionKey == AccessibilityActions.HexGridSkipNorthWest.Key
-                || actionKey == AccessibilityActions.HexGridSkipNorthEast.Key
-                || actionKey == AccessibilityActions.HexGridSkipSouthWest.Key
-                || actionKey == AccessibilityActions.HexGridSkipSouthEast.Key
-                || IsScannerAction(actionKey);
+            return HexGridMoves.ClaimsAction(actionKey)
+                || HexGridScanner.ClaimsAction(actionKey);
         }
 
         public bool HandleAction(InputAction action)
@@ -119,74 +104,21 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            if (HandleScannerAction(action))
+            if (_scanner.HandleAction(action))
             {
                 return true;
             }
 
-            if (action.Key == AccessibilityActions.HexGridWest.Key)
+            bool skip;
+            Func<Vector2Int, Vector2Int> step = HexGridMoves.TryGetStep(action.Key, out skip);
+            if (step != null)
             {
-                return Move(-1, 0);
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipWest.Key)
-            {
-                return SkipMove(point => new Vector2Int(point.x - 1, point.y));
-            }
-
-            if (action.Key == AccessibilityActions.HexGridEast.Key)
-            {
-                return Move(1, 0);
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipEast.Key)
-            {
-                return SkipMove(point => new Vector2Int(point.x + 1, point.y));
-            }
-
-            if (action.Key == AccessibilityActions.HexGridNorthWest.Key)
-            {
-                return MoveDiagonal(north: true, east: false);
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipNorthWest.Key)
-            {
-                return SkipMove(point => GetDiagonalNeighbor(point, north: true, east: false));
-            }
-
-            if (action.Key == AccessibilityActions.HexGridNorthEast.Key)
-            {
-                return MoveDiagonal(north: true, east: true);
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipNorthEast.Key)
-            {
-                return SkipMove(point => GetDiagonalNeighbor(point, north: true, east: true));
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSouthWest.Key)
-            {
-                return MoveDiagonal(north: false, east: false);
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipSouthWest.Key)
-            {
-                return SkipMove(point => GetDiagonalNeighbor(point, north: false, east: false));
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSouthEast.Key)
-            {
-                return MoveDiagonal(north: false, east: true);
+                return skip ? SkipMove(step) : SetCursor(step(_cursor));
             }
 
             if (action.Key == AccessibilityActions.HexGridFocusCenterTile.Key)
             {
-                return SetCursor(CenterTile);
-            }
-
-            if (action.Key == AccessibilityActions.HexGridSkipSouthEast.Key)
-            {
-                return SkipMove(point => GetDiagonalNeighbor(point, north: false, east: true));
+                return SetCursor(HexGridMoves.CenterTile);
             }
 
             return false;
@@ -232,20 +164,6 @@ namespace SongsOfConquestAccess.UI
                 semitoneOffset);
         }
 
-        /// <summary>The remote tile's own cues carry the direction to it; out of range plays nothing.</summary>
-        private void PlayDirectionalTileCues(Vector2Int origin, Vector2Int target)
-        {
-            float pan;
-            float semitones;
-            float gainScale;
-            if (!DirectionalCueMath.TryCompute(origin, target, CueGridGeometry.Hex, out pan, out semitones, out gainScale))
-            {
-                return;
-            }
-
-            PlayTileCuesFor(target, pan, gainScale, semitones);
-        }
-
         /// <summary>Draw the game's own highlight on the tile the cursor stands on and hover it, so
         /// the game draws the troop's own details - what the screen does when the board's node takes
         /// the focus.</summary>
@@ -263,17 +181,7 @@ namespace SongsOfConquestAccess.UI
             _adapter?.ClearFocusedTileOverlay();
         }
 
-        private bool Move(int xDelta, int yDelta)
-        {
-            return SetCursor(new Vector2Int(_cursor.x + xDelta, _cursor.y + yDelta));
-        }
-
-        private bool MoveDiagonal(bool north, bool east)
-        {
-            return SetCursor(GetDiagonalNeighbor(_cursor, north, east));
-        }
-
-        private bool SkipMove(System.Func<Vector2Int, Vector2Int> step)
+        private bool SkipMove(Func<Vector2Int, Vector2Int> step)
         {
             RefreshSnapshot();
             TileSkipResult result = TileSkipNavigator.FindTarget(
@@ -287,24 +195,8 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
-            SpeakSkipped(result.SkippedCount);
+            TileSkipNavigator.SpeakSkipped(result.SkippedCount);
             return SetCursor(result.Target);
-        }
-
-        private static Vector2Int GetDiagonalNeighbor(Vector2Int point, bool north, bool east)
-        {
-            int yDelta = north ? 1 : -1;
-            int xDelta;
-            if ((point.y & 1) == 0)
-            {
-                xDelta = east ? 0 : -1;
-            }
-            else
-            {
-                xDelta = east ? 1 : 0;
-            }
-
-            return new Vector2Int(point.x + xDelta, point.y + yDelta);
         }
 
         private bool SetCursor(Vector2Int point)
@@ -351,44 +243,6 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        private bool JumpToScannerResult(Vector2Int point)
-        {
-            if (point == _cursor)
-            {
-                SpeakHere();
-                return true;
-            }
-
-            Vector2Int origin = _cursor;
-            SetCursor(point);
-            return _jumpAnchor.RememberIfMoved(origin, _cursor);
-        }
-
-        /// <summary>
-        /// A jump onto the tile the cursor already occupies moves nothing, so no
-        /// tile announcement follows it. Say where the player is rather than
-        /// letting the key fall silent.
-        /// </summary>
-        private static void SpeakHere()
-        {
-            SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Spatial.Here), interrupt: false));
-        }
-
-        private bool ReturnFromJump()
-        {
-            Vector2Int anchor;
-            if (!_jumpAnchor.TryTake(out anchor))
-            {
-                CueLibrary.PlayCue(CueLibrary.MoveDenied);
-                SpeechPipeline.Output(new SpeechRequest(
-                    ModText.Get(ModStrings.Scanner.NoTileToReturnTo),
-                    interrupt: false));
-                return true;
-            }
-
-            return SetCursor(anchor);
-        }
-
         private TroopPlacementTile GetScannerTile(ScannerResult result)
         {
             if (result == null)
@@ -402,97 +256,6 @@ namespace SongsOfConquestAccess.UI
             }
 
             return _snapshot != null ? _snapshot.Get(result.Position) : null;
-        }
-
-        private bool HandleScannerAction(InputAction action)
-        {
-            if (action.Key == AccessibilityActions.ScannerPreviousCategory.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveCategory(-1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerNextCategory.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveCategory(1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerPreviousSubcategory.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveSubcategory(-1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerNextSubcategory.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveSubcategory(1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerPreviousItem.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveItem(-1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerNextItem.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveItem(1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerPreviousInstance.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveInstance(-1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerNextInstance.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveInstance(1));
-            }
-
-            if (action.Key == AccessibilityActions.ScannerJumpToResult.Key)
-            {
-                return _scanner.JumpToCurrent();
-            }
-
-            if (action.Key == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteSpeakDistanceAndDirection());
-            }
-
-            if (action.Key == AccessibilityActions.ScannerReturnFromJump.Key)
-            {
-                return ReturnFromJump();
-            }
-
-            return false;
-        }
-
-        private bool HandleScannerNavigationResult(ScannerCommandResult result)
-        {
-            if (result != null && result.Status == ScannerCommandStatus.Result && result.Wrapped)
-            {
-                NativeSoundUtility.PostEvent(ScannerWrapCueKey);
-            }
-
-            if (result != null && result.Status == ScannerCommandStatus.Result && result.Result != null)
-            {
-                PlayDirectionalTileCues(_cursor, result.Result.Position);
-            }
-
-            _scanner.Output(result);
-            return true;
-        }
-
-        private static bool IsScannerAction(string actionKey)
-        {
-            return actionKey == AccessibilityActions.ScannerPreviousCategory.Key
-                || actionKey == AccessibilityActions.ScannerNextCategory.Key
-                || actionKey == AccessibilityActions.ScannerPreviousSubcategory.Key
-                || actionKey == AccessibilityActions.ScannerNextSubcategory.Key
-                || actionKey == AccessibilityActions.ScannerPreviousItem.Key
-                || actionKey == AccessibilityActions.ScannerNextItem.Key
-                || actionKey == AccessibilityActions.ScannerPreviousInstance.Key
-                || actionKey == AccessibilityActions.ScannerNextInstance.Key
-                || actionKey == AccessibilityActions.ScannerJumpToResult.Key
-                || actionKey == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key
-                || actionKey == AccessibilityActions.ScannerReturnFromJump.Key;
         }
 
         private void RefreshSnapshot()
@@ -542,18 +305,6 @@ namespace SongsOfConquestAccess.UI
             }
 
             return tile.TroopSide.Value == _snapshot.OwnSide.Value;
-        }
-
-        private static void SpeakSkipped(int skippedCount)
-        {
-            if (skippedCount <= 0)
-            {
-                return;
-            }
-
-            SpeechPipeline.Output(new SpeechRequest(
-                ModText.Plural(ModStrings.Spatial.SkippedTileCount, skippedCount, skippedCount),
-                interrupt: false));
         }
     }
 }

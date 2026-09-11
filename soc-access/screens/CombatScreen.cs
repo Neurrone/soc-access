@@ -89,7 +89,6 @@ namespace SongsOfConquestAccess.Screens
         };
 
         private const string ReturnToGridSoundKey = "Common_ClosePauseMenu";
-        private const string FocusWrapCueKey = "Common_ClickUnfold";
 
         private const string BoardStop = "combat:board";
         private const string QuickbarStop = "combat:quickbar";
@@ -1096,7 +1095,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (result.Wrapped)
             {
-                NativeSoundUtility.PostEvent(FocusWrapCueKey);
+                NativeSoundUtility.PostEvent(WrapCue.Key);
             }
 
             return true;
