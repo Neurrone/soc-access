@@ -195,10 +195,8 @@ namespace SongsOfConquestAccess.Screens
             return cells;
         }
 
-        /// <summary>One read-only cell: the drawn value alone, the column's caption being spoken as
-        /// the edge crossed into it, with the caption and the value as the buffer's head. Every cell
-        /// carries the row's click, as the map select table's do: Enter anywhere along a row means
-        /// that row.</summary>
+        /// <summary>One read-only cell of the table (<see cref="LobbyMapNodes.Cell"/>), under the
+        /// caption of the column the game draws it in.</summary>
         private static NodeVtable Cell(
             IReadOnlyList<string> captions,
             int column,
@@ -208,28 +206,11 @@ namespace SongsOfConquestAccess.Screens
         {
             AdventureLobbyChallengeMapRowAdapter it = row;
             string caption = captions != null && column < captions.Count ? captions[column] : string.Empty;
-            Func<string> text = () => CellText.Filled(value());
-            NodeVtable vtable = new NodeVtable
-            {
-                ControlType = ControlTypes.Text,
-                Announcements = new List<NodeAnnouncement> { GraphNodes.ValuePart(text, watch: false) },
-                Sections = GraphNodes.Sections(null, tooltip),
-                SearchText = () => it.Name,
-                BufferHead = () => ModText.Get(ModStrings.Common.ListSeparator, caption, text()),
-                OnActivate = () => it.Select(),
-            };
-            GraphNodes.Aim(vtable, tooltip);
-            return vtable;
+            return LobbyMapNodes.Cell(() => caption, value, () => it.Name, () => it.Select(), tooltip);
         }
 
-        /// <summary>The preview beside the table, as the one line it is: the challenge's name as the
-        /// panel draws it, watched live, with the dossier as a section - read on arrival and held in
-        /// the review buffer one drawn line at a time.
-        ///
-        /// THE WIN CONDITIONS ARE NOT READ OUT, as on the map select page: the panel draws them as
-        /// ICONS whose words the game only reveals on hover, so they are buffer-only, where the
-        /// player who wants them goes to look. The dossier, by contrast, is drawn text
-        /// (<c>LobbyMapPreviewText.GetInfo</c>) and stays in the readout.</summary>
+        /// <summary>The preview beside the table (<see cref="LobbyMapNodes.Preview"/>), which is
+        /// declared only while the menu has a challenge selected to fill it.</summary>
         private void BuildDetails(GraphBuilder builder)
         {
             AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
@@ -238,46 +219,9 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            NodeVtable vtable = new NodeVtable
-            {
-                ControlType = ControlTypes.Text,
-                Announcements = new List<NodeAnnouncement>
-                {
-                    new NodeAnnouncement(() => PreviewTitle(), live: true, kind: AnnouncementKinds.Label),
-                },
-                Sections = new List<NodeSection>
-                {
-                    NodeSection.Composed(() => SpokenLines.Of(new[] { Description() })),
-                    NodeSection.Buffer(() => SpokenLines.Of(new[] { PreviewWinConditions() })),
-                },
-            };
             builder.AddItem(new SyntheticNode(
                 ControlId.For(_detailsMarker, "challenge-map:preview"),
-                vtable));
-        }
-
-        private string PreviewTitle()
-        {
-            string title = Live.PreviewTitle;
-            if (!string.IsNullOrWhiteSpace(title))
-            {
-                return title;
-            }
-
-            AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
-            return selected != null ? selected.Name : string.Empty;
-        }
-
-        private string Description()
-        {
-            AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
-            return selected != null ? selected.Description : string.Empty;
-        }
-
-        private string PreviewWinConditions()
-        {
-            AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
-            return selected != null ? ModText.JoinList(selected.WinConditionLabels) : string.Empty;
+                LobbyMapNodes.Preview(() => Live.PreviewTitle, () => Live.SelectedRow)));
         }
 
         private void BuildButtons(GraphBuilder builder)
