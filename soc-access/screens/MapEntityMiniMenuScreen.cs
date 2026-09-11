@@ -255,11 +255,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker("close"), "map-entity:close"),
-                GraphNodes.Button(
-                    () => ModText.Get(ModStrings.Screens.Close),
-                    () => Live.Close())));
+            GraphNodes.ModClose(builder, "map-entity:close", Marker("close"), () => Live.Close());
         }
     }
 }

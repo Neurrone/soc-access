@@ -283,18 +283,12 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = Live.CloseButton;
-            if (close == null || !Live.IsCloseVisible())
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "commander-sheet:close",
+                Live.CloseButton,
+                Live.IsCloseVisible,
                 () => Live.ActivateClose());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, "commander-sheet:close"), vtable, close));
         }
 
         // ---- shared ----

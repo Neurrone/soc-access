@@ -247,11 +247,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker("close"), "marketplace:close"),
-                GraphNodes.Button(
-                    () => ModText.Get(ModStrings.Screens.Close),
-                    () => Live.Close())));
+            GraphNodes.ModClose(builder, "marketplace:close", Marker("close"), () => Live.Close());
         }
     }
 }

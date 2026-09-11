@@ -313,18 +313,12 @@ namespace SongsOfConquestAccess.Screens
         private void BuildClose(GraphBuilder builder)
         {
             WielderInteract wielder = Live.Wielder;
-            Component close = wielder == null ? null : wielder.CloseButton;
-            if (close == null || !wielder.IsCloseVisible)
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "settlement:close",
+                wielder == null ? null : wielder.CloseButton,
+                () => wielder.IsCloseVisible,
                 () => wielder.ActivateClose());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, "settlement:close"), vtable, close));
         }
 
         private static bool SameText(string left, string right)

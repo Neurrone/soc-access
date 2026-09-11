@@ -287,22 +287,13 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = Live.CloseButton;
-            if (close == null || !Live.IsCloseButtonVisible())
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "post-adventure-stats:close",
+                Live.CloseButton,
+                Live.IsCloseButtonVisible,
                 () => Live.Close(),
                 Live.IsCloseButtonEnabled);
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(
-                ControlId.For(close, "post-adventure-stats:close"),
-                vtable,
-                close));
         }
 
         // ---- the lines the menu gives nothing to key on ----

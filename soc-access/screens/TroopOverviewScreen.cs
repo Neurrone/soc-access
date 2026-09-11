@@ -177,11 +177,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(_closeKey, "troop-overview:close"),
-                GraphNodes.Button(
-                    () => ModText.Get(ModStrings.Screens.Close),
-                    () => Live.Close())));
+            GraphNodes.ModClose(builder, "troop-overview:close", _closeKey, () => Live.Close());
         }
     }
 }

@@ -343,11 +343,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(_closeKey, "adventure-players:close"),
-                GraphNodes.Button(
-                    () => ModText.Get(ModStrings.Screens.Close),
-                    () => Live.Close())));
+            GraphNodes.ModClose(builder, "adventure-players:close", _closeKey, () => Live.Close());
         }
 
         // ---- shared helpers ----

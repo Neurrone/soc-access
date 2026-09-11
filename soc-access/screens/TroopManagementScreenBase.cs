@@ -3,7 +3,6 @@ using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
-using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -191,17 +190,12 @@ namespace SongsOfConquestAccess.Screens
         /// names it.</summary>
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = Host.CloseButton;
-            if (close == null || !Host.IsCloseVisible())
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                Key + ":close-button",
+                Host.CloseButton,
+                Host.IsCloseVisible,
                 () => Host.Close());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, Key + ":close-button"), vtable, close));
         }
     }
 }

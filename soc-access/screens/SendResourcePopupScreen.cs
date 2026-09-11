@@ -136,19 +136,14 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = Live.CloseButton;
-            if (close == null || !Live.IsCloseVisible())
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "send-resource:close",
+                Live.CloseButton,
+                Live.IsCloseVisible,
                 () => Live.ActivateClose(),
-                null,
-                Live.CloseTooltip);
-            vtable.OnFocusVisual = Live.FocusClose;
-            builder.AddItem(new DrawnNode(ControlId.For(close, "send-resource:close"), vtable, close));
+                tooltip: Live.CloseTooltip,
+                onFocusVisual: Live.FocusClose);
         }
     }
 }

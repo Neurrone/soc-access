@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI.Graph;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
 {
@@ -159,6 +160,42 @@ namespace SongsOfConquestAccess.UI
             NodeVtable vtable = Button(button.GetLabel, () => button.Activate(), button.IsEnabled);
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button.Button);
             builder.AddItem(new DrawnNode(ControlId.For(button.Button, key), vtable, button.Button));
+        }
+
+        /// <summary>THE WINDOW'S OWN CLOSE CONTROL, over the cross the game draws: in the tree only
+        /// while the game is drawing it, named by the mod because the icon carries no text of its
+        /// own, and arriving on it moves the game's own selection onto it so the window looks where
+        /// the cursor is. A screen whose close has a tooltip, an enabled state or a native focus call
+        /// passes them.</summary>
+        public static void DrawnClose(
+            GraphBuilder builder,
+            string key,
+            Component close,
+            Func<bool> isVisible,
+            Action activate,
+            Func<bool> enabled = null,
+            Tooltip tooltip = null,
+            Action onFocusVisual = null)
+        {
+            if (close == null || (isVisible != null && !isVisible()))
+            {
+                return;
+            }
+
+            NodeVtable vtable = Button(() => ModText.Get(ModStrings.Screens.Close), activate, enabled, tooltip);
+            vtable.OnFocusVisual = onFocusVisual ?? (() => NativeSelectionUtility.Select(close));
+            builder.AddItem(new DrawnNode(ControlId.For(close, key), vtable, close));
+        }
+
+        /// <summary>A CLOSE THE MOD OWNS, for a window that draws no cross of its own: the mouse
+        /// leaves it by clicking the blocker behind it or by picking something on it, so the way out
+        /// the keyboard needs is a node with nothing under it, running the game's own hide. The marker
+        /// is the screen's, so the id is that screen's.</summary>
+        public static void ModClose(GraphBuilder builder, string key, object marker, Action close)
+        {
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(marker, key),
+                Button(() => ModText.Get(ModStrings.Screens.Close), close)));
         }
 
         /// <summary>A container the player expands and collapses. Declare it with the builder's

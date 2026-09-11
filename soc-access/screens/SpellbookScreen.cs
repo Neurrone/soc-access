@@ -497,18 +497,12 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            UIButton close = Live.CloseButton;
-            if (close == null || !Live.IsCloseVisible())
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "spellbook:close",
+                (Component)Live.CloseButton,
+                Live.IsCloseVisible,
                 () => Live.ActivateClose());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select((Component)close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, "spellbook:close"), vtable, close));
         }
 
         // ---- shared ----
