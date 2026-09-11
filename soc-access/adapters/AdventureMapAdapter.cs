@@ -3326,7 +3326,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            object response = ResolveWritableScreenInputResponse(_inputManager.Screen.Primary);
+            object response = ScreenInputOverride.ResolveWritableResponse(_inputManager.Screen.Primary);
             if (response == null)
             {
                 SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because no writable ScreenInputResponse could be resolved from " + _inputManager.Screen.Primary.GetType().FullName);
@@ -3346,141 +3346,12 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            screenInputOverride = ScreenInputOverride.Apply(response, screenPosition);
+            // A still mouse over the world at the tile's screen point, put back in the finally that
+            // ends TryInvokeNativeMapInput. The same five properties the game's own mouse writes, so
+            // the native handler sees exactly what a click there would have left it (AGENTS.md,
+            // "Native Input Equivalence").
+            screenInputOverride = ScreenInputOverride.ApplyMouseClick(response, screenPosition, "AdventureMapAdapter");
             return screenInputOverride != null;
-        }
-
-        private object ResolveWritableScreenInputResponse(object response)
-        {
-            if (response == null)
-            {
-                return null;
-            }
-
-            PropertyInfo positionProperty = AccessTools.Property(response.GetType(), "Position");
-            if (positionProperty != null && positionProperty.CanWrite)
-            {
-                return response;
-            }
-
-            FieldInfo currentResponseField = AccessTools.Field(response.GetType(), "_currentResponse");
-            object currentResponse = currentResponseField != null ? currentResponseField.GetValue(response) : null;
-            positionProperty = currentResponse != null ? AccessTools.Property(currentResponse.GetType(), "Position") : null;
-            if (positionProperty != null && positionProperty.CanWrite)
-            {
-                return currentResponse;
-            }
-
-            FieldInfo mouseResponseField = AccessTools.Field(response.GetType(), "_mouseResponse");
-            object mouseResponse = mouseResponseField != null ? mouseResponseField.GetValue(response) : null;
-            positionProperty = mouseResponse != null ? AccessTools.Property(mouseResponse.GetType(), "Position") : null;
-            if (positionProperty != null && positionProperty.CanWrite)
-            {
-                return mouseResponse;
-            }
-
-            return null;
-        }
-
-        private sealed class ScreenInputOverride
-        {
-            private readonly object _response;
-            private readonly PropertyInfo _positionProperty;
-            private readonly PropertyInfo _deltaProperty;
-            private readonly PropertyInfo _isOverUIProperty;
-            private readonly PropertyInfo _isPanningProperty;
-            private readonly PropertyInfo _wasActivatedOverUIProperty;
-            private readonly object _oldPosition;
-            private readonly object _oldDelta;
-            private readonly object _oldIsOverUI;
-            private readonly object _oldIsPanning;
-            private readonly object _oldWasActivatedOverUI;
-            private bool _restored;
-
-            private ScreenInputOverride(
-                object response,
-                Vector2 screenPosition,
-                PropertyInfo positionProperty,
-                PropertyInfo deltaProperty,
-                PropertyInfo isOverUIProperty,
-                PropertyInfo isPanningProperty,
-                PropertyInfo wasActivatedOverUIProperty)
-            {
-                _response = response;
-                ScreenPosition = screenPosition;
-                _positionProperty = positionProperty;
-                _deltaProperty = deltaProperty;
-                _isOverUIProperty = isOverUIProperty;
-                _isPanningProperty = isPanningProperty;
-                _wasActivatedOverUIProperty = wasActivatedOverUIProperty;
-                _oldPosition = _positionProperty.GetValue(_response, null);
-                _oldDelta = _deltaProperty.GetValue(_response, null);
-                _oldIsOverUI = _isOverUIProperty.GetValue(_response, null);
-                _oldIsPanning = _isPanningProperty.GetValue(_response, null);
-                _oldWasActivatedOverUI = _wasActivatedOverUIProperty.GetValue(_response, null);
-
-                _positionProperty.SetValue(_response, screenPosition, null);
-                _deltaProperty.SetValue(_response, Vector2.zero, null);
-                _isOverUIProperty.SetValue(_response, false, null);
-                _isPanningProperty.SetValue(_response, false, null);
-                _wasActivatedOverUIProperty.SetValue(_response, false, null);
-            }
-
-            public Vector2 ScreenPosition { get; private set; }
-
-            public static ScreenInputOverride Apply(object response, Vector2 screenPosition)
-            {
-                if (response == null)
-                {
-                    return null;
-                }
-
-                Type responseType = response.GetType();
-                PropertyInfo positionProperty = GetWritableProperty(responseType, "Position");
-                PropertyInfo deltaProperty = GetWritableProperty(responseType, "Delta");
-                PropertyInfo isOverUIProperty = GetWritableProperty(responseType, "IsOverUI");
-                PropertyInfo isPanningProperty = GetWritableProperty(responseType, "IsPanning");
-                PropertyInfo wasActivatedOverUIProperty = GetWritableProperty(responseType, "WasActivatedOverUI");
-                if (positionProperty == null
-                    || deltaProperty == null
-                    || isOverUIProperty == null
-                    || isPanningProperty == null
-                    || wasActivatedOverUIProperty == null)
-                {
-                    SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because required writable properties were missing on " + responseType.FullName);
-                    return null;
-                }
-
-                return new ScreenInputOverride(
-                    response,
-                    screenPosition,
-                    positionProperty,
-                    deltaProperty,
-                    isOverUIProperty,
-                    isPanningProperty,
-                    wasActivatedOverUIProperty);
-            }
-
-            public void Restore()
-            {
-                if (_restored)
-                {
-                    return;
-                }
-
-                _positionProperty.SetValue(_response, _oldPosition, null);
-                _deltaProperty.SetValue(_response, _oldDelta, null);
-                _isOverUIProperty.SetValue(_response, _oldIsOverUI, null);
-                _isPanningProperty.SetValue(_response, _oldIsPanning, null);
-                _wasActivatedOverUIProperty.SetValue(_response, _oldWasActivatedOverUI, null);
-                _restored = true;
-            }
-
-            private static PropertyInfo GetWritableProperty(Type type, string name)
-            {
-                PropertyInfo property = AccessTools.Property(type, name);
-                return property != null && property.CanWrite ? property : null;
-            }
         }
 
         private object GetCurrentInputModule()
