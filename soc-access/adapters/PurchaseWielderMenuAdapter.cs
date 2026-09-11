@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -53,18 +53,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo SkillFrameField = AccessTools.Field(typeof(PurchaseWielderSkillEntry), "_frame");
         private static readonly FieldInfo TroopHudEntrySizeField = AccessTools.Field(typeof(TroopHUDEntry), "_size");
 
-        private static readonly FieldInfo GoldCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_goldCostEntry");
-        private static readonly FieldInfo StoneCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_stoneCostEntry");
-        private static readonly FieldInfo WoodCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_woodCostEntry");
-        private static readonly FieldInfo GlimmerWeaveCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_glimmerWeaveCostEntry");
-        private static readonly FieldInfo AncientAmberCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_ancientAmberCostEntry");
-        private static readonly FieldInfo CelestialOreCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_celestialOreCostEntry");
-        private static readonly FieldInfo GoldAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_goldAmountText");
-        private static readonly FieldInfo StoneAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_stoneAmountText");
-        private static readonly FieldInfo WoodAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_woodAmountText");
-        private static readonly FieldInfo GlimmerWeaveAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_glimmerWeaveAmountText");
-        private static readonly FieldInfo AncientAmberAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_ancientAmberAmountText");
-        private static readonly FieldInfo CelestialOreAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_celestialOreAmountText");
 
         private readonly PurchaseWielderMenu _menu;
         private readonly ILocalizationHandler _localization;
@@ -452,13 +440,7 @@ namespace SongsOfConquestAccess.Adapters
                     return string.Empty;
                 }
 
-                List<string> parts = new List<string>();
-                AddCostPart(parts, section, GoldCostEntryField, GoldAmountTextField, ResourceType.Gold);
-                AddCostPart(parts, section, StoneCostEntryField, StoneAmountTextField, ResourceType.Stone);
-                AddCostPart(parts, section, WoodCostEntryField, WoodAmountTextField, ResourceType.Wood);
-                AddCostPart(parts, section, GlimmerWeaveCostEntryField, GlimmerWeaveAmountTextField, ResourceType.Glimmerweave);
-                AddCostPart(parts, section, AncientAmberCostEntryField, AncientAmberAmountTextField, ResourceType.AncientAmber);
-                AddCostPart(parts, section, CelestialOreCostEntryField, CelestialOreAmountTextField, ResourceType.CelestialOre);
+                List<string> parts = LargeCostSectionText.Parts(section, FormatCostPart);
                 return parts.Count == 0
                     ? string.Empty
                     : ModText.Get(
@@ -508,26 +490,16 @@ namespace SongsOfConquestAccess.Adapters
             return text == null ? string.Empty : UITextMeshTextUtility.Spoken(text);
         }
 
-        private void AddCostPart(List<string> parts, LargeCostSection section, FieldInfo entryField, FieldInfo textField, ResourceType resourceType)
+        /// <summary>One resource of the price: the game's own amount text, with the resource named
+        /// in the plural form that amount asks for.</summary>
+        private string FormatCostPart(ResourceType resourceType, string amount)
         {
-            UITransform entry = Reflect.Get<UITransform>(section, entryField);
-            if (entry == null || !entry.Active)
-            {
-                return;
-            }
-
-            string amount = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(section, textField));
-            if (string.IsNullOrWhiteSpace(amount))
-            {
-                return;
-            }
-
             int parsed;
-            parts.Add(ModText.Get(
+            return ModText.Get(
                 _localization,
                 ModStrings.Common.ResourceAmount,
                 amount,
-                GetResourceName(resourceType, int.TryParse(amount, out parsed) ? parsed : 0)));
+                GetResourceName(resourceType, int.TryParse(amount, out parsed) ? parsed : 0));
         }
 
         /// <summary>The resource's own name, in the game's plural form for the amount asked for.</summary>

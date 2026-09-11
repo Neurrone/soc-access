@@ -23,7 +23,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class BuildMenuAdapter : IPresent
+    public sealed partial class BuildMenuAdapter : IPresent
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(BuildMenu), "_async");
         private static readonly FieldInfo TutorialButtonField = AccessTools.Field(typeof(BuildMenu), "_tutorialButton");
@@ -67,19 +67,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo DescriptionEntryTextField = AccessTools.Field(typeof(BuildMenuDescriptionEntry), "_text");
         private static readonly FieldInfo DescriptionEntryBackgroundField = AccessTools.Field(typeof(BuildMenuDescriptionEntry), "_background");
         private static readonly FieldInfo DescriptionEntryIconField = AccessTools.Field(typeof(BuildMenuDescriptionEntry), "_icon");
-
-        private static readonly FieldInfo GoldCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_goldCostEntry");
-        private static readonly FieldInfo StoneCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_stoneCostEntry");
-        private static readonly FieldInfo WoodCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_woodCostEntry");
-        private static readonly FieldInfo GlimmerWeaveCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_glimmerWeaveCostEntry");
-        private static readonly FieldInfo AncientAmberCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_ancientAmberCostEntry");
-        private static readonly FieldInfo CelestialOreCostEntryField = AccessTools.Field(typeof(LargeCostSection), "_celestialOreCostEntry");
-        private static readonly FieldInfo GoldAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_goldAmountText");
-        private static readonly FieldInfo StoneAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_stoneAmountText");
-        private static readonly FieldInfo WoodAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_woodAmountText");
-        private static readonly FieldInfo GlimmerWeaveAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_glimmerWeaveAmountText");
-        private static readonly FieldInfo AncientAmberAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_ancientAmberAmountText");
-        private static readonly FieldInfo CelestialOreAmountTextField = AccessTools.Field(typeof(LargeCostSection), "_celestialOreAmountText");
 
         private readonly BuildMenu _menu;
         private readonly IClientAdventureFacade _facade;
@@ -773,13 +760,7 @@ namespace SongsOfConquestAccess.Adapters
                     return string.Empty;
                 }
 
-                List<string> parts = new List<string>();
-                AddCostPart(parts, section, GoldCostEntryField, GoldAmountTextField, ResourceType.Gold);
-                AddCostPart(parts, section, StoneCostEntryField, StoneAmountTextField, ResourceType.Stone);
-                AddCostPart(parts, section, WoodCostEntryField, WoodAmountTextField, ResourceType.Wood);
-                AddCostPart(parts, section, GlimmerWeaveCostEntryField, GlimmerWeaveAmountTextField, ResourceType.Glimmerweave);
-                AddCostPart(parts, section, AncientAmberCostEntryField, AncientAmberAmountTextField, ResourceType.AncientAmber);
-                AddCostPart(parts, section, CelestialOreCostEntryField, CelestialOreAmountTextField, ResourceType.CelestialOre);
+                List<string> parts = LargeCostSectionText.Parts(section, FormatCostPart);
                 if (parts.Count > 0)
                 {
                     return string.Join(", ", parts.ToArray());
@@ -1120,26 +1101,17 @@ namespace SongsOfConquestAccess.Adapters
             return Reflect.Get<UIButton>(_menu, PurchaseButtonField);
         }
 
-        private void AddCostPart(List<string> parts, LargeCostSection section, FieldInfo entryField, FieldInfo textField, ResourceType resourceType)
+        /// <summary>One resource of the section's price: the game's own amount text, counted as a
+        /// number where it reads as one.</summary>
+        private string FormatCostPart(ResourceType resourceType, string amount)
         {
-            UITransform entry = Reflect.Get<UITransform>(section, entryField);
-            if (entry == null || !entry.Active)
-            {
-                return;
-            }
-
-            string amount = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(section, textField));
             int parsedAmount;
-            if (!string.IsNullOrWhiteSpace(amount) && int.TryParse(amount, out parsedAmount))
+            if (int.TryParse(amount, out parsedAmount))
             {
-                parts.Add(FormatResourceAmount(resourceType, parsedAmount));
-                return;
+                return FormatResourceAmount(resourceType, parsedAmount);
             }
 
-            if (!string.IsNullOrWhiteSpace(amount))
-            {
-                parts.Add(ModText.Get(_localization, ModStrings.Common.ResourceAmount, amount, GetResourceName(resourceType, 0)));
-            }
+            return ModText.Get(_localization, ModStrings.Common.ResourceAmount, amount, GetResourceName(resourceType, 0));
         }
 
         private string GetCategoryButtonLabel(BuildSiteSize size)
@@ -1438,170 +1410,5 @@ namespace SongsOfConquestAccess.Adapters
             int after = CurrentBuildSite != null ? CurrentBuildSite.Id : -1;
             return before != after;
         }
-
-        public sealed class CategoryItem
-        {
-            public CategoryItem(
-                string label,
-                string buildTime,
-                int index,
-                BuildSiteSize size,
-                bool enabled,
-                bool isSelected,
-                Component button)
-            {
-                BuildTime = buildTime ?? string.Empty;
-                IsSelected = isSelected;
-                Button = button;
-                Label = label;
-                Index = index;
-                Size = size;
-                Enabled = enabled;
-            }
-
-            public string Label { get; private set; }
-
-            /// <summary>How long anything of this size takes to build, in the game's own counted
-            /// words ("2 rounds").</summary>
-            public string BuildTime { get; private set; }
-
-            public int Index { get; private set; }
-            public BuildSiteSize Size { get; private set; }
-            public bool Enabled { get; private set; }
-
-            /// <summary>The size the menu is showing.</summary>
-            public bool IsSelected { get; private set; }
-
-            /// <summary>The tab's own button - what the tab is drawn by.</summary>
-            public Component Button { get; private set; }
-        }
-
-        public sealed class BuildingItem
-        {
-            private readonly Func<bool> _isAvailable;
-
-            public BuildingItem(
-                string label,
-                int number,
-                Func<bool> isAvailable,
-                Func<bool> isSelected,
-                Component button,
-                Func<bool> focus,
-                Func<Tooltip> tooltip)
-            {
-                _isSelected = isSelected;
-                Button = button;
-                Label = label;
-                Number = number;
-                _isAvailable = isAvailable;
-                Focus = focus;
-                Tooltip = tooltip;
-            }
-
-            private readonly Func<bool> _isSelected;
-
-            /// <summary>The building's own name, and empty where the game has no blueprint to
-            /// name it by.</summary>
-            public string Label { get; private set; }
-
-            /// <summary>Which button of the grid this is, counting from one.</summary>
-            public int Number { get; private set; }
-
-            public Func<bool> Focus { get; private set; }
-            public Func<Tooltip> Tooltip { get; private set; }
-
-            /// <summary>The building's own button - what the row is drawn by.</summary>
-            public Component Button { get; private set; }
-
-            /// <summary>The building the details pane is describing.</summary>
-            public bool IsSelected
-            {
-                get { return _isSelected == null || _isSelected(); }
-            }
-
-            public bool IsAvailable
-            {
-                get { return _isAvailable == null || _isAvailable(); }
-            }
-        }
-
-        public sealed class TierItem
-        {
-            public TierItem(
-                string label,
-                int level,
-                bool isSelected,
-                Component button,
-                Func<bool> focus,
-                Func<bool> activate,
-                Func<Tooltip> tooltip)
-            {
-                IsSelected = isSelected;
-                Button = button;
-                Activate = activate;
-                Label = label;
-                Level = level;
-                Focus = focus;
-                Tooltip = tooltip;
-            }
-
-            public string Label { get; private set; }
-            public int Level { get; private set; }
-            public Func<bool> Focus { get; private set; }
-            public Func<bool> Activate { get; private set; }
-            public Func<Tooltip> Tooltip { get; private set; }
-
-            /// <summary>The tier the details pane is showing.</summary>
-            public bool IsSelected { get; private set; }
-
-            /// <summary>The tier's own button - what the tab is drawn by.</summary>
-            public Component Button { get; private set; }
-        }
-
-        public sealed class SectionMenu
-        {
-            public SectionMenu(string label, IReadOnlyList<SectionItem> items)
-            {
-                Label = label ?? string.Empty;
-                Items = items ?? new SectionItem[0];
-            }
-
-            public string Label { get; private set; }
-            public IReadOnlyList<SectionItem> Items { get; private set; }
-        }
-
-        public sealed class SectionItem
-        {
-            public SectionItem(string label, Component target, Action focus, Func<Tooltip> tooltip)
-            {
-                Target = target;
-                Label = label ?? string.Empty;
-                Focus = focus;
-                Tooltip = tooltip;
-            }
-
-            public string Label { get; private set; }
-            public Action Focus { get; private set; }
-            public Func<Tooltip> Tooltip { get; private set; }
-
-            /// <summary>The entry's own background or icon - what the row is drawn by, and what its
-            /// tooltip hangs on.</summary>
-            public Component Target { get; private set; }
-        }
-
-        public sealed class RequirementItem
-        {
-            public RequirementItem(string label, bool isMet, Tooltip tooltip)
-            {
-                Label = label ?? string.Empty;
-                IsMet = isMet;
-                Tooltip = tooltip;
-            }
-
-            public string Label { get; private set; }
-            public bool IsMet { get; private set; }
-            public Tooltip Tooltip { get; private set; }
-        }
-
     }
 }
