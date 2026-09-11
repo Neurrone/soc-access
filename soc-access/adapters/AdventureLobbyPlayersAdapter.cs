@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -752,6 +752,8 @@ namespace SongsOfConquestAccess.Adapters
                 get { return ModText.Get(ModStrings.Screens.CopyGameCodeToClipboard, GameCode); }
             }
 
+            /// <summary>Put the game's code on the clipboard, answering whether there was one to
+            /// put there. Saying so is the screen's.</summary>
             public bool CopyGameCodeToClipboard()
             {
                 string code = GameCode;
@@ -761,7 +763,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 GUIUtility.systemCopyBuffer = code;
-                SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Screens.CopiedGameCodeToClipboard), interrupt: false));
                 return true;
             }
 

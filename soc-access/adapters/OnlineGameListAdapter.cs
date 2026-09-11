@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -460,6 +460,16 @@ namespace SongsOfConquestAccess.Adapters
                 get { return UITextMeshTextUtility.GetEffectiveText(PlayerInfoTextRef(_entry)); }
             }
 
+            /// <summary>Whether the game can be joined at all: it is open and its version matches
+            /// the one running. A row that cannot is one the screen calls unavailable.</summary>
+            public bool CanJoin
+            {
+                get { return _entry != null && _entry.Open && _entry.MatchingVersions; }
+            }
+
+            /// <summary>What the game itself says about the row: the join command's own words where
+            /// it can be joined, and the reason drawn in its tooltip where it cannot. Empty where the
+            /// game says nothing, which the screen words.</summary>
             public string Status
             {
                 get
@@ -469,17 +479,14 @@ namespace SongsOfConquestAccess.Adapters
                         return string.Empty;
                     }
 
-                    if (_entry.Open && _entry.MatchingVersions)
+                    if (CanJoin)
                     {
                         return _adapter != null && _adapter.JoinSelectedButton != null
                             ? _adapter.JoinSelectedButton.GetLabel()
                             : string.Empty;
                     }
 
-                    string tooltip = TooltipLines.First(GetStatusTooltip());
-                    return !string.IsNullOrWhiteSpace(tooltip)
-                        ? tooltip
-                        : ModText.Get(ModStrings.UI.StatusUnavailable);
+                    return TooltipLines.First(GetStatusTooltip());
                 }
             }
 

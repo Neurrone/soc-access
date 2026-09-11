@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
@@ -66,9 +67,41 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                string title = Live != null ? Live.ResultTitle : null;
+                string title = Live != null ? ResultTitle() : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
+        }
+
+        /// <summary>What the page is called: the words the menu drew over the outcome, and - where it
+        /// drew none the mod can read - the mod's own word for the outcome the menu is showing.
+        /// </summary>
+        private string ResultTitle()
+        {
+            string title = Live.ResultTitle;
+            if (!string.IsNullOrWhiteSpace(title))
+            {
+                return title;
+            }
+
+            if (Live.IsVictory)
+            {
+                return ModText.Get(ModStrings.Combat.Victory);
+            }
+
+            if (Live.IsDefeat)
+            {
+                return ModText.Get(ModStrings.Combat.Defeat);
+            }
+
+            return ModText.Get(ModStrings.Screens.PostAdventureResult);
+        }
+
+        /// <summary>The heading over the outcome's lines: the menu's own, or the mod's word for what
+        /// they are.</summary>
+        private string ObjectivesTitle()
+        {
+            string title = Live.ObjectivesTitle;
+            return string.IsNullOrWhiteSpace(title) ? ModText.Get(ModStrings.Screens.Objectives) : title;
         }
 
         public override void Build(GraphBuilder builder)
@@ -79,7 +112,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.BeginStop(ResultStop);
-            AddLine(builder, "title", () => Live.ResultTitle);
+            AddLine(builder, "title", ResultTitle);
 
             ControlId start = BuildMessage(builder);
             BuildButtons(builder);
@@ -109,7 +142,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             ControlId first = null;
-            builder.PushContext(Live.ObjectivesTitle);
+            builder.PushContext(ObjectivesTitle());
             for (int i = 0; i < objectives.Count; i++)
             {
                 PostAdventureResultAdapter.ObjectiveEntry objective = objectives[i];

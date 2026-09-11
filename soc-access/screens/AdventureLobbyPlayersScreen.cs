@@ -1,8 +1,9 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
@@ -348,7 +349,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 NodeVtable code = GraphNodes.Button(
                     () => panel.CopyGameCodeLabel,
-                    () => panel.CopyGameCodeToClipboard(),
+                    () => CopyGameCode(panel),
                     null,
                     panel.GameCodeTooltip);
                 // NEITHER SELECTED NOR AIMED AT: the game draws the code in one of its own text
@@ -583,5 +584,20 @@ namespace SongsOfConquestAccess.Screens
 
             return key;
         }
+        /// <summary>Put the game's code on the clipboard and say so, because nothing on the screen
+        /// changes to show that it happened.</summary>
+        private static bool CopyGameCode(AdventureLobbyPlayersAdapter.MultiplayerPanelItem panel)
+        {
+            if (!panel.CopyGameCodeToClipboard())
+            {
+                return false;
+            }
+
+            SpeechPipeline.Output(new SpeechRequest(
+                ModText.Get(ModStrings.Screens.CopiedGameCodeToClipboard),
+                interrupt: false));
+            return true;
+        }
+
     }
 }
