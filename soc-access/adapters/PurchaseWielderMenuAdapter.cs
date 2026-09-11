@@ -329,7 +329,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 Tooltip tooltip = PurchaseTooltip;
                 return tooltip != null && tooltip.TextLines.Count > 0
-                    ? SpokenLines.Clean(string.Join(". ", tooltip.TextLines))
+                    ? SpokenLines.Clean(ModText.JoinList(_localization, ModStrings.Common.SentenceSeparator, tooltip.TextLines))
                     : string.Empty;
             }
         }
