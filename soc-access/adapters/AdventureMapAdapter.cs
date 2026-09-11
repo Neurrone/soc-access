@@ -99,8 +99,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly HashSet<string> _unknownMapInstructions = new HashSet<string>(StringComparer.Ordinal);
         private Dictionary<string, TileInstruction> _mapInstructionKinds;
         private bool _mapInstructionKindsProbed;
-        private GameObject _cursorOverlay;
-        private RectTransform[] _cursorOverlaySegments;
+        private readonly FocusedTileOverlay _cursorOverlay = new FocusedTileOverlay("SongsOfConquestAccess_AdventureMapCursor");
         private Vector2Int? _focusedOverlayTile;
 
         // WHAT THIS ADAPTER ATTACHED TO THE GAME. The map's own event listener is bound to this
@@ -2836,14 +2835,12 @@ namespace SongsOfConquestAccess.Adapters
 
             try
             {
-                EnsureCursorOverlay();
-                if (_cursorOverlaySegments == null || _cursorOverlay == null)
+                if (!_cursorOverlay.Ensure())
                 {
                     return;
                 }
 
-                SetScreenOverlayPosition(GetScreenPoint(tile));
-                _cursorOverlay.SetActive(true);
+                _cursorOverlay.MoveTo(GetScreenPoint(tile));
                 _focusedOverlayTile = tile;
             }
             catch (Exception exception)
@@ -3104,7 +3101,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public void ClearFocusedTileOverlay()
         {
-            if (_cursorOverlay == null)
+            if (!_cursorOverlay.IsCreated)
             {
                 _focusedOverlayTile = null;
                 return;
@@ -3112,9 +3109,7 @@ namespace SongsOfConquestAccess.Adapters
 
             try
             {
-                UnityEngine.Object.Destroy(_cursorOverlay);
-                _cursorOverlay = null;
-                _cursorOverlaySegments = null;
+                _cursorOverlay.Destroy();
                 _focusedOverlayTile = null;
                 _tooltipManager?.HideTileTooltip();
             }
@@ -3476,69 +3471,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return ClampToMap(new Vector2Int(_facade.Level.Width / 2, _facade.Level.Height / 2));
-        }
-
-        private void EnsureCursorOverlay()
-        {
-            if (_cursorOverlay != null && _cursorOverlaySegments != null)
-            {
-                return;
-            }
-
-            _cursorOverlay = new GameObject("SongsOfConquestAccess_AdventureMapCursor");
-            Canvas canvas = _cursorOverlay.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            // Keep the cursor above map visuals and the native overlay canvas
-            // (29998), but below native tooltip canvases (30001) and windows.
-            canvas.sortingOrder = 29999;
-            CanvasScaler scaler = _cursorOverlay.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            CanvasGroup canvasGroup = _cursorOverlay.AddComponent<CanvasGroup>();
-            canvasGroup.blocksRaycasts = false;
-            canvasGroup.interactable = false;
-
-            _cursorOverlaySegments = new[]
-            {
-                CreateOverlaySegment("Top"),
-                CreateOverlaySegment("Right"),
-                CreateOverlaySegment("Bottom"),
-                CreateOverlaySegment("Left")
-            };
-        }
-
-        private RectTransform CreateOverlaySegment(string name)
-        {
-            GameObject segment = new GameObject(name);
-            segment.transform.SetParent(_cursorOverlay.transform, false);
-            Image image = segment.AddComponent<Image>();
-            image.color = Color.yellow;
-            image.raycastTarget = false;
-            RectTransform rect = segment.GetComponent<RectTransform>();
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.zero;
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            return rect;
-        }
-
-        private void SetScreenOverlayPosition(Vector2 point)
-        {
-            const float size = 42f;
-            const float thickness = 4f;
-            if (_cursorOverlaySegments == null || _cursorOverlaySegments.Length != 4)
-            {
-                return;
-            }
-
-            SetSegment(_cursorOverlaySegments[0], point + new Vector2(0f, size * 0.5f), new Vector2(size, thickness));
-            SetSegment(_cursorOverlaySegments[1], point + new Vector2(size * 0.5f, 0f), new Vector2(thickness, size));
-            SetSegment(_cursorOverlaySegments[2], point + new Vector2(0f, -size * 0.5f), new Vector2(size, thickness));
-            SetSegment(_cursorOverlaySegments[3], point + new Vector2(-size * 0.5f, 0f), new Vector2(thickness, size));
-        }
-
-        private static void SetSegment(RectTransform segment, Vector2 position, Vector2 size)
-        {
-            segment.anchoredPosition = position;
-            segment.sizeDelta = size;
         }
 
         private IEnumerator RefreshFocusedTileOverlayAfterCameraMove(Vector2Int tile)
