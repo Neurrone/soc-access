@@ -388,3 +388,10 @@ Filled in as the loop is used; keep entries to one line each with the date.
 - 2026-09-11: after the Options window closes, the main menu's landing is sometimes the Continue
   button and sometimes the Options button; read `focusedNodeId` before walking, because a blind
   `ui_next`, `ui_down`, `ui_left_click` activated Continue and loaded the last campaign save twice.
+- 2026-09-11: `InputSystem.QueueStateEvent` from `/eval` drives the router like a real key (a
+  `KeyboardState(Key.LeftShift, Key.Tab)` press, then `KeyboardState(Key.Tab)` for the Shift
+  release, then an empty state) and is how the Shift+Tab double fire was reproduced and proved
+  fixed; but while the game window is unfocused `backgroundBehavior` is
+  `ResetAndDisableAllDevices` and the keyboard is disabled, so queued events go nowhere. Set
+  `InputSystem.settings.backgroundBehavior = IgnoreFocus` and `EnableDevice(Keyboard.current)`
+  for the test and put the setting back after. `/input` bypasses the device and needs none of it.

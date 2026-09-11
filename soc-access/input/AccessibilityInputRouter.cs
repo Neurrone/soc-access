@@ -11,9 +11,6 @@ namespace SongsOfConquestAccess.Input
 {
     public sealed class AccessibilityInputRouter : IDisposable, IObserver<InputEventPtr>
     {
-        private const float ReleasePollingDelaySeconds = 0.05f;
-        private const float ModifiedReleasePollingDelaySeconds = 0.10f;
-
         private readonly ScreenManager _screenManager;
         private readonly Dictionary<string, ActiveBindingState> _activeBindings =
             new Dictionary<string, ActiveBindingState>();
@@ -24,6 +21,7 @@ namespace SongsOfConquestAccess.Input
         {
             _screenManager = screenManager;
             _rawInputSubscription = InputSystem.onEvent.Subscribe(this);
+            UnityEngine.Application.focusChanged += OnFocusChanged;
             FollowKeyboard();
             SocAccessMod.Instance?.LogInfo("AccessibilityInputRouter raw keyboard input attached");
         }
@@ -37,6 +35,7 @@ namespace SongsOfConquestAccess.Input
                 SocAccessMod.Instance?.LogInfo("AccessibilityInputRouter raw keyboard input detached");
             }
 
+            UnityEngine.Application.focusChanged -= OnFocusChanged;
             if (_textKeyboard != null)
             {
                 _textKeyboard.onTextInput -= OnTextInput;
@@ -45,6 +44,16 @@ namespace SongsOfConquestAccess.Input
 
             _activeBindings.Clear();
             _typed.Length = 0;
+        }
+
+        // A key released while the window had no focus sends no event this side ever sees, so the
+        // held-key table is emptied when focus goes: a stale entry would hide that key's next press.
+        private void OnFocusChanged(bool focused)
+        {
+            if (!focused)
+            {
+                _activeBindings.Clear();
+            }
         }
 
         // ---- typed text, for the graph screens' type-ahead search ----
@@ -193,7 +202,6 @@ namespace SongsOfConquestAccess.Input
             FollowKeyboard();
             ForgetTypedAcrossScreens();
             DrainInjections();
-            ConfirmPendingReleases();
         }
 
         /// <summary>
@@ -204,7 +212,7 @@ namespace SongsOfConquestAccess.Input
         /// silence, the same dispatch.
         ///
         /// It deliberately does not touch <see cref="_activeBindings"/>: no physical key is down,
-        /// so there is no release to wait for and nothing to debounce.
+        /// so there is no release to wait for.
         /// </summary>
         public Injection Inject(InputAction action)
         {
@@ -324,13 +332,15 @@ namespace SongsOfConquestAccess.Input
                 return;
             }
 
-            InputDevice device = InputSystem.GetDeviceById(value.deviceId);
-            if (!(device is Keyboard))
+            Keyboard keyboard = InputSystem.GetDeviceById(value.deviceId) as Keyboard;
+            if (keyboard == null)
             {
                 return;
             }
 
-            foreach (InputControl control in InputControlExtensions.EnumerateChangedControls(value, device, 0f))
+            HideHeldKeys(keyboard, value);
+
+            foreach (InputControl control in InputControlExtensions.EnumerateChangedControls(value, keyboard, 0f))
             {
                 KeyControl keyControl = control as KeyControl;
                 if (keyControl == null)
@@ -345,14 +355,90 @@ namespace SongsOfConquestAccess.Input
                 }
 
                 bool pressed = rawValue >= keyControl.pressPointOrDefault;
-                if (pressed)
+                if (pressed && TryHandleKeyDown(keyControl))
                 {
-                    if (TryHandleKeyDown(keyControl))
-                    {
-                        value.handled = true;
-                    }
+                    Hide(keyControl, value);
                 }
             }
+        }
+
+        // HOW A CONSUMED KEY IS KEPT FROM THE GAME, and the bug that lived here for a long time.
+        //
+        // A key the mod takes must not reach the game. This used to be done by marking the whole
+        // event handled, which makes the input system skip it - and skipping it means the keyboard
+        // device never records the key as down. Everything that followed came from that one gap:
+        //
+        // - Keyboard.current[key].isPressed stayed false for a consumed key, so the release wait
+        //   that keyed on it could only be a timer (50 ms plain, 100 ms with a modifier), tuned by
+        //   several attempts against the symptoms below and never long enough.
+        // - The key's release changed nothing against the device's stale state, so no release was
+        //   ever observed here, and the comment of the day blamed the input system for that.
+        // - Every later event while the key was physically held - the Shift going up a moment
+        //   before the Tab under it, another key rolled over, the OS auto-repeat - carried the key
+        //   as down against a device that still said up, so it enumerated as a NEW press. Inside
+        //   the timer it was swallowed; after it, Shift+Tab fired twice, or Tab fired after
+        //   Shift+Tab. Marking those events handled too hid the Shift release from the game and
+        //   from the device, which is where the "modifier state can change while the primary key
+        //   is held" note came from.
+        //
+        // Now only the consumed key's own bit is cleared in the event (WriteValueIntoEvent) and the
+        // event is left to be applied: the game never sees the key, every other key in the same
+        // event reaches the device as it should, and the device agrees with what the mod let
+        // through. While the key stays physically held, each event still carries its true state,
+        // so the held-key table reads it off the event itself: down means "hide it again", up means
+        // released. No timer, no isPressed, no phantom presses.
+        //
+        // Input System 1.7.0's own frame-state bugs (fixed in 1.9.0) are real but were not what
+        // this was:
+        // https://docs.unity.cn/Packages/com.unity.inputsystem%401.10/changelog/CHANGELOG.html#190---2024-07-15
+        // https://discussions.unity.com/t/keyboard-current-temporarily-stops-registering-ispressed-or-waspressedthisframe-after-scene-load/1496259
+        // https://discussions.unity.com/t/keyboard-current-key-waspressedthisframe-fires-multiple-times-before-key-is-released/886444
+        private void HideHeldKeys(Keyboard keyboard, InputEventPtr value)
+        {
+            if (_activeBindings.Count == 0)
+            {
+                return;
+            }
+
+            List<string> released = null;
+            foreach (KeyValuePair<string, ActiveBindingState> item in _activeBindings)
+            {
+                KeyControl keyControl = keyboard[item.Value.PressedKey];
+                float rawValue;
+                if (keyControl == null || !InputControlExtensions.ReadValueFromEvent(keyControl, value, out rawValue))
+                {
+                    // A delta event that does not carry this key says nothing about it.
+                    continue;
+                }
+
+                if (rawValue >= keyControl.pressPointOrDefault)
+                {
+                    Hide(keyControl, value);
+                }
+                else
+                {
+                    if (released == null)
+                    {
+                        released = new List<string>();
+                    }
+
+                    released.Add(item.Key);
+                }
+            }
+
+            if (released != null)
+            {
+                for (int i = 0; i < released.Count; i++)
+                {
+                    _activeBindings.Remove(released[i]);
+                }
+            }
+        }
+
+        // Clear the key's bit in the event, so the device and the game see it as up.
+        private static void Hide(KeyControl keyControl, InputEventPtr value)
+        {
+            InputControlExtensions.WriteValueIntoEvent(keyControl, 0f, value);
         }
 
         private bool TryHandleKeyDown(KeyControl keyControl)
@@ -391,10 +477,9 @@ namespace SongsOfConquestAccess.Input
             ActiveBindingState activeForKey = FindActiveBindingForKey(key);
             if (activeForKey != null)
             {
-                // Modifier state can change while a primary key is still held
-                // (for example, releasing Shift before releasing Tab). Do not let
-                // the same held primary key trigger a different binding until the
-                // primary key has been confirmed released.
+                // Still held since the press that was consumed (HideHeldKeys clears its bit before
+                // the enumeration, so this is only reached for a key the same event both hid and
+                // reported); one press is one dispatch until the key is seen up.
                 return true;
             }
 
@@ -550,78 +635,6 @@ namespace SongsOfConquestAccess.Input
             return null;
         }
 
-        private void ConfirmPendingReleases()
-        {
-            if (_activeBindings.Count == 0)
-            {
-                return;
-            }
-
-            Keyboard keyboard = Keyboard.current;
-            if (keyboard == null)
-            {
-                return;
-            }
-
-            List<string> released = null;
-            foreach (KeyValuePair<string, ActiveBindingState> item in _activeBindings)
-            {
-                ActiveBindingState state = item.Value;
-                float age = UnityEngine.Time.unscaledTime - state.ActivatedAtSeconds;
-                float releaseDelay = GetReleasePollingDelaySeconds(state.Binding);
-                if (age < releaseDelay)
-                {
-                    continue;
-                }
-
-                if (keyboard[state.PressedKey].isPressed)
-                {
-                    continue;
-                }
-
-                // Plain bindings use the shortest release delay that avoids
-                // duplicate key-down handling, so rapid arrow navigation remains
-                // responsive. Modified bindings use a longer delay because
-                // Unity.InputSystem 1.7.0 can emit duplicate raw Tab pressed
-                // events for Shift+Tab while the key was not actually released.
-                // We also did not observe raw Tab release events in this input
-                // path, so release is inferred from Keyboard.current below. From
-                // the mod side this debounce is the available workaround unless
-                // the game updates to Input System 1.9.0 or newer, which fixes
-                // related press/release frame-state bugs:
-                // https://docs.unity.cn/Packages/com.unity.inputsystem%401.10/changelog/CHANGELOG.html#190---2024-07-15
-                // See also:
-                // https://discussions.unity.com/t/keyboard-current-temporarily-stops-registering-ispressed-or-waspressedthisframe-after-scene-load/1496259
-                // https://discussions.unity.com/t/keyboard-current-key-waspressedthisframe-fires-multiple-times-before-key-is-released/886444
-                if (released == null)
-                {
-                    released = new List<string>();
-                }
-
-                released.Add(item.Key);
-            }
-
-            if (released == null)
-            {
-                return;
-            }
-
-            for (int i = 0; i < released.Count; i++)
-            {
-                _activeBindings.Remove(released[i]);
-            }
-        }
-
-        private static float GetReleasePollingDelaySeconds(InputBinding binding)
-        {
-            if (binding != null && binding.IsModified)
-            {
-                return ModifiedReleasePollingDelaySeconds;
-            }
-
-            return ReleasePollingDelaySeconds;
-        }
-
         private bool CurrentScreenClaims(InputAction action)
         {
             return action != null
@@ -636,7 +649,6 @@ namespace SongsOfConquestAccess.Input
                 Action = action;
                 Binding = binding;
                 PressedKey = pressedKey;
-                ActivatedAtSeconds = UnityEngine.Time.unscaledTime;
             }
 
             public InputAction Action { get; private set; }
@@ -644,8 +656,6 @@ namespace SongsOfConquestAccess.Input
             public InputBinding Binding { get; private set; }
 
             public Key PressedKey { get; private set; }
-
-            public float ActivatedAtSeconds { get; private set; }
         }
 
         private sealed class BindingMatch
