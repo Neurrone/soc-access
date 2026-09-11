@@ -102,7 +102,11 @@ namespace SongsOfConquestAccess.Screens
         // passively: baselined on arrival, so only a CHANGE is spoken.
         private string _instruction;
 
-        /// <summary>The cursor is built over one placement: a new one gets a new grid.</summary>
+        /// <summary>The cursor is built over one placement: a new one gets a new grid. The tile
+        /// tooltip is about that same placement's board, so it is dropped here too - keyed on the
+        /// identity of the adapter, which <see cref="LiveScreen{TAdapter}.SyncLive"/> reads from
+        /// the game every frame. Without this a second battle whose cursor starts on the same
+        /// coordinates would be served the previous battle's tooltip.</summary>
         private TroopPlacementHexGrid HexGrid()
         {
             if (_hexGrid != null && ReferenceEquals(_hexGridAdapter, Live))
@@ -112,6 +116,8 @@ namespace SongsOfConquestAccess.Screens
 
             _hexGridAdapter = Live;
             _hexGrid = Live == null ? null : new TroopPlacementHexGrid(Live);
+            _tooltip = null;
+            _tooltipRead = false;
             return _hexGrid;
         }
 
