@@ -1467,13 +1467,13 @@ msgstr "Sürüklemeyi başlat"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Step down"
-msgstr "Bir adım aşağı"
+msgid "Decrease slider by 10%"
+msgstr "Kaydırıcıyı %10 azalt"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Step up"
-msgstr "Bir adım yukarı"
+msgid "Increase slider by 10%"
+msgstr "Kaydırıcıyı %10 artır"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"

@@ -1482,13 +1482,13 @@ msgstr "Ziehen beginnen"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Step down"
-msgstr "Schritt nach unten"
+msgid "Decrease slider by 10%"
+msgstr "Regler um 10 % verringern"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Step up"
-msgstr "Schritt nach oben"
+msgid "Increase slider by 10%"
+msgstr "Regler um 10 % erhöhen"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"

@@ -1482,13 +1482,13 @@ msgstr "Inizia trascinamento"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Step down"
-msgstr "Passo giù"
+msgid "Decrease slider by 10%"
+msgstr "Diminuisci il cursore del 10%"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Step up"
-msgstr "Passo su"
+msgid "Increase slider by 10%"
+msgstr "Aumenta il cursore del 10%"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"

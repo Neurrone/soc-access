@@ -1497,13 +1497,13 @@ msgstr "Начать перетаскивание"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Step down"
-msgstr "Шаг вниз"
+msgid "Decrease slider by 10%"
+msgstr "Уменьшить ползунок на 10%"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Step up"
-msgstr "Шаг вверх"
+msgid "Increase slider by 10%"
+msgstr "Увеличить ползунок на 10%"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"

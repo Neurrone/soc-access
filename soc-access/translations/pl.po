@@ -1497,13 +1497,13 @@ msgstr "Rozpocznij przeciąganie"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Step down"
-msgstr "Krok w dół"
+msgid "Decrease slider by 10%"
+msgstr "Zmniejsz suwak o 10%"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Step up"
-msgstr "Krok w górę"
+msgid "Increase slider by 10%"
+msgstr "Zwiększ suwak o 10%"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"

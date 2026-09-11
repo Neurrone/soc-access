@@ -1467,13 +1467,13 @@ msgstr "開始拖曳"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Step down"
-msgstr "下調一檔"
+msgid "Decrease slider by 10%"
+msgstr "滑桿減少10%"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Step up"
-msgstr "上調一檔"
+msgid "Increase slider by 10%"
+msgstr "滑桿增加10%"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"

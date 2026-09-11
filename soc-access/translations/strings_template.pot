@@ -1281,12 +1281,12 @@ msgstr ""
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Step down"
+msgid "Decrease slider by 10%"
 msgstr ""
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Step up"
+msgid "Increase slider by 10%"
 msgstr ""
 
 #. Actions.UiDown

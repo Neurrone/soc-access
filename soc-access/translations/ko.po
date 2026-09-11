@@ -1467,13 +1467,13 @@ msgstr "끌기 시작"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Step down"
-msgstr "한 단계 내리기"
+msgid "Decrease slider by 10%"
+msgstr "슬라이더 10% 감소"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Step up"
-msgstr "한 단계 올리기"
+msgid "Increase slider by 10%"
+msgstr "슬라이더 10% 증가"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"

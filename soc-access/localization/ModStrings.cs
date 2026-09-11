@@ -308,8 +308,8 @@
             public static readonly ModString UiBack = new ModString("Actions.UiBack", "Back");
             public static readonly ModString UiCarry = new ModString("Actions.UiCarry", "Start drag");
             public static readonly ModString UiClearSearch = new ModString("Actions.UiClearSearch", "Clear typeahead");
-            public static readonly ModString UiCoarseDecrease = new ModString("Actions.UiCoarseDecrease", "Step down");
-            public static readonly ModString UiCoarseIncrease = new ModString("Actions.UiCoarseIncrease", "Step up");
+            public static readonly ModString UiCoarseDecrease = new ModString("Actions.UiCoarseDecrease", "Decrease slider by 10%");
+            public static readonly ModString UiCoarseIncrease = new ModString("Actions.UiCoarseIncrease", "Increase slider by 10%");
             public static readonly ModString UiDown = new ModString("Actions.UiDown", "Move Down");
             public static readonly ModString UiEnd = new ModString("Actions.UiEnd", "Last Item");
             public static readonly ModString UiHome = new ModString("Actions.UiHome", "First Item");

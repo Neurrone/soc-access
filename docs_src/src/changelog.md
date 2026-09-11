@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Keybinds rows renamed: `Shift+Left`/`Shift+Right` read `Step down` and `Step up`, `Enter` reads `Left click or complete drag`, `Alt+R` reads `Summarize enemy essence`, and `Ctrl+R` carries a tooltip saying it summarizes your essence in combat. Removed `W` and `Shift+W` in combat inspect mode, whose ordered walk the restricted arrows already cover
+- Keybinds rows renamed: `Shift+Left`/`Shift+Right` read `Decrease slider by 10%` and `Increase slider by 10%`, `Enter` reads `Left click or complete drag`, `Alt+R` reads `Summarize enemy essence`, and `Ctrl+R` carries a tooltip saying it summarizes your essence in combat. Removed `W` and `Shift+W` in combat inspect mode, whose ordered walk the restricted arrows already cover
 - Every mod gesture on `Enter` or a digit now answers the numpad key too, and a gesture rebound to a numpad key answers the main-block one, the way the game's own `1 or Numpad 1` bindings do
 - Custom scanner categories are now three fixed numbered slots per context instead of a list you add to. `,`, `.` and `/` always walk custom categories 1, 2 and 3, so there is no key to choose any more, and `Clear this custom category` empties a slot in place of deleting it. Categories you already had keep the slot their key gave them, and anything past the third is dropped
 

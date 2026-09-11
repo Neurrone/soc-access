@@ -1482,13 +1482,13 @@ msgstr "Iniciar arrasto"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Step down"
-msgstr "Passo abaixo"
+msgid "Decrease slider by 10%"
+msgstr "Diminuir o controle deslizante em 10%"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Step up"
-msgstr "Passo acima"
+msgid "Increase slider by 10%"
+msgstr "Aumentar o controle deslizante em 10%"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"

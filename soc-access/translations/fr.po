@@ -1482,13 +1482,13 @@ msgstr "Commencer le glisser"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Step down"
-msgstr "Cran vers le bas"
+msgid "Decrease slider by 10%"
+msgstr "Diminuer le curseur de 10 %"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Step up"
-msgstr "Cran vers le haut"
+msgid "Increase slider by 10%"
+msgstr "Augmenter le curseur de 10 %"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"

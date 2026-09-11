@@ -1467,13 +1467,13 @@ msgstr "ドラッグ開始"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Step down"
-msgstr "一段階下げる"
+msgid "Decrease slider by 10%"
+msgstr "スライダーを10%下げる"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Step up"
-msgstr "一段階上げる"
+msgid "Increase slider by 10%"
+msgstr "スライダーを10%上げる"
 
 #. Actions.UiDown
 msgctxt "Actions.UiDown"
