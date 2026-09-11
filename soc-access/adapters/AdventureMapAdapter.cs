@@ -99,6 +99,15 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FocusedTileOverlay _cursorOverlay = new FocusedTileOverlay("SongsOfConquestAccess_AdventureMapCursor");
         private Vector2Int? _focusedOverlayTile;
 
+        // The selected commander's reachable set for one frame, and the game-read values it is the
+        // answer to. See GetReachableMovementCosts.
+        private Dictionary<Vector2Int, float> _reachableMovementCosts;
+        private int _reachableMovementFrame = -1;
+        private int _reachableMovementCommanderId;
+        private int _reachableMovementTeamId;
+        private Vector2Int _reachableMovementOrigin;
+        private float _reachableMovementMovesLeft;
+
         // WHAT THIS ADAPTER ATTACHED TO THE GAME. The map's own event listener is bound to this
         // adventure's facade, selection handler and fog manager, so it lives exactly as long as the
         // adapter over them does and is released in Dispose - never on the screen, which outlives
@@ -692,12 +701,71 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
+            Dictionary<Vector2Int, float> reachable = GetReachableMovementCosts(selectedCommander, teamId);
+            return reachable != null && reachable.TryGetValue(target, out cost);
+        }
+
+        /// <summary>
+        /// The travel cost of every tile the selected commander can still reach this turn, as the
+        /// game's own whole-map Dijkstra answers it, indexed by tile.
+        ///
+        /// <c>PointsWithinReach</c> reads exactly three things - the team, the commander's position
+        /// and its movement left - so those three, plus the commander's id to tell one commander
+        /// from another standing on the same tile with the same moves, are the key, and
+        /// <c>Time.frameCount</c> closes it: within one frame nothing the game owns has moved. Every
+        /// part of the key is read from the game on the call, so a step, a turn, a selection change
+        /// and a hot reload all miss on their own with no hook to tell them to (AGENTS.md, "Screen
+        /// Resolution"). Without this the Dijkstra ran once per tile read, and a scanner snapshot or
+        /// a skip-navigator sweep reads thousands.
+        /// </summary>
+        private Dictionary<Vector2Int, float> GetReachableMovementCosts(ICommanderState selectedCommander, int teamId)
+        {
+            int frame = Time.frameCount;
+            Vector2Int origin = selectedCommander.Position;
+            float movesLeft = selectedCommander.MovesLeft;
+            int commanderId = selectedCommander.Id;
+            if (_reachableMovementCosts != null
+                && _reachableMovementFrame == frame
+                && _reachableMovementCommanderId == commanderId
+                && _reachableMovementTeamId == teamId
+                && _reachableMovementOrigin == origin
+                && _reachableMovementMovesLeft == movesLeft)
+            {
+                return _reachableMovementCosts;
+            }
+
             PathNode[] reachable = _facade.Level.PointsWithinReach(
                 teamId,
-                selectedCommander.Position,
-                selectedCommander.MovesLeft,
+                origin,
+                movesLeft,
                 (PathfinderCacheType)0);
-            return TryGetReachableMovementCost(reachable, target, out cost);
+            Dictionary<Vector2Int, float> costs = new Dictionary<Vector2Int, float>();
+            if (reachable != null)
+            {
+                for (int i = 0; i < reachable.Length; i++)
+                {
+                    PathNode node = reachable[i];
+                    if (float.IsInfinity(node.travelCost))
+                    {
+                        continue;
+                    }
+
+                    Vector2Int point = new Vector2Int(node.point.x, node.point.y);
+                    if (!costs.ContainsKey(point))
+                    {
+                        // First finite cost for a tile wins, as the linear scan this replaces did.
+                        costs.Add(point, node.travelCost);
+                    }
+                }
+            }
+
+            _reachableMovementCosts = costs;
+            _reachableMovementFrame = frame;
+            _reachableMovementCommanderId = commanderId;
+            _reachableMovementTeamId = teamId;
+            _reachableMovementOrigin = origin;
+            _reachableMovementMovesLeft = movesLeft;
+            return costs;
         }
 
         public static bool TryGetReachableMovementCost(PathNode[] reachable, Vector2Int target, out float cost)
