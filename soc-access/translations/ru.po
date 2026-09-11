@@ -3841,3 +3841,8 @@ msgctxt "Scanner.CustomCategoryEmpty"
 msgid "Custom category {0} is empty"
 msgstr "Своя категория {0} пуста"
 
+#. Spatial.Coordinates
+msgctxt "Spatial.Coordinates"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
+

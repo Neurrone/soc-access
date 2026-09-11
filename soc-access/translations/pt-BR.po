@@ -3811,3 +3811,8 @@ msgctxt "Scanner.CustomCategoryEmpty"
 msgid "Custom category {0} is empty"
 msgstr "A categoria personalizada {0} está vazia"
 
+#. Spatial.Coordinates
+msgctxt "Spatial.Coordinates"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
+

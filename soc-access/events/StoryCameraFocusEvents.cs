@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Speech.Spatial;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -26,7 +27,7 @@ namespace SongsOfConquestAccess.Events
 
         public string ToSpeech()
         {
-            return ModText.Get(ModStrings.Events.StoryCameraFocusTargetAt, Label, Tile.x + ", " + Tile.y);
+            return ModText.Get(ModStrings.Events.StoryCameraFocusTargetAt, Label, SquareCoordinateFormatter.Format(Tile));
         }
     }
 

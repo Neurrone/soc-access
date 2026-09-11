@@ -939,6 +939,11 @@ msgctxt "Spatial.ZoneOfControlInstance"
 msgid "{0} within {1}"
 msgstr ""
 
+#. Spatial.Coordinates
+msgctxt "Spatial.Coordinates"
+msgid "{0}, {1}"
+msgstr ""
+
 #. Actions.Cancel
 msgctxt "Actions.Cancel"
 msgid "Cancel"

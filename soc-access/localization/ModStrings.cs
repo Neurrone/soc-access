@@ -234,6 +234,7 @@
             public static readonly ModString ZoneOfControl = new ModString("Spatial.ZoneOfControl", "Zone of control");
             public static readonly ModString ZoneOfControlTiles = new ModString("Spatial.ZoneOfControlTiles", "{0} within {1} zone of control");
             public static readonly ModString ZoneOfControlInstance = new ModString("Spatial.ZoneOfControlInstance", "{0} within {1}");
+            public static readonly ModString Coordinates = new ModString("Spatial.Coordinates", "{0}, {1}");
         }
 
         public static class Actions

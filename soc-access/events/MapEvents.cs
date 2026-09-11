@@ -71,12 +71,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return ModText.Get(ModStrings.Events.WielderMoved, WielderName, FormatTile(Tile));
-        }
-
-        private static string FormatTile(Vector2Int tile)
-        {
-            return tile.x + ", " + tile.y;
+            return ModText.Get(ModStrings.Events.WielderMoved, WielderName, SquareCoordinateFormatter.Format(Tile));
         }
     }
 
@@ -101,12 +96,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return ModText.Get(ModStrings.Events.WielderTeleported, WielderName, FormatTile(Tile));
-        }
-
-        private static string FormatTile(Vector2Int tile)
-        {
-            return tile.x + ", " + tile.y;
+            return ModText.Get(ModStrings.Events.WielderTeleported, WielderName, SquareCoordinateFormatter.Format(Tile));
         }
     }
 
@@ -128,7 +118,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return ModText.Get(ModStrings.Events.SelectedBuildSite, FormatSize(Size), FormatTile(Tile));
+            return ModText.Get(ModStrings.Events.SelectedBuildSite, FormatSize(Size), SquareCoordinateFormatter.Format(Tile));
         }
 
         private static string FormatSize(BuildSiteSize size)
@@ -148,11 +138,6 @@ namespace SongsOfConquestAccess.Events
                 default:
                     return ModText.Get(ModStrings.Events.BuildSiteSmall);
             }
-        }
-
-        private static string FormatTile(Vector2Int tile)
-        {
-            return tile.x + ", " + tile.y;
         }
     }
 
@@ -272,7 +257,7 @@ namespace SongsOfConquestAccess.Events
 
         private string DescribeDestinationTile()
         {
-            return ModText.Get(ModStrings.Events.DestinationSet, WielderName, FormatTile(Destination));
+            return ModText.Get(ModStrings.Events.DestinationSet, WielderName, SquareCoordinateFormatter.Format(Destination));
         }
 
         // A route that ends in an interaction names it after the last step, so the
@@ -361,11 +346,6 @@ namespace SongsOfConquestAccess.Events
 
             return ModText.JoinListWithCommas(parts);
         }
-
-        private static string FormatTile(Vector2Int tile)
-        {
-            return tile.x + ", " + tile.y;
-        }
     }
 
     public sealed class MapDestinationClearedEvent : IAccessibilityEvent
@@ -448,7 +428,7 @@ namespace SongsOfConquestAccess.Events
         public string GetSpeechText()
         {
             return Announce
-                ? ModText.Get(ModStrings.Events.MapCameraFocus, Tile.x + ", " + Tile.y)
+                ? ModText.Get(ModStrings.Events.MapCameraFocus, SquareCoordinateFormatter.Format(Tile))
                 : string.Empty;
         }
     }

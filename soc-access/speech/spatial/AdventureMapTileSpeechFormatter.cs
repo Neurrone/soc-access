@@ -92,7 +92,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         public string DescribeCoordinates(AdventureMapTile tile)
         {
-            return tile == null ? string.Empty : tile.Position.x + ", " + tile.Position.y;
+            return tile == null ? string.Empty : SquareCoordinateFormatter.Format(tile.Position);
         }
 
         private IEnumerable<AnnouncementPart> BuildTileParts(AdventureMapTile tile)
@@ -210,7 +210,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             {
                 yield return new AnnouncementPart(
                     AdventureMapAnnouncementDefinitions.WielderKeys.Destination,
-                    ModText.Get(ModStrings.Spatial.DestinationAt, FormatPoint(commander.Destination)));
+                    ModText.Get(ModStrings.Spatial.DestinationAt, SquareCoordinateFormatter.Format(commander.Destination)));
             }
 
             if (commander.IsOwnedByLocalTeam
@@ -219,7 +219,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             {
                 yield return new AnnouncementPart(
                     AdventureMapAnnouncementDefinitions.WielderKeys.ThisTurnDestination,
-                    ModText.Get(ModStrings.Spatial.ThisTurnAt, FormatPoint(commander.ThisTurnDestination)));
+                    ModText.Get(ModStrings.Spatial.ThisTurnAt, SquareCoordinateFormatter.Format(commander.ThisTurnDestination)));
             }
         }
 
@@ -431,11 +431,6 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 ModStrings.UI.LabelValue,
                 FirstNonEmpty(commander.MovementLabel, ModText.Get(ModStrings.Spatial.Movement)),
                 FormatMovementValue(commander.MovesLeft) + " / " + FormatMovementValue(commander.MaxMovement));
-        }
-
-        private static string FormatPoint(UnityEngine.Vector2Int point)
-        {
-            return point.x + ", " + point.y;
         }
 
         private static string FirstNonEmpty(string preferred, string fallback)
