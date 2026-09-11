@@ -458,12 +458,6 @@ namespace SongsOfConquestAccess.Adapters
             return "ready";
         }
 
-        public CombatSnapshot BuildSnapshot()
-        {
-            Vector2Int size = _facade != null && _facade.Level != null ? _facade.Level.Size : Vector2Int.zero;
-            return new CombatSnapshot(size, this);
-        }
-
         public Vector2Int GetInitialTile()
         {
             CombatTargetingMode mode = GetTargetingMode();
@@ -3071,29 +3065,6 @@ namespace SongsOfConquestAccess.Adapters
             return point.x + ", " + point.y;
         }
 
-    }
-
-    public sealed class CombatSnapshot
-    {
-        private readonly CombatAdapter _adapter;
-
-        public CombatSnapshot(Vector2Int size, CombatAdapter adapter)
-        {
-            Size = size;
-            _adapter = adapter;
-        }
-
-        public Vector2Int Size { get; private set; }
-
-        public bool IsValidTile(Vector2Int point)
-        {
-            return _adapter != null && _adapter.IsValidTile(point);
-        }
-
-        public CombatTile Get(Vector2Int point)
-        {
-            return _adapter != null ? _adapter.GetTile(point) : null;
-        }
     }
 
     public sealed class CombatTile

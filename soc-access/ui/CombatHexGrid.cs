@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Input;
@@ -31,7 +31,6 @@ namespace SongsOfConquestAccess.UI
         // The screen that owns this grid, handed over when it builds it: the troop cycles and the
         // turn-order jump are the screen's, and the board's keys reach them through here.
         private readonly CombatScreen _screen;
-        private CombatSnapshot _snapshot;
         private Vector2Int _cursor;
         private CombatInspectContext _inspectContext;
         private bool _componentWarningSpoken;
@@ -41,7 +40,6 @@ namespace SongsOfConquestAccess.UI
         {
             _adapter = adapter;
             _screen = screen;
-            RefreshSnapshot();
             _cursor = _adapter != null ? _adapter.GetInitialTile() : Vector2Int.zero;
             _scanner = new HexGridScanner(
                 origin => ScannerCustomCategorySynthesizer.ApplyFromSettings(
@@ -260,8 +258,7 @@ namespace SongsOfConquestAccess.UI
         /// the troop cycles and the narrator's "it is your turn" all land this way.</summary>
         public bool MoveToTroop(Vector2Int point)
         {
-            RefreshSnapshot();
-            if (_snapshot == null || !_snapshot.IsValidTile(point))
+            if (_adapter == null || !_adapter.IsValidTile(point))
             {
                 return false;
             }
@@ -297,7 +294,7 @@ namespace SongsOfConquestAccess.UI
 
         private void PlayTileCuesFor(Vector2Int point, float panOffset, float gainScale, float semitoneOffset)
         {
-            CombatTile tile = _snapshot != null ? _snapshot.Get(point) : null;
+            CombatTile tile = _adapter != null ? _adapter.GetTile(point) : null;
             if (tile == null)
             {
                 return;
@@ -322,8 +319,7 @@ namespace SongsOfConquestAccess.UI
 
         private bool MoveToCenterTile()
         {
-            RefreshSnapshot();
-            if (_snapshot == null || !_snapshot.IsValidTile(HexGridMoves.CenterTile))
+            if (_adapter == null || !_adapter.IsValidTile(HexGridMoves.CenterTile))
             {
                 return true;
             }
@@ -349,12 +345,11 @@ namespace SongsOfConquestAccess.UI
 
         private bool SkipMove(Func<Vector2Int, Vector2Int> step)
         {
-            RefreshSnapshot();
             TileSkipResult result = TileSkipNavigator.FindTarget(
                 _cursor,
                 step,
                 IsValidSkipTile,
-                point => CombatTileSkipSignature.FromTile(_snapshot != null ? _snapshot.Get(point) : null));
+                point => CombatTileSkipSignature.FromTile(_adapter != null ? _adapter.GetTile(point) : null));
             if (result.Target == _cursor)
             {
                 CueLibrary.PlayCue(CueLibrary.MoveDenied);
@@ -367,7 +362,7 @@ namespace SongsOfConquestAccess.UI
 
         private bool IsValidSkipTile(Vector2Int point)
         {
-            if (_snapshot == null || !_snapshot.IsValidTile(point))
+            if (_adapter == null || !_adapter.IsValidTile(point))
             {
                 return false;
             }
@@ -441,7 +436,7 @@ namespace SongsOfConquestAccess.UI
 
         private bool SetCursor(Vector2Int point)
         {
-            if (_snapshot == null || !_snapshot.IsValidTile(point))
+            if (_adapter == null || !_adapter.IsValidTile(point))
             {
                 CueLibrary.PlayCue(CueLibrary.MoveDenied);
                 return true;
@@ -469,7 +464,6 @@ namespace SongsOfConquestAccess.UI
 
         private void FocusCurrentTile(bool updateNativeFocus)
         {
-            RefreshSnapshot();
             if (_adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None)
             {
                 if (_inspectContext != null)
@@ -528,7 +522,7 @@ namespace SongsOfConquestAccess.UI
         /// the tile itself.</summary>
         private string DescribeInspectTarget(CombatInspectContext context)
         {
-            CombatTile tile = context != null && _snapshot != null ? _snapshot.Get(context.PinnedTile) : null;
+            CombatTile tile = context != null && _adapter != null ? _adapter.GetTile(context.PinnedTile) : null;
             if (tile == null || _adapter == null)
             {
                 return string.Empty;
@@ -544,14 +538,9 @@ namespace SongsOfConquestAccess.UI
                 : _adapter.DescribeTile(tile, null);
         }
 
-        private void RefreshSnapshot()
-        {
-            _snapshot = _adapter != null ? _adapter.BuildSnapshot() : null;
-        }
-
         private CombatTile GetFocusedTile()
         {
-            return _snapshot != null ? _snapshot.Get(_cursor) : null;
+            return _adapter != null ? _adapter.GetTile(_cursor) : null;
         }
 
         private CombatInspectContext GetEffectiveInspectContext()
