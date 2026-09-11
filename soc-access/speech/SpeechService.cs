@@ -46,7 +46,6 @@ namespace SongsOfConquestAccess.Speech
                 _backend = PrismNative.RegistryCreateBest(_context);
                 if (_backend == IntPtr.Zero)
                 {
-                    LogBoiyuInitializationProbe(null);
                     _logger.LogError("Prism initialization failed: no available speech backend");
                     Dispose();
                     return false;
@@ -69,10 +68,6 @@ namespace SongsOfConquestAccess.Speech
                     + " ["
                     + FormatFeatures(_backendFeatures)
                     + "])");
-                if (selectedInfo == null || selectedInfo.Id != PrismNative.BackendBoyPcReader)
-                {
-                    LogBoiyuInitializationProbe(selectedInfo);
-                }
             }
             catch (DllNotFoundException ex)
             {
@@ -223,9 +218,7 @@ namespace SongsOfConquestAccess.Speech
                     ulong id = PrismNative.RegistryIdAt(_context, new UIntPtr(index));
                     string name = PrismNative.RegistryName(_context, id) ?? "<unknown>";
                     int priority = PrismNative.RegistryPriority(_context, id);
-                    bool exists = PrismNative.RegistryExists(_context, id);
-                    BackendDiagnosticInfo info = new BackendDiagnosticInfo(id, name, priority, exists);
-                    backends.Add(info);
+                    backends.Add(new BackendDiagnosticInfo(id, name, priority));
                     _logger.LogInfo(
                         "Prism registry backend: id="
                         + FormatBackendId(id)
@@ -234,8 +227,6 @@ namespace SongsOfConquestAccess.Speech
                         + ", priority="
                         + priority);
                 }
-
-                LogBoiyuRegistryDiagnostics(backends);
             }
             catch (Exception ex)
             {
@@ -243,103 +234,6 @@ namespace SongsOfConquestAccess.Speech
             }
 
             return backends;
-        }
-
-        private void LogBoiyuRegistryDiagnostics(List<BackendDiagnosticInfo> backends)
-        {
-            BackendDiagnosticInfo boiyu = FindBackendById(backends, PrismNative.BackendBoyPcReader);
-            if (boiyu != null)
-            {
-                _logger.LogInfo(
-                    "Prism Boiyu backend registry entry: exists="
-                    + boiyu.Exists
-                    + ", id="
-                    + FormatBackendId(boiyu.Id)
-                    + ", name="
-                    + boiyu.Name
-                    + ", priority="
-                    + boiyu.Priority);
-                return;
-            }
-
-            bool exists = PrismNative.RegistryExists(_context, PrismNative.BackendBoyPcReader);
-            string name = exists ? PrismNative.RegistryName(_context, PrismNative.BackendBoyPcReader) : null;
-            string priority = exists ? PrismNative.RegistryPriority(_context, PrismNative.BackendBoyPcReader).ToString() : "<unavailable>";
-            _logger.LogInfo(
-                "Prism Boiyu backend registry entry: exists="
-                + exists
-                + ", id="
-                + FormatBackendId(PrismNative.BackendBoyPcReader)
-                + ", name="
-                + (name ?? "<unavailable>")
-                + ", priority="
-                + priority);
-        }
-
-        private void LogBoiyuInitializationProbe(BackendDiagnosticInfo selectedInfo)
-        {
-            try
-            {
-                bool exists = PrismNative.RegistryExists(_context, PrismNative.BackendBoyPcReader);
-                if (!exists)
-                {
-                    _logger.LogInfo("Prism Boiyu backend probe skipped because the backend is not registered");
-                    return;
-                }
-
-                if (selectedInfo != null && selectedInfo.Id == PrismNative.BackendBoyPcReader)
-                {
-                    _logger.LogInfo("Prism Boiyu backend probe skipped because Boiyu is the selected backend");
-                    return;
-                }
-
-                IntPtr backend = PrismNative.RegistryCreate(_context, PrismNative.BackendBoyPcReader);
-                if (backend == IntPtr.Zero)
-                {
-                    _logger.LogWarning("Prism Boiyu backend probe failed: registry_create returned null");
-                    return;
-                }
-
-                try
-                {
-                    PrismNative.PrismError error = PrismNative.BackendInitialize(backend);
-                    PrismNative.BackendFeatures features = (PrismNative.BackendFeatures)PrismNative.BackendGetFeatures(backend);
-                    _logger.LogInfo(
-                        "Prism Boiyu backend probe: initialize="
-                        + FormatError(error)
-                        + ", features=0x"
-                        + ((ulong)features).ToString("X")
-                        + " ["
-                        + FormatFeatures(features)
-                        + "]");
-                }
-                finally
-                {
-                    PrismNative.BackendFree(backend);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning("Prism Boiyu backend probe failed: " + ex.Message);
-            }
-        }
-
-        private static BackendDiagnosticInfo FindBackendById(List<BackendDiagnosticInfo> backends, ulong id)
-        {
-            if (backends == null)
-            {
-                return null;
-            }
-
-            for (int i = 0; i < backends.Count; i++)
-            {
-                if (backends[i] != null && backends[i].Id == id)
-                {
-                    return backends[i];
-                }
-            }
-
-            return null;
         }
 
         private static BackendDiagnosticInfo FindBackendByName(List<BackendDiagnosticInfo> backends, string name)
@@ -432,12 +326,11 @@ namespace SongsOfConquestAccess.Speech
 
         private sealed class BackendDiagnosticInfo
         {
-            public BackendDiagnosticInfo(ulong id, string name, int priority, bool exists)
+            public BackendDiagnosticInfo(ulong id, string name, int priority)
             {
                 Id = id;
                 Name = name;
                 Priority = priority;
-                Exists = exists;
             }
 
             public ulong Id { get; private set; }
@@ -445,8 +338,6 @@ namespace SongsOfConquestAccess.Speech
             public string Name { get; private set; }
 
             public int Priority { get; private set; }
-
-            public bool Exists { get; private set; }
         }
     }
 }

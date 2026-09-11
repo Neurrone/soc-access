@@ -1192,24 +1192,6 @@ namespace SongsOfConquestAccess.Events
             return AdventureMapEntityLabel.GetMapEntityName(_facade, _selectionHandler, _localizationHandler, entity);
         }
 
-        private string Localize(string key)
-        {
-            if (string.IsNullOrWhiteSpace(key) || _localizationHandler == null)
-            {
-                return string.Empty;
-            }
-
-            try
-            {
-                string text = _localizationHandler.GetText(key);
-                return string.IsNullOrWhiteSpace(text) || text == key ? string.Empty : text;
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
-        }
-
         private struct DiscoveryCount
         {
             public DiscoveryCount(string label, int count)

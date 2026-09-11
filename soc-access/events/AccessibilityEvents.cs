@@ -37,11 +37,6 @@ namespace SongsOfConquestAccess.Events
             public const string CameraFocusStarted = "story.camera_focus.started";
         }
 
-        public static class ArmyExchange
-        {
-            public const string InvalidDestination = "army_exchange.invalid_destination";
-        }
-
         public static class Combat
         {
             public const string NewTurn = "combat.turn.new";

@@ -52,11 +52,6 @@ namespace SongsOfConquestAccess.Events
 
     public sealed class MapWielderMovedEvent : IAccessibilityEvent
     {
-        public MapWielderMovedEvent(int wielderId, string wielderName, Vector2Int tile)
-            : this(wielderId, wielderName, tile, isLocalWielder: false)
-        {
-        }
-
         public MapWielderMovedEvent(int wielderId, string wielderName, Vector2Int tile, bool isLocalWielder)
         {
             WielderId = wielderId;
