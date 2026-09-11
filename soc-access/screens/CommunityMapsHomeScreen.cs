@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
@@ -143,7 +143,7 @@ namespace SongsOfConquestAccess.Screens
                     () => captured.Label,
                     () => captured.IsSelected);
                 vtable.OnActivate = () => captured.Select();
-                builder.AddItem(Synthetic("tab/" + captured.Id, vtable));
+                builder.AddItem(Synthetic("tab/" + captured.Key, vtable));
             }
         }
 

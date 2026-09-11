@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquest.Client.Menu;
@@ -145,13 +145,13 @@ namespace SongsOfConquestAccess.UI
                     if (HasRowsUnder(controls, i))
                     {
                         builder.PushContext(caption.GetText());
-                        builder.SetRegion(caption.Id);
+                        builder.SetRegion(caption.Key);
                         inCaption = true;
                     }
                     else
                     {
                         builder.AddItem(new SyntheticNode(
-                            ControlId.For(_markers.For(caption.Id), _prefix + ":caption/" + caption.Id),
+                            ControlId.For(_markers.For(caption.Key), _prefix + ":caption/" + caption.Key),
                             GraphNodes.Text(caption.GetText)));
                     }
 
@@ -183,7 +183,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             builder.AddItem(new DrawnNode(
-                ControlId.For(subject, _rowKey + text.Id),
+                ControlId.For(subject, _rowKey + text.Key),
                 GraphNodes.Text(text.GetText),
                 subject));
         }
@@ -208,7 +208,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             builder.AddItem(new SyntheticNode(
-                ControlId.For(_markers.For(button.Id), _prefix + ":" + button.Id),
+                ControlId.For(_markers.For(button.Key), _prefix + ":" + button.Key),
                 Button(button, label)));
         }
 
@@ -299,7 +299,7 @@ namespace SongsOfConquestAccess.UI
 
             // The row's identity across rebuilds; the widget it is drawn as is the scroll anchor and
             // the existence evidence.
-            sheet.RowAt(nodes.Name, binding.Id, nodes.Cells, row.Transform);
+            sheet.RowAt(nodes.Name, binding.Key, nodes.Cells, row.Transform);
         }
 
         /// <summary>The binding chip: the current hotkey or "not bound". A BUTTON that clears the
@@ -532,7 +532,7 @@ namespace SongsOfConquestAccess.UI
                     toggle.IsEnabled,
                     toggle.GetTooltip());
                 vtable.OnFocusVisual = toggle.Focus;
-                into.Add(new DrawnNode(ControlId.For(subject, _rowKey + toggle.Id), vtable, subject));
+                into.Add(new DrawnNode(ControlId.For(subject, _rowKey + toggle.Key), vtable, subject));
                 return;
             }
 
@@ -553,7 +553,7 @@ namespace SongsOfConquestAccess.UI
                     dropdown.IsEnabled,
                     dropdown.GetTooltip());
                 vtable.OnFocusVisual = dropdown.Focus;
-                into.Add(new DrawnNode(ControlId.For(subject, _rowKey + dropdown.Id), vtable, subject));
+                into.Add(new DrawnNode(ControlId.For(subject, _rowKey + dropdown.Key), vtable, subject));
                 return;
             }
 
@@ -582,7 +582,7 @@ namespace SongsOfConquestAccess.UI
                     input.IsEnabled,
                     input.GetTooltip());
                 GraphNodes.DoNotDrawTooltip(vtable);
-                into.Add(new DrawnNode(ControlId.For(subject, _rowKey + input.Id), vtable, subject));
+                into.Add(new DrawnNode(ControlId.For(subject, _rowKey + input.Key), vtable, subject));
                 return;
             }
 
@@ -590,7 +590,7 @@ namespace SongsOfConquestAccess.UI
             if (button != null)
             {
                 into.Add(new DrawnNode(
-                    ControlId.For(subject, _rowKey + button.Id),
+                    ControlId.For(subject, _rowKey + button.Key),
                     Button(button, button.GetLabel),
                     subject));
             }
@@ -618,7 +618,7 @@ namespace SongsOfConquestAccess.UI
                     ? (Action)null
                     : () => slider.OpenValueEditor());
             vtable.OnFocusVisual = slider.Focus;
-            into.Add(new DrawnNode(ControlId.For(subject, _rowKey + slider.Id), vtable, subject));
+            into.Add(new DrawnNode(ControlId.For(subject, _rowKey + slider.Key), vtable, subject));
         }
 
         /// <summary>The two halves of a time row, each on the game's own field, each named with the
@@ -654,7 +654,7 @@ namespace SongsOfConquestAccess.UI
                 time.GetTooltip());
             GraphNodes.DoNotDrawTooltip(vtable);
             into.Add(new DrawnNode(
-                ControlId.For(subject, _rowKey + time.Id + "/" + part),
+                ControlId.For(subject, _rowKey + time.Key + "/" + part),
                 vtable,
                 subject));
         }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -32,7 +32,7 @@ namespace SongsOfConquestAccess.Dev
     ///   GET  /speech?since=N&amp;wait=MS
     ///                           lines spoken after sequence N, plus the next cursor; with wait, hold
     ///                           the connection open until there is one
-    ///   GET  /gui/graph?buffers=1&amp;flat=1&amp;edges=1&amp;screen=KEY
+    ///   GET  /gui/graph?buffers=1&amp;flat=1&amp;edges=1&amp;screen=KEY&amp;lines=N
     ///                           the accessible tree of the focused screen, or of the named one
     ///                           (see <see cref="GraphDump"/>)
     ///   GET  /screens          every registered screen: key, type, layer, active, on stack, focused
@@ -104,7 +104,7 @@ namespace SongsOfConquestAccess.Dev
             _host.RegisterRoute("GET", "/status", Status);
             _host.RegisterRoute("GET", "/speech", Speech, "since", "wait");
             _host.RegisterRoute("GET", "/screens", Screens);
-            _host.RegisterRoute("GET", "/gui/graph", Graph, "buffers", "flat", "edges", "screen");
+            _host.RegisterRoute("GET", "/gui/graph", Graph, "buffers", "flat", "edges", "screen", "lines");
             _host.RegisterRoute("POST", "/type", Type);
             _host.RegisterRoute(
                 "GET",
@@ -251,7 +251,8 @@ namespace SongsOfConquestAccess.Dev
         }
 
         /// <summary>The same for a graph screen (see <see cref="GraphDump"/>); <c>edges=1</c> adds
-        /// where each arrow goes from every node.</summary>
+        /// where each arrow goes from every node, and <c>lines=N</c> raises the line the dump is cut
+        /// off at (default <see cref="GraphDump.DefaultMaxLines"/>) for a screen too big for it.</summary>
         private DevResponse Graph(DevRequest request)
         {
             bool buffers;
@@ -266,11 +267,12 @@ namespace SongsOfConquestAccess.Dev
                 return bad;
             }
 
+            int lines = request.QueryInt("lines", GraphDump.DefaultMaxLines);
             string key = request.QueryValue("screen");
             if (string.IsNullOrEmpty(key))
             {
                 return Plain(
-                    (string)_host.MainThread.Run(() => GraphDump.Dump(_screens, buffers, flat, edges))
+                    (string)_host.MainThread.Run(() => GraphDump.Dump(_screens, null, buffers, flat, edges, lines))
                 );
             }
 
@@ -283,7 +285,7 @@ namespace SongsOfConquestAccess.Dev
                     return null;
                 }
 
-                return GraphDump.Dump(_screens, graph, buffers, flat, edges);
+                return GraphDump.Dump(_screens, graph, buffers, flat, edges, lines);
             });
 
             if (answer == null)

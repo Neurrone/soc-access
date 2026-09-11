@@ -914,15 +914,15 @@ namespace SongsOfConquestAccess.Adapters
             private readonly Func<bool> _isSelected;
             private readonly Func<bool> _select;
 
-            public TabItem(string id, string label, Func<bool> isSelected, Func<bool> select)
+            public TabItem(string key, string label, Func<bool> isSelected, Func<bool> select)
             {
-                Id = id ?? string.Empty;
+                Key = key ?? string.Empty;
                 Label = label ?? string.Empty;
                 _isSelected = isSelected;
                 _select = select;
             }
 
-            public string Id { get; private set; }
+            public string Key { get; private set; }
             public string Label { get; private set; }
             public bool IsSelected { get { return _isSelected != null && _isSelected(); } }
             public bool Select() { return _select != null && _select(); }

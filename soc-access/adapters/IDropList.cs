@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.Adapters
@@ -15,7 +15,9 @@ namespace SongsOfConquestAccess.Adapters
     /// </summary>
     public interface IDropList
     {
-        string Id { get; }
+        /// <summary>What this drop list is known by - a stable KEY the screen builds its node id
+        /// from, never the node id itself.</summary>
+        string Key { get; }
         Func<IReadOnlyList<string>> GetOptions { get; }
         Func<int> GetValue { get; }
         Func<bool> IsEnabled { get; }

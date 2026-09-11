@@ -91,7 +91,7 @@ namespace SongsOfConquestAccess.UI
                 ModText.Get(expanded ? ModStrings.UI.StatusExpanded : ModStrings.UI.StatusCollapsed);
             GraphSheet.BlankText = () => ModText.Get(ModStrings.UI.Blank);
             // "table", the word ES2 uses, not the widget tree's "grid": a sheet is a table of rows and
-            // columns, and a grid is the map. RoleGrid stays where an adapter's own title still says it.
+            // columns, and a grid is the map.
             GraphSheet.TableRoleText = () => ModText.Get(ModStrings.UI.RoleTable);
             GraphSheet.TextCellType = ControlTypes.Text;
 
@@ -1090,6 +1090,10 @@ namespace SongsOfConquestAccess.UI
                 }
                 catch (Exception)
                 {
+                    // Silent on purpose: this runs for every live part of the focused node on every
+                    // frame, so a getter that throws would throw again next frame and a log would be
+                    // one line per frame for as long as the cursor rests there. A part that cannot
+                    // be read reads as nothing, which the diff below treats as "unchanged".
                 }
 
                 if (baseline)
@@ -1136,6 +1140,10 @@ namespace SongsOfConquestAccess.UI
             }
             catch (Exception)
             {
+                // Silent on purpose: asking a DESTROYED component for its game object throws, and
+                // that is the ordinary way a drawn node goes away - a menu closing under the cursor,
+                // once a frame while it does. Answered as still drawn, which is the same answer a
+                // node the engine cannot ask gets, and the next build drops the node anyway.
                 return true;
             }
         }
@@ -1246,6 +1254,10 @@ namespace SongsOfConquestAccess.UI
             }
             catch (Exception)
             {
+                // Silent on purpose: this is asked of the focused node on every frame to see whether
+                // its pointer target has moved, so a throwing PointsAt would log once a frame. No
+                // target is the same answer a node that declares none gives - the hover is released
+                // and nothing else changes.
                 return null;
             }
         }

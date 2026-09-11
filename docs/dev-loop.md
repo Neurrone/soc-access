@@ -78,14 +78,15 @@ Mod routes answer 404 while the mod is down:
   `IsActive()` answers true, whether it is on the stack, whether the player is on it, and the
   last exception its predicate threw. The answer to "why is the mod not on the page I am
   looking at". Side-effect free.
-- `GET /gui/graph?buffers=1&flat=1&edges=1&screen=KEY`: the whole accessible tree of the focused
-  screen (`screens/GraphScreen.cs`): one line per node in navigation order, indented by its
+- `GET /gui/graph?buffers=1&flat=1&edges=1&screen=KEY&lines=N`: the whole accessible tree of the
+  focused screen (`screens/GraphScreen.cs`): one line per node in navigation order, indented by its
   depth, with `-- stop:` markers between Tab stops and `(collapsed)` on a shut group;
   `buffers=1` adds each node's review-buffer lines, `flat=1` answers one
   `label | status | buffer` line per leaf for diffing, `edges=1` adds where each arrow
   goes from every node (a wired edge, `adjust value`, `expand`, `descend to`, `collapse`,
   `ascend to`). `screen=KEY` dumps that registered screen instead, built over a throwaway state
-  whether or not anyone is on it; an unknown key answers 404 listing the keys. Side-effect free:
+  whether or not anyone is on it; an unknown key answers 404 listing the keys. `lines=N` raises
+  the 800-line cut-off, which a few of the biggest screens overflow. Side-effect free:
   two calls answer identically, and the cursor is never moved. Grammar in §2a below.
 - `POST /type`: body = characters typed into the focused graph screen's type-ahead search,
   through the same per-frame tick a keypress takes. Answers `{ok, searchText, searchActive,

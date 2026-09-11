@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
@@ -45,8 +45,8 @@ namespace SongsOfConquestAccess.Adapters
                 : GlobalLocalizationVariables.LocalizationHandler;
             _rowSettings = new MenuRowSettings
             {
-                IdPrefix = "player-settings",
-                ButtonIdKind = "content-button",
+                KeyPrefix = "player-settings",
+                ButtonKeyKind = "content-button",
                 Localization = _localization,
             };
         }

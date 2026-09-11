@@ -70,6 +70,11 @@ namespace SongsOfConquestAccess.Screens
             return CommunityMapsModalAdapter.ActivePanel;
         }
 
+        /// <summary>The panel is walked for again rather than taken from <paramref name="menu"/>:
+        /// which popup it is decides what the adapter caches with it (the five-digit box's actions,
+        /// the authentication flow's panel set, the context menu's items), and a walk that took the
+        /// object would have to test the same branches to find that out. It runs once per popup,
+        /// never per frame.</summary>
         protected override CommunityMapsModalAdapter Adapt(object menu)
         {
             return CommunityMapsModalAdapter.TryCreate();

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
@@ -139,7 +139,7 @@ namespace SongsOfConquestAccess.Screens
                     () => captured.Label,
                     () => captured.IsSelected);
                 vtable.OnActivate = () => captured.Select();
-                builder.AddItem(Synthetic("tab/" + captured.Id, vtable));
+                builder.AddItem(Synthetic("tab/" + captured.Key, vtable));
             }
         }
 
@@ -187,7 +187,7 @@ namespace SongsOfConquestAccess.Screens
                 () => action.Activate(),
                 action.IsEnabled);
             vtable.OnFocusVisual = () => action.Focus();
-            builder.AddItem(Synthetic(action.Id, vtable));
+            builder.AddItem(Synthetic(action.Key, vtable));
         }
 
         private void BuildDropdown(GraphBuilder builder, CommunityMapsCollectionAdapter.DropdownItem list)
@@ -204,7 +204,7 @@ namespace SongsOfConquestAccess.Screens
                 list.IsEnabled);
             vtable.OnFocusVisual = () => list.Focus();
             builder.AddItem(new DrawnNode(
-                ControlId.For(list.Subject, "community-maps-collection:" + list.Id),
+                ControlId.For(list.Subject, "community-maps-collection:" + list.Key),
                 vtable,
                 list.Subject));
         }

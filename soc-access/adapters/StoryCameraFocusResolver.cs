@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -21,7 +21,6 @@ namespace SongsOfConquestAccess.Adapters
         [HookWritable]
         public static StoryCameraFocusTarget ResolvePointTarget(
             IClientAdventureFacade facade,
-            object cartographyConverter,
             ILocalizationHandler localizationHandler,
             CameraFocusPointIdentifier camera)
         {

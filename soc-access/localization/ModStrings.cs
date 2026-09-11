@@ -506,7 +506,6 @@
             public static readonly ModString RoleDocument = new ModString("UI.RoleDocument", "document");
             public static readonly ModString RoleEdit = new ModString("UI.RoleEdit", "edit");
             public static readonly ModString RoleEditable = new ModString("UI.RoleEditable", "editable");
-            public static readonly ModString RoleGrid = new ModString("UI.RoleGrid", "grid");
             public static readonly ModString RoleGroup = new ModString("UI.RoleGroup", "group");
             public static readonly ModString RoleMenu = new ModString("UI.RoleMenu", "menu");
             public static readonly ModString RoleRadioButton = new ModString("UI.RoleRadioButton", "radio button");

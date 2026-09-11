@@ -141,7 +141,7 @@ namespace SongsOfConquestAccess.Screens
                 // beside the label, and both are watched because a vote changes them under the cursor.
                 vtable.Announcements.Add(GraphNodes.SelectedPart(() => captured.IsSelected));
                 vtable.Announcements.Add(GraphNodes.ValuePart(() => captured.Status));
-                builder.AddItem(Synthetic("vote/" + captured.Id, vtable));
+                builder.AddItem(Synthetic("vote/" + captured.Key, vtable));
             }
 
             if (!string.IsNullOrWhiteSpace(Live.ReportLabel))
@@ -176,7 +176,7 @@ namespace SongsOfConquestAccess.Screens
                 CommunityMapsDetailsAdapter.DetailItem captured = detail;
                 NodeVtable vtable = GraphNodes.Text(() => captured.Label);
                 vtable.Announcements.Add(GraphNodes.ValuePart(() => captured.Value));
-                builder.AddItem(Synthetic("fact/" + captured.Id, vtable));
+                builder.AddItem(Synthetic("fact/" + captured.Key, vtable));
             }
 
             builder.PopContext();

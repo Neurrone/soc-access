@@ -252,7 +252,6 @@ namespace SongsOfConquestAccess.Adapters
                 UIButton button = TabButtonField != null && tab != null ? TabButtonField.GetValue(tab) as UIButton : null;
                 int index = i;
                 result.Add(new TabItem(
-                    "save-load-tab-" + index,
                     index,
                     button,
                     () => GetTabLabel(button),
@@ -279,6 +278,80 @@ namespace SongsOfConquestAccess.Adapters
             _entriesFrame = frame;
             _entries = ReadEntries();
             return _entries;
+        }
+
+        /// <summary>The rows the page is drawing, the visible ones only and in DRAWN order: topmost
+        /// first (Unity's y grows upwards, so that is the largest y). Rows the layout has not placed
+        /// yet - every row on the frame the list is built, where they all sit at one y - fall back to
+        /// the newest save first, which is the order the page settles into a frame later.
+        ///
+        /// Built when the list the page holds changes rather than every frame, stamped with how many
+        /// rows it holds and which row is first, both read from the game. The adapter lives exactly
+        /// as long as this menu instance, so there is nothing to reset.</summary>
+        public IReadOnlyList<SaveEntry> GetVisibleEntriesInDrawnOrder()
+        {
+            IReadOnlyList<SaveEntry> all = GetEntries();
+            Component first = all.Count > 0 && all[0] != null ? all[0].Entry : null;
+            if (_visibleEntries != null && _visibleEntriesCount == all.Count && ReferenceEquals(_visibleEntriesFirst, first))
+            {
+                return _visibleEntries;
+            }
+
+            List<SaveEntry> visible = new List<SaveEntry>();
+            for (int i = 0; i < all.Count; i++)
+            {
+                if (all[i] != null && all[i].Entry != null && all[i].IsVisible())
+                {
+                    visible.Add(all[i]);
+                }
+            }
+
+            SortByDrawnTop(visible);
+            _visibleEntriesCount = all.Count;
+            _visibleEntriesFirst = first;
+            _visibleEntries = visible;
+            return _visibleEntries;
+        }
+
+        private static void SortByDrawnTop(List<SaveEntry> items)
+        {
+            List<float> tops = new List<float>(items.Count);
+            List<long> times = new List<long>(items.Count);
+            for (int i = 0; i < items.Count; i++)
+            {
+                Component component = items[i].Entry;
+                tops.Add(component != null ? component.transform.position.y : 0f);
+                times.Add(items[i].LastWriteTime.Ticks);
+            }
+
+            for (int i = 1; i < items.Count; i++)
+            {
+                SaveEntry moving = items[i];
+                float top = tops[i];
+                long time = times[i];
+                int j = i - 1;
+                while (j >= 0 && IsAbove(top, time, tops[j], times[j]))
+                {
+                    items[j + 1] = items[j];
+                    tops[j + 1] = tops[j];
+                    times[j + 1] = times[j];
+                    j--;
+                }
+
+                items[j + 1] = moving;
+                tops[j + 1] = top;
+                times[j + 1] = time;
+            }
+        }
+
+        private static bool IsAbove(float top, long time, float otherTop, long otherTime)
+        {
+            if (Mathf.Abs(top - otherTop) > 0.5f)
+            {
+                return top > otherTop;
+            }
+
+            return time > otherTime;
         }
 
         private IReadOnlyList<SaveEntry> ReadEntries()
@@ -385,16 +458,19 @@ namespace SongsOfConquestAccess.Adapters
         private int _tabsFrame = -1;
         private IReadOnlyList<SaveEntry> _entries;
         private int _entriesFrame = -1;
+        private IReadOnlyList<SaveEntry> _visibleEntries;
+        private int _visibleEntriesCount = -1;
+        private Component _visibleEntriesFirst;
 
         private SaveLoadGameMenu.Settings Settings
         {
             get { return SettingsField != null && _menu != null ? SettingsField.GetValue(_menu) as SaveLoadGameMenu.Settings : null; }
         }
 
-        private ButtonItem BuildButton(string id, UIButton button)
+        private ButtonItem BuildButton(string key, UIButton button)
         {
             return new ButtonItem(
-                id,
+                key,
                 button,
                 () => GetButtonLabel(button),
                 () => ActivateButton(button),
@@ -403,10 +479,10 @@ namespace SongsOfConquestAccess.Adapters
                 () => MenuButtonAdapterBase.IsButtonVisible(button));
         }
 
-        private ButtonItem BuildEnabledOnlyButton(string id, UIButton button)
+        private ButtonItem BuildEnabledOnlyButton(string key, UIButton button)
         {
             return new ButtonItem(
-                id,
+                key,
                 button,
                 () => GetButtonLabel(button),
                 () => ActivateButton(button),
@@ -489,7 +565,6 @@ namespace SongsOfConquestAccess.Adapters
             private readonly Func<bool> _isSelected;
 
             public TabItem(
-                string id,
                 int index,
                 UIButton button,
                 Func<string> getLabel,
@@ -499,7 +574,6 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> isEnabled,
                 Func<bool> isSelected)
             {
-                Id = id;
                 Index = index;
                 Button = button;
                 _getLabel = getLabel;
@@ -510,7 +584,6 @@ namespace SongsOfConquestAccess.Adapters
                 _isSelected = isSelected;
             }
 
-            public string Id { get; private set; }
             public int Index { get; private set; }
             public UIButton Button { get; private set; }
             public string GetLabel() { return _getLabel != null ? _getLabel() : string.Empty; }
@@ -534,11 +607,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public int Index { get; private set; }
-
-            public string Id
-            {
-                get { return "save-load-entry-" + Index; }
-            }
 
             public string SaveName
             {
@@ -638,7 +706,7 @@ namespace SongsOfConquestAccess.Adapters
             private readonly Func<bool> _isVisible;
 
             public ButtonItem(
-                string id,
+                string key,
                 UIButton button,
                 Func<string> getLabel,
                 Func<bool> activate,
@@ -646,7 +714,7 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> isEnabled,
                 Func<bool> isVisible)
             {
-                Id = id;
+                Key = key;
                 Button = button;
                 _getLabel = getLabel;
                 _activate = activate;
@@ -655,7 +723,7 @@ namespace SongsOfConquestAccess.Adapters
                 _isVisible = isVisible;
             }
 
-            public string Id { get; private set; }
+            public string Key { get; private set; }
 
             /// <summary>The drawn button, so a screen can read where it is drawn.</summary>
             public UIButton Button { get; private set; }
