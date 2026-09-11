@@ -61,9 +61,6 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The one codex window the project container holds for the whole game.</summary>
         private readonly ScreenSource<ICodexMenu> _source = ScreenSource<ICodexMenu>.FromProject();
 
-        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
-        // cursor on the same line: the body's lines, which the mod reads off text meshes several of
-        // them share, and the footer's Close.
         protected override object ResolveMenu()
         {
             return _source.Current;

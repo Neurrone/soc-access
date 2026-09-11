@@ -70,8 +70,6 @@ namespace SongsOfConquestAccess.Screens
         /// (<c>SpellbookMovableSpell.EndDrag</c>), which is what a given-up carry is.</summary>
         public const string CancelSound = "Common_SpellbookEndDragCancel";
 
-        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the removal target is a line the mod invented.
         // Whether the carry that is ending ran the game's own drag, which plays the game's own noise
         // for how it ended. Only a carry that did NOT get that far - one the player gave up, or one
         // the game would not take - is the mod's to make a noise about.

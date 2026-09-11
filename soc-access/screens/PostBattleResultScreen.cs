@@ -49,9 +49,6 @@ namespace SongsOfConquestAccess.Screens
         private const string LootStop = "post-battle-loot";
         private const string ButtonsStop = "post-battle-buttons";
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor back on the same one: the menu gives no component the screen can key the XP figure,
-        // the returned-troops line or the "None" row on.
         // Resolving a portrait walks the menu's parents and the scene root, so each side is looked
         // for once per menu, hit or miss: a defender without a commander has no portrait to find,
         // and the search would otherwise run again every frame. A new menu starts both over.

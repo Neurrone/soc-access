@@ -67,9 +67,6 @@ namespace SongsOfConquestAccess.Screens
         private const string CloseStop = "commander-sheet-close";
         private const string KeyPrefix = "commander-sheet";
 
-        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the auto-arrange button and the read-only lines are not drawn as
-        // controls of their own.
         // This column's slot nodes, kept for as long as the adapter hands back the same slot list.
         // The nodes are closures that read the game when they are READ, so rebuilding them every
         // frame bought nothing but the allocation; the contributor owns the key and the rule

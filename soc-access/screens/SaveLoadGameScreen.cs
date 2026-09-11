@@ -60,8 +60,6 @@ namespace SongsOfConquestAccess.Screens
 
         private readonly GameTextEditor _editor = new GameTextEditor();
 
-        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
-        // cursor on the same line while what it says changes under it.
         public object SourceKey
         {
             get { return Live != null ? Live.SourceKey : null; }

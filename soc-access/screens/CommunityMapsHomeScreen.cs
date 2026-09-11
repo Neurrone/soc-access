@@ -51,9 +51,6 @@ namespace SongsOfConquestAccess.Screens
         private const string RowsStop = "community-maps-rows";
         private const string FooterStop = "community-maps-footer";
 
-        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
-        // cursor on the same row: mod.io rebuilds its list item objects whenever a band refreshes, and
-        // a band's item is a place in a named band either way.
         /// <summary>The Browse page, read off mod.io's own singleton every frame
         /// (<see cref="CommunityMapsSources"/>).</summary>
         protected override object ResolveMenu()

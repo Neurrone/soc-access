@@ -42,9 +42,6 @@ namespace SongsOfConquestAccess.Screens
         private const string SkillsStop = "level-up-skills";
         private const string CloseStop = "level-up-close";
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the menu gives no component for its heading, its identity line, the
-        // "Choose a Skill" caption or the max-level notice.
         /// <summary>The one level-up window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<ICommanderLevelUpMenu> _source =
             ScreenSource<ICommanderLevelUpMenu>.FromScene(LoadedScenes.AdventureScene);

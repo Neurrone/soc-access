@@ -35,8 +35,6 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string ResultStop = "post-adventure-result";
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the menu gives no component the screen can key its texts on.
         /// <summary>The one post-adventure window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<IPostAdventureMenu> _source =
             ScreenSource<IPostAdventureMenu>.FromScene(LoadedScenes.AdventureScene);

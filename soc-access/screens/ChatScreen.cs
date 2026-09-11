@@ -42,8 +42,6 @@ namespace SongsOfConquestAccess.Screens
 
         private readonly GameTextEditor _editor = new GameTextEditor();
 
-        // Subjects of their own for the lines the game gives no component for: a message is text the
-        // window renders into one mesh, and the way out is the mod's own row.
         /// <summary>The chat window the game has up, drawn or not (<see cref="ChatSource"/>); the
         /// page is this screen only while the window is OPEN.</summary>
         protected override object ResolveMenu()

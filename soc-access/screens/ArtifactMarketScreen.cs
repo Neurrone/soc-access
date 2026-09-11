@@ -75,9 +75,6 @@ namespace SongsOfConquestAccess.Screens
         private const string KeyPrefix = "artifact-market";
         private const string WielderKey = "artifact-market:wielder";
 
-        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the description and the auto-arrange button are not drawn as
-        // controls of their own.
         // This column's slot nodes, kept for as long as the adapter hands back the same slot list.
         // The nodes are closures that read the game when they are READ, so rebuilding them every
         // frame bought nothing but the allocation; the contributor owns the key and the rule

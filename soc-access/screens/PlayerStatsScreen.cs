@@ -42,8 +42,6 @@ namespace SongsOfConquestAccess.Screens
         private const string ButtonsStop = "player-stats-buttons";
         private const string SheetKey = "player-stats:";
 
-        // A subject of its own per summary line, kept across rebuilds so the reconciler seats the
-        // cursor on the same line: the page draws them as labels the mod has nothing else to key on.
         /// <summary>The page's navigation object, an unbound scene object found by one gated walk of
         /// its own scene's roots (<see cref="MenuSceneSources"/>).</summary>
         protected override object ResolveMenu()

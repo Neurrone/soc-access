@@ -87,8 +87,6 @@ namespace SongsOfConquestAccess.Screens
         private TroopPlacementHexGrid _hexGrid;
         private PreBattleMenuAdapter _hexGridAdapter;
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor back on the same one: the menu gives no component a text line can be keyed on.
         // The tile tooltip is the game's whole troop-details capture and the graph is rebuilt for
         // every navigation operation, so it is composed once per tile - which is exactly as often as
         // the widget engine's focus commit composed it.

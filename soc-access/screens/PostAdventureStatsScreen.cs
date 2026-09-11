@@ -50,8 +50,6 @@ namespace SongsOfConquestAccess.Screens
 
         private static readonly FieldInfo StatsMenuField = AccessTools.Field(typeof(PostAdventureMenu), "_statsMenu");
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the menu gives no component the screen can key its figures on.
         /// <summary>The one post-adventure stats window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<IPostAdventureStatsMenu> _source =
             ScreenSource<IPostAdventureStatsMenu>.FromScene(LoadedScenes.AdventureScene);

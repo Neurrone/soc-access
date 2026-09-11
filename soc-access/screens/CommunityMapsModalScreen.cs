@@ -53,9 +53,6 @@ namespace SongsOfConquestAccess.Screens
 
         private readonly GameTextEditor _editor = new GameTextEditor();
 
-        // A subject of its own for each node the modal gives no component for, kept across rebuilds:
-        // the reconciler seats the cursor by SUBJECT before it looks at the structural key, so two
-        // nodes sharing one collapse onto whichever was declared first.
         // The five-digit code as it was last spoken, so typing echoes the digit that changed rather
         // than the whole box. Mod-owned announcement state, which outlives the panel.
         private string _lastCode;

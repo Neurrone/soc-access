@@ -38,9 +38,6 @@ namespace SongsOfConquestAccess.Screens
         private const string DetailsStop = "build-details";
         private const string CloseStop = "build-close";
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the site summary, the selected building's description, the cost and
-        // the warning are read off text meshes the menu rebinds rather than off rows of their own.
         /// <summary>The one build window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<IBuildMenu> _source =
             ScreenSource<IBuildMenu>.FromScene(LoadedScenes.AdventureScene);

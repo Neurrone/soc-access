@@ -45,9 +45,6 @@ namespace SongsOfConquestAccess.Screens
         private const string DetailsStop = "purchase-wielder-details";
         private const string CloseStop = "purchase-wielder-close";
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the quote, the four stats, the specialization and the purchase
-        // status are read off text meshes the details pane rebinds rather than off rows of their own.
         public PurchaseWielderMenuAdapter Adapter
         {
             get { return Live; }

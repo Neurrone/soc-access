@@ -38,8 +38,6 @@ namespace SongsOfConquestAccess.Screens
         private const string ActionsStop = "map-entity-actions";
         private const string CloseStop = "map-entity-close";
 
-        // The lines the game gives no component of their own for, and the close, keyed by subjects
-        // held across rebuilds so the reconciler seats the cursor back on the same node.
         public MapEntityMiniMenuAdapter Adapter
         {
             get { return Live; }
