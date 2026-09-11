@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
@@ -232,24 +233,28 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private void AddParagraph(GraphBuilder builder, string key, string heading, string text)
         {
-            IList<string> lines = SpokenLines.Of(new[] { text });
-            if (lines.Count == 0)
+            if (string.IsNullOrWhiteSpace(text))
             {
                 return;
             }
 
             // Nothing on this page changes under the cursor - a details page is opened for one mod
-            // and closed again - so the lines are read off the snapshot taken here.
+            // and closed again - so the block is split into paragraphs when it is first READ and the
+            // lines are read off that snapshot after. A description can run to several hundred words
+            // and the page draws four of these, so splitting them all on every build was the page's
+            // whole cost (AGENTS.md, Performance).
+            IList<string> lines = null;
+            Func<IList<string>> read = () => lines ?? (lines = SpokenLines.Of(new[] { text }));
             NodeVtable vtable;
             if (string.IsNullOrWhiteSpace(heading))
             {
-                vtable = GraphNodes.Paragraphs(() => lines);
+                vtable = GraphNodes.Paragraphs(read);
             }
             else
             {
                 string label = heading;
                 vtable = GraphNodes.Text(() => label);
-                GraphNodes.ParagraphParts(vtable, () => lines);
+                GraphNodes.ParagraphParts(vtable, read);
             }
 
             builder.AddItem(Synthetic(key, vtable));

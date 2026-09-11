@@ -62,20 +62,32 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
-            get { return string.Join(" ", BodyLines); }
+            get { return _body.Joined(RawBody); }
+        }
+
+        /// <summary>Whether the menu is drawing any line at all.</summary>
+        public bool HasBody
+        {
+            get { return _body.HasAny(RawBody); }
         }
 
         /// <summary>The paragraphs the game broke the line into, kept apart rather than collapsed:
         /// the dialogue is read a paragraph at a time.</summary>
         public IList<string> BodyLines
         {
+            get { return _body.Lines(RawBody); }
+        }
+
+        // The line, split at most once a frame and re-split whenever the game rewrites it, which it
+        // does a letter at a time while it types (AGENTS.md, Performance).
+        private readonly BodyText _body = new BodyText();
+
+        private string RawBody
+        {
             get
             {
                 DialogueMenu.Settings settings = GetSettings();
-                return SpokenLines.Of(new[]
-                {
-                    settings != null ? UITextMeshTextUtility.GetEffectiveText(settings.DialogueText) : string.Empty
-                });
+                return settings != null ? UITextMeshTextUtility.GetEffectiveText(settings.DialogueText) : string.Empty;
             }
         }
 

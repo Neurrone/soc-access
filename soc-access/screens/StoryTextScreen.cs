@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Menu;
@@ -100,7 +100,7 @@ namespace SongsOfConquestAccess.Screens
             // ONE BUTTON: "{speaker}: {first paragraph}" then the further paragraphs as parts, every
             // part live, so the next line the game writes in place is read by the live watch under a
             // cursor that never moved. Enter advances (owner ruling 2026-09-07).
-            if (!string.IsNullOrWhiteSpace(Live.Body))
+            if (Live.HasBody)
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "story-text:body");
                 NodeVtable body = GraphNodes.Paragraphs(Lines, live: true);

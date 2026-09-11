@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
@@ -39,20 +39,26 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
-            get { return string.Join(" ", BodyLines); }
+            get { return _body.Joined(RawBody); }
         }
 
         /// <summary>The paragraphs the game broke the body into, kept apart rather than collapsed:
         /// the dialog reads a paragraph at a time.</summary>
         public IList<string> BodyLines
         {
+            get { return _body.Lines(RawBody); }
+        }
+
+        // The body, split at most once a frame: the guard, the node and the screen's own name all
+        // ask for it (AGENTS.md, Performance).
+        private readonly BodyText _body = new BodyText();
+
+        private string RawBody
+        {
             get
             {
                 CustomMessageMenu.Settings settings = GetSettings();
-                return SpokenLines.Of(new[]
-                {
-                    UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.BodyText : null),
-                });
+                return UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.BodyText : null);
             }
         }
 

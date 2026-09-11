@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -13,6 +13,10 @@ namespace SongsOfConquestAccess.Adapters
 
         /// <summary>The body's paragraphs, one line each, as the game broke them.</summary>
         IList<string> BodyLines { get; }
+
+        /// <summary>Whether there is any body to read, asked without the caller splitting it into
+        /// paragraphs.</summary>
+        bool HasBody { get; }
 
 
         bool AdvanceNow();

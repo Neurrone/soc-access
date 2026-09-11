@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client;
@@ -225,13 +225,12 @@ namespace SongsOfConquestAccess.Screens
                     GraphNodes.Text(() => Live.Title)));
             }
 
-            // The body is broken into its paragraphs ONCE: the guard and the node ask the same
-            // question, and the paragraph node counts them at build.
-            IList<string> bodyLines = Live.BodyLines;
-            if (bodyLines.Count > 0)
+            // The guard and the node ask the same question, and the adapter splits the body at
+            // most once a frame, so the node reads the live answer rather than one captured here.
+            if (Live.BodyLines.Count > 0)
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "dialog:body");
-                NodeVtable body = GraphNodes.Paragraphs(() => bodyLines);
+                NodeVtable body = GraphNodes.Paragraphs(() => Live.BodyLines);
                 body.OnFocusVisual = () => Live.SyncNativeSelection(DialogAction.Body);
                 builder.AddItem(new SyntheticNode(bodyId, body));
                 start = bodyId;
