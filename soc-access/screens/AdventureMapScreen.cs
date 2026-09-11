@@ -154,10 +154,11 @@ namespace SongsOfConquestAccess.Screens
         private Tooltip _tooltip;
         private bool _tooltipRead;
 
-        // The tile itself is the same story: reading one runs a reachability fill, a loop over every
-        // commander, a route preview and two shortest-path queries, and the focused node's label
-        // resolves it about twice a frame. It is read once per tile and kept until the cursor moves
-        // or the map changes under it, which is what the event listener's hook below reports.
+        // The tile itself is the same story: reading one still runs the game's shortest-path query
+        // for an interactable entity standing on it, on top of everything the adapter reads about
+        // the tile, and the focused node's label resolves it about twice a frame. It is read once
+        // per tile and kept until the cursor moves or the map changes under it, which is what the
+        // event listener's hook below reports.
         private Vector2Int _tileTile;
         private AdventureMapTile _tile;
         private bool _tileRead;

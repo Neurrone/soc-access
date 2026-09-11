@@ -1,4 +1,4 @@
-using SongsOfConquest.Client.Adventure;
+﻿using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
@@ -154,10 +154,8 @@ namespace SongsOfConquestAccess.Screens
             get { return Live == null ? null : Live.SettlementTroops; }
         }
 
-        // ---- the tutorial ----
+        // ---- the wielder stored here ----
 
-        /// <summary>The button the game draws in the corner until the player has seen the town
-        /// tutorial, and never again.</summary>
         /// <summary>The wielder stored in the settlement, when one is: the panel draws their portrait
         /// and their army, and the game's drag reaches that army, so it is a Wielder stop of its own
         /// as it is on the defence menu.</summary>
@@ -189,6 +187,10 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        // ---- the tutorial ----
+
+        /// <summary>The button the game draws in the corner until the player has seen the town
+        /// tutorial, and never again.</summary>
         private void BuildTutorial(GraphBuilder builder)
         {
             if (!Live.IsTutorialButtonVisible())

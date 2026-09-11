@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
@@ -48,10 +48,6 @@ namespace SongsOfConquestAccess.Screens
         private const string DefenderStop = "post-battle-defender";
         private const string LootStop = "post-battle-loot";
         private const string ButtonsStop = "post-battle-buttons";
-
-        // Resolving a portrait walks the menu's parents and the scene root, so each side is looked
-        // for once per menu, hit or miss: a defender without a commander has no portrait to find,
-        // and the search would otherwise run again every frame. A new menu starts both over.
 
         // The battle menu the adventure scene binds, and the post-battle page it holds in its
         // settings: the page is a child of one menu that lives for the whole game, so it is read
