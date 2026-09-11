@@ -500,11 +500,6 @@ msgctxt "UI.RoleEditable"
 msgid "editable"
 msgstr "edytowalne"
 
-#. UI.RoleGrid
-msgctxt "UI.RoleGrid"
-msgid "grid"
-msgstr "siatka"
-
 #. UI.RoleGroup
 msgctxt "UI.RoleGroup"
 msgid "group"

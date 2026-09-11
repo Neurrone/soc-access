@@ -495,11 +495,6 @@ msgctxt "UI.RoleEditable"
 msgid "editable"
 msgstr "編集可能"
 
-#. UI.RoleGrid
-msgctxt "UI.RoleGrid"
-msgid "grid"
-msgstr "グリッド"
-
 #. UI.RoleGroup
 msgctxt "UI.RoleGroup"
 msgid "group"
