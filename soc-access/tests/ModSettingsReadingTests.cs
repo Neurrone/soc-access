@@ -1,30 +1,16 @@
 using System.IO;
-using BepInEx.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace SongsOfConquestAccess.Tests
 {
     /// <summary>The settings that govern what the readout says on its own initiative.</summary>
     [TestClass]
-    public sealed class ModSettingsReadingTests
+    public sealed class ModSettingsReadingTests : ModSettingsFixture
     {
-        private string _configPath;
-
         [TestInitialize]
-        public void BindTemporaryConfig()
+        public void BindTheConfig()
         {
-            _configPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".cfg");
-            ModSettings.Bind(new ConfigFile(_configPath, saveOnInit: false));
-        }
-
-        [TestCleanup]
-        public void ResetSettings()
-        {
-            ModSettings.Reset();
-            if (File.Exists(_configPath))
-            {
-                File.Delete(_configPath);
-            }
+            BindTemporaryConfig();
         }
 
         [TestMethod]
@@ -66,7 +52,7 @@ namespace SongsOfConquestAccess.Tests
         {
             ModSettings.SetReadUsageHints("changed");
             Assert.AreEqual(UsageHintReading.Always, ModSettings.ReadUsageHints);
-            Assert.IsTrue(File.ReadAllText(_configPath).Contains("ReadUsageHints = changed"));
+            Assert.IsTrue(File.ReadAllText(ConfigPath).Contains("ReadUsageHints = changed"));
         }
     }
 }

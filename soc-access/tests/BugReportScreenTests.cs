@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.UI.Graph;
+using static SongsOfConquestAccess.Tests.Graphs;
 
 namespace SongsOfConquestAccess.Tests
 {
@@ -21,18 +22,6 @@ namespace SongsOfConquestAccess.Tests
             GraphBuilder builder = new GraphBuilder();
             new BugReportScreen().BuildInto(builder, stub);
             return builder.Build();
-        }
-
-        private static HashSet<string> Keys(GraphRender render)
-        {
-            return new HashSet<string>(render.Nodes.Keys
-                .Select(id => id.StructuralKey as string)
-                .Where(key => key != null));
-        }
-
-        private static GraphNode Node(GraphRender render, string key)
-        {
-            return render.NodeAt(ControlId.Structural(key));
         }
 
         [TestMethod]

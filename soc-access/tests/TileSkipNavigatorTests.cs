@@ -177,12 +177,7 @@ namespace SongsOfConquestAccess.Tests
         /// </summary>
         private static AdventureMapTile RoadTile(Vector2Int point)
         {
-            AdventureMapTile tile = new AdventureMapTile(point)
-            {
-                IsVisible = true,
-                IsExplored = true,
-                Terrain = AdventureTerrainKind.DirtRoad
-            };
+            AdventureMapTile tile = TileFixtures.Tile(point, AdventureTerrainKind.DirtRoad);
             tile.SetRoadDirectionsSource(() => point.x == 3
                 ? new[] { ScannerDirection.North, ScannerDirection.East, ScannerDirection.West }
                 : new[] { ScannerDirection.East, ScannerDirection.West });

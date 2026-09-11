@@ -530,12 +530,7 @@ namespace SongsOfConquestAccess.Tests
 
         private static AdventureMapTile ExploredTile(AdventureTerrainKind terrain)
         {
-            return new AdventureMapTile(new Vector2Int(5, 6))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = terrain
-            };
+            return TileFixtures.Tile(5, 6, terrain);
         }
 
         private static AdventureMapTile.CommanderInfo Commander(ModString relationship, bool isOwnedByLocalTeam)

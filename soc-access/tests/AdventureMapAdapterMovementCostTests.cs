@@ -43,7 +43,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void ApplyReachableMovementCostSetsInteractionCostWhenDirectCostIsMissing()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2));
+            AdventureMapTile tile = TileFixtures.Bare(4, 2);
 
             AdventureMapAdapter.ApplyReachableMovementCost(tile, 5f);
 
@@ -54,11 +54,9 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void ApplyReachableMovementCostPreservesDirectMovementCost()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsReachable = true,
-                ReachableMovementCost = 2f
-            };
+            AdventureMapTile tile = TileFixtures.Bare(4, 2);
+            tile.IsReachable = true;
+            tile.ReachableMovementCost = 2f;
 
             AdventureMapAdapter.ApplyReachableMovementCost(tile, 5f);
 

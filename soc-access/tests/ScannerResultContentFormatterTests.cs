@@ -256,10 +256,8 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void OmitsTheAdventureMovementCostForAnUnexploredTile()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                ReachableMovementCost = 3f
-            };
+            AdventureMapTile tile = TileFixtures.Bare(4, 2);
+            tile.ReachableMovementCost = 3f;
             ScannerResult result = new ScannerResult("terrain:road:4:2", "Dirt road", tile.Position)
             {
                 InstanceLabel = "Dirt road"
@@ -279,14 +277,10 @@ namespace SongsOfConquestAccess.Tests
 
         private static AdventureMapTile CreateReachableRoadTile()
         {
-            return new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                IsReachable = true,
-                ReachableMovementCost = 3f,
-                Terrain = AdventureTerrainKind.DirtRoad
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.DirtRoad);
+            tile.IsReachable = true;
+            tile.ReachableMovementCost = 3f;
+            return tile;
         }
 
         private static string Describe(ScannerResult result)
