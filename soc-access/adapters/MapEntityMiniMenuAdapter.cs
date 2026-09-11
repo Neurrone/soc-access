@@ -249,39 +249,28 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        // The rows the block last drew, and what its entry container looked like when they were
-        // read. SetDetails clears the container and instantiates new rows into it and Clear destroys
-        // them, so the child count and the identity of the first row both move on every rewrite - a
-        // key read from the game each build, not a generation a hook feeds (AGENTS.md, Screen
-        // Resolution).
-        private List<DescriptionRow> _descriptionRows;
-        private int _descriptionChildCount = -1;
-        private int _descriptionFirstChildId;
+        // The rows the block last drew. SetDetails clears the entry container and instantiates new
+        // rows into it and Clear destroys them, so the memo's key is what that container holds - read
+        // from the game each build, not a generation a hook feeds (AGENTS.md, Screen Resolution).
+        private readonly ContainerMemo<IReadOnlyList<DescriptionRow>> _descriptionRows =
+            new ContainerMemo<IReadOnlyList<DescriptionRow>>();
 
         public IReadOnlyList<DescriptionRow> GetDescriptionRows()
         {
-            List<DescriptionRow> rows = new List<DescriptionRow>();
             MiniMenuDescription description = Reflect.Get<MiniMenuDescription>(_menu, DescriptionField);
             if (!GameObjects.IsLive(description))
             {
-                return rows;
+                return new List<DescriptionRow>();
             }
 
-            Transform entryContainer = GetDescriptionEntryContainer(description);
-            int childCount = entryContainer != null ? entryContainer.childCount : 0;
-            int firstChildId = childCount > 0 && entryContainer.GetChild(0) != null
-                ? entryContainer.GetChild(0).GetInstanceID()
-                : 0;
-            if (_descriptionRows != null
-                && _descriptionChildCount == childCount
-                && _descriptionFirstChildId == firstChildId)
-            {
-                return _descriptionRows;
-            }
+            return _descriptionRows.Get(
+                GetDescriptionEntryContainer(description),
+                () => ReadDescriptionRows(description));
+        }
 
-            _descriptionRows = rows;
-            _descriptionChildCount = childCount;
-            _descriptionFirstChildId = firstChildId;
+        private IReadOnlyList<DescriptionRow> ReadDescriptionRows(MiniMenuDescription description)
+        {
+            List<DescriptionRow> rows = new List<DescriptionRow>();
 
             // Reached only when the key above says the block has been rewritten, so a still menu
             // costs no walk.

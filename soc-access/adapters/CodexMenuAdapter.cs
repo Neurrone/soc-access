@@ -229,22 +229,12 @@ namespace SongsOfConquestAccess.Adapters
                 return new List<CodexContentItem>();
             }
 
-            int childCount = contentParent.childCount;
-            int firstChildId = childCount > 0 && contentParent.GetChild(0) != null
-                ? contentParent.GetChild(0).GetInstanceID()
-                : 0;
-            if (_contentItems != null
-                && _contentChildCount == childCount
-                && _contentFirstChildId == firstChildId)
-            {
-                return _contentItems;
-            }
+            return _contentItems.Get(contentParent, () => ReadContentItems(contentParent));
+        }
 
+        private IReadOnlyList<CodexContentItem> ReadContentItems(Transform contentParent)
+        {
             List<CodexContentItem> items = new List<CodexContentItem>();
-            _contentItems = items;
-            _contentChildCount = childCount;
-            _contentFirstChildId = firstChildId;
-
             if (TryAddWielderContentItems(contentParent, items))
             {
                 return items;
@@ -418,14 +408,12 @@ namespace SongsOfConquestAccess.Adapters
             return settings != null ? settings.GetComponent<CodexTutorialSettings>() : null;
         }
 
-        // The body the window last drew, and what the game's own content parent looked like when it
-        // was read. Reading it walks every text mesh of the article and cleans each one, which is the
-        // page's whole cost. DrawContent destroys the body and builds a new one, so the parent's
-        // child count and the identity of its first child both move on every redraw - a key read
-        // from the game each build, not a generation a hook feeds (AGENTS.md, Screen Resolution).
-        private List<CodexContentItem> _contentItems;
-        private int _contentChildCount = -1;
-        private int _contentFirstChildId;
+        // The body the window last drew. Reading it walks every text mesh of the article and cleans
+        // each one, which is the page's whole cost, and DrawContent destroys the body and builds a
+        // new one, so the memo's key is what the content parent holds - read from the game each
+        // build, not a generation a hook feeds (AGENTS.md, Screen Resolution).
+        private readonly ContainerMemo<IReadOnlyList<CodexContentItem>> _contentItems =
+            new ContainerMemo<IReadOnlyList<CodexContentItem>>();
 
         // The settings object's fields and each entry pool's ActiveEntries: one reflection lookup per
         // name rather than one per call.
