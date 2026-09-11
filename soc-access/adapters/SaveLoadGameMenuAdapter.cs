@@ -392,7 +392,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static bool IsActive(Component component)
         {
-            return component != null && component.gameObject.activeInHierarchy;
+            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
         public sealed class TabItem

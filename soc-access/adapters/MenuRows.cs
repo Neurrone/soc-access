@@ -592,7 +592,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static bool IsActive(Component component)
         {
-            return component != null && component.gameObject.activeInHierarchy;
+            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
         /// <summary>The entries the game's dropdown draws, in its own words. LAZY, never on a build

@@ -510,7 +510,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static bool IsActive(Component component)
         {
-            return component != null && component.gameObject.activeInHierarchy;
+            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
         private static bool IsActive(GameObject gameObject)
