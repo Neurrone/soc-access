@@ -1040,11 +1040,6 @@ msgctxt "Screens.Round"
 msgid "Round {0}"
 msgstr "Rodada {0}"
 
-#. Screens.SettlementTroops
-msgctxt "Screens.SettlementTroops"
-msgid "settlement troops"
-msgstr "tropas do assentamento"
-
 #. Screens.Skill
 msgctxt "Screens.Skill"
 msgid "Skill {0}"

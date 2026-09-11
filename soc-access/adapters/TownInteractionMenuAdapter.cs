@@ -13,6 +13,7 @@ using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -46,6 +47,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo HeaderCustomNameTextField = AccessTools.Field(typeof(WielderInteractHeader), "_customNameText");
 
         private static readonly FieldInfo SettlementTroopHudField = AccessTools.Field(typeof(TownInteractDefencePanel), "_mapEntityTroopHUD");
+        private static readonly FieldInfo SettlementTroopsContainerField = AccessTools.Field(typeof(TownInteractDefencePanel), "_mapEntityTroopsContainer");
         private static readonly FieldInfo MoveToDefenceButtonField = AccessTools.Field(typeof(TownInteractDefencePanel), "_moveToDefenceButton");
         private static readonly FieldInfo MoveToWielderButtonField = AccessTools.Field(typeof(TownInteractDefencePanel), "_moveToWielderButton");
         private static readonly FieldInfo UpgradesAvailableIndicatorField = AccessTools.Field(typeof(TownInteractionMenu), "_upgradesAvailableIndicator");
@@ -200,6 +202,25 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 return _settlementTroops;
+            }
+        }
+
+        /// <summary>Whether the settlement's own troop rows are drawn at all. The panel turns the
+        /// container off for a map entity with no troop storage
+        /// (<c>TownInteractDefencePanel.Show</c>).</summary>
+        public bool IsSettlementTroopsVisible()
+        {
+            return IsVisible(GetField<GameObject>(GetDefencePanelTroops(), SettlementTroopsContainerField));
+        }
+
+        /// <summary>The header the game writes over a settlement's own troops, from the same key the
+        /// defence menu reads.</summary>
+        public string DefendingTroopsLabel
+        {
+            get
+            {
+                return SpokenLines.Clean(
+                    GameText.Get(_localization, "Adventure/TroopManagementMenu/DefendingTroopsHeader", string.Empty));
             }
         }
 

@@ -1030,11 +1030,6 @@ msgctxt "Screens.Round"
 msgid "Round {0}"
 msgstr "第 {0} 回合"
 
-#. Screens.SettlementTroops
-msgctxt "Screens.SettlementTroops"
-msgid "settlement troops"
-msgstr "定居點部隊"
-
 #. Screens.Skill
 msgctxt "Screens.Skill"
 msgid "Skill {0}"

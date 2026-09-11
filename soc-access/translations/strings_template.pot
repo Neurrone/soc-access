@@ -2999,11 +2999,6 @@ msgctxt "Screens.ScannerResultAnnouncements"
 msgid "Scanner result announcements"
 msgstr ""
 
-#. Screens.SettlementTroops
-msgctxt "Screens.SettlementTroops"
-msgid "settlement troops"
-msgstr ""
-
 #. Screens.Skill
 msgctxt "Screens.Skill"
 msgid "Skill {0}"

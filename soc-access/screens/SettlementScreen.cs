@@ -261,11 +261,22 @@ namespace SongsOfConquestAccess.Screens
         // ---- the settlement's own army ----
 
         /// <summary>The troops left behind in the settlement, and the two buttons that move a whole
-        /// army in or out of it.</summary>
+        /// army in or out of it. Drawn only where the menu draws the rows at all, and named by the
+        /// header the game writes over them, as the defence menu does.</summary>
         private void BuildSettlementTroops(GraphBuilder builder)
         {
-            builder.PushContext(ModText.Get(ModStrings.Screens.SettlementTroops));
-            builder.SetRegion(SettlementArmyKey);
+            if (!Live.IsSettlementTroopsVisible())
+            {
+                return;
+            }
+
+            string caption = Live.DefendingTroopsLabel;
+            bool named = !string.IsNullOrWhiteSpace(caption);
+            if (named)
+            {
+                builder.PushContext(caption);
+                builder.SetRegion(SettlementArmyKey);
+            }
 
             TroopHudRows.Rows(builder, SettlementTroops, TroopHudRows.RowPrefix(SettlementArmyKey));
             SettlementNodes.Button(
@@ -287,7 +298,11 @@ namespace SongsOfConquestAccess.Screens
                 Live.MoveToWielderTooltip,
                 Live.FocusMoveToWielder);
 
-            builder.PopContext();
+            if (named)
+            {
+                builder.PopContext();
+            }
+
             builder.SetRegion(null);
         }
 

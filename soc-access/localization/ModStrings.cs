@@ -691,7 +691,6 @@
             public static readonly ModString ScannerUsesLongDirections = new ModString("Screens.ScannerUsesLongDirections", "Long directions");
             public static readonly ModString AdventureMapUsesLongRoadDirections = new ModString("Screens.AdventureMapUsesLongRoadDirections", "Long road directions");
             public static readonly ModString ScannerResultAnnouncements = new ModString("Screens.ScannerResultAnnouncements", "Scanner result announcements");
-            public static readonly ModString SettlementTroops = new ModString("Screens.SettlementTroops", "settlement troops");
             public static readonly ModPluralString SelectedSubcategoryCount = new ModPluralString("Screens.SelectedSubcategoryCount", "{0} selected", "{0} selected");
             public static readonly ModString Skill = new ModString("Screens.Skill", "Skill {0}");
             public static readonly ModString SpellbookAddToQuickbarHint = new ModString("Screens.SpellbookAddToQuickbarHint", "{0} adds to quickbar");
