@@ -585,7 +585,6 @@
             public static readonly ModString CombatPortraitDetail = new ModString("Screens.CombatPortraitDetail", "{0}, {1}, level {2}");
             public static readonly ModString Defender = new ModString("Screens.Defender", "Defender");
             public static readonly ModString DefenderPortrait = new ModString("Screens.DefenderPortrait", "Defender portrait");
-            public static readonly ModString Downloads = new ModString("Screens.Downloads", "Downloads");
             public static readonly ModString Duration = new ModString("Screens.Duration", "Duration");
             public static readonly ModString Empty = new ModString("Screens.Empty", "empty");
             public static readonly ModString Enabled = new ModString("Screens.Enabled", "Enabled");

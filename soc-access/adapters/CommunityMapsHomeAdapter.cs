@@ -53,6 +53,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly string _unsubscribeLabel;
         private readonly string _loadingLabel;
         private readonly string _errorLabel;
+        private readonly string _downloadsLabel;
 
         // mod.io's own subscription check, and the collection object it is asked on: both were looked
         // up afresh for every mod whose Subscribe label was read.
@@ -77,6 +78,7 @@ namespace SongsOfConquestAccess.Adapters
             _unsubscribeLabel = Translate("Unsubscribe");
             _loadingLabel = Translate("Loading");
             _errorLabel = Translate("Error");
+            _downloadsLabel = Translate("Downloads");
         }
 
         public bool IsPresent()
@@ -440,6 +442,13 @@ namespace SongsOfConquestAccess.Adapters
 
             InputReceiver.OnSearch();
             return true;
+        }
+
+        /// <summary>mod.io's own word for the download queue, as the collection page reads it.
+        /// </summary>
+        public string DownloadsLabel
+        {
+            get { return _downloadsLabel; }
         }
 
         public bool HasDownloadsMenu

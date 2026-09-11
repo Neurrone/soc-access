@@ -49,6 +49,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly string _voteDownLabel;
         private readonly string _reportLabel;
         private readonly string _backLabel;
+        private readonly string _downloadsLabel;
 
         public CommunityMapsDetailsAdapter(Details details)
         {
@@ -56,6 +57,7 @@ namespace SongsOfConquestAccess.Adapters
             _voteUpLabel = Translate("Vote up");
             _voteDownLabel = Translate("Vote down");
             _reportLabel = Translate("Report");
+            _downloadsLabel = Translate("Downloads");
             _backLabel = FindTopBarText("Back / Exit");
             if (string.IsNullOrWhiteSpace(_backLabel))
             {
@@ -169,6 +171,13 @@ namespace SongsOfConquestAccess.Adapters
             EnsureSelectedGameObjectForReport();
             _details.ReportButtonPress();
             return true;
+        }
+
+        /// <summary>mod.io's own word for the download queue, as the collection page reads it.
+        /// </summary>
+        public string DownloadsLabel
+        {
+            get { return _downloadsLabel; }
         }
 
         public bool HasDownloadsMenu

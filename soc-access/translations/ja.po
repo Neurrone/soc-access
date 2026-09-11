@@ -790,11 +790,6 @@ msgctxt "Screens.CurrentTroopSection"
 msgid "Current troop"
 msgstr "現在の部隊"
 
-#. Screens.Downloads
-msgctxt "Screens.Downloads"
-msgid "Downloads"
-msgstr "ダウンロード"
-
 #. Screens.Empty
 msgctxt "Screens.Empty"
 msgid "empty"

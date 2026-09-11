@@ -810,11 +810,6 @@ msgctxt "Screens.CurrentTroopSection"
 msgid "Current troop"
 msgstr "Поточне військо"
 
-#. Screens.Downloads
-msgctxt "Screens.Downloads"
-msgid "Downloads"
-msgstr "Завантаження"
-
 #. Screens.Empty
 msgctxt "Screens.Empty"
 msgid "empty"

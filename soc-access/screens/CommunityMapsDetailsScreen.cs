@@ -120,7 +120,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             NodeVtable downloads = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Downloads),
+                () => Live.DownloadsLabel,
                 () => Live.OpenDownloadsMenu(),
                 () => Live.HasDownloadsMenu);
             builder.AddItem(Synthetic("downloads", downloads));
