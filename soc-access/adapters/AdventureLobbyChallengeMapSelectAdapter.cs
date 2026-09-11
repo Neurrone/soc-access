@@ -493,9 +493,10 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
+            string normalized = line.Trim();
             for (int i = 0; i < lines.Count; i++)
             {
-                if (string.Equals(lines[i], line, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(lines[i]?.Trim(), normalized, StringComparison.OrdinalIgnoreCase))
                 {
                     return;
                 }
