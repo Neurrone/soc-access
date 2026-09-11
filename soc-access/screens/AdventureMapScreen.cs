@@ -661,10 +661,18 @@ namespace SongsOfConquestAccess.Screens
             for (int i = 0; overviewDrawn && i < KingdomOverviewSlots; i++)
             {
                 int index = i;
+                // Checked here rather than handed to SyntheticButton, because the tooltip beside it
+                // is an argument: an undrawn slot would compose one for a node nothing draws. The
+                // wielder and town lists guard theirs the same way.
+                if (!hud.IsKingdomOverviewItemVisible(index))
+                {
+                    continue;
+                }
+
                 GraphNodes.SyntheticButton(
                     builder,
                     KingdomKeyPrefix + index,
-                    hud.IsKingdomOverviewItemVisible(index),
+                    true,
                     () => hud.GetKingdomOverviewLabel(index),
                     () => hud.ClickKingdomOverviewItem(index),
                     () => hud.IsKingdomOverviewItemEnabled(index),
