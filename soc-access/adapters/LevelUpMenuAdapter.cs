@@ -56,7 +56,7 @@ namespace SongsOfConquestAccess.Adapters
                 && AsyncField != null
                 && AsyncField.GetValue(_menu) != null
                 && IsBackgroundOpen()
-                && GetSkillChoices().Count > 0;
+                && IsAnySkillCardDrawn();
         }
 
         public string GetTitle()
@@ -184,9 +184,23 @@ namespace SongsOfConquestAccess.Adapters
                 Tooltip.ForComponent(tooltipComponent, _localization)));
         }
 
+        /// <summary>Whether the menu is drawing a skill card at all, asked without building the
+        /// three the page builds: this runs on every screen's tick.</summary>
+        private bool IsAnySkillCardDrawn()
+        {
+            return IsSkillCardDrawn(_settings != null ? _settings.LeftSkill : null)
+                || IsSkillCardDrawn(_settings != null ? _settings.MiddleSkill : null)
+                || IsSkillCardDrawn(_settings != null ? _settings.RightSkill : null);
+        }
+
+        private static bool IsSkillCardDrawn(CommanderLevelUpSkillComponent component)
+        {
+            return component != null && component.gameObject.activeInHierarchy;
+        }
+
         private void AddSkillChoice(List<SkillChoice> choices, LevelUpSkillSlot slot, int headerIndex, CommanderLevelUpSkillComponent component)
         {
-            if (component == null || !component.gameObject.activeInHierarchy)
+            if (!IsSkillCardDrawn(component))
             {
                 return;
             }

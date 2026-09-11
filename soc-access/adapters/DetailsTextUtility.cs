@@ -74,9 +74,11 @@ namespace SongsOfConquestAccess.Adapters
             return drawer;
         }
 
+        /// <summary>The lines the draw captured. A drawer is made per capture and thrown away
+        /// after it is read, so the list itself is handed out rather than copied per read.</summary>
         public IReadOnlyList<string> TextLines
         {
-            get { return _parts.ToArray(); }
+            get { return _parts; }
         }
 
         // Native tooltip instruction rows are draw-time metadata. They are not
@@ -84,7 +86,7 @@ namespace SongsOfConquestAccess.Adapters
         // native source must decide whether an instruction can be invoked safely.
         public IReadOnlyList<TooltipInstructionRow> InstructionRows
         {
-            get { return _instructionRows.ToArray(); }
+            get { return _instructionRows; }
         }
 
         public void RegisterSidePanelDescription(DetailsSidePanelDescription description)

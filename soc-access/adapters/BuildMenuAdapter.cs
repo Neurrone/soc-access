@@ -99,6 +99,8 @@ namespace SongsOfConquestAccess.Adapters
         // the cost, and each of those walked the same pooled subtrees again.
         private int _sectionsFrame = -1;
         private List<BuildMenuDescriptionSection> _sections;
+        private int _buildButtonsFrame = -1;
+        private List<BuildMenuButton> _buildButtons;
         private readonly FrameSweep<BuildMenuDescriptionEntry> _sectionEntries =
             new FrameSweep<BuildMenuDescriptionEntry>("build menu description section", inactiveToo: false);
 
@@ -135,6 +137,8 @@ namespace SongsOfConquestAccess.Adapters
         {
             _sectionsFrame = -1;
             _sections = null;
+            _buildButtonsFrame = -1;
+            _buildButtons = null;
             _sectionEntries.Invalidate();
             _selectedTierFrame = -1;
         }
@@ -978,8 +982,17 @@ namespace SongsOfConquestAccess.Adapters
             return clicked;
         }
 
+        /// <summary>The pooled build buttons the grid is drawing, walked at most once a frame: the
+        /// buildings and the selected building each asked the pool again.</summary>
         private IReadOnlyList<BuildMenuButton> GetActiveBuildButtons()
         {
+            int frame = Time.frameCount;
+            if (_buildButtons != null && _buildButtonsFrame == frame)
+            {
+                return _buildButtons;
+            }
+
+            _buildButtonsFrame = frame;
             List<BuildMenuButton> buttons = new List<BuildMenuButton>();
             foreach (object entry in GetActivePoolEntries(Reflect.Get<object>(_menu, BuildMenuButtonPoolField)))
             {
@@ -990,6 +1003,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
+            _buildButtons = buttons;
             return buttons;
         }
 

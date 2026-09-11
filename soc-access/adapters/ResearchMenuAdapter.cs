@@ -55,6 +55,11 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FrameSweep<ResearchMenuStackButton> _categoryButtons =
             new FrameSweep<ResearchMenuStackButton>("research menu category", inactiveToo: false);
 
+        // The team's global research as a set, kept until the game's own answer changes shape.
+        private HashSet<ResearchTypes> _owned;
+        private int _ownedTeamId = -1;
+        private int _ownedCount = -1;
+
         public ResearchMenuAdapter(ResearchMenu menu)
         {
             _menu = menu;
@@ -339,7 +344,11 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The local team's global research, asked for once per page. The game answers
         /// <c>HasGlobalResearch</c> with a scan of every research state, and the page used to ask it
         /// once per tier of every row; <c>GetGlobal</c> with disabled states included is the same
-        /// set in one scan.</summary>
+        /// set in one scan.
+        ///
+        /// The set itself is kept until the game's own answer changes shape - another team in
+        /// control, or one more state in it, which is the only way research is gained - so a build
+        /// that changes nothing refills nothing.</summary>
         private HashSet<ResearchTypes> GetOwnedGlobalResearch()
         {
             IClientAdventureFacade facade = Facade;
@@ -348,7 +357,14 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            IResearchState[] states = facade.Research.GetGlobal(facade.Teams.LocalTeamInControlId, includeDisabled: true);
+            int teamId = facade.Teams.LocalTeamInControlId;
+            IResearchState[] states = facade.Research.GetGlobal(teamId, includeDisabled: true);
+            int count = states != null ? states.Length : 0;
+            if (_owned != null && _ownedTeamId == teamId && _ownedCount == count)
+            {
+                return _owned;
+            }
+
             HashSet<ResearchTypes> owned = new HashSet<ResearchTypes>();
             for (int i = 0; states != null && i < states.Length; i++)
             {
@@ -358,6 +374,9 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
+            _ownedTeamId = teamId;
+            _ownedCount = count;
+            _owned = owned;
             return owned;
         }
 

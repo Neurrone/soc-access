@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using HarmonyLib;
 using Lavapotion.Utilities;
 using SongsOfConquest.Client;
@@ -23,6 +24,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(WorldConfirmMenu), "_async");
         private static readonly FieldInfo CostEntryPoolField = AccessTools.Field(typeof(WorldConfirmMenu), "_costEntryPool");
         private static readonly FieldInfo IconsField = AccessTools.Field(typeof(WorldConfirmMenu), "_icons");
+        private static readonly Regex DigitsPattern = new Regex(@"\d+", RegexOptions.Compiled);
 
         private readonly WorldConfirmMenu _menu;
         private readonly WorldConfirmMenu.Settings _settings;
@@ -245,11 +247,11 @@ namespace SongsOfConquestAccess.Adapters
             return ResourceCosts.Name(GlobalLocalizationVariables.LocalizationHandler, type, amount);
         }
 
-        /// <summary>The number out of the drawn amount ("-30"), for the plural form.</summary>
+        /// <summary>The number out of the drawn amount ("-30"), for the plural form. One compiled
+        /// pattern: this runs per cost line per build.</summary>
         private static int ParseAmount(string amount)
         {
-            System.Text.RegularExpressions.Match match =
-                System.Text.RegularExpressions.Regex.Match(amount ?? string.Empty, @"\d+");
+            Match match = DigitsPattern.Match(amount ?? string.Empty);
             int value;
             return match.Success && int.TryParse(match.Value, out value) ? value : 0;
         }

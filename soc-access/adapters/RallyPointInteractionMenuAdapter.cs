@@ -58,7 +58,7 @@ namespace SongsOfConquestAccess.Adapters
                 && subMenu != null
                 && subMenu.gameObject != null
                 && subMenu.gameObject.activeInHierarchy
-                && GetSourceItems().Count > 0;
+                && IsAnySourceEntryDrawn();
         }
 
         public string Title
@@ -132,6 +132,23 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return result;
+        }
+
+        /// <summary>Whether the menu is drawing a town row at all, asked without building the list
+        /// the page builds: this runs on every screen's tick.</summary>
+        private bool IsAnySourceEntryDrawn()
+        {
+            List<RallyPointTownEntry> entries = Reflect.Get<List<RallyPointTownEntry>>(_menu, ActiveEntriesField);
+            for (int i = 0; entries != null && i < entries.Count; i++)
+            {
+                RallyPointTownEntry entry = entries[i];
+                if (entry != null && entry.gameObject != null && entry.gameObject.activeInHierarchy)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool IsMenuOpen()

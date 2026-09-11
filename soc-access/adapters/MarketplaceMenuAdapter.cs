@@ -37,6 +37,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly MarketplaceMenu _menu;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
+        private GridSnapshot _grid;
 
         public MarketplaceMenuAdapter(MarketplaceMenu menu)
         {
@@ -110,6 +111,57 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public IReadOnlyList<TradeColumn> GetTradeColumns()
         {
+            return Grid().Columns;
+        }
+
+        /// <summary>The grid as the menu laid it out: the columns in drawn order and the button at
+        /// every crossing of resource and column. Both are fixed once the menu has spawned its
+        /// buttons, so the whole thing is built when the menu's own button list is replaced or grows
+        /// and not on every build - the page used to sort the layout twice a frame and then scan the
+        /// button list once per cell.
+        ///
+        /// A grid whose column captions are not all drawn yet is not kept: the menu spawns its
+        /// buttons before it turns its headers on, and a snapshot taken in between would name the
+        /// columns nothing for the life of the menu.</summary>
+        private GridSnapshot Grid()
+        {
+            List<MarketplaceButton> buttons = Reflect.Get<List<MarketplaceButton>>(_menu, ButtonsField);
+            int count = buttons != null ? buttons.Count : 0;
+            if (_grid != null
+                && ReferenceEquals(_grid.Source, buttons)
+                && _grid.Count == count
+                && _grid.IsCaptioned)
+            {
+                return _grid;
+            }
+
+            GridSnapshot grid = new GridSnapshot();
+            grid.Source = buttons;
+            grid.Count = count;
+            grid.Columns = BuildTradeColumns();
+            grid.ByCell = new Dictionary<long, MarketplaceButton>();
+            for (int i = 0; buttons != null && i < buttons.Count; i++)
+            {
+                MarketplaceButton button = buttons[i];
+                if (button != null)
+                {
+                    grid.ByCell[CellKey(button.ResourceType, button.IsBuyButton, button.Amount)] = button;
+                }
+            }
+
+            _grid = grid;
+            return grid;
+        }
+
+        /// <summary>One crossing of the grid as a single number, so a cell is found without walking
+        /// the menu's button list.</summary>
+        private static long CellKey(ResourceType resourceType, bool isBuyButton, int amount)
+        {
+            return ((long)(int)resourceType << 33) | ((long)(uint)amount << 1) | (isBuyButton ? 1L : 0L);
+        }
+
+        private List<TradeColumn> BuildTradeColumns()
+        {
             List<ColumnGeometry> geometry = GetColumnGeometry();
             List<TradeColumn> columns = new List<TradeColumn>(geometry.Count);
             if (geometry.Count == 0)
@@ -143,8 +195,10 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The button at one crossing of the grid, or null where the menu draws none.</summary>
         public TradeButtonItem GetTradeButton(ResourceType resourceType, bool isBuyButton, int amount)
         {
-            MarketplaceButton button = FindButton(resourceType, isBuyButton, amount);
-            return button != null ? new TradeButtonItem(button) : null;
+            MarketplaceButton button;
+            return Grid().ByCell.TryGetValue(CellKey(resourceType, isBuyButton, amount), out button) && button != null
+                ? new TradeButtonItem(button)
+                : null;
         }
 
         /// <summary>The paragraphs of the tip the menu draws under the trade, kept apart rather than
@@ -206,6 +260,32 @@ namespace SongsOfConquestAccess.Adapters
         public string GetResourceName(ResourceType resourceType)
         {
             return FormatResource(resourceType);
+        }
+
+        // The grid as the menu laid it out, kept until the menu's own button list is replaced.
+        private sealed class GridSnapshot
+        {
+            public List<MarketplaceButton> Source;
+            public int Count;
+            public List<TradeColumn> Columns;
+            public Dictionary<long, MarketplaceButton> ByCell;
+
+            /// <summary>Whether every column the menu drew has the caption that names it.</summary>
+            public bool IsCaptioned
+            {
+                get
+                {
+                    for (int i = 0; i < Columns.Count; i++)
+                    {
+                        if (string.IsNullOrWhiteSpace(Columns[i].Caption))
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            }
         }
 
         // One column of the grid as its buttons are drawn: which trade it makes and where it sits, so
@@ -381,24 +461,6 @@ namespace SongsOfConquestAccess.Adapters
         private static float Top(UITextMesh textMesh)
         {
             return textMesh != null ? textMesh.transform.position.y : 0f;
-        }
-
-        private MarketplaceButton FindButton(ResourceType resourceType, bool isBuyButton, int amount)
-        {
-            IReadOnlyList<MarketplaceButton> buttons = GetButtons();
-            for (int i = 0; i < buttons.Count; i++)
-            {
-                MarketplaceButton button = buttons[i];
-                if (button != null
-                    && button.ResourceType == resourceType
-                    && button.IsBuyButton == isBuyButton
-                    && button.Amount == amount)
-                {
-                    return button;
-                }
-            }
-
-            return null;
         }
 
         private IReadOnlyList<MarketplaceButton> GetButtons()
