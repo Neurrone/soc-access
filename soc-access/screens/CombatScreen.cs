@@ -777,7 +777,7 @@ namespace SongsOfConquestAccess.Screens
                 builder,
                 "combat:chat",
                 chatDrawn,
-                () => chat.ButtonLabel,
+                () => ChatButtonText.Label(chat),
                 () => chat.Open(),
                 () => chat.IsButtonEnabled(),
                 chatDrawn ? chat.ButtonTooltip : null,

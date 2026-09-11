@@ -458,7 +458,7 @@ namespace SongsOfConquestAccess.Screens
 
             ChatAdapter it = chat;
             NodeVtable vtable = GraphNodes.Button(
-                () => it.ButtonLabel,
+                () => ChatButtonText.Label(it),
                 () => it.Open(),
                 it.IsButtonEnabled,
                 it.ButtonTooltip);

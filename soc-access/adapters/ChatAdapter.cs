@@ -103,16 +103,6 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        public string ButtonLabel
-        {
-            get
-            {
-                return HasUnreadMessages()
-                    ? ModText.Get(ModStrings.Screens.ChatUnreadMessages)
-                    : ModText.Get(ModStrings.Screens.Chat);
-            }
-        }
-
         public Tooltip ButtonTooltip
         {
             get { return Tooltip.ForComponent(GetChatButton(), LocalizationHandler); }
