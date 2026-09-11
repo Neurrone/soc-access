@@ -443,6 +443,8 @@ namespace SongsOfConquestAccess.Dev
             }
             catch (Exception)
             {
+                // No window found is the same answer as no window: the caller reports the
+                // foreground failure to whoever asked for the keys, in a sentence saying so.
                 return IntPtr.Zero;
             }
 

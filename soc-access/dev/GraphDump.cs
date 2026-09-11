@@ -222,8 +222,10 @@ namespace SongsOfConquestAccess.Dev
             {
                 return KeyGraph.ComputeOrder(render);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                SocAccessMod.Instance?.LogWarning(
+                    "Graph dump could not compute the traversal order, falling back on the declared one: " + e);
                 List<ControlId> declared = new List<ControlId>();
                 foreach (GraphNode node in render.Order)
                 {

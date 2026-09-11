@@ -28,8 +28,13 @@ namespace SongsOfConquestAccess
                     ? assembly.GetName().Version.ToString()
                     : stamped.InformationalVersion;
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                // Kept rather than let a static initialiser throw and take the whole type with it,
+                // but never silent: this runs once, before the mod has a logger of its own, so the
+                // line goes out through Unity's, which BepInEx captures.
+                UnityEngine.Debug.LogWarning(
+                    "SongsOfConquestAccess: reading the mod version threw: " + exception);
                 return string.Empty;
             }
         }
