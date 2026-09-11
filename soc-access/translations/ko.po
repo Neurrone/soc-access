@@ -3831,3 +3831,38 @@ msgstr "분류 {0}"
 msgctxt "UI.RankNumber"
 msgid "#{0}"
 msgstr "{0}위"
+
+#. UI.ColumnGameName
+msgctxt "UI.ColumnGameName"
+msgid "Game name"
+msgstr "게임 이름"
+
+#. UI.ColumnPlayers
+msgctxt "UI.ColumnPlayers"
+msgid "Players"
+msgstr "플레이어"
+
+#. Screens.CampaignNumber
+msgctxt "Screens.CampaignNumber"
+msgid "Campaign {0}"
+msgstr "캠페인 {0}"
+
+#. Screens.CustomCampaigns
+msgctxt "Screens.CustomCampaigns"
+msgid "Custom campaigns"
+msgstr "사용자 지정 캠페인"
+
+#. Screens.Tales
+msgctxt "Screens.Tales"
+msgid "Tales"
+msgstr "이야기"
+
+#. Screens.Confirm
+msgctxt "Screens.Confirm"
+msgid "Confirm"
+msgstr "확인"
+
+#. Screens.ShowTutorials
+msgctxt "Screens.ShowTutorials"
+msgid "Show tutorials"
+msgstr "튜토리얼 표시"

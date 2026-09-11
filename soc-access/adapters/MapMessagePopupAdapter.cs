@@ -3,6 +3,7 @@ using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -61,7 +62,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string PositiveLabel
         {
-            get { return FirstNonEmpty(GetButtonText(GetOkButton()), "OK"); }
+            get { return FirstNonEmpty(GetButtonText(GetOkButton()), ModText.Get(ModStrings.Screens.Ok)); }
         }
 
         public string NegativeLabel

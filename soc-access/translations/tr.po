@@ -3831,3 +3831,38 @@ msgstr "Kategori {0}"
 msgctxt "UI.RankNumber"
 msgid "#{0}"
 msgstr "{0}."
+
+#. UI.ColumnGameName
+msgctxt "UI.ColumnGameName"
+msgid "Game name"
+msgstr "Oyun adı"
+
+#. UI.ColumnPlayers
+msgctxt "UI.ColumnPlayers"
+msgid "Players"
+msgstr "Oyuncular"
+
+#. Screens.CampaignNumber
+msgctxt "Screens.CampaignNumber"
+msgid "Campaign {0}"
+msgstr "Kampanya {0}"
+
+#. Screens.CustomCampaigns
+msgctxt "Screens.CustomCampaigns"
+msgid "Custom campaigns"
+msgstr "Özel kampanyalar"
+
+#. Screens.Tales
+msgctxt "Screens.Tales"
+msgid "Tales"
+msgstr "Hikâyeler"
+
+#. Screens.Confirm
+msgctxt "Screens.Confirm"
+msgid "Confirm"
+msgstr "Onayla"
+
+#. Screens.ShowTutorials
+msgctxt "Screens.ShowTutorials"
+msgid "Show tutorials"
+msgstr "Öğreticileri göster"

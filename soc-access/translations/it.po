@@ -3861,3 +3861,38 @@ msgstr "Categoria {0}"
 msgctxt "UI.RankNumber"
 msgid "#{0}"
 msgstr "n. {0}"
+
+#. UI.ColumnGameName
+msgctxt "UI.ColumnGameName"
+msgid "Game name"
+msgstr "Nome partita"
+
+#. UI.ColumnPlayers
+msgctxt "UI.ColumnPlayers"
+msgid "Players"
+msgstr "Giocatori"
+
+#. Screens.CampaignNumber
+msgctxt "Screens.CampaignNumber"
+msgid "Campaign {0}"
+msgstr "Campagna {0}"
+
+#. Screens.CustomCampaigns
+msgctxt "Screens.CustomCampaigns"
+msgid "Custom campaigns"
+msgstr "Campagne personalizzate"
+
+#. Screens.Tales
+msgctxt "Screens.Tales"
+msgid "Tales"
+msgstr "Racconti"
+
+#. Screens.Confirm
+msgctxt "Screens.Confirm"
+msgid "Confirm"
+msgstr "Conferma"
+
+#. Screens.ShowTutorials
+msgctxt "Screens.ShowTutorials"
+msgid "Show tutorials"
+msgstr "Mostra tutorial"

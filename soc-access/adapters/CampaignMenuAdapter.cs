@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu.Common;
 using SongsOfConquest.Client.Menu.Loading;
@@ -6,6 +6,7 @@ using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -84,7 +85,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (_customCampaignButton == null)
                 {
                     _customCampaignButton = CreateOptionalButton(
-                        "Custom campaigns",
+                        ModText.Get(ModStrings.Screens.CustomCampaigns),
                         _campaignMenu != null ? CustomCampaignButtonRef(_campaignMenu) : null,
                         includeAllVisibleText: false);
                 }
@@ -102,7 +103,7 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     UIButton talesButton = _campaignMenu != null ? TalesButtonRef(_campaignMenu) : null;
                     _talesButton = CreateOptionalButton(
-                        "Tales",
+                        ModText.Get(ModStrings.Screens.Tales),
                         talesButton != null ? ((Component)talesButton).gameObject : null,
                         includeAllVisibleText: true);
                 }
@@ -147,7 +148,7 @@ namespace SongsOfConquestAccess.Adapters
             _headerFound = true;
             _backButton = new OptionalMenuButtonAdapter(
                 settings.BackButton,
-                "Back",
+                ModText.Get(ModStrings.Screens.Back),
                 () => settings.BackButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.BackButton),
                 null,
                 includeAllVisibleText: false);

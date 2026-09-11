@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
@@ -41,11 +41,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public UIButton Button { get; private set; }
 
+        /// <summary>Which campaign of the page this card is, counted from one; 0 for a card the
+        /// page gives no number. Saying where it sits is the screen's wording.</summary>
+        public int CampaignNumber
+        {
+            get { return _campaignNumber; }
+        }
+
         public string GetLabel()
         {
             ICampaignDefinition definition = GetDefinition();
             return MenuButtonTextUtility.JoinParts(
-                PrefixCampaignNumber(_campaignNumber),
                 GetLocalizedText(definition != null ? definition.Title : null, GetText(CampaignNameTextRef)),
                 GetLocalizedText(definition != null ? definition.SubTitle : null, GetText(CampaignSubHeaderTextRef)));
         }
@@ -110,11 +116,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 HandleBeginHoverMethod.Invoke(_campaignButton, new object[] { null });
             }
-        }
-
-        private static string PrefixCampaignNumber(int number)
-        {
-            return number > 0 ? "Campaign " + number : string.Empty;
         }
 
         private string GetText(AccessTools.FieldRef<CampaignButton, UITextMesh> fieldRef)

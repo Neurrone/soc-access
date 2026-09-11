@@ -83,7 +83,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string TutorialsToggleLabel
         {
-            get { return SpokenText.Get("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
+            get { return SpokenText.Get("Tutorial/TutorialPopup/ShowTutorialCheckbox", ModText.Get(ModStrings.Screens.ShowTutorials)); }
         }
 
         /// <summary>The component the game draws the OK button with, or null where the popup has

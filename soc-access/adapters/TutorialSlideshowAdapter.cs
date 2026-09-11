@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
@@ -76,7 +76,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string TutorialsToggleLabel
         {
-            get { return SpokenText.Get("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
+            get { return SpokenText.Get("Tutorial/TutorialPopup/ShowTutorialCheckbox", ModText.Get(ModStrings.Screens.ShowTutorials)); }
         }
 
         /// <summary>The text mesh the panel writes each page's description into - one viewer the game

@@ -568,9 +568,9 @@ namespace SongsOfConquestAccess.Screens
         {
             ModDialog dialog = screen.Dialog;
             dialog.StartRow();
-            dialog.AddButton(GameText.Get("Common/Cancel", "Cancel"), () => screen.Cancel());
+            dialog.AddButton(GameText.Get("Common/Cancel", ModText.Get(ModStrings.Actions.Cancel)), () => screen.Cancel());
             dialog.AddButton(
-                GameText.Get("Common/Confirm", "Confirm"),
+                GameText.Get("Common/Confirm", ModText.Get(ModStrings.Screens.Confirm)),
                 () =>
                 {
                     // A confirm the dialog refuses - a name already spoken for - leaves it open, so
