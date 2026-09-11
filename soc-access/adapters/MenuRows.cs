@@ -316,10 +316,15 @@ namespace SongsOfConquestAccess.Adapters
                 hasOverride,
                 () =>
                 {
+                    // Resolved BEFORE the click: starting the game's capture redraws the whole
+                    // page inside the click, so afterwards this widget is no longer the drawn one
+                    // and nothing maps it to its action any more.
+                    BindingContainer container = source != null && source.Resolve != null ? source.Resolve(widget) : null;
                     bool clicked = NativeSelectionUtility.Click(PlusButton(widget));
                     if (clicked && source != null)
                     {
                         source.LastRebindWidget = widget;
+                        source.LastRebindAction = container != null ? container.action : (ActionReference?)null;
                     }
 
                     return clicked;
@@ -360,7 +365,7 @@ namespace SongsOfConquestAccess.Adapters
         // empty and sets the row's own label mesh through a localization component - so it is read
         // the same way every other native label is, off that mesh with GetEffectiveText. The mesh is
         // the widget's cached field, so this is a field read and no subtree walk.
-        private static string ActionText(IUIKeyBinding widget)
+        public static string ActionText(IUIKeyBinding widget)
         {
             IUITextMesh mesh = widget != null && LabelMeshField != null ? LabelMeshField.GetValue(widget) as IUITextMesh : null;
             return mesh != null
@@ -387,7 +392,7 @@ namespace SongsOfConquestAccess.Adapters
             return chip != null && EntryButtonField != null ? EntryButtonField.GetValue(chip) as UIButton : null;
         }
 
-        private static string ChipText(IUIKeyBinding widget)
+        public static string ChipText(IUIKeyBinding widget)
         {
             UIKeyBindingEntry chip = Chip(widget);
             IUITextMesh mesh = chip != null && EntryTextField != null ? EntryTextField.GetValue(chip) as IUITextMesh : null;
@@ -922,6 +927,11 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>Have the panel's scroller measure the content column again - asked from a row's
         /// focus when its chip was redrawn since the last measure.</summary>
         public Action RefreshScroll;
+
+        /// <summary>The action whose capture the mod last started from a "+", resolved before the
+        /// click because the click redraws the page; null where the row could not be resolved.
+        /// </summary>
+        public ActionReference? LastRebindAction;
     }
 
     /// <summary>

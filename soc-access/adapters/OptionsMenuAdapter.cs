@@ -6,6 +6,8 @@ using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.Menu.Options;
 using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -40,6 +42,7 @@ namespace SongsOfConquestAccess.Adapters
         // records the reader mints, so it lives here on the adapter.
         private readonly KeyBindingSource _keyBindings;
         private Dictionary<IUIKeyBinding, ActionReference> _reverse;
+        private Dictionary<ActionReference, IUIKeyBinding> _binders;
         private IInputManager _inputManager;
         private int _reverseFrame = -1;
 
@@ -157,6 +160,80 @@ namespace SongsOfConquestAccess.Adapters
         // The rows of the page showing, re-read only when the column is redrawn (a tab switch).
         private MenuRowMemo _rows;
 
+        // Where the capture the mod started from a "+" cell has got to: 0 not seen running yet (the
+        // game's button-less popup takes a frame to come up, so "not capturing" right after the
+        // click is not yet "finished"), 1 seen running, 2 seen ended, read on the next frame. The
+        // ACTION is what the row remembered, not its widget: the game redraws the whole Controls
+        // page as the capture starts and again as it ends, so the widget the "+" was clicked on is
+        // destroyed by then (2026-09-11).
+        private int _captureStage;
+
+        /// <summary>
+        /// Once, when a capture the mod started from a row's "+" has ended: the action's drawn name
+        /// and the hotkey its redrawn chip shows, the input manager's own text where the chip reads
+        /// empty. False every other frame.
+        /// </summary>
+        public bool TakeFinishedRebind(out string actionName, out string bindingText)
+        {
+            actionName = null;
+            bindingText = null;
+            IUIKeyBinding widget = _keyBindings.LastRebindWidget;
+            if (widget == null)
+            {
+                return false;
+            }
+
+            if (KeyCaptureFocus.IsCapturing())
+            {
+                _captureStage = 1;
+                return false;
+            }
+
+            if (_captureStage == 0)
+            {
+                return false;
+            }
+
+            if (_captureStage == 1)
+            {
+                _captureStage = 2;
+                return false;
+            }
+
+            _captureStage = 0;
+            _keyBindings.LastRebindWidget = null;
+            ActionReference? action = _keyBindings.LastRebindAction;
+            _keyBindings.LastRebindAction = null;
+            if (action == null)
+            {
+                return false;
+            }
+
+            EnsureReverseMap();
+            IUIKeyBinding current;
+            if (_binders != null && _binders.TryGetValue(action.Value, out current) && current as UnityEngine.Object != null)
+            {
+                actionName = MenuRows.ActionText(current);
+                bindingText = MenuRows.ChipText(current);
+            }
+
+            if (string.IsNullOrWhiteSpace(actionName))
+            {
+                actionName = GameText.Get("Hotkeys/" + action.Value.Identifier, action.Value.Identifier);
+            }
+
+            if (string.IsNullOrWhiteSpace(bindingText))
+            {
+                BindingContainer container;
+                if (_inputManager != null && _inputManager.TryGetOverride(action.Value, out container) && container != null)
+                {
+                    bindingText = container.currentOverride ?? container.defaultBinding;
+                }
+            }
+
+            return true;
+        }
+
         // widget -> the binding it holds, for a row that needs the input manager's own text as a
         // fallback. Null for an unknown widget; the reverse map is rebuilt at most once per frame.
         private BindingContainer ResolveBinding(IUIKeyBinding widget)
@@ -182,6 +259,7 @@ namespace SongsOfConquestAccess.Adapters
 
             _reverseFrame = frame;
             _reverse = null;
+            _binders = null;
             _inputManager = null;
 
             OptionsMenuKeyBindContent content = KeyBindContent();
@@ -199,6 +277,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
+            _binders = binders;
             Dictionary<IUIKeyBinding, ActionReference> reverse = new Dictionary<IUIKeyBinding, ActionReference>();
             foreach (KeyValuePair<ActionReference, IUIKeyBinding> binder in binders)
             {

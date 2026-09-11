@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SongsOfConquest.Client.Menu.Options;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
@@ -89,6 +90,23 @@ namespace SongsOfConquestAccess.Screens
         public override object InitialFocusStop
         {
             get { return TabsStop; }
+        }
+
+        /// <summary>A capture the mod started from a "+" cell ends with the cursor still on that
+        /// cell, so the chip's live text (spoken only while the chip is focused) says nothing. The
+        /// result is spoken here, queued behind whatever the closing popup said.</summary>
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+            string actionName;
+            string bindingText;
+            if (IsActive() && Live.TakeFinishedRebind(out actionName, out bindingText))
+            {
+                string chord = KeyBindingText.Display(bindingText, ModText.Get(ModStrings.Screens.NotBound));
+                SpeechPipeline.Output(new SpeechRequest(
+                    ModText.Get(ModStrings.Screens.KeybindSet, actionName, chord),
+                    interrupt: false));
+            }
         }
 
         public override void Build(GraphBuilder builder)
