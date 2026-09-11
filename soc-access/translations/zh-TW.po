@@ -3872,3 +3872,18 @@ msgstr "無法執行主要操作。"
 msgctxt "Events.MapSecondaryActionFailed"
 msgid "Could not perform secondary action."
 msgstr "無法執行次要操作。"
+
+#. Common.Parenthetical
+msgctxt "Common.Parenthetical"
+msgid "{0} ({1})"
+msgstr "{0} ({1})"
+
+#. Common.PositiveAmount
+msgctxt "Common.PositiveAmount"
+msgid "+{0}"
+msgstr "+{0}"
+
+#. Combat.Spell
+msgctxt "Combat.Spell"
+msgid "Spell"
+msgstr "法術"
