@@ -28,7 +28,14 @@ namespace SongsOfConquestAccess.Screens
         private readonly GraphNavigator _navigator;
         private readonly ReviewBufferManager _reviewBuffers;
         private readonly ReviewBufferController _reviewBufferController;
+        // The polled stack and the buffers Tick reuses for it. Resolve runs once a frame over some
+        // sixty screens and used to allocate a list for the answer and diff it against the old one
+        // with List.Contains, which is a walk per screen per side; the two lists are swapped instead
+        // and the two sets answer the diff's questions in one hop. _stacked always mirrors _stack.
         private List<Screen> _stack = new List<Screen>();
+        private List<Screen> _spare = new List<Screen>();
+        private HashSet<Screen> _stacked = new HashSet<Screen>();
+        private HashSet<Screen> _wanted = new HashSet<Screen>();
         private Screen _focused;
 
         public ScreenManager(
@@ -147,7 +154,7 @@ namespace SongsOfConquestAccess.Screens
 
             for (Screen at = screen; at != null; at = at.ParentScreen)
             {
-                if (_stack.Contains(at))
+                if (_stacked.Contains(at))
                 {
                     return true;
                 }
@@ -158,7 +165,7 @@ namespace SongsOfConquestAccess.Screens
 
         public void Tick()
         {
-            ApplyDiff(Resolve());
+            ApplyDiff(Resolve(_spare, _wanted));
             SyncFocus();
 
             Screen current = Current;
@@ -186,7 +193,8 @@ namespace SongsOfConquestAccess.Screens
                 Pop(_stack[i]);
             }
 
-            _stack = new List<Screen>();
+            _stack.Clear();
+            _stacked.Clear();
             _focused = null;
             _failures.Clear();
             GraphNavigator navigator = _navigator;
@@ -226,9 +234,10 @@ namespace SongsOfConquestAccess.Screens
         // Active screens, bottom layer first. Insertion-sorted rather than List.Sort, which is not
         // stable: two screens on the same layer must stay in registration order, which is how combat
         // sits above the map.
-        private List<Screen> Resolve()
+        private List<Screen> Resolve(List<Screen> active, HashSet<Screen> into)
         {
-            List<Screen> active = new List<Screen>();
+            active.Clear();
+            into.Clear();
             for (int i = 0; i < _registered.Count; i++)
             {
                 Screen screen = _registered[i];
@@ -246,6 +255,7 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 active.Insert(at, screen);
+                into.Add(screen);
             }
 
             return active;
@@ -259,7 +269,7 @@ namespace SongsOfConquestAccess.Screens
             // replaced another hears about it in the order the player experienced it.
             for (int i = _stack.Count - 1; i >= 0; i--)
             {
-                if (!desired.Contains(_stack[i]))
+                if (!_wanted.Contains(_stack[i]))
                 {
                     Pop(_stack[i]);
                     changed = true;
@@ -268,14 +278,20 @@ namespace SongsOfConquestAccess.Screens
 
             for (int i = 0; i < desired.Count; i++)
             {
-                if (!_stack.Contains(desired[i]))
+                if (!_stacked.Contains(desired[i]))
                 {
                     Safe(desired[i].OnPush, desired[i], "OnPush");
                     changed = true;
                 }
             }
 
+            // The lists and their sets change places; what the stack was becomes next frame's
+            // scratch, so neither is allocated again.
+            _spare = _stack;
             _stack = desired;
+            HashSet<Screen> stacked = _stacked;
+            _stacked = _wanted;
+            _wanted = stacked;
             if (changed)
             {
                 ApplyVisibleReviewBuffers();

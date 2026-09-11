@@ -121,15 +121,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>Look again on the next read. For a source whose object the game replaces
-        /// within one scene (a menu it re-instantiates); not for a scene change, which the key
-        /// already covers.</summary>
-        public void Invalidate()
-        {
-            _probed = false;
-            _found = null;
-        }
-
         /// <summary>A binding in the project container: the system menus that exist for the whole
         /// game. Only for <c>NonLazy</c> contracts; resolving a lazy one constructs it.</summary>
         public static ScreenSource<T> FromProject()
