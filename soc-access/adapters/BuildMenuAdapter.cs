@@ -114,6 +114,7 @@ namespace SongsOfConquestAccess.Adapters
         // Reflection handles and fixed answers resolved once per menu; misses are remembered too.
         private bool _gameConfigProbed;
         private MethodInfo _gameConfigGetValue;
+        private readonly HashSet<string> _reportedGameConfigFailures = new HashSet<string>();
         private readonly Dictionary<BuildSiteSize, string> _buildTimeBySize =
             new Dictionary<BuildSiteSize, string>();
         private Type _validateResearchArgType;
@@ -1355,8 +1356,16 @@ namespace SongsOfConquestAccess.Adapters
                 object value = _gameConfigGetValue.Invoke(_gameConfig, new object[] { key, fallback });
                 return value is int ? (int)value : fallback;
             }
-            catch
+            catch (Exception exception)
             {
+                // Once per menu instance: three keys are asked for, each of them cached, so this
+                // cannot flood - but a game whose config has moved should say so once.
+                if (_reportedGameConfigFailures.Add(key))
+                {
+                    SocAccessMod.Instance?.LogWarning(
+                        "BuildMenuAdapter could not read the game config value " + key + ": " + exception);
+                }
+
                 return fallback;
             }
         }

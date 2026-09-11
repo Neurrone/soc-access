@@ -518,6 +518,9 @@ namespace SongsOfConquestAccess.Screens
         private static readonly List<SpellbookAdapter.SpellItem> EmptySpells =
             new List<SpellbookAdapter.SpellItem>();
 
+        /// <summary>Whether the failure above has already been written to the log.</summary>
+        private bool _reportedSpellsFailure;
+
         /// <summary>Every column's spells, or none where reading them threw.</summary>
         private Dictionary<SpellbookSpellGroup, List<SpellbookAdapter.SpellItem>> Grouped()
         {
@@ -527,7 +530,16 @@ namespace SongsOfConquestAccess.Screens
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("SpellbookScreen section spells failed to build: " + exception);
+                // Reported ONCE, as a section is (ui/SectionItems.cs): a build runs every frame, so
+                // a window that has stopped answering would write a line a frame and bury the log.
+                // What has already been said is mod-owned state that outlives any one spellbook, and
+                // there is no reset hook for it to want.
+                if (!_reportedSpellsFailure)
+                {
+                    _reportedSpellsFailure = true;
+                    SocAccessMod.Instance?.LogWarning("SpellbookScreen section spells failed to build: " + exception);
+                }
+
                 return null;
             }
         }
