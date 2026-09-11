@@ -108,7 +108,6 @@ namespace SongsOfConquestAccess.Speech
                 return;
             }
 
-            _logger.LogInfo("SpeechService speaking: \"" + text + "\", interrupt=" + interrupt);
             PrismNative.PrismError error = PrismNative.PrismError.NotImplemented;
 
             if ((_backendFeatures & PrismNative.BackendFeatures.SupportsOutput) != 0)
