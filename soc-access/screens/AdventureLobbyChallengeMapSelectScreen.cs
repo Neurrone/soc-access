@@ -195,10 +195,8 @@ namespace SongsOfConquestAccess.Screens
             return cells;
         }
 
-        /// <summary>One read-only cell: the drawn value alone, the column's caption being spoken as
-        /// the edge crossed into it, with the caption and the value as the buffer's head. Every cell
-        /// carries the row's click, as the map select table's do: Enter anywhere along a row means
-        /// that row.</summary>
+        /// <summary>One read-only cell of the table (<see cref="LobbyMapNodes.Cell"/>), under the
+        /// caption of the column the game draws it in.</summary>
         private static NodeVtable Cell(
             IReadOnlyList<string> captions,
             int column,
@@ -208,33 +206,11 @@ namespace SongsOfConquestAccess.Screens
         {
             AdventureLobbyChallengeMapRowAdapter it = row;
             string caption = captions != null && column < captions.Count ? captions[column] : string.Empty;
-            Func<string> text = () => Filled(value());
-            NodeVtable vtable = new NodeVtable
-            {
-                ControlType = ControlTypes.Text,
-                Announcements = new List<NodeAnnouncement> { GraphNodes.ValuePart(text, watch: false) },
-                Sections = GraphNodes.Sections(null, tooltip),
-                SearchText = () => it.Name,
-                BufferHead = () => ModText.Get(ModStrings.Common.ListSeparator, caption, text()),
-                OnActivate = () => it.Select(),
-            };
-            GraphNodes.Aim(vtable, tooltip);
-            return vtable;
+            return LobbyMapNodes.Cell(() => caption, value, () => it.Name, () => it.Select(), tooltip);
         }
 
-        private static string Filled(string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                return value;
-            }
-
-            return GraphSheet.BlankText != null ? GraphSheet.BlankText() : string.Empty;
-        }
-
-        /// <summary>The preview beside the table, as the one line it is: the challenge's name as the
-        /// panel draws it, watched live, with the dossier and the win conditions as a section - read
-        /// on arrival and held in the review buffer one drawn line at a time.</summary>
+        /// <summary>The preview beside the table (<see cref="LobbyMapNodes.Preview"/>), which is
+        /// declared only while the menu has a challenge selected to fill it.</summary>
         private void BuildDetails(GraphBuilder builder)
         {
             AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
@@ -243,65 +219,17 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            NodeVtable vtable = new NodeVtable
-            {
-                ControlType = ControlTypes.Text,
-                Announcements = new List<NodeAnnouncement>
-                {
-                    new NodeAnnouncement(() => PreviewTitle(), live: true, kind: AnnouncementKinds.Label),
-                },
-                Sections = new List<NodeSection>
-                {
-                    NodeSection.Composed(() => SpokenLines.Of(new[] { Description(), PreviewWinConditions() })),
-                },
-            };
             builder.AddItem(new SyntheticNode(
                 ControlId.For(_detailsMarker, "challenge-map:preview"),
-                vtable));
-        }
-
-        private string PreviewTitle()
-        {
-            string title = Live.PreviewTitle;
-            if (!string.IsNullOrWhiteSpace(title))
-            {
-                return title;
-            }
-
-            AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
-            return selected != null ? selected.Name : string.Empty;
-        }
-
-        private string Description()
-        {
-            AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
-            return selected != null ? selected.Description : string.Empty;
-        }
-
-        private string PreviewWinConditions()
-        {
-            AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
-            return selected != null ? ModText.JoinList(selected.WinConditionLabels) : string.Empty;
+                LobbyMapNodes.Preview(() => Live.PreviewTitle, () => Live.SelectedRow)));
         }
 
         private void BuildButtons(GraphBuilder builder)
         {
             // Back (x 21) and Options (x 1233) in the header band, then Confirm at the bottom right.
-            AddButton(builder, "challenge-map:back", Live.BackButton);
-            AddButton(builder, "challenge-map:options", Live.OptionsButton);
-            AddButton(builder, "challenge-map:confirm", Live.ConfirmButton);
-        }
-
-        private static void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
-        {
-            if (button == null || button.Button == null || !button.IsVisible())
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.Button(button.GetLabel, () => button.Activate(), button.IsEnabled);
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button.Button);
-            builder.AddItem(new DrawnNode(ControlId.For(button.Button, key), vtable, button.Button));
+            GraphNodes.MenuButton(builder, "challenge-map:back", Live.BackButton);
+            GraphNodes.MenuButton(builder, "challenge-map:options", Live.OptionsButton);
+            GraphNodes.MenuButton(builder, "challenge-map:confirm", Live.ConfirmButton);
         }
     }
 }

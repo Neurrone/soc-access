@@ -208,7 +208,7 @@ namespace SongsOfConquestAccess.Screens
             return new NodeVtable
             {
                 ControlType = ControlTypes.Text,
-                Announcements = new List<NodeAnnouncement> { GraphNodes.LabelPart(() => Plain(it.Name)) },
+                Announcements = new List<NodeAnnouncement> { GraphNodes.LabelPart(() => CellText.Plain(it.Name)) },
                 OnActivate = () => it.Activate(),
                 OnFocusVisual = it.FocusNative,
             };
@@ -239,36 +239,18 @@ namespace SongsOfConquestAccess.Screens
         {
             OnlineGameListAdapter.GameRow it = row;
             string caption = captions != null && column < captions.Count ? captions[column] : string.Empty;
-            Func<string> text = () => Filled(Plain(value()));
+            Func<string> text = () => CellText.Filled(CellText.Plain(value()));
             NodeVtable vtable = new NodeVtable
             {
                 ControlType = ControlTypes.Text,
                 Announcements = new List<NodeAnnouncement> { GraphNodes.ValuePart(text) },
                 Sections = GraphNodes.Sections(null, tooltip),
-                SearchText = () => Plain(it.Name),
+                SearchText = () => CellText.Plain(it.Name),
                 BufferHead = () => ModText.Get(ModStrings.Common.ListSeparator, caption, text()),
                 OnActivate = () => it.Activate(),
             };
             GraphNodes.Aim(vtable, tooltip);
             return vtable;
-        }
-
-        /// <summary>What the game wrote, without the renderer's markup: this list draws its player
-        /// count with the game's own colour tags ("2/&lt;low&gt;4&lt;/low&gt;"), which a screen reader
-        /// must not spell out.</summary>
-        private static string Plain(string value)
-        {
-            return string.Join(" ", SpokenLines.Of(new[] { value }));
-        }
-
-        private static string Filled(string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                return value;
-            }
-
-            return GraphSheet.BlankText != null ? GraphSheet.BlankText() : string.Empty;
         }
 
         private void BuildButtons(GraphBuilder builder)

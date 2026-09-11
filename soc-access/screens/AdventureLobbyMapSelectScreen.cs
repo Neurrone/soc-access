@@ -182,7 +182,7 @@ namespace SongsOfConquestAccess.Screens
                 builder.EndGroup();
             }
 
-            AddButton(builder, "map-select:clear-filters", Live.GetClearFiltersButton());
+            GraphNodes.MenuButton(builder, "map-select:clear-filters", Live.GetClearFiltersButton());
             builder.PopContext();
         }
 
@@ -417,16 +417,8 @@ namespace SongsOfConquestAccess.Screens
             cells.Add(new GraphSheet.SheetCell(column, 0, Cell(captions, column, row, value, tooltip)));
         }
 
-        /// <summary>
-        /// One read-only cell: the drawn value alone, since the column's caption is spoken as the edge
-        /// crossed into it, with the caption and the value together as what the review buffer opens
-        /// with - nobody arrives at a buffer across an edge. An empty cell reads the sheet's own blank
-        /// word rather than being dropped, so the columns stay the same all the way down.
-        ///
-        /// EVERY CELL CARRIES THE ROW'S CLICK: a player reading across a map's size or player count and
-        /// pressing Enter means "this map", and having to walk back to the Name column first is a rule
-        /// the drawn table does not have - clicking anywhere on the row selects it.
-        /// </summary>
+        /// <summary>One read-only cell of the table (<see cref="LobbyMapNodes.Cell"/>), under the
+        /// caption of the column the game draws it in.</summary>
         private static NodeVtable Cell(
             IReadOnlyList<string> captions,
             int column,
@@ -435,30 +427,12 @@ namespace SongsOfConquestAccess.Screens
             Tooltip tooltip)
         {
             AdventureLobbyMapSelectRowAdapter it = row;
-            Func<string> caption = Caption(captions, SheetColumns[column]);
-            Func<string> text = () => Filled(value());
-            NodeVtable vtable = new NodeVtable
-            {
-                ControlType = ControlTypes.Text,
-                Announcements = new List<NodeAnnouncement> { GraphNodes.ValuePart(text, watch: false) },
-                Sections = GraphNodes.Sections(null, tooltip),
-                // One search result per map, whichever column the cursor is standing in.
-                SearchText = () => it.Name,
-                BufferHead = () => ModText.Get(ModStrings.Common.ListSeparator, caption(), text()),
-                OnActivate = () => it.Activate(),
-            };
-            GraphNodes.Aim(vtable, tooltip);
-            return vtable;
-        }
-
-        private static string Filled(string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                return value;
-            }
-
-            return GraphSheet.BlankText != null ? GraphSheet.BlankText() : string.Empty;
+            return LobbyMapNodes.Cell(
+                Caption(captions, SheetColumns[column]),
+                value,
+                () => it.Name,
+                () => it.Activate(),
+                tooltip);
         }
 
         /// <summary>The column captions in the sheet's own order, the primary's first.</summary>
@@ -483,19 +457,8 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the preview panel ----
 
-        /// <summary>
-        /// The preview beside the table, as the one line it is: the map's name as the panel draws it,
-        /// then the description it draws under it, read on arrival and held in the review buffer one
-        /// drawn line at a time, a map's dossier running to a paragraph or more. The name is watched
-        /// live, so the panel being refilled under a standing cursor says which map it is now showing.
-        ///
-        /// THE WIN CONDITIONS ARE NOT READ OUT. The panel draws them as ICONS whose words the game only
-        /// reveals on hover (<c>LobbyMapPreview</c> hangs each icon's <c>GameModes/*/Name</c> and
-        /// objective on it as a tooltip), so a sentence naming them is not something the page says: it
-        /// is buffer-only, where the player who wants it goes to look. The description, by contrast, is
-        /// drawn text (<c>LobbyMapPreviewText.GetInfo</c> reads the panel's own <c>_mpInfo</c> mesh) and
-        /// stays in the readout.
-        /// </summary>
+        /// <summary>The preview beside the table (<see cref="LobbyMapNodes.Preview"/>), which is
+        /// declared only while the menu has a map selected to fill it.</summary>
         private void BuildDetails(GraphBuilder builder)
         {
             AdventureLobbyMapSelectRowAdapter selected = Live.SelectedRow;
@@ -504,46 +467,9 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            NodeVtable vtable = new NodeVtable
-            {
-                ControlType = ControlTypes.Text,
-                Announcements = new List<NodeAnnouncement>
-                {
-                    new NodeAnnouncement(() => PreviewTitle(), live: true, kind: AnnouncementKinds.Label),
-                },
-                Sections = new List<NodeSection>
-                {
-                    NodeSection.Composed(() => SpokenLines.Of(new[] { Description() })),
-                    NodeSection.Buffer(() => SpokenLines.Of(new[] { PreviewWinConditions() })),
-                },
-            };
             builder.AddItem(new SyntheticNode(
                 ControlId.For(_detailsMarker, "map-select:preview"),
-                vtable));
-        }
-
-        private string PreviewTitle()
-        {
-            string title = Live.PreviewTitle;
-            if (!string.IsNullOrWhiteSpace(title))
-            {
-                return title;
-            }
-
-            AdventureLobbyMapSelectRowAdapter selected = Live.SelectedRow;
-            return selected != null ? selected.Name : string.Empty;
-        }
-
-        private string Description()
-        {
-            AdventureLobbyMapSelectRowAdapter selected = Live.SelectedRow;
-            return selected != null ? selected.Description : string.Empty;
-        }
-
-        private string PreviewWinConditions()
-        {
-            AdventureLobbyMapSelectRowAdapter selected = Live.SelectedRow;
-            return selected != null ? ModText.JoinList(selected.WinConditionLabels) : string.Empty;
+                LobbyMapNodes.Preview(() => Live.PreviewTitle, () => Live.SelectedRow)));
         }
 
         // ---- the page's buttons ----
@@ -551,21 +477,9 @@ namespace SongsOfConquestAccess.Screens
         private void BuildButtons(GraphBuilder builder)
         {
             // Back (x 21) and Options (x 1233) in the header band, then Confirm at the bottom right.
-            AddButton(builder, "map-select:back", Live.BackButton);
-            AddButton(builder, "map-select:options", Live.OptionsButton);
-            AddButton(builder, "map-select:confirm", Live.SelectButton);
-        }
-
-        private static void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
-        {
-            if (button == null || button.Button == null || !button.IsVisible())
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.Button(button.GetLabel, () => button.Activate(), button.IsEnabled);
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button.Button);
-            builder.AddItem(new DrawnNode(ControlId.For(button.Button, key), vtable, button.Button));
+            GraphNodes.MenuButton(builder, "map-select:back", Live.BackButton);
+            GraphNodes.MenuButton(builder, "map-select:options", Live.OptionsButton);
+            GraphNodes.MenuButton(builder, "map-select:confirm", Live.SelectButton);
         }
 
         private static T At<T>(IReadOnlyList<T> items, int index) where T : class
