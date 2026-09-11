@@ -93,7 +93,7 @@ namespace SongsOfConquestAccess.Adapters
                 () => NativeSelectionUtility.Click(button),
                 () => NativeSelectionUtility.Select(button),
                 () => button.Active && button.Interactable,
-                () => IsActive(button),
+                () => GameObjects.IsLive(button),
                 () => Tooltip.ForComponent(button, localization));
         }
 
@@ -122,7 +122,7 @@ namespace SongsOfConquestAccess.Adapters
                     new MenuRowText(
                         RowId(settings, "text", i),
                         () => SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text)),
-                        () => IsActive(component))));
+                        () => GameObjects.IsLive(component))));
             }
         }
 
@@ -146,7 +146,7 @@ namespace SongsOfConquestAccess.Adapters
                         () => InputLabel(field),
                         () => field,
                         () => field.Active && field.Interactable,
-                        () => IsActive(component),
+                        () => GameObjects.IsLive(component),
                         () => Tooltip.ForComponent(InputTextMesh(field) ?? component, settings.Localization))));
             }
         }
@@ -180,7 +180,7 @@ namespace SongsOfConquestAccess.Adapters
                         () => TimeInputChildField(field, TimeInputMinutesField),
                         () => TimeInputChildField(field, TimeInputSecondsField),
                         () => field.Active && field.Interactable,
-                        () => IsActive(component),
+                        () => GameObjects.IsLive(component),
                         () => Tooltip.ForComponent(component, settings.Localization))));
             }
         }
@@ -235,7 +235,7 @@ namespace SongsOfConquestAccess.Adapters
                         value => SetDropdownValue(dropdown, value),
                         () => NativeSelectionUtility.Select(dropdown.GetSelectable()),
                         () => dropdown.Active && dropdown.Interactable,
-                        () => IsActive(component),
+                        () => GameObjects.IsLive(component),
                         () => Tooltip.ForComponent(DropdownTextMesh(dropdown) ?? component, settings.Localization),
                         () => DropdownPopup.Show(dropdown),
                         () => DropdownPopup.Hide(dropdown),
@@ -270,7 +270,7 @@ namespace SongsOfConquestAccess.Adapters
                         () => toggle.ToggleValue,
                         () => NativeSelectionUtility.Select(toggle.GetSelectable()),
                         () => toggle.Active && toggle.Interactable,
-                        () => IsActive(component),
+                        () => GameObjects.IsLive(component),
                         () => Tooltip.ForComponent(ToggleTextMesh(toggle) ?? component, settings.Localization))));
             }
         }
@@ -301,7 +301,7 @@ namespace SongsOfConquestAccess.Adapters
                         value => SetSliderValue(slider, value),
                         () => NativeSelectionUtility.Select(slider.GetSelectable()),
                         () => slider.Active && slider.Interactable,
-                        () => IsActive(component),
+                        () => GameObjects.IsLive(component),
                         () => Tooltip.ForComponent(SliderTextMesh(slider) ?? component, settings.Localization),
                         () => SliderValueEditor.Label(slider),
                         () => SliderValueEditor.Open(slider))));
@@ -329,7 +329,7 @@ namespace SongsOfConquestAccess.Adapters
                         () => NativeSelectionUtility.Click(button),
                         () => NativeSelectionUtility.Select(component),
                         () => button.Active && button.Interactable,
-                        () => IsActive(component),
+                        () => GameObjects.IsLive(component),
                         () => Tooltip.ForComponent(component, settings.Localization))));
             }
         }
@@ -588,11 +588,6 @@ namespace SongsOfConquestAccess.Adapters
         private static Component DropdownTextMesh(IUITextMeshDropdown dropdown)
         {
             return DropdownText.Of(dropdown) as Component;
-        }
-
-        private static bool IsActive(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
         /// <summary>The entries the game's dropdown draws, in its own words. LAZY, never on a build

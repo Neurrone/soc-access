@@ -97,7 +97,7 @@ namespace SongsOfConquestAccess.Adapters
         /// read by <c>TroopManagementScreenBase</c> through the host interface.</summary>
         public bool IsPresent()
         {
-            return IsMenuOpen() && IsVisible(Reflect.Get<GameObject>(_menu, LandingPageContainerField));
+            return IsMenuOpen() && GameObjects.IsLive(Reflect.Get<GameObject>(_menu, LandingPageContainerField));
         }
 
         public bool IsDraftPresent()
@@ -119,7 +119,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsCustomNameVisible
         {
-            get { return IsVisible(Reflect.Get<GameObject>(GetHeader(), HeaderCustomNameContainerField)); }
+            get { return GameObjects.IsLive(Reflect.Get<GameObject>(GetHeader(), HeaderCustomNameContainerField)); }
         }
 
         public string CustomName
@@ -161,7 +161,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsTutorialButtonVisible()
         {
             UIButton button = GetTutorialButton();
-            return button != null && IsVisible(button as Component);
+            return button != null && GameObjects.IsLive(button as Component);
         }
 
         public string GetTutorialButtonLabel()
@@ -210,7 +210,7 @@ namespace SongsOfConquestAccess.Adapters
         /// (<c>TownInteractDefencePanel.Show</c>).</summary>
         public bool IsSettlementTroopsVisible()
         {
-            return IsVisible(Reflect.Get<GameObject>(GetDefencePanelTroops(), SettlementTroopsContainerField));
+            return GameObjects.IsLive(Reflect.Get<GameObject>(GetDefencePanelTroops(), SettlementTroopsContainerField));
         }
 
         /// <summary>The header the game writes over a settlement's own troops, from the same key the
@@ -312,7 +312,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                return IsVisible(Reflect.Get<GameObject>(_menu, UpgradesAvailableIndicatorField))
+                return GameObjects.IsLive(Reflect.Get<GameObject>(_menu, UpgradesAvailableIndicatorField))
                     ? UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, UpgradesAvailableNumberField))
                     : string.Empty;
             }
@@ -382,7 +382,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsBackVisible()
         {
-            return IsVisible(BackButton);
+            return GameObjects.IsLive(BackButton);
         }
 
         public bool BackToTop()
@@ -546,19 +546,9 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(MenuButtonTextUtility.GetAllVisibleText(button));
         }
 
-        private static bool IsVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
         private static bool IsButtonEnabled(UIButton button)
         {
-            return button != null && button.Active && button.Interactable && IsVisible(button as Component);
-        }
-
-        private static bool IsVisible(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
+            return button != null && button.Active && button.Interactable && GameObjects.IsLive(button as Component);
         }
 
     }

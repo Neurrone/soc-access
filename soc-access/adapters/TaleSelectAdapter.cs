@@ -129,7 +129,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             return _coordinator != null
                 && IsLoadedMainMenuScene(MainMenuSceneType.TaleSelect)
-                && IsLiveSceneObject(((Component)_coordinator).gameObject)
+                && GameObjects.IsLiveSceneObject(((Component)_coordinator).gameObject)
                 && IsReady()
                 && HasVisibleTale();
         }
@@ -181,9 +181,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             GameObject gameObject = ((Component)taleButton).gameObject;
-            return gameObject != null
-                && gameObject.scene.IsValid()
-                && gameObject.scene.isLoaded
+            return GameObjects.IsLiveSceneObject(gameObject)
                 && MenuButtonAdapterBase.IsButtonVisible(TaleButtonMainButtonRef(taleButton));
         }
 
@@ -206,11 +204,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return null;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
         private static bool IsLoadedMainMenuScene(MainMenuSceneType sceneType)

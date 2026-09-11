@@ -52,7 +52,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsVisible()
         {
             return _button != null
-                && IsLiveSceneObject(((Component)_button).gameObject)
+                && GameObjects.IsLiveSceneObject(((Component)_button).gameObject)
                 && (MenuButtonAdapterBase.IsButtonVisible(GetUnplayedButton())
                     || MenuButtonAdapterBase.IsButtonVisible(GetPlayedBeforeButton()));
         }
@@ -103,11 +103,6 @@ namespace SongsOfConquestAccess.Adapters
         private UIButton GetPlayedBeforeButton()
         {
             return _button != null ? PlayedBeforeButtonRef(_button) : null;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

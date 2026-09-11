@@ -43,7 +43,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             GameObject container = GetContainer();
             return _menu != null
-                && IsLiveSceneObject(((Component)_menu).gameObject)
+                && GameObjects.IsLiveSceneObject(((Component)_menu).gameObject)
                 && container != null
                 && container.activeInHierarchy;
         }
@@ -55,7 +55,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Count; i++)
             {
                 PlatformUserButtonEntry entry = entries[i];
-                if (entry != null && IsVisible(entry as Component))
+                if (entry != null && GameObjects.IsLive(entry as Component))
                 {
                     items.Add(new ActionItem(this, entry, i));
                 }
@@ -99,16 +99,6 @@ namespace SongsOfConquestAccess.Adapters
             return _menu != null && UserButtonsField != null
                 ? UserButtonsField.GetValue(_menu) as List<PlatformUserButtonEntry> ?? new List<PlatformUserButtonEntry>()
                 : new List<PlatformUserButtonEntry>();
-        }
-
-        private static bool IsVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
         public sealed class ActionItem
@@ -162,7 +152,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsVisible
             {
-                get { return PlatformUserMenuAdapter.IsVisible(_entry as Component) && MenuButtonAdapterBase.IsButtonVisible(Button); }
+                get { return GameObjects.IsLive(_entry as Component) && MenuButtonAdapterBase.IsButtonVisible(Button); }
             }
 
             public bool IsEnabled

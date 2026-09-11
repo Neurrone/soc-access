@@ -234,10 +234,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             Component component = container as Component;
             GameObject gameObject = component != null ? component.gameObject : null;
-            return gameObject != null
-                && gameObject.activeInHierarchy
-                && gameObject.scene.IsValid()
-                && gameObject.scene.isLoaded;
+            return GameObjects.IsLive(gameObject) && GameObjects.IsLiveSceneObject(gameObject);
         }
     }
 }

@@ -116,7 +116,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 PurchaseWielderDetails details = GetDetails();
-                return IsVisible(Reflect.Get<GameObject>(details, DetailsLevelContainerField))
+                return GameObjects.IsLive(Reflect.Get<GameObject>(details, DetailsLevelContainerField))
                     ? UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(details, DetailsLevelTextField))
                     : string.Empty;
             }
@@ -171,7 +171,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasTroops()
         {
-            return IsVisible(Reflect.Get<GameObject>(GetDetails(), DetailsTroopsSectionField));
+            return GameObjects.IsLive(Reflect.Get<GameObject>(GetDetails(), DetailsTroopsSectionField));
         }
 
         public int TroopSlotCount
@@ -185,7 +185,7 @@ namespace SongsOfConquestAccess.Adapters
             return HasTroops()
                 && index >= 0
                 && index < entries.Count
-                && IsVisible(entries[index] as Component);
+                && GameObjects.IsLive(entries[index] as Component);
         }
 
         public string GetTroopName(int index)
@@ -255,7 +255,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsSkillVisible(int index)
         {
             IReadOnlyList<PurchaseWielderSkillEntry> entries = GetSkillEntries();
-            return index >= 0 && index < entries.Count && IsVisible(entries[index] as Component);
+            return index >= 0 && index < entries.Count && GameObjects.IsLive(entries[index] as Component);
         }
 
         public string GetSkillName(int index)
@@ -298,7 +298,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool HasSpecialization()
         {
             UITextMesh text = Reflect.Get<UITextMesh>(GetDetails(), DetailsSpecializationField);
-            return IsVisible(text as Component) && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(text));
+            return GameObjects.IsLive(text as Component) && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(text));
         }
 
         /// <summary>The specialization the pane draws, under the game's own caption, one line per
@@ -334,7 +334,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 PurchaseWielderDetails details = GetDetails();
                 UITextMesh alreadyOwned = Reflect.Get<UITextMesh>(details, DetailsAlreadyOwnedTextField);
-                if (IsVisible(alreadyOwned as Component))
+                if (GameObjects.IsLive(alreadyOwned as Component))
                 {
                     return UITextMeshTextUtility.Spoken(alreadyOwned);
                 }
@@ -363,13 +363,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPurchaseVisible()
         {
-            return IsVisible(GetPurchaseButton() as Component);
+            return GameObjects.IsLive(GetPurchaseButton() as Component);
         }
 
         public bool IsPurchaseEnabled()
         {
             UIButton button = GetPurchaseButton();
-            return button != null && button.Active && button.Interactable && IsVisible(button as Component);
+            return button != null && button.Active && button.Interactable && GameObjects.IsLive(button as Component);
         }
 
         public Tooltip PurchaseTooltip
@@ -404,7 +404,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsCloseVisible()
         {
             UIButton button = GetCloseButton();
-            return button != null && button.Active && IsVisible(button as Component);
+            return button != null && button.Active && GameObjects.IsLive(button as Component);
         }
 
         public bool ActivateClose()
@@ -440,7 +440,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Count; i++)
             {
                 PurchaseWielderEntry entry = entries[i] as PurchaseWielderEntry;
-                if (entry != null && IsVisible(entry as Component))
+                if (entry != null && GameObjects.IsLive(entry as Component))
                 {
                     result.Add(new EntryItem(this, entry, i));
                 }
@@ -454,7 +454,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 LargeCostSection section = Reflect.Get<LargeCostSection>(GetDetails(), DetailsLargeCostSectionField);
-                if (!IsVisible(section as Component))
+                if (!GameObjects.IsLive(section as Component))
                 {
                     return string.Empty;
                 }
@@ -593,16 +593,6 @@ namespace SongsOfConquestAccess.Adapters
             return value is int ? (int)value : 0;
         }
 
-        private static bool IsVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static bool IsVisible(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
-        }
-
         public sealed class EntryItem
         {
             private readonly PurchaseWielderMenuAdapter _adapter;
@@ -648,13 +638,13 @@ namespace SongsOfConquestAccess.Adapters
             /// <summary>The game draws a crossed-out overlay over a wielder that has died.</summary>
             public bool IsDead
             {
-                get { return IsVisible(Reflect.Get<GameObject>(_entry, EntryDeadOverlayField)); }
+                get { return GameObjects.IsLive(Reflect.Get<GameObject>(_entry, EntryDeadOverlayField)); }
             }
 
             /// <summary>The game draws a frame around a wielder the team already has.</summary>
             public bool IsOwned
             {
-                get { return IsVisible(Reflect.Get<GameObject>(_entry, EntryOwnedFrameField)); }
+                get { return GameObjects.IsLive(Reflect.Get<GameObject>(_entry, EntryOwnedFrameField)); }
             }
 
             /// <summary>The entry's own button - what the row is drawn by.</summary>
@@ -665,7 +655,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsVisible
             {
-                get { return PurchaseWielderMenuAdapter.IsVisible(_entry as Component); }
+                get { return GameObjects.IsLive(_entry as Component); }
             }
 
             public bool Select()

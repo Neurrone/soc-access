@@ -90,7 +90,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             GameObject gameObject = ((Component)_entry).gameObject;
-            return IsLiveSceneObject(gameObject)
+            return GameObjects.IsLiveSceneObject(gameObject)
                 && gameObject.activeInHierarchy
                 && HasAnyVisibleTextOrAction();
         }
@@ -150,11 +150,6 @@ namespace SongsOfConquestAccess.Adapters
 
             GameObject gameObject = ((Component)overlay).gameObject;
             return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
         private string ReadTextMesh(AccessTools.FieldRef<CustomCampaignEntry, UITextMesh> fieldRef)

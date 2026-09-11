@@ -168,7 +168,7 @@ namespace SongsOfConquestAccess.Adapters
             GameObject gameObject = _menu != null ? ((Component)_menu).gameObject : null;
             return _menu != null
                 && IsLoadedMainMenuScene(MainMenuSceneType.AdventureLobby)
-                && IsLiveSceneObject(gameObject)
+                && GameObjects.IsLiveSceneObject(gameObject)
                 && gameObject.activeInHierarchy
                 && canvasGroup != null
                 && (canvasGroup.blocksRaycasts || canvasGroup.alpha > 0.5f)
@@ -593,11 +593,6 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenText.Get(_localization, key, fallback);
         }
 
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
 
         private static bool IsLoadedMainMenuScene(MainMenuSceneType sceneType)
         {

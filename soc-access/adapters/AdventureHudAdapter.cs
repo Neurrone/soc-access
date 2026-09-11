@@ -173,14 +173,14 @@ namespace SongsOfConquestAccess.Adapters
             CommanderHUD.Settings settings = CommanderSettings;
             return settings != null
                 && HudGroupVisible(HudStateSettings != null ? HudStateSettings.SelectionHUDContainer : null)
-                && IsGameObjectVisible(settings.CommanderContainer as Component)
+                && GameObjects.IsLive(settings.CommanderContainer as Component)
                 && settings.Portrait != null
                 && settings.Portrait.Commander != null;
         }
 
         public bool IsExperienceVisible()
         {
-            return IsSelectionHudVisible() && IsGameObjectVisible(GetExperienceBar());
+            return IsSelectionHudVisible() && GameObjects.IsLive(GetExperienceBar());
         }
 
         public string ExperienceLabel
@@ -258,7 +258,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsEssenceMenuVisible()
         {
-            return IsSelectionHudVisible() && IsGameObjectVisible(GetAdventureEssenceContainer() as Component);
+            return IsSelectionHudVisible() && GameObjects.IsLive(GetAdventureEssenceContainer() as Component);
         }
 
         public string GetEssenceLabel(EssenceType essenceType)
@@ -283,7 +283,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsTroopMenuVisible()
         {
             TroopHUD troopHud = CommanderSettings != null ? CommanderSettings.TroopHUD : null;
-            if (!IsSelectionHudVisible() || !IsGameObjectVisible(troopHud))
+            if (!IsSelectionHudVisible() || !GameObjects.IsLive(troopHud))
             {
                 return false;
             }
@@ -313,7 +313,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsTroopSlotVisible(int index)
         {
             TroopHUDEntry entry = GetTroopSlot(index);
-            return entry != null && entry.IsUnlocked && IsGameObjectVisible(entry);
+            return entry != null && entry.IsUnlocked && GameObjects.IsLive(entry);
         }
 
         public void FocusTroopSlot(int index)
@@ -447,7 +447,7 @@ namespace SongsOfConquestAccess.Adapters
             ResourceHUD.ResourceEntry entry = GetResourceEntry(resourceType);
             string name = GetResourceName(resourceType);
             string amount = UITextMeshTextUtility.Spoken(entry != null ? entry.AmountText : null);
-            string income = entry != null && IsGameObjectVisible(entry.IncomeText)
+            string income = entry != null && GameObjects.IsLive(entry.IncomeText)
                 ? UITextMeshTextUtility.Spoken(entry.IncomeText)
                 : string.Empty;
 
@@ -1522,8 +1522,8 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             ObjectivesHUD.Settings settings = ObjectivesSettings;
-            return IsGameObjectVisible(settings != null ? settings.ObjectiveHeader as Component : null)
-                || IsGameObjectVisible(ObjectivesEntryContainer as Component);
+            return GameObjects.IsLive(settings != null ? settings.ObjectiveHeader as Component : null)
+                || GameObjects.IsLive(ObjectivesEntryContainer as Component);
         }
 
         private bool IsAdventureHudVisible()
@@ -1563,7 +1563,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < texts.Length; i++)
             {
                 UITextMesh text = texts[i];
-                if (text != null && IsGameObjectVisible(text) && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(text)))
+                if (text != null && GameObjects.IsLive(text) && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(text)))
                 {
                     IObjectivesHUDEntry entry;
                     entriesByText.TryGetValue(text, out entry);
@@ -1827,7 +1827,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < texts.Length; i++)
             {
                 UITextMesh text = texts[i];
-                if (text == null || !IsGameObjectVisible(text))
+                if (text == null || !GameObjects.IsLive(text))
                 {
                     continue;
                 }
@@ -1858,7 +1858,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < components.Length; i++)
             {
                 T component = components[i];
-                if (IsLiveSceneComponent(component) && IsSameScene(component))
+                if (GameObjects.IsLiveSceneObject(component) && IsSameScene(component))
                 {
                     return component;
                 }
@@ -1875,14 +1875,6 @@ namespace SongsOfConquestAccess.Adapters
                 && source.gameObject.scene.IsValid()
                 && component.gameObject.scene.IsValid()
                 && source.gameObject.scene == component.gameObject.scene;
-        }
-
-        private static bool IsLiveSceneComponent(Component component)
-        {
-            return component != null
-                && component.gameObject != null
-                && component.gameObject.scene.IsValid()
-                && component.gameObject.scene.isLoaded;
         }
 
         private static void InvokeNoArgs(object instance, MethodInfo method)
@@ -1956,11 +1948,6 @@ namespace SongsOfConquestAccess.Adapters
 
             GameObject gameObject = ((Component)button).gameObject;
             return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static bool IsGameObjectVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
         private static bool HudGroupVisible(GameObject gameObject)

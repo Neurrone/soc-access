@@ -376,7 +376,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Count; i++)
             {
                 QuickbarEntry entry = entries[i];
-                if (entry == null || entry.Spell == null || !IsGameObjectVisible(entry as Component))
+                if (entry == null || entry.Spell == null || !GameObjects.IsLive(entry as Component))
                 {
                     continue;
                 }
@@ -610,7 +610,7 @@ namespace SongsOfConquestAccess.Adapters
             UITransform container = settings != null && SpellsHudSpellcastingContainerField != null
                 ? SpellsHudSpellcastingContainerField.GetValue(settings) as UITransform
                 : null;
-            return container != null && container.Active && IsGameObjectVisible(container as Component);
+            return container != null && container.Active && GameObjects.IsLive(container as Component);
         }
 
         private UIButton GetCancelSpellButton()
@@ -800,7 +800,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (entry != null
                     && entry.Troop.Id == queuedTroop.Id
                     && entry.Troop.Round == queuedTroop.Round
-                    && IsGameObjectVisible(entry.Container))
+                    && GameObjects.IsLive(entry.Container))
                 {
                     return entry;
                 }
@@ -829,7 +829,7 @@ namespace SongsOfConquestAccess.Adapters
         private string GetVisibleSpellInstructionText()
         {
             BattleSpellTargetInstruction instruction = GetSpellTargetInstruction();
-            if (!IsGameObjectVisible(instruction))
+            if (!GameObjects.IsLive(instruction))
             {
                 return string.Empty;
             }
@@ -1110,22 +1110,12 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             Component component = button as Component;
-            return component == null || IsGameObjectVisible(component.gameObject);
+            return component == null || GameObjects.IsLive(component.gameObject);
         }
 
         private static bool IsButtonInteractable(UIButton button)
         {
             return IsButtonVisible(button) && button.Interactable;
-        }
-
-        private static bool IsGameObjectVisible(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static bool IsGameObjectVisible(Component component)
-        {
-            return component != null && IsGameObjectVisible(component.gameObject);
         }
 
         private static bool HudGroupVisible(GameObject gameObject)
@@ -1230,7 +1220,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsVisible
             {
-                get { return _entry != null && _entry.Spell != null && IsGameObjectVisible(_entry as Component); }
+                get { return _entry != null && _entry.Spell != null && GameObjects.IsLive(_entry as Component); }
             }
 
             public bool IsEnabled

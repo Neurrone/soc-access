@@ -60,7 +60,7 @@ namespace SongsOfConquestAccess.Adapters
         /// the description.</summary>
         public IList<string> GetDescriptionLines()
         {
-            if (IsActive(GetPurchaseContainer()))
+            if (GameObjects.IsLive(GetPurchaseContainer()))
             {
                 return new List<string>();
             }
@@ -89,7 +89,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsVisible()
         {
             return _taleButton != null
-                && IsLiveSceneObject(((Component)_taleButton).gameObject)
+                && GameObjects.IsLiveSceneObject(((Component)_taleButton).gameObject)
                 && MenuButtonAdapterBase.IsButtonVisible(Button);
         }
 
@@ -119,7 +119,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string BuildNativeStateText()
         {
-            if (IsActive(GetComingSoonContainer()))
+            if (GameObjects.IsLive(GetComingSoonContainer()))
             {
                 string comingSoon = GetAllVisibleText(GetComingSoonContainer());
                 return string.IsNullOrWhiteSpace(comingSoon)
@@ -127,14 +127,14 @@ namespace SongsOfConquestAccess.Adapters
                     : comingSoon;
             }
 
-            if (IsActive(GetPurchaseContainer()))
+            if (GameObjects.IsLive(GetPurchaseContainer()))
             {
                 return JoinLines(
                     UITextMeshTextUtility.Spoken(GetPartOfDLCLabel()),
                     GetAllVisibleText(GetPurchaseContainer(), GetPartOfDLCLabel()));
             }
 
-            if (IsActive(GetProgressContainer()))
+            if (GameObjects.IsLive(GetProgressContainer()))
             {
                 return string.Empty;
             }
@@ -144,7 +144,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string BuildProgressStatus()
         {
-            if (!IsActive(GetProgressContainer()))
+            if (!GameObjects.IsLive(GetProgressContainer()))
             {
                 return string.Empty;
             }
@@ -261,16 +261,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return false;
-        }
-
-        private static bool IsActive(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

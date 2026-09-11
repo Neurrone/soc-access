@@ -447,7 +447,7 @@ namespace SongsOfConquestAccess.Adapters
         /// selected.</summary>
         public bool IsNoSelectionShown
         {
-            get { return IsActive(Reflect.Get<GameObject>(_menu, NoSelectionContainerField)); }
+            get { return GameObjects.IsLive(Reflect.Get<GameObject>(_menu, NoSelectionContainerField)); }
         }
 
         /// <summary>The prompt the band draws while nothing is selected.</summary>
@@ -477,7 +477,7 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>Whether the band is showing the artifact the player is buying.</summary>
         public bool IsBuyShown
         {
-            get { return IsActive(Reflect.Get<GameObject>(_menu, BuyContainerField)); }
+            get { return GameObjects.IsLive(Reflect.Get<GameObject>(_menu, BuyContainerField)); }
         }
 
         /// <summary>The tooltip on the Buy band's icon: the game hangs the artifact's details on it
@@ -539,7 +539,7 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public bool IsSellShown
         {
-            get { return IsActive(Reflect.Get<GameObject>(_menu, SellContainerField)); }
+            get { return GameObjects.IsLive(Reflect.Get<GameObject>(_menu, SellContainerField)); }
         }
 
         /// <summary>The tooltip on the Sell band's icon: the game hangs the artifact's details on it
@@ -560,7 +560,7 @@ namespace SongsOfConquestAccess.Adapters
         /// treats as important (<c>ArtifactMarketMenu.SetArtifact</c>).</summary>
         public bool IsSellButtonShown
         {
-            get { return IsActive(ButtonObject(Reflect.Get<PurchaseButton>(_menu, SellButtonField))); }
+            get { return GameObjects.IsLive(ButtonObject(Reflect.Get<PurchaseButton>(_menu, SellButtonField))); }
         }
 
         /// <summary>The word on the Sell button, as the band draws it above it.</summary>
@@ -645,11 +645,6 @@ namespace SongsOfConquestAccess.Adapters
         private static GameObject ButtonObject(PurchaseButton button)
         {
             return button == null ? null : ((Component)button).gameObject;
-        }
-
-        private static bool IsActive(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
         }
 
         // LAZY: reached only through GraphNodes.Text's Func for the "no selection" line, so the walk

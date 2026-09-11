@@ -202,7 +202,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsTutorialButtonVisible()
         {
             UIButton button = GetTutorialButton();
-            return IsVisible(button as Component);
+            return GameObjects.IsLive(button as Component);
         }
 
         public string GetTutorialButtonLabel()
@@ -258,7 +258,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsCloseVisible()
         {
             UIButton button = GetCloseButton();
-            return button != null && button.Active && IsVisible(button as Component);
+            return button != null && button.Active && GameObjects.IsLive(button as Component);
         }
 
         public bool ActivateClose()
@@ -481,7 +481,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < sections.Count; i++)
             {
                 BuildMenuDescriptionSection section = sections[i];
-                if (!IsVisible(section as Component))
+                if (!GameObjects.IsLive(section as Component))
                 {
                     continue;
                 }
@@ -571,7 +571,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (SelectedTier == 1 && IsVisible(Reflect.Get<UITransform>(_menu, PurchaseAreaField) as Component))
+                if (SelectedTier == 1 && GameObjects.IsLive(Reflect.Get<UITransform>(_menu, PurchaseAreaField) as Component))
                 {
                     string visibleCost = LargeCostText;
                     if (!string.IsNullOrWhiteSpace(visibleCost))
@@ -608,7 +608,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 GameObject container = Reflect.Get<GameObject>(_menu, CannotBuyContainerField);
-                if (!IsVisible(container))
+                if (!GameObjects.IsLive(container))
                 {
                     return string.Empty;
                 }
@@ -619,7 +619,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsBuildButtonVisible()
         {
-            return IsVisible(Reflect.Get<GameObject>(_menu, PurchaseButtonContainerField));
+            return GameObjects.IsLive(Reflect.Get<GameObject>(_menu, PurchaseButtonContainerField));
         }
 
         public bool IsBuildButtonEnabled()
@@ -688,7 +688,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsAutoSelectVisible()
         {
-            return IsVisible(GetAutoSelectToggle() as Component);
+            return GameObjects.IsLive(GetAutoSelectToggle() as Component);
         }
 
         public string AutoSelectLabel
@@ -897,7 +897,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < sections.Count; i++)
             {
                 BuildMenuDescriptionSection section = sections[i];
-                if (!IsVisible(section as Component))
+                if (!GameObjects.IsLive(section as Component))
                 {
                     continue;
                 }
@@ -974,7 +974,7 @@ namespace SongsOfConquestAccess.Adapters
             foreach (object entry in GetActivePoolEntries(Reflect.Get<object>(_menu, BuildMenuButtonPoolField)))
             {
                 BuildMenuButton button = entry as BuildMenuButton;
-                if (button != null && IsVisible(button as Component))
+                if (button != null && GameObjects.IsLive(button as Component))
                 {
                     buttons.Add(button);
                 }
@@ -1432,7 +1432,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static bool IsButtonEnabled(UIButton button)
         {
-            return button != null && button.Active && button.Interactable && IsVisible(button as Component);
+            return button != null && button.Active && button.Interactable && GameObjects.IsLive(button as Component);
         }
 
         private bool InvokeNativeHandler(MethodInfo method)
@@ -1462,16 +1462,6 @@ namespace SongsOfConquestAccess.Adapters
             InvalidateFrameSnapshots();
             int after = CurrentBuildSite != null ? CurrentBuildSite.Id : -1;
             return before != after;
-        }
-
-        private static bool IsVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static bool IsVisible(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
         }
 
         public sealed class CategoryItem

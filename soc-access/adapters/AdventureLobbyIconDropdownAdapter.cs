@@ -49,7 +49,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             GameObject container = GetMainContainer();
             return _dropdown != null
-                && IsLiveSceneObject(((Component)_dropdown).gameObject)
+                && GameObjects.IsLiveSceneObject(((Component)_dropdown).gameObject)
                 && container != null
                 && container.activeInHierarchy;
         }
@@ -71,7 +71,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Count; i++)
             {
                 IconDropdownEntry entry = entries[i];
-                if (entry != null && IsVisible(entry as Component))
+                if (entry != null && GameObjects.IsLive(entry as Component))
                 {
                     items.Add(new OptionItem(this, entry, i));
                 }
@@ -209,16 +209,6 @@ namespace SongsOfConquestAccess.Adapters
             return layer != null ? layer.DefaultSelectable : null;
         }
 
-        private static bool IsVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
         public sealed class OptionItem
         {
             private readonly AdventureLobbyIconDropdownAdapter _adapter;
@@ -267,7 +257,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsVisible
             {
-                get { return AdventureLobbyIconDropdownAdapter.IsVisible(_entry as Component); }
+                get { return GameObjects.IsLive(_entry as Component); }
             }
 
             public bool IsEnabled

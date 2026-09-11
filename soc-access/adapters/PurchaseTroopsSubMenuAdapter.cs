@@ -219,11 +219,6 @@ namespace SongsOfConquestAccess.Adapters
                 return Tooltip.ForComponent(target, Localization);
             }
 
-            protected static bool IsVisible(Component component)
-            {
-                return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-            }
-
             private static void LogTroopNameFailure(TroopReference reference, string reason)
             {
                 string key = reference.FactionIndex
@@ -285,8 +280,8 @@ namespace SongsOfConquestAccess.Adapters
             public override string TroopName { get { return ResolveTroopName(); } }
             public override Tooltip Tooltip { get { return BuildEntryTooltip(); } }
             public override string NoTroopsText { get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, NoTroopsTextField)); } }
-            public override bool IsNoTroopsVisible { get { return IsVisible(Reflect.Get<Component>(_entry, NoTroopsContainerField)); } }
-            public override bool IsSliderVisible { get { return IsVisible(GetSlider()); } }
+            public override bool IsNoTroopsVisible { get { return GameObjects.IsLive(Reflect.Get<Component>(_entry, NoTroopsContainerField)); } }
+            public override bool IsSliderVisible { get { return GameObjects.IsLive(GetSlider()); } }
             public override bool IsSliderEnabled { get { UISlider slider = GetSlider(); return slider != null && slider.Interactable; } }
 
             public override string SliderLabel
@@ -354,7 +349,7 @@ namespace SongsOfConquestAccess.Adapters
                 return true;
             }
 
-            public override bool IsPurchaseVisible { get { UIButton button = GetPurchaseButton(); return button != null && button.Active && IsVisible(button as Component); } }
+            public override bool IsPurchaseVisible { get { UIButton button = GetPurchaseButton(); return button != null && button.Active && GameObjects.IsLive(button as Component); } }
             public override bool IsPurchaseEnabled { get { UIButton button = GetPurchaseButton(); return button != null && button.Active && button.Interactable; } }
             public override Tooltip PurchaseTooltip { get { return Tooltip.ForComponent(GetPurchaseButton() as Component, Localization); } }
 
@@ -380,7 +375,7 @@ namespace SongsOfConquestAccess.Adapters
                 return true;
             }
 
-            public override bool IsUpgradeInPoolVisible { get { UIButton button = GetUpgradeButton(); return button != null && button.Active && IsVisible(button as Component); } }
+            public override bool IsUpgradeInPoolVisible { get { UIButton button = GetUpgradeButton(); return button != null && button.Active && GameObjects.IsLive(button as Component); } }
             public override bool IsUpgradeInPoolEnabled { get { UIButton button = GetUpgradeButton(); return button != null && button.Active && button.Interactable; } }
             public override Tooltip UpgradeInPoolTooltip { get { return Tooltip.ForComponent(GetUpgradeButton() as Component, Localization); } }
 
@@ -395,7 +390,7 @@ namespace SongsOfConquestAccess.Adapters
                 return true;
             }
 
-            public override bool IsEssenceMenuVisible { get { return IsVisible(Reflect.Get<Component>(_entry, EssenceTabsField)); } }
+            public override bool IsEssenceMenuVisible { get { return GameObjects.IsLive(Reflect.Get<Component>(_entry, EssenceTabsField)); } }
             public override TroopUpgradeType CurrentEssenceVariant { get { return TroopReference.UpgradeType; } }
 
             public override bool SelectEssenceVariant(TroopUpgradeType upgradeType)

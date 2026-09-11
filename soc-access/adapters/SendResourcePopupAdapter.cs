@@ -56,7 +56,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPresent()
         {
             return _popup != null
-                && IsLiveSceneObject(((Component)_popup).gameObject)
+                && GameObjects.IsLiveSceneObject(((Component)_popup).gameObject)
                 && ((Component)_popup).gameObject.activeInHierarchy;
         }
 
@@ -77,7 +77,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsRequestMenuVisible()
         {
-            return IsPresent() && IsGameObjectVisible(Reflect.Get<Component>(_popup, RequestButtonsContainerField));
+            return IsPresent() && GameObjects.IsLive(Reflect.Get<Component>(_popup, RequestButtonsContainerField));
         }
 
         public IReadOnlyList<ResourceItem> GetSendResources()
@@ -147,16 +147,6 @@ namespace SongsOfConquestAccess.Adapters
         private string GetResourceName(ResourceType type)
         {
             return SpokenLines.Clean(GameText.Get(_localization, "Common/Resource/" + type, string.Empty));
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static bool IsGameObjectVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
         public sealed class ResourceItem

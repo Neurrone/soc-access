@@ -128,7 +128,7 @@ namespace SongsOfConquestAccess.Adapters
             GameObject gameObject = _menu != null ? ((Component)_menu).gameObject : null;
             return _menu != null
                 && IsLoadedMainMenuScene(MainMenuSceneType.AdventureLobby)
-                && IsLiveSceneObject(gameObject)
+                && GameObjects.IsLiveSceneObject(gameObject)
                 && gameObject.activeInHierarchy
                 && canvasGroup != null
                 && (canvasGroup.blocksRaycasts || canvasGroup.alpha > 0.5f);
@@ -367,11 +367,6 @@ namespace SongsOfConquestAccess.Adapters
         }
 
 
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
         private static bool IsLoadedMainMenuScene(MainMenuSceneType sceneType)
         {
             MainMenuSceneLoader loader = MainMenuSceneLoader.UnsafeInstance;
@@ -453,8 +448,8 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    return IsDrawn(Reflect.Get<GameObject>(_entry, ReadyImageField))
-                        || IsDrawn(Reflect.Get<GameObject>(_entry, NotReadyImageField));
+                    return GameObjects.IsLive(Reflect.Get<GameObject>(_entry, ReadyImageField))
+                        || GameObjects.IsLive(Reflect.Get<GameObject>(_entry, NotReadyImageField));
                 }
             }
 
@@ -615,7 +610,7 @@ namespace SongsOfConquestAccess.Adapters
                     return Localize("Factions/Random/Name");
                 }
 
-                bool locked = IsVisible(Reflect.Get<Image>(_entry, WielderLockedIconField));
+                bool locked = GameObjects.IsLive(Reflect.Get<Image>(_entry, WielderLockedIconField));
                 if (locked)
                 {
                     return Localize("Lobby/PlayerSetting/SettingUnknown");
@@ -707,16 +702,6 @@ namespace SongsOfConquestAccess.Adapters
 
                 return SpokenText.Get(_adapter != null ? _adapter._localization : null, key, string.Empty);
             }
-
-            private static bool IsVisible(Component component)
-            {
-                return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-            }
-
-            private static bool IsDrawn(GameObject gameObject)
-            {
-                return gameObject != null && gameObject.activeInHierarchy;
-            }
         }
 
         public sealed class MultiplayerPanelItem
@@ -740,7 +725,7 @@ namespace SongsOfConquestAccess.Adapters
                 get
                 {
                     GameObject gameObject = _panel != null ? ((Component)_panel).gameObject : null;
-                    return IsLiveSceneObject(gameObject) && gameObject.activeInHierarchy;
+                    return GameObjects.IsLiveSceneObject(gameObject) && gameObject.activeInHierarchy;
                 }
             }
 
@@ -764,7 +749,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsGameNameVisible
             {
-                get { return IsVisibleComponent(Reflect.Get<Component>(_panel, MultiplayerGameNameLabelField)) && !string.IsNullOrWhiteSpace(GameName); }
+                get { return GameObjects.IsLive(Reflect.Get<Component>(_panel, MultiplayerGameNameLabelField)) && !string.IsNullOrWhiteSpace(GameName); }
             }
 
             public string GameCode
@@ -778,7 +763,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsGameCodeVisible
             {
-                get { return IsVisibleComponent(Reflect.Get<Component>(_panel, MultiplayerGameCodeInputField)) && !string.IsNullOrWhiteSpace(GameCode); }
+                get { return GameObjects.IsLive(Reflect.Get<Component>(_panel, MultiplayerGameCodeInputField)) && !string.IsNullOrWhiteSpace(GameCode); }
             }
 
             public string CopyGameCodeLabel
@@ -842,7 +827,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    return IsVisibleComponent(Reflect.Get<Component>(_panel, MultiplayerXboxCrossplayInformationField))
+                    return GameObjects.IsLive(Reflect.Get<Component>(_panel, MultiplayerXboxCrossplayInformationField))
                         && !string.IsNullOrWhiteSpace(XboxCrossplayInformation);
                 }
             }
@@ -867,7 +852,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsVisible
             {
-                get { return IsVisibleComponent(_toggle as Component); }
+                get { return GameObjects.IsLive(_toggle as Component); }
             }
 
             public bool IsEnabled
@@ -1111,13 +1096,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return toggle != null ? toggle.Text ?? string.Empty : string.Empty;
-        }
-
-        private static bool IsVisibleComponent(Component component)
-        {
-            return component != null
-                && component.gameObject != null
-                && component.gameObject.activeInHierarchy;
         }
     }
 }

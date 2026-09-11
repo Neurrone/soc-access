@@ -38,7 +38,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPresent()
         {
             return _popup != null
-                && IsLiveSceneObject(((Component)_popup).gameObject)
+                && GameObjects.IsLiveSceneObject(((Component)_popup).gameObject)
                 && ((Component)_popup).gameObject.activeInHierarchy;
         }
 
@@ -59,7 +59,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsRequestMenuVisible()
         {
-            return IsPresent() && IsGameObjectVisible(Reflect.Get<Component>(_popup, RequestButtonParentField));
+            return IsPresent() && GameObjects.IsLive(Reflect.Get<Component>(_popup, RequestButtonParentField));
         }
 
         public IReadOnlyList<TownItem> GetGiftTowns()
@@ -102,7 +102,7 @@ namespace SongsOfConquestAccess.Adapters
         private IReadOnlyList<TownItem> GetTownItems(string rowId, Component parent)
         {
             List<TownItem> items = new List<TownItem>();
-            if (!IsPresent() || parent == null || !IsGameObjectVisible(parent))
+            if (!IsPresent() || parent == null || !GameObjects.IsLive(parent))
             {
                 return items;
             }
@@ -111,7 +111,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < buttons.Length; i++)
             {
                 GiftTownButton button = buttons[i];
-                if (button == null || !IsGameObjectVisible(button))
+                if (button == null || !GameObjects.IsLive(button))
                 {
                     continue;
                 }
@@ -124,16 +124,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return items;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static bool IsGameObjectVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
         public sealed class TownItem
@@ -193,7 +183,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsVisible
             {
-                get { return _button != null && IsGameObjectVisible(_button); }
+                get { return _button != null && GameObjects.IsLive(_button); }
             }
 
             public bool IsEnabled

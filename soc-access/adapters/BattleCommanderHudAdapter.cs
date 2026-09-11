@@ -74,14 +74,14 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPortraitVisible(CombatHudSide side)
         {
             BattleCommanderHUD hud = GetCommanderHud(side);
-            if (!IsComponentVisible(hud))
+            if (!GameObjects.IsLive(hud))
             {
                 return false;
             }
 
             GameObject portraitContainer = Reflect.Get<GameObject>(hud, WielderPortraitContainerField);
             ICommanderState commander = GetCommander(hud);
-            return IsGameObjectVisible(portraitContainer)
+            return GameObjects.IsLive(portraitContainer)
                 && commander != null
                 && !commander.GetIsEmpty();
         }
@@ -139,7 +139,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPlayerNameVisible(CombatHudSide side)
         {
             BattleCommanderHUD hud = GetCommanderHud(side);
-            return IsGameObjectVisible(Reflect.Get<GameObject>(hud, PlayerNameContainerField))
+            return GameObjects.IsLive(Reflect.Get<GameObject>(hud, PlayerNameContainerField))
                 && !string.IsNullOrWhiteSpace(GetPlayerName(side));
         }
 
@@ -186,7 +186,7 @@ namespace SongsOfConquestAccess.Adapters
             BattleEssenceContainer container = GetEssenceContainer(side);
             Transform innerContainer = Reflect.Get<Transform>(container, BattleEssenceContainerField);
             return IsPortraitVisible(side)
-                && (innerContainer == null || IsGameObjectVisible(innerContainer.gameObject));
+                && (innerContainer == null || GameObjects.IsLive(innerContainer.gameObject));
         }
 
         public string GetEssenceLabel(CombatHudSide side, EssenceType essenceType)
@@ -407,29 +407,14 @@ namespace SongsOfConquestAccess.Adapters
             return Regex.Replace(name, "([a-z])([A-Z])", "$1 $2");
         }
 
-        private static bool IsComponentVisible(Component component)
-        {
-            return component != null && IsGameObjectVisible(component.gameObject);
-        }
-
         private static bool IsButtonVisible(UIButton button)
         {
-            return button != null && button.Active && IsGameObjectVisible(button as Component);
+            return button != null && button.Active && GameObjects.IsLive(button as Component);
         }
 
         private static bool IsButtonInteractable(UIButton button)
         {
             return IsButtonVisible(button) && button.Interactable;
-        }
-
-        private static bool IsGameObjectVisible(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static bool IsGameObjectVisible(Component component)
-        {
-            return component != null && IsGameObjectVisible(component.gameObject);
         }
 
         private static bool HudGroupVisible(GameObject gameObject)

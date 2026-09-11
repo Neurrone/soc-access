@@ -99,7 +99,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsTutorialButtonVisible()
         {
             UIButton button = GetTutorialButton();
-            return IsVisible(button as Component);
+            return GameObjects.IsLive(button as Component);
         }
 
         public string GetTutorialButtonLabel()
@@ -117,7 +117,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasFactionSelector()
         {
-            return IsVisible(Reflect.Get<RectTransform>(_menu, MixedFactionsContainerField) as Component)
+            return GameObjects.IsLive(Reflect.Get<RectTransform>(_menu, MixedFactionsContainerField) as Component)
                 && GetFactions().Count > 0;
         }
 
@@ -130,7 +130,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < buttons.Length; i++)
             {
                 UIButton button = buttons[i];
-                if (!IsVisible(button as Component))
+                if (!GameObjects.IsLive(button as Component))
                 {
                     continue;
                 }
@@ -162,7 +162,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < tabs.Count; i++)
             {
                 ResearchMenuBuildingTabButton tab = tabs[i];
-                if (!IsVisible(tab as Component))
+                if (!GameObjects.IsLive(tab as Component))
                 {
                     continue;
                 }
@@ -204,7 +204,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < categories.Count; i++)
             {
                 ResearchMenuCategory category = categories[i];
-                if (!IsVisible(category as Component))
+                if (!GameObjects.IsLive(category as Component))
                 {
                     continue;
                 }
@@ -214,7 +214,7 @@ namespace SongsOfConquestAccess.Adapters
                 for (int j = 0; j < buttons.Length; j++)
                 {
                     ResearchMenuStackButton stackButton = buttons[j];
-                    if (!IsVisible(stackButton as Component))
+                    if (!GameObjects.IsLive(stackButton as Component))
                     {
                         continue;
                     }
@@ -465,11 +465,6 @@ namespace SongsOfConquestAccess.Adapters
         private ILocalizationHandler GetLocalization()
         {
             return Reflect.Get<ILocalizationHandler>(_menu, LocalizationField);
-        }
-
-        private static bool IsVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
         public sealed class FactionItem

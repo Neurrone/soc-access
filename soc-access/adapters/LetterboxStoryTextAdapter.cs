@@ -83,11 +83,8 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             Component component = container as Component;
-            return component != null
-                && component.gameObject != null
-                && component.gameObject.activeInHierarchy
-                && component.gameObject.scene.IsValid()
-                && component.gameObject.scene.isLoaded
+            return GameObjects.IsLive(component)
+                && GameObjects.IsLiveSceneObject(component)
                 && HasTextStarted();
         }
 

@@ -220,11 +220,6 @@ namespace SongsOfConquestAccess.Adapters
             return behavior != null ? DownloadTipRef(behavior) : null;
         }
 
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
         private bool IsReadySceneOrBehavior()
         {
             if (IsLoadedMainMenuScene(MainMenuSceneType.CustomCampaign))
@@ -235,7 +230,7 @@ namespace SongsOfConquestAccess.Adapters
             CustomCampaignSelectMenuBehavior.Settings settings = _behavior != null ? SettingsRef(_behavior) : null;
             UITransform contentContainer = settings != null ? settings.contentContainer : null;
             GameObject gameObject = contentContainer != null ? ((Component)contentContainer).gameObject : null;
-            return IsLiveSceneObject(gameObject) && gameObject.activeInHierarchy;
+            return GameObjects.IsLiveSceneObject(gameObject) && gameObject.activeInHierarchy;
         }
 
         private static bool IsLoadedMainMenuScene(MainMenuSceneType sceneType)

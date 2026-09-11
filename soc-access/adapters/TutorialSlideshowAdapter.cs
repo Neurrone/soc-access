@@ -55,7 +55,7 @@ namespace SongsOfConquestAccess.Adapters
             GameObject top = TopContainerRef(_menu);
             RectTransform panel = PanelRectRef(_menu);
             TutorialSimplePopup simplePopup = SimplePopupRef(_menu);
-            return IsActive(top)
+            return GameObjects.IsLive(top)
                 && panel != null
                 && panel.gameObject != null
                 && panel.gameObject.activeInHierarchy
@@ -201,11 +201,6 @@ namespace SongsOfConquestAccess.Adapters
         private ITutorialEntry CurrentTutorial
         {
             get { return _menu != null ? CurrentTutorialRef(_menu) : null; }
-        }
-
-        private static bool IsActive(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
         }
 
         private static string Normalize(string value)

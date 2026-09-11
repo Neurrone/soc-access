@@ -75,7 +75,7 @@ namespace SongsOfConquestAccess.Adapters
             return _settings != null
                 && IsLoadedMainMenuScene(MainMenuSceneType.OnlineGameList)
                 && _settings.EntryParent != null
-                && IsLiveSceneObject(((Component)_settings.EntryParent).gameObject)
+                && GameObjects.IsLiveSceneObject(((Component)_settings.EntryParent).gameObject)
                 && ((Component)_settings.EntryParent).gameObject.activeInHierarchy;
         }
 
@@ -213,7 +213,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             GameObject gameObject = ((Component)entry).gameObject;
-            if (gameObject != null && gameObject.activeInHierarchy && IsLiveSceneObject(gameObject))
+            if (gameObject != null && gameObject.activeInHierarchy && GameObjects.IsLiveSceneObject(gameObject))
             {
                 result.Add(entry);
             }
@@ -302,11 +302,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             MainMenuSceneLoader loader = MainMenuSceneLoader.UnsafeInstance;
             return loader != null && loader.CurrentlyLoadedScene == sceneType;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
         /// <summary>The page's one dropdown, answering the questions every drop list answers so the

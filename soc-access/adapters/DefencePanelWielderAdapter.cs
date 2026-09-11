@@ -55,12 +55,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPresent
         {
-            get { return IsVisible(_panel as Component); }
+            get { return GameObjects.IsLive(_panel as Component); }
         }
 
         public bool IsStoredWielderVisible
         {
-            get { return IsVisible(Reflect.Get<GameObject>(_panel, StoredWielderContainerField)); }
+            get { return GameObjects.IsLive(Reflect.Get<GameObject>(_panel, StoredWielderContainerField)); }
         }
 
         public string StoredWielderName
@@ -205,17 +205,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsStoreVisible()
         {
-            return IsVisible(GetStoreButton() as Component);
+            return GameObjects.IsLive(GetStoreButton() as Component);
         }
 
         public bool IsEjectVisible()
         {
-            return IsVisible(GetEjectButton() as Component);
+            return GameObjects.IsLive(GetEjectButton() as Component);
         }
 
         public bool IsTradeVisible()
         {
-            return IsVisible(GetTradeButton() as Component);
+            return GameObjects.IsLive(GetTradeButton() as Component);
         }
 
         public bool IsStoreEnabled()
@@ -319,7 +319,7 @@ namespace SongsOfConquestAccess.Adapters
             List<string> parts = new List<string>();
             for (int i = 0; i < textMeshes.Length; i++)
             {
-                if (!IsVisible(textMeshes[i] as Component))
+                if (!GameObjects.IsLive(textMeshes[i] as Component))
                 {
                     continue;
                 }
@@ -336,17 +336,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static bool IsButtonEnabled(UIButton button)
         {
-            return button != null && button.Active && button.Interactable && IsVisible(button as Component);
-        }
-
-        private static bool IsVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static bool IsVisible(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
+            return button != null && button.Active && button.Interactable && GameObjects.IsLive(button as Component);
         }
     }
 }

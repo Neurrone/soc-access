@@ -59,7 +59,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPresent()
         {
             return _menu != null
-                && IsLiveSceneObject(((Component)_menu).gameObject)
+                && GameObjects.IsLiveSceneObject(((Component)_menu).gameObject)
                 && ((Component)_menu).gameObject.activeInHierarchy;
         }
 
@@ -94,7 +94,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Length; i++)
             {
                 AdventurePlayerMenuEntry entry = entries[i];
-                if (entry == null || !IsLiveSceneObject(((Component)entry).gameObject) || !((Component)entry).gameObject.activeInHierarchy)
+                if (entry == null || !GameObjects.IsLiveSceneObject(((Component)entry).gameObject) || !((Component)entry).gameObject.activeInHierarchy)
                 {
                     continue;
                 }
@@ -202,11 +202,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return nativePlayers;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
         /// <summary>One of the two captions the menu draws over its rows. The game places them by
@@ -445,7 +440,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 string name = SpokenLines.Clean(GameText.Get(_adapter != null ? _adapter._localization : null, "Common/Resource/" + resourceType, string.Empty));
                 string amount = UITextMeshTextUtility.Spoken(GetResourceAmountText(resourceType));
-                string income = IsGameObjectVisible(GetResourceIncomeText(resourceType))
+                string income = GameObjects.IsLive(GetResourceIncomeText(resourceType))
                     ? UITextMeshTextUtility.Spoken(GetResourceIncomeText(resourceType))
                     : string.Empty;
 
@@ -547,13 +542,13 @@ namespace SongsOfConquestAccess.Adapters
             private Component GetResourceTooltipComponent(ResourceType resourceType)
             {
                 UITextMesh amountText = GetResourceAmountText(resourceType);
-                if (IsGameObjectVisible(amountText))
+                if (GameObjects.IsLive(amountText))
                 {
                     return amountText as Component;
                 }
 
                 UITextMesh incomeText = GetResourceIncomeText(resourceType);
-                return IsGameObjectVisible(incomeText) ? incomeText as Component : null;
+                return GameObjects.IsLive(incomeText) ? incomeText as Component : null;
             }
 
             private static FieldInfo GetResourceAmountField(ResourceType resourceType)
@@ -596,11 +591,6 @@ namespace SongsOfConquestAccess.Adapters
                     default:
                         return null;
                 }
-            }
-
-            private static bool IsGameObjectVisible(Component component)
-            {
-                return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
             }
 
             private ActionItem BuildAction(string idSuffix, UIButton button, Func<string> fallbackLabel)

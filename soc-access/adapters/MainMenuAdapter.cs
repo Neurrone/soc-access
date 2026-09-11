@@ -171,7 +171,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPresent()
         {
             return _mainMenu != null
-                && IsLiveSceneObject(_mainMenu.gameObject)
+                && GameObjects.IsLiveSceneObject(_mainMenu.gameObject)
                 && IsGameObjectActive(LeftButtonContainerRef(_mainMenu));
         }
 
@@ -227,11 +227,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
         private sealed class MainMenuButtonAdapter : MenuButtonAdapterBase

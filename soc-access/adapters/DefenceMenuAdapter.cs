@@ -98,7 +98,7 @@ namespace SongsOfConquestAccess.Adapters
         /// read by <c>TroopManagementScreenBase</c> through the host interface.</summary>
         public bool IsPresent()
         {
-            return IsMenuOpen() && IsVisible(GetDefencePanel() as Component);
+            return IsMenuOpen() && GameObjects.IsLive(GetDefencePanel() as Component);
         }
 
         public bool IsDraftPresent()
@@ -248,7 +248,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsCloseVisible()
         {
-            return IsVisible(GetCloseButton() as Component);
+            return GameObjects.IsLive(GetCloseButton() as Component);
         }
 
         public bool ActivateClose()
@@ -258,7 +258,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsSettlementTroopsVisible()
         {
-            return IsVisible(Reflect.Get<GameObject>(GetDefencePanelTroops(), SettlementTroopsContainerField));
+            return GameObjects.IsLive(Reflect.Get<GameObject>(GetDefencePanelTroops(), SettlementTroopsContainerField));
         }
 
         public Component TutorialButton
@@ -275,7 +275,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsTutorialButtonVisible()
         {
             UIButton button = GetTutorialButton();
-            return button != null && IsVisible(button as Component);
+            return button != null && GameObjects.IsLive(button as Component);
         }
 
         public bool ActivateTutorial()
@@ -321,12 +321,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsDraftVisible()
         {
-            return IsVisible(GetDraftButton() as Component);
+            return GameObjects.IsLive(GetDraftButton() as Component);
         }
 
         public bool IsUpgradeVisible()
         {
-            return IsVisible(GetUpgradeButton() as Component);
+            return GameObjects.IsLive(GetUpgradeButton() as Component);
         }
 
         public Tooltip DraftTooltip
@@ -373,7 +373,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsBackVisible()
         {
-            return IsVisible(BackButton);
+            return GameObjects.IsLive(BackButton);
         }
 
         public bool BackToTop()
@@ -439,8 +439,8 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasVisibleTowerSummary()
         {
-            return IsVisible(Reflect.Get<GameObject>(GetDefencePanelTroops(), TowerInfoContainerField))
-                && IsVisible(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowersLevelTextField) as Component)
+            return GameObjects.IsLive(Reflect.Get<GameObject>(GetDefencePanelTroops(), TowerInfoContainerField))
+                && GameObjects.IsLive(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowersLevelTextField) as Component)
                 && !string.IsNullOrWhiteSpace(TowerSummary);
         }
 
@@ -451,8 +451,8 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasVisibleNoTowersHelp()
         {
-            return IsVisible(Reflect.Get<GameObject>(GetDefencePanelTroops(), NoTowersContainerField))
-                && IsVisible(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField) as Component)
+            return GameObjects.IsLive(Reflect.Get<GameObject>(GetDefencePanelTroops(), NoTowersContainerField))
+                && GameObjects.IsLive(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField) as Component)
                 && !string.IsNullOrWhiteSpace(TowerInfoText);
         }
 
@@ -567,17 +567,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static bool IsButtonEnabled(UIButton button)
         {
-            return button != null && button.Active && button.Interactable && IsVisible(button as Component);
-        }
-
-        private static bool IsVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static bool IsVisible(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
+            return button != null && button.Active && button.Interactable && GameObjects.IsLive(button as Component);
         }
 
         public sealed class TowerItem

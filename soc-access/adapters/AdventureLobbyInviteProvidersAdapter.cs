@@ -57,7 +57,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             GameObject panelObject = _panel != null ? ((Component)_panel).gameObject : null;
             GameObject container = Reflect.Get<GameObject>(_panel, InviteDropdownContainerField);
-            return IsLiveSceneObject(panelObject)
+            return GameObjects.IsLiveSceneObject(panelObject)
                 && panelObject.activeInHierarchy
                 && container != null
                 && container.activeInHierarchy;
@@ -105,11 +105,6 @@ namespace SongsOfConquestAccess.Adapters
         public void HideNativeTooltip()
         {
             NativeTooltipUtility.HideTooltip();
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
         public sealed class ProviderButtonItem

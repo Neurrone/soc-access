@@ -97,7 +97,7 @@ namespace SongsOfConquestAccess.Adapters
             return _menu != null
                 && _settings != null
                 && Reflect.Get<object>(_menu, AsyncField) != null
-                && IsVisible(_settings.TradingMenuTransform)
+                && GameObjects.IsLive(_settings.TradingMenuTransform)
                 && _settings.leftInventory != null
                 && _settings.rightInventory != null
                 && _settings.leftTroopHud != null
@@ -174,11 +174,6 @@ namespace SongsOfConquestAccess.Adapters
         private ICommanderState GetCommander(int commanderId)
         {
             return commanderId >= 0 && _facade != null ? _facade.Commanders.Get(commanderId) : null;
-        }
-
-        private static bool IsVisible(Transform transform)
-        {
-            return transform != null && transform.gameObject != null && transform.gameObject.activeInHierarchy;
         }
 
         private static T GetFieldValue<T>(object owner, FieldInfo field, T fallback)

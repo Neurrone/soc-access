@@ -160,7 +160,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Count; i++)
             {
                 PostAdventureStatsMenuTeamEntry entry = entries[i];
-                if (!IsComponentVisible(entry))
+                if (!GameObjects.IsLive(entry))
                 {
                     continue;
                 }
@@ -471,11 +471,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return null;
-        }
-
-        private static bool IsComponentVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
         public sealed class GraphDropList : IDropList

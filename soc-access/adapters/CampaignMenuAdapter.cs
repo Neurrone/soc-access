@@ -172,7 +172,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             return _campaignMenu != null
                 && IsLoadedMainMenuScene(MainMenuSceneType.Campaign)
-                && IsLiveSceneObject(_campaignMenu.gameObject)
+                && GameObjects.IsLiveSceneObject(_campaignMenu.gameObject)
                 && IsGameObjectActive(GetCampaignButtonContainer())
                 && HasVisibleCampaignButton();
         }
@@ -261,11 +261,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsGameObjectActive(GameObject gameObject)
         {
             return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
         private static bool IsLoadedMainMenuScene(MainMenuSceneType sceneType)

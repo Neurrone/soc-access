@@ -82,7 +82,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsCustomNameVisible
         {
-            get { return IsActive(Reflect.Get<GameObject>(_menu, CustomNameContainerField)) && !string.IsNullOrWhiteSpace(CustomName); }
+            get { return GameObjects.IsLive(Reflect.Get<GameObject>(_menu, CustomNameContainerField)) && !string.IsNullOrWhiteSpace(CustomName); }
         }
 
         public string BlueprintDescription
@@ -105,7 +105,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsBlueprintDescriptionVisible
         {
-            get { return IsActive(Reflect.Get<GameObject>(_menu, DescriptionTextContainerField)) && !string.IsNullOrWhiteSpace(BlueprintDescription); }
+            get { return GameObjects.IsLive(Reflect.Get<GameObject>(_menu, DescriptionTextContainerField)) && !string.IsNullOrWhiteSpace(BlueprintDescription); }
         }
 
         public string StoredWielderName
@@ -132,7 +132,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsStoredWielderVisible
         {
-            get { return IsActive(Reflect.Get<UIButton>(_menu, StoredWielderButtonField)); }
+            get { return GameObjects.IsLive(Reflect.Get<UIButton>(_menu, StoredWielderButtonField)); }
         }
 
         public Tooltip StoredWielderTooltip
@@ -183,7 +183,7 @@ namespace SongsOfConquestAccess.Adapters
                 int used;
                 int total;
                 GetUpgradeCounts(out used, out total);
-                return total > 0 && IsActive(Reflect.Get<GameObject>(_menu, UpgradesParentField));
+                return total > 0 && GameObjects.IsLive(Reflect.Get<GameObject>(_menu, UpgradesParentField));
             }
         }
 
@@ -200,7 +200,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsSiegeStateVisible
         {
-            get { return IsActive(Reflect.Get<GameObject>(_menu, SiegeStateDescriptionContainerField)) && !string.IsNullOrWhiteSpace(SiegeState); }
+            get { return GameObjects.IsLive(Reflect.Get<GameObject>(_menu, SiegeStateDescriptionContainerField)) && !string.IsNullOrWhiteSpace(SiegeState); }
         }
 
         /// <summary>The controller drawing the round dots the town status is counted off.</summary>
@@ -245,7 +245,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 TownStatusController controller = Reflect.Get<TownStatusController>(_menu, TownStatusControllerField);
                 List<TownStatusControllerRoundEntry> entries = TownStatusEntries;
-                return IsActive(controller) && entries != null && entries.Count > 0;
+                return GameObjects.IsLive(controller) && entries != null && entries.Count > 0;
             }
         }
 
@@ -262,7 +262,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<DescriptionRow> rows = new List<DescriptionRow>();
             MiniMenuDescription description = Reflect.Get<MiniMenuDescription>(_menu, DescriptionField);
-            if (!IsActive(description))
+            if (!GameObjects.IsLive(description))
             {
                 return rows;
             }
@@ -289,7 +289,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Length; i++)
             {
                 MapEntityHUDDescriptionEntry entry = entries[i];
-                if (!IsActive(entry))
+                if (!GameObjects.IsLive(entry))
                 {
                     continue;
                 }
@@ -334,7 +334,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < actions.ActiveEntries.Count; i++)
             {
                 MiniMenuActionButton entry = actions.ActiveEntries[i];
-                if (!IsActive(entry) || entry.GameAction == null)
+                if (!GameObjects.IsLive(entry) || entry.GameAction == null)
                 {
                     continue;
                 }
@@ -404,14 +404,14 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < slots.Count; i++)
             {
                 MapEntityHUDUpgradeSlot slot = slots[i];
-                if (!IsActive(slot))
+                if (!GameObjects.IsLive(slot))
                 {
                     continue;
                 }
 
                 total++;
                 UIImage filledSlot = Reflect.Get<UIImage>(slot, FilledSlotField);
-                if (IsActive(filledSlot))
+                if (GameObjects.IsLive(filledSlot))
                 {
                     used++;
                 }
@@ -506,16 +506,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool HasTooltipLines(Tooltip tooltip)
         {
             return tooltip != null && tooltip.TextLines != null && tooltip.TextLines.Count > 0;
-        }
-
-        private static bool IsActive(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static bool IsActive(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
         }
 
         public sealed class DescriptionRow

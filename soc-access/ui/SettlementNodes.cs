@@ -113,7 +113,7 @@ namespace SongsOfConquestAccess.UI
             Tooltip tooltip,
             Action focus)
         {
-            if (builder == null || !IsDrawn(button))
+            if (builder == null || !GameObjects.IsLive(button))
             {
                 return;
             }
@@ -218,11 +218,6 @@ namespace SongsOfConquestAccess.UI
             return slot.CurrentSize > 0 && slot.MaxSize > 0
                 ? ModText.Get(ModStrings.UI.TroopWithSize, slot.TroopName, slot.CurrentSize, slot.MaxSize)
                 : slot.TroopName;
-        }
-
-        private static bool IsDrawn(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
     }
 }

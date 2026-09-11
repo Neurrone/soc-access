@@ -140,7 +140,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (_navigation == null
                 || !IsLoadedPlayerStatsScene()
-                || !IsLiveSceneObject(_navigation.gameObject)
+                || !GameObjects.IsLiveSceneObject(_navigation.gameObject)
                 || !_navigation.gameObject.activeInHierarchy)
             {
                 return false;
@@ -204,7 +204,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Length; i++)
             {
                 PlayerStatsFactionEntry entry = entries[i];
-                if (!IsComponentVisible(entry))
+                if (!GameObjects.IsLive(entry))
                 {
                     continue;
                 }
@@ -243,7 +243,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Length; i++)
             {
                 PlayerStatsMapEntry entry = entries[i];
-                if (!IsComponentVisible(entry))
+                if (!GameObjects.IsLive(entry))
                 {
                     continue;
                 }
@@ -284,7 +284,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Length; i++)
             {
                 PlayerStatsWielderEntry entry = entries[i];
-                if (!IsComponentVisible(entry))
+                if (!GameObjects.IsLive(entry))
                 {
                     continue;
                 }
@@ -377,7 +377,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Count; i++)
             {
                 PlayerStatsSpellEntry entry = entries[i];
-                if (!IsComponentVisible(entry))
+                if (!GameObjects.IsLive(entry))
                 {
                     continue;
                 }
@@ -519,7 +519,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Length; i++)
             {
                 PlayerStatsTroopEntry entry = entries[i];
-                if (!IsComponentVisible(entry))
+                if (!GameObjects.IsLive(entry))
                 {
                     continue;
                 }
@@ -811,16 +811,6 @@ namespace SongsOfConquestAccess.Adapters
             return loader != null && loader.CurrentlyLoadedScene == MainMenuSceneType.PlayerStats;
         }
 
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static bool IsComponentVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
         private static UITextMesh GetTextField(object owner, FieldInfo field)
         {
             return Reflect.Get<UITextMesh>(owner, field);
@@ -859,7 +849,7 @@ namespace SongsOfConquestAccess.Adapters
 
             for (int i = 0; i < entries.Count; i++)
             {
-                if (IsComponentVisible(entries[i]))
+                if (GameObjects.IsLive(entries[i]))
                 {
                     return entries[i];
                 }

@@ -594,10 +594,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static bool IsGameObjectVisible(GameObject gameObject)
         {
-            return gameObject != null
-                && gameObject.activeInHierarchy
-                && gameObject.scene.IsValid()
-                && gameObject.scene.isLoaded;
+            return GameObjects.IsLive(gameObject) && GameObjects.IsLiveSceneObject(gameObject);
         }
 
         /// <summary>The chat's "send to" dropdown as the mod's own list screen needs it. The game

@@ -110,7 +110,7 @@ namespace SongsOfConquestAccess.Adapters
         /// question the callers ask before they keep a component.</summary>
         public static bool HasTooltip(Component component, ILocalizationHandler localization)
         {
-            return IsVisible(component)
+            return GameObjects.IsLive(component)
                 && NativeTooltipUtility.GetTooltipLinesForComponent(component, localization).Count > 0;
         }
 
@@ -144,13 +144,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return SpokenText.Get(localization, key, fallback);
-        }
-
-        public static bool IsVisible(Component component)
-        {
-            return component != null
-                && component.gameObject != null
-                && component.gameObject.activeInHierarchy;
         }
 
         public static void AddIfNotEmpty(List<string> parts, string value)

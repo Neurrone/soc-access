@@ -261,10 +261,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             GameObject gameObject = GetMenuGameObject();
-            return gameObject != null
-                && gameObject.scene.IsValid()
-                && gameObject.scene.isLoaded
-                && gameObject.activeInHierarchy;
+            return GameObjects.IsLiveSceneObject(gameObject) && GameObjects.IsLive(gameObject);
         }
 
         /// <summary>The arrival fade has finished: the canvas group the menu tweens is opaque.</summary>

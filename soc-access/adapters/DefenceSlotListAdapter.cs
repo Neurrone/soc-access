@@ -90,7 +90,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsOccupied
             {
-                get { return IsVisible(_entry as Component) && GetDetails() != null; }
+                get { return GameObjects.IsLive(_entry as Component) && GetDetails() != null; }
             }
 
             public string TroopName
@@ -136,7 +136,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    if (!IsVisible(_entry as Component))
+                    if (!GameObjects.IsLive(_entry as Component))
                     {
                         return null;
                     }
@@ -147,15 +147,10 @@ namespace SongsOfConquestAccess.Adapters
 
             public void Focus()
             {
-                if (IsVisible(_entry as Component))
+                if (GameObjects.IsLive(_entry as Component))
                 {
                     NativeSelectionUtility.Select(_entry.GetSelectable());
                 }
-            }
-
-            private static bool IsVisible(Component component)
-            {
-                return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
             }
 
             private AdventureTroopDetails GetDetails()

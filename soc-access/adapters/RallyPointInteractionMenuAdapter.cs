@@ -177,16 +177,6 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(string.IsNullOrWhiteSpace(name) || name == entity.NameKey ? entity.NameKey : name);
         }
 
-        private static bool IsVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static bool IsVisible(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
-        }
-
         public sealed class SourceItem
         {
             private readonly RallyPointInteractionMenuAdapter _adapter;
@@ -222,12 +212,12 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsLevelVisible
             {
-                get { return IsVisible(Reflect.Get<GameObject>(_entry, EntryLevelContainerField)); }
+                get { return GameObjects.IsLive(Reflect.Get<GameObject>(_entry, EntryLevelContainerField)); }
             }
 
             public bool IsSelected
             {
-                get { return IsVisible(Reflect.Get<Image>(_entry, EntrySelectedField) as Component); }
+                get { return GameObjects.IsLive(Reflect.Get<Image>(_entry, EntrySelectedField) as Component); }
             }
 
             public Tooltip Tooltip

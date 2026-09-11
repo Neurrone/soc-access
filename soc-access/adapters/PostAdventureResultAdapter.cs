@@ -91,7 +91,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 UITextMesh description = Reflect.Get<UITextMesh>(_menu, DescriptionField);
-                return IsComponentVisible(description) && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(description));
+                return GameObjects.IsLive(description) && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(description));
             }
         }
 
@@ -128,7 +128,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Length; i++)
             {
                 PostAdventureMenuObjectiveEntry entry = entries[i];
-                if (!IsComponentVisible(entry))
+                if (!GameObjects.IsLive(entry))
                 {
                     continue;
                 }
@@ -219,11 +219,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool IsLiveMenu()
         {
-            return _menu != null
-                && _menu.gameObject != null
-                && _menu.gameObject.scene.IsValid()
-                && _menu.gameObject.scene.isLoaded
-                && _menu.gameObject.activeInHierarchy;
+            return GameObjects.IsLiveSceneObject(_menu) && GameObjects.IsLive(_menu);
         }
 
         private bool HasVisibleButton()
@@ -309,11 +305,6 @@ namespace SongsOfConquestAccess.Adapters
             return canvasGroup != null && canvasGroup.gameObject != null && canvasGroup.gameObject.activeInHierarchy;
         }
 
-        private static bool IsComponentVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
         public sealed class ObjectiveEntry
         {
             private readonly PostAdventureMenuObjectiveEntry _entry;
@@ -328,7 +319,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsVisible
             {
-                get { return IsComponentVisible(_entry) && !string.IsNullOrWhiteSpace(GetObjectiveText(_entry)); }
+                get { return GameObjects.IsLive(_entry) && !string.IsNullOrWhiteSpace(GetObjectiveText(_entry)); }
             }
         }
     }

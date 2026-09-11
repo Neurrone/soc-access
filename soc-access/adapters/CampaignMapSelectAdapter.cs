@@ -121,7 +121,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             return _menu != null
                 && _settings != null
-                && IsLiveSceneObject(GetMapContainerGameObject())
+                && GameObjects.IsLiveSceneObject(GetMapContainerGameObject())
                 && IsGameObjectActive(GetMapContainerGameObject())
                 && Information != null
                 && Information.IsPresent()
@@ -201,9 +201,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             GameObject gameObject = ((Component)button).gameObject;
-            return gameObject != null
-                && gameObject.scene.IsValid()
-                && gameObject.scene.isLoaded
+            return GameObjects.IsLiveSceneObject(gameObject)
                 && (MenuButtonAdapterBase.IsButtonVisible(UnplayedButtonRef(button))
                     || MenuButtonAdapterBase.IsButtonVisible(PlayedBeforeButtonRef(button)));
         }
@@ -230,11 +228,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsGameObjectActive(GameObject gameObject)
         {
             return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

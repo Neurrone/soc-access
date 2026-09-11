@@ -51,7 +51,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             return _menu != null
                 && _settings != null
-                && IsVisible(_settings.ContainerCanvasGroup as Component)
+                && GameObjects.IsLive(_settings.ContainerCanvasGroup as Component)
                 && GetChoices().Count > 0;
         }
 
@@ -83,7 +83,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             Component containerComponent = container as Component;
             GameObject root = containerComponent != null ? containerComponent.gameObject : null;
-            if (!IsVisible(root) || toggle == null)
+            if (!GameObjects.IsLive(root) || toggle == null)
             {
                 return;
             }
@@ -121,16 +121,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             Transform transform = root != null ? root.transform.Find(relativePath) : null;
             return transform != null ? transform.GetComponent<UITextMesh>() : null;
-        }
-
-        private static bool IsVisible(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static bool IsVisible(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
         }
 
         public sealed class ChoiceItem

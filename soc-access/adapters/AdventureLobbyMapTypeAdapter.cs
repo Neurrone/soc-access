@@ -83,7 +83,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             return _menu != null
                 && IsLoadedMainMenuScene(MainMenuSceneType.AdventureLobby)
-                && IsLiveSceneObject(((Component)_menu).gameObject)
+                && GameObjects.IsLiveSceneObject(((Component)_menu).gameObject)
                 && ((Component)_menu).gameObject.activeInHierarchy
                 && IsReady()
                 && HasVisibleMapTypeButton();
@@ -122,11 +122,6 @@ namespace SongsOfConquestAccess.Adapters
             return button != null && button.IsVisible();
         }
 
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
 
         private static bool IsLoadedMainMenuScene(MainMenuSceneType sceneType)
         {

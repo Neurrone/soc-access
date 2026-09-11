@@ -245,12 +245,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool IsVoteUpSelected
         {
-            get { return IsActive(Reflect.Cast<GameObject>(_details, UpVoteActiveOverlayField)); }
+            get { return GameObjects.IsLive(Reflect.Cast<GameObject>(_details, UpVoteActiveOverlayField)); }
         }
 
         private bool IsVoteDownSelected
         {
-            get { return IsActive(Reflect.Cast<GameObject>(_details, DownVoteActiveOverlayField)); }
+            get { return GameObjects.IsLive(Reflect.Cast<GameObject>(_details, DownVoteActiveOverlayField)); }
         }
 
         // LAZY: only from Report(), which mod.io refuses without a selected object. The walk is paid
@@ -371,11 +371,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Empty;
-        }
-
-        private static bool IsActive(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
         }
 
         private static string GetText(TMP_Text text)

@@ -172,7 +172,7 @@ namespace SongsOfConquestAccess.UI
             TroopUpgradeType upgradeType)
         {
             Component button = entry.EssenceButton(upgradeType);
-            return button != null && button.gameObject != null && button.gameObject.activeInHierarchy;
+            return GameObjects.IsLive(button);
         }
 
         private static void AddEssence(

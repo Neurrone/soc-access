@@ -103,7 +103,7 @@ namespace SongsOfConquestAccess.Adapters
             GameObject gameObject = _menu != null ? ((Component)_menu).gameObject : null;
             return _menu != null
                 && IsLoadedMainMenuScene(MainMenuSceneType.AdventureLobby)
-                && IsLiveSceneObject(gameObject)
+                && GameObjects.IsLiveSceneObject(gameObject)
                 && gameObject.activeInHierarchy
                 && canvasGroup != null
                 && (canvasGroup.blocksRaycasts || canvasGroup.alpha > 0.5f)
@@ -136,7 +136,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Count; i++)
             {
                 LobbyRandomMapPreviewEntry entry = entries[i];
-                if (entry != null && IsVisible((Component)entry))
+                if (entry != null && GameObjects.IsLive((Component)entry))
                 {
                     items.Add(ItemFor(entry));
                 }
@@ -259,18 +259,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             MainMenuSceneLoader loader = MainMenuSceneLoader.UnsafeInstance;
             return loader != null && loader.CurrentlyLoadedScene == sceneType;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static bool IsVisible(Component component)
-        {
-            return component != null
-                && component.gameObject != null
-                && component.gameObject.activeInHierarchy;
         }
 
         private static T GetEntryField<T>(LobbyRandomMapPreviewEntry entry, FieldInfo field) where T : class
@@ -415,7 +403,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsVisible
             {
-                get { return IsVisibleComponent(_toggle); }
+                get { return GameObjects.IsLive(_toggle); }
             }
 
             public bool IsEnabled
@@ -450,13 +438,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 Component component = _toggle != null ? _toggle.GetTextMesh() as Component : null;
                 return component != null ? Tooltip.ForComponent(component, _localization) : null;
-            }
-
-            private static bool IsVisibleComponent(Component component)
-            {
-                return component != null
-                    && component.gameObject != null
-                    && component.gameObject.activeInHierarchy;
             }
         }
 

@@ -80,7 +80,7 @@ namespace SongsOfConquestAccess.Adapters
             SaveLoadGameMenu.Settings settings = Settings;
             return _menu != null
                 && settings != null
-                && IsActive(settings.Parent as Component);
+                && GameObjects.IsLive(settings.Parent as Component);
         }
 
         public bool Close()
@@ -97,7 +97,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsInputVisible()
         {
             SaveLoadGameMenu.Settings settings = Settings;
-            return settings != null && IsActive(settings.InputField as Component);
+            return settings != null && GameObjects.IsLive(settings.InputField as Component);
         }
 
         public bool IsInputEnabled()
@@ -203,7 +203,7 @@ namespace SongsOfConquestAccess.Adapters
                     () => GetTabLabel(index, button),
                     () => ActivateTab(index, button),
                     () => FocusButton(button),
-                    () => IsActive(tabGroup as Component) && MenuButtonAdapterBase.IsButtonVisible(button),
+                    () => GameObjects.IsLive(tabGroup as Component) && MenuButtonAdapterBase.IsButtonVisible(button),
                     () => button != null && button.Active && button.Interactable,
                     () => tabGroup != null && tabGroup.CurrentTab == index));
             }
@@ -387,12 +387,7 @@ namespace SongsOfConquestAccess.Adapters
             UIImage selectedFrame = EntrySelectedFrameField != null && entry != null
                 ? EntrySelectedFrameField.GetValue(entry) as UIImage
                 : null;
-            return IsActive(selectedFrame as Component);
-        }
-
-        private static bool IsActive(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
+            return GameObjects.IsLive(selectedFrame as Component);
         }
 
         public sealed class TabItem
@@ -505,7 +500,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsVisible()
             {
-                return IsActive(_entry as Component);
+                return GameObjects.IsLive(_entry as Component);
             }
 
             public bool Select()
