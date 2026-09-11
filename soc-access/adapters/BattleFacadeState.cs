@@ -1,3 +1,4 @@
+using System;
 using SongsOfConquest.Client.Battle;
 
 namespace SongsOfConquestAccess.Adapters
@@ -27,8 +28,9 @@ namespace SongsOfConquestAccess.Adapters
 
                 return facade.Teams.Current != null ? facade.Teams.Current.Id : -1;
             }
-            catch
+            catch (Exception exception)
             {
+                LogOnce.Warn("BattleFacadeState.LocalTeamId", exception);
                 return -1;
             }
         }
@@ -36,28 +38,14 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The troop whose turn it is; -1 when no troop is acting.</summary>
         public static int CurrentTroopId(IClientBattleFacade facade)
         {
-            try
-            {
-                return facade != null && facade.Troops != null && facade.Troops.Current != null
-                    ? facade.Troops.Current.Id
-                    : -1;
-            }
-            catch
-            {
-                return -1;
-            }
+            return facade != null && facade.Troops != null && facade.Troops.Current != null
+                ? facade.Troops.Current.Id
+                : -1;
         }
 
         public static int CurrentRound(IClientBattleFacade facade)
         {
-            try
-            {
-                return facade != null && facade.Queue != null ? facade.Queue.CurrentRound : 0;
-            }
-            catch
-            {
-                return 0;
-            }
+            return facade != null && facade.Queue != null ? facade.Queue.CurrentRound : 0;
         }
     }
 }
