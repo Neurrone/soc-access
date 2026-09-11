@@ -785,6 +785,8 @@
             public static readonly ModString AnnouncementVisited = new ModString("Screens.AnnouncementVisited", "Visited");
             public static readonly ModString AnnouncementWielder = new ModString("Screens.AnnouncementWielder", "Wielder");
             public static readonly ModString AnnouncementZoneOfControl = new ModString("Screens.AnnouncementZoneOfControl", "Zone of control");
+            public static readonly ModString CodexTabNumber = new ModString("Screens.CodexTabNumber", "Tab {0}");
+            public static readonly ModString CodexCategoryNumber = new ModString("Screens.CodexCategoryNumber", "Category {0}");
         }
 
         public static class Scanner

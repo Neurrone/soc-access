@@ -3439,6 +3439,16 @@ msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr ""
 
+#. Screens.CodexTabNumber
+msgctxt "Screens.CodexTabNumber"
+msgid "Tab {0}"
+msgstr ""
+
+#. Screens.CodexCategoryNumber
+msgctxt "Screens.CodexCategoryNumber"
+msgid "Category {0}"
+msgstr ""
+
 #. Scanner.All
 msgctxt "Scanner.All"
 msgid "All"

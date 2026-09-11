@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
@@ -130,15 +131,24 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 int index = tab.Index;
-                string label = tab.Label;
+                CodexMenuAdapter.TabItem it = tab;
                 // The guard also keeps the showing tab's native selection - which is the article the
                 // window is drawing - where the game put it.
                 NodeVtable vtable = GraphNodes.SwitchingTab(
-                    () => label,
+                    () => TabLabel(it),
                     () => Live.GetActiveTabIndex() == index,
                     () => Live.FocusTab(index));
                 builder.AddItem(new SyntheticNode(ControlId.Structural("codex:tab/" + index), vtable));
             }
+        }
+
+        /// <summary>A tab's own name, or - for a page the game names nowhere - where it sits in the
+        /// row.</summary>
+        private static string TabLabel(CodexMenuAdapter.TabItem tab)
+        {
+            return string.IsNullOrWhiteSpace(tab.Label)
+                ? ModText.Get(ModStrings.Screens.CodexTabNumber, tab.Index + 1)
+                : tab.Label;
         }
 
         // ---- the categories with their articles ----
@@ -155,7 +165,9 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                builder.PushContext(group.Label);
+                builder.PushContext(string.IsNullOrWhiteSpace(group.Label)
+                    ? ModText.Get(ModStrings.Screens.CodexCategoryNumber, g + 1)
+                    : group.Label);
                 builder.SetRegion("codex:category/" + g);
                 for (int a = 0; a < group.Articles.Count; a++)
                 {
@@ -166,9 +178,8 @@ namespace SongsOfConquestAccess.Screens
                         continue;
                     }
 
-                    string label = article.Label;
                     CodexMenuAdapter.ArticleItem it = article;
-                    NodeVtable vtable = GraphNodes.Button(() => label, () => Live.ActivateArticle(it));
+                    NodeVtable vtable = GraphNodes.Button(() => ArticleLabel(it), () => Live.ActivateArticle(it));
                     vtable.OnFocusVisual = () => Live.FocusArticle(it);
                     ControlId id = ControlId.For(subject, "codex:article/" + g + "/" + a);
                     builder.AddItem(new DrawnNode(id, vtable, subject));
@@ -184,6 +195,15 @@ namespace SongsOfConquestAccess.Screens
             builder.SetRegion(null);
             // The article the window is drawing, so Tab into the list lands on what is being read.
             builder.LandStopOn(landing);
+        }
+
+        /// <summary>An article's own name, with the rarity its power-level colour stands for where
+        /// the game gave it one - composed when the row is read, not for every row per frame.</summary>
+        private string ArticleLabel(CodexMenuAdapter.ArticleItem article)
+        {
+            return article.HasContentColor
+                ? ArtifactSpeechFormatter.FormatName(Live.Localization, article.Label, article.ContentColor)
+                : article.Label;
         }
 
         // ---- the article's body ----
@@ -265,13 +285,14 @@ namespace SongsOfConquestAccess.Screens
         private void AddContentLine(GraphBuilder builder, CodexContentItem item, int index)
         {
             CodexContentItem it = item;
-            string text = LineText(item);
-            if (string.IsNullOrWhiteSpace(text))
+            if (IsBlank(item))
             {
                 return;
             }
 
-            NodeVtable vtable = GraphNodes.Text(() => text);
+            // Composed when the line is read: the body is rebuilt every frame and only the line the
+            // cursor is on is spoken (AGENTS.md, Performance).
+            NodeVtable vtable = GraphNodes.Text(() => LineText(it));
             vtable.OnFocusVisual = () => Live.ScrollContentItemIntoView(it);
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker("content/" + index), "codex:content-line/" + index),
@@ -284,7 +305,9 @@ namespace SongsOfConquestAccess.Screens
         {
             if (item.Kind != CodexContentItemKind.Essence)
             {
-                return item.Text;
+                return string.IsNullOrWhiteSpace(item.Value)
+                    ? item.Text
+                    : ModText.Get(ModStrings.UI.LabelValue, item.Text, item.Value);
             }
 
             List<string> parts = new List<string>();
@@ -305,6 +328,25 @@ namespace SongsOfConquestAccess.Screens
             return string.IsNullOrWhiteSpace(item.Text)
                 ? values
                 : ModText.Get(ModStrings.UI.LabelValue, item.Text, values);
+        }
+
+        /// <summary>Whether an item has nothing to say, asked without composing its line.</summary>
+        private static bool IsBlank(CodexContentItem item)
+        {
+            if (item.Kind != CodexContentItemKind.Essence)
+            {
+                return string.IsNullOrWhiteSpace(item.Text) && string.IsNullOrWhiteSpace(item.Value);
+            }
+
+            for (int i = 0; i < item.Essences.Count; i++)
+            {
+                if (item.Essences[i] != null && !string.IsNullOrWhiteSpace(item.Essences[i].Text))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         // ---- the footer ----

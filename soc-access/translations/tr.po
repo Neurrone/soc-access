@@ -3817,3 +3817,12 @@ msgctxt "Spatial.MovementOfMax"
 msgid "{0} / {1}"
 msgstr "{0} / {1}"
 
+#. Screens.CodexTabNumber
+msgctxt "Screens.CodexTabNumber"
+msgid "Tab {0}"
+msgstr "Sekme {0}"
+
+#. Screens.CodexCategoryNumber
+msgctxt "Screens.CodexCategoryNumber"
+msgid "Category {0}"
+msgstr "Kategori {0}"
