@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -27,9 +27,6 @@ namespace SongsOfConquestAccess.Adapters
 
         private static readonly FieldInfo ActiveConversantsField =
             AccessTools.Field(typeof(DialogueMenu), "_activeConversants");
-
-        private static readonly PropertyInfo CurrentStateTypeProperty =
-            AccessTools.Property(StateMachineField.FieldType, "CurrentStateType");
 
         private static readonly MethodInfo GetHeaderTextMethod =
             AccessTools.Method(typeof(DialogueMenu), "GetHeaderText");
@@ -95,12 +92,13 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            if (IsWaitingForInput())
+            object state = CurrentState();
+            if (IsWaitingForInput(state))
             {
                 return HasVisibleText(settings);
             }
 
-            return IsTypingText() && HasVisibleText(settings) && GetMaxVisibleCharacters(settings.DialogueText) > 0;
+            return IsTypingText(state) && HasVisibleText(settings) && GetMaxVisibleCharacters(settings.DialogueText) > 0;
         }
 
         public bool AdvanceNow()
@@ -117,6 +115,9 @@ namespace SongsOfConquestAccess.Adapters
                 HandlePrimaryClickedMethod.Invoke(_dialogueMenu, null);
             }
 
+            // The advance can move the menu on to the next line inside this frame, so the header
+            // read above is no longer the one being drawn.
+            _headerFrame = -1;
             return true;
         }
 
@@ -125,26 +126,77 @@ namespace SongsOfConquestAccess.Adapters
             return _dialogueMenu != null ? SettingsRef(_dialogueMenu) : null;
         }
 
+        /// <summary>Which state the menu's own state machine is in, read live: the mod's own advance
+        /// moves it inside the frame, so it is never remembered across a call.</summary>
+        private object CurrentState()
+        {
+            ProbeStateMachine();
+            if (_dialogueMenu == null || StateMachineField == null || CurrentStateTypeProperty == null)
+            {
+                return null;
+            }
+
+            object stateMachine = StateMachineField.GetValue(_dialogueMenu);
+            return stateMachine != null ? CurrentStateTypeProperty.GetValue(stateMachine, null) : null;
+        }
+
         private bool IsTypingText()
         {
-            return IsState("TypingText");
+            return IsTypingText(CurrentState());
         }
 
         private bool IsWaitingForInput()
         {
-            return IsState("WaitingForInput");
+            return IsWaitingForInput(CurrentState());
         }
 
-        private bool IsState(string stateName)
+        // The state is the game's own private enum, so it is compared as the VALUE it is rather than
+        // through ToString, which allocated a string on every read and ran twice per build.
+        private static bool IsTypingText(object state)
         {
-            if (_dialogueMenu == null || StateMachineField == null || CurrentStateTypeProperty == null)
+            return state != null && TypingTextState != null && state.Equals(TypingTextState);
+        }
+
+        private static bool IsWaitingForInput(object state)
+        {
+            return state != null && WaitingForInputState != null && state.Equals(WaitingForInputState);
+        }
+
+        // Probed on first use, not in a static initialiser: the state machine's field handle is what
+        // names the enum's type, and a renamed game field would otherwise throw inside this type's
+        // constructor and take the whole adapter down with it.
+        private static PropertyInfo CurrentStateTypeProperty;
+        private static object TypingTextState;
+        private static object WaitingForInputState;
+        private static bool StateMachineProbed;
+
+        private static void ProbeStateMachine()
+        {
+            if (StateMachineProbed)
             {
-                return false;
+                return;
             }
 
-            object stateMachine = StateMachineField.GetValue(_dialogueMenu);
-            object currentState = stateMachine != null ? CurrentStateTypeProperty.GetValue(stateMachine, null) : null;
-            return string.Equals(currentState != null ? currentState.ToString() : string.Empty, stateName, StringComparison.Ordinal);
+            StateMachineProbed = true;
+            if (StateMachineField == null)
+            {
+                return;
+            }
+
+            CurrentStateTypeProperty = AccessTools.Property(StateMachineField.FieldType, "CurrentStateType");
+            Type stateType = CurrentStateTypeProperty != null ? CurrentStateTypeProperty.PropertyType : null;
+            if (stateType == null || !stateType.IsEnum)
+            {
+                return;
+            }
+
+            TypingTextState = StateValue(stateType, "TypingText");
+            WaitingForInputState = StateValue(stateType, "WaitingForInput");
+        }
+
+        private static object StateValue(Type stateType, string name)
+        {
+            return Enum.IsDefined(stateType, name) ? Enum.Parse(stateType, name) : null;
         }
 
         private bool HasVisibleText(DialogueMenu.Settings settings)
@@ -162,7 +214,28 @@ namespace SongsOfConquestAccess.Adapters
             return tmpText != null ? tmpText.maxVisibleCharacters : int.MaxValue;
         }
 
+        /// <summary>Who is speaking, composed by the game's own GetHeaderText. Read once a frame:
+        /// the screen's name, its title node and the presence check all ask for it, and the answer is
+        /// one reflective invoke (AGENTS.md, Performance). The mod's own advance is what can change
+        /// it inside a frame, and it drops this.</summary>
         private bool TryGetNativeHeaderText(out string header)
+        {
+            int frame = Time.frameCount;
+            if (_headerFrame != frame)
+            {
+                _headerFrame = frame;
+                _headerFound = ReadNativeHeaderText(out _header);
+            }
+
+            header = _header;
+            return _headerFound;
+        }
+
+        private string _header = string.Empty;
+        private bool _headerFound;
+        private int _headerFrame = -1;
+
+        private bool ReadNativeHeaderText(out string header)
         {
             header = string.Empty;
             if (_dialogueMenu == null
