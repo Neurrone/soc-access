@@ -380,3 +380,11 @@ Filled in as the loop is used; keep entries to one line each with the date.
   ends a battle from outside but playing it or loading a save through the pause menu;
   `POST /loadsave` refuses during one. `POST /key` refuses while the game window cannot take the
   foreground; every menu above was driven with `/type`, `/input` and native `Show`/`Hide` calls.
+- 2026-09-11: an `/eval` that re-declares a top-level `var` name an earlier eval used can fail
+  with `Internal compiler error: The method or operation is not implemented`; wrap the body in
+  `((System.Func<string>)(() => { ... }))()` with fresh names and it compiles every time.
+- 2026-09-11: the REPL cannot see `UnityEngine.UI` or `UnityEngine.EventSystems`; read a
+  `ScrollRect` through `GetComponent("ScrollRect")` and its `content` property by reflection.
+- 2026-09-11: after the Options window closes, the main menu's landing is sometimes the Continue
+  button and sometimes the Options button; read `focusedNodeId` before walking, because a blind
+  `ui_next`, `ui_down`, `ui_left_click` activated Continue and loaded the last campaign save twice.
