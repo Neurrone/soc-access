@@ -747,22 +747,39 @@ namespace SongsOfConquestAccess
                 return;
             }
 
+            // The override replaces every default, the display-name fallback a default may carry
+            // included (map_secondary_action's backslash), so a rebound gesture no longer answers
+            // the key it was moved off. What a captured chord carries instead is the character
+            // its key printed, and a punctuation character gets a twin that matches by that
+            // character: a backslash captured as OEM1 on one keyboard fires on the Backslash key
+            // of another, and the other way round. Letters and digits get no twin, since on a
+            // keyboard whose layout moves them the key the player pressed is the one to keep.
             List<InputBinding> effective = new List<InputBinding>();
             for (int i = 0; i < chords.Count; i++)
             {
-                effective.Add(chords[i]);
-            }
-
-            IReadOnlyList<InputBinding> defaults = action.Defaults;
-            for (int i = 0; i < defaults.Count; i++)
-            {
-                if (!(defaults[i] is KeyboardBinding))
+                KeyboardBinding chord = chords[i];
+                effective.Add(chord);
+                if (IsPortableDisplayName(chord.DisplayName))
                 {
-                    effective.Add(defaults[i]);
+                    effective.Add(new KeyboardDisplayNameBinding(chord.DisplayName, chord.Ctrl, chord.Shift, chord.Alt));
                 }
             }
 
             action.SetOverride(effective);
+        }
+
+        /// <summary>Whether a captured key's printed character is worth matching by: one character
+        /// that is neither a letter, a digit nor whitespace - the punctuation keyboards move
+        /// between key codes.</summary>
+        public static bool IsPortableDisplayName(string displayName)
+        {
+            if (string.IsNullOrEmpty(displayName) || displayName.Length != 1)
+            {
+                return false;
+            }
+
+            char c = displayName[0];
+            return !char.IsLetterOrDigit(c) && !char.IsWhiteSpace(c) && !char.IsControl(c);
         }
 
         private static KeybindConfig GetKeybindConfig(string actionKey)

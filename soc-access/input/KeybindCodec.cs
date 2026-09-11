@@ -39,10 +39,14 @@ namespace SongsOfConquestAccess.Input
                     continue;
                 }
 
+                // The display name last, hex-encoded: the comma key prints the field separator and
+                // the semicolon key the binding separator, and a reader of the older four-field
+                // token still reads the rest.
                 tokens.Add(chord.Key + FieldSeparator.ToString()
                     + Flag(chord.Ctrl) + FieldSeparator
                     + Flag(chord.Shift) + FieldSeparator
-                    + Flag(chord.Alt));
+                    + Flag(chord.Alt) + FieldSeparator
+                    + HexEncode(chord.DisplayName));
             }
 
             return string.Join(BindingSeparator.ToString(), tokens.ToArray());
@@ -77,7 +81,7 @@ namespace SongsOfConquestAccess.Input
             }
 
             string[] fields = token.Split(FieldSeparator);
-            if (fields.Length != 4)
+            if (fields.Length != 4 && fields.Length != 5)
             {
                 return null;
             }
@@ -99,7 +103,49 @@ namespace SongsOfConquestAccess.Input
                 return null;
             }
 
-            return new KeyboardBinding(key, ctrl, shift, alt);
+            string displayName = fields.Length == 5 ? HexDecode(fields[4]) : null;
+            return new KeyboardBinding(key, ctrl, shift, alt, displayName);
+        }
+
+        private static string HexEncode(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+
+            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(text);
+            System.Text.StringBuilder hex = new System.Text.StringBuilder(bytes.Length * 2);
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                hex.Append(bytes[i].ToString("x2"));
+            }
+
+            return hex.ToString();
+        }
+
+        // Tolerant like the rest of the reader: anything that is not hex answers empty rather than
+        // throwing the whole token away, the chord still being sound without its display name.
+        private static string HexDecode(string hex)
+        {
+            if (string.IsNullOrEmpty(hex) || hex.Length % 2 != 0)
+            {
+                return null;
+            }
+
+            byte[] bytes = new byte[hex.Length / 2];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                int value;
+                if (!int.TryParse(hex.Substring(i * 2, 2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out value))
+                {
+                    return null;
+                }
+
+                bytes[i] = (byte)value;
+            }
+
+            return System.Text.Encoding.UTF8.GetString(bytes);
         }
 
         private static bool TryParseKey(string name, out Key key)

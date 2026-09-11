@@ -89,5 +89,37 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(1, decoded.Count);
             Assert.IsTrue(decoded[0].Ctrl);
         }
+
+        [TestMethod]
+        public void RoundTripsTheDisplayNameEvenWhenItIsASeparator()
+        {
+            List<InputBinding> bindings = new List<InputBinding>
+            {
+                new KeyboardBinding(Key.Comma, displayName: ","),
+                new KeyboardBinding(Key.Semicolon, shift: true, displayName: ";"),
+                new KeyboardBinding(Key.OEM1, displayName: "\\"),
+            };
+            List<KeyboardBinding> decoded = KeybindCodec.Decode(KeybindCodec.Encode(bindings));
+
+            Assert.AreEqual(3, decoded.Count);
+            Assert.AreEqual(",", decoded[0].DisplayName);
+            Assert.AreEqual(";", decoded[1].DisplayName);
+            Assert.IsTrue(decoded[1].Shift);
+            Assert.AreEqual("\\", decoded[2].DisplayName);
+            Assert.AreEqual(Key.OEM1, decoded[2].Key);
+        }
+
+        [TestMethod]
+        public void OnlyPunctuationIsAPortableDisplayName()
+        {
+            Assert.IsTrue(ModSettings.IsPortableDisplayName("\\"));
+            Assert.IsTrue(ModSettings.IsPortableDisplayName("/"));
+            Assert.IsFalse(ModSettings.IsPortableDisplayName("a"));
+            Assert.IsFalse(ModSettings.IsPortableDisplayName("7"));
+            Assert.IsFalse(ModSettings.IsPortableDisplayName(" "));
+            Assert.IsFalse(ModSettings.IsPortableDisplayName("Enter"));
+            Assert.IsFalse(ModSettings.IsPortableDisplayName(string.Empty));
+            Assert.IsFalse(ModSettings.IsPortableDisplayName(null));
+        }
     }
 }

@@ -467,9 +467,12 @@ namespace SongsOfConquestAccess.Input
                     return false;
                 }
 
+                // The character the key printed rides along: a chord captured on a key Unity
+                // calls OEM1 but the keyboard prints as a backslash should still fire on a keyboard
+                // where that character sits on the Backslash key (see ModSettings.ApplyKeybindOverride).
                 KeyboardStateSnapshot captureState = KeyboardStateSnapshot.Capture();
                 ModKeyCapture.Complete(new KeyboardBinding(
-                    captureKey, captureState.Ctrl, captureState.Shift, captureState.Alt));
+                    captureKey, captureState.Ctrl, captureState.Shift, captureState.Alt, keyControl.displayName));
                 return true;
             }
 
