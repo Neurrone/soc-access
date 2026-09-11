@@ -42,7 +42,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 CommanderHUDPortrait portrait = CommanderSettings != null ? CommanderSettings.Portrait : null;
                 return new CommanderHudPortraitAdapter(
-                    "adventure-selected-wielder",
                     GetSelectedCommanderName,
                     portrait,
                     LocalizationHandler,

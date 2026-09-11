@@ -118,7 +118,6 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     _attackerPortraitProbed = true;
                     _attackerPortrait = BuildCommanderPortrait(
-                        "post-battle-attacker-commander",
                         () => AttackerCommanderText,
                         "AttackerCommanderHudPortrait");
                 }
@@ -135,7 +134,6 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     _defenderPortraitProbed = true;
                     _defenderPortrait = BuildCommanderPortrait(
-                        "post-battle-defender-commander",
                         () => DefenderCommanderText,
                         "DefenderCommanderHudPortrait");
                 }
@@ -392,7 +390,7 @@ namespace SongsOfConquestAccess.Adapters
             return Reflect.Get<IBattleResult>(_menu, PostBattleMenuResultField);
         }
 
-        private CommanderHudPortraitAdapter BuildCommanderPortrait(string id, Func<string> getName, string settingsFieldName)
+        private CommanderHudPortraitAdapter BuildCommanderPortrait(Func<string> getName, string settingsFieldName)
         {
             CommanderHUDPortrait portrait = GetBattleMenuSettingsField<CommanderHUDPortrait>(settingsFieldName);
             if (portrait == null)
@@ -412,7 +410,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return new CommanderHudPortraitAdapter(
-                id,
                 getName,
                 portrait,
                 button,

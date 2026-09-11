@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure.UI;
@@ -15,7 +15,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo RefreshTooltipMethod =
             AccessTools.Method(typeof(CommanderHUDPortrait), "RefreshTooltip");
 
-        private readonly string _id;
         private readonly Func<string> _getName;
         private readonly Func<bool> _isVisible;
         private readonly Func<bool> _canActivate;
@@ -24,18 +23,16 @@ namespace SongsOfConquestAccess.Adapters
         private readonly ILocalizationHandler _localization;
 
         public CommanderHudPortraitAdapter(
-            string id,
             Func<string> getName,
             CommanderHUDPortrait portrait,
             ILocalizationHandler localization,
             Func<bool> isVisible = null,
             Func<bool> canActivate = null)
-            : this(id, getName, portrait, GetButton(portrait), localization, isVisible, canActivate)
+            : this(getName, portrait, GetButton(portrait), localization, isVisible, canActivate)
         {
         }
 
         public CommanderHudPortraitAdapter(
-            string id,
             Func<string> getName,
             CommanderHUDPortrait portrait,
             UIButton button,
@@ -43,18 +40,12 @@ namespace SongsOfConquestAccess.Adapters
             Func<bool> isVisible = null,
             Func<bool> canActivate = null)
         {
-            _id = id ?? string.Empty;
             _getName = getName;
             _portrait = portrait;
             _button = button;
             _localization = localization;
             _isVisible = isVisible;
             _canActivate = canActivate;
-        }
-
-        public string Id
-        {
-            get { return _id; }
         }
 
         public string Name

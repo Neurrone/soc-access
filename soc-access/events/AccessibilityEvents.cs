@@ -1,4 +1,4 @@
-namespace SongsOfConquestAccess.Events
+﻿namespace SongsOfConquestAccess.Events
 {
     public static class AccessibilityEvents
     {
@@ -61,7 +61,6 @@ namespace SongsOfConquestAccess.Events
             public const string WielderEssenceGenerated = "combat.wielder.essence.generated";
             public const string TroopCreated = "combat.troop.created";
             public const string MapEntityCreated = "combat.map_entity.created";
-            public const string MapEntityDestroyed = "combat.map_entity.destroyed";
             public const string TroopPushed = "combat.troop.pushed";
             public const string AbilityUsed = "combat.ability.used";
             public const string Teleport = "combat.teleport";
