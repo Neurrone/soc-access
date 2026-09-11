@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Menu;
@@ -558,17 +559,17 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            string digits = string.Empty;
+            StringBuilder digits = new StringBuilder(text.Length);
             for (int i = 0; i < text.Length; i++)
             {
                 char c = text[i];
                 if (c >= '0' && c <= '9')
                 {
-                    digits += c;
+                    digits.Append(c);
                 }
             }
 
-            return digits.Length > 0 && int.TryParse(digits, out value);
+            return digits.Length > 0 && int.TryParse(digits.ToString(), out value);
         }
 
         private string GetText(FieldInfo field)

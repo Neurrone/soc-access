@@ -3837,3 +3837,19 @@ msgstr "연구 {0}"
 msgctxt "Screens.ResearchCategoryNumber"
 msgid "Research category {0}"
 msgstr "연구 분류 {0}"
+||||||| 3cea894
+
+#. Common.Parenthetical
+msgctxt "Common.Parenthetical"
+msgid "{0} ({1})"
+msgstr "{0} ({1})"
+
+#. Combat.Spell
+msgctxt "Combat.Spell"
+msgid "Spell"
+msgstr "주문"
+
+#. Common.PositiveAmount
+msgctxt "Common.PositiveAmount"
+msgid "+{0}"
+msgstr "+{0}"

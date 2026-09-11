@@ -66,6 +66,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly ITroopAbilityUtility _abilityUtility;
         private readonly BattleViewManager _battleViewManager;
         private readonly ISpellsLookup _spellsLookup;
+        // Every recovery below says so the first time it happens; see FaultLog.
+        private readonly FaultLog _faults = new FaultLog("BattleHudAdapter");
         private string _spellTargetInstructionText;
         private string _abilityTargetInstructionText;
 
@@ -79,6 +81,12 @@ namespace SongsOfConquestAccess.Adapters
         private bool _optionsButtonProbed;
         private GameLogHandleUI _gameLogHandle;
         private bool _gameLogHandleProbed;
+        private IReadOnlyList<QuickbarItem> _quickbarItems;
+        private int _quickbarItemsFrame = -1;
+        private IReadOnlyList<string> _battleLogEntries;
+        private int _battleLogCount = -1;
+        private string _battleLogFirst;
+        private string _battleLogLast;
         private PropertyInfo _queuePoolActiveItemsProperty;
         private Type _queuePoolType;
         private FieldInfo _troopViewStatusField;
@@ -129,7 +137,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 string label = TooltipLines.First(SpellbookButtonTooltip);
                 return string.IsNullOrWhiteSpace(label)
-                    ? SpokenText.Get(_localization, "Common/HUD/SpellbookButton", "Spellbook")
+                    ? SpokenText.Get(_localization, "Common/HUD/SpellbookButton", string.Empty)
                     : label;
             }
         }
@@ -167,7 +175,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 string label = TooltipLines.First(EndTurnButtonTooltip);
                 return string.IsNullOrWhiteSpace(label)
-                    ? SpokenText.Get(_localization, "Battle/Labels/EndTurn", "End turn")
+                    ? SpokenText.Get(_localization, "Battle/Labels/EndTurn", string.Empty)
                     : label;
             }
         }
@@ -216,11 +224,6 @@ namespace SongsOfConquestAccess.Adapters
         public Tooltip OptionsButtonTooltip
         {
             get { return Tooltip.ForComponent(GetOptionsButton(), _localization); }
-        }
-
-        public bool IsTargetingInstructionVisible()
-        {
-            return !string.IsNullOrWhiteSpace(TargetingInstructionText);
         }
 
         public void SetAbilityTargetInstructionText(string text)
@@ -361,7 +364,24 @@ namespace SongsOfConquestAccess.Adapters
             return IsSpellcastingContainerVisible() && GetQuickbarItems().Count > 0;
         }
 
+        /// <summary>The spell slots the game is drawing, built once a frame: the screen's build asks
+        /// whether the quickbar is worth a stop and then asks for the slots again, and the answer
+        /// cannot have changed between the two - the frame the game runs the entries in has not
+        /// moved. Keyed on the frame count, so nothing has to remember to drop it.</summary>
         public IReadOnlyList<QuickbarItem> GetQuickbarItems()
+        {
+            int frame = Time.frameCount;
+            if (_quickbarItems != null && _quickbarItemsFrame == frame)
+            {
+                return _quickbarItems;
+            }
+
+            _quickbarItemsFrame = frame;
+            _quickbarItems = BuildQuickbarItems();
+            return _quickbarItems;
+        }
+
+        private IReadOnlyList<QuickbarItem> BuildQuickbarItems()
         {
             List<QuickbarItem> items = new List<QuickbarItem>();
             Quickbar quickbar = GetQuickbar();
@@ -387,30 +407,6 @@ namespace SongsOfConquestAccess.Adapters
             return items;
         }
 
-        public int GetQuickbarSlotCount()
-        {
-            Quickbar quickbar = GetQuickbar();
-            List<QuickbarEntry> entries = quickbar != null && QuickbarEntriesField != null
-                ? QuickbarEntriesField.GetValue(quickbar) as List<QuickbarEntry>
-                : null;
-            return entries != null ? entries.Count : 0;
-        }
-
-        public QuickbarItem GetQuickbarItem(int index)
-        {
-            Quickbar quickbar = GetQuickbar();
-            List<QuickbarEntry> entries = quickbar != null && QuickbarEntriesField != null
-                ? QuickbarEntriesField.GetValue(quickbar) as List<QuickbarEntry>
-                : null;
-            if (entries == null || index < 0 || index >= entries.Count)
-            {
-                return null;
-            }
-
-            QuickbarEntry entry = entries[index];
-            return entry != null ? new QuickbarItem(this, entry, index) : null;
-        }
-
         public bool IsCurrentTroopIndicatorVisible()
         {
             return GetCurrentTroopId() >= 0;
@@ -419,11 +415,6 @@ namespace SongsOfConquestAccess.Adapters
         public int GetCurrentTroopId()
         {
             return BattleFacadeState.CurrentTroopId(_facade);
-        }
-
-        public bool IsQueueMenuVisible()
-        {
-            return GetQueueItems().Count > 0;
         }
 
         public IReadOnlyList<QueueItem> GetQueueItems()
@@ -459,22 +450,11 @@ namespace SongsOfConquestAccess.Adapters
             return items;
         }
 
-        public int GetQueueItemCount()
-        {
-            return GetQueueItems().Count;
-        }
-
-        public QueueItem GetQueueItem(int index)
-        {
-            IReadOnlyList<QueueItem> items = GetQueueItems();
-            return index >= 0 && index < items.Count ? items[index] : null;
-        }
-
-        public bool IsBattleLogMenuVisible()
-        {
-            return GetBattleLogEntries().Count > 0;
-        }
-
+        /// <summary>The battle log's lines, cleaned of the tags the game draws them with. Stripping
+        /// them is the cost here and the build asks every frame, so the cleaned list is kept while
+        /// the game's own log still reads the same. The log is a 32-deep stack that drops its oldest
+        /// entry when it is full, so the count alone would stop noticing once it filled: the ends of
+        /// the window are part of the key, and a push moves one of them.</summary>
         public IReadOnlyList<string> GetBattleLogEntries()
         {
             if (_gameLog == null)
@@ -490,6 +470,16 @@ namespace SongsOfConquestAccess.Adapters
                     return new string[0];
                 }
 
+                string first = entries.Count > 0 ? entries[0] : null;
+                string last = entries.Count > 0 ? entries[entries.Count - 1] : null;
+                if (_battleLogEntries != null
+                    && _battleLogCount == entries.Count
+                    && string.Equals(_battleLogFirst, first, StringComparison.Ordinal)
+                    && string.Equals(_battleLogLast, last, StringComparison.Ordinal))
+                {
+                    return _battleLogEntries;
+                }
+
                 List<string> result = new List<string>();
                 for (int i = 0; i < entries.Count; i++)
                 {
@@ -500,23 +490,17 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
 
+                _battleLogCount = entries.Count;
+                _battleLogFirst = first;
+                _battleLogLast = last;
+                _battleLogEntries = result;
                 return result;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetBattleLogEntries", exception);
                 return new string[0];
             }
-        }
-
-        public int GetBattleLogEntryCount()
-        {
-            return GetBattleLogEntries().Count;
-        }
-
-        public string GetBattleLogEntry(int index)
-        {
-            IReadOnlyList<string> entries = GetBattleLogEntries();
-            return index >= 0 && index < entries.Count ? entries[index] : string.Empty;
         }
 
         public void FocusBattleLog()
@@ -698,8 +682,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.Troops != null ? _facade.Troops.Current : null;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetCurrentTroop", exception);
                 return null;
             }
         }
@@ -820,8 +805,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.Queue != null ? _facade.Queue.TurnsLeftInRound : 0;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetTurnsLeftInRound", exception);
                 return 0;
             }
         }
@@ -899,8 +885,9 @@ namespace SongsOfConquestAccess.Adapters
                 bool isEnemy = localTeamId >= 0 && troop.TeamId != localTeamId;
                 return new TroopInfo(name, size, troop.Stats != null, isEnemy, troop.Position);
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetTroopInfo", exception);
                 return TroopInfo.Unknown();
             }
         }
@@ -934,73 +921,40 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private Tooltip GetQuickbarTooltip(QuickbarEntry entry)
+        /// <summary>Everything a spell's tooltip says, read from the game WHEN THE TOOLTIP IS READ
+        /// and never when the build asks whether there is one: the game recomposes the tier details
+        /// on the way through. <see cref="UI.SpellTooltipText"/> turns it into lines.</summary>
+        private SpellTooltipFacts ReadSpellTooltipFacts(ISpellDefinition spell)
         {
-            if (entry == null || entry.Spell == null)
-            {
-                return null;
-            }
-
-            ISpellDefinition capturedSpell = entry.Spell;
-            return new Tooltip(() => BuildSpellTooltipLines(capturedSpell), null);
-        }
-
-        private IReadOnlyList<string> BuildSpellTooltipLines(ISpellDefinition spell)
-        {
-            List<string> lines = new List<string>();
+            SpellTooltipFacts facts = new SpellTooltipFacts();
             if (spell == null)
             {
-                return lines;
+                return facts;
             }
 
             ICommanderState commander = _facade != null ? _facade.Commanders.Current : null;
-            string name = SpokenText.Get(_localization, spell.NameKey, "Spell");
+            facts.Name = SpokenText.Get(_localization, spell.NameKey, string.Empty);
             int tier = GetCurrentSpellTier(spell, commander);
-            lines.Add(tier > 0 ? name + ", " + GetTierLabel(tier) : name);
-
-            string lore = SpokenText.Get(_localization, spell.DescriptionKey, string.Empty);
-            if (!string.IsNullOrWhiteSpace(lore))
-            {
-                lines.Add(lore);
-            }
+            facts.TierLabel = tier > 0 ? GetTierLabel(tier) : string.Empty;
+            facts.Lore = SpokenText.Get(_localization, spell.DescriptionKey, string.Empty);
 
             if (_spellsLookup != null && commander != null && _localization != null)
             {
                 SpellDetails details = _spellsLookup.GetDetails((SpellTypes)spell.Id, commander);
                 if (details != null)
                 {
-                    string description = details.GetLocalizedTierDescription(details.CurrentTier, _localization);
-                    if (!string.IsNullOrWhiteSpace(description))
-                    {
-                        string header = _localization.GetText("Spells/Spellbook/SpellDescriptionHeader")
-                            + " ("
-                            + _localization.GetText("Spells/Spellbook/SpellTierHeader", details.CurrentTier)
-                            + ")";
-                        lines.Add(header);
-                        lines.Add(description);
-                    }
-
-                    string duration = details.GetLocalizedTierDurationDescription(details.CurrentTier, _localization);
-                    if (!string.IsNullOrWhiteSpace(duration))
-                    {
-                        lines.Add(SpokenText.Get(_localization, "Spells/Spellbook/SpellDurationHeader", "Duration") + ": " + duration);
-                    }
+                    facts.TierDescription = details.GetLocalizedTierDescription(details.CurrentTier, _localization);
+                    facts.DescriptionHeader = _localization.GetText("Spells/Spellbook/SpellDescriptionHeader");
+                    facts.DescriptionTierLabel = _localization.GetText("Spells/Spellbook/SpellTierHeader", details.CurrentTier);
+                    facts.Duration = details.GetLocalizedTierDurationDescription(details.CurrentTier, _localization);
+                    facts.DurationHeader = SpokenText.Get(_localization, "Spells/Spellbook/SpellDurationHeader", string.Empty);
                 }
             }
 
-            string cost = FormatSpellCost(spell);
-            if (!string.IsNullOrWhiteSpace(cost))
-            {
-                lines.Add(SpokenText.Get(_localization, "Spells/Spellbook/SpellCostHeader", "Cost") + ": " + cost);
-            }
-
-            string castText = BuildSpellCastText(spell, commander, tier);
-            if (!string.IsNullOrWhiteSpace(castText))
-            {
-                lines.Add(castText);
-            }
-
-            return lines;
+            facts.Cost = ReadSpellCost(spell);
+            facts.CostHeader = SpokenText.Get(_localization, "Spells/Spellbook/SpellCostHeader", string.Empty);
+            facts.CastText = BuildSpellCastText(spell, commander, tier);
+            return facts;
         }
 
         private string BuildSpellCastText(ISpellDefinition spell, ICommanderState commander, int tier)
@@ -1043,37 +997,35 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return Math.Max(1, spell.GetHighestAvailableTier(commander).Tier);
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetCurrentSpellTier", exception);
                 return 1;
             }
         }
 
-        private string FormatSpellCost(ISpellDefinition spell)
+        private List<EssenceCost> ReadSpellCost(ISpellDefinition spell)
         {
-            if (spell == null || spell.Cost == null || spell.Cost.Count == 0)
+            List<EssenceCost> costs = new List<EssenceCost>();
+            if (spell == null || spell.Cost == null)
             {
-                return string.Empty;
+                return costs;
             }
 
-            List<string> parts = new List<string>();
             for (int i = 0; i < spell.Cost.Count; i++)
             {
                 SpellCostEntry cost = spell.Cost[i];
-                parts.Add(cost.Amount + " " + GetEssenceName(cost.Type));
+                costs.Add(new EssenceCost(cost.Amount, EssenceText.Name(_localization, cost.Type)));
             }
 
-            return string.Join(", ", parts.ToArray());
+            return costs;
         }
 
+        /// <summary>The game's own words for a spell tier, as the spellbook's header says them.
+        /// </summary>
         public string GetTierLabel(int tier)
         {
-            return SpokenText.Get(_localization, "Spells/Spellbook/SpellTierHeader", "tier " + tier, tier);
-        }
-
-        private string GetEssenceName(EssenceType type)
-        {
-            return EssenceText.Name(_localization, type);
+            return SpokenText.Get(_localization, "Spells/Spellbook/SpellTierHeader", string.Empty, tier);
         }
 
         private UIButton GetQueueEntryButton(IQueueHUDEntry entry)
@@ -1142,7 +1094,7 @@ namespace SongsOfConquestAccess.Adapters
                         return string.Empty;
                     }
 
-                    return SpokenText.Get(_adapter._localization, spell.NameKey, "Spell");
+                    return SpokenText.Get(_adapter._localization, spell.NameKey, string.Empty);
                 }
             }
 
@@ -1161,8 +1113,9 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         tier = Math.Max(1, spell.GetHighestAvailableTier(_adapter._facade.Commanders.Current).Tier);
                     }
-                    catch
+                    catch (Exception exception)
                     {
+                        _adapter._faults.Report("SpellTier", exception);
                         tier = 1;
                     }
 
@@ -1195,10 +1148,43 @@ namespace SongsOfConquestAccess.Adapters
                 return NativeSelectionUtility.Click(_adapter.GetQuickbarEntryButton(_entry));
             }
 
-            public Tooltip Tooltip
+            /// <summary>What the spell's tooltip says, read at the moment it is read.</summary>
+            public SpellTooltipFacts ReadTooltipFacts()
             {
-                get { return _adapter.GetQuickbarTooltip(_entry); }
+                return _adapter.ReadSpellTooltipFacts(_entry != null ? _entry.Spell : null);
             }
+        }
+
+        /// <summary>A spell's tooltip as the game answers it: every piece is the game's own text, and
+        /// none of it is joined up here.</summary>
+        public sealed class SpellTooltipFacts
+        {
+            public string Name = string.Empty;
+            public string TierLabel = string.Empty;
+            public string Lore = string.Empty;
+            public string DescriptionHeader = string.Empty;
+            public string DescriptionTierLabel = string.Empty;
+            public string TierDescription = string.Empty;
+            public string DurationHeader = string.Empty;
+            public string Duration = string.Empty;
+            public string CostHeader = string.Empty;
+            public string CastText = string.Empty;
+            public List<EssenceCost> Cost = new List<EssenceCost>();
+        }
+
+        /// <summary>One essence a spell costs: how much, and the game's word for the essence.
+        /// </summary>
+        public struct EssenceCost
+        {
+            public EssenceCost(int amount, string essenceName)
+            {
+                Amount = amount;
+                EssenceName = essenceName ?? string.Empty;
+            }
+
+            public int Amount { get; private set; }
+
+            public string EssenceName { get; private set; }
         }
 
         public sealed class QueueItem

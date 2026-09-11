@@ -28,7 +28,6 @@ using SongsOfConquest.Server.Battle;
 using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 using SongsOfConquest.Utilities;
 using SongsOfConquestAccess.UI;
@@ -52,14 +51,92 @@ namespace SongsOfConquestAccess.Adapters
         Enemy
     }
 
-    public sealed class CombatAdapter : IPresent, IDisposable
+    /// <summary>A stack on the battlefield as the facts a spoken row is made of: what the game calls
+    /// it, how many are in it, the health it has left of its maximum, and whether it is an enemy or
+    /// the one acting. <see cref="UI.CombatTroopText"/> does the wording.</summary>
+    public struct CombatTroopFacts
     {
-        // The extra sentence the game passes to AddAdditionalText and keeps nowhere readable, held
-        // per preview because the hook is the only place it exists. Static, so it is dropped in
-        // Reset from SocAccessMod.Stop: a preview the game destroyed would otherwise be held here
-        // for the life of the process, across every hot reload.
-        private static readonly Dictionary<BattleAttackPreview, string> AttackPreviewAdditionalTexts =
-            new Dictionary<BattleAttackPreview, string>();
+        public CombatTroopFacts(string name, int size, int currentHealth, int maxHealth, bool isEnemy, bool isActing)
+        {
+            Name = name ?? string.Empty;
+            Size = size;
+            CurrentHealth = currentHealth;
+            MaxHealth = maxHealth;
+            IsEnemy = isEnemy;
+            IsActing = isActing;
+        }
+
+        /// <summary>The game's own name for the stack at this size, cleaned, and empty where the
+        /// game gives none: the general word a blank name falls back to is wording and belongs to
+        /// whoever composes the row.</summary>
+        public string Name { get; private set; }
+
+        public int Size { get; private set; }
+
+        public int CurrentHealth { get; private set; }
+
+        public int MaxHealth { get; private set; }
+
+        public bool IsEnemy { get; private set; }
+
+        public bool IsActing { get; private set; }
+    }
+
+    /// <summary>A thing on the battlefield that can be attacked, as the facts a spoken row is made
+    /// of: the game's name for it and the health it has, where it has any.</summary>
+    public struct CombatEntityFacts
+    {
+        public CombatEntityFacts(string name, bool hasHealth, int healthLeft, int maxHealth)
+        {
+            Name = name ?? string.Empty;
+            HasHealth = hasHealth;
+            HealthLeft = healthLeft;
+            MaxHealth = maxHealth;
+        }
+
+        public string Name { get; private set; }
+
+        public bool HasHealth { get; private set; }
+
+        public int HealthLeft { get; private set; }
+
+        public int MaxHealth { get; private set; }
+    }
+
+    /// <summary>What confirming a spell target DID, as facts rather than words: whether the native
+    /// click ran at all, how many times the tile was a selected target before and after it, and
+    /// whether the game is still aiming. <see cref="Screens.CombatScreen"/> words it.</summary>
+    public struct CombatSpellTargetSelection
+    {
+        private CombatSpellTargetSelection(bool clicked, int previousCount, int count, bool stillTargeting)
+        {
+            Clicked = clicked;
+            PreviousCount = previousCount;
+            Count = count;
+            StillTargeting = stillTargeting;
+        }
+
+        public bool Clicked { get; private set; }
+
+        public int PreviousCount { get; private set; }
+
+        public int Count { get; private set; }
+
+        public bool StillTargeting { get; private set; }
+
+        public static CombatSpellTargetSelection None
+        {
+            get { return new CombatSpellTargetSelection(false, 0, 0, false); }
+        }
+
+        public static CombatSpellTargetSelection Confirmed(int previousCount, int count, bool stillTargeting)
+        {
+            return new CombatSpellTargetSelection(true, previousCount, count, stillTargeting);
+        }
+    }
+
+    public sealed partial class CombatAdapter : IPresent, IDisposable
+    {
         private readonly object _sourceKey;
         private readonly DiContainer _container;
         private readonly IClientBattleFacade _facade;
@@ -73,6 +150,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IInputManager _inputManager;
         private readonly ILocalizationHandler _localization;
         private readonly HashSet<string> _unknownCombatInstructions = new HashSet<string>(StringComparer.Ordinal);
+        // Every recovery below says so the first time it happens; see FaultLog.
+        private readonly FaultLog _faults = new FaultLog("CombatAdapter");
         private Dictionary<string, TileInstruction> _combatInstructionKinds;
         private bool _combatInstructionKindsProbed;
         private readonly ICameraLookup _cameraLookup;
@@ -99,6 +178,10 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FieldInfo _attackPreviewAdditionalTextField;
         private readonly FocusedTileOverlay _cursorOverlay = new FocusedTileOverlay("SongsOfConquestAccess_CombatCursor");
         private Action<ISpellDefinition, string> _targetInstructionHandler;
+        // The screen's: it is handed the spell name and the instruction and does the wording.
+        private Action<string, string> _spellTargetInstructionHandler;
+        // The screen's: the narration asks for the cursor when a new turn begins.
+        private Action<int> _actingTroopFocusHandler;
         private Action _spellTargetingEndHandler;
         private Action<ISpellDefinition> _beginCastHandler;
         // The delegate this adapter handed the battle HUD's signals, held here rather than on the
@@ -108,6 +191,12 @@ namespace SongsOfConquestAccess.Adapters
         private Action<bool> _endAbilityTargetingHandler;
         private bool _hasBeenPresent;
         private bool _combatEnded;
+        // This frame's answer to "which enemies reach that tile", for the one tile it was asked
+        // about. See BuildEnemyInfluenceSources.
+        private List<CombatInfluenceSource> _influenceSources;
+        private int _influenceFrame = -1;
+        private Vector2Int _influencePoint;
+        private int _influenceOccupantId = -1;
 
         public CombatAdapter(BattleSceneInstaller installer)
             : this(
@@ -235,44 +324,13 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return container.Resolve(type);
             }
-            catch
+            catch (Exception exception)
             {
+                // Constructor-time and once per battle, so it says so every time.
+                SocAccessMod.Instance?.LogWarning(
+                    "CombatAdapter could not resolve " + typeName + ": " + exception.Message);
                 return null;
             }
-        }
-
-        [HookWritable]
-        public static void CaptureAttackPreviewAdditionalText(BattleAttackPreview preview, string text)
-        {
-            if (preview == null)
-            {
-                return;
-            }
-
-            text = SpokenLines.Clean(text);
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                AttackPreviewAdditionalTexts.Remove(preview);
-                return;
-            }
-
-            AttackPreviewAdditionalTexts[preview] = text;
-        }
-
-        [HookWritable]
-        public static void ClearAttackPreviewAdditionalText(BattleAttackPreview preview)
-        {
-            if (preview != null)
-            {
-                AttackPreviewAdditionalTexts.Remove(preview);
-            }
-        }
-
-        /// <summary>The teardown <c>SocAccessMod.Stop</c> calls: let go of every attack preview the
-        /// captures are keyed on, so the next load starts holding nothing.</summary>
-        public static void Reset()
-        {
-            AttackPreviewAdditionalTexts.Clear();
         }
 
         public bool IsPresent()
@@ -329,8 +387,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.Teams != null && _facade.Teams.IsCurrentLocal;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("IsLocalTurn", exception);
                 return false;
             }
         }
@@ -363,12 +422,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return "ready";
-        }
-
-        public CombatSnapshot BuildSnapshot()
-        {
-            Vector2Int size = _facade != null && _facade.Level != null ? _facade.Level.Size : Vector2Int.zero;
-            return new CombatSnapshot(size, this);
         }
 
         public Vector2Int GetInitialTile()
@@ -476,219 +529,6 @@ namespace SongsOfConquestAccess.Adapters
             healthLost = troop != null ? troop.HealthLost : 0;
         }
 
-        public ScannerSnapshot BuildScannerSnapshot(Vector2Int origin)
-        {
-            ScannerSnapshot snapshot = new ScannerSnapshot(BattleScannerTaxonomy.Instance);
-            if (_facade == null || _facade.Level == null)
-            {
-                return snapshot;
-            }
-
-            ScannerContribution.Run(ScannerCategoryKeys.Troops, () => AddCombatTroopScannerResults(snapshot));
-            ScannerContribution.Run(ScannerCategoryKeys.Entities, () => AddCombatEntityScannerResults(snapshot));
-            ScannerContribution.Run(ScannerCategoryKeys.Terrain, () => AddCombatTerrainScannerResults(snapshot));
-            return snapshot;
-        }
-
-        private void AddCombatTroopScannerResults(ScannerSnapshot snapshot)
-        {
-            AddCombatTroopScannerResults(snapshot, friendly: true);
-            AddCombatTroopScannerResults(snapshot, friendly: false);
-        }
-
-        private void AddCombatTroopScannerResults(ScannerSnapshot snapshot, bool friendly)
-        {
-            for (int y = 0; y < _facade.Level.Size.y; y++)
-            {
-                for (int x = 0; x < _facade.Level.Size.x; x++)
-                {
-                    Vector2Int point = new Vector2Int(x, y);
-                    CombatTile tile = GetTile(point);
-                    if (tile == null)
-                    {
-                        continue;
-                    }
-
-                    if (tile.Troop != null && IsFriendlyTroop(tile.Troop) == friendly)
-                    {
-                        ScannerResult result = new ScannerResult(
-                            ScannerTileKeys.For(friendly ? "troop:friendly" : "troop:enemy", point),
-                            FormatTroopGridLabel(tile.Troop),
-                            point)
-                        {
-                            // Keyed by troop type, not by the label: the label
-                            // carries stack size and health, so grouping on it
-                            // would give every stack an item of its own and
-                            // split one apart the moment it took damage.
-                            ItemKey = ScannerTroopItemKey(tile.Troop),
-                            Relationship = friendly
-                                ? ScannerResultRelationship.Friendly
-                                : ScannerResultRelationship.Enemy,
-                            Attackable = tile.IsTroopAttackable
-                        };
-                        snapshot.Add(ScannerCategoryKeys.Troops, ScannerSubcategoryKeys.All, result.Clone());
-                        snapshot.Add(ScannerCategoryKeys.Troops, friendly ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy, result);
-                    }
-                }
-            }
-        }
-
-        private void AddCombatEntityScannerResults(ScannerSnapshot snapshot)
-        {
-            for (int y = 0; y < _facade.Level.Size.y; y++)
-            {
-                for (int x = 0; x < _facade.Level.Size.x; x++)
-                {
-                    Vector2Int point = new Vector2Int(x, y);
-                    CombatTile tile = GetTile(point);
-                    if (tile == null)
-                    {
-                        continue;
-                    }
-
-                    IMapEntity mapEntity = _facade.MapEntities != null ? _facade.MapEntities.GetAtIncludingNonBlockers(point) : null;
-                    if (mapEntity != null && mapEntity.IsEnabled && mapEntity.IsVisibleInGame)
-                    {
-                        if (mapEntity.Category == MapEntityCategory.TownWallGate)
-                        {
-                            bool friendlyGate = IsFriendlyMapEntity(mapEntity);
-                            ScannerResult result = new ScannerResult(
-                                ScannerTileKeys.For(friendlyGate ? "gate:friendly" : "gate:enemy", point),
-                                GetMapEntityName(mapEntity),
-                                point)
-                            {
-                                Relationship = friendlyGate
-                                    ? ScannerResultRelationship.Friendly
-                                    : ScannerResultRelationship.Enemy,
-                                Attackable = tile.IsEntityAttackable
-                            };
-                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, result.Clone());
-                            snapshot.Add(ScannerCategoryKeys.Entities, friendlyGate ? ScannerSubcategoryKeys.FriendlyGates : ScannerSubcategoryKeys.EnemyGates, result);
-                        }
-                        else if (tile.Entity != null)
-                        {
-                            ScannerResult result = new ScannerResult(
-                                ScannerTileKeys.For("entity:attackable", point),
-                                GetMapEntityName(tile.Entity),
-                                point)
-                            {
-                                // The subcategory says these can be attacked in
-                                // principle. This says the acting troop can
-                                // reach one now, which is a different question
-                                // and the one worth answering per result.
-                                Attackable = tile.IsEntityAttackable
-                            };
-                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, result.Clone());
-                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.Attackable, result);
-                        }
-                        else if (tile.MapEffects.Count > 0)
-                        {
-                            ScannerResult result = new ScannerResult(
-                                ScannerTileKeys.For("entity:dangerous", point),
-                                GetMapEntityName(mapEntity),
-                                point);
-                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, result.Clone());
-                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.Dangerous, result);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void AddCombatTerrainScannerResults(ScannerSnapshot snapshot)
-        {
-            for (int elevation = 1; elevation <= 3; elevation++)
-            {
-                for (int y = 0; y < _facade.Level.Size.y; y++)
-                {
-                    for (int x = 0; x < _facade.Level.Size.x; x++)
-                    {
-                        Vector2Int point = new Vector2Int(x, y);
-                        CombatTile tile = GetTile(point);
-                        if (tile == null)
-                        {
-                            continue;
-                        }
-
-                        if (tile.Elevation == elevation)
-                        {
-                            ScannerResult result = new ScannerResult(
-                                ScannerTileKeys.For("terrain:elevated:" + elevation, point),
-                                ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
-                                point)
-                            {
-                                Kind = ScannerResultKind.TerrainPoint,
-                                ItemKey = ScannerItemKeys.ElevatedGround + elevation
-                            };
-                            snapshot.Add(ScannerCategoryKeys.Terrain, ScannerSubcategoryKeys.All, result);
-                        }
-                    }
-                }
-            }
-
-            for (int y = 0; y < _facade.Level.Size.y; y++)
-            {
-                for (int x = 0; x < _facade.Level.Size.x; x++)
-                {
-                    Vector2Int point = new Vector2Int(x, y);
-                    CombatTile tile = GetTile(point);
-                    if (tile == null)
-                    {
-                        continue;
-                    }
-
-                    if (tile.IsImpassable)
-                    {
-                        ScannerResult result = new ScannerResult(
-                            ScannerTileKeys.For("terrain:impassable", point),
-                            ModText.Get(ModStrings.Scanner.ImpassableTerrain),
-                            point)
-                        {
-                            Kind = ScannerResultKind.TerrainPoint,
-                            ItemKey = ScannerItemKeys.ImpassableTerrain
-                        };
-                        snapshot.Add(ScannerCategoryKeys.Terrain, ScannerSubcategoryKeys.All, result);
-                    }
-
-                    if (tile.IsBlocked)
-                    {
-                        snapshot.Add(
-                            ScannerCategoryKeys.Terrain,
-                            ScannerSubcategoryKeys.All,
-                            new ScannerResult(
-                                ScannerTileKeys.For("obstacle:blocked", point),
-                                ModText.Get(ModStrings.Scanner.Blocked),
-                                point)
-                            {
-                                ItemKey = ScannerItemKeys.Blocked
-                            });
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Identifies the kind of troop rather than the stack, so every stack
-        /// of the same unit collapses into one stop in the item cycle.
-        /// </summary>
-        private static string ScannerTroopItemKey(ICommonTroopState troop)
-        {
-            if (troop == null)
-            {
-                return null;
-            }
-
-            TroopReference reference = troop.Reference;
-            return "troop:" + reference.FactionIndex + ":" + reference.UnitIndex + ":" + reference.UpgradeType;
-        }
-
-        public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)
-        {
-            return result != null && IsValidTile(result.Position)
-                ? ScannerResultRefresh.Valid(result.Position)
-                : ScannerResultRefresh.Invalid;
-        }
-
         public bool IsValidTile(Vector2Int point)
         {
             return _facade != null
@@ -717,38 +557,35 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             PathNode[] path = GetPathTo(point);
-            _cursorManager?.SetCurrentTile(point);
-            _gridManager?.SetCurrentTile(point, path);
-            _pathManager?.SetCurrentTile(point, path);
-            _highlightManager?.SetCurrentTile(point);
+            SetNativeCursorTile(point, path);
             if (GetTargetingMode() != CombatTargetingMode.None || IsAnySpellCastingStateActive())
             {
                 return;
             }
 
-            _cursorManager?.SetState(BattleCursorManager.State.CurrentTroop);
-            _gridManager?.SetState(BattleGridManager.State.CurrentTroop);
-            _pathManager?.SetState(BattlePathManager.State.CurrentTroop);
-            _highlightManager?.SetState(BattleHighlightManager.State.CurrentTroop);
+            SetNativeCurrentTroopState();
             _attackPreviewHandler?.Hide();
+            // The tile and the path travel down with the point: nothing between here and the hover
+            // sync changes what either of them answers, and reading them again cost a second
+            // whole-board path search per cursor step.
             CombatTile tile = GetTile(point);
-            if (tile != null && tile.Troop != null)
+            if (tile != null && (tile.Troop != null || tile.Entity != null))
             {
-                SynchronizeNativeHoverForPreview(point);
-            }
-            else if (tile != null && tile.Entity != null)
-            {
-                SynchronizeNativeHoverForPreview(point);
+                SynchronizeNativeHoverForPreview(point, tile, path);
             }
         }
 
-        public void AttachSpellTargetingNarration()
+        /// <summary>Listen for the game asking for a spell target. The two facts it asks with - the
+        /// spell's name and the instruction - are handed to the screen, which words and speaks
+        /// them.</summary>
+        public void AttachSpellTargetingNarration(Action<string, string> handler)
         {
-            if (_battleHudSignals == null || _targetInstructionHandler != null)
+            if (_battleHudSignals == null || handler == null || _targetInstructionHandler != null)
             {
                 return;
             }
 
+            _spellTargetInstructionHandler = handler;
             _targetInstructionHandler = HandleTargetInstruction;
             _spellTargetingEndHandler = HandleSpellTargetingEnd;
             _battleHudSignals.OnRequestTargetInstruction =
@@ -781,6 +618,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             _targetInstructionHandler = null;
             _spellTargetingEndHandler = null;
+            _spellTargetInstructionHandler = null;
         }
 
         public void AttachSpellCastBegin(Action handler)
@@ -805,6 +643,19 @@ namespace SongsOfConquestAccess.Adapters
             _battleHudSignals.OnBeginCast =
                 (Action<ISpellDefinition>)Delegate.Remove(_battleHudSignals.OnBeginCast, _beginCastHandler);
             _beginCastHandler = null;
+        }
+
+        /// <summary>The screen's answer to "a new turn has begun, put the cursor on the troop". The
+        /// narration asks THIS BATTLE'S adapter rather than reaching for whatever screen happens to
+        /// be on top, and the screen decides whether the cursor is its to move.</summary>
+        public void AttachActingTroopFocus(Action<int> handler)
+        {
+            _actingTroopFocusHandler = handler;
+        }
+
+        public void RequestActingTroopFocus(int troopId)
+        {
+            _actingTroopFocusHandler?.Invoke(troopId);
         }
 
         public void AttachAbilityTargetingBegin(Action<TroopAbilityTargeting> handler)
@@ -857,34 +708,20 @@ namespace SongsOfConquestAccess.Adapters
             _endAbilityTargetingHandler = null;
         }
 
-        public void AnnounceVisibleSpellTargetInstruction()
-        {
-            if (GetTargetingMode() != CombatTargetingMode.Spell)
-            {
-                return;
-            }
-
-            string text = Hud != null ? Hud.TargetingInstructionText : string.Empty;
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
-            }
-        }
-
-        public string BuildAbilityTargetInstruction(TroopAbilityTargeting targeting)
+        /// <summary>The acting troop's ability, as the game names it.</summary>
+        public string GetCurrentAbilityName()
         {
             IBattleTroopState current = GetCurrentTroop();
             ITroopAbilityDefinition ability = current != null && _abilityUtility != null
                 ? _abilityUtility.GetAbilityDefinition(current)
                 : null;
-            string abilityName = ability != null ? SpokenLines.Clean(GameText.Get(_localization, ability.NameKey, string.Empty)) : string.Empty;
-            string instruction = SpokenLines.Clean(GameText.Get(_localization, "Battle/AbilityTargeting/" + targeting, string.Empty));
-            if (!string.IsNullOrWhiteSpace(abilityName) && !string.IsNullOrWhiteSpace(instruction))
-            {
-                return abilityName + ": " + instruction;
-            }
+            return ability != null ? SpokenLines.Clean(GameText.Get(_localization, ability.NameKey, string.Empty)) : string.Empty;
+        }
 
-            return !string.IsNullOrWhiteSpace(abilityName) ? abilityName : instruction;
+        /// <summary>The game's own instruction for what an ability wants aimed at.</summary>
+        public string GetAbilityTargetInstruction(TroopAbilityTargeting targeting)
+        {
+            return SpokenLines.Clean(GameText.Get(_localization, "Battle/AbilityTargeting/" + targeting, string.Empty));
         }
 
         public CombatTargetingMode GetTargetingMode()
@@ -965,11 +802,11 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public bool ConfirmSpellTarget(Vector2Int point)
+        public CombatSpellTargetSelection ConfirmSpellTarget(Vector2Int point)
         {
             if (GetTargetingMode() != CombatTargetingMode.Spell || !IsValidTile(point))
             {
-                return false;
+                return CombatSpellTargetSelection.None;
             }
 
             int previousSelectionCount = CountSpellTargetSelections(point);
@@ -977,7 +814,7 @@ namespace SongsOfConquestAccess.Adapters
             if (_spellPrimaryClickMethod == null || _mouseKeyboardSpellInputModule == null)
             {
                 SocAccessMod.Instance?.LogWarning("CombatAdapter cannot confirm spell target because native HandlePrimaryClick was not found");
-                return false;
+                return CombatSpellTargetSelection.None;
             }
 
             try
@@ -987,28 +824,13 @@ namespace SongsOfConquestAccess.Adapters
             catch (Exception exception)
             {
                 SocAccessMod.Instance?.LogWarning("CombatAdapter failed to invoke native spell primary click: " + exception.Message);
-                return false;
+                return CombatSpellTargetSelection.None;
             }
 
-            int selectionCount = CountSpellTargetSelections(point);
-            if (selectionCount > previousSelectionCount)
-            {
-                SpeechPipeline.Output(new SpeechRequest(
-                    selectionCount > 1
-                        ? ModText.Get(ModStrings.UI.SelectedCount, selectionCount)
-                        : ModText.Get(ModStrings.UI.Selected),
-                    interrupt: false));
-            }
-            else if (selectionCount < previousSelectionCount && GetTargetingMode() == CombatTargetingMode.Spell)
-            {
-                SpeechPipeline.Output(new SpeechRequest(
-                    selectionCount > 0
-                        ? ModText.Get(ModStrings.UI.SelectedCount, selectionCount)
-                        : ModText.Get(ModStrings.UI.Unselected),
-                    interrupt: false));
-            }
-
-            return true;
+            return CombatSpellTargetSelection.Confirmed(
+                previousSelectionCount,
+                CountSpellTargetSelections(point),
+                GetTargetingMode() == CombatTargetingMode.Spell);
         }
 
         public bool ConfirmAbilityTarget(Vector2Int point)
@@ -1063,8 +885,11 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        public CombatInspectContext BeginInspect(Vector2Int point)
+        /// <summary>Pin the inspection on a tile, or answer null with the reason the caller words:
+        /// an empty tile the acting troop cannot walk to has no path to inspect.</summary>
+        public CombatInspectContext BeginInspect(Vector2Int point, out bool notInMovementRange)
         {
+            notInMovementRange = false;
             CombatTile tile = GetTile(point);
             if (tile == null)
             {
@@ -1079,6 +904,12 @@ namespace SongsOfConquestAccess.Adapters
             if (tile.Entity != null)
             {
                 return BeginEntityInspect(tile.Entity);
+            }
+
+            if (!IsReachable(point))
+            {
+                notInMovementRange = true;
+                return null;
             }
 
             return BeginPathInspect(point);
@@ -1199,153 +1030,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsEntityInspectMode(CombatInspectMode mode)
         {
             return mode == CombatInspectMode.EntityPath || mode == CombatInspectMode.EntityOnly;
-        }
-
-        private List<string> CaptureAttackPreviewLines(bool targetIsEntity)
-        {
-            List<string> lines = new List<string>();
-            List<BattleAttackPreview> previews = GetActiveAttackPreviews();
-            for (int i = 0; i < previews.Count; i++)
-            {
-                BattleAttackPreview preview = previews[i];
-                string damage = GetPreviewText(preview, _attackPreviewDamageTextField);
-                string kills = GetPreviewText(preview, _attackPreviewKillsTextField);
-                string additional = GetCapturedAdditionalText(preview);
-                if (string.IsNullOrWhiteSpace(additional))
-                {
-                    additional = GetPreviewText(preview, _attackPreviewAdditionalTextField);
-                }
-                bool hasDamage = IsPreviewContainerVisible(preview, _attackPreviewDamageContainerField)
-                    && !string.IsNullOrWhiteSpace(damage);
-                bool hasKills = IsPreviewContainerVisible(preview, _attackPreviewKillsContainerField)
-                    && !string.IsNullOrWhiteSpace(kills);
-
-                List<string> parts = new List<string>();
-                string prefix = previews.Count > 1
-                    ? (i == 0 ? ModText.Get(ModStrings.Spatial.PrimaryPrefix) : ModText.Get(ModStrings.Spatial.ExtraTargetPrefix))
-                    : string.Empty;
-                if (hasDamage)
-                {
-                    parts.Add(ModText.Get(ModStrings.Spatial.DamagePreview, prefix, damage));
-                }
-
-                if (hasKills)
-                {
-                    parts.Add(targetIsEntity ? FormatEntityDestruction(kills) : ModText.Get(ModStrings.Spatial.Kills, kills));
-                }
-
-                if (parts.Count > 0)
-                {
-                    lines.Add(string.Join(", ", parts.ToArray()) + ".");
-                }
-
-                if (!string.IsNullOrWhiteSpace(additional))
-                {
-                    lines.Add(additional + ".");
-                }
-            }
-
-            return lines;
-        }
-
-        private List<BattleAttackPreview> GetActiveAttackPreviews()
-        {
-            List<BattleAttackPreview> previews = new List<BattleAttackPreview>();
-            if (_attackPreviewHandler == null || _attackPreviewPoolField == null)
-            {
-                return previews;
-            }
-
-            try
-            {
-                object pool = _attackPreviewPoolField.GetValue(_attackPreviewHandler);
-                if (pool == null)
-                {
-                    return previews;
-                }
-
-                MethodInfo getActive = AccessTools.Method(pool.GetType(), "GetActive");
-                IEnumerable active = getActive != null ? getActive.Invoke(pool, null) as IEnumerable : null;
-                if (active == null)
-                {
-                    return previews;
-                }
-
-                foreach (object item in active)
-                {
-                    BattleAttackPreview preview = item as BattleAttackPreview;
-                    if (preview != null)
-                    {
-                        previews.Add(preview);
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                SocAccessMod.Instance?.LogWarning("CombatAdapter failed to capture attack preview text: " + exception.Message);
-            }
-
-            return previews;
-        }
-
-        private bool IsPreviewContainerVisible(BattleAttackPreview preview, FieldInfo field)
-        {
-            GameObject container = preview != null && field != null ? field.GetValue(preview) as GameObject : null;
-            return container != null && container.activeSelf;
-        }
-
-        private string GetPreviewText(BattleAttackPreview preview, FieldInfo field)
-        {
-            UITextMesh text = preview != null && field != null ? field.GetValue(preview) as UITextMesh : null;
-            return text != null ? TrimSentence(SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text))) : string.Empty;
-        }
-
-        private static string GetCapturedAdditionalText(BattleAttackPreview preview)
-        {
-            string text;
-            return preview != null && AttackPreviewAdditionalTexts.TryGetValue(preview, out text)
-                ? TrimSentence(text)
-                : string.Empty;
-        }
-
-        private static string FormatEntityDestruction(string killsText)
-        {
-            int min;
-            int max;
-            if (TryParseRange(killsText, out min, out max))
-            {
-            return min <= 0 && max > 0
-                ? ModText.Get(ModStrings.Spatial.MayDestroy)
-                : ModText.Get(ModStrings.Spatial.Destroys);
-            }
-
-            return ModText.Get(ModStrings.Spatial.Destroys);
-        }
-
-        private static bool TryParseRange(string text, out int min, out int max)
-        {
-            min = 0;
-            max = 0;
-            MatchCollection matches = Regex.Matches(text ?? string.Empty, "\\d+");
-            if (matches.Count == 0)
-            {
-                return false;
-            }
-
-            min = int.Parse(matches[0].Value);
-            max = matches.Count > 1 ? int.Parse(matches[1].Value) : min;
-            return true;
-        }
-
-        private static string TrimSentence(string text)
-        {
-            text = text != null ? text.Trim() : string.Empty;
-            while (text.EndsWith(".", StringComparison.Ordinal))
-            {
-                text = text.Substring(0, text.Length - 1).TrimEnd();
-            }
-
-            return text;
         }
 
         private VisualTooltipMetadata CreateScreenPointTooltipMetadata(IDetails details, Vector2Int tile)
@@ -1523,166 +1207,15 @@ namespace SongsOfConquestAccess.Adapters
             return new CombatTileSpeechFormatter(this, context, selectedForSpellcast: selectedForSpellcast).DescribeTile(tile);
         }
 
-        private void SynchronizeNativeHoverForInput(Vector2Int point)
-        {
-            if (!IsValidTile(point))
-            {
-                return;
-            }
-
-            CombatTile tile = GetTile(point);
-            PathNode[] path = GetPathTo(point);
-
-            _cursorManager?.SetCurrentTile(point);
-            _gridManager?.SetCurrentTile(point, path);
-            _pathManager?.SetCurrentTile(point, path);
-            _highlightManager?.SetCurrentTile(point);
-
-            if (_humanBattleController == null || tile == null)
-            {
-                return;
-            }
-
-            _humanBattleController.CurrentHoverTile = point;
-            _humanBattleController.CurrentTroopAtPosition = tile.Troop;
-            _humanBattleController.TroopToInspect = tile.Troop;
-            _humanBattleController.EntityToInspect = tile.Entity;
-            _humanBattleController.TileToInspect = new int2(point.x, point.y);
-            _humanBattleController.PathToCurrentTile = (!tile.IsImpassable && !tile.IsBlocked) ? path : null;
-            _humanBattleController.EnemiesWithinMeleeReach = _facade.Level.AllEnemiesWithinMeleeReach(_facade.Troops.Current).ToList();
-            _humanBattleController.MapEntitiesWithinMeleeReach = _facade.Level.AllMapEntitiesWithinMeleeReach(_facade.Troops.Current).ToList();
-
-            HumanBattleController.State currentState = _humanBattleController.StateMachine.CurrentStateType;
-            if (currentState == HumanBattleController.State.ChoosingAbilityTarget)
-            {
-                return;
-            }
-
-            if (IsAnySpellCastingStateActive())
-            {
-                return;
-            }
-
-            // This is native hover synchronization for mouse-equivalent input.
-            // It is intentionally separate from CombatHexGrid's accessibility inspect mode.
-            if (tile.Troop != null)
-            {
-                if (currentState == HumanBattleController.State.InspectTroop
-                    && _humanBattleController.TroopToInspect != null
-                    && _humanBattleController.TroopToInspect.Id == tile.Troop.Id)
-                {
-                    return;
-                }
-
-                _gridManager?.SetInspectedTroop(tile.Troop);
-                _cursorManager?.SetState(BattleCursorManager.State.InspectTroop);
-                _gridManager?.SetState(BattleGridManager.State.InspectTroop);
-                _highlightManager?.SetState(BattleHighlightManager.State.InspectTroop);
-                _pathManager?.SetState(BattlePathManager.State.InspectTroop);
-                _humanBattleController.StateMachine.ChangeState(HumanBattleController.State.InspectTroop);
-            }
-            else if (tile.Entity != null)
-            {
-                if (currentState == HumanBattleController.State.InspectEntity
-                    && _humanBattleController.EntityToInspect != null
-                    && _humanBattleController.EntityToInspect.Id == tile.Entity.Id)
-                {
-                    return;
-                }
-
-                _cursorManager?.SetState(BattleCursorManager.State.InspectTile);
-                _gridManager?.SetState(BattleGridManager.State.InspectEntity);
-                _highlightManager?.SetState(BattleHighlightManager.State.InspectEntity);
-                _pathManager?.SetState(BattlePathManager.State.InspectEntity);
-                _humanBattleController.StateMachine.ChangeState(HumanBattleController.State.InspectEntity);
-            }
-            else
-            {
-                if (currentState == HumanBattleController.State.InspectTile && IsNativeTileToInspect(point))
-                {
-                    return;
-                }
-
-                _cursorManager?.SetState(BattleCursorManager.State.CurrentTroop);
-                _gridManager?.SetState(BattleGridManager.State.CurrentTroop);
-                _highlightManager?.SetState(BattleHighlightManager.State.CurrentTroop);
-                _pathManager?.SetState(BattlePathManager.State.CurrentTroop);
-                _humanBattleController.StateMachine.ChangeState(HumanBattleController.State.ShowCurrentTroop);
-            }
-        }
-
         private void HandleTargetInstruction(ISpellDefinition spell, string instruction)
         {
             string spellName = spell != null ? SpokenLines.Clean(GameText.Get(_localization, spell.NameKey, string.Empty)) : string.Empty;
-            instruction = SpokenLines.Clean(instruction);
-            string text = !string.IsNullOrWhiteSpace(spellName) && !string.IsNullOrWhiteSpace(instruction)
-                ? spellName + ": " + instruction
-                : (!string.IsNullOrWhiteSpace(spellName) ? spellName : instruction);
-            Hud?.SetSpellTargetInstructionText(text);
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
-            }
+            _spellTargetInstructionHandler?.Invoke(spellName, SpokenLines.Clean(instruction));
         }
 
         private void HandleSpellTargetingEnd()
         {
             Hud?.ClearSpellTargetInstructionText();
-        }
-
-        private bool IsNativeTileToInspect(Vector2Int point)
-        {
-            if (_humanBattleController == null)
-            {
-                return false;
-            }
-
-            int2 tile = _humanBattleController.TileToInspect;
-            return tile.x == point.x && tile.y == point.y;
-        }
-
-        private void InvokeNativeClickWithHover(Vector2Int point, MethodInfo clickMethod, string clickName)
-        {
-            ScreenInputOverride screenInputOverride;
-            if (!TryBeginScreenInputOverride(point, out screenInputOverride))
-            {
-                return;
-            }
-
-            try
-            {
-                if (_updateCurrentTileMethod != null)
-                {
-                    _updateCurrentTileMethod.Invoke(_mouseKeyboardInputModule, Array.Empty<object>());
-                }
-
-                SynchronizeNativeHoverForInput(point);
-                InvokeNativeClick(clickMethod, clickName);
-            }
-            finally
-            {
-                screenInputOverride.Restore();
-            }
-        }
-
-        private bool InvokeNativeClick(MethodInfo clickMethod, string clickName)
-        {
-            if (clickMethod == null || _mouseKeyboardInputModule == null)
-            {
-                SocAccessMod.Instance?.LogWarning("CombatAdapter cannot emulate " + clickName + " click because the native mouse input module was not resolved.");
-                return false;
-            }
-
-            try
-            {
-                clickMethod.Invoke(_mouseKeyboardInputModule, Array.Empty<object>());
-                return true;
-            }
-            catch (Exception exception)
-            {
-                SocAccessMod.Instance?.LogWarning("CombatAdapter failed to emulate native " + clickName + " click: " + exception.Message);
-                return false;
-            }
         }
 
         private IDetails BuildTileDetails(Vector2Int point)
@@ -1710,36 +1243,6 @@ namespace SongsOfConquestAccess.Adapters
             };
         }
 
-        private bool TryBeginScreenInputOverride(Vector2Int tilePosition, out ScreenInputOverride screenInputOverride)
-        {
-            screenInputOverride = null;
-            if (_inputManager == null || _inputManager.Screen == null || _inputManager.Screen.Primary == null)
-            {
-                SocAccessMod.Instance?.LogWarning("CombatAdapter could not override native screen input because primary screen input was unavailable");
-                return false;
-            }
-
-            object response = ScreenInputOverride.ResolveWritableResponse(_inputManager.Screen.Primary);
-            if (response == null)
-            {
-                SocAccessMod.Instance?.LogWarning("CombatAdapter could not override native screen input because no writable ScreenInputResponse could be resolved from " + _inputManager.Screen.Primary.GetType().FullName);
-                return false;
-            }
-
-            Vector2 screenPosition = GetScreenPoint(tilePosition);
-            if (screenPosition.x < 0f
-                || screenPosition.y < 0f
-                || screenPosition.x > Screen.width
-                || screenPosition.y > Screen.height)
-            {
-                SocAccessMod.Instance?.LogWarning("CombatAdapter could not target tile " + FormatDiagnosticPoint(tilePosition) + " because its screen position is outside the current view: " + screenPosition);
-                return false;
-            }
-
-            screenInputOverride = ScreenInputOverride.ApplyMouseClick(response, screenPosition, "CombatAdapter");
-            return screenInputOverride != null;
-        }
-
         private CombatInspectContext BeginStackInspect(IBattleTroopState troop)
         {
             if (troop == null)
@@ -1747,19 +1250,16 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
+            PathNode[] path = GetPathTo(troop.Position);
             _gridManager?.SetInspectedTroop(troop);
-            _cursorManager?.SetCurrentTile(troop.Position);
-            _gridManager?.SetCurrentTile(troop.Position, GetPathTo(troop.Position));
-            _highlightManager?.SetCurrentTile(troop.Position);
-            _gridManager?.SetState(BattleGridManager.State.InspectTroop);
-            _highlightManager?.SetState(BattleHighlightManager.State.InspectTroop);
-            _pathManager?.SetCurrentTile(troop.Position, GetPathTo(troop.Position));
+            SetNativeCursorTile(troop.Position, path);
             _cursorManager?.SetState(BattleCursorManager.State.InspectTroop);
+            _gridManager?.SetState(BattleGridManager.State.InspectTroop);
             _pathManager?.SetState(BattlePathManager.State.InspectTroop);
-            SynchronizeNativeHoverForPreview(troop.Position);
+            _highlightManager?.SetState(BattleHighlightManager.State.InspectTroop);
+            SynchronizeNativeHoverForPreview(troop.Position, GetTile(troop.Position), path);
 
             CombatInspectContext context = CombatInspectContext.ForStack(troop.Position);
-            context.TargetLabel = DescribeTroopForSpeech(troop);
             BuildStackRanges(troop, context);
             context.TooltipDetails = _tooltipUtility != null ? _tooltipUtility.GetInspectTroopDetails(troop) : null;
             return context;
@@ -1767,24 +1267,11 @@ namespace SongsOfConquestAccess.Adapters
 
         private CombatInspectContext BeginPathInspect(Vector2Int point)
         {
-            if (!IsReachable(point))
-            {
-                SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.NotInMovementRange), interrupt: false));
-                return null;
-            }
-
             PathNode[] path = GetPathTo(point);
-            _cursorManager?.SetCurrentTile(point);
-            _gridManager?.SetCurrentTile(point, path);
-            _pathManager?.SetCurrentTile(point, path);
-            _highlightManager?.SetCurrentTile(point);
-            _cursorManager?.SetState(BattleCursorManager.State.CurrentTroop);
-            _gridManager?.SetState(BattleGridManager.State.CurrentTroop);
-            _pathManager?.SetState(BattlePathManager.State.CurrentTroop);
-            _highlightManager?.SetState(BattleHighlightManager.State.CurrentTroop);
+            SetNativeCursorTile(point, path);
+            SetNativeCurrentTroopState();
             _attackPreviewHandler?.Hide();
             CombatInspectContext context = CombatInspectContext.ForPath(point, ConvertPath(path));
-            context.TargetLabel = DescribeTile(GetTile(point), null);
             context.TooltipDetails = BuildTileDetails(point);
             return context;
         }
@@ -1797,10 +1284,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             PathNode[] path = GetPathToEntity(entity);
-            _cursorManager?.SetCurrentTile(entity.Position);
-            _gridManager?.SetCurrentTile(entity.Position, path);
-            _pathManager?.SetCurrentTile(entity.Position, path);
-            _highlightManager?.SetCurrentTile(entity.Position);
+            SetNativeCursorTile(entity.Position, path);
             _cursorManager?.SetState(BattleCursorManager.State.InspectTile);
             _gridManager?.SetState(BattleGridManager.State.InspectEntity);
             _highlightManager?.SetState(BattleHighlightManager.State.InspectEntity);
@@ -1810,55 +1294,8 @@ namespace SongsOfConquestAccess.Adapters
             CombatInspectContext context = PathfinderExtensions.IsReachable(path, GetCurrentMovesLeft(), true)
                 ? CombatInspectContext.ForEntityPath(entity.Position, ConvertPath(path))
                 : CombatInspectContext.ForEntityOnly(entity.Position);
-            context.TargetLabel = DescribeEntityForSpeech(entity);
             context.TooltipDetails = BuildEntityDetails(entity);
             return context;
-        }
-
-        private void SynchronizeNativeHoverForPreview(Vector2Int point)
-        {
-            if (!IsValidTile(point))
-            {
-                return;
-            }
-
-            CombatTile tile = GetTile(point);
-            if (tile == null)
-            {
-                return;
-            }
-
-            SynchronizeNativeHoverForInput(point);
-
-            if (_humanBattleController == null)
-            {
-                return;
-            }
-
-            if (_facade != null && _facade.Level != null && _facade.Troops != null && _facade.Troops.Current != null)
-            {
-                _humanBattleController.EnemiesWithinMeleeReach = _facade.Level.AllEnemiesWithinMeleeReach(_facade.Troops.Current).ToList();
-                _humanBattleController.MapEntitiesWithinMeleeReach = _facade.Level.AllMapEntitiesWithinMeleeReach(_facade.Troops.Current).ToList();
-            }
-
-            UpdateNativeAttackPreviews();
-        }
-
-        private void UpdateNativeAttackPreviews()
-        {
-            if (_mouseKeyboardInputModule == null || _updateAttackPreviewsMethod == null)
-            {
-                return;
-            }
-
-            try
-            {
-                _updateAttackPreviewsMethod.Invoke(_mouseKeyboardInputModule, null);
-            }
-            catch (Exception exception)
-            {
-                SocAccessMod.Instance?.LogWarning("CombatAdapter failed to update native attack previews: " + exception.Message);
-            }
         }
 
         private void BuildStackRanges(IBattleTroopState troop, CombatInspectContext context)
@@ -1930,8 +1367,9 @@ namespace SongsOfConquestAccess.Adapters
                     indicators.Add(CombatRangeIndicator.Deadly);
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("BuildAttackIndicators.Ranged", exception);
             }
 
             try
@@ -1941,8 +1379,9 @@ namespace SongsOfConquestAccess.Adapters
                     indicators.Add(CombatRangeIndicator.Melee);
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("BuildAttackIndicators.Melee", exception);
             }
 
             return indicators;
@@ -1968,8 +1407,9 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("BuildInfluenceIndicators", exception);
             }
 
             IBattleTroopState current = GetCurrentTroop();
@@ -1992,8 +1432,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return ZoneOfControlTriggerSystem.ExertsZoneOfControl(movingTroop, controllingTroop, point, _facade.Level);
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("IsInZoneOfControl", exception);
                 return false;
             }
         }
@@ -2017,7 +1458,33 @@ namespace SongsOfConquestAccess.Adapters
             return BuildEnemyInfluenceSources(point, occupyingTroop).Count > 0;
         }
 
+        /// <summary>Which enemy stacks reach a tile, and how. Every stack is asked for its own
+        /// movement and attack ranges, so this is a pathfind per enemy per call - and one cursor step
+        /// asks for it three times over: the cue that warns about a threatened tile, the tile's
+        /// readout, and the graph rebuilt in the same frame. Held for the frame it was worked out in
+        /// and for the tile it was worked out for, which is as long as the answer cannot have
+        /// changed; the frame count is the game's own, so nothing has to remember to drop it.
+        /// </summary>
         private List<CombatInfluenceSource> BuildEnemyInfluenceSources(Vector2Int point, IBattleTroopState occupyingTroop)
+        {
+            int frame = Time.frameCount;
+            int occupantId = occupyingTroop != null ? occupyingTroop.Id : -1;
+            if (_influenceSources != null
+                && _influenceFrame == frame
+                && _influencePoint == point
+                && _influenceOccupantId == occupantId)
+            {
+                return _influenceSources;
+            }
+
+            _influenceFrame = frame;
+            _influencePoint = point;
+            _influenceOccupantId = occupantId;
+            _influenceSources = BuildEnemyInfluenceSourcesCore(point, occupyingTroop);
+            return _influenceSources;
+        }
+
+        private List<CombatInfluenceSource> BuildEnemyInfluenceSourcesCore(Vector2Int point, IBattleTroopState occupyingTroop)
         {
             int perspectiveTeamId = GetLocalTeamId();
             if (_facade == null || _facade.Troops == null || _facade.Teams == null || perspectiveTeamId < 0)
@@ -2110,8 +1577,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade.Level.GetElevation(point);
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("SafeGetElevation", exception);
                 return 0;
             }
         }
@@ -2140,8 +1608,9 @@ namespace SongsOfConquestAccess.Adapters
                 int localTeamId = GetLocalTeamId();
                 return localTeamId >= 0 && owningTeamId == localTeamId;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("IsFriendlyMapEntity", exception);
                 return false;
             }
         }
@@ -2165,8 +1634,9 @@ namespace SongsOfConquestAccess.Adapters
                 return _facade.Commands.CanAttack(current.Id, troop.Position)
                     || (IsMeleeOnly(current) && _facade.Level.AllEnemiesWithinMeleeReach(current).Contains(troop));
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("IsAttackable.Troop", exception);
                 return false;
             }
         }
@@ -2190,8 +1660,9 @@ namespace SongsOfConquestAccess.Adapters
                 return _facade.Commands.CanAttack(current.Id, entity.Position)
                     || (IsMeleeOnly(current) && _facade.Level.AllMapEntitiesWithinMeleeReach(current).Contains(entity));
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("IsAttackable.Entity", exception);
                 return false;
             }
         }
@@ -2238,8 +1709,9 @@ namespace SongsOfConquestAccess.Adapters
                     && _facade.MapEntities != null
                     && _facade.MapEntities.GetDangerousAuraMapEntityEffects(point).Any();
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("HasDangerousMapEntityEffect", exception);
                 return false;
             }
         }
@@ -2289,9 +1761,32 @@ namespace SongsOfConquestAccess.Adapters
             return IsDebris(entity) ? ModText.Get(ModStrings.Spatial.Debris) : string.Empty;
         }
 
-        public string DescribeTroopForSpeech(IBattleTroopState troop)
+        /// <summary>Everything a spoken stack row is made of, read from the game in one go.</summary>
+        public CombatTroopFacts GetTroopFacts(IBattleTroopState troop)
         {
-            return FormatTroopGridLabel(troop);
+            if (troop == null)
+            {
+                return new CombatTroopFacts(string.Empty, 0, 0, 0, false, false);
+            }
+
+            return new CombatTroopFacts(
+                SpokenLines.Clean(_facade.Troops.GetName(troop.Id, troop.Stats.Size)),
+                troop.Stats.Size,
+                troop.CurrentHealth,
+                troop.Stats.MaxHealth.GetValue(),
+                IsEnemyTroop(troop),
+                IsActingTroop(troop));
+        }
+
+        /// <summary>Everything a spoken row for an attackable thing is made of.</summary>
+        public CombatEntityFacts GetEntityFacts(IMapEntity entity)
+        {
+            IHealthComponent health = entity != null ? entity.GetComponent<IHealthComponent>() : null;
+            return new CombatEntityFacts(
+                GetMapEntityName(entity),
+                health != null,
+                health != null ? health.HealthLeft : 0,
+                health != null ? health.MaxHealth.GetValue() : 0);
         }
 
         public bool PerformsBeamAttacks(IBattleTroopState troop)
@@ -2325,132 +1820,6 @@ namespace SongsOfConquestAccess.Adapters
             return troop.TeamId == _facade.Teams.AttackingTeam.Id ? BeamFacing.Right : BeamFacing.Left;
         }
 
-        public string DescribeEntityForSpeech(IMapEntity entity)
-        {
-            string name = GetMapEntityName(entity);
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                name = ModText.Get(ModStrings.Combat.AttackableEntity);
-            }
-
-            IHealthComponent health = entity.GetComponent<IHealthComponent>();
-            if (health == null)
-            {
-                return name;
-            }
-
-            return MenuButtonTextUtility.JoinParts(
-                name,
-                ModText.Get(ModStrings.Spatial.Health, health.HealthLeft, health.MaxHealth.GetValue()));
-        }
-
-        public string FormatTroopGridLabel(IBattleTroopState troop)
-        {
-            if (troop == null)
-            {
-                return string.Empty;
-            }
-
-            string label = FormatTroopLabel(troop, troop.Stats.Size, includeHealth: true, includePosition: false);
-            IBattleTroopState current = GetCurrentTroop();
-            return current != null && current.Id == troop.Id
-                ? MenuButtonTextUtility.JoinParts(ModText.Get(ModStrings.Spatial.Acting), label)
-                : label;
-        }
-
-        public string FormatTroopEventLabel(IBattleTroopState troop)
-        {
-            if (troop == null)
-            {
-                return ModText.Get(ModStrings.Combat.UnknownTroop);
-            }
-
-            return FormatTroopLabel(troop, troop.Stats.Size, includeHealth: false, includePosition: true);
-        }
-
-        public string FormatTroopEventLabel(IBattleTroopState troop, int sizeOverride)
-        {
-            if (troop == null)
-            {
-                return ModText.Get(ModStrings.Combat.UnknownTroop);
-            }
-
-            return FormatTroopLabel(troop, sizeOverride, includeHealth: false, includePosition: true);
-        }
-
-        public string FormatTroopEventLabel(IBattleTroopState troop, int sizeOverride, Vector2Int positionOverride)
-        {
-            if (troop == null)
-            {
-                return ModText.Get(ModStrings.Combat.UnknownTroop);
-            }
-
-            string label = FormatTroopLabel(troop, sizeOverride, includeHealth: false, includePosition: false);
-            return ModText.Get(ModStrings.Combat.TroopAt, label, FormatPoint(positionOverride));
-        }
-
-        public string FormatEntityEventLabel(IMapEntity entity)
-        {
-            if (entity == null)
-            {
-                return ModText.Get(ModStrings.Combat.UnknownEntity);
-            }
-
-            string name = GetMapEntityName(entity);
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                name = ModText.Get(ModStrings.Combat.AttackableEntity);
-            }
-
-            return ModText.Get(ModStrings.Combat.TroopAt, name, FormatPoint(entity.Position));
-        }
-
-        public TroopRef CreateTroopRef(IBattleTroopState troop)
-        {
-            return CreateTroopRef(troop, troop != null ? troop.Stats.Size : 0, troop != null ? troop.Position : Vector2Int.zero);
-        }
-
-        public TroopRef CreateTroopRef(IBattleTroopState troop, int sizeOverride)
-        {
-            return CreateTroopRef(troop, sizeOverride, troop != null ? troop.Position : Vector2Int.zero);
-        }
-
-        public TroopRef CreateTroopRef(IBattleTroopState troop, int sizeOverride, Vector2Int positionOverride)
-        {
-            if (troop == null)
-            {
-                return new TroopRef(-1, -1, GetLocalTeamId(), ModText.Get(ModStrings.Combat.UnknownTroop), sizeOverride, positionOverride);
-            }
-
-            string name = SpokenLines.Clean(_facade.Troops.GetName(troop.Id, sizeOverride));
-            return new TroopRef(troop.Id, troop.TeamId, GetLocalTeamId(), name, sizeOverride, positionOverride);
-        }
-
-        public EntityRef CreateEntityRef(IMapEntity entity)
-        {
-            if (entity == null)
-            {
-                return new EntityRef(-1, -1, ModText.Get(ModStrings.Combat.UnknownEntity), Vector2Int.zero);
-            }
-
-            string name = GetMapEntityName(entity);
-            return new EntityRef(entity.Id, entity.BlueprintId, name, entity.Position);
-        }
-
-        public CommanderRef CreateCommanderRef(int commanderId)
-        {
-            try
-            {
-                ICommanderState commander = _facade != null && _facade.Commanders != null ? _facade.Commanders.Get(commanderId) : null;
-                string name = _facade != null && _facade.Commanders != null ? _facade.Commanders.GetShortName(commanderId) : string.Empty;
-                return new CommanderRef(commanderId, commander != null ? commander.TeamId : -1, GetLocalTeamId(), name);
-            }
-            catch
-            {
-                return new CommanderRef(commanderId, -1, GetLocalTeamId(), ModText.Get(ModStrings.Combat.Wielder));
-            }
-        }
-
         public int GetCommanderGeneratedEssenceAmount(int commanderId, EssenceType essenceType)
         {
             try
@@ -2460,84 +1829,11 @@ namespace SongsOfConquestAccess.Adapters
                     ? commander.Stats.Essences.GetValue(essenceType)
                     : 0;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetCommanderGeneratedEssenceAmount", exception);
                 return 0;
             }
-        }
-
-        public SpellRef CreateSpellRef(SpellTypes spellType, int tier)
-        {
-            string name = LocalizeSpellName(spellType);
-            return new SpellRef(spellType, name, tier);
-        }
-
-        public AbilityRef CreateAbilityRef(TroopAbilityType abilityType)
-        {
-            string name = LocalizeAbilityName(abilityType);
-            return new AbilityRef(abilityType, name);
-        }
-
-        public ModifierChange CreateModifierChange(BacteriaModifier modifier)
-        {
-            if (modifier == null)
-            {
-                return null;
-            }
-
-            string localizedDescriptionFormat = LocalizeModifierDescriptionFormat(
-                modifier.Type,
-                modifier.ApplicationType,
-                modifier.AmountToAdd,
-                out bool formatAmount,
-                out int displayAmountMultiplier);
-            return new ModifierChange(
-                modifier.Type,
-                modifier.ApplicationType,
-                modifier.AmountToAdd,
-                localizedDescriptionFormat,
-                formatAmount,
-                displayAmountMultiplier);
-        }
-
-        private string LocalizeModifierDescriptionFormat(
-            BacteriaModifierType modifierType,
-            BacteriaModifierApplicationType applicationType,
-            int amount,
-            out bool formatAmount,
-            out int displayAmountMultiplier)
-        {
-            formatAmount = modifierType != BacteriaModifierType.TroopIgnoreZoneOfControl;
-            displayAmountMultiplier = 1;
-
-            string modifierName = modifierType.ToString().Replace("Troop", string.Empty);
-            if (modifierType == BacteriaModifierType.TroopBlessed
-                && amount < 0
-                && applicationType != BacteriaModifierApplicationType.Percentage
-                && !BacteriaModifierExtensions.IsPercentageBased(modifierType))
-            {
-                modifierName = "Cursed";
-                displayAmountMultiplier = -1;
-            }
-
-            return LocalizeText("Modifiers/" + modifierName + "/Description");
-        }
-
-        public BacteriaRef CreateBacteriaRef(BacteriaReference bacteriaReference)
-        {
-            if (bacteriaReference == null)
-            {
-                return null;
-            }
-
-            string name = LocalizeText(BacteriaReferenceUtility.GetLocalizationNameKey(bacteriaReference.BacteriaType));
-            return new BacteriaRef(bacteriaReference.Id, bacteriaReference.BacteriaType, name);
-        }
-
-        public BacteriaRef CreateBacteriaRef(BacteriaTypes bacteriaType)
-        {
-            string name = LocalizeText(BacteriaReferenceUtility.GetLocalizationNameKey(bacteriaType));
-            return new BacteriaRef(-1, bacteriaType, name);
         }
 
         public int LocalTeamId
@@ -2575,8 +1871,9 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetAliveBattleTroopIdsForSide", exception);
             }
 
             return ids;
@@ -2622,60 +1919,12 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetAliveBattleTroopIdsForSide.Filtered", exception);
             }
 
             return ids;
-        }
-
-        public string BuildLocalEssenceSummary()
-        {
-            CombatHudSide? side = GetLocalCombatHudSide();
-            if (!side.HasValue)
-            {
-                return string.Empty;
-            }
-
-            return Hud != null && Hud.Commanders != null
-                ? Hud.Commanders.BuildEssenceSummary(side.Value, requireVisible: false)
-                : string.Empty;
-        }
-
-        public string BuildEnemyEssenceSummary()
-        {
-            CombatHudSide? side = GetEnemyCombatHudSide();
-            if (!side.HasValue)
-            {
-                return string.Empty;
-            }
-
-            return Hud != null && Hud.Commanders != null
-                ? Hud.Commanders.BuildEssenceSummary(side.Value, requireVisible: true)
-                : string.Empty;
-        }
-
-        private string FormatTroopLabel(IBattleTroopState troop, int size, bool includeHealth, bool includePosition)
-        {
-            string name = SpokenLines.Clean(_facade.Troops.GetName(troop.Id, size));
-            int localTeamId = GetLocalTeamId();
-            string label = localTeamId < 0 || troop.TeamId == localTeamId
-                ? ModText.Get(ModStrings.Combat.TroopQuantity, size, name)
-                : ModText.Get(ModStrings.Combat.EnemyTroop, size, name);
-
-            if (includeHealth)
-            {
-                label = MenuButtonTextUtility.JoinParts(
-                    label,
-                    ModText.Get(ModStrings.Spatial.Health, troop.CurrentHealth, troop.Stats.MaxHealth.GetValue()));
-            }
-
-            if (includePosition)
-            {
-                label = ModText.Get(ModStrings.Combat.TroopAt, label, FormatPoint(troop.Position));
-            }
-
-            return label;
         }
 
         public bool IsActingTroop(IBattleTroopState troop)
@@ -2690,47 +1939,13 @@ namespace SongsOfConquestAccess.Adapters
             return troop != null && localTeamId >= 0 && troop.TeamId != localTeamId;
         }
 
-        public int GetTroopStackSize(IBattleTroopState troop)
-        {
-            return troop != null ? troop.Stats.Size : 0;
-        }
-
-        public string GetTroopNameForSpeech(IBattleTroopState troop)
-        {
-            return CreateTroopRef(troop).Name;
-        }
-
-        public string GetTroopHealthForSpeech(IBattleTroopState troop)
-        {
-            return troop != null
-                ? ModText.Get(ModStrings.Spatial.Health, troop.CurrentHealth, troop.Stats.MaxHealth.GetValue())
-                : string.Empty;
-        }
-
-        public string GetEntityNameForSpeech(IMapEntity entity)
-        {
-            return GetMapEntityName(entity);
-        }
-
-        public string GetEntityHealthForSpeech(IMapEntity entity)
-        {
-            if (entity == null)
-            {
-                return string.Empty;
-            }
-
-            IHealthComponent health = entity.GetComponent<IHealthComponent>();
-            return health != null
-                ? ModText.Get(ModStrings.Spatial.Health, health.HealthLeft, health.MaxHealth.GetValue())
-                : string.Empty;
-        }
-
         private int GetLocalTeamId()
         {
             return BattleFacadeState.LocalTeamId(_facade);
         }
 
-        private CombatHudSide? GetLocalCombatHudSide()
+        /// <summary>Which side's HUD column is the local player's, where either is.</summary>
+        public CombatHudSide? GetLocalCombatHudSide()
         {
             if (Hud == null || Hud.Commanders == null)
             {
@@ -2756,7 +1971,7 @@ namespace SongsOfConquestAccess.Adapters
             return null;
         }
 
-        private CombatHudSide? GetEnemyCombatHudSide()
+        public CombatHudSide? GetEnemyCombatHudSide()
         {
             CombatHudSide? localSide = GetLocalCombatHudSide();
             if (!localSide.HasValue)
@@ -2773,8 +1988,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.Troops != null ? _facade.Troops.Get(troopId) : null;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetTroop", exception);
                 return null;
             }
         }
@@ -2785,8 +2001,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.MapEntities != null ? _facade.MapEntities.Get(entityId) : null;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetMapEntity", exception);
                 return null;
             }
         }
@@ -2801,8 +2018,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.Queue != null ? _facade.Queue.CurrentTurn : 0;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetCurrentTurn", exception);
                 return 0;
             }
         }
@@ -2865,17 +2083,13 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetActingTroopIds", exception);
                 return troopIds;
             }
 
             return troopIds;
-        }
-
-        public bool TryGetLocalActingTroopPosition(int troopId, out Vector2Int position)
-        {
-            return TryGetTroopPosition(troopId, out position, requireLocalCurrentTurn: true);
         }
 
         public bool TryGetTroopPosition(int troopId, out Vector2Int position, bool requireLocalCurrentTurn)
@@ -2910,42 +2124,6 @@ namespace SongsOfConquestAccess.Adapters
         public string LocalizeText(string key)
         {
             return GameText.Get(_localization, key, string.Empty);
-        }
-
-        private string LocalizeSpellName(SpellTypes spellType)
-        {
-            try
-            {
-                ISpellDefinition definition = _spellsLookup != null ? _spellsLookup.GetSpellDefinition(spellType) : null;
-                string name = definition != null ? GameText.Get(_localization, definition.NameKey, string.Empty) : string.Empty;
-                if (!string.IsNullOrWhiteSpace(name))
-                {
-                    return name;
-                }
-            }
-            catch
-            {
-            }
-
-            return LocalizeText("Spells/" + spellType);
-        }
-
-        private string LocalizeAbilityName(TroopAbilityType abilityType)
-        {
-            try
-            {
-                ITroopAbilityDefinition definition = _abilityUtility != null ? _abilityUtility.GetAbilityDefinition(abilityType) : null;
-                string name = definition != null ? GameText.Get(_localization, definition.NameKey, string.Empty) : string.Empty;
-                if (!string.IsNullOrWhiteSpace(name))
-                {
-                    return name;
-                }
-            }
-            catch
-            {
-            }
-
-            return LocalizeText("TroopAbilities/" + abilityType);
         }
 
         private string GetMapEntityName(IMapEntity entity)
@@ -3002,41 +2180,6 @@ namespace SongsOfConquestAccess.Adapters
                 HealthLeft = health.HealthLeft,
                 HealthMax = health.MaxHealth.GetValue()
             };
-        }
-
-        private Vector2 GetScreenPoint(Vector2Int tile)
-        {
-            Vector3 world = GetWorldCenter(tile);
-            ICamera camera = _cameraLookup != null ? _cameraLookup.GetBrainCamera() : null;
-            if (camera == null)
-            {
-                return new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-            }
-
-            Vector3 point = camera.WorldToScreenPoint(world);
-            return new Vector2(point.x, point.y);
-        }
-
-        private Vector3 GetWorldCenter(Vector2Int tile)
-        {
-            if (_pointToWorldMethod != null)
-            {
-                try
-                {
-                    object world = _pointToWorldMethod.Invoke(_cartographyConverter, new object[] { new int2(tile.x, tile.y), -1 });
-                    if (world is float3)
-                    {
-                        float3 point = (float3)world;
-                        return new Vector3(point.x, point.y, point.z);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    SocAccessMod.Instance?.LogWarning("CombatAdapter failed to resolve tile world position: " + exception.Message);
-                }
-            }
-
-            return new Vector3(tile.x, 0f, tile.y);
         }
 
         private static PathNode[] ToArray(IEnumerable<PathNode> nodes)
@@ -3106,314 +2249,5 @@ namespace SongsOfConquestAccess.Adapters
             };
         }
 
-        public static string FormatPoint(Vector2Int point)
-        {
-            return HexCoordinateFormatter.Format(point);
-        }
-
-        private static string FormatDiagnosticPoint(Vector2Int point)
-        {
-            return point.x + ", " + point.y;
-        }
-
-    }
-
-    public sealed class CombatSnapshot
-    {
-        private readonly CombatAdapter _adapter;
-
-        public CombatSnapshot(Vector2Int size, CombatAdapter adapter)
-        {
-            Size = size;
-            _adapter = adapter;
-        }
-
-        public Vector2Int Size { get; private set; }
-
-        public bool IsValidTile(Vector2Int point)
-        {
-            return _adapter != null && _adapter.IsValidTile(point);
-        }
-
-        public CombatTile Get(Vector2Int point)
-        {
-            return _adapter != null ? _adapter.GetTile(point) : null;
-        }
-    }
-
-    public sealed class CombatTile
-    {
-        public CombatTile(Vector2Int point)
-        {
-            Point = point;
-        }
-
-        public Vector2Int Point { get; private set; }
-
-        public byte Elevation { get; set; }
-
-        public bool IsReachable { get; set; }
-
-        public bool IsImpassable { get; set; }
-
-        public bool IsBlocked { get; set; }
-
-        public IBattleTroopState Troop { get; set; }
-
-        public int TroopId { get; set; } = -1;
-
-        public bool IsTroopAttackable { get; set; }
-
-        public IMapEntity Entity { get; set; }
-
-        public int EntityId { get; set; } = -1;
-
-        public bool IsEntityAttackable { get; set; }
-
-        public List<string> MapEffects { get; private set; } = new List<string>();
-
-        public List<int> DangerousMapEffectEntityIds { get; private set; } = new List<int>();
-
-        public string DecorativeFeature { get; set; }
-    }
-
-    public enum CombatRangeIndicator
-    {
-        Source,
-        Movement,
-        Attack,
-        Deadly,
-        Melee,
-        ZoneOfControl
-    }
-
-    public sealed class CombatInspectContext
-    {
-        private readonly Dictionary<Vector2Int, HashSet<CombatRangeIndicator>> _indicators =
-            new Dictionary<Vector2Int, HashSet<CombatRangeIndicator>>();
-        private readonly HashSet<Vector2Int> _reviewSet = new HashSet<Vector2Int>();
-
-        private CombatInspectContext(CombatInspectMode mode, Vector2Int pinnedTile)
-        {
-            Mode = mode;
-            PinnedTile = pinnedTile;
-            AddReviewTile(pinnedTile);
-        }
-
-        public CombatInspectMode Mode { get; private set; }
-
-        public Vector2Int PinnedTile { get; private set; }
-
-        public List<Vector2Int> OrderedTiles { get; private set; }
-
-        public IDetails TooltipDetails { get; set; }
-
-        public string TargetLabel { get; set; }
-
-        public static CombatInspectContext ForStack(Vector2Int pinnedTile)
-        {
-            return new CombatInspectContext(CombatInspectMode.Stack, pinnedTile);
-        }
-
-        public static CombatInspectContext ForPath(Vector2Int pinnedTile, List<Vector2Int> path)
-        {
-            CombatInspectContext context = new CombatInspectContext(CombatInspectMode.Path, pinnedTile);
-            context.SetPath(path);
-            return context;
-        }
-
-        public static CombatInspectContext ForEntityPath(Vector2Int pinnedTile, List<Vector2Int> path)
-        {
-            CombatInspectContext context = new CombatInspectContext(CombatInspectMode.EntityPath, pinnedTile);
-            context.SetPath(path);
-            return context;
-        }
-
-        public static CombatInspectContext ForEntityOnly(Vector2Int pinnedTile)
-        {
-            CombatInspectContext context = new CombatInspectContext(CombatInspectMode.EntityOnly, pinnedTile);
-            context.OrderedTiles = new List<Vector2Int> { pinnedTile };
-            return context;
-        }
-
-        public void Add(Vector2Int point, CombatRangeIndicator indicator)
-        {
-            AddReviewTile(point);
-            HashSet<CombatRangeIndicator> set;
-            if (!_indicators.TryGetValue(point, out set))
-            {
-                set = new HashSet<CombatRangeIndicator>();
-                _indicators[point] = set;
-            }
-
-            set.Add(indicator);
-        }
-
-        public bool Contains(Vector2Int point)
-        {
-            return _reviewSet.Contains(point);
-        }
-
-        public void FinalizeOrdering()
-        {
-            if (OrderedTiles != null)
-            {
-                return;
-            }
-
-            OrderedTiles = new List<Vector2Int>(_reviewSet);
-            OrderedTiles.Sort((left, right) =>
-            {
-                int y = right.y.CompareTo(left.y);
-                return y != 0 ? y : left.x.CompareTo(right.x);
-            });
-        }
-
-        public int CountConnectedComponents()
-        {
-            if (_reviewSet.Count == 0)
-            {
-                return 0;
-            }
-
-            HashSet<Vector2Int> remaining = new HashSet<Vector2Int>(_reviewSet);
-            Queue<Vector2Int> queue = new Queue<Vector2Int>();
-            int count = 0;
-            while (remaining.Count > 0)
-            {
-                Vector2Int start = default(Vector2Int);
-                foreach (Vector2Int point in remaining)
-                {
-                    start = point;
-                    break;
-                }
-
-                remaining.Remove(start);
-                queue.Enqueue(start);
-                count++;
-                while (queue.Count > 0)
-                {
-                    Vector2Int current = queue.Dequeue();
-                    Vector2Int[] neighbors = CombatAdapter.GetNeighbors(current);
-                    for (int i = 0; i < neighbors.Length; i++)
-                    {
-                        if (remaining.Remove(neighbors[i]))
-                        {
-                            queue.Enqueue(neighbors[i]);
-                        }
-                    }
-                }
-            }
-
-            return count;
-        }
-
-        public void AddIndicators(Vector2Int point, List<string> parts)
-        {
-            if (Mode == CombatInspectMode.Stack && point == PinnedTile)
-            {
-                return;
-            }
-
-            HashSet<CombatRangeIndicator> set;
-            if (!_indicators.TryGetValue(point, out set))
-            {
-                return;
-            }
-
-            string text = FormatRangeIndicators(set);
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                parts.Add(text);
-            }
-        }
-
-        private void SetPath(List<Vector2Int> path)
-        {
-            _reviewSet.Clear();
-            OrderedTiles = new List<Vector2Int>();
-            if (path == null || path.Count == 0)
-            {
-                AddReviewTile(PinnedTile);
-                OrderedTiles.Add(PinnedTile);
-                return;
-            }
-
-            for (int i = 0; i < path.Count; i++)
-            {
-                AddReviewTile(path[i]);
-                OrderedTiles.Add(path[i]);
-            }
-        }
-
-        private void AddReviewTile(Vector2Int point)
-        {
-            _reviewSet.Add(point);
-        }
-
-        public static string FormatRangeIndicators(HashSet<CombatRangeIndicator> indicators)
-        {
-            if (indicators == null || indicators.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            bool hasZoneOfControl = indicators.Contains(CombatRangeIndicator.ZoneOfControl);
-
-            string attackRangeText = string.Empty;
-            if (hasZoneOfControl)
-            {
-                attackRangeText = ModText.Get(ModStrings.Spatial.ZoneOfControl);
-            }
-            else if (indicators.Contains(CombatRangeIndicator.Deadly))
-            {
-                attackRangeText = ModText.Get(ModStrings.Spatial.DeadlyRange);
-            }
-            else if (indicators.Contains(CombatRangeIndicator.Attack) || indicators.Contains(CombatRangeIndicator.Melee))
-            {
-                attackRangeText = ModText.Get(ModStrings.Spatial.AttackRange);
-            }
-
-            bool hasMovement = indicators.Contains(CombatRangeIndicator.Movement);
-            if (!hasMovement)
-            {
-                return attackRangeText;
-            }
-
-            if (!hasZoneOfControl && !string.IsNullOrWhiteSpace(attackRangeText))
-            {
-                string compactAttackText = indicators.Contains(CombatRangeIndicator.Deadly)
-                    ? ModText.Get(ModStrings.Spatial.Deadly)
-                    : ModText.Get(ModStrings.Spatial.Attack);
-                return ModText.Get(ModStrings.Spatial.RangeAndMovement, compactAttackText);
-            }
-
-            return string.IsNullOrWhiteSpace(attackRangeText)
-                ? ModText.Get(ModStrings.Spatial.MovementRange)
-                : ModText.Get(ModStrings.Spatial.RangeAndMovement, attackRangeText);
-        }
-
-        private static string FormatList(List<string> values)
-        {
-            if (values == null || values.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            if (values.Count == 1)
-            {
-                return values[0];
-            }
-
-            return ModText.JoinList(values);
-        }
-    }
-
-    public enum CombatInspectMode
-    {
-        Stack,
-        Path,
-        EntityPath,
-        EntityOnly
     }
 }

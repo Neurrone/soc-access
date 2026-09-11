@@ -1,7 +1,8 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
@@ -70,8 +71,9 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 return string.Empty;
             }
 
+            CombatTroopFacts troop = _adapter.GetTroopFacts(tile.Troop);
             List<AnnouncementPart> parts = new List<AnnouncementPart>();
-            if (_adapter.IsActingTroop(tile.Troop))
+            if (troop.IsActing)
             {
                 parts.Add(new AnnouncementPart(
                     CombatAnnouncementDefinitions.TroopKeys.Acting,
@@ -87,17 +89,17 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             parts.Add(new AnnouncementPart(
                 CombatAnnouncementDefinitions.TroopKeys.StackSize,
-                _adapter.GetTroopStackSize(tile.Troop).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                troop.Size.ToString(System.Globalization.CultureInfo.InvariantCulture)));
 
-            if (_adapter.IsEnemyTroop(tile.Troop))
+            if (troop.IsEnemy)
             {
                 parts.Add(new AnnouncementPart(
                     CombatAnnouncementDefinitions.TroopKeys.Affiliation,
                     ModText.Get(ModStrings.Spatial.Enemy)));
             }
 
-            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.TroopName, _adapter.GetTroopNameForSpeech(tile.Troop));
-            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.Health, _adapter.GetTroopHealthForSpeech(tile.Troop));
+            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.TroopName, CombatTroopText.Name(troop));
+            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.Health, CombatTroopText.Health(troop.CurrentHealth, troop.MaxHealth));
 
             BeamFacing? facing = _adapter.PerformsBeamAttacks(tile.Troop) ? _adapter.GetBeamFacing(tile.Troop) : null;
             if (facing.HasValue)
@@ -117,6 +119,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 return string.Empty;
             }
 
+            CombatEntityFacts entity = _adapter.GetEntityFacts(tile.Entity);
             List<AnnouncementPart> parts = new List<AnnouncementPart>();
             if (tile.IsEntityAttackable)
             {
@@ -125,14 +128,17 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     ModText.Get(ModStrings.Scanner.Attackable)));
             }
 
-            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.EntityKeys.EntityName, _adapter.GetEntityNameForSpeech(tile.Entity));
-            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.EntityKeys.Health, _adapter.GetEntityHealthForSpeech(tile.Entity));
+            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.EntityKeys.EntityName, entity.Name);
+            AnnouncementPart.AddIfPresent(
+                parts,
+                CombatAnnouncementDefinitions.EntityKeys.Health,
+                entity.HasHealth ? CombatTroopText.Health(entity.HealthLeft, entity.MaxHealth) : string.Empty);
             return ConfigurableAnnouncementComposer.Compose(CombatAnnouncementDefinitions.Entity, parts);
         }
 
         public string DescribeCoordinates(CombatTile tile)
         {
-            return tile == null ? string.Empty : CombatAdapter.FormatPoint(tile.Point);
+            return tile == null ? string.Empty : CombatText.FormatPoint(tile.Point);
         }
 
         private IEnumerable<AnnouncementPart> BuildTileParts(CombatTile tile)

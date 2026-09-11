@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using SongsOfConquest;
 using SongsOfConquest.Common;
@@ -238,18 +239,23 @@ namespace SongsOfConquestAccess.Events.Combat
         {
         }
 
+        /// <param name="localizedName">What the game calls this modifier, for the case where it has
+        /// no description to say instead. The adapter reads it from the game; nothing here makes a
+        /// name out of the C# enum, which would be English in every language.</param>
         public ModifierChange(
             BacteriaModifierType modifierType,
             BacteriaModifierApplicationType applicationType,
             int amount,
             string localizedDescriptionFormat,
             bool formatAmount,
-            int displayAmountMultiplier)
+            int displayAmountMultiplier,
+            string localizedName = null)
         {
             ModifierType = modifierType;
             ApplicationType = applicationType;
             Amount = amount;
             LocalizedDescriptionFormat = localizedDescriptionFormat ?? string.Empty;
+            LocalizedName = localizedName ?? string.Empty;
             FormatAmount = formatAmount;
             DisplayAmountMultiplier = displayAmountMultiplier == 0 ? 1 : displayAmountMultiplier;
         }
@@ -258,6 +264,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public BacteriaModifierApplicationType ApplicationType { get; private set; }
         public int Amount { get; private set; }
         public string LocalizedDescriptionFormat { get; private set; }
+        public string LocalizedName { get; private set; }
         public bool FormatAmount { get; private set; }
         public int DisplayAmountMultiplier { get; private set; }
 
@@ -273,10 +280,9 @@ namespace SongsOfConquestAccess.Events.Combat
                 return FormatLocalizedDescription(LocalizedDescriptionFormat, FormatAmountValue());
             }
 
-            string name = FormatModifierType(ModifierType);
             return FormatAmount
-                ? name + " " + FormatAmountValue()
-                : name;
+                ? ModText.JoinList(ModStrings.Common.PhraseSeparator, new[] { LocalizedName, FormatAmountValue() })
+                : LocalizedName;
         }
 
         public ModifierChange WithAmount(int amount)
@@ -287,7 +293,8 @@ namespace SongsOfConquestAccess.Events.Combat
                 amount,
                 LocalizedDescriptionFormat,
                 FormatAmount,
-                DisplayAmountMultiplier);
+                DisplayAmountMultiplier,
+                LocalizedName);
         }
 
         public static bool IsPercentageBased(BacteriaModifierType modifierType)
@@ -298,19 +305,26 @@ namespace SongsOfConquestAccess.Events.Combat
         private string FormatAmountValue()
         {
             int displayAmount = Amount * DisplayAmountMultiplier;
-            string amount = (displayAmount > 0 ? "+" : string.Empty) + displayAmount;
+            string amount = displayAmount > 0
+                ? ModText.Get(ModStrings.Common.PositiveAmount, displayAmount)
+                : displayAmount.ToString(CultureInfo.InvariantCulture);
             return ApplicationType == BacteriaModifierApplicationType.Percentage || IsPercentageBased(ModifierType)
-                ? amount + "%"
+                ? ModText.Get(ModStrings.UI.Percent, amount)
                 : amount;
         }
 
+        /// <summary>The game's description with the amount in the place the language puts it. The one
+        /// thing that can go wrong is the description itself: a translator who wrote a brace the
+        /// formatter cannot read makes <c>string.Format</c> throw, and putting the amount where the
+        /// placeholder stands is the same answer by hand. Nothing else is caught, and the line is
+        /// still said with its amount in it, so this is a recovery rather than a swallow.</summary>
         private static string FormatLocalizedDescription(string format, string amount)
         {
             try
             {
                 return string.Format(format, amount);
             }
-            catch
+            catch (FormatException)
             {
                 return format.Replace("{0}", amount);
             }
@@ -748,7 +762,10 @@ namespace SongsOfConquestAccess.Events.Combat
             string text = ModText.Get(ModStrings.Combat.Affects, Bacteria.Name, Target.Format(includePosition: true));
             if (Changes.Count > 0)
             {
-                text += ", " + FormatList(Changes.Select(c => c.Format()).ToList());
+                text = ModText.Get(
+                    ModStrings.Common.ListSeparator,
+                    text,
+                    FormatList(Changes.Select(c => c.Format()).ToList()));
             }
 
             return text;
@@ -829,7 +846,9 @@ namespace SongsOfConquestAccess.Events.Combat
                 List<TroopRef> groupTargets = group.Value.Select(t => t.Target).ToList();
                 EffectTargetSummaryKind kind = byChanges.Count == 1 ? TargetSummaryKind : TargetSummaryContext.Determine(groupTargets);
                 string targets = EffectTargetSummary.FormatTargets(groupTargets, kind);
-                parts.Add(string.IsNullOrWhiteSpace(group.Key) ? targets : targets + ", " + group.Key);
+                parts.Add(string.IsNullOrWhiteSpace(group.Key)
+                    ? targets
+                    : ModText.Get(ModStrings.Common.ListSeparator, targets, group.Key));
             }
 
             string name = Bacteria != null ? Bacteria.Name : ModText.Get(ModStrings.Combat.Effect);
@@ -922,14 +941,6 @@ namespace SongsOfConquestAccess.Events.Combat
         public string Kind { get { return AccessibilityEvents.Combat.MapEntityCreated; } }
         public EntityRef Entity { get; private set; }
         public string GetSpeechText() { return ModText.Get(ModStrings.Combat.Appears, Entity.Format()); }
-    }
-
-    public sealed class MapEntityDestroyedEvent : IAccessibilityEvent
-    {
-        public MapEntityDestroyedEvent(EntityRef entity) { Entity = entity; }
-        public string Kind { get { return AccessibilityEvents.Combat.MapEntityDestroyed; } }
-        public EntityRef Entity { get; private set; }
-        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.Destroyed, Entity.Format()); }
     }
 
     public sealed class TroopPushedEvent : IAccessibilityEvent
@@ -1070,32 +1081,9 @@ namespace SongsOfConquestAccess.Events.Combat
             return path != null ? new List<Vector2Int>(path) : new List<Vector2Int>();
         }
 
-        public static void AddAmount(List<string> parts, int amount, string name)
-        {
-            if (amount > 0)
-            {
-                parts.Add(amount + " " + name);
-            }
-        }
-
         public static string FormatList(IList<string> values)
         {
-            if (values == null || values.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            if (values.Count == 1)
-            {
-                return values[0];
-            }
-
-            if (values.Count == 2)
-            {
-                return ModText.JoinList(values.ToList());
-            }
-
-            return ModText.JoinList(values.ToList());
+            return ModText.JoinList(values != null ? new List<string>(values) : null);
         }
 
         public static string FormatEssenceAmounts(int order, int creation, int chaos, int arcana, int destruction)
@@ -1159,8 +1147,10 @@ namespace SongsOfConquestAccess.Events.Combat
                 parts.Add(attackTrigger);
             }
 
-            parts.Add(bacteria != null ? bacteria.Name.ToLowerInvariant() : FormatDamageType(type));
-            return string.Join(" ", parts.ToArray());
+            // The bacteria's name is the game's own and is left cased as the game cased it: a
+            // language that capitalises its nouns is not served by lowercasing them.
+            parts.Add(bacteria != null ? bacteria.Name : FormatDamageType(type));
+            return ModText.JoinList(ModStrings.Common.PhraseSeparator, parts);
         }
 
         public static string FormatAttackTrigger(AttackTrigger trigger)
@@ -1210,45 +1200,5 @@ namespace SongsOfConquestAccess.Events.Combat
             }
         }
 
-        public static string FormatModifierType(BacteriaModifierType type)
-        {
-            string name = type.ToString();
-            if (name.StartsWith("Troop", StringComparison.Ordinal))
-            {
-                name = name.Substring("Troop".Length);
-            }
-            else if (name.StartsWith("Commander", StringComparison.Ordinal))
-            {
-                name = name.Substring("Commander".Length);
-            }
-            else if (name.StartsWith("Team", StringComparison.Ordinal))
-            {
-                name = name.Substring("Team".Length);
-            }
-
-            return SplitPascalCase(name).ToLowerInvariant();
-        }
-
-        public static string SplitPascalCase(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
-            List<char> chars = new List<char>();
-            for (int i = 0; i < value.Length; i++)
-            {
-                char c = value[i];
-                if (i > 0 && char.IsUpper(c) && !char.IsWhiteSpace(value[i - 1]))
-                {
-                    chars.Add(' ');
-                }
-
-                chars.Add(c);
-            }
-
-            return new string(chars.ToArray());
-        }
     }
 }

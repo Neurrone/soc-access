@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Input;
@@ -31,7 +31,6 @@ namespace SongsOfConquestAccess.UI
         // The screen that owns this grid, handed over when it builds it: the troop cycles and the
         // turn-order jump are the screen's, and the board's keys reach them through here.
         private readonly CombatScreen _screen;
-        private CombatSnapshot _snapshot;
         private Vector2Int _cursor;
         private CombatInspectContext _inspectContext;
         private bool _componentWarningSpoken;
@@ -41,7 +40,6 @@ namespace SongsOfConquestAccess.UI
         {
             _adapter = adapter;
             _screen = screen;
-            RefreshSnapshot();
             _cursor = _adapter != null ? _adapter.GetInitialTile() : Vector2Int.zero;
             _scanner = new HexGridScanner(
                 origin => ScannerCustomCategorySynthesizer.ApplyFromSettings(
@@ -108,18 +106,27 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>Enter on the board: while a spell or an ability is being aimed it confirms the
         /// target under the cursor. The game binds no confirm key in battle otherwise, so anywhere
-        /// else it does nothing.</summary>
-        public bool ConfirmTarget()
+        /// else it does nothing. What a spell confirmation DID is handed back for the screen to say.
+        /// </summary>
+        public CombatSpellTargetSelection ConfirmTarget()
         {
             if (_adapter == null)
             {
-                return false;
+                return CombatSpellTargetSelection.None;
             }
 
             CombatTargetingMode mode = _adapter.GetTargetingMode();
-            return mode == CombatTargetingMode.Spell
-                ? _adapter.ConfirmSpellTarget(_cursor)
-                : mode == CombatTargetingMode.Ability && _adapter.ConfirmAbilityTarget(_cursor);
+            if (mode == CombatTargetingMode.Spell)
+            {
+                return _adapter.ConfirmSpellTarget(_cursor);
+            }
+
+            if (mode == CombatTargetingMode.Ability)
+            {
+                _adapter.ConfirmAbilityTarget(_cursor);
+            }
+
+            return CombatSpellTargetSelection.None;
         }
 
         /// <summary>Escape while the board has the cursor: it gives up whatever sub-mode is on - the
@@ -251,8 +258,7 @@ namespace SongsOfConquestAccess.UI
         /// the troop cycles and the narrator's "it is your turn" all land this way.</summary>
         public bool MoveToTroop(Vector2Int point)
         {
-            RefreshSnapshot();
-            if (_snapshot == null || !_snapshot.IsValidTile(point))
+            if (_adapter == null || !_adapter.IsValidTile(point))
             {
                 return false;
             }
@@ -288,7 +294,7 @@ namespace SongsOfConquestAccess.UI
 
         private void PlayTileCuesFor(Vector2Int point, float panOffset, float gainScale, float semitoneOffset)
         {
-            CombatTile tile = _snapshot != null ? _snapshot.Get(point) : null;
+            CombatTile tile = _adapter != null ? _adapter.GetTile(point) : null;
             if (tile == null)
             {
                 return;
@@ -313,8 +319,7 @@ namespace SongsOfConquestAccess.UI
 
         private bool MoveToCenterTile()
         {
-            RefreshSnapshot();
-            if (_snapshot == null || !_snapshot.IsValidTile(HexGridMoves.CenterTile))
+            if (_adapter == null || !_adapter.IsValidTile(HexGridMoves.CenterTile))
             {
                 return true;
             }
@@ -340,12 +345,11 @@ namespace SongsOfConquestAccess.UI
 
         private bool SkipMove(Func<Vector2Int, Vector2Int> step)
         {
-            RefreshSnapshot();
             TileSkipResult result = TileSkipNavigator.FindTarget(
                 _cursor,
                 step,
                 IsValidSkipTile,
-                point => CombatTileSkipSignature.FromTile(_snapshot != null ? _snapshot.Get(point) : null));
+                point => CombatTileSkipSignature.FromTile(_adapter != null ? _adapter.GetTile(point) : null));
             if (result.Target == _cursor)
             {
                 CueLibrary.PlayCue(CueLibrary.MoveDenied);
@@ -358,7 +362,7 @@ namespace SongsOfConquestAccess.UI
 
         private bool IsValidSkipTile(Vector2Int point)
         {
-            if (_snapshot == null || !_snapshot.IsValidTile(point))
+            if (_adapter == null || !_adapter.IsValidTile(point))
             {
                 return false;
             }
@@ -392,9 +396,15 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
-            CombatInspectContext context = _adapter != null ? _adapter.BeginInspect(_cursor) : null;
+            bool notInMovementRange = false;
+            CombatInspectContext context = _adapter != null ? _adapter.BeginInspect(_cursor, out notInMovementRange) : null;
             if (context == null)
             {
+                if (notInMovementRange)
+                {
+                    SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.NotInMovementRange), interrupt: false));
+                }
+
                 return true;
             }
 
@@ -426,7 +436,7 @@ namespace SongsOfConquestAccess.UI
 
         private bool SetCursor(Vector2Int point)
         {
-            if (_snapshot == null || !_snapshot.IsValidTile(point))
+            if (_adapter == null || !_adapter.IsValidTile(point))
             {
                 CueLibrary.PlayCue(CueLibrary.MoveDenied);
                 return true;
@@ -454,7 +464,6 @@ namespace SongsOfConquestAccess.UI
 
         private void FocusCurrentTile(bool updateNativeFocus)
         {
-            RefreshSnapshot();
             if (_adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None)
             {
                 if (_inspectContext != null)
@@ -497,9 +506,9 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        private static void SpeakInspectStarted(CombatInspectContext context)
+        private void SpeakInspectStarted(CombatInspectContext context)
         {
-            string target = context != null ? context.TargetLabel : null;
+            string target = DescribeInspectTarget(context);
             if (string.IsNullOrWhiteSpace(target))
             {
                 target = ModText.Get(ModStrings.UI.Target);
@@ -508,14 +517,30 @@ namespace SongsOfConquestAccess.UI
             SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.Inspecting, target), interrupt: false));
         }
 
-        private void RefreshSnapshot()
+        /// <summary>What the inspection has just pinned itself to: the stack standing there, the
+        /// thing that can be attacked there, or - on an empty tile the acting troop can walk to -
+        /// the tile itself.</summary>
+        private string DescribeInspectTarget(CombatInspectContext context)
         {
-            _snapshot = _adapter != null ? _adapter.BuildSnapshot() : null;
+            CombatTile tile = context != null && _adapter != null ? _adapter.GetTile(context.PinnedTile) : null;
+            if (tile == null || _adapter == null)
+            {
+                return string.Empty;
+            }
+
+            if (tile.Troop != null)
+            {
+                return CombatTroopText.Stack(_adapter.GetTroopFacts(tile.Troop));
+            }
+
+            return tile.Entity != null
+                ? CombatTroopText.Entity(_adapter.GetEntityFacts(tile.Entity))
+                : _adapter.DescribeTile(tile, null);
         }
 
         private CombatTile GetFocusedTile()
         {
-            return _snapshot != null ? _snapshot.Get(_cursor) : null;
+            return _adapter != null ? _adapter.GetTile(_cursor) : null;
         }
 
         private CombatInspectContext GetEffectiveInspectContext()

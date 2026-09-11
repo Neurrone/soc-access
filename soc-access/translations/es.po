@@ -3867,3 +3867,19 @@ msgstr "Investigación {0}"
 msgctxt "Screens.ResearchCategoryNumber"
 msgid "Research category {0}"
 msgstr "Categoría de investigación {0}"
+||||||| 3cea894
+
+#. Common.Parenthetical
+msgctxt "Common.Parenthetical"
+msgid "{0} ({1})"
+msgstr "{0} ({1})"
+
+#. Combat.Spell
+msgctxt "Combat.Spell"
+msgid "Spell"
+msgstr "Hechizo"
+
+#. Common.PositiveAmount
+msgctxt "Common.PositiveAmount"
+msgid "+{0}"
+msgstr "+{0}"

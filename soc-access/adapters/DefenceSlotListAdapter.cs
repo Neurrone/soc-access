@@ -73,6 +73,13 @@ namespace SongsOfConquestAccess.Adapters
             private readonly TroopHUDEntry _entry;
             private readonly ILocalizationHandler _localization;
 
+            // The details behind a slot are a NATIVE TOOLTIP CAPTURE, and four of the five things a
+            // row says ask for them. Held for the frame they were captured in - both pages that draw
+            // these read every slot in one build - and never longer: the game refills the entry
+            // under a slot between frames.
+            private AdventureTroopDetails _details;
+            private int _detailsFrame = -1;
+
             public Slot(int slotNumber, TroopHUDEntry entry, ILocalizationHandler localization)
             {
                 SlotNumber = slotNumber;
@@ -155,11 +162,19 @@ namespace SongsOfConquestAccess.Adapters
 
             private AdventureTroopDetails GetDetails()
             {
+                int frame = Time.frameCount;
+                if (_detailsFrame == frame)
+                {
+                    return _details;
+                }
+
+                _detailsFrame = frame;
                 IDetails nativeDetails;
-                return _entry != null
+                _details = _entry != null
                     && NativeTooltipUtility.TryGetUiDetails(_entry.GetSelectable(), out nativeDetails)
                     ? nativeDetails as AdventureTroopDetails
                     : null;
+                return _details;
             }
 
             private static int ParseAmount(string amountText)

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquest;
 using SongsOfConquest.Common.Bacterias;
@@ -1189,7 +1189,40 @@ namespace SongsOfConquestAccess.Tests
 
         private static ModifierChange Modifier(BacteriaModifierType type, int amount)
         {
-            return new ModifierChange(type, BacteriaModifierApplicationType.Value, amount);
+            return new ModifierChange(
+                type,
+                BacteriaModifierApplicationType.Value,
+                amount,
+                string.Empty,
+                true,
+                1,
+                ModifierName(type));
+        }
+
+        /// <summary>What the game calls each modifier under "Modifiers/&lt;type without Troop&gt;",
+        /// which is what the adapter reads and hands to the change. Spelled out here because these
+        /// tests run without the game's localization tables.</summary>
+        private static string ModifierName(BacteriaModifierType type)
+        {
+            switch (type)
+            {
+                case BacteriaModifierType.TroopBlessed:
+                    return "blessed";
+                case BacteriaModifierType.TroopDefense:
+                    return "defense";
+                case BacteriaModifierType.TroopInitiative:
+                    return "initiative";
+                case BacteriaModifierType.TroopMeleeOffense:
+                    return "melee offense";
+                case BacteriaModifierType.TroopMovement:
+                    return "movement";
+                case BacteriaModifierType.TroopRangedOffense:
+                    return "ranged offense";
+                case BacteriaModifierType.TroopRangedRange:
+                    return "ranged range";
+                default:
+                    return string.Empty;
+            }
         }
 
         private sealed class TestEvent : IAccessibilityEvent

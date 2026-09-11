@@ -3897,3 +3897,19 @@ msgstr "Исследование {0}"
 msgctxt "Screens.ResearchCategoryNumber"
 msgid "Research category {0}"
 msgstr "Категория исследований {0}"
+||||||| 3cea894
+
+#. Common.Parenthetical
+msgctxt "Common.Parenthetical"
+msgid "{0} ({1})"
+msgstr "{0} ({1})"
+
+#. Combat.Spell
+msgctxt "Combat.Spell"
+msgid "Spell"
+msgstr "Заклинание"
+
+#. Common.PositiveAmount
+msgctxt "Common.PositiveAmount"
+msgid "+{0}"
+msgstr "+{0}"
