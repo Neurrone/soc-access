@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
@@ -316,19 +316,33 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        /// <summary>Several of the card's lines run together as sentences. The stop and the space
+        /// between them are the locale's rather than the mod's: a line the game already ended is
+        /// followed by Common.PhraseSeparator and one it did not by Common.SentenceSeparator, and
+        /// the whole is ended with Common.Sentence.</summary>
         private static string JoinSentences(params string[] parts)
         {
-            List<string> cleaned = new List<string>();
+            string text = string.Empty;
             for (int i = 0; parts != null && i < parts.Length; i++)
             {
-                string part = EnsureSentenceTerminated(parts[i]);
-                if (!string.IsNullOrWhiteSpace(part))
+                string part = parts[i] != null ? parts[i].Trim() : string.Empty;
+                if (part.Length == 0)
                 {
-                    cleaned.Add(part);
+                    continue;
                 }
+
+                if (text.Length == 0)
+                {
+                    text = part;
+                    continue;
+                }
+
+                text = IsTerminated(text)
+                    ? ModText.Get(ModStrings.Common.PhraseSeparator, text, part)
+                    : ModText.Get(ModStrings.Common.SentenceSeparator, text, part);
             }
 
-            return cleaned.Count == 0 ? string.Empty : string.Join(" ", cleaned.ToArray());
+            return EnsureSentenceTerminated(text);
         }
 
         private static string EnsureSentenceTerminated(string value)
@@ -339,10 +353,14 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
+            return IsTerminated(value) ? value : ModText.Get(ModStrings.Common.Sentence, value);
+        }
+
+        /// <summary>Whether the game ended the line itself.</summary>
+        private static bool IsTerminated(string value)
+        {
             char last = value[value.Length - 1];
-            return last == '.' || last == '!' || last == '?' || last == ':' || last == ';'
-                ? value
-                : value + ".";
+            return last == '.' || last == '!' || last == '?' || last == ':' || last == ';';
         }
     }
 }
