@@ -631,7 +631,7 @@ namespace SongsOfConquestAccess.Adapters
                 tile.MapEntityName = GetMapEntityName(entity);
                 if (CanExposeMapEntityTooltipDetails(entity))
                 {
-                    PopulateMapEntityTooltipSpeech(tile, entity, selectedCommander);
+                    PopulateMapEntityVisited(tile, entity, selectedCommander);
                 }
 
                 tile.MapEntityRelationship = FormatSpatialRelationship(GetMapEntityRelationship(entity, localTeamId));
@@ -4195,43 +4195,22 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private void PopulateMapEntityTooltipSpeech(AdventureMapTile tile, IMapEntity entity, ICommanderState selectedCommander)
+        /// <summary>Whether the selected commander has already visited what stands on this tile.
+        /// </summary>
+        private void PopulateMapEntityVisited(AdventureMapTile tile, IMapEntity entity, ICommanderState selectedCommander)
         {
-            if (tile == null || entity == null)
+            if (tile == null || entity == null || selectedCommander == null)
             {
                 return;
             }
 
             try
             {
-                if (selectedCommander != null && entity.DidVisit(selectedCommander.Id))
-                {
-                    tile.MapEntityVisited = true;
-                    return;
-                }
-
-                IDetails details = entity.GetPreVisitDetails(
-                    selectedCommander != null ? selectedCommander.Id : -1,
-                    false,
-                    ScoutingDetailLevel.VeryFar,
-                    null,
-                    selectedCommander != null && selectedCommander.IsAlive);
-
-                MapEntityPreVisitDetails preVisitDetails = details as MapEntityPreVisitDetails;
-                if (preVisitDetails == null)
-                {
-                    return;
-                }
-
-                if (preVisitDetails.Hint != MapEntityPreVisitDetails.PreVisitHint.None)
-                {
-                    tile.MapEntityHint = GameText.Get(_localizationHandler, "Adventure/Tooltips/PreVisitHint/" + preVisitDetails.Hint, string.Empty);
-                }
-
+                tile.MapEntityVisited = entity.DidVisit(selectedCommander.Id);
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to read map entity tooltip details: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to read whether a map entity was visited: " + exception.Message);
             }
         }
 

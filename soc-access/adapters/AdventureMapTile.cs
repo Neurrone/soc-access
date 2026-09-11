@@ -12,6 +12,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private IReadOnlyList<Scanner.ScannerDirection> _roadDirections;
         private Func<IReadOnlyList<Scanner.ScannerDirection>> _roadDirectionsSource;
+        private List<string> _zoneOfControlNames;
 
         public enum PathIndicatorKind
         {
@@ -131,17 +132,21 @@ namespace SongsOfConquestAccess.Adapters
 
         public CommanderInfo Commander { get; set; }
 
-        public List<string> ZoneOfControlNames { get; private set; } = new List<string>();
+        /// <summary>
+        /// The commanders whose zone of control covers this tile, by the name the map speaks them
+        /// under. Allocated on first touch rather than per tile: a scanner snapshot builds thousands
+        /// of tiles and hardly any of them stand inside one.
+        /// </summary>
+        public List<string> ZoneOfControlNames
+        {
+            get { return _zoneOfControlNames ?? (_zoneOfControlNames = new List<string>()); }
+        }
 
         public IMapEntity MapEntity { get; set; }
 
         public int? MapEntityId { get; set; }
 
         public string MapEntityName { get; set; }
-
-        public string MapEntityHint { get; set; }
-
-        public List<string> MapEntityDetails { get; private set; } = new List<string>();
 
         public bool MapEntityVisited { get; set; }
 

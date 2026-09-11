@@ -212,21 +212,7 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>How many rounds of the claim the game has drawn as filled.</summary>
         public int TownStatusRoundsComplete
         {
-            get
-            {
-                int filled = 0;
-                List<TownStatusControllerRoundEntry> entries = TownStatusEntries;
-                for (int i = 0; entries != null && i < entries.Count; i++)
-                {
-                    Transform filledSlot = Reflect.Get<Transform>(entries[i], TownStatusFilledSlotField);
-                    if (filledSlot != null && ((Component)filledSlot).gameObject.activeSelf)
-                    {
-                        filled++;
-                    }
-                }
-
-                return filled;
-            }
+            get { return CountFilledRounds(TownStatusEntries); }
         }
 
         /// <summary>How many rounds of the claim the game has drawn as still empty.</summary>
@@ -234,9 +220,26 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
+                // One read of the entries answers both halves; asking TownStatusRoundsComplete here
+                // would read them again and walk them a second time.
                 List<TownStatusControllerRoundEntry> entries = TownStatusEntries;
-                return entries == null ? 0 : entries.Count - TownStatusRoundsComplete;
+                return entries == null ? 0 : entries.Count - CountFilledRounds(entries);
             }
+        }
+
+        private static int CountFilledRounds(List<TownStatusControllerRoundEntry> entries)
+        {
+            int filled = 0;
+            for (int i = 0; entries != null && i < entries.Count; i++)
+            {
+                Transform filledSlot = Reflect.Get<Transform>(entries[i], TownStatusFilledSlotField);
+                if (filledSlot != null && ((Component)filledSlot).gameObject.activeSelf)
+                {
+                    filled++;
+                }
+            }
+
+            return filled;
         }
 
         public bool IsTownStatusVisible
