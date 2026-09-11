@@ -51,6 +51,58 @@ namespace SongsOfConquestAccess.Adapters
         Enemy
     }
 
+    /// <summary>A stack on the battlefield as the facts a spoken row is made of: what the game calls
+    /// it, how many are in it, the health it has left of its maximum, and whether it is an enemy or
+    /// the one acting. <see cref="UI.CombatTroopText"/> does the wording.</summary>
+    public struct CombatTroopFacts
+    {
+        public CombatTroopFacts(string name, int size, int currentHealth, int maxHealth, bool isEnemy, bool isActing)
+        {
+            Name = name ?? string.Empty;
+            Size = size;
+            CurrentHealth = currentHealth;
+            MaxHealth = maxHealth;
+            IsEnemy = isEnemy;
+            IsActing = isActing;
+        }
+
+        /// <summary>The game's own name for the stack at this size, cleaned, and empty where the
+        /// game gives none: the general word a blank name falls back to is wording and belongs to
+        /// whoever composes the row.</summary>
+        public string Name { get; private set; }
+
+        public int Size { get; private set; }
+
+        public int CurrentHealth { get; private set; }
+
+        public int MaxHealth { get; private set; }
+
+        public bool IsEnemy { get; private set; }
+
+        public bool IsActing { get; private set; }
+    }
+
+    /// <summary>A thing on the battlefield that can be attacked, as the facts a spoken row is made
+    /// of: the game's name for it and the health it has, where it has any.</summary>
+    public struct CombatEntityFacts
+    {
+        public CombatEntityFacts(string name, bool hasHealth, int healthLeft, int maxHealth)
+        {
+            Name = name ?? string.Empty;
+            HasHealth = hasHealth;
+            HealthLeft = healthLeft;
+            MaxHealth = maxHealth;
+        }
+
+        public string Name { get; private set; }
+
+        public bool HasHealth { get; private set; }
+
+        public int HealthLeft { get; private set; }
+
+        public int MaxHealth { get; private set; }
+    }
+
     /// <summary>What confirming a spell target DID, as facts rather than words: whether the native
     /// click ran at all, how many times the tile was a selected target before and after it, and
     /// whether the game is still aiming. <see cref="Screens.CombatScreen"/> words it.</summary>
@@ -548,7 +600,7 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         ScannerResult result = new ScannerResult(
                             ScannerTileKeys.For(friendly ? "troop:friendly" : "troop:enemy", point),
-                            FormatTroopGridLabel(tile.Troop),
+                            CombatTroopText.Stack(GetTroopFacts(tile.Troop)),
                             point)
                         {
                             // Keyed by troop type, not by the label: the label
@@ -1784,7 +1836,6 @@ namespace SongsOfConquestAccess.Adapters
             SynchronizeNativeHoverForPreview(troop.Position);
 
             CombatInspectContext context = CombatInspectContext.ForStack(troop.Position);
-            context.TargetLabel = DescribeTroopForSpeech(troop);
             BuildStackRanges(troop, context);
             context.TooltipDetails = _tooltipUtility != null ? _tooltipUtility.GetInspectTroopDetails(troop) : null;
             return context;
@@ -1803,7 +1854,6 @@ namespace SongsOfConquestAccess.Adapters
             _highlightManager?.SetState(BattleHighlightManager.State.CurrentTroop);
             _attackPreviewHandler?.Hide();
             CombatInspectContext context = CombatInspectContext.ForPath(point, ConvertPath(path));
-            context.TargetLabel = DescribeTile(GetTile(point), null);
             context.TooltipDetails = BuildTileDetails(point);
             return context;
         }
@@ -1829,7 +1879,6 @@ namespace SongsOfConquestAccess.Adapters
             CombatInspectContext context = PathfinderExtensions.IsReachable(path, GetCurrentMovesLeft(), true)
                 ? CombatInspectContext.ForEntityPath(entity.Position, ConvertPath(path))
                 : CombatInspectContext.ForEntityOnly(entity.Position);
-            context.TargetLabel = DescribeEntityForSpeech(entity);
             context.TooltipDetails = BuildEntityDetails(entity);
             return context;
         }
@@ -2308,9 +2357,32 @@ namespace SongsOfConquestAccess.Adapters
             return IsDebris(entity) ? ModText.Get(ModStrings.Spatial.Debris) : string.Empty;
         }
 
-        public string DescribeTroopForSpeech(IBattleTroopState troop)
+        /// <summary>Everything a spoken stack row is made of, read from the game in one go.</summary>
+        public CombatTroopFacts GetTroopFacts(IBattleTroopState troop)
         {
-            return FormatTroopGridLabel(troop);
+            if (troop == null)
+            {
+                return new CombatTroopFacts(string.Empty, 0, 0, 0, false, false);
+            }
+
+            return new CombatTroopFacts(
+                SpokenLines.Clean(_facade.Troops.GetName(troop.Id, troop.Stats.Size)),
+                troop.Stats.Size,
+                troop.CurrentHealth,
+                troop.Stats.MaxHealth.GetValue(),
+                IsEnemyTroop(troop),
+                IsActingTroop(troop));
+        }
+
+        /// <summary>Everything a spoken row for an attackable thing is made of.</summary>
+        public CombatEntityFacts GetEntityFacts(IMapEntity entity)
+        {
+            IHealthComponent health = entity != null ? entity.GetComponent<IHealthComponent>() : null;
+            return new CombatEntityFacts(
+                GetMapEntityName(entity),
+                health != null,
+                health != null ? health.HealthLeft : 0,
+                health != null ? health.MaxHealth.GetValue() : 0);
         }
 
         public bool PerformsBeamAttacks(IBattleTroopState troop)
@@ -2342,86 +2414,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return troop.TeamId == _facade.Teams.AttackingTeam.Id ? BeamFacing.Right : BeamFacing.Left;
-        }
-
-        public string DescribeEntityForSpeech(IMapEntity entity)
-        {
-            string name = GetMapEntityName(entity);
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                name = ModText.Get(ModStrings.Combat.AttackableEntity);
-            }
-
-            IHealthComponent health = entity.GetComponent<IHealthComponent>();
-            if (health == null)
-            {
-                return name;
-            }
-
-            return MenuButtonTextUtility.JoinParts(
-                name,
-                ModText.Get(ModStrings.Spatial.Health, health.HealthLeft, health.MaxHealth.GetValue()));
-        }
-
-        public string FormatTroopGridLabel(IBattleTroopState troop)
-        {
-            if (troop == null)
-            {
-                return string.Empty;
-            }
-
-            string label = FormatTroopLabel(troop, troop.Stats.Size, includeHealth: true, includePosition: false);
-            IBattleTroopState current = GetCurrentTroop();
-            return current != null && current.Id == troop.Id
-                ? MenuButtonTextUtility.JoinParts(ModText.Get(ModStrings.Spatial.Acting), label)
-                : label;
-        }
-
-        public string FormatTroopEventLabel(IBattleTroopState troop)
-        {
-            if (troop == null)
-            {
-                return ModText.Get(ModStrings.Combat.UnknownTroop);
-            }
-
-            return FormatTroopLabel(troop, troop.Stats.Size, includeHealth: false, includePosition: true);
-        }
-
-        public string FormatTroopEventLabel(IBattleTroopState troop, int sizeOverride)
-        {
-            if (troop == null)
-            {
-                return ModText.Get(ModStrings.Combat.UnknownTroop);
-            }
-
-            return FormatTroopLabel(troop, sizeOverride, includeHealth: false, includePosition: true);
-        }
-
-        public string FormatTroopEventLabel(IBattleTroopState troop, int sizeOverride, Vector2Int positionOverride)
-        {
-            if (troop == null)
-            {
-                return ModText.Get(ModStrings.Combat.UnknownTroop);
-            }
-
-            string label = FormatTroopLabel(troop, sizeOverride, includeHealth: false, includePosition: false);
-            return ModText.Get(ModStrings.Combat.TroopAt, label, FormatPoint(positionOverride));
-        }
-
-        public string FormatEntityEventLabel(IMapEntity entity)
-        {
-            if (entity == null)
-            {
-                return ModText.Get(ModStrings.Combat.UnknownEntity);
-            }
-
-            string name = GetMapEntityName(entity);
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                name = ModText.Get(ModStrings.Combat.AttackableEntity);
-            }
-
-            return ModText.Get(ModStrings.Combat.TroopAt, name, FormatPoint(entity.Position));
         }
 
         public TroopRef CreateTroopRef(IBattleTroopState troop)
@@ -2674,29 +2666,6 @@ namespace SongsOfConquestAccess.Adapters
                 : string.Empty;
         }
 
-        private string FormatTroopLabel(IBattleTroopState troop, int size, bool includeHealth, bool includePosition)
-        {
-            string name = SpokenLines.Clean(_facade.Troops.GetName(troop.Id, size));
-            int localTeamId = GetLocalTeamId();
-            string label = localTeamId < 0 || troop.TeamId == localTeamId
-                ? ModText.Get(ModStrings.Combat.TroopQuantity, size, name)
-                : ModText.Get(ModStrings.Combat.EnemyTroop, size, name);
-
-            if (includeHealth)
-            {
-                label = MenuButtonTextUtility.JoinParts(
-                    label,
-                    ModText.Get(ModStrings.Spatial.Health, troop.CurrentHealth, troop.Stats.MaxHealth.GetValue()));
-            }
-
-            if (includePosition)
-            {
-                label = ModText.Get(ModStrings.Combat.TroopAt, label, FormatPoint(troop.Position));
-            }
-
-            return label;
-        }
-
         public bool IsActingTroop(IBattleTroopState troop)
         {
             IBattleTroopState current = GetCurrentTroop();
@@ -2707,41 +2676,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             int localTeamId = GetLocalTeamId();
             return troop != null && localTeamId >= 0 && troop.TeamId != localTeamId;
-        }
-
-        public int GetTroopStackSize(IBattleTroopState troop)
-        {
-            return troop != null ? troop.Stats.Size : 0;
-        }
-
-        public string GetTroopNameForSpeech(IBattleTroopState troop)
-        {
-            return CreateTroopRef(troop).Name;
-        }
-
-        public string GetTroopHealthForSpeech(IBattleTroopState troop)
-        {
-            return troop != null
-                ? ModText.Get(ModStrings.Spatial.Health, troop.CurrentHealth, troop.Stats.MaxHealth.GetValue())
-                : string.Empty;
-        }
-
-        public string GetEntityNameForSpeech(IMapEntity entity)
-        {
-            return GetMapEntityName(entity);
-        }
-
-        public string GetEntityHealthForSpeech(IMapEntity entity)
-        {
-            if (entity == null)
-            {
-                return string.Empty;
-            }
-
-            IHealthComponent health = entity.GetComponent<IHealthComponent>();
-            return health != null
-                ? ModText.Get(ModStrings.Spatial.Health, health.HealthLeft, health.MaxHealth.GetValue())
-                : string.Empty;
         }
 
         private int GetLocalTeamId()
@@ -2890,11 +2824,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return troopIds;
-        }
-
-        public bool TryGetLocalActingTroopPosition(int troopId, out Vector2Int position)
-        {
-            return TryGetTroopPosition(troopId, out position, requireLocalCurrentTurn: true);
         }
 
         public bool TryGetTroopPosition(int troopId, out Vector2Int position, bool requireLocalCurrentTurn)
@@ -3227,8 +3156,6 @@ namespace SongsOfConquestAccess.Adapters
 
         public IDetails TooltipDetails { get; set; }
 
-        public string TargetLabel { get; set; }
-
         public static CombatInspectContext ForStack(Vector2Int pinnedTile)
         {
             return new CombatInspectContext(CombatInspectMode.Stack, pinnedTile);
@@ -3412,20 +3339,6 @@ namespace SongsOfConquestAccess.Adapters
                 : ModText.Get(ModStrings.Spatial.RangeAndMovement, attackRangeText);
         }
 
-        private static string FormatList(List<string> values)
-        {
-            if (values == null || values.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            if (values.Count == 1)
-            {
-                return values[0];
-            }
-
-            return ModText.JoinList(values);
-        }
     }
 
     public enum CombatInspectMode

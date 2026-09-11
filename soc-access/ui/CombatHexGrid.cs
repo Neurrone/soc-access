@@ -512,15 +512,36 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        private static void SpeakInspectStarted(CombatInspectContext context)
+        private void SpeakInspectStarted(CombatInspectContext context)
         {
-            string target = context != null ? context.TargetLabel : null;
+            string target = DescribeInspectTarget(context);
             if (string.IsNullOrWhiteSpace(target))
             {
                 target = ModText.Get(ModStrings.UI.Target);
             }
 
             SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.Inspecting, target), interrupt: false));
+        }
+
+        /// <summary>What the inspection has just pinned itself to: the stack standing there, the
+        /// thing that can be attacked there, or - on an empty tile the acting troop can walk to -
+        /// the tile itself.</summary>
+        private string DescribeInspectTarget(CombatInspectContext context)
+        {
+            CombatTile tile = context != null && _snapshot != null ? _snapshot.Get(context.PinnedTile) : null;
+            if (tile == null || _adapter == null)
+            {
+                return string.Empty;
+            }
+
+            if (tile.Troop != null)
+            {
+                return CombatTroopText.Stack(_adapter.GetTroopFacts(tile.Troop));
+            }
+
+            return tile.Entity != null
+                ? CombatTroopText.Entity(_adapter.GetEntityFacts(tile.Entity))
+                : _adapter.DescribeTile(tile, null);
         }
 
         private void RefreshSnapshot()
