@@ -3781,3 +3781,7 @@ msgctxt "Scanner.CustomCategoryEmpty"
 msgid "Custom category {0} is empty"
 msgstr "自訂類別 {0} 為空"
 
+#. UI.ModReady
+msgctxt "UI.ModReady"
+msgid "Songs of Conquest Access v{0} ready"
+msgstr "Songs of Conquest Access v{0} 已就緒"

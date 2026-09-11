@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
@@ -179,7 +180,7 @@ namespace SongsOfConquestAccess
                 return string.Empty;
             }
 
-            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+            List<string> parts = new List<string>();
             for (int i = 0; i < textMeshes.Length; i++)
             {
                 UITextMesh textMesh = textMeshes[i];
@@ -188,21 +189,10 @@ namespace SongsOfConquestAccess
                     continue;
                 }
 
-                string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-                if (string.IsNullOrWhiteSpace(text))
-                {
-                    continue;
-                }
-
-                if (builder.Length > 0)
-                {
-                    builder.Append(": ");
-                }
-
-                builder.Append(text);
+                parts.Add(SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh)));
             }
 
-            return builder.ToString();
+            return ModText.JoinList(ModStrings.UI.LabelValue, parts);
         }
 
         private static string GetNotificationHudEntryText(NotificationHUDEntry entry)

@@ -403,7 +403,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            string message = PluginName + " v" + ModEntry.ModVersion + " ready";
+            string message = ModText.Get(ModStrings.UI.ModReady, ModEntry.ModVersion);
             SpeechPipeline.Output(new SpeechRequest(message, interrupt: true));
             _announcedReady = true;
             Logger.LogInfo(message);

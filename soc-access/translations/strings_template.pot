@@ -2274,6 +2274,11 @@ msgctxt "UI.Unselected"
 msgid "unselected"
 msgstr ""
 
+#. UI.ModReady
+msgctxt "UI.ModReady"
+msgid "Songs of Conquest Access v{0} ready"
+msgstr ""
+
 #. Screens.AdventureMap
 msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
