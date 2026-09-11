@@ -86,19 +86,33 @@ namespace SongsOfConquestAccess.Screens
             return false;
         }
 
+        /// <summary>THE PAGE'S OWN BACK CONTROL, where it draws one the back key should press - the
+        /// menu pages' and the lobby pages' Back button. Null (the usual answer) leaves the key to the
+        /// game.</summary>
+        public virtual IMenuButtonAdapter BackButton
+        {
+            get { return null; }
+        }
+
         /// <summary>The back key was pressed. Return true when the screen handled it; false lets the
-        /// game's own handling stand.</summary>
+        /// game's own handling stand. The default presses <see cref="BackButton"/>.</summary>
         public virtual bool Back()
         {
-            return false;
+            IMenuButtonAdapter back = BackButton;
+            return back != null && back.Activate();
         }
 
         /// <summary>Whether <see cref="Back"/> is going to claim the key, asked BEFORE it is pressed.
-        /// Screens overwhelmingly answer false: Escape belongs to the game, and only a surface the
-        /// mod itself put on the screen has any business taking the key away from it.</summary>
+        /// Screens overwhelmingly answer false: Escape belongs to the game, and only a surface the mod
+        /// itself put on the screen, or a page drawing a Back button of its own, has any business
+        /// taking the key away from it.</summary>
         public virtual bool ConsumesBack
         {
-            get { return false; }
+            get
+            {
+                IMenuButtonAdapter back = BackButton;
+                return back != null && back.IsVisible();
+            }
         }
 
         /// <summary>THE SCREEN'S OWN TEXT EDITOR, or null where the page has no box the player types

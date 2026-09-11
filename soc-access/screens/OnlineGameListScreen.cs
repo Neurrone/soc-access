@@ -82,14 +82,9 @@ namespace SongsOfConquestAccess.Screens
             get { return TableStop; }
         }
 
-        public override bool ConsumesBack
+        public override IMenuButtonAdapter BackButton
         {
-            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
-        }
-
-        public override bool Back()
-        {
-            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
+            get { return Live != null ? Live.BackButton : null; }
         }
 
         public override void Build(GraphBuilder builder)
