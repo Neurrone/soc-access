@@ -116,7 +116,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string EquipmentLabel
         {
-            get { return SpokenText.Get(_localization, "Common/CommanderInventory/Equipment", "Equipment"); }
+            get { return SpokenText.Get(_localization, "Common/CommanderInventory/Equipment", string.Empty); }
         }
 
         public string InventoryLabel

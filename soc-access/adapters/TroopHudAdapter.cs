@@ -512,7 +512,7 @@ namespace SongsOfConquestAccess.Adapters
                 return tooltip;
             }
 
-            string disbandLine = GetLocalizedText("Adventure/TroopHUD/DisbandInstruction", "Disband Troop");
+            string disbandLine = GetLocalizedText("Adventure/TroopHUD/DisbandInstruction", string.Empty);
             List<string> instructionLines = new List<string> { disbandLine };
             return new Tooltip(
                 () => TooltipLines.Without(tooltip.TextLines, instructionLines),

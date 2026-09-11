@@ -213,9 +213,9 @@ namespace SongsOfConquestAccess.Adapters
             switch (index)
             {
                 case 0:
-                    return GameText.Get(LocalizationHandler, "Chat/All", "All");
+                    return GameText.Get(LocalizationHandler, "Chat/All", string.Empty);
                 case 1:
-                    return GameText.Get(LocalizationHandler, "Chat/Allies", "Allies");
+                    return GameText.Get(LocalizationHandler, "Chat/Allies", string.Empty);
                 default:
                     return string.Empty;
             }
@@ -243,7 +243,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string SendLabel
         {
-            get { return GameText.Get(LocalizationHandler, "Common/Chat/Send", "Send"); }
+            get { return GameText.Get(LocalizationHandler, "Common/Chat/Send", string.Empty); }
         }
 
         public bool Send()
@@ -425,7 +425,7 @@ namespace SongsOfConquestAccess.Adapters
             if (!isLocalResponse)
             {
                 senderName = isServer
-                    ? GameText.Get(LocalizationHandler, "Chat/Server", "Server")
+                    ? GameText.Get(LocalizationHandler, "Chat/Server", string.Empty)
                     : GetNativeSenderName(message);
             }
 

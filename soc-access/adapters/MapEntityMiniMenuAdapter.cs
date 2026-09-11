@@ -158,7 +158,7 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The game's own caption for the row of upgrade slots.</summary>
         public string UpgradeCaption
         {
-            get { return SpokenText.Get(Localization, "Adventure/MapEntityHUD/Upgrades", "Tier:"); }
+            get { return SpokenText.Get(Localization, "Adventure/MapEntityHUD/Upgrades", string.Empty); }
         }
 
         /// <summary>How many of the entity's upgrade tiers the game has drawn as built.</summary>

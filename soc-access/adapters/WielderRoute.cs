@@ -288,7 +288,7 @@ namespace SongsOfConquestAccess.Adapters
             string action = GameText.Get(
                 localization,
                 isPartner ? "Adventure/TooltipInstruction/Trade" : "Adventure/TooltipInstruction/Attack",
-                isPartner ? "Trade" : "Attack");
+                string.Empty);
             string target = facade.Commanders.GetName(other.Id);
             return string.IsNullOrWhiteSpace(action) || string.IsNullOrWhiteSpace(target)
                 ? null

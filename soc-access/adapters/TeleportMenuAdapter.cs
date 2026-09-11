@@ -70,22 +70,22 @@ namespace SongsOfConquestAccess.Adapters
 
         public string PreviousLabel
         {
-            get { return FirstNonEmpty(GetButtonText(GetPreviousButton()), GameText.Get(LocalizationHandler, "Common/Previous", "Previous")); }
+            get { return FirstNonEmpty(GetButtonText(GetPreviousButton()), GameText.Get(LocalizationHandler, "Common/Previous", string.Empty)); }
         }
 
         public string NextLabel
         {
-            get { return FirstNonEmpty(GetButtonText(GetNextButton()), GameText.Get(LocalizationHandler, "Common/Next", "Next")); }
+            get { return FirstNonEmpty(GetButtonText(GetNextButton()), GameText.Get(LocalizationHandler, "Common/Next", string.Empty)); }
         }
 
         public string ConfirmLabel
         {
-            get { return FirstNonEmpty(GetButtonText(GetConfirmButton()), GameText.Get(LocalizationHandler, "Common/Confirm", "Confirm")); }
+            get { return FirstNonEmpty(GetButtonText(GetConfirmButton()), GameText.Get(LocalizationHandler, "Common/Confirm", string.Empty)); }
         }
 
         public string CancelLabel
         {
-            get { return FirstNonEmpty(GetButtonText(GetCancelButton()), GameText.Get(LocalizationHandler, "Common/Cancel", "Cancel")); }
+            get { return FirstNonEmpty(GetButtonText(GetCancelButton()), GameText.Get(LocalizationHandler, "Common/Cancel", string.Empty)); }
         }
 
         private int CurrentIndex
