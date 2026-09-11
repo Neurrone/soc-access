@@ -164,7 +164,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _gridAdapter = Live;
-            _grid = Live == null ? null : new CombatHexGrid(Live);
+            _grid = Live == null ? null : new CombatHexGrid(Live, this);
             return _grid;
         }
 

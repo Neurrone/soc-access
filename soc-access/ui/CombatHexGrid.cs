@@ -27,15 +27,20 @@ namespace SongsOfConquestAccess.UI
     public sealed class CombatHexGrid
     {
         private readonly CombatAdapter _adapter;
+
+        // The screen that owns this grid, handed over when it builds it: the troop cycles and the
+        // turn-order jump are the screen's, and the board's keys reach them through here.
+        private readonly CombatScreen _screen;
         private CombatSnapshot _snapshot;
         private Vector2Int _cursor;
         private CombatInspectContext _inspectContext;
         private bool _componentWarningSpoken;
         private readonly HexGridScanner _scanner;
 
-        public CombatHexGrid(CombatAdapter adapter)
+        public CombatHexGrid(CombatAdapter adapter, CombatScreen screen)
         {
             _adapter = adapter;
+            _screen = screen;
             RefreshSnapshot();
             _cursor = _adapter != null ? _adapter.GetInitialTile() : Vector2Int.zero;
             _scanner = new HexGridScanner(
@@ -196,38 +201,32 @@ namespace SongsOfConquestAccess.UI
 
             if (action.Key == AccessibilityActions.CombatNextActingTroop.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.NavigateLocalActingTroop(1);
+                return _screen != null && _screen.NavigateLocalActingTroop(1);
             }
 
             if (action.Key == AccessibilityActions.CombatPreviousActingTroop.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.NavigateLocalActingTroop(-1);
+                return _screen != null && _screen.NavigateLocalActingTroop(-1);
             }
 
             if (action.Key == AccessibilityActions.CombatFocusActingTroop.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.FocusActingTroop();
+                return _screen != null && _screen.FocusActingTroop();
             }
 
             if (action.Key == AccessibilityActions.CombatNextEnemyTroop.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.NavigateEnemyActingTroop(1);
+                return _screen != null && _screen.NavigateEnemyActingTroop(1);
             }
 
             if (action.Key == AccessibilityActions.CombatPreviousEnemyTroop.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.NavigateEnemyActingTroop(-1);
+                return _screen != null && _screen.NavigateEnemyActingTroop(-1);
             }
 
             if (action.Key == AccessibilityActions.CombatFocusTimeline.Key)
             {
-                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-                return screen != null && screen.FocusTimeline();
+                return _screen != null && _screen.FocusTimeline();
             }
 
             if (action.Key == AccessibilityActions.ReadThreat.Key)
@@ -240,14 +239,12 @@ namespace SongsOfConquestAccess.UI
 
         private bool CanNavigateLocalActingTroops()
         {
-            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-            return screen != null && screen.CanNavigateLocalActingTroops();
+            return _screen != null && _screen.CanNavigateLocalActingTroops();
         }
 
         private bool CanNavigateEnemyActingTroops()
         {
-            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-            return screen != null && screen.CanNavigateEnemyActingTroops();
+            return _screen != null && _screen.CanNavigateEnemyActingTroops();
         }
 
         /// <summary>Put the cursor on a troop's tile and read it, as a move does: the queue's Enter,
