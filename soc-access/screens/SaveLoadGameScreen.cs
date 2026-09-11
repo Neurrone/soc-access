@@ -164,17 +164,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildSaves(GraphBuilder builder)
         {
-            List<SaveLoadGameMenuAdapter.SaveEntry> entries = new List<SaveLoadGameMenuAdapter.SaveEntry>();
-            IReadOnlyList<SaveLoadGameMenuAdapter.SaveEntry> all = Live.GetEntries();
-            for (int i = 0; i < all.Count; i++)
-            {
-                if (all[i] != null && all[i].Entry != null && all[i].IsVisible())
-                {
-                    entries.Add(all[i]);
-                }
-            }
-
-            SortByDrawnTop(entries);
+            IReadOnlyList<SaveLoadGameMenuAdapter.SaveEntry> entries = Live.GetVisibleEntriesInDrawnOrder();
             ControlId landing = null;
             for (int i = 0; i < entries.Count; i++)
             {
@@ -198,53 +188,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.LandStopOn(landing);
-        }
-
-        /// <summary>
-        /// The rows in drawn order, topmost first (Unity's y grows upwards, so that is the largest
-        /// y). Rows the layout has not placed yet - every row on the frame the list is built, where
-        /// they all sit at one y - fall back to the newest save first, which is the order the page
-        /// settles into a frame later.
-        /// </summary>
-        private static void SortByDrawnTop(List<SaveLoadGameMenuAdapter.SaveEntry> items)
-        {
-            List<float> tops = new List<float>(items.Count);
-            List<long> times = new List<long>(items.Count);
-            for (int i = 0; i < items.Count; i++)
-            {
-                Component component = items[i].Entry;
-                tops.Add(component != null ? component.transform.position.y : 0f);
-                times.Add(items[i].LastWriteTime.Ticks);
-            }
-
-            for (int i = 1; i < items.Count; i++)
-            {
-                SaveLoadGameMenuAdapter.SaveEntry moving = items[i];
-                float top = tops[i];
-                long time = times[i];
-                int j = i - 1;
-                while (j >= 0 && IsAbove(top, time, tops[j], times[j]))
-                {
-                    items[j + 1] = items[j];
-                    tops[j + 1] = tops[j];
-                    times[j + 1] = times[j];
-                    j--;
-                }
-
-                items[j + 1] = moving;
-                tops[j + 1] = top;
-                times[j + 1] = time;
-            }
-        }
-
-        private static bool IsAbove(float top, long time, float otherTop, long otherTime)
-        {
-            if (Mathf.Abs(top - otherTop) > 0.5f)
-            {
-                return top > otherTop;
-            }
-
-            return time > otherTime;
         }
 
         // ---- the preview panel ----
