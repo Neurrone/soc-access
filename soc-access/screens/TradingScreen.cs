@@ -70,6 +70,10 @@ namespace SongsOfConquestAccess.Screens
         // frame bought nothing but the allocation; the contributor owns the key and the rule
         // (ui/ArtifactSlotNodes.cs, Column). It is a field on the SCREEN because an adapter may hold
         // no graph concepts.
+        // A section the game has stopped answering for is reported once and then costs only its own
+        // rows. What has been reported is mod-owned and outlives any one menu instance.
+        private readonly SectionItems _sections = new SectionItems("TradingScreen");
+
         private readonly ArtifactSlotNodes.Column _leftColumn = new ArtifactSlotNodes.Column();
 
         private readonly ArtifactSlotNodes.Column _rightColumn = new ArtifactSlotNodes.Column();
@@ -250,7 +254,7 @@ namespace SongsOfConquestAccess.Screens
         /// the bar.</summary>
         private void BuildModifiers(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
         {
-            IReadOnlyList<TradingMenuAdapter.ModifierCategory> categories = Items(
+            IReadOnlyList<TradingMenuAdapter.ModifierCategory> categories = _sections.Of(
                 "modifier categories",
                 side.GetModifierCategories);
             List<CommanderBands.TabItem> tabs = new List<CommanderBands.TabItem>();
@@ -351,11 +355,11 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- shared ----
 
-        private static IReadOnlyList<CommanderBands.Line> Lines(
+        private IReadOnlyList<CommanderBands.Line> Lines(
             string section,
             Func<IReadOnlyList<TradingMenuAdapter.LabeledItem>> getter)
         {
-            IReadOnlyList<TradingMenuAdapter.LabeledItem> items = Items(section, getter);
+            IReadOnlyList<TradingMenuAdapter.LabeledItem> items = _sections.Of(section, getter);
             List<CommanderBands.Line> lines = new List<CommanderBands.Line>();
             for (int i = 0; i < items.Count; i++)
             {
@@ -364,22 +368,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return lines;
-        }
-
-        /// <summary>One section's items, or none where reading them threw: a part of the menu the game
-        /// has stopped answering for costs its own rows and never the rest of the page.</summary>
-        private static IReadOnlyList<T> Items<T>(string section, Func<IReadOnlyList<T>> getter)
-        {
-            try
-            {
-                IReadOnlyList<T> items = getter != null ? getter() : null;
-                return items ?? new T[0];
-            }
-            catch (Exception exception)
-            {
-                SocAccessMod.Instance?.LogWarning("TradingScreen section " + section + " failed to build: " + exception);
-                return new T[0];
-            }
         }
 
     }

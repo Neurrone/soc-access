@@ -77,6 +77,10 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>The adventure spellbook: the commander HUD's settings hold the opener, and the
         /// opener holds the book (<see cref="HudSources"/>).</summary>
+        // A section the game has stopped answering for is reported once and then costs only its own
+        // rows. What has been reported is mod-owned and outlives any one menu instance.
+        private readonly SectionItems _sections = new SectionItems("SpellbookScreen");
+
         private readonly ScreenSource<SpellBook> _adventure =
             ScreenSource<SpellBook>.FromOwner(HudSources.Commander, HudSources.Spellbook);
 
@@ -190,7 +194,7 @@ namespace SongsOfConquestAccess.Screens
 
             BuildAutoPopulate(builder);
 
-            IReadOnlyList<SpellbookAdapter.QuickbarItem> items = Items("quickbar", Live.GetQuickbarItems);
+            IReadOnlyList<SpellbookAdapter.QuickbarItem> items = _sections.Of("quickbar", Live.GetQuickbarItems);
             for (int i = 0; i < items.Count; i++)
             {
                 AddSlot(builder, items[i], i);
@@ -358,7 +362,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildSpells(GraphBuilder builder)
         {
-            IReadOnlyList<SpellbookAdapter.SchoolItem> schools = Items("schools", Live.GetSchools);
+            IReadOnlyList<SpellbookAdapter.SchoolItem> schools = _sections.Of("schools", Live.GetSchools);
 
             // Every column's spells in one pass over the entries: asking column by column walked the
             // whole list six times a frame.
@@ -521,20 +525,6 @@ namespace SongsOfConquestAccess.Screens
             {
                 SocAccessMod.Instance?.LogWarning("SpellbookScreen section spells failed to build: " + exception);
                 return null;
-            }
-        }
-
-        private static IReadOnlyList<T> Items<T>(string section, Func<IReadOnlyList<T>> getter)
-        {
-            try
-            {
-                IReadOnlyList<T> items = getter != null ? getter() : null;
-                return items ?? new T[0];
-            }
-            catch (Exception exception)
-            {
-                SocAccessMod.Instance?.LogWarning("SpellbookScreen section " + section + " failed to build: " + exception);
-                return new T[0];
             }
         }
 

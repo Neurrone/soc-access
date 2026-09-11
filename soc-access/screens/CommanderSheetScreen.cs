@@ -72,6 +72,10 @@ namespace SongsOfConquestAccess.Screens
         // frame bought nothing but the allocation; the contributor owns the key and the rule
         // (ui/ArtifactSlotNodes.cs, Column). It is a field on the SCREEN because an adapter may hold
         // no graph concepts.
+        // A section the game has stopped answering for is reported once and then costs only its own
+        // rows. What has been reported is mod-owned and outlives any one menu instance.
+        private readonly SectionItems _sections = new SectionItems("CommanderSheetScreen");
+
         private readonly ArtifactSlotNodes.Column _column = new ArtifactSlotNodes.Column();
 
         /// <summary>The commander HUD's settings hold the sheet (<see cref="HudSources"/>).</summary>
@@ -182,12 +186,12 @@ namespace SongsOfConquestAccess.Screens
                 builder,
                 "stats",
                 GameText.Get("Common/CommanderInventory/Stats", string.Empty),
-                Items("Stats", Live.GetStats));
+                _sections.Of("Stats", Live.GetStats));
             BuildBand(
                 builder,
                 "specialization",
                 GameText.Get("Commanders/Tooltip/Specializations", string.Empty),
-                Items("Specializations", Live.GetSpecializations));
+                _sections.Of("Specializations", Live.GetSpecializations));
             BuildModifiers(builder);
 
             if (firstStat != null)
@@ -219,7 +223,7 @@ namespace SongsOfConquestAccess.Screens
                 index => Live.ActivateModifierCategory(index),
                 index => Live.SelectModifierCategory(index),
                 Live.GetActiveModifierListLabel(),
-                Lines(Items("Modifiers", Live.GetActiveModifiers)),
+                Lines(_sections.Of("Modifiers", Live.GetActiveModifiers)),
                 Marker);
         }
 
@@ -268,12 +272,12 @@ namespace SongsOfConquestAccess.Screens
                 builder,
                 "skills",
                 GameText.Get("Commanders/Tooltip/Skills", string.Empty),
-                Items("Skills", () => Live.GetSkills(powers: false)));
+                _sections.Of("Skills", () => Live.GetSkills(powers: false)));
             BuildBand(
                 builder,
                 "powers",
                 GameText.Get("Commanders/Tooltip/Powers", string.Empty),
-                Items("Powers", () => Live.GetSkills(powers: true)));
+                _sections.Of("Powers", () => Live.GetSkills(powers: true)));
         }
 
         // ---- the close cross ----
@@ -314,24 +318,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return lines;
-        }
-
-        /// <summary>One band's items, or an empty band where reading them threw: a section the game
-        /// has stopped answering for costs its own rows and never the rest of the sheet.</summary>
-        private static IReadOnlyList<CommanderSheetAdapter.LabeledItem> Items(
-            string section,
-            Func<IReadOnlyList<CommanderSheetAdapter.LabeledItem>> getter)
-        {
-            try
-            {
-                IReadOnlyList<CommanderSheetAdapter.LabeledItem> items = getter();
-                return items ?? new CommanderSheetAdapter.LabeledItem[0];
-            }
-            catch (Exception ex)
-            {
-                SocAccessMod.Instance?.LogWarning("CommanderSheetScreen section " + section + " failed to build: " + ex);
-                return new CommanderSheetAdapter.LabeledItem[0];
-            }
         }
     }
 }
