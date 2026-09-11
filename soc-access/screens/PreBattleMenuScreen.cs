@@ -397,16 +397,16 @@ namespace SongsOfConquestAccess.Screens
             List<KeyValuePair<float, NodeDeclaration>> drawn = new List<KeyValuePair<float, NodeDeclaration>>(4);
             AddButton(drawn, "withdraw", Live.IsWithdrawButtonVisible(), Live.WithdrawButton,
                 () => Live.WithdrawButtonLabel, () => Live.Withdraw(),
-                Live.IsWithdrawButtonEnabled, Live.WithdrawButtonTooltip, Live.FocusWithdrawButton);
+                Live.IsWithdrawButtonEnabled, () => Live.WithdrawButtonTooltip, Live.FocusWithdrawButton);
             AddButton(drawn, "manual-battle", Live.IsManualBattleButtonVisible(), Live.ManualBattleButton,
                 () => Live.ManualBattleButtonLabel, () => Live.ManualBattle(),
-                Live.IsManualBattleButtonEnabled, Live.ManualBattleButtonTooltip, Live.FocusManualBattleButton);
+                Live.IsManualBattleButtonEnabled, () => Live.ManualBattleButtonTooltip, Live.FocusManualBattleButton);
             AddButton(drawn, "quick-battle", Live.IsQuickBattleButtonVisible(), Live.QuickBattleButton,
                 () => Live.QuickBattleButtonLabel, () => Live.QuickBattle(),
-                Live.IsQuickBattleButtonEnabled, Live.QuickBattleButtonTooltip, Live.FocusQuickBattleButton);
+                Live.IsQuickBattleButtonEnabled, () => Live.QuickBattleButtonTooltip, Live.FocusQuickBattleButton);
             AddButton(drawn, "ready", Live.IsReadyButtonVisible(), Live.ReadyButton,
                 () => Live.ReadyButtonLabel, () => Live.Ready(),
-                Live.IsReadyButtonEnabled, Live.ReadyButtonTooltip, Live.FocusReadyButton);
+                Live.IsReadyButtonEnabled, () => Live.ReadyButtonTooltip, Live.FocusReadyButton);
             if (drawn.Count == 0)
             {
                 return;
@@ -428,7 +428,7 @@ namespace SongsOfConquestAccess.Screens
             Func<string> label,
             Func<bool> activate,
             Func<bool> enabled,
-            Tooltip tooltip,
+            Func<Tooltip> tooltip,
             Action focus)
         {
             if (!drawn || button == null)
@@ -436,7 +436,9 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            NodeVtable vtable = GraphNodes.Button(label, () => activate(), enabled, tooltip);
+            // The tooltip is composed AFTER the drawn check: a button the menu is not showing must
+            // not cost a read of the game's details for it.
+            NodeVtable vtable = GraphNodes.Button(label, () => activate(), enabled, tooltip());
             vtable.OnFocusVisual = focus;
             into.Add(new KeyValuePair<float, NodeDeclaration>(
                 DrawnOrder.LeftOf(button),

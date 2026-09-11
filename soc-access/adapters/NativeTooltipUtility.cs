@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
@@ -69,10 +70,46 @@ namespace SongsOfConquestAccess.Adapters
         // Whether the details object behind this component's tooltip is one of the game's long ones.
         // A native fact about the game's own tooltip, not a judgement about how it should read: what
         // the mod DOES with the answer is decided in ui/GraphNodes.ModeFor.
+        //
+        // REMEMBERED PER WIDGET, because the question is put when a NODE IS DECLARED - a section's
+        // mode is fixed there (GraphNodes.TooltipSection) - and screens compose a fresh Tooltip on
+        // every build, so Tooltip's own per-instance memo never saw a second call and
+        // tooltipable.GetDetails ran for every tooltip-bearing node on every frame. AGENTS.md: a
+        // game-side refresh runs when the text is read, never when the build asks whether a tooltip
+        // exists. The details CLASS a widget answers with does not change under it - a pooled row
+        // reused for another entity answers with the same class - so one answer per widget stands.
+        // Only a DEFINITE answer is kept: a widget with no details yet is asked again, which is what
+        // a row the game fills in later needs. The keys are weak, so an answer dies with its widget
+        // and there is nothing to tear down.
+        private static readonly ConditionalWeakTable<Component, object> LongByComponent =
+            new ConditionalWeakTable<Component, object>();
+
+        private static readonly object Long = true;
+
+        private static readonly object Short = false;
+
         public static bool IsLongForComponent(Component component)
         {
+            if (component == null)
+            {
+                return false;
+            }
+
+            object known;
+            if (LongByComponent.TryGetValue(component, out known))
+            {
+                return (bool)known;
+            }
+
             IDetails details;
-            return TryGetUiDetails(component, out details) && IsLong(details);
+            if (!TryGetUiDetails(component, out details))
+            {
+                return false;
+            }
+
+            bool answer = IsLong(details);
+            LongByComponent.Add(component, answer ? Long : Short);
+            return answer;
         }
 
         // The same question on a widget whose real details the game only composes when the pointer
@@ -89,6 +126,13 @@ namespace SongsOfConquestAccess.Adapters
             if (compose != null && !HasComposedDetails(component))
             {
                 compose();
+
+                // The widget's details have just been replaced; a remembered answer was about the
+                // plain text that stood there before.
+                if (component != null)
+                {
+                    LongByComponent.Remove(component);
+                }
             }
 
             return IsLongForComponent(component);
