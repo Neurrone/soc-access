@@ -48,6 +48,14 @@ namespace SongsOfConquestAccess.Adapters
         private readonly LobbyNavigation _navigation;
         private readonly ILocalizationHandler _localization;
 
+        // The visible rows, kept while the table's membership and drawn order are unchanged: a row
+        // adapter memoizes its labels and tooltips, which is what keeps the per-frame build cheap.
+        private readonly List<LobbyChallengeMapEntry> _visibleScratch = new List<LobbyChallengeMapEntry>();
+        private List<AdventureLobbyChallengeMapRowAdapter> _rows;
+        private int _rowsSignature;
+        private LobbyChallengeMapEntry _selectedEntry;
+        private AdventureLobbyChallengeMapRowAdapter _selectedRow;
+
         public AdventureLobbyChallengeMapSelectAdapter(ChallengeMapsMenu menu, LobbyNavigation navigation)
         {
             _menu = menu;
@@ -122,15 +130,32 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 LobbyChallengeMapEntry selected = _menu != null ? SelectedEntryRef(_menu) : null;
-                return selected != null ? new AdventureLobbyChallengeMapRowAdapter(this, selected, _localization) : null;
+                if (selected == null)
+                {
+                    _selectedEntry = null;
+                    _selectedRow = null;
+                    return null;
+                }
+
+                if (!ReferenceEquals(_selectedEntry, selected))
+                {
+                    _selectedEntry = selected;
+                    _selectedRow = new AdventureLobbyChallengeMapRowAdapter(this, selected, _localization);
+                }
+
+                return _selectedRow;
             }
         }
 
+        /// <summary>The drawn rows in drawn order. One cheap pass over the menu's own entry list says
+        /// whether the table still holds the same rows in the same order; while it does, the kept row
+        /// adapters - and everything they have already read off the game - are handed back unchanged.
+        /// </summary>
         public IReadOnlyList<AdventureLobbyChallengeMapRowAdapter> GetVisibleRows()
         {
-            List<AdventureLobbyChallengeMapRowAdapter> rows = new List<AdventureLobbyChallengeMapRowAdapter>();
-            List<LobbyChallengeMapEntry> visibleEntries = new List<LobbyChallengeMapEntry>();
             IReadOnlyList<LobbyChallengeMapEntry> entries = GetEntries();
+            _visibleScratch.Clear();
+            int signature = 17;
             for (int i = 0; i < entries.Count; i++)
             {
                 LobbyChallengeMapEntry entry = entries[i];
@@ -140,19 +165,36 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 GameObject gameObject = ((Component)entry).gameObject;
-                if (gameObject != null && gameObject.activeInHierarchy)
+                if (gameObject == null || !gameObject.activeInHierarchy)
                 {
-                    visibleEntries.Add(entry);
+                    continue;
+                }
+
+                _visibleScratch.Add(entry);
+                unchecked
+                {
+                    signature = (signature * 31) + entry.GetInstanceID();
+                    signature = (signature * 31) + ((Component)entry).transform.GetSiblingIndex();
                 }
             }
 
-            visibleEntries.Sort(CompareVisualOrder);
-            for (int i = 0; i < visibleEntries.Count; i++)
+            if (_rows != null && _rows.Count == _visibleScratch.Count && _rowsSignature == signature)
             {
-                rows.Add(new AdventureLobbyChallengeMapRowAdapter(this, visibleEntries[i], _localization));
+                _visibleScratch.Clear();
+                return _rows;
             }
 
-            return rows;
+            _visibleScratch.Sort(CompareVisualOrder);
+            List<AdventureLobbyChallengeMapRowAdapter> rows = new List<AdventureLobbyChallengeMapRowAdapter>(_visibleScratch.Count);
+            for (int i = 0; i < _visibleScratch.Count; i++)
+            {
+                rows.Add(new AdventureLobbyChallengeMapRowAdapter(this, _visibleScratch[i], _localization));
+            }
+
+            _visibleScratch.Clear();
+            _rows = rows;
+            _rowsSignature = signature;
+            return _rows;
         }
 
         public void FocusEntry(LobbyChallengeMapEntry entry)
@@ -281,6 +323,18 @@ namespace SongsOfConquestAccess.Adapters
         private readonly LobbyChallengeMapEntry _entry;
         private readonly ILocalizationHandler _localization;
 
+        // Everything the row reads off the map's own metadata and off the game's tooltip data is fixed
+        // for the life of the row, and a tooltip's existence can only be answered by capturing it, so
+        // each is read once and kept. The live parts - the selection, the preview text - are not here.
+        private string _name;
+        private string _nativeKey;
+        private string _completedLabel;
+        private string _notCompletedLabel;
+        private IReadOnlyList<string> _winConditionLabels;
+        private IReadOnlyList<Tooltip> _winConditionTooltips;
+        private Tooltip _winConditionTooltip;
+        private bool _winConditionTooltipProbed;
+
         public AdventureLobbyChallengeMapRowAdapter(
             AdventureLobbyChallengeMapSelectAdapter owner,
             LobbyChallengeMapEntry entry,
@@ -293,26 +347,28 @@ namespace SongsOfConquestAccess.Adapters
 
         public string NativeKey
         {
-            get
-            {
-                string path = _entry != null && _entry.MapMetadata != null ? _entry.MapMetadata.PathName : null;
-                if (string.IsNullOrWhiteSpace(path))
-                {
-                    path = _entry != null ? _entry.MapData.path : null;
-                }
+            get { return _nativeKey ?? (_nativeKey = ResolveNativeKey()); }
+        }
 
-                return string.IsNullOrWhiteSpace(path) ? Name : path;
+        private string ResolveNativeKey()
+        {
+            string path = _entry != null && _entry.MapMetadata != null ? _entry.MapMetadata.PathName : null;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                path = _entry != null ? _entry.MapData.path : null;
             }
+
+            return string.IsNullOrWhiteSpace(path) ? Name : path;
         }
 
         public string Name
         {
-            get { return SpokenLines.Clean(_entry != null ? _entry.LocalizedMapName : string.Empty); }
+            get { return _name ?? (_name = SpokenLines.Clean(_entry != null ? _entry.LocalizedMapName : string.Empty)); }
         }
 
         public IReadOnlyList<string> WinConditionLabels
         {
-            get { return GetWinConditionLabels(); }
+            get { return _winConditionLabels ?? (_winConditionLabels = GetWinConditionLabels()); }
         }
 
         /// <summary>One tooltip per drawn win-condition icon, in the order of
@@ -320,13 +376,15 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public IReadOnlyList<Tooltip> WinConditionTooltips
         {
-            get
-            {
-                return LobbyMapRow.WinConditionTooltips(
-                    GetWinConditionLabels(),
-                    _entry != null ? WinConditionIconsRef(_entry) : null,
-                    _localization);
-            }
+            get { return _winConditionTooltips ?? (_winConditionTooltips = BuildWinConditionTooltips()); }
+        }
+
+        private IReadOnlyList<Tooltip> BuildWinConditionTooltips()
+        {
+            return LobbyMapRow.WinConditionTooltips(
+                WinConditionLabels,
+                _entry != null ? WinConditionIconsRef(_entry) : null,
+                _localization);
         }
 
         /// <summary>The row the game draws this challenge as.</summary>
@@ -352,12 +410,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string CompletedLabel
         {
-            get { return GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", "Completed"); }
+            get { return _completedLabel ?? (_completedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", "Completed")); }
         }
 
         public string NotCompletedLabel
         {
-            get { return GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", "Not completed"); }
+            get { return _notCompletedLabel ?? (_notCompletedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", "Not completed")); }
         }
 
         public string Description
@@ -382,7 +440,13 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            return GetWinConditionTooltip();
+            if (!_winConditionTooltipProbed)
+            {
+                _winConditionTooltip = GetWinConditionTooltip();
+                _winConditionTooltipProbed = true;
+            }
+
+            return _winConditionTooltip;
         }
 
         private IReadOnlyList<string> GetWinConditionLabels()
