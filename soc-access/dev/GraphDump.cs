@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using SongsOfConquestAccess.Adapters;
@@ -25,8 +25,10 @@ namespace SongsOfConquestAccess.Dev
     /// </summary>
     public static class GraphDump
     {
-        /// <summary>A screen big enough to hit this is a screen whose dump nobody can read anyway.</summary>
-        public const int MaxLines = 800;
+        /// <summary>How many lines a dump runs to when the caller does not say. A screen big enough
+        /// to hit this is a screen whose dump nobody can read anyway; the three baseline screens that
+        /// do are why <c>GET /gui/graph</c> takes <c>lines=</c>.</summary>
+        public const int DefaultMaxLines = 800;
 
         private static readonly GraphDir[] Dirs = { GraphDir.Up, GraphDir.Down, GraphDir.Left, GraphDir.Right };
 
@@ -67,20 +69,17 @@ namespace SongsOfConquestAccess.Dev
             return text.ToString();
         }
 
-        public static string Dump(ScreenManager screens, bool buffers, bool flat, bool edges)
-        {
-            return Dump(screens, null, buffers, flat, edges);
-        }
-
         /// <summary>
         /// One screen's render as text. With no <paramref name="named"/> screen this is the focused
         /// one, read through the navigator's own state so the dump shows the cursor where it stands;
         /// with one, that registered screen is built over a THROWAWAY state, so a screen nobody is on
         /// can be read without moving anything.
         /// </summary>
-        public static string Dump(ScreenManager screens, GraphScreen named, bool buffers, bool flat, bool edges)
+        /// <param name="maxLines">Lines to stop at; anything below one reads as
+        /// <see cref="DefaultMaxLines"/>.</param>
+        public static string Dump(ScreenManager screens, GraphScreen named, bool buffers, bool flat, bool edges, int maxLines)
         {
-            Sink sink = new Sink();
+            Sink sink = new Sink(maxLines > 0 ? maxLines : DefaultMaxLines);
             Screen top = screens == null ? null : screens.Current;
             sink.Line(Header(screens));
             GraphScreen screen = named ?? top as GraphScreen;
@@ -466,12 +465,18 @@ namespace SongsOfConquestAccess.Dev
         private sealed class Sink
         {
             private readonly StringBuilder _text = new StringBuilder();
+            private readonly int _maxLines;
             private int _lines;
             private bool _full;
 
+            public Sink(int maxLines)
+            {
+                _maxLines = maxLines;
+            }
+
             public bool Line(string line)
             {
-                if (_lines >= MaxLines)
+                if (_lines >= _maxLines)
                 {
                     _full = true;
                     return false;
@@ -489,7 +494,7 @@ namespace SongsOfConquestAccess.Dev
 
             public override string ToString()
             {
-                return _full ? _text + "\n... (truncated at " + MaxLines + " lines)" : _text.ToString();
+                return _full ? _text + "\n... (truncated at " + _maxLines + " lines; GET /gui/graph takes lines=N)" : _text.ToString();
             }
         }
     }
