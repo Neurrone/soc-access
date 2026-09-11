@@ -45,8 +45,8 @@ namespace SongsOfConquestAccess.Adapters
         public LevelUpMenuAdapter(CommanderLevelUpMenu menu)
         {
             _menu = menu;
-            _settings = GetField<CommanderLevelUpMenu.Settings>(menu, SettingsField);
-            _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
+            _settings = Reflect.Get<CommanderLevelUpMenu.Settings>(menu, SettingsField);
+            _localization = Reflect.Get<ILocalizationHandler>(menu, LocalizationField);
         }
 
         public bool IsPresent()
@@ -165,9 +165,9 @@ namespace SongsOfConquestAccess.Adapters
             FieldInfo textField,
             FieldInfo tooltipField)
         {
-            UITextMesh textMesh = GetField<UITextMesh>(statsInfo, textField);
+            UITextMesh textMesh = Reflect.Get<UITextMesh>(statsInfo, textField);
             string value = GetText(textMesh);
-            UIImage tooltipImage = GetField<UIImage>(statsInfo, tooltipField);
+            UIImage tooltipImage = Reflect.Get<UIImage>(statsInfo, tooltipField);
             Component tooltipComponent = tooltipImage as Component;
             if (string.IsNullOrWhiteSpace(value)
                 || tooltipComponent == null
@@ -191,11 +191,11 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            UIButton button = GetField<UIButton>(component, ButtonField);
+            UIButton button = Reflect.Get<UIButton>(component, ButtonField);
             string choiceHeader = GetSkillChoiceHeader(headerIndex);
-            string skillName = GetText(GetField<UITextMesh>(component, HeaderTextField));
-            string skillLevel = GetText(GetField<UITextMesh>(component, SkillLevelTextField));
-            IList<string> description = GetLines(GetField<UITextMesh>(component, DescriptionTextField));
+            string skillName = GetText(Reflect.Get<UITextMesh>(component, HeaderTextField));
+            string skillLevel = GetText(Reflect.Get<UITextMesh>(component, SkillLevelTextField));
+            IList<string> description = GetLines(Reflect.Get<UITextMesh>(component, DescriptionTextField));
             Component buttonComponent = button as Component;
 
             choices.Add(new SkillChoice(
@@ -246,7 +246,7 @@ namespace SongsOfConquestAccess.Adapters
         private UIButton GetCloseButton()
         {
             AdventureMenuBackground background = _settings != null ? _settings.AdventureMenuBackground : null;
-            return GetField<UIButton>(background, BackgroundCloseButtonField);
+            return Reflect.Get<UIButton>(background, BackgroundCloseButtonField);
         }
 
         private static string GetText(IUITextMesh textMesh)
@@ -258,11 +258,6 @@ namespace SongsOfConquestAccess.Adapters
         private static IList<string> GetLines(IUITextMesh textMesh)
         {
             return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         public sealed class StatItem

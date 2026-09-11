@@ -60,7 +60,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                GameObject container = GetField<GameObject>(_subMenu, NoUpgradableTroopsField);
+                GameObject container = Reflect.Get<GameObject>(_subMenu, NoUpgradableTroopsField);
                 return container != null && container.activeInHierarchy;
             }
         }
@@ -69,7 +69,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                GameObject root = GetField<GameObject>(_subMenu, NoUpgradableTroopsField);
+                GameObject root = Reflect.Get<GameObject>(_subMenu, NoUpgradableTroopsField);
                 if (!_noUpgradableProbed || !ReferenceEquals(_noUpgradableRoot, root))
                 {
                     _noUpgradableProbed = true;
@@ -91,7 +91,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                GameObject container = GetField<GameObject>(_subMenu, NoUpgradableTroopsField);
+                GameObject container = Reflect.Get<GameObject>(_subMenu, NoUpgradableTroopsField);
                 return container != null ? container.transform : null;
             }
         }
@@ -144,11 +144,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return PairValueProperty != null ? PairValueProperty.GetValue(pair, null) : null;
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         private static string GetText(IUITextMesh textMesh)
@@ -221,12 +216,12 @@ namespace SongsOfConquestAccess.Adapters
 
             public string CurrentTroopName
             {
-                get { return GetText(GetField<UITextMesh>(_entry, CurrentTextField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_entry, CurrentTextField)); }
             }
 
             public string TargetTroopName
             {
-                get { return GetText(GetField<UITextMesh>(_entry, TargetTextField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_entry, TargetTextField)); }
             }
 
             /// <summary>The two numbers the card draws under its portraits: how many of the troop
@@ -235,24 +230,24 @@ namespace SongsOfConquestAccess.Adapters
             /// them behind until it does.</summary>
             public string CurrentAmountText
             {
-                get { return GetText(GetField<UITextMesh>(_entry, CurrentAmountTextField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_entry, CurrentAmountTextField)); }
             }
 
             public string TargetAmountText
             {
-                get { return GetText(GetField<UITextMesh>(_entry, TargetAmountTextField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_entry, TargetAmountTextField)); }
             }
 
             /// <summary>The two portraits, which the game wires as the shortcuts to none of them and
             /// as many as can be afforded.</summary>
             public Component CurrentTroopButton
             {
-                get { return GetField<UIButton>(_entry, CurrentButtonField) as Component; }
+                get { return Reflect.Get<UIButton>(_entry, CurrentButtonField) as Component; }
             }
 
             public Component TargetTroopButton
             {
-                get { return GetField<UIButton>(_entry, TargetButtonField) as Component; }
+                get { return Reflect.Get<UIButton>(_entry, TargetButtonField) as Component; }
             }
 
             public Component Slider
@@ -267,12 +262,12 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool ClickCurrentTroop()
             {
-                return NativeSelectionUtility.Click(GetField<UIButton>(_entry, CurrentButtonField));
+                return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_entry, CurrentButtonField));
             }
 
             public bool ClickTargetTroop()
             {
-                return NativeSelectionUtility.Click(GetField<UIButton>(_entry, TargetButtonField));
+                return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_entry, TargetButtonField));
             }
 
             public int SliderValue
@@ -359,14 +354,14 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    Component container = GetField<Component>(_entry, PurchaseMessageContainerField);
+                    Component container = Reflect.Get<Component>(_entry, PurchaseMessageContainerField);
                     return container != null && container.gameObject.activeInHierarchy;
                 }
             }
 
             public string RefusalText
             {
-                get { return GetText(GetField<UITextMesh>(_entry, PurchaseMessageTextField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_entry, PurchaseMessageTextField)); }
             }
 
             /// <summary>What upgrading the amount the slider is set to would cost.</summary>
@@ -389,7 +384,7 @@ namespace SongsOfConquestAccess.Adapters
                             continue;
                         }
 
-                        ITeamState team = GetField<ITeamState>(_entry, TeamStateField);
+                        ITeamState team = Reflect.Get<ITeamState>(_entry, TeamStateField);
                         bool canAfford = team == null
                             || team.Resources == null
                             || team.Resources.CanAffordResource(entry.Type, entry.Amount);
@@ -407,12 +402,12 @@ namespace SongsOfConquestAccess.Adapters
 
             public Tooltip CurrentTooltip
             {
-                get { return Tooltip.ForComponent(GetField<UIButton>(_entry, CurrentButtonField) as Component, _localization); }
+                get { return Tooltip.ForComponent(Reflect.Get<UIButton>(_entry, CurrentButtonField) as Component, _localization); }
             }
 
             public Tooltip TargetTooltip
             {
-                get { return Tooltip.ForComponent(GetField<UIButton>(_entry, TargetButtonField) as Component, _localization); }
+                get { return Tooltip.ForComponent(Reflect.Get<UIButton>(_entry, TargetButtonField) as Component, _localization); }
             }
 
             public void Focus()
@@ -439,9 +434,9 @@ namespace SongsOfConquestAccess.Adapters
 
             private Cost GetUpgradeCost()
             {
-                ITroopState troop = GetField<ITroopState>(_entry, CurrentTroopField);
-                IRecruitmentPoolComponent recruitmentPool = GetField<IRecruitmentPoolComponent>(_entry, RecruitmentPoolField);
-                IFactionLookup factionLookup = GetField<IFactionLookup>(_entry, FactionLookupField);
+                ITroopState troop = Reflect.Get<ITroopState>(_entry, CurrentTroopField);
+                IRecruitmentPoolComponent recruitmentPool = Reflect.Get<IRecruitmentPoolComponent>(_entry, RecruitmentPoolField);
+                IFactionLookup factionLookup = Reflect.Get<IFactionLookup>(_entry, FactionLookupField);
                 if (troop == null || troop.Reference == null || recruitmentPool == null || factionLookup == null)
                 {
                     return null;
@@ -476,7 +471,7 @@ namespace SongsOfConquestAccess.Adapters
                         return (TroopUpgradeType)fieldValue;
                     }
 
-                    ITroopState troop = GetField<ITroopState>(_entry, CurrentTroopField);
+                    ITroopState troop = Reflect.Get<ITroopState>(_entry, CurrentTroopField);
                     return troop != null && troop.Reference != null
                         ? troop.Reference.UpgradeType + 1
                         : TroopUpgradeType.Upgraded;
@@ -485,12 +480,12 @@ namespace SongsOfConquestAccess.Adapters
 
             private UISlider GetSlider()
             {
-                return GetField<UISlider>(_entry, SliderField);
+                return Reflect.Get<UISlider>(_entry, SliderField);
             }
 
             private UIButton GetPurchaseButton()
             {
-                return GetField<UIButton>(_entry, PurchaseButtonField);
+                return Reflect.Get<UIButton>(_entry, PurchaseButtonField);
             }
         }
     }

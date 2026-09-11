@@ -72,7 +72,7 @@ namespace SongsOfConquestAccess.Adapters
         public PurchaseWielderMenuAdapter(PurchaseWielderMenu menu)
         {
             _menu = menu;
-            _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
+            _localization = Reflect.Get<ILocalizationHandler>(menu, LocalizationField);
         }
 
         public PurchaseWielderMenu Source
@@ -85,13 +85,13 @@ namespace SongsOfConquestAccess.Adapters
             return _menu != null
                 && _menu.gameObject != null
                 && _menu.gameObject.activeInHierarchy
-                && GetField<Async>(_menu, AsyncField) != null
-                && GetField<IList>(_menu, ActiveEntriesField) != null;
+                && Reflect.Get<Async>(_menu, AsyncField) != null
+                && Reflect.Get<IList>(_menu, ActiveEntriesField) != null;
         }
 
         public string Title
         {
-            get { return GetText(GetField<UITextMesh>(_menu, WielderListTitleField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, WielderListTitleField)); }
         }
 
         public int SelectedEntryIndex
@@ -106,7 +106,7 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The name the pane draws for the candidate it is describing.</summary>
         public string SelectedName
         {
-            get { return GetText(GetField<UITextMesh>(GetDetails(), DetailsNameField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(GetDetails(), DetailsNameField)); }
         }
 
         /// <summary>The level the pane draws beside that name, or empty while the pane hides it.
@@ -116,8 +116,8 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 PurchaseWielderDetails details = GetDetails();
-                return IsVisible(GetField<GameObject>(details, DetailsLevelContainerField))
-                    ? GetText(GetField<UITextMesh>(details, DetailsLevelTextField))
+                return IsVisible(Reflect.Get<GameObject>(details, DetailsLevelContainerField))
+                    ? GetText(Reflect.Get<UITextMesh>(details, DetailsLevelTextField))
                     : string.Empty;
             }
         }
@@ -126,7 +126,7 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public IList<string> SelectedDescriptionLines
         {
-            get { return GetLines(GetField<UITextMesh>(GetDetails(), DetailsDescriptionField)); }
+            get { return GetLines(Reflect.Get<UITextMesh>(GetDetails(), DetailsDescriptionField)); }
         }
 
         public string OffenceHeader
@@ -171,7 +171,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasTroops()
         {
-            return IsVisible(GetField<GameObject>(GetDetails(), DetailsTroopsSectionField));
+            return IsVisible(Reflect.Get<GameObject>(GetDetails(), DetailsTroopsSectionField));
         }
 
         public int TroopSlotCount
@@ -230,7 +230,7 @@ namespace SongsOfConquestAccess.Adapters
         /// writes it; empty where the section is not drawn.</summary>
         public string TroopsHeader
         {
-            get { return SectionHeader(GetField<GameObject>(GetDetails(), DetailsTroopsSectionField)); }
+            get { return SectionHeader(Reflect.Get<GameObject>(GetDetails(), DetailsTroopsSectionField)); }
         }
 
         /// <summary>The caption the pane draws over the skills ("Skills"). The pane keeps no field for
@@ -277,7 +277,7 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            return Tooltip.ForComponent(GetField<UIImage>(entries[index], SkillFrameField) as Component, _localization);
+            return Tooltip.ForComponent(Reflect.Get<UIImage>(entries[index], SkillFrameField) as Component, _localization);
         }
 
         /// <summary>The frame the game draws this skill in - what the row is drawn by, and what its
@@ -286,7 +286,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             IReadOnlyList<PurchaseWielderSkillEntry> entries = GetSkillEntries();
             return index >= 0 && index < entries.Count
-                ? GetField<UIImage>(entries[index], SkillFrameField) as Component
+                ? Reflect.Get<UIImage>(entries[index], SkillFrameField) as Component
                 : null;
         }
 
@@ -297,7 +297,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasSpecialization()
         {
-            UITextMesh text = GetField<UITextMesh>(GetDetails(), DetailsSpecializationField);
+            UITextMesh text = Reflect.Get<UITextMesh>(GetDetails(), DetailsSpecializationField);
             return IsVisible(text as Component) && !string.IsNullOrWhiteSpace(GetText(text));
         }
 
@@ -307,7 +307,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                IList<string> body = GetLines(GetField<UITextMesh>(GetDetails(), DetailsSpecializationField));
+                IList<string> body = GetLines(Reflect.Get<UITextMesh>(GetDetails(), DetailsSpecializationField));
                 if (body.Count == 0)
                 {
                     return body;
@@ -333,7 +333,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 PurchaseWielderDetails details = GetDetails();
-                UITextMesh alreadyOwned = GetField<UITextMesh>(details, DetailsAlreadyOwnedTextField);
+                UITextMesh alreadyOwned = Reflect.Get<UITextMesh>(details, DetailsAlreadyOwnedTextField);
                 if (IsVisible(alreadyOwned as Component))
                 {
                     return GetText(alreadyOwned);
@@ -431,7 +431,7 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<EntryItem> GetEntries()
         {
             List<EntryItem> result = new List<EntryItem>();
-            IList entries = GetField<IList>(_menu, ActiveEntriesField);
+            IList entries = Reflect.Get<IList>(_menu, ActiveEntriesField);
             if (entries == null)
             {
                 return result;
@@ -453,7 +453,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                LargeCostSection section = GetField<LargeCostSection>(GetDetails(), DetailsLargeCostSectionField);
+                LargeCostSection section = Reflect.Get<LargeCostSection>(GetDetails(), DetailsLargeCostSectionField);
                 if (!IsVisible(section as Component))
                 {
                     return string.Empty;
@@ -478,32 +478,32 @@ namespace SongsOfConquestAccess.Adapters
 
         private PurchaseWielderDetails GetDetails()
         {
-            return GetField<PurchaseWielderDetails>(_menu, WielderDetailsField);
+            return Reflect.Get<PurchaseWielderDetails>(_menu, WielderDetailsField);
         }
 
         private UIButton GetCloseButton()
         {
-            return GetField<UIButton>(_menu, BackgroundCloseButtonField);
+            return Reflect.Get<UIButton>(_menu, BackgroundCloseButtonField);
         }
 
         private UIButton GetPurchaseButton()
         {
-            return GetField<UIButton>(GetDetails(), DetailsPurchaseButtonField);
+            return Reflect.Get<UIButton>(GetDetails(), DetailsPurchaseButtonField);
         }
 
         private string GetDetailsText(FieldInfo field)
         {
-            return GetText(GetField<UITextMesh>(GetDetails(), field));
+            return GetText(Reflect.Get<UITextMesh>(GetDetails(), field));
         }
 
         private IReadOnlyList<TroopHUDEntry> GetTroopEntries()
         {
-            return GetField<List<TroopHUDEntry>>(GetDetails(), DetailsTroopsField) ?? new List<TroopHUDEntry>();
+            return Reflect.Get<List<TroopHUDEntry>>(GetDetails(), DetailsTroopsField) ?? new List<TroopHUDEntry>();
         }
 
         private IReadOnlyList<PurchaseWielderSkillEntry> GetSkillEntries()
         {
-            return GetField<List<PurchaseWielderSkillEntry>>(GetDetails(), DetailsSkillEntriesField) ?? new List<PurchaseWielderSkillEntry>();
+            return Reflect.Get<List<PurchaseWielderSkillEntry>>(GetDetails(), DetailsSkillEntriesField) ?? new List<PurchaseWielderSkillEntry>();
         }
 
         /// <summary>The text a section's header draws, at the path the prefab keeps it at (measured
@@ -517,13 +517,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddCostPart(List<string> parts, LargeCostSection section, FieldInfo entryField, FieldInfo textField, ResourceType resourceType)
         {
-            UITransform entry = GetField<UITransform>(section, entryField);
+            UITransform entry = Reflect.Get<UITransform>(section, entryField);
             if (entry == null || !entry.Active)
             {
                 return;
             }
 
-            string amount = GetText(GetField<UITextMesh>(section, textField));
+            string amount = GetText(Reflect.Get<UITextMesh>(section, textField));
             if (string.IsNullOrWhiteSpace(amount))
             {
                 return;
@@ -619,11 +619,6 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.activeInHierarchy;
         }
 
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
-        }
-
         public sealed class EntryItem
         {
             private readonly PurchaseWielderMenuAdapter _adapter;
@@ -651,13 +646,13 @@ namespace SongsOfConquestAccess.Adapters
             /// <summary>The wielder's own name.</summary>
             public string Name
             {
-                get { return GetText(GetField<UITextMesh>(_entry, EntryNameField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_entry, EntryNameField)); }
             }
 
             /// <summary>The class line the entry draws under the name ("Level 12 Human Commander").</summary>
             public string ClassText
             {
-                get { return GetText(GetField<UITextMesh>(_entry, EntryClassField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_entry, EntryClassField)); }
             }
 
             /// <summary>The entry the menu is showing the details of.</summary>
@@ -669,19 +664,19 @@ namespace SongsOfConquestAccess.Adapters
             /// <summary>The game draws a crossed-out overlay over a wielder that has died.</summary>
             public bool IsDead
             {
-                get { return IsVisible(GetField<GameObject>(_entry, EntryDeadOverlayField)); }
+                get { return IsVisible(Reflect.Get<GameObject>(_entry, EntryDeadOverlayField)); }
             }
 
             /// <summary>The game draws a frame around a wielder the team already has.</summary>
             public bool IsOwned
             {
-                get { return IsVisible(GetField<GameObject>(_entry, EntryOwnedFrameField)); }
+                get { return IsVisible(Reflect.Get<GameObject>(_entry, EntryOwnedFrameField)); }
             }
 
             /// <summary>The entry's own button - what the row is drawn by.</summary>
             public Component Button
             {
-                get { return GetField<UIButton>(_entry, EntryButtonField) as Component; }
+                get { return Reflect.Get<UIButton>(_entry, EntryButtonField) as Component; }
             }
 
             public bool IsVisible
@@ -691,12 +686,12 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool Select()
             {
-                return NativeSelectionUtility.Click(GetField<UIButton>(_entry, EntryButtonField));
+                return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_entry, EntryButtonField));
             }
 
             public void Focus()
             {
-                NativeSelectionUtility.Select(GetField<UIButton>(_entry, EntryButtonField) as Component);
+                NativeSelectionUtility.Select(Reflect.Get<UIButton>(_entry, EntryButtonField) as Component);
                 Select();
             }
         }

@@ -49,13 +49,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<RecruitEntry> GetRecruitEntries()
         {
-            List<IPurchaseTroopsEntry> entries = GetField<List<IPurchaseTroopsEntry>>(_subMenu, CurrentEntriesField);
+            List<IPurchaseTroopsEntry> entries = Reflect.Get<List<IPurchaseTroopsEntry>>(_subMenu, CurrentEntriesField);
             if (entries == null || entries.Count == 0)
             {
                 return new RecruitEntry[0];
             }
 
-            IFactionLookup factionLookup = GetField<IFactionLookup>(_subMenu, FactionLookupField);
+            IFactionLookup factionLookup = Reflect.Get<IFactionLookup>(_subMenu, FactionLookupField);
             List<RecruitEntry> result = new List<RecruitEntry>(entries.Count);
             for (int i = 0; i < entries.Count; i++)
             {
@@ -80,11 +80,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return result;
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         private static string GetText(IUITextMesh textMesh)
@@ -294,8 +289,8 @@ namespace SongsOfConquestAccess.Adapters
             public override string IdPrefix { get { return BuildIdPrefix(); } }
             public override string TroopName { get { return ResolveTroopName(); } }
             public override Tooltip Tooltip { get { return BuildEntryTooltip(); } }
-            public override string NoTroopsText { get { return GetText(GetField<UITextMesh>(_entry, NoTroopsTextField)); } }
-            public override bool IsNoTroopsVisible { get { return IsVisible(GetField<Component>(_entry, NoTroopsContainerField)); } }
+            public override string NoTroopsText { get { return GetText(Reflect.Get<UITextMesh>(_entry, NoTroopsTextField)); } }
+            public override bool IsNoTroopsVisible { get { return IsVisible(Reflect.Get<Component>(_entry, NoTroopsContainerField)); } }
             public override bool IsSliderVisible { get { return IsVisible(GetSlider()); } }
             public override bool IsSliderEnabled { get { UISlider slider = GetSlider(); return slider != null && slider.Interactable; } }
 
@@ -303,20 +298,20 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    string amount = GetText(GetField<UITextMesh>(_entry, AmountTextField));
-                    string total = GetText(GetField<UITextMesh>(_entry, TotalAmountTextField));
+                    string amount = GetText(Reflect.Get<UITextMesh>(_entry, AmountTextField));
+                    string total = GetText(Reflect.Get<UITextMesh>(_entry, TotalAmountTextField));
                     return SpokenLines.Clean((amount + " " + total).Trim());
                 }
             }
 
             public override string AmountText
             {
-                get { return GetText(GetField<UITextMesh>(_entry, AmountTextField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_entry, AmountTextField)); }
             }
 
             public override string TotalAmountText
             {
-                get { return GetText(GetField<UITextMesh>(_entry, TotalAmountTextField)).TrimStart('/').Trim(); }
+                get { return GetText(Reflect.Get<UITextMesh>(_entry, TotalAmountTextField)).TrimStart('/').Trim(); }
             }
 
             public override Component Slider { get { return GetSlider() as Component; } }
@@ -405,7 +400,7 @@ namespace SongsOfConquestAccess.Adapters
                 return true;
             }
 
-            public override bool IsEssenceMenuVisible { get { return IsVisible(GetField<Component>(_entry, EssenceTabsField)); } }
+            public override bool IsEssenceMenuVisible { get { return IsVisible(Reflect.Get<Component>(_entry, EssenceTabsField)); } }
             public override TroopUpgradeType CurrentEssenceVariant { get { return TroopReference.UpgradeType; } }
 
             public override bool SelectEssenceVariant(TroopUpgradeType upgradeType)
@@ -423,22 +418,22 @@ namespace SongsOfConquestAccess.Adapters
             {
                 if (upgradeType == TroopUpgradeType.ArcanaUpgraded)
                 {
-                    return GetField<UIButton>(_entry, ArcanaButtonField);
+                    return Reflect.Get<UIButton>(_entry, ArcanaButtonField);
                 }
 
                 if (upgradeType == TroopUpgradeType.CreationUpgraded)
                 {
-                    return GetField<UIButton>(_entry, CreationButtonField);
+                    return Reflect.Get<UIButton>(_entry, CreationButtonField);
                 }
 
                 return upgradeType == TroopUpgradeType.OrderUpgraded
-                    ? GetField<UIButton>(_entry, OrderButtonField)
+                    ? Reflect.Get<UIButton>(_entry, OrderButtonField)
                     : null;
             }
 
-            private UISlider GetSlider() { return GetField<UISlider>(_entry, SliderField); }
-            private UIButton GetPurchaseButton() { return GetField<UIButton>(_entry, PurchaseButtonField); }
-            private UIButton GetUpgradeButton() { return GetField<UIButton>(_entry, UpgradeButtonField); }
+            private UISlider GetSlider() { return Reflect.Get<UISlider>(_entry, SliderField); }
+            private UIButton GetPurchaseButton() { return Reflect.Get<UIButton>(_entry, PurchaseButtonField); }
+            private UIButton GetUpgradeButton() { return Reflect.Get<UIButton>(_entry, UpgradeButtonField); }
 
             private Cost.CostEntry? GetCost(FieldInfo field)
             {
@@ -460,7 +455,7 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                ITeamState team = GetField<ITeamState>(_entry, TeamStateField);
+                ITeamState team = Reflect.Get<ITeamState>(_entry, TeamStateField);
                 bool canAfford = team == null || team.Resources == null || team.Resources.CanAffordResource(value.Type, amount);
                 lines.Add(new ResourceCostLine(value.Type, amount, canAfford));
             }
@@ -481,7 +476,7 @@ namespace SongsOfConquestAccess.Adapters
             public override string IdPrefix { get { return BuildIdPrefix(); } }
             public override string TroopName { get { return ResolveTroopName(); } }
             public override Tooltip Tooltip { get { return BuildEntryTooltip(); } }
-            public override string NoTroopsText { get { return GetText(GetField<UITextMesh>(_entry, NoTroopsTextField)); } }
+            public override string NoTroopsText { get { return GetText(Reflect.Get<UITextMesh>(_entry, NoTroopsTextField)); } }
             public override bool IsNoTroopsVisible { get { return true; } }
         }
 

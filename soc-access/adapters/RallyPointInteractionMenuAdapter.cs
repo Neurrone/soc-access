@@ -44,8 +44,8 @@ namespace SongsOfConquestAccess.Adapters
         public RallyPointInteractionMenuAdapter(RallyPointInteractionMenu menu)
         {
             _menu = menu;
-            _facade = GetField<IClientAdventureFacade>(_menu, AdventureFacadeField);
-            _localization = GetField<ILocalizationHandler>(_menu, LocalizationField);
+            _facade = Reflect.Get<IClientAdventureFacade>(_menu, AdventureFacadeField);
+            _localization = Reflect.Get<ILocalizationHandler>(_menu, LocalizationField);
         }
 
         public bool IsPresent()
@@ -54,7 +54,7 @@ namespace SongsOfConquestAccess.Adapters
             return _menu != null
                 && _menu.gameObject != null
                 && _menu.gameObject.activeInHierarchy
-                && GetField<Async>(_menu, AsyncField) != null
+                && Reflect.Get<Async>(_menu, AsyncField) != null
                 && subMenu != null
                 && subMenu.gameObject != null
                 && subMenu.gameObject.activeInHierarchy
@@ -63,7 +63,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(GetField<UITextMesh>(_menu, BuildingNameField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, BuildingNameField)); }
         }
 
         /// <summary>The name of the place the recruits are coming from, which the menu writes in a
@@ -71,12 +71,12 @@ namespace SongsOfConquestAccess.Adapters
         /// them.</summary>
         public string SelectedSourceName
         {
-            get { return GetText(GetField<UITextMesh>(_menu, SelectedTownNameField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, SelectedTownNameField)); }
         }
 
         public Component SelectedSourceLine
         {
-            get { return GetField<UITextMesh>(_menu, SelectedTownNameField) as Component; }
+            get { return Reflect.Get<UITextMesh>(_menu, SelectedTownNameField) as Component; }
         }
 
         /// <summary>The band the menu hangs across its top: the wielder who walked in, their army and
@@ -113,7 +113,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<SourceItem> GetSourceItems()
         {
-            List<RallyPointTownEntry> entries = GetField<List<RallyPointTownEntry>>(_menu, ActiveEntriesField);
+            List<RallyPointTownEntry> entries = Reflect.Get<List<RallyPointTownEntry>>(_menu, ActiveEntriesField);
             if (entries == null || entries.Count == 0)
             {
                 return new SourceItem[0];
@@ -139,17 +139,17 @@ namespace SongsOfConquestAccess.Adapters
             return _menu != null
                 && _menu.gameObject != null
                 && _menu.gameObject.activeInHierarchy
-                && GetField<Async>(_menu, AsyncField) != null;
+                && Reflect.Get<Async>(_menu, AsyncField) != null;
         }
 
         private WielderInteractHeader GetHeader()
         {
-            return GetField<WielderInteractHeader>(_menu, HeaderField);
+            return Reflect.Get<WielderInteractHeader>(_menu, HeaderField);
         }
 
         private PurchaseTroopsSubMenu GetPurchaseSubMenu()
         {
-            return GetField<PurchaseTroopsSubMenu>(_menu, PurchaseTroopsSubMenuField);
+            return Reflect.Get<PurchaseTroopsSubMenu>(_menu, PurchaseTroopsSubMenuField);
         }
 
         private string GetLocalizedText(string key)
@@ -197,11 +197,6 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.activeInHierarchy;
         }
 
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
-        }
-
         public sealed class SourceItem
         {
             private readonly RallyPointInteractionMenuAdapter _adapter;
@@ -229,39 +224,39 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Level
             {
-                get { return GetText(GetField<UITextMesh>(_entry, EntryLevelField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_entry, EntryLevelField)); }
             }
 
             public bool IsLevelVisible
             {
-                get { return IsVisible(GetField<GameObject>(_entry, EntryLevelContainerField)); }
+                get { return IsVisible(Reflect.Get<GameObject>(_entry, EntryLevelContainerField)); }
             }
 
             public bool IsSelected
             {
-                get { return IsVisible(GetField<Image>(_entry, EntrySelectedField) as Component); }
+                get { return IsVisible(Reflect.Get<Image>(_entry, EntrySelectedField) as Component); }
             }
 
             public Tooltip Tooltip
             {
-                get { return Tooltip.ForComponent(GetField<UIButton>(_entry, EntryButtonField) as Component, _adapter._localization); }
+                get { return Tooltip.ForComponent(Reflect.Get<UIButton>(_entry, EntryButtonField) as Component, _adapter._localization); }
             }
 
             /// <summary>The button the entry draws, which is the whole of it.</summary>
             public Component Button
             {
-                get { return GetField<UIButton>(_entry, EntryButtonField) as Component; }
+                get { return Reflect.Get<UIButton>(_entry, EntryButtonField) as Component; }
             }
 
             public void Focus()
             {
-                UIButton button = GetField<UIButton>(_entry, EntryButtonField);
+                UIButton button = Reflect.Get<UIButton>(_entry, EntryButtonField);
                 NativeSelectionUtility.Select(button);
             }
 
             public bool Select()
             {
-                UIButton button = GetField<UIButton>(_entry, EntryButtonField);
+                UIButton button = Reflect.Get<UIButton>(_entry, EntryButtonField);
                 return NativeSelectionUtility.Click(button);
             }
         }

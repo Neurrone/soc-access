@@ -89,24 +89,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public static UITextMesh GetText(object target, FieldInfo field)
         {
-            return GetField<UITextMesh>(target, field);
-        }
-
-        public static T GetField<T>(object target, FieldInfo field) where T : class
-        {
-            if (target == null || field == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return field.GetValue(target) as T;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            return Reflect.Get<UITextMesh>(target, field);
         }
 
         public static string NormalizeText(UITextMesh text)

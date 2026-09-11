@@ -106,9 +106,9 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _title = FindPanelTitle();
-            _refineFilter = GetField<Selectable>(RefineFilterField);
+            _refineFilter = Reflect.Cast<Selectable>(_results, RefineFilterField);
             _refineFilterLabel = GetSelectableLabel(_refineFilter);
-            _sort = new SortDropdown(GetField<TMP_Dropdown>(SortDropdownField));
+            _sort = new SortDropdown(Reflect.Cast<TMP_Dropdown>(_results, SortDropdownField));
         }
 
         /// <summary>Take the page again when the panel has fetched since the last time.</summary>
@@ -259,7 +259,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                TMP_Text title = GetField<TMP_Text>(component, "title");
+                TMP_Text title = Reflect.Typed<TMP_Text>(component, "title");
                 if (string.IsNullOrWhiteSpace(GetText(title)))
                 {
                     continue;
@@ -370,18 +370,18 @@ namespace SongsOfConquestAccess.Adapters
 
         private string BuildFooterText()
         {
-            GameObject noResults = GetField<GameObject>(NoResultsField);
+            GameObject noResults = Reflect.Cast<GameObject>(_results, NoResultsField);
             if (noResults != null && noResults.activeInHierarchy)
             {
                 return JoinVisibleText(noResults);
             }
 
-            GameObject endOfResults = GetField<GameObject>(EndOfResultsField);
+            GameObject endOfResults = Reflect.Cast<GameObject>(_results, EndOfResultsField);
             if (endOfResults != null && endOfResults.activeInHierarchy)
             {
                 List<string> lines = new List<string>();
-                AddIfNotEmpty(lines, GetText(GetField<TMP_Text>(EndOfResultsHeaderField)));
-                AddIfNotEmpty(lines, GetText(GetField<TMP_Text>(EndOfResultsTextField)));
+                AddIfNotEmpty(lines, GetText(Reflect.Cast<TMP_Text>(_results, EndOfResultsHeaderField)));
+                AddIfNotEmpty(lines, GetText(Reflect.Cast<TMP_Text>(_results, EndOfResultsTextField)));
                 return string.Join("\n", lines.ToArray());
             }
 
@@ -390,24 +390,24 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetActiveFilterText()
         {
-            GameObject mainTag = GetField<GameObject>(MainTagField);
+            GameObject mainTag = Reflect.Cast<GameObject>(_results, MainTagField);
             if (mainTag == null || !mainTag.activeInHierarchy)
             {
                 return string.Empty;
             }
 
             List<string> parts = new List<string>();
-            AddIfNotEmpty(parts, GetCategoryLabel(GetText(GetField<TMP_Text>(MainTagCategoryNameField))));
-            AddIfNotEmpty(parts, GetTagLabel(GetText(GetField<TMP_Text>(MainTagNameField))));
-            AddIfNotEmpty(parts, GetText(GetField<TMP_Text>(OtherTagsTextField)));
+            AddIfNotEmpty(parts, GetCategoryLabel(GetText(Reflect.Cast<TMP_Text>(_results, MainTagCategoryNameField))));
+            AddIfNotEmpty(parts, GetTagLabel(GetText(Reflect.Cast<TMP_Text>(_results, MainTagNameField))));
+            AddIfNotEmpty(parts, GetText(Reflect.Cast<TMP_Text>(_results, OtherTagsTextField)));
             return string.Join(" ", parts.ToArray());
         }
 
         private string GetSearchPhraseText()
         {
-            GameObject phrase = GetField<GameObject>(SearchPhraseField);
+            GameObject phrase = Reflect.Cast<GameObject>(_results, SearchPhraseField);
             return phrase != null && phrase.activeInHierarchy
-                ? GetText(GetField<TMP_Text>(SearchPhraseTextField))
+                ? GetText(Reflect.Cast<TMP_Text>(_results, SearchPhraseTextField))
                 : string.Empty;
         }
 
@@ -449,31 +449,14 @@ namespace SongsOfConquestAccess.Adapters
             return string.Empty;
         }
 
-        private T GetField<T>(FieldInfo field)
-        {
-            return field != null && _results != null ? (T)field.GetValue(_results) : default(T);
-        }
-
-        private static T GetField<T>(object instance, string name)
-        {
-            if (instance == null || string.IsNullOrWhiteSpace(name))
-            {
-                return default(T);
-            }
-
-            FieldInfo field = AccessTools.Field(instance.GetType(), name);
-            object value = field != null ? field.GetValue(instance) : null;
-            return value is T ? (T)value : default(T);
-        }
-
         /// <summary>The mod's own id, which is what tells one result from another. <c>ModId</c> is a
         /// struct wrapping a long with no <c>ToString</c> of its own, so reading it as an object and
         /// printing it answered the type name for every row - which is why every result used to carry
         /// the same identity.</summary>
         private static string BuildResultId(Component component, int index)
         {
-            object profile = GetField<object>(component, "profile");
-            object idValue = profile != null ? GetField<object>(profile, "id") : null;
+            object profile = Reflect.Typed<object>(component, "profile");
+            object idValue = profile != null ? Reflect.Typed<object>(profile, "id") : null;
             string id = idValue is ModIO.ModId
                 ? ((ModIO.ModId)idValue).id.ToString(System.Globalization.CultureInfo.InvariantCulture)
                 : (idValue != null ? idValue.ToString() : string.Empty);
@@ -500,7 +483,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            TMP_Text foundText = GetField<TMP_Text>(FoundTextField);
+            TMP_Text foundText = Reflect.Cast<TMP_Text>(_results, FoundTextField);
             TMP_Text[] texts = _results.SearchResultsPanel.GetComponentsInChildren<TMP_Text>(false);
             for (int i = 0; i < texts.Length; i++)
             {
@@ -526,24 +509,24 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool IsSearchResultsStatusText(TMP_Text text)
         {
-            GameObject noResults = GetField<GameObject>(NoResultsField);
-            GameObject endOfResults = GetField<GameObject>(EndOfResultsField);
-            GameObject mainTag = GetField<GameObject>(MainTagField);
-            GameObject searchPhrase = GetField<GameObject>(SearchPhraseField);
+            GameObject noResults = Reflect.Cast<GameObject>(_results, NoResultsField);
+            GameObject endOfResults = Reflect.Cast<GameObject>(_results, EndOfResultsField);
+            GameObject mainTag = Reflect.Cast<GameObject>(_results, MainTagField);
+            GameObject searchPhrase = Reflect.Cast<GameObject>(_results, SearchPhraseField);
             return IsChildOf(text, noResults)
                 || IsChildOf(text, endOfResults)
                 || IsChildOf(text, mainTag)
                 || IsChildOf(text, searchPhrase)
-                || text == GetField<TMP_Text>(MainTagNameField)
-                || text == GetField<TMP_Text>(MainTagCategoryNameField)
-                || text == GetField<TMP_Text>(OtherTagsTextField)
-                || text == GetField<TMP_Text>(SearchPhraseTextField);
+                || text == Reflect.Cast<TMP_Text>(_results, MainTagNameField)
+                || text == Reflect.Cast<TMP_Text>(_results, MainTagCategoryNameField)
+                || text == Reflect.Cast<TMP_Text>(_results, OtherTagsTextField)
+                || text == Reflect.Cast<TMP_Text>(_results, SearchPhraseTextField);
         }
 
         private bool IsSearchResultsControlText(TMP_Text text)
         {
-            TMP_Dropdown sortDropdown = GetField<TMP_Dropdown>(SortDropdownField);
-            Selectable refineFilter = GetField<Selectable>(RefineFilterField);
+            TMP_Dropdown sortDropdown = Reflect.Cast<TMP_Dropdown>(_results, SortDropdownField);
+            Selectable refineFilter = Reflect.Cast<Selectable>(_results, RefineFilterField);
             return IsChildOf(text, sortDropdown != null ? sortDropdown.gameObject : null)
                 || IsChildOf(text, refineFilter != null ? refineFilter.gameObject : null);
         }

@@ -459,8 +459,8 @@ namespace SongsOfConquestAccess.Adapters
                 return result;
             }
 
-            string modName = CleanText(GetText(GetField<TMP_Text>(confirmUninstall.Collection, "uninstallConfirmationPanelModName")));
-            string fileSize = CleanText(GetText(GetField<TMP_Text>(confirmUninstall.Collection, "uninstallConfirmationPanelFileSize")));
+            string modName = CleanText(GetText(Reflect.Cast<TMP_Text>(confirmUninstall.Collection, "uninstallConfirmationPanelModName")));
+            string fileSize = CleanText(GetText(Reflect.Cast<TMP_Text>(confirmUninstall.Collection, "uninstallConfirmationPanelFileSize")));
             List<string> lines = new List<string>();
             IReadOnlyList<string> panelTexts = GetPanelTextValues(confirmUninstall.Panel);
             for (int i = 0; i < panelTexts.Count; i++)
@@ -623,11 +623,11 @@ namespace SongsOfConquestAccess.Adapters
                 return result;
             }
 
-            TMP_Text currentHeading = GetField<TMP_Text>(queue, "DownloadQueueCurrentJobText");
-            GameObject noCurrentNotice = GetField<GameObject>(queue, "DownloadQueueNoCurrentNotice");
+            TMP_Text currentHeading = Reflect.Cast<TMP_Text>(queue, "DownloadQueueCurrentJobText");
+            GameObject noCurrentNotice = Reflect.Cast<GameObject>(queue, "DownloadQueueNoCurrentNotice");
             AddHeadingAndBody(result, currentHeading, noCurrentNotice);
 
-            GameObject noPendingNotice = GetField<GameObject>(queue, "DownloadQueueNoPendingNotice");
+            GameObject noPendingNotice = Reflect.Cast<GameObject>(queue, "DownloadQueueNoPendingNotice");
             TMP_Text queueHeading = FindNearestPreviousVisibleText(noPendingNotice);
             AddHeadingAndBody(result, queueHeading, noPendingNotice);
 
@@ -645,10 +645,10 @@ namespace SongsOfConquestAccess.Adapters
 
             AddButtonAction(
                 result,
-                GetField<Button>(queue, "DownloadQueueCurrentUnsubscribeButton"));
+                Reflect.Cast<Button>(queue, "DownloadQueueCurrentUnsubscribeButton"));
             AddButtonAction(
                 result,
-                GetField<Button>(queue, "DownloadQueueCurrentLogoutButton"));
+                Reflect.Cast<Button>(queue, "DownloadQueueCurrentLogoutButton"));
             return result;
         }
 
@@ -736,7 +736,7 @@ namespace SongsOfConquestAccess.Adapters
         private static IReadOnlyList<ActionItem> GetContextMenuActions(object contextMenu)
         {
             List<ActionItem> result = new List<ActionItem>();
-            Transform list = GetField<Transform>(contextMenu, "ContextMenuList");
+            Transform list = Reflect.Cast<Transform>(contextMenu, "ContextMenuList");
             if (list == null)
             {
                 return result;
@@ -933,7 +933,7 @@ namespace SongsOfConquestAccess.Adapters
                 return component.gameObject;
             }
 
-            GameObject panel = GetField<GameObject>(contextMenu, "ContextMenu");
+            GameObject panel = Reflect.Cast<GameObject>(contextMenu, "ContextMenu");
             return panel != null && panel.activeInHierarchy ? panel : null;
         }
 
@@ -963,17 +963,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             Component unityComponent = component as Component;
             return unityComponent != null ? unityComponent.gameObject : null;
-        }
-
-        private static T GetField<T>(object instance, string name)
-        {
-            if (instance == null)
-            {
-                return default(T);
-            }
-
-            FieldInfo field = AccessTools.Field(instance.GetType(), name);
-            return field != null ? (T)field.GetValue(instance) : default(T);
         }
 
         private static string GetButtonLabel(Button button)

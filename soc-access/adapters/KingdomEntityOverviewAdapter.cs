@@ -201,7 +201,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static IMapEntity GetParent(KingdomEntityOverviewCategoryEntry entry)
         {
-            return KingdomOverviewRead.GetField<IMapEntity>(entry, ParentField);
+            return Reflect.Get<IMapEntity>(entry, ParentField);
         }
 
         /// <summary>A tier text as the game wrote it: the claimed catch-all's rows and header get an

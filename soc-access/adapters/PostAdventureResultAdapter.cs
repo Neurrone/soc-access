@@ -72,7 +72,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return SpokenLines.Of(new[]
                 {
-                    UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(DescriptionField)),
+                    UITextMeshTextUtility.GetEffectiveText(Reflect.Get<UITextMesh>(_menu, DescriptionField)),
                 });
             }
         }
@@ -81,7 +81,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string title = GetText(GetField<UITextMesh>(DescriptionTitleField));
+                string title = GetText(Reflect.Get<UITextMesh>(_menu, DescriptionTitleField));
                 return !string.IsNullOrWhiteSpace(title) ? title : ModText.Get(ModStrings.Screens.Objectives);
             }
         }
@@ -90,19 +90,19 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                UITextMesh description = GetField<UITextMesh>(DescriptionField);
+                UITextMesh description = Reflect.Get<UITextMesh>(_menu, DescriptionField);
                 return IsComponentVisible(description) && !string.IsNullOrWhiteSpace(GetText(description));
             }
         }
 
         public bool IsVictory
         {
-            get { return IsCanvasActive(GetField<CanvasGroup>(VictoryCanvasGroupField)); }
+            get { return IsCanvasActive(Reflect.Get<CanvasGroup>(_menu, VictoryCanvasGroupField)); }
         }
 
         public bool IsDefeat
         {
-            get { return IsCanvasActive(GetField<CanvasGroup>(DefeatCanvasGroupField)); }
+            get { return IsCanvasActive(Reflect.Get<CanvasGroup>(_menu, DefeatCanvasGroupField)); }
         }
 
         public bool IsPresent()
@@ -114,7 +114,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsReadyAfterAnimation()
         {
-            CanvasGroup buttonCanvasGroup = GetField<CanvasGroup>(ButtonCanvasGroupField);
+            CanvasGroup buttonCanvasGroup = Reflect.Get<CanvasGroup>(_menu, ButtonCanvasGroupField);
             return IsPresent()
                 && buttonCanvasGroup != null
                 && buttonCanvasGroup.alpha >= 0.95f
@@ -149,32 +149,32 @@ namespace SongsOfConquestAccess.Adapters
 
         public UIButton StatsButton
         {
-            get { return GetField<UIButton>(StatsButtonField); }
+            get { return Reflect.Get<UIButton>(_menu, StatsButtonField); }
         }
 
         public UIButton ContinueCampaignButton
         {
-            get { return GetField<UIButton>(ContinueCampaignButtonField); }
+            get { return Reflect.Get<UIButton>(_menu, ContinueCampaignButtonField); }
         }
 
         public UIButton RestartMapButton
         {
-            get { return GetField<UIButton>(RestartMapButtonField); }
+            get { return Reflect.Get<UIButton>(_menu, RestartMapButtonField); }
         }
 
         public UIButton LoadButton
         {
-            get { return GetField<UIButton>(LoadButtonField); }
+            get { return Reflect.Get<UIButton>(_menu, LoadButtonField); }
         }
 
         public UIButton QuitToMainButton
         {
-            get { return GetField<UIButton>(QuitToMainButtonField); }
+            get { return Reflect.Get<UIButton>(_menu, QuitToMainButtonField); }
         }
 
         public UIButton PlayerStatsButton
         {
-            get { return GetField<UIButton>(PlayerStatsButtonField); }
+            get { return Reflect.Get<UIButton>(_menu, PlayerStatsButtonField); }
         }
 
         public string GetButtonLabel(UIButton button)
@@ -206,13 +206,13 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                CanvasGroup victory = GetField<CanvasGroup>(VictoryCanvasGroupField);
+                CanvasGroup victory = Reflect.Get<CanvasGroup>(_menu, VictoryCanvasGroupField);
                 if (IsCanvasActive(victory))
                 {
                     return victory;
                 }
 
-                CanvasGroup defeat = GetField<CanvasGroup>(DefeatCanvasGroupField);
+                CanvasGroup defeat = Reflect.Get<CanvasGroup>(_menu, DefeatCanvasGroupField);
                 return IsCanvasActive(defeat) ? defeat : null;
             }
         }
@@ -244,7 +244,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private PostAdventureMenuObjectiveEntry[] GetObjectiveEntries()
         {
-            UITransform container = GetField<UITransform>(ObjectiveEntryContainerField);
+            UITransform container = Reflect.Get<UITransform>(_menu, ObjectiveEntryContainerField);
             Transform transform = container != null ? container.MonoTransform : null;
             if (transform == null)
             {
@@ -256,7 +256,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetObjectiveText(PostAdventureMenuObjectiveEntry entry)
         {
-            UITextMesh text = GetField<UITextMesh>(entry, ObjectiveTextField);
+            UITextMesh text = Reflect.Get<UITextMesh>(entry, ObjectiveTextField);
             return GetText(text);
         }
 
@@ -317,16 +317,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsComponentVisible(Component component)
         {
             return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private T GetField<T>(FieldInfo field) where T : class
-        {
-            return GetField<T>(_menu, field);
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         public sealed class ObjectiveEntry

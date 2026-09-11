@@ -29,7 +29,7 @@ namespace SongsOfConquestAccess.Adapters
         public WorldConfirmMenuAdapter(WorldConfirmMenu menu)
         {
             _menu = menu;
-            _settings = GetField<WorldConfirmMenu.Settings>(menu, SettingsField);
+            _settings = Reflect.Get<WorldConfirmMenu.Settings>(menu, SettingsField);
         }
 
         public object SourceKey
@@ -159,7 +159,7 @@ namespace SongsOfConquestAccess.Adapters
         /// resource to its icon, so the icon is named back into words here.</summary>
         public IReadOnlyList<string> GetCostLabels()
         {
-            IUIPool<IWorldMenuIconTextEntry> pool = GetField<IUIPool<IWorldMenuIconTextEntry>>(_menu, CostEntryPoolField);
+            IUIPool<IWorldMenuIconTextEntry> pool = Reflect.Get<IUIPool<IWorldMenuIconTextEntry>>(_menu, CostEntryPoolField);
             List<string> labels = new List<string>();
             if (pool == null || pool.ActiveItems == null)
             {
@@ -212,7 +212,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 _resourcesBySprite = new Dictionary<Sprite, ResourceType>();
-                IMenuIconFactory icons = GetField<IMenuIconFactory>(_menu, IconsField);
+                IMenuIconFactory icons = Reflect.Get<IMenuIconFactory>(_menu, IconsField);
                 if (icons == null)
                 {
                     return _resourcesBySprite;
@@ -279,11 +279,6 @@ namespace SongsOfConquestAccess.Adapters
                 SpokenLines.Clean(text),
                 @"-\s+(\d)",
                 "-$1");
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
     }
 }

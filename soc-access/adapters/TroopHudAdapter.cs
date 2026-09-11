@@ -416,12 +416,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private TroopHUDEntryMovable GetMovable()
         {
-            return GetField<TroopHUDEntryMovable>(_hud, MovableTroopField);
+            return Reflect.Get<TroopHUDEntryMovable>(_hud, MovableTroopField);
         }
 
         private List<TroopHUDEntry> GetEntries()
         {
-            return GetField<List<TroopHUDEntry>>(_hud, TroopHudEntriesField) ?? new List<TroopHUDEntry>();
+            return Reflect.Get<List<TroopHUDEntry>>(_hud, TroopHudEntriesField) ?? new List<TroopHUDEntry>();
         }
 
         private static bool IsDrawnEntry(TroopHUDEntry entry)
@@ -481,11 +481,6 @@ namespace SongsOfConquestAccess.Adapters
 
             Vector3 position = component != null ? component.transform.position : Vector3.zero;
             return new Vector2(position.x, position.y);
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         private static IReadOnlyList<string> RemoveExactLines(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)

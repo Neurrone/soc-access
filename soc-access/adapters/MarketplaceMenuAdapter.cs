@@ -41,8 +41,8 @@ namespace SongsOfConquestAccess.Adapters
         public MarketplaceMenuAdapter(MarketplaceMenu menu)
         {
             _menu = menu;
-            _facade = GetField<IClientAdventureFacade>(menu, FacadeField);
-            _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
+            _facade = Reflect.Get<IClientAdventureFacade>(menu, FacadeField);
+            _localization = Reflect.Get<ILocalizationHandler>(menu, LocalizationField);
         }
 
         public MarketplaceMenu Source
@@ -73,7 +73,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string title = GetText(GetField<UITextMesh>(_menu, TitleTextField));
+                string title = GetText(Reflect.Get<UITextMesh>(_menu, TitleTextField));
                 return string.IsNullOrWhiteSpace(title) ? string.Empty : title;
             }
         }
@@ -82,7 +82,7 @@ namespace SongsOfConquestAccess.Adapters
         /// ("Owning: 2").</summary>
         public string OwningSummary
         {
-            get { return GetText(GetField<UITextMesh>(_menu, NumberOfMarketplacesTextField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, NumberOfMarketplacesTextField)); }
         }
 
         /// <summary>One entry per resource the grid trades, in drawn order.</summary>
@@ -307,8 +307,8 @@ namespace SongsOfConquestAccess.Adapters
                 return candidates;
             }
 
-            UITextMesh title = GetField<UITextMesh>(_menu, TitleTextField);
-            UITextMesh owning = GetField<UITextMesh>(_menu, NumberOfMarketplacesTextField);
+            UITextMesh title = Reflect.Get<UITextMesh>(_menu, TitleTextField);
+            UITextMesh owning = Reflect.Get<UITextMesh>(_menu, NumberOfMarketplacesTextField);
             UITextMesh[] textMeshes = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: true);
             for (int i = 0; i < textMeshes.Length; i++)
             {
@@ -403,7 +403,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private IReadOnlyList<MarketplaceButton> GetButtons()
         {
-            List<MarketplaceButton> buttons = GetField<List<MarketplaceButton>>(_menu, ButtonsField);
+            List<MarketplaceButton> buttons = Reflect.Get<List<MarketplaceButton>>(_menu, ButtonsField);
             return buttons ?? new List<MarketplaceButton>();
         }
 
@@ -442,11 +442,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(IUITextMesh textMesh)
         {
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         private static T GetFieldValue<T>(object owner, FieldInfo field, T fallback)

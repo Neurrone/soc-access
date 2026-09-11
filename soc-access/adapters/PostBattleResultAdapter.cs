@@ -211,7 +211,7 @@ namespace SongsOfConquestAccess.Adapters
             if (!probed)
             {
                 probed = true;
-                Transform parent = GetField<Transform>(parentField);
+                Transform parent = Reflect.Get<Transform>(_menu, parentField);
                 Transform band = parent != null && parent.parent != null ? parent.parent.parent : null;
                 Transform title = band != null ? band.Find("Title") : null;
                 cached = title != null ? title.GetComponent<UITextMesh>() : null;
@@ -274,8 +274,8 @@ namespace SongsOfConquestAccess.Adapters
         /// entries it has spawned.</summary>
         private void SyncLootEntries()
         {
-            int attacker = ActiveLootCount(GetField<PostBattleLootContainer>(AttackerLootContainerField));
-            int defender = ActiveLootCount(GetField<PostBattleLootContainer>(DefenderLootContainerField));
+            int attacker = ActiveLootCount(Reflect.Get<PostBattleLootContainer>(_menu, AttackerLootContainerField));
+            int defender = ActiveLootCount(Reflect.Get<PostBattleLootContainer>(_menu, DefenderLootContainerField));
             if (attacker == _attackerLootCount && defender == _defenderLootCount)
             {
                 return;
@@ -291,7 +291,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 List<AdventureBattleMenuTroopEntry> entries =
-                    GetField<List<AdventureBattleMenuTroopEntry>>(TroopInstancesField);
+                    Reflect.Get<List<AdventureBattleMenuTroopEntry>>(_menu, TroopInstancesField);
                 return entries != null ? entries.Count : -1;
             }
         }
@@ -299,72 +299,72 @@ namespace SongsOfConquestAccess.Adapters
         private static int ActiveLootCount(PostBattleLootContainer container)
         {
             List<PostBattleLootEntry> entries =
-                GetField<List<PostBattleLootEntry>>(container, LootContainerActiveEntriesField);
+                Reflect.Get<List<PostBattleLootEntry>>(container, LootContainerActiveEntriesField);
             return entries != null ? entries.Count : -1;
         }
 
         public string AcceptButtonLabel
         {
-            get { return GetButtonLabel(GetField<UIButton>(ConfirmButtonField)); }
+            get { return GetButtonLabel(Reflect.Get<UIButton>(_menu, ConfirmButtonField)); }
         }
 
         /// <summary>The drawn Accept button, for the screen to key a control on, sort by and select.
         /// </summary>
         public Component AcceptButton
         {
-            get { return GetField<UIButton>(ConfirmButtonField) as Component; }
+            get { return Reflect.Get<UIButton>(_menu, ConfirmButtonField) as Component; }
         }
 
         public bool Accept()
         {
-            return NativeSelectionUtility.Click(GetField<UIButton>(ConfirmButtonField));
+            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_menu, ConfirmButtonField));
         }
 
         public bool IsAcceptButtonEnabled()
         {
-            return IsButtonEnabled(GetField<UIButton>(ConfirmButtonField));
+            return IsButtonEnabled(Reflect.Get<UIButton>(_menu, ConfirmButtonField));
         }
 
         public bool IsAcceptButtonVisible()
         {
-            return IsButtonVisible(GetField<UIButton>(ConfirmButtonField));
+            return IsButtonVisible(Reflect.Get<UIButton>(_menu, ConfirmButtonField));
         }
 
         public Tooltip AcceptButtonTooltip
         {
-            get { return Tooltip.ForComponent(GetField<UIButton>(ConfirmButtonField), _localization); }
+            get { return Tooltip.ForComponent(Reflect.Get<UIButton>(_menu, ConfirmButtonField), _localization); }
         }
 
         public string RedoManualBattleButtonLabel
         {
-            get { return GetButtonLabel(GetField<UIButton>(RedoManualBattleButtonField)); }
+            get { return GetButtonLabel(Reflect.Get<UIButton>(_menu, RedoManualBattleButtonField)); }
         }
 
         /// <summary>The drawn Manual Battle button, for the screen to key a control on, sort by and
         /// select.</summary>
         public Component RedoManualBattleButton
         {
-            get { return GetField<UIButton>(RedoManualBattleButtonField) as Component; }
+            get { return Reflect.Get<UIButton>(_menu, RedoManualBattleButtonField) as Component; }
         }
 
         public bool RedoManualBattle()
         {
-            return NativeSelectionUtility.Click(GetField<UIButton>(RedoManualBattleButtonField));
+            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_menu, RedoManualBattleButtonField));
         }
 
         public bool IsRedoManualBattleButtonEnabled()
         {
-            return IsButtonEnabled(GetField<UIButton>(RedoManualBattleButtonField));
+            return IsButtonEnabled(Reflect.Get<UIButton>(_menu, RedoManualBattleButtonField));
         }
 
         public bool IsRedoManualBattleButtonVisible()
         {
-            return IsButtonVisible(GetField<UIButton>(RedoManualBattleButtonField));
+            return IsButtonVisible(Reflect.Get<UIButton>(_menu, RedoManualBattleButtonField));
         }
 
         public Tooltip RedoManualBattleButtonTooltip
         {
-            get { return Tooltip.ForComponent(GetField<UIButton>(RedoManualBattleButtonField), _localization); }
+            get { return Tooltip.ForComponent(Reflect.Get<UIButton>(_menu, RedoManualBattleButtonField), _localization); }
         }
 
         public void HideNativeTooltip()
@@ -388,7 +388,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private IBattleResult GetResult()
         {
-            return GetField<IBattleResult>(PostBattleMenuResultField);
+            return Reflect.Get<IBattleResult>(_menu, PostBattleMenuResultField);
         }
 
         private CommanderHudPortraitAdapter BuildCommanderPortrait(string id, Func<string> getName, string settingsFieldName)
@@ -454,7 +454,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private ResultEntry[] BuildTroopEntries(FieldInfo parentField)
         {
-            Transform parent = GetField<Transform>(parentField);
+            Transform parent = Reflect.Get<Transform>(_menu, parentField);
             if (parent == null)
             {
                 return new ResultEntry[0];
@@ -472,10 +472,10 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                Component tooltipComponent = GetField<Component>(entry, TroopEntryTooltipAreaField);
+                Component tooltipComponent = Reflect.Get<Component>(entry, TroopEntryTooltipAreaField);
                 Tooltip tooltip = Tooltip.ForComponent(tooltipComponent, _localization);
                 result.Add(new ResultEntry(
-                    GetText(GetField<UITextMesh>(entry, TroopEntryAmountField)),
+                    GetText(Reflect.Get<UITextMesh>(entry, TroopEntryAmountField)),
                     TooltipLines.First(tooltip),
                     isLostTroop: true,
                     tooltip,
@@ -489,8 +489,8 @@ namespace SongsOfConquestAccess.Adapters
         private ResultEntry[] BuildLootEntries()
         {
             List<ResultEntry> result = new List<ResultEntry>();
-            AddLootEntries(result, GetField<PostBattleLootContainer>(AttackerLootContainerField));
-            AddLootEntries(result, GetField<PostBattleLootContainer>(DefenderLootContainerField));
+            AddLootEntries(result, Reflect.Get<PostBattleLootContainer>(_menu, AttackerLootContainerField));
+            AddLootEntries(result, Reflect.Get<PostBattleLootContainer>(_menu, DefenderLootContainerField));
             return result.ToArray();
         }
 
@@ -511,7 +511,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                Component tooltipComponent = GetField<Component>(entry, LootEntryMainTransformField);
+                Component tooltipComponent = Reflect.Get<Component>(entry, LootEntryMainTransformField);
                 Tooltip tooltip = Tooltip.ForComponent(tooltipComponent, _localization);
                 result.Add(new ResultEntry(
                     string.Empty,
@@ -573,7 +573,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetText(FieldInfo field)
         {
-            return GetText(GetField<UITextMesh>(field));
+            return GetText(Reflect.Get<UITextMesh>(_menu, field));
         }
 
         private static string GetText(UITextMesh text)
@@ -583,7 +583,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool IsTextVisible(FieldInfo field)
         {
-            UITextMesh text = GetField<UITextMesh>(field);
+            UITextMesh text = Reflect.Get<UITextMesh>(_menu, field);
             return text != null
                 && text.gameObject.activeInHierarchy
                 && !string.IsNullOrWhiteSpace(GetText(text));
@@ -604,11 +604,6 @@ namespace SongsOfConquestAccess.Adapters
             return button != null && button.Active && button.Interactable;
         }
 
-        private T GetField<T>(FieldInfo field) where T : class
-        {
-            return GetField<T>(_menu, field);
-        }
-
         private T GetFieldValue<T>(FieldInfo field)
         {
             if (_menu == null || field == null)
@@ -618,16 +613,6 @@ namespace SongsOfConquestAccess.Adapters
 
             object value = field.GetValue(_menu);
             return value is T ? (T)value : default(T);
-        }
-
-        private static T GetField<T>(object instance, FieldInfo field) where T : class
-        {
-            if (instance == null || field == null)
-            {
-                return null;
-            }
-
-            return field.GetValue(instance) as T;
         }
 
         private T GetBattleMenuSettingsField<T>(string fieldName) where T : class

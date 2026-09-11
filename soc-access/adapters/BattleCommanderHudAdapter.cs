@@ -79,7 +79,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            GameObject portraitContainer = GetField<GameObject>(hud, WielderPortraitContainerField);
+            GameObject portraitContainer = Reflect.Get<GameObject>(hud, WielderPortraitContainerField);
             ICommanderState commander = GetCommander(hud);
             return IsGameObjectVisible(portraitContainer)
                 && commander != null
@@ -131,7 +131,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public UIButton GetPortraitButton(CombatHudSide side)
         {
-            return GetField<UIButton>(GetCommanderHud(side), WielderPortraitButtonField);
+            return Reflect.Get<UIButton>(GetCommanderHud(side), WielderPortraitButtonField);
         }
 
         /// <summary>Whether the side's panel is drawing the player's name, which the game does only
@@ -139,14 +139,14 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPlayerNameVisible(CombatHudSide side)
         {
             BattleCommanderHUD hud = GetCommanderHud(side);
-            return IsGameObjectVisible(GetField<GameObject>(hud, PlayerNameContainerField))
+            return IsGameObjectVisible(Reflect.Get<GameObject>(hud, PlayerNameContainerField))
                 && !string.IsNullOrWhiteSpace(GetPlayerName(side));
         }
 
         /// <summary>The player's name as the game wrote it on the side's panel.</summary>
         public string GetPlayerName(CombatHudSide side)
         {
-            UITextMesh text = GetField<UITextMesh>(GetCommanderHud(side), PlayerNameTextField);
+            UITextMesh text = Reflect.Get<UITextMesh>(GetCommanderHud(side), PlayerNameTextField);
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
@@ -184,7 +184,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsEssenceMenuVisible(CombatHudSide side)
         {
             BattleEssenceContainer container = GetEssenceContainer(side);
-            Transform innerContainer = GetField<Transform>(container, BattleEssenceContainerField);
+            Transform innerContainer = Reflect.Get<Transform>(container, BattleEssenceContainerField);
             return IsPortraitVisible(side)
                 && (innerContainer == null || IsGameObjectVisible(innerContainer.gameObject));
         }
@@ -262,12 +262,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private ICommanderState GetCommander(BattleCommanderHUD hud)
         {
-            return GetField<ICommanderState>(hud, CommanderStateField);
+            return Reflect.Get<ICommanderState>(hud, CommanderStateField);
         }
 
         private BattleEssenceContainer GetEssenceContainer(CombatHudSide side)
         {
-            return GetField<BattleEssenceContainer>(GetCommanderHud(side), EssenceContainerField);
+            return Reflect.Get<BattleEssenceContainer>(GetCommanderHud(side), EssenceContainerField);
         }
 
         private UIButton GetAiControlButton(CombatHudSide side)
@@ -277,7 +277,7 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            UIButton[] buttons = GetField<UIButton[]>(GetCommanderHud(side), AiAutoBattleButtonsField);
+            UIButton[] buttons = Reflect.Get<UIButton[]>(GetCommanderHud(side), AiAutoBattleButtonsField);
             if (buttons == null)
             {
                 return null;
@@ -339,7 +339,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private int GetEssenceAmount(CombatHudSide side, EssenceType essenceType)
         {
-            ICommanderState commander = GetField<ICommanderState>(GetEssenceContainer(side), BattleEssenceCommanderField);
+            ICommanderState commander = Reflect.Get<ICommanderState>(GetEssenceContainer(side), BattleEssenceCommanderField);
             if (commander == null || commander.GetIsEmpty() || commander.EssenceWallet == null)
             {
                 return 0;
@@ -394,7 +394,7 @@ namespace SongsOfConquestAccess.Adapters
                     break;
             }
 
-            return GetField<Component>(container, field);
+            return Reflect.Get<Component>(container, field);
         }
 
         private string Localize(string key, string fallback)
@@ -410,23 +410,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return Regex.Replace(name, "([a-z])([A-Z])", "$1 $2");
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            if (owner == null || field == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return field.GetValue(owner) as T;
-            }
-            catch
-            {
-                return null;
-            }
         }
 
         private static bool IsComponentVisible(Component component)

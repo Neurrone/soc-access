@@ -67,7 +67,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPresent()
         {
-            UITransform container = GetField<UITransform>(SettingsContainerField);
+            UITransform container = Reflect.Get<UITransform>(_menu, SettingsContainerField);
             GameObject gameObject = _menu != null ? ((Component)_menu).gameObject : null;
             return _menu != null
                 && gameObject != null
@@ -81,13 +81,13 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (_rows == null)
             {
-                IMenuFactoryCollection factory = GetField<IMenuFactoryCollection>(FactoryField);
+                IMenuFactoryCollection factory = Reflect.Get<IMenuFactoryCollection>(_menu, FactoryField);
                 if (factory == null)
                 {
                     return new MenuRow[0];
                 }
 
-                UITransform content = GetField<UITransform>(SettingsContainerField);
+                UITransform content = Reflect.Get<UITransform>(_menu, SettingsContainerField);
                 _rows = new MenuRowMemo(factory, content != null ? content.MonoTransform : null, _rowSettings);
             }
 
@@ -96,17 +96,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public MenuRowButton GetCancelButton()
         {
-            return MenuRows.Button("player-settings-cancel", GetField<UIButton>(CancelButtonField), _localization);
+            return MenuRows.Button("player-settings-cancel", Reflect.Get<UIButton>(_menu, CancelButtonField), _localization);
         }
 
         public MenuRowButton GetConfirmButton()
         {
-            return MenuRows.Button("player-settings-confirm", GetField<UIButton>(ConfirmButtonField), _localization);
-        }
-
-        private T GetField<T>(FieldInfo field) where T : class
-        {
-            return _menu != null && field != null ? field.GetValue(_menu) as T : null;
+            return MenuRows.Button("player-settings-confirm", Reflect.Get<UIButton>(_menu, ConfirmButtonField), _localization);
         }
     }
 }

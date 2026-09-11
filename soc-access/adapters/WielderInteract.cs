@@ -78,13 +78,13 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                GameObject container = GetField<GameObject>(CustomNameContainerField);
+                GameObject container = Reflect.Get<GameObject>(_header, CustomNameContainerField);
                 if (container == null || !container.activeInHierarchy)
                 {
                     return string.Empty;
                 }
 
-                return UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(CustomNameTextField));
+                return UITextMeshTextUtility.GetEffectiveText(Reflect.Get<UITextMesh>(_header, CustomNameTextField));
             }
         }
 
@@ -146,11 +146,6 @@ namespace SongsOfConquestAccess.Adapters
         public bool FocusPortrait()
         {
             return NativeSelectionUtility.Select(Portrait);
-        }
-
-        private T GetField<T>(FieldInfo field) where T : class
-        {
-            return _header != null && field != null ? field.GetValue(_header) as T : null;
         }
 
         private TroopHUD GetTroopHud()

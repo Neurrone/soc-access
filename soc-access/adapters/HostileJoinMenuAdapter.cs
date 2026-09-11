@@ -54,9 +54,9 @@ namespace SongsOfConquestAccess.Adapters
         public HostileJoinMenuAdapter(HostileJoinMenu menu)
         {
             _menu = menu;
-            _settings = GetField<HostileJoinMenu.Settings>(menu, SettingsField);
-            _facade = GetField<IClientAdventureFacade>(menu, AdventureFacadeField);
-            _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
+            _settings = Reflect.Get<HostileJoinMenu.Settings>(menu, SettingsField);
+            _facade = Reflect.Get<IClientAdventureFacade>(menu, AdventureFacadeField);
+            _localization = Reflect.Get<ILocalizationHandler>(menu, LocalizationField);
         }
 
         public object SourceKey
@@ -73,7 +73,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                ICommanderState commander = GetField<ICommanderState>(_menu, AttackingCommanderField);
+                ICommanderState commander = Reflect.Get<ICommanderState>(_menu, AttackingCommanderField);
                 return commander != null ? commander.Id : -1;
             }
         }
@@ -82,7 +82,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                ICommanderState commander = GetField<ICommanderState>(_menu, JoiningCommanderField);
+                ICommanderState commander = Reflect.Get<ICommanderState>(_menu, JoiningCommanderField);
                 return commander != null ? commander.Id : -1;
             }
         }
@@ -91,7 +91,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             return _menu != null
                 && _settings != null
-                && GetField<object>(_menu, AsyncField) != null
+                && Reflect.Get<object>(_menu, AsyncField) != null
                 && Stage != HostileJoinMenuStage.None;
         }
 
@@ -413,11 +413,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsButtonEnabled(UIButton button)
         {
             return button != null && button.Active && button.Interactable;
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
     }
 }

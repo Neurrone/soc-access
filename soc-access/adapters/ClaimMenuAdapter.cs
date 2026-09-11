@@ -22,7 +22,7 @@ namespace SongsOfConquestAccess.Adapters
         public ClaimMenuAdapter(ClaimMenu menu)
         {
             _menu = menu;
-            _settings = GetField<ClaimMenu.Settings>(menu, SettingsField);
+            _settings = Reflect.Get<ClaimMenu.Settings>(menu, SettingsField);
         }
 
         public object SourceKey
@@ -142,11 +142,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsVisible(GameObject gameObject)
         {
             return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         public sealed class ChoiceItem

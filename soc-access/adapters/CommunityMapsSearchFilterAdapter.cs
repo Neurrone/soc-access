@@ -74,13 +74,13 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < categories.Length; i++)
             {
                 object category = categories.GetValue(i);
-                if (category == null || GetField<bool>(category, "hidden"))
+                if (category == null || Reflect.Typed<bool>(category, "hidden"))
                 {
                     continue;
                 }
 
-                string categoryName = GetField<string>(category, "name");
-                Array tags = GetField<Array>(category, "tags");
+                string categoryName = Reflect.Typed<string>(category, "name");
+                Array tags = Reflect.Typed<Array>(category, "tags");
                 if (string.IsNullOrWhiteSpace(categoryName) || tags == null || tags.Length == 0)
                 {
                     continue;
@@ -90,7 +90,7 @@ namespace SongsOfConquestAccess.Adapters
                 for (int tagIndex = 0; tagIndex < tags.Length; tagIndex++)
                 {
                     object tag = tags.GetValue(tagIndex);
-                    string tagName = GetField<string>(tag, "name");
+                    string tagName = Reflect.Typed<string>(tag, "name");
                     if (!string.IsNullOrWhiteSpace(tagName))
                     {
                         tagItems.Add(new TagItem(this, categoryName, tagName, GetTagLabel(tagName), tagIndex));
@@ -266,7 +266,7 @@ namespace SongsOfConquestAccess.Adapters
 
             foreach (object tag in selectedTags)
             {
-                if (GetField<string>(tag, "category") == category && GetField<string>(tag, "name") == name)
+                if (Reflect.Typed<string>(tag, "category") == category && Reflect.Typed<string>(tag, "name") == name)
                 {
                     return true;
                 }
@@ -342,18 +342,6 @@ namespace SongsOfConquestAccess.Adapters
 
             string key = "ModBrowser/Tag/" + tagName.Replace(" ", string.Empty);
             return GameText.Get(key, tagName);
-        }
-
-        private static T GetField<T>(object instance, string name)
-        {
-            if (instance == null || string.IsNullOrWhiteSpace(name))
-            {
-                return default(T);
-            }
-
-            FieldInfo field = AccessTools.Field(instance.GetType(), name);
-            object value = field != null ? field.GetValue(instance) : null;
-            return value is T ? (T)value : default(T);
         }
 
         // FindActionButtons walks the panel for its buttons and then asked each of them for its

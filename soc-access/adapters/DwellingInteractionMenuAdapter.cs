@@ -37,8 +37,8 @@ namespace SongsOfConquestAccess.Adapters
         public DwellingInteractionMenuAdapter(DwellingInteractionMenu menu)
         {
             _menu = menu;
-            _facade = GetField<IClientAdventureFacade>(_menu, AdventureFacadeField);
-            _localization = GetField<ILocalizationHandler>(_menu, LocalizationField);
+            _facade = Reflect.Get<IClientAdventureFacade>(_menu, AdventureFacadeField);
+            _localization = Reflect.Get<ILocalizationHandler>(_menu, LocalizationField);
         }
 
         public object SourceKey
@@ -53,7 +53,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(GetField<UITextMesh>(_menu, BuildingNameField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, BuildingNameField)); }
         }
 
         public string WielderName
@@ -174,12 +174,12 @@ namespace SongsOfConquestAccess.Adapters
         /// opens on, and the word the prefab has written on it.</summary>
         public Component BackButton
         {
-            get { return GetField<UIButton>(_menu, BackToTopButtonField) as Component; }
+            get { return Reflect.Get<UIButton>(_menu, BackToTopButtonField) as Component; }
         }
 
         public string BackLabel
         {
-            get { return SpokenLines.Clean(MenuButtonTextUtility.GetAllVisibleText(GetField<UIButton>(_menu, BackToTopButtonField))); }
+            get { return SpokenLines.Clean(MenuButtonTextUtility.GetAllVisibleText(Reflect.Get<UIButton>(_menu, BackToTopButtonField))); }
         }
 
         public bool IsBackVisible()
@@ -207,27 +207,27 @@ namespace SongsOfConquestAccess.Adapters
 
         private WielderInteractHeader GetHeader()
         {
-            return GetField<WielderInteractHeader>(_menu, WielderInteractHeaderField);
+            return Reflect.Get<WielderInteractHeader>(_menu, WielderInteractHeaderField);
         }
 
         private TroopHUD GetTroopHud()
         {
-            return GetField<TroopHUD>(GetHeader(), HeaderTroopHudField);
+            return Reflect.Get<TroopHUD>(GetHeader(), HeaderTroopHudField);
         }
 
         private Component GetWielderPortrait()
         {
-            return GetField<UIImage>(GetHeader(), HeaderPortraitField);
+            return Reflect.Get<UIImage>(GetHeader(), HeaderPortraitField);
         }
 
         private PurchaseTroopsSubMenu GetPurchaseTroopsSubMenu()
         {
-            return GetField<PurchaseTroopsSubMenu>(_menu, PurchaseTroopsSubMenuField);
+            return Reflect.Get<PurchaseTroopsSubMenu>(_menu, PurchaseTroopsSubMenuField);
         }
 
         private UpgradeTroopsSubMenu GetUpgradeTroopsSubMenu()
         {
-            return GetField<UpgradeTroopsSubMenu>(_menu, UpgradeTroopsSubMenuField);
+            return Reflect.Get<UpgradeTroopsSubMenu>(_menu, UpgradeTroopsSubMenuField);
         }
 
         private int GetInteractingCommanderId()
@@ -241,11 +241,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(IUITextMesh textMesh)
         {
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
     }
 }

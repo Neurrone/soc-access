@@ -112,8 +112,8 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            GameObject main = GetField<GameObject>(MainContainerField);
-            GameObject grid = GetField<GameObject>(GridContainerField);
+            GameObject main = Reflect.Get<GameObject>(_menu, MainContainerField);
+            GameObject grid = Reflect.Get<GameObject>(_menu, GridContainerField);
             return main != null
                 && main.activeInHierarchy
                 && grid != null
@@ -215,7 +215,7 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetCommanderPortraitTooltip(BattleParticipantSide.Defender); }
         }
 
-        public Component WithdrawButton { get { return GetField<UIButton>(CancelButtonField) as Component; } }
+        public Component WithdrawButton { get { return Reflect.Get<UIButton>(_menu, CancelButtonField) as Component; } }
         public string WithdrawButtonLabel { get { return GetButtonLabel(CancelButtonField); } }
         public bool Withdraw() { return ActivateButton(CancelButtonField); }
         public void FocusWithdrawButton() { FocusButton(CancelButtonField); }
@@ -223,7 +223,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsWithdrawButtonVisible() { return IsButtonVisible(CancelButtonField); }
         public Tooltip WithdrawButtonTooltip { get { return GetButtonTooltip(CancelButtonField); } }
 
-        public Component ManualBattleButton { get { return GetField<UIButton>(BattleButtonField) as Component; } }
+        public Component ManualBattleButton { get { return Reflect.Get<UIButton>(_menu, BattleButtonField) as Component; } }
         public string ManualBattleButtonLabel { get { return GetButtonLabel(BattleButtonField); } }
         public bool ManualBattle() { return ActivateButton(BattleButtonField); }
         public void FocusManualBattleButton() { FocusButton(BattleButtonField); }
@@ -231,7 +231,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsManualBattleButtonVisible() { return IsButtonVisible(BattleButtonField); }
         public Tooltip ManualBattleButtonTooltip { get { return GetButtonTooltip(BattleButtonField); } }
 
-        public Component QuickBattleButton { get { return GetField<UIButton>(QuickButtonField) as Component; } }
+        public Component QuickBattleButton { get { return Reflect.Get<UIButton>(_menu, QuickButtonField) as Component; } }
         public string QuickBattleButtonLabel { get { return GetButtonLabel(QuickButtonField); } }
         public bool QuickBattle() { return ActivateButton(QuickButtonField); }
         public void FocusQuickBattleButton() { FocusButton(QuickButtonField); }
@@ -239,7 +239,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsQuickBattleButtonVisible() { return IsButtonVisible(QuickButtonField); }
         public Tooltip QuickBattleButtonTooltip { get { return GetButtonTooltip(QuickButtonField); } }
 
-        public Component ReadyButton { get { return GetField<UIButton>(ReadyButtonField) as Component; } }
+        public Component ReadyButton { get { return Reflect.Get<UIButton>(_menu, ReadyButtonField) as Component; } }
         public string ReadyButtonLabel { get { return GetButtonLabel(ReadyButtonField); } }
         public bool Ready() { return ActivateButton(ReadyButtonField); }
         public void FocusReadyButton() { FocusButton(ReadyButtonField); }
@@ -593,7 +593,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             IDetails details = GetTroopDetails(tile.Troop.Id);
-            TooltipBehaviour tooltipBehaviour = GetField<TooltipBehaviour>(TooltipField);
+            TooltipBehaviour tooltipBehaviour = Reflect.Get<TooltipBehaviour>(_menu, TooltipField);
             ILocalizationHandler localization = GetLocalization();
             if (details == null || tooltipBehaviour == null || localization == null)
             {
@@ -700,35 +700,35 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetButtonLabel(FieldInfo field)
         {
-            return MenuButtonTextUtility.GetStandardButtonLabel(GetField<UIButton>(field));
+            return MenuButtonTextUtility.GetStandardButtonLabel(Reflect.Get<UIButton>(_menu, field));
         }
 
         private bool ActivateButton(FieldInfo field)
         {
-            return NativeSelectionUtility.Click(GetField<UIButton>(field));
+            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_menu, field));
         }
 
         private void FocusButton(FieldInfo field)
         {
             HideNativeTooltip();
-            NativeSelectionUtility.Select(GetField<UIButton>(field));
+            NativeSelectionUtility.Select(Reflect.Get<UIButton>(_menu, field));
         }
 
         private bool IsButtonEnabled(FieldInfo field)
         {
-            UIButton button = GetField<UIButton>(field);
+            UIButton button = Reflect.Get<UIButton>(_menu, field);
             return button == null || button.Interactable;
         }
 
         private bool IsButtonVisible(FieldInfo field)
         {
-            UIButton button = GetField<UIButton>(field);
+            UIButton button = Reflect.Get<UIButton>(_menu, field);
             return button != null && button.Active;
         }
 
         private Tooltip GetButtonTooltip(FieldInfo field)
         {
-            return Tooltip.ForComponent(GetField<UIButton>(field), GetLocalization());
+            return Tooltip.ForComponent(Reflect.Get<UIButton>(_menu, field), GetLocalization());
         }
 
         private void AddTiles(TroopPlacementSnapshot snapshot, MapFormat map)
@@ -864,7 +864,7 @@ namespace SongsOfConquestAccess.Adapters
             string name = string.Empty;
             try
             {
-                IFactionLookup factionLookup = GetField<IFactionLookup>(FactionLookupField);
+                IFactionLookup factionLookup = Reflect.Get<IFactionLookup>(_menu, FactionLookupField);
                 ILocalizationHandler localization = GetLocalization();
                 if (factionLookup != null && localization != null)
                 {
@@ -935,7 +935,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetCurrentStateName()
         {
-            object stateMachine = GetField<object>(StateMachineField);
+            object stateMachine = Reflect.Get<object>(_menu, StateMachineField);
             if (stateMachine == null)
             {
                 return string.Empty;
@@ -976,22 +976,22 @@ namespace SongsOfConquestAccess.Adapters
 
         private DeploymentMenu GetDeploymentMenu()
         {
-            return GetField<IDeploymentMenu>(DeploymentMenuField) as DeploymentMenu;
+            return Reflect.Get<IDeploymentMenu>(_menu, DeploymentMenuField) as DeploymentMenu;
         }
 
         private MapFormat GetMap()
         {
-            return GetField<MapFormat>(MapFormatField);
+            return Reflect.Get<MapFormat>(_menu, MapFormatField);
         }
 
         private RawImage GetDeploymentRawImage()
         {
-            return GetField<RawImage>(DeploymentRawImageField);
+            return Reflect.Get<RawImage>(_menu, DeploymentRawImageField);
         }
 
         private ILocalizationHandler GetLocalization()
         {
-            return GetField<ILocalizationHandler>(LocalizationField);
+            return Reflect.Get<ILocalizationHandler>(_menu, LocalizationField);
         }
 
         private string GetParticipantNameText(BattleParticipantSide side)
@@ -1010,7 +1010,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private Tooltip GetScoutingTooltip(BattleParticipantSide side)
         {
-            UIImage area = GetField<UIImage>(side == BattleParticipantSide.Attacker
+            UIImage area = Reflect.Get<UIImage>(_menu, side == BattleParticipantSide.Attacker
                 ? AttackerScoutingAreaField
                 : DefenderScoutingAreaField);
             return area != null && area.Active && ((Component)area).gameObject != null && ((Component)area).gameObject.activeInHierarchy
@@ -1064,7 +1064,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             try
             {
-                IClientAdventureFacade facade = GetField<IClientAdventureFacade>(AdventureFacadeField);
+                IClientAdventureFacade facade = Reflect.Get<IClientAdventureFacade>(_menu, AdventureFacadeField);
                 return facade != null && facade.Troops != null ? facade.Troops.GetDetails(troopId) : null;
             }
             catch (Exception ex)
@@ -1074,14 +1074,9 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private T GetField<T>(FieldInfo field) where T : class
-        {
-            return field != null && _menu != null ? field.GetValue(_menu) as T : null;
-        }
-
         private string GetUIText(FieldInfo field)
         {
-            UITextMesh text = GetField<UITextMesh>(field);
+            UITextMesh text = Reflect.Get<UITextMesh>(_menu, field);
             if (!IsVisibleText(text))
             {
                 return string.Empty;

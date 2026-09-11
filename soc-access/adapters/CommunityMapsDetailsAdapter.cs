@@ -73,15 +73,15 @@ namespace SongsOfConquestAccess.Adapters
                 && _details.ModDetailsPanel.activeInHierarchy;
         }
 
-        public string Title { get { return GetText(GetField<TMP_Text>(NameField)); } }
+        public string Title { get { return GetText(Reflect.Cast<TMP_Text>(_details, NameField)); } }
 
-        public string Summary { get { return GetText(GetField<TMP_Text>(SummaryField)); } }
+        public string Summary { get { return GetText(Reflect.Cast<TMP_Text>(_details, SummaryField)); } }
 
-        public string Description { get { return GetText(GetField<TMP_Text>(DescriptionField)); } }
+        public string Description { get { return GetText(Reflect.Cast<TMP_Text>(_details, DescriptionField)); } }
 
-        public string DescriptionLabel { get { return FindHeaderLabel(GetField<TMP_Text>(DescriptionField)); } }
+        public string DescriptionLabel { get { return FindHeaderLabel(Reflect.Cast<TMP_Text>(_details, DescriptionField)); } }
 
-        public string SubscribeLabel { get { return GetText(GetField<TMP_Text>(SubscribeTextField)); } }
+        public string SubscribeLabel { get { return GetText(Reflect.Cast<TMP_Text>(_details, SubscribeTextField)); } }
 
         public string BackLabel { get { return _backLabel; } }
 
@@ -90,19 +90,19 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<ActionItem> GetVoteActions()
         {
             List<ActionItem> actions = new List<ActionItem>();
-            AddAction(actions, "vote-up", _voteUpLabel, GetText(GetField<TMP_Text>(UpVotesField)), () => IsVoteUpSelected, RatePositive);
-            AddAction(actions, "vote-down", _voteDownLabel, GetText(GetField<TMP_Text>(DownVotesField)), () => IsVoteDownSelected, RateNegative);
+            AddAction(actions, "vote-up", _voteUpLabel, GetText(Reflect.Cast<TMP_Text>(_details, UpVotesField)), () => IsVoteUpSelected, RatePositive);
+            AddAction(actions, "vote-down", _voteDownLabel, GetText(Reflect.Cast<TMP_Text>(_details, DownVotesField)), () => IsVoteDownSelected, RateNegative);
             return actions;
         }
 
         public IReadOnlyList<DetailItem> GetDetails()
         {
             List<DetailItem> details = new List<DetailItem>();
-            AddDetail(details, "file-size", GetField<TMP_Text>(FileSizeField));
-            AddDetail(details, "last-updated", GetField<TMP_Text>(LastUpdatedField));
-            AddDetail(details, "release-date", GetField<TMP_Text>(ReleaseDateField));
-            AddDetail(details, "subscribers", GetField<TMP_Text>(SubscribersField));
-            AddDetail(details, "created-by", GetField<TMP_Text>(CreatedByField));
+            AddDetail(details, "file-size", Reflect.Cast<TMP_Text>(_details, FileSizeField));
+            AddDetail(details, "last-updated", Reflect.Cast<TMP_Text>(_details, LastUpdatedField));
+            AddDetail(details, "release-date", Reflect.Cast<TMP_Text>(_details, ReleaseDateField));
+            AddDetail(details, "subscribers", Reflect.Cast<TMP_Text>(_details, SubscribersField));
+            AddDetail(details, "created-by", Reflect.Cast<TMP_Text>(_details, CreatedByField));
             return details;
         }
 
@@ -245,12 +245,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool IsVoteUpSelected
         {
-            get { return IsActive(GetField<GameObject>(UpVoteActiveOverlayField)); }
+            get { return IsActive(Reflect.Cast<GameObject>(_details, UpVoteActiveOverlayField)); }
         }
 
         private bool IsVoteDownSelected
         {
-            get { return IsActive(GetField<GameObject>(DownVoteActiveOverlayField)); }
+            get { return IsActive(Reflect.Cast<GameObject>(_details, DownVoteActiveOverlayField)); }
         }
 
         // LAZY: only from Report(), which mod.io refuses without a selected object. The walk is paid
@@ -371,11 +371,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Empty;
-        }
-
-        private T GetField<T>(FieldInfo field)
-        {
-            return field != null && _details != null ? (T)field.GetValue(_details) : default(T);
         }
 
         private static bool IsActive(GameObject gameObject)

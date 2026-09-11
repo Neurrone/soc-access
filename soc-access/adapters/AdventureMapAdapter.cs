@@ -45,8 +45,6 @@ namespace SongsOfConquestAccess.Adapters
 
         private const ushort ObjectiveBeaconBlueprintId = 50;
         private const ushort FallenBeaconBlueprintId = 158;
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(AdventureViewInstaller), "Container");
         private static readonly ScannerDirection[] NoRoadDirections = new ScannerDirection[0];
         // The names ReactiveAdventureMenuSystem waits under while it shows a story page
         // (RegisterCommandWaiter composes them as "<type name>_<name>").
@@ -111,20 +109,20 @@ namespace SongsOfConquestAccess.Adapters
         public AdventureMapAdapter(AdventureViewInstaller installer, AdventureMapRevealedRegistry revealedRegistry = null)
             : this(
                 installer,
-                GetContainer(installer),
-                Resolve<IClientAdventureFacade>(GetContainer(installer)),
-                Resolve<ISelectionHandler>(GetContainer(installer)),
-                Resolve<IFogManager>(GetContainer(installer)),
-                Resolve<IGrid>(GetContainer(installer)),
-                Resolve<ICameraController>(GetContainer(installer)),
-                ResolveByTypeName(GetContainer(installer), "Lavapotion.Cartography.ICartographyConverter"),
-                Resolve<IAdventureTooltipManager>(GetContainer(installer)),
-                Resolve<ILocalizationHandler>(GetContainer(installer)),
-                Resolve<ICartographyVisualManifest>(GetContainer(installer)),
-                Resolve<IHumanAdventureController>(GetContainer(installer)),
-                Resolve<IHumanAdventureControllerFacade>(GetContainer(installer)),
-                Resolve<IInputManager>(GetContainer(installer)),
-                Resolve<ISystemPopups>(GetContainer(installer)),
+                Reflect.InstallerContainer(installer),
+                Reflect.Resolve<IClientAdventureFacade>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<ISelectionHandler>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IFogManager>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IGrid>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<ICameraController>(Reflect.InstallerContainer(installer)),
+                ResolveByTypeName(Reflect.InstallerContainer(installer), "Lavapotion.Cartography.ICartographyConverter"),
+                Reflect.Resolve<IAdventureTooltipManager>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<ILocalizationHandler>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<ICartographyVisualManifest>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IHumanAdventureController>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IHumanAdventureControllerFacade>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IInputManager>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<ISystemPopups>(Reflect.InstallerContainer(installer)),
                 revealedRegistry)
         {
         }
@@ -163,7 +161,7 @@ namespace SongsOfConquestAccess.Adapters
             _inputManager = inputManager;
             _systemPopups = systemPopups;
             _revealedRegistry = revealedRegistry;
-            _commandWaiter = Resolve<ICommandWaiter>(container);
+            _commandWaiter = Reflect.Resolve<ICommandWaiter>(container);
             _sceneLoader = ProjectContext.HasInstance && ProjectContext.Instance.Container != null
                 ? ProjectContext.Instance.Container.TryResolve<ISceneLoader>()
                 : null;
@@ -304,33 +302,6 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsValidMapTile(Vector2Int position)
         {
             return IsWithinMap(position);
-        }
-
-        private static T Resolve<T>(DiContainer container) where T : class
-        {
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private static DiContainer GetContainer(AdventureViewInstaller installer)
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            return InstallerContainerProperty.GetValue(installer, null) as DiContainer;
         }
 
         private static object ResolveByTypeName(DiContainer container, string typeName)

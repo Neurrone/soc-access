@@ -74,12 +74,12 @@ namespace SongsOfConquestAccess.Adapters
         public TradingMenuAdapter(TradingMenu menu)
         {
             _menu = menu;
-            _settings = GetField<TradingMenu.Settings>(menu, SettingsField);
-            _facade = GetField<IClientAdventureFacade>(menu, FacadeField);
-            _localization = GetField<ILocalizationHandler>(_settings != null ? _settings.leftInventory : null, LocalizationField)
-                ?? GetField<ILocalizationHandler>(_settings != null ? _settings.rightInventory : null, LocalizationField);
-            _artifactLookup = GetField<IArtifactLookup>(_settings != null ? _settings.leftInventory : null, ArtifactLookupField)
-                ?? GetField<IArtifactLookup>(_settings != null ? _settings.rightInventory : null, ArtifactLookupField);
+            _settings = Reflect.Get<TradingMenu.Settings>(menu, SettingsField);
+            _facade = Reflect.Get<IClientAdventureFacade>(menu, FacadeField);
+            _localization = Reflect.Get<ILocalizationHandler>(_settings != null ? _settings.leftInventory : null, LocalizationField)
+                ?? Reflect.Get<ILocalizationHandler>(_settings != null ? _settings.rightInventory : null, LocalizationField);
+            _artifactLookup = Reflect.Get<IArtifactLookup>(_settings != null ? _settings.leftInventory : null, ArtifactLookupField)
+                ?? Reflect.Get<IArtifactLookup>(_settings != null ? _settings.rightInventory : null, ArtifactLookupField);
         }
 
         public TradingMenu Source
@@ -96,7 +96,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             return _menu != null
                 && _settings != null
-                && GetField<object>(_menu, AsyncField) != null
+                && Reflect.Get<object>(_menu, AsyncField) != null
                 && IsVisible(_settings.TradingMenuTransform)
                 && _settings.leftInventory != null
                 && _settings.rightInventory != null
@@ -157,11 +157,11 @@ namespace SongsOfConquestAccess.Adapters
             switch (categoryIndex)
             {
                 case 1:
-                    return GetField<UIButton>(tabs, TemporaryModifierButtonField);
+                    return Reflect.Get<UIButton>(tabs, TemporaryModifierButtonField);
                 case 2:
-                    return GetField<UIButton>(tabs, GearModifierButtonField);
+                    return Reflect.Get<UIButton>(tabs, GearModifierButtonField);
                 default:
-                    return GetField<UIButton>(tabs, TroopModifierButtonField);
+                    return Reflect.Get<UIButton>(tabs, TroopModifierButtonField);
             }
         }
 
@@ -184,11 +184,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsVisible(Transform transform)
         {
             return transform != null && transform.gameObject != null && transform.gameObject.activeInHierarchy;
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         private static T GetFieldValue<T>(object owner, FieldInfo field, T fallback)
@@ -347,16 +342,16 @@ namespace SongsOfConquestAccess.Adapters
                 switch (type)
                 {
                     case StatEntryType.Offense:
-                        tooltipImage = GetField<UIImage>(statsInfo, OffenseTooltipImageField);
+                        tooltipImage = Reflect.Get<UIImage>(statsInfo, OffenseTooltipImageField);
                         break;
                     case StatEntryType.Defense:
-                        tooltipImage = GetField<UIImage>(statsInfo, DefenceTooltipImageField);
+                        tooltipImage = Reflect.Get<UIImage>(statsInfo, DefenceTooltipImageField);
                         break;
                     case StatEntryType.Movement:
-                        tooltipImage = GetField<UIImage>(statsInfo, MovementTooltipImageField);
+                        tooltipImage = Reflect.Get<UIImage>(statsInfo, MovementTooltipImageField);
                         break;
                     case StatEntryType.View:
-                        tooltipImage = GetField<UIImage>(statsInfo, ViewTooltipImageField);
+                        tooltipImage = Reflect.Get<UIImage>(statsInfo, ViewTooltipImageField);
                         break;
                 }
 
@@ -396,7 +391,7 @@ namespace SongsOfConquestAccess.Adapters
             /// <summary>The title the game itself writes over the showing tab's list.</summary>
             public string GetActiveModifierListLabel()
             {
-                UITextMesh title = GetField<UITextMesh>(ModifierTabs, ModifierTitleField);
+                UITextMesh title = Reflect.Get<UITextMesh>(ModifierTabs, ModifierTitleField);
                 return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(title));
             }
 
@@ -409,7 +404,7 @@ namespace SongsOfConquestAccess.Adapters
                     CommanderSheetSummaryEntry[] entries = _modifierEntries.Under(content);
                     for (int i = 0; i < entries.Length; i++)
                     {
-                        UITextMesh text = GetField<UITextMesh>(entries[i], SummaryEntryTextField);
+                        UITextMesh text = Reflect.Get<UITextMesh>(entries[i], SummaryEntryTextField);
                         string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
                         if (!string.IsNullOrWhiteSpace(label))
                         {
@@ -420,7 +415,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 if (items.Count == 0)
                 {
-                    UITextMesh noneText = GetField<UITextMesh>(ModifierTabs, NoModifiersTextField);
+                    UITextMesh noneText = Reflect.Get<UITextMesh>(ModifierTabs, NoModifiersTextField);
                     string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(noneText));
                     if (!string.IsNullOrWhiteSpace(label))
                     {
@@ -459,7 +454,7 @@ namespace SongsOfConquestAccess.Adapters
 
             private Transform GetContentTransform(FieldInfo field)
             {
-                GameObject content = GetField<GameObject>(ModifierTabs, field);
+                GameObject content = Reflect.Get<GameObject>(ModifierTabs, field);
                 return content != null ? content.transform : null;
             }
 

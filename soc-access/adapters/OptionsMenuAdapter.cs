@@ -80,7 +80,7 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<TabItem> GetTabs()
         {
             List<TabItem> result = new List<TabItem>();
-            List<UIButton> tabs = GetField<List<UIButton>>(_menu, TabsField);
+            List<UIButton> tabs = Reflect.Get<List<UIButton>>(_menu, TabsField);
             if (tabs == null)
             {
                 return result;
@@ -107,8 +107,8 @@ namespace SongsOfConquestAccess.Adapters
 
         public int GetActiveTabIndex()
         {
-            List<IOptionsContent> contentTabs = GetField<List<IOptionsContent>>(_menu, ContentTabsField);
-            IOptionsContent current = GetField<IOptionsContent>(_menu, CurrentContentField);
+            List<IOptionsContent> contentTabs = Reflect.Get<List<IOptionsContent>>(_menu, ContentTabsField);
+            IOptionsContent current = Reflect.Get<IOptionsContent>(_menu, CurrentContentField);
             if (contentTabs == null || current == null)
             {
                 return 0;
@@ -120,7 +120,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool SelectTab(int index)
         {
-            List<UIButton> tabs = GetField<List<UIButton>>(_menu, TabsField);
+            List<UIButton> tabs = Reflect.Get<List<UIButton>>(_menu, TabsField);
             if (tabs == null || index < 0 || index >= tabs.Count)
             {
                 return false;
@@ -292,7 +292,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private OptionsMenuKeyBindContent KeyBindContent()
         {
-            List<IOptionsContent> tabs = GetField<List<IOptionsContent>>(_menu, ContentTabsField);
+            List<IOptionsContent> tabs = Reflect.Get<List<IOptionsContent>>(_menu, ContentTabsField);
             if (tabs == null)
             {
                 return null;
@@ -329,17 +329,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private IMenuFactoryCollection Factory
         {
-            get { return GetField<IMenuFactoryCollection>(_menu, FactoryField); }
+            get { return Reflect.Get<IMenuFactoryCollection>(_menu, FactoryField); }
         }
 
         private OptionsMenu.Settings Settings
         {
-            get { return GetField<OptionsMenu.Settings>(_menu, SettingsField); }
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
+            get { return Reflect.Get<OptionsMenu.Settings>(_menu, SettingsField); }
         }
 
         public sealed class TabItem

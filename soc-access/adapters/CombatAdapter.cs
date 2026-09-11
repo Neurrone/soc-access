@@ -54,8 +54,6 @@ namespace SongsOfConquestAccess.Adapters
 
     public sealed class CombatAdapter : IPresent, IDisposable
     {
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(BattleSceneInstaller), "Container");
         // The extra sentence the game passes to AddAdditionalText and keeps nowhere readable, held
         // per preview because the hook is the only place it exists. Static, so it is dropped in
         // Reset from SocAccessMod.Stop: a preview the game destroyed would otherwise be held here
@@ -114,26 +112,26 @@ namespace SongsOfConquestAccess.Adapters
         public CombatAdapter(BattleSceneInstaller installer)
             : this(
                 installer,
-                GetContainer(installer),
-                Resolve<IClientBattleFacade>(GetContainer(installer)),
-                Resolve<IBattleCursorManager>(GetContainer(installer)),
-                Resolve<IBattleGridManager>(GetContainer(installer)),
-                Resolve<IBattlePathManager>(GetContainer(installer)),
-                Resolve<IBattleHighlightManager>(GetContainer(installer)),
-                Resolve<IBattleViewManager>(GetContainer(installer)),
-                Resolve<IBattleAttackPreviewHandler>(GetContainer(installer)),
-                Resolve<IBattleTooltipUtility>(GetContainer(installer)),
-                Resolve<IInputManager>(GetContainer(installer)),
-                Resolve<ILocalizationHandler>(GetContainer(installer)),
-                Resolve<ICameraLookup>(GetContainer(installer)),
-                ResolveByTypeName(GetContainer(installer), "Lavapotion.Cartography.ICartographyConverter"),
-                Resolve<IHumanBattleControllerFacade>(GetContainer(installer)),
-                Resolve<MouseKeyboardHumanBattleControllerModule>(GetContainer(installer)),
-                Resolve<IHumanBattleSpellController>(GetContainer(installer)),
-                Resolve<MouseKeyboardHumanBattleSpellModule>(GetContainer(installer)),
-                Resolve<IBattleHudSignals>(GetContainer(installer)),
-                Resolve<ISpellsLookup>(GetContainer(installer)),
-                Resolve<ITroopAbilityUtility>(GetContainer(installer)))
+                Reflect.InstallerContainer(installer),
+                Reflect.Resolve<IClientBattleFacade>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IBattleCursorManager>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IBattleGridManager>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IBattlePathManager>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IBattleHighlightManager>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IBattleViewManager>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IBattleAttackPreviewHandler>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IBattleTooltipUtility>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IInputManager>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<ILocalizationHandler>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<ICameraLookup>(Reflect.InstallerContainer(installer)),
+                ResolveByTypeName(Reflect.InstallerContainer(installer), "Lavapotion.Cartography.ICartographyConverter"),
+                Reflect.Resolve<IHumanBattleControllerFacade>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<MouseKeyboardHumanBattleControllerModule>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IHumanBattleSpellController>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<MouseKeyboardHumanBattleSpellModule>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<IBattleHudSignals>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<ISpellsLookup>(Reflect.InstallerContainer(installer)),
+                Reflect.Resolve<ITroopAbilityUtility>(Reflect.InstallerContainer(installer)))
         {
         }
 
@@ -219,33 +217,6 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         public BattleHudAdapter Hud { get; private set; }
-
-        private static DiContainer GetContainer(BattleSceneInstaller installer)
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            return InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-        }
-
-        private static T Resolve<T>(DiContainer container) where T : class
-        {
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch
-            {
-                return null;
-            }
-        }
 
         private static object ResolveByTypeName(DiContainer container, string typeName)
         {

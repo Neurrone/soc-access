@@ -224,32 +224,27 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIButton GetPreviousButton()
         {
-            return GetField<UIButton>(PreviousButtonField);
+            return Reflect.Get<UIButton>(_menu, PreviousButtonField);
         }
 
         private UIButton GetNextButton()
         {
-            return GetField<UIButton>(NextButtonField);
+            return Reflect.Get<UIButton>(_menu, NextButtonField);
         }
 
         private UIButton GetConfirmButton()
         {
-            return GetField<UIButton>(ConfirmButtonField);
+            return Reflect.Get<UIButton>(_menu, ConfirmButtonField);
         }
 
         private UIButton GetCancelButton()
         {
-            return GetField<UIButton>(CancelButtonField);
+            return Reflect.Get<UIButton>(_menu, CancelButtonField);
         }
 
         private UITextMesh GetTextMesh(FieldInfo field)
         {
-            return GetField<UITextMesh>(field);
-        }
-
-        private T GetField<T>(FieldInfo field) where T : class
-        {
-            return _menu != null && field != null ? field.GetValue(_menu) as T : null;
+            return Reflect.Get<UITextMesh>(_menu, field);
         }
 
         private static string GetButtonText(UIButton button)

@@ -67,17 +67,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public string SendHeader
         {
-            get { return GetText(GetField<IUITextMesh>(SendTextField)); }
+            get { return GetText(Reflect.Get<IUITextMesh>(_popup, SendTextField)); }
         }
 
         public string RequestHeader
         {
-            get { return GetText(GetField<IUITextMesh>(RequestTextField)); }
+            get { return GetText(Reflect.Get<IUITextMesh>(_popup, RequestTextField)); }
         }
 
         public bool IsRequestMenuVisible()
         {
-            return IsPresent() && IsGameObjectVisible(GetField<Component>(RequestButtonsContainerField));
+            return IsPresent() && IsGameObjectVisible(Reflect.Get<Component>(_popup, RequestButtonsContainerField));
         }
 
         public IReadOnlyList<ResourceItem> GetSendResources()
@@ -111,42 +111,37 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public Component CloseButton
         {
-            get { return GetField<UIButton>(CloseButtonField) as Component; }
+            get { return Reflect.Get<UIButton>(_popup, CloseButtonField) as Component; }
         }
 
         public bool IsCloseVisible()
         {
-            return IsPresent() && MenuButtonAdapterBase.IsButtonVisible(GetField<UIButton>(CloseButtonField));
+            return IsPresent() && MenuButtonAdapterBase.IsButtonVisible(Reflect.Get<UIButton>(_popup, CloseButtonField));
         }
 
         public bool ActivateClose()
         {
-            return NativeSelectionUtility.Click(GetField<UIButton>(CloseButtonField));
+            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_popup, CloseButtonField));
         }
 
         public Tooltip CloseTooltip
         {
-            get { return Tooltip.ForComponent(GetField<UIButton>(CloseButtonField) as Component, _localization); }
+            get { return Tooltip.ForComponent(Reflect.Get<UIButton>(_popup, CloseButtonField) as Component, _localization); }
         }
 
         public void FocusClose()
         {
-            NativeSelectionUtility.Select(GetField<UIButton>(CloseButtonField));
+            NativeSelectionUtility.Select(Reflect.Get<UIButton>(_popup, CloseButtonField));
         }
 
         private ResourceItem BuildSendItem(ResourceType type, FieldInfo buttonField, FieldInfo tooltipButtonField)
         {
-            return new ResourceItem(this, "send", type, GetField<UIButton>(buttonField), GetField<UIButton>(tooltipButtonField));
+            return new ResourceItem(this, "send", type, Reflect.Get<UIButton>(_popup, buttonField), Reflect.Get<UIButton>(_popup, tooltipButtonField));
         }
 
         private ResourceItem BuildRequestItem(ResourceType type, FieldInfo buttonField, FieldInfo tooltipButtonField)
         {
-            return new ResourceItem(this, "request", type, GetField<UIButton>(buttonField), GetField<UIButton>(tooltipButtonField));
-        }
-
-        private T GetField<T>(FieldInfo field) where T : class
-        {
-            return _popup != null && field != null ? field.GetValue(_popup) as T : null;
+            return new ResourceItem(this, "request", type, Reflect.Get<UIButton>(_popup, buttonField), Reflect.Get<UIButton>(_popup, tooltipButtonField));
         }
 
         private string GetResourceName(ResourceType type)

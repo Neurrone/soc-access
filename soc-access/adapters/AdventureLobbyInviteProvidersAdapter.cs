@@ -42,7 +42,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                UIButton button = GetField<UIButton>(InviteFriendButtonField);
+                UIButton button = Reflect.Get<UIButton>(_panel, InviteFriendButtonField);
                 string label = MenuButtonTextUtility.GetStandardButtonLabel(button);
                 return string.IsNullOrWhiteSpace(label) ? ModText.Get(ModStrings.Screens.InviteFriend) : label;
             }
@@ -56,7 +56,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPresent()
         {
             GameObject panelObject = _panel != null ? ((Component)_panel).gameObject : null;
-            GameObject container = GetField<GameObject>(InviteDropdownContainerField);
+            GameObject container = Reflect.Get<GameObject>(_panel, InviteDropdownContainerField);
             return IsLiveSceneObject(panelObject)
                 && panelObject.activeInHierarchy
                 && container != null
@@ -66,7 +66,7 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<ProviderButtonItem> GetProviderButtons()
         {
             List<ProviderButtonItem> items = new List<ProviderButtonItem>();
-            UIButton[] buttons = GetField<UIButton[]>(InviteFromSocialButtonsField);
+            UIButton[] buttons = Reflect.Get<UIButton[]>(_panel, InviteFromSocialButtonsField);
             if (buttons == null)
             {
                 return items;
@@ -98,18 +98,13 @@ namespace SongsOfConquestAccess.Adapters
                 return true;
             }
 
-            UIButton blocker = GetField<UIButton>(InviteUiBlockerField);
+            UIButton blocker = Reflect.Get<UIButton>(_panel, InviteUiBlockerField);
             return NativeSelectionUtility.Click(blocker);
         }
 
         public void HideNativeTooltip()
         {
             NativeTooltipUtility.HideTooltip();
-        }
-
-        private T GetField<T>(FieldInfo field) where T : class
-        {
-            return _panel != null && field != null ? field.GetValue(_panel) as T : null;
         }
 
         private static bool IsLiveSceneObject(GameObject gameObject)

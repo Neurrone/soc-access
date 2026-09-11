@@ -377,11 +377,6 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
-        }
-
         private static bool IsLiveSceneObject(GameObject gameObject)
         {
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
@@ -468,8 +463,8 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    return IsDrawn(GetField<GameObject>(_entry, ReadyImageField))
-                        || IsDrawn(GetField<GameObject>(_entry, NotReadyImageField));
+                    return IsDrawn(Reflect.Get<GameObject>(_entry, ReadyImageField))
+                        || IsDrawn(Reflect.Get<GameObject>(_entry, NotReadyImageField));
                 }
             }
 
@@ -509,7 +504,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public LobbyButtonItem FactionButton
             {
-                get { return BuildValueButton(SetFactionButtonField, GetFactionLabel, GetField<Component>(_entry, FactionIconImageField)); }
+                get { return BuildValueButton(SetFactionButtonField, GetFactionLabel, Reflect.Get<Component>(_entry, FactionIconImageField)); }
             }
 
             public LobbyButtonItem ColorButton
@@ -524,7 +519,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public LobbyButtonItem PartnershipButton
             {
-                get { return BuildValueButton(SetPartnershipButtonField, GetPartnershipNumber, GetField<Component>(_entry, PartnershipTransformField)); }
+                get { return BuildValueButton(SetPartnershipButtonField, GetPartnershipNumber, Reflect.Get<Component>(_entry, PartnershipTransformField)); }
             }
 
             public LobbyButtonItem AiDifficultyButton
@@ -546,13 +541,13 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    GameObject container = GetField<GameObject>(_entry, DlcNeededContainerField);
+                    GameObject container = Reflect.Get<GameObject>(_entry, DlcNeededContainerField);
                     if (container == null || !container.activeInHierarchy)
                     {
                         return string.Empty;
                     }
 
-                    UIButton button = GetField<UIButton>(_entry, DlcNeededButtonField);
+                    UIButton button = Reflect.Get<UIButton>(_entry, DlcNeededButtonField);
                     Tooltip tooltip = Tooltip.ForComponent(button, _adapter != null ? _adapter._localization : null);
                     return tooltip != null ? string.Join(". ", tooltip.TextLines) : string.Empty;
                 }
@@ -569,7 +564,7 @@ namespace SongsOfConquestAccess.Adapters
 
             private string GetName()
             {
-                UITextMesh text = GetField<UITextMesh>(_entry, NameTextField);
+                UITextMesh text = Reflect.Get<UITextMesh>(_entry, NameTextField);
                 return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
             }
 
@@ -586,7 +581,7 @@ namespace SongsOfConquestAccess.Adapters
                     return Localize("Factions/Random/Name");
                 }
 
-                IFactionLookup factionLookup = GetField<IFactionLookup>(_entry, FactionLookupField);
+                IFactionLookup factionLookup = Reflect.Get<IFactionLookup>(_entry, FactionLookupField);
                 IFactionDefinition faction = factionLookup != null ? factionLookup.GetFaction(team.FactionIndex) : null;
                 return faction != null ? Localize(faction.NameKey) : string.Empty;
             }
@@ -630,13 +625,13 @@ namespace SongsOfConquestAccess.Adapters
                     return Localize("Factions/Random/Name");
                 }
 
-                bool locked = IsVisible(GetField<Image>(_entry, WielderLockedIconField));
+                bool locked = IsVisible(Reflect.Get<Image>(_entry, WielderLockedIconField));
                 if (locked)
                 {
                     return Localize("Lobby/PlayerSetting/SettingUnknown");
                 }
 
-                IWielderLookup wielderLookup = GetField<IWielderLookup>(_entry, WielderLookupField);
+                IWielderLookup wielderLookup = Reflect.Get<IWielderLookup>(_entry, WielderLookupField);
                 ICommanderDefinition commander = wielderLookup != null ? wielderLookup.Get(team.StartingCommander) : null;
                 return commander != null ? Localize(commander.NameKey) : string.Empty;
             }
@@ -660,7 +655,7 @@ namespace SongsOfConquestAccess.Adapters
 
             private LobbyButtonItem BuildButton(FieldInfo field)
             {
-                UIButton button = GetField<UIButton>(_entry, field);
+                UIButton button = Reflect.Get<UIButton>(_entry, field);
                 return LobbyButtonItem.ForButton(button, _adapter != null ? _adapter._localization : null);
             }
 
@@ -673,7 +668,7 @@ namespace SongsOfConquestAccess.Adapters
             /// through the lobby's own team state, and the build only needs the button.</summary>
             private LobbyButtonItem BuildValueButton(FieldInfo field, Func<string> label, Component tooltipComponent)
             {
-                UIButton button = GetField<UIButton>(_entry, field);
+                UIButton button = Reflect.Get<UIButton>(_entry, field);
                 return button != null
                     ? new LobbyButtonItem(button, label, _adapter != null ? _adapter._localization : null, tooltipComponent)
                     : null;
@@ -681,7 +676,7 @@ namespace SongsOfConquestAccess.Adapters
 
             private LobbyButtonItem BuildTooltipLabelButton(FieldInfo field)
             {
-                UIButton button = GetField<UIButton>(_entry, field);
+                UIButton button = Reflect.Get<UIButton>(_entry, field);
                 return button != null
                     ? new LobbyButtonItem(button, () => GetButtonTooltipLabel(button), _adapter != null ? _adapter._localization : null)
                     : null;
@@ -703,7 +698,7 @@ namespace SongsOfConquestAccess.Adapters
                 FieldInfo[] fields = PrimarySelectableFields;
                 for (int i = 0; i < fields.Length; i++)
                 {
-                    UIButton button = GetField<UIButton>(_entry, fields[i]);
+                    UIButton button = Reflect.Get<UIButton>(_entry, fields[i]);
                     if (MenuButtonAdapterBase.IsButtonVisible(button))
                     {
                         return button as Component;
@@ -731,11 +726,6 @@ namespace SongsOfConquestAccess.Adapters
             private static bool IsDrawn(GameObject gameObject)
             {
                 return gameObject != null && gameObject.activeInHierarchy;
-            }
-
-            private static T GetField<T>(object owner, FieldInfo field) where T : class
-            {
-                return owner != null && field != null ? field.GetValue(owner) as T : null;
             }
         }
 
@@ -768,37 +758,37 @@ namespace SongsOfConquestAccess.Adapters
             /// on it and read where it is drawn.</summary>
             public Component GameNameLabel
             {
-                get { return GetField<Component>(MultiplayerGameNameLabelField); }
+                get { return Reflect.Get<Component>(_panel, MultiplayerGameNameLabelField); }
             }
 
             /// <summary>The box the band draws the game code in, likewise.</summary>
             public Component GameCodeField
             {
-                get { return GetField<Component>(MultiplayerGameCodeInputField); }
+                get { return Reflect.Get<Component>(_panel, MultiplayerGameCodeInputField); }
             }
 
             public string GameName
             {
-                get { return GetText(GetField<UITextMesh>(MultiplayerGameNameLabelField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_panel, MultiplayerGameNameLabelField)); }
             }
 
             public bool IsGameNameVisible
             {
-                get { return IsVisibleComponent(GetField<Component>(MultiplayerGameNameLabelField)) && !string.IsNullOrWhiteSpace(GameName); }
+                get { return IsVisibleComponent(Reflect.Get<Component>(_panel, MultiplayerGameNameLabelField)) && !string.IsNullOrWhiteSpace(GameName); }
             }
 
             public string GameCode
             {
                 get
                 {
-                    UITextMeshInputField field = GetField<UITextMeshInputField>(MultiplayerGameCodeInputField);
+                    UITextMeshInputField field = Reflect.Get<UITextMeshInputField>(_panel, MultiplayerGameCodeInputField);
                     return field != null ? field.InputFieldValue : string.Empty;
                 }
             }
 
             public bool IsGameCodeVisible
             {
-                get { return IsVisibleComponent(GetField<Component>(MultiplayerGameCodeInputField)) && !string.IsNullOrWhiteSpace(GameCode); }
+                get { return IsVisibleComponent(Reflect.Get<Component>(_panel, MultiplayerGameCodeInputField)) && !string.IsNullOrWhiteSpace(GameCode); }
             }
 
             public string CopyGameCodeLabel
@@ -821,55 +811,50 @@ namespace SongsOfConquestAccess.Adapters
 
             public void FocusGameCode()
             {
-                UITextMeshInputField field = GetField<UITextMeshInputField>(MultiplayerGameCodeInputField);
+                UITextMeshInputField field = Reflect.Get<UITextMeshInputField>(_panel, MultiplayerGameCodeInputField);
                 NativeSelectionUtility.Select(field != null ? field.GetSelectable() : null);
             }
 
             public Tooltip GameCodeTooltip
             {
-                get { return Tooltip.ForComponent(GetField<Component>(MultiplayerGameCodeInputField), _localization); }
+                get { return Tooltip.ForComponent(Reflect.Get<Component>(_panel, MultiplayerGameCodeInputField), _localization); }
             }
 
             public ToggleItem InvitesOnly
             {
                 get
                 {
-                    UIToggle toggle = GetField<UIToggle>(MultiplayerPublicGameToggleField);
+                    UIToggle toggle = Reflect.Get<UIToggle>(_panel, MultiplayerPublicGameToggleField);
                     return toggle != null ? new ToggleItem(toggle, _localization) : null;
                 }
             }
 
             public LobbyButtonItem InviteFriendButton
             {
-                get { return LobbyButtonItem.ForButton(GetField<UIButton>(MultiplayerInviteFriendButtonField), _localization); }
+                get { return LobbyButtonItem.ForButton(Reflect.Get<UIButton>(_panel, MultiplayerInviteFriendButtonField), _localization); }
             }
 
             public ToggleItem Crossplay
             {
                 get
                 {
-                    UIToggle toggle = GetField<UIToggle>(MultiplayerCrossplayToggleField);
+                    UIToggle toggle = Reflect.Get<UIToggle>(_panel, MultiplayerCrossplayToggleField);
                     return toggle != null ? new ToggleItem(toggle, _localization) : null;
                 }
             }
 
             public string XboxCrossplayInformation
             {
-                get { return GetText(GetField<UITextMesh>(MultiplayerXboxCrossplayInformationField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_panel, MultiplayerXboxCrossplayInformationField)); }
             }
 
             public bool IsXboxCrossplayInformationVisible
             {
                 get
                 {
-                    return IsVisibleComponent(GetField<Component>(MultiplayerXboxCrossplayInformationField))
+                    return IsVisibleComponent(Reflect.Get<Component>(_panel, MultiplayerXboxCrossplayInformationField))
                         && !string.IsNullOrWhiteSpace(XboxCrossplayInformation);
                 }
-            }
-
-            private T GetField<T>(FieldInfo field) where T : class
-            {
-                return _panel != null && field != null ? field.GetValue(_panel) as T : null;
             }
 
             private static string GetText(IUITextMesh textMesh)

@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess.Adapters
         public AdventurePlayerMenuAdapter(AdventurePlayerMenu menu)
         {
             _menu = menu;
-            _facade = GetField<IClientAdventureFacade>(menu, AdventureFacadeField);
+            _facade = Reflect.Get<IClientAdventureFacade>(menu, AdventureFacadeField);
             _localization = GlobalLocalizationVariables.LocalizationHandler;
         }
 
@@ -127,7 +127,7 @@ namespace SongsOfConquestAccess.Adapters
             Transform root;
             if (!_captionTexts.TryGetValue(field, out text))
             {
-                GameObject header = GetField<GameObject>(_menu, field);
+                GameObject header = Reflect.Get<GameObject>(_menu, field);
                 if (header == null)
                 {
                     return null;
@@ -212,23 +212,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(IUITextMesh textMesh)
         {
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
-        }
-
-        private static T GetField<T>(object target, FieldInfo field) where T : class
-        {
-            if (target == null || field == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return field.GetValue(target) as T;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
         }
 
         private static bool IsLiveSceneObject(GameObject gameObject)
@@ -351,7 +334,7 @@ namespace SongsOfConquestAccess.Adapters
             /// The game leaves it non-interactable for the local player and for an AI.</summary>
             public Component NameButton
             {
-                get { return GetField<UIButton>(_entry, NameButtonField) as Component; }
+                get { return Reflect.Get<UIButton>(_entry, NameButtonField) as Component; }
             }
 
             /// <summary>Whether the row draws the game's own dead marker.</summary>
@@ -359,7 +342,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    GameObject container = GetField<GameObject>(_entry, DeadContainerField);
+                    GameObject container = Reflect.Get<GameObject>(_entry, DeadContainerField);
                     return container != null && container.activeInHierarchy;
                 }
             }
@@ -375,14 +358,14 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Name
             {
-                get { return GetText(GetField<UITextMesh>(_entry, NameTextField)); }
+                get { return GetText(Reflect.Get<UITextMesh>(_entry, NameTextField)); }
             }
 
             public string TeamLabel
             {
                 get
                 {
-                    string teamNumber = GetText(GetField<UITextMesh>(_entry, PartnershipIdField));
+                    string teamNumber = GetText(Reflect.Get<UITextMesh>(_entry, PartnershipIdField));
                     return !string.IsNullOrWhiteSpace(teamNumber)
                         ? ModText.Get(ModStrings.Screens.TeamValue, teamNumber)
                         : string.Empty;
@@ -426,7 +409,7 @@ namespace SongsOfConquestAccess.Adapters
                 get
                 {
                     ITeamState team = Team;
-                    GameObject container = GetField<GameObject>(_entry, AiContainerField);
+                    GameObject container = Reflect.Get<GameObject>(_entry, AiContainerField);
                     if (team == null || team.AiMode == AiMode.Off || container == null || !container.activeInHierarchy)
                     {
                         return string.Empty;
@@ -443,13 +426,13 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    GameObject container = GetField<GameObject>(_entry, ScoreContainerField);
+                    GameObject container = Reflect.Get<GameObject>(_entry, ScoreContainerField);
                     if (container == null || !container.activeInHierarchy)
                     {
                         return string.Empty;
                     }
 
-                    return GetText(GetField<UITextMesh>(_entry, ScoreTextField));
+                    return GetText(Reflect.Get<UITextMesh>(_entry, ScoreTextField));
                 }
             }
 
@@ -503,7 +486,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    UIButton button = GetField<UIButton>(_entry, NameButtonField);
+                    UIButton button = Reflect.Get<UIButton>(_entry, NameButtonField);
                     return BuildAction(
                         "platform-actions",
                         button,
@@ -513,21 +496,21 @@ namespace SongsOfConquestAccess.Adapters
 
             public ActionItem Resources
             {
-                get { return BuildAction("resources", GetField<UIButton>(_entry, ResourceButtonField), null); }
+                get { return BuildAction("resources", Reflect.Get<UIButton>(_entry, ResourceButtonField), null); }
             }
 
             public ActionItem Towns
             {
-                get { return BuildAction("towns", GetField<UIButton>(_entry, TownsButtonField), null); }
+                get { return BuildAction("towns", Reflect.Get<UIButton>(_entry, TownsButtonField), null); }
             }
 
             public ActionItem NonAggressionPact
             {
                 get
                 {
-                    NonAggressionPactButton pactButton = GetField<NonAggressionPactButton>(_entry, NonAggressionPactButtonField);
+                    NonAggressionPactButton pactButton = Reflect.Get<NonAggressionPactButton>(_entry, NonAggressionPactButtonField);
                     UIButton button = pactButton != null
-                        ? GetField<UIButton>(pactButton, NonAggressionPactInnerButtonField)
+                        ? Reflect.Get<UIButton>(pactButton, NonAggressionPactInnerButtonField)
                         : null;
                     return BuildAction(
                         "non-aggression-pact",
@@ -538,7 +521,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public ActionItem SpectateBattle
             {
-                get { return BuildAction("spectate-battle", GetField<UIButton>(_entry, SpectateBattleButtonField), null); }
+                get { return BuildAction("spectate-battle", Reflect.Get<UIButton>(_entry, SpectateBattleButtonField), null); }
             }
 
             public void FocusNative()
@@ -558,17 +541,17 @@ namespace SongsOfConquestAccess.Adapters
 
             private ITeamState Team
             {
-                get { return GetField<ITeamState>(_entry, TeamField); }
+                get { return Reflect.Get<ITeamState>(_entry, TeamField); }
             }
 
             private UITextMesh GetResourceAmountText(ResourceType resourceType)
             {
-                return GetField<UITextMesh>(_entry, GetResourceAmountField(resourceType));
+                return Reflect.Get<UITextMesh>(_entry, GetResourceAmountField(resourceType));
             }
 
             private UITextMesh GetResourceIncomeText(ResourceType resourceType)
             {
-                return GetField<UITextMesh>(_entry, GetResourceIncomeField(resourceType));
+                return Reflect.Get<UITextMesh>(_entry, GetResourceIncomeField(resourceType));
             }
 
             private Component GetResourceTooltipComponent(ResourceType resourceType)
@@ -641,10 +624,10 @@ namespace SongsOfConquestAccess.Adapters
             {
                 Component[] components =
                 {
-                    GetField<UIButton>(_entry, NameButtonField) as Component,
-                    GetField<UIButton>(_entry, ResourceButtonField) as Component,
-                    GetField<UIButton>(_entry, TownsButtonField) as Component,
-                    GetField<UIButton>(_entry, SpectateBattleButtonField) as Component
+                    Reflect.Get<UIButton>(_entry, NameButtonField) as Component,
+                    Reflect.Get<UIButton>(_entry, ResourceButtonField) as Component,
+                    Reflect.Get<UIButton>(_entry, TownsButtonField) as Component,
+                    Reflect.Get<UIButton>(_entry, SpectateBattleButtonField) as Component
                 };
 
                 for (int i = 0; i < components.Length; i++)

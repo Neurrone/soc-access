@@ -45,17 +45,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GraphTitle
         {
-            get { return GetText(GetField<UITextMesh>(GraphView, GraphTitleTextField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(GraphView, GraphTitleTextField)); }
         }
 
         public string TotalRounds
         {
-            get { return GetText(GetField<UITextMesh>(GraphView, TotalRoundsTextField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(GraphView, TotalRoundsTextField)); }
         }
 
         public string TotalPlayTime
         {
-            get { return GetText(GetField<UITextMesh>(GraphView, TotalPlayTimeTextField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(GraphView, TotalPlayTimeTextField)); }
         }
 
         public bool IsPresent()
@@ -87,7 +87,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             EnsureDropdownInitialized(dropdown);
-            TMP_Dropdown nativeDropdown = GetField<TMP_Dropdown>(dropdown, DropdownField);
+            TMP_Dropdown nativeDropdown = Reflect.Get<TMP_Dropdown>(dropdown, DropdownField);
             if (nativeDropdown == null || nativeDropdown.options == null)
             {
                 return new GraphOption[0];
@@ -298,7 +298,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private PostAdventureStatsMenu.Settings Settings
         {
-            get { return GetField<PostAdventureStatsMenu.Settings>(_menu, SettingsField); }
+            get { return Reflect.Get<PostAdventureStatsMenu.Settings>(_menu, SettingsField); }
         }
 
         private PostAdventureStatsMenuGraphView GraphView
@@ -308,7 +308,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private IClientAdventureFacade Facade
         {
-            get { return GetField<IClientAdventureFacade>(GraphView, FacadeField); }
+            get { return Reflect.Get<IClientAdventureFacade>(GraphView, FacadeField); }
         }
 
         private UITextMeshDropdown GraphDropdown
@@ -340,7 +340,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static List<PostAdventureStatsMenuTeamEntry> GetTeamEntries(PostAdventureStatsMenuGraphView graphView)
         {
-            return GetField<List<PostAdventureStatsMenuTeamEntry>>(graphView, TeamEntriesField)
+            return Reflect.Get<List<PostAdventureStatsMenuTeamEntry>>(graphView, TeamEntriesField)
                 ?? new List<PostAdventureStatsMenuTeamEntry>();
         }
 
@@ -351,12 +351,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetTeamLabel(PostAdventureStatsMenuTeamEntry entry)
         {
-            return GetText(GetField<UITextMesh>(entry, TeamNameTextField));
+            return GetText(Reflect.Get<UITextMesh>(entry, TeamNameTextField));
         }
 
         private static UIToggle GetTeamToggle(PostAdventureStatsMenuTeamEntry entry)
         {
-            return GetField<UIToggle>(entry, TeamToggleField);
+            return Reflect.Get<UIToggle>(entry, TeamToggleField);
         }
 
         private Dictionary<int, Dictionary<int, GraphPoint>> BuildGraphValues(PostAdventureStatsGraphType graphType)
@@ -481,11 +481,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsComponentVisible(Component component)
         {
             return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         public sealed class GraphDropList : IDropList

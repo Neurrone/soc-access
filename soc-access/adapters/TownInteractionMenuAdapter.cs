@@ -69,8 +69,8 @@ namespace SongsOfConquestAccess.Adapters
         public TownInteractionMenuAdapter(TownInteractionMenu menu)
         {
             _menu = menu;
-            _facade = GetField<IClientAdventureFacade>(menu, AdventureFacadeField);
-            _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
+            _facade = Reflect.Get<IClientAdventureFacade>(menu, AdventureFacadeField);
+            _localization = Reflect.Get<ILocalizationHandler>(menu, LocalizationField);
         }
 
         public IClientAdventureFacade Facade
@@ -87,7 +87,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                IMapEntity mapEntity = GetField<IMapEntity>(_menu, MapEntityField);
+                IMapEntity mapEntity = Reflect.Get<IMapEntity>(_menu, MapEntityField);
                 return mapEntity != null ? mapEntity.Id : -1;
             }
         }
@@ -97,7 +97,7 @@ namespace SongsOfConquestAccess.Adapters
         /// read by <c>TroopManagementScreenBase</c> through the host interface.</summary>
         public bool IsPresent()
         {
-            return IsMenuOpen() && IsVisible(GetField<GameObject>(_menu, LandingPageContainerField));
+            return IsMenuOpen() && IsVisible(Reflect.Get<GameObject>(_menu, LandingPageContainerField));
         }
 
         public bool IsDraftPresent()
@@ -114,17 +114,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(GetField<UITextMesh>(_menu, BuildingNameField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, BuildingNameField)); }
         }
 
         public bool IsCustomNameVisible
         {
-            get { return IsVisible(GetField<GameObject>(GetHeader(), HeaderCustomNameContainerField)); }
+            get { return IsVisible(Reflect.Get<GameObject>(GetHeader(), HeaderCustomNameContainerField)); }
         }
 
         public string CustomName
         {
-            get { return GetText(GetField<UITextMesh>(GetHeader(), HeaderCustomNameTextField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(GetHeader(), HeaderCustomNameTextField)); }
         }
 
         public string VisitingWielderName
@@ -176,12 +176,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public Tooltip VisitingWielderTooltip
         {
-            get { return Tooltip.ForComponent(GetField<UIImage>(GetHeader(), HeaderPortraitField) as Component, _localization); }
+            get { return Tooltip.ForComponent(Reflect.Get<UIImage>(GetHeader(), HeaderPortraitField) as Component, _localization); }
         }
 
         public TroopHudAdapter VisitingTroops
         {
-            get { return new TroopHudAdapter(GetField<TroopHUD>(GetHeader(), HeaderTroopHudField), _facade, _localization); }
+            get { return new TroopHudAdapter(Reflect.Get<TroopHUD>(GetHeader(), HeaderTroopHudField), _facade, _localization); }
         }
 
         /// <summary>The settlement's own army. Kept: the adapter wakes the game's drag ghost when it
@@ -190,7 +190,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                TroopHUD hud = GetField<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField);
+                TroopHUD hud = Reflect.Get<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField);
                 if (hud == null)
                 {
                     return null;
@@ -210,7 +210,7 @@ namespace SongsOfConquestAccess.Adapters
         /// (<c>TownInteractDefencePanel.Show</c>).</summary>
         public bool IsSettlementTroopsVisible()
         {
-            return IsVisible(GetField<GameObject>(GetDefencePanelTroops(), SettlementTroopsContainerField));
+            return IsVisible(Reflect.Get<GameObject>(GetDefencePanelTroops(), SettlementTroopsContainerField));
         }
 
         /// <summary>The header the game writes over a settlement's own troops, from the same key the
@@ -298,12 +298,12 @@ namespace SongsOfConquestAccess.Adapters
         /// would do, or the game's own reason there is nothing to do.</summary>
         public string DraftDescription
         {
-            get { return GetText(GetField<UITextMesh>(_menu, PurchaseTroopsDescriptionField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, PurchaseTroopsDescriptionField)); }
         }
 
         public string UpgradeDescription
         {
-            get { return GetText(GetField<UITextMesh>(_menu, UpgradeTroopsDescriptionField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, UpgradeTroopsDescriptionField)); }
         }
 
         /// <summary>The number the menu stamps on the Upgrade button while something can be upgraded;
@@ -312,8 +312,8 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                return IsVisible(GetField<GameObject>(_menu, UpgradesAvailableIndicatorField))
-                    ? GetText(GetField<UITextMesh>(_menu, UpgradesAvailableNumberField))
+                return IsVisible(Reflect.Get<GameObject>(_menu, UpgradesAvailableIndicatorField))
+                    ? GetText(Reflect.Get<UITextMesh>(_menu, UpgradesAvailableNumberField))
                     : string.Empty;
             }
         }
@@ -372,12 +372,12 @@ namespace SongsOfConquestAccess.Adapters
         /// word the prefab has written on it. The menu hides it on the landing page itself.</summary>
         public Component BackButton
         {
-            get { return GetField<UIButton>(_menu, BackToTopButtonField) as Component; }
+            get { return Reflect.Get<UIButton>(_menu, BackToTopButtonField) as Component; }
         }
 
         public string BackLabel
         {
-            get { return GetButtonLabel(GetField<UIButton>(_menu, BackToTopButtonField)); }
+            get { return GetButtonLabel(Reflect.Get<UIButton>(_menu, BackToTopButtonField)); }
         }
 
         public bool IsBackVisible()
@@ -387,7 +387,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool BackToTop()
         {
-            return NativeSelectionUtility.Click(GetField<UIButton>(_menu, BackToTopButtonField));
+            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_menu, BackToTopButtonField));
         }
 
         public bool Close()
@@ -452,7 +452,7 @@ namespace SongsOfConquestAccess.Adapters
         /// build does not allocate a slot list adapter and a slot per entry every frame.</summary>
         public IReadOnlyList<DefenceSlotListAdapter.Slot> GetGarrisonSlots()
         {
-            List<TroopHUDEntry> entries = GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField);
+            List<TroopHUDEntry> entries = Reflect.Get<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField);
             if (_garrison == null || !ReferenceEquals(_garrison.Entries, entries))
             {
                 _garrison = new DefenceSlotListAdapter(entries, _localization);
@@ -463,7 +463,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<DefenceSlotListAdapter.Slot> GetBallistaSlots()
         {
-            List<TroopHUDEntry> entries = GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField);
+            List<TroopHUDEntry> entries = Reflect.Get<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField);
             if (_ballistae == null || !ReferenceEquals(_ballistae.Entries, entries))
             {
                 _ballistae = new DefenceSlotListAdapter(entries, _localization);
@@ -482,57 +482,57 @@ namespace SongsOfConquestAccess.Adapters
             return _menu != null
                 && _menu.gameObject != null
                 && _menu.gameObject.activeInHierarchy
-                && GetField<Async>(_menu, AsyncField) != null;
+                && Reflect.Get<Async>(_menu, AsyncField) != null;
         }
 
         private WielderInteractHeader GetHeader()
         {
-            return GetField<WielderInteractHeader>(_menu, HeaderField);
+            return Reflect.Get<WielderInteractHeader>(_menu, HeaderField);
         }
 
         private TownInteractDefencePanel GetDefencePanelTroops()
         {
-            return GetField<TownInteractDefencePanel>(_menu, DefencePanelTroopsField);
+            return Reflect.Get<TownInteractDefencePanel>(_menu, DefencePanelTroopsField);
         }
 
         private DefencePanelWielder GetDefencePanelWielder()
         {
-            return GetField<DefencePanelWielder>(_menu, DefencePanelWielderField);
+            return Reflect.Get<DefencePanelWielder>(_menu, DefencePanelWielderField);
         }
 
         private PurchaseTroopsSubMenu GetPurchaseSubMenu()
         {
-            return GetField<PurchaseTroopsSubMenu>(_menu, PurchaseTroopsSubMenuField);
+            return Reflect.Get<PurchaseTroopsSubMenu>(_menu, PurchaseTroopsSubMenuField);
         }
 
         private UpgradeTroopsSubMenu GetUpgradeSubMenu()
         {
-            return GetField<UpgradeTroopsSubMenu>(_menu, UpgradeTroopsSubMenuField);
+            return Reflect.Get<UpgradeTroopsSubMenu>(_menu, UpgradeTroopsSubMenuField);
         }
 
         private UIButton GetDraftButton()
         {
-            return GetField<UIButton>(_menu, PurchaseTroopsButtonField);
+            return Reflect.Get<UIButton>(_menu, PurchaseTroopsButtonField);
         }
 
         private UIButton GetTutorialButton()
         {
-            return GetField<UIButton>(_menu, TutorialButtonField);
+            return Reflect.Get<UIButton>(_menu, TutorialButtonField);
         }
 
         private UIButton GetUpgradeButton()
         {
-            return GetField<UIButton>(_menu, UpgradeTroopsButtonField);
+            return Reflect.Get<UIButton>(_menu, UpgradeTroopsButtonField);
         }
 
         private UIButton GetMoveToDefenceButton()
         {
-            return GetField<UIButton>(GetDefencePanelTroops(), MoveToDefenceButtonField);
+            return Reflect.Get<UIButton>(GetDefencePanelTroops(), MoveToDefenceButtonField);
         }
 
         private UIButton GetMoveToWielderButton()
         {
-            return GetField<UIButton>(GetDefencePanelTroops(), MoveToWielderButtonField);
+            return Reflect.Get<UIButton>(GetDefencePanelTroops(), MoveToWielderButtonField);
         }
 
         private int GetInteractingCommanderId()
@@ -564,11 +564,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsVisible(GameObject gameObject)
         {
             return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
     }

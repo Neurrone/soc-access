@@ -27,9 +27,6 @@ namespace SongsOfConquestAccess.Adapters
 {
     public sealed class BattleHudAdapter
     {
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(MonoInstallerBase), "Container");
-
         private static readonly FieldInfo BattleHudSettingsField =
             AccessTools.Field(typeof(BattleHUDStateHandler), "_settings");
         private static readonly FieldInfo BattleEndTurnButtonField =
@@ -92,12 +89,12 @@ namespace SongsOfConquestAccess.Adapters
             _facade = facade;
             _localization = localization;
             _stateHandler = ResolveHud<BattleHUDStateHandler, BattleHUDStateHandlerInstaller>(container);
-            _settings = Resolve<BattleHUDStateHandler.Settings>(container)
-                ?? GetField<BattleHUDStateHandler.Settings>(_stateHandler, BattleHudSettingsField);
-            _gameLog = Resolve<IGameLog>(container);
-            _abilityUtility = Resolve<ITroopAbilityUtility>(container);
+            _settings = Reflect.Resolve<BattleHUDStateHandler.Settings>(container)
+                ?? Reflect.Get<BattleHUDStateHandler.Settings>(_stateHandler, BattleHudSettingsField);
+            _gameLog = Reflect.Resolve<IGameLog>(container);
+            _abilityUtility = Reflect.Resolve<ITroopAbilityUtility>(container);
             _battleViewManager = ResolveHud<BattleViewManager, BattleViewInstaller>(container);
-            _spellsLookup = Resolve<ISpellsLookup>(container);
+            _spellsLookup = Reflect.Resolve<ISpellsLookup>(container);
             Commanders = new BattleCommanderHudAdapter(_settings, facade, localization);
         }
 
@@ -609,7 +606,7 @@ namespace SongsOfConquestAccess.Adapters
         private bool IsSpellcastingContainerVisible()
         {
             SpellsHUD spellsHud = GetSpellsHud();
-            object settings = GetField<object>(spellsHud, SpellsHudSettingsField);
+            object settings = Reflect.Get<object>(spellsHud, SpellsHudSettingsField);
             UITransform container = settings != null && SpellsHudSpellcastingContainerField != null
                 ? SpellsHudSpellcastingContainerField.GetValue(settings) as UITransform
                 : null;
@@ -644,7 +641,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIButton GetCancelSpellButton(SpellsHUD spellsHud)
         {
-            object settings = GetField<object>(spellsHud, SpellsHudSettingsField);
+            object settings = Reflect.Get<object>(spellsHud, SpellsHudSettingsField);
             return settings != null && SpellsHudCancelSpellButtonField != null
                 ? SpellsHudCancelSpellButtonField.GetValue(settings) as UIButton
                 : null;
@@ -653,13 +650,13 @@ namespace SongsOfConquestAccess.Adapters
         private UIButton GetAbilityButton()
         {
             BattleTroopStatusPanel panel = GetCurrentTroopStatusPanel();
-            return GetField<UIButton>(panel, TroopStatusPanelAbilityButtonField);
+            return Reflect.Get<UIButton>(panel, TroopStatusPanelAbilityButtonField);
         }
 
         private UIButton GetCancelAbilityButton()
         {
             BattleTroopStatusPanel panel = GetCurrentTroopStatusPanel();
-            return GetField<UIButton>(panel, TroopStatusPanelCancelAbilityButtonField);
+            return Reflect.Get<UIButton>(panel, TroopStatusPanelCancelAbilityButtonField);
         }
 
         private BattleTroopStatusPanel GetCurrentTroopStatusPanel()
@@ -720,7 +717,7 @@ namespace SongsOfConquestAccess.Adapters
                     : null;
             }
 
-            return GetField<UIButton>(_endTurnHud, BattleEndTurnButtonField);
+            return Reflect.Get<UIButton>(_endTurnHud, BattleEndTurnButtonField);
         }
 
         // ONCE PER ADAPTER, miss included: the options button is instantiated with the HUD and
@@ -837,8 +834,8 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            string spellName = GetText(GetField<UITextMesh>(instruction, SpellTargetInstructionSpellNameField));
-            string text = GetText(GetField<UITextMesh>(instruction, SpellTargetInstructionTextField));
+            string spellName = GetText(Reflect.Get<UITextMesh>(instruction, SpellTargetInstructionSpellNameField));
+            string text = GetText(Reflect.Get<UITextMesh>(instruction, SpellTargetInstructionTextField));
             if (!string.IsNullOrWhiteSpace(spellName) && !string.IsNullOrWhiteSpace(text))
             {
                 return spellName + ": " + text;
@@ -855,7 +852,7 @@ namespace SongsOfConquestAccess.Adapters
         private BattleSpellTargetInstruction GetSpellTargetInstruction()
         {
             SpellsHUD spellsHud = GetSpellsHud();
-            object settings = GetField<object>(spellsHud, SpellsHudSettingsField);
+            object settings = Reflect.Get<object>(spellsHud, SpellsHudSettingsField);
             return settings != null && SpellsHudTargetInstructionField != null
                 ? SpellsHudTargetInstructionField.GetValue(settings) as BattleSpellTargetInstruction
                 : null;
@@ -915,7 +912,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIButton GetQuickbarEntryButton(QuickbarEntry entry)
         {
-            return GetField<UIButton>(entry, QuickbarEntryButtonField);
+            return Reflect.Get<UIButton>(entry, QuickbarEntryButtonField);
         }
 
         private void FocusQuickbarEntry(QuickbarEntry entry)
@@ -1102,7 +1099,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIButton GetQueueEntryButton(IQueueHUDEntry entry)
         {
-            return GetField<UIButton>(entry, QueueEntryButtonField);
+            return Reflect.Get<UIButton>(entry, QueueEntryButtonField);
         }
 
         private string Localize(string key, string fallback, params object[] args)
@@ -1161,7 +1158,7 @@ namespace SongsOfConquestAccess.Adapters
             where T : class
             where TInstaller : MonoInstallerBase
         {
-            T found = Resolve<T>(container);
+            T found = Reflect.Resolve<T>(container);
             if (found != null)
             {
                 return found;
@@ -1171,47 +1168,13 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < installers.Length && found == null; i++)
             {
                 TInstaller installer = installers[i];
-                if (installer != null && installer.gameObject.scene.IsValid() && InstallerContainerProperty != null)
+                if (installer != null && installer.gameObject.scene.IsValid())
                 {
-                    found = Resolve<T>(InstallerContainerProperty.GetValue(installer, null) as DiContainer);
+                    found = Reflect.Resolve<T>(Reflect.InstallerContainer(installer));
                 }
             }
 
             return found;
-        }
-
-        private static T Resolve<T>(DiContainer container) where T : class
-        {
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            if (owner == null || field == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return field.GetValue(owner) as T;
-            }
-            catch
-            {
-                return null;
-            }
         }
 
         public sealed class QuickbarItem

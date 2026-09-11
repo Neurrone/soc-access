@@ -70,8 +70,8 @@ namespace SongsOfConquestAccess.Adapters
         public DefenceMenuAdapter(DefenceMenu menu)
         {
             _menu = menu;
-            _facade = GetField<IClientAdventureFacade>(menu, AdventureFacadeField);
-            _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
+            _facade = Reflect.Get<IClientAdventureFacade>(menu, AdventureFacadeField);
+            _localization = Reflect.Get<ILocalizationHandler>(menu, LocalizationField);
         }
 
         public DefenceMenu Source
@@ -88,7 +88,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                IMapEntity mapEntity = GetField<IMapEntity>(_menu, MapEntityField);
+                IMapEntity mapEntity = Reflect.Get<IMapEntity>(_menu, MapEntityField);
                 return mapEntity != null ? mapEntity.Id : -1;
             }
         }
@@ -115,12 +115,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(GetField<UITextMesh>(_menu, MainTitleField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, MainTitleField)); }
         }
 
         public string Subtitle
         {
-            get { return GetText(GetField<UITextMesh>(_menu, SubTitleField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, SubTitleField)); }
         }
 
         public string SettlementDefendingTroopsLabel
@@ -164,7 +164,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                TroopHUD hud = GetField<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField);
+                TroopHUD hud = Reflect.Get<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField);
                 if (hud == null)
                 {
                     return null;
@@ -258,7 +258,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsSettlementTroopsVisible()
         {
-            return IsVisible(GetField<GameObject>(GetDefencePanelTroops(), SettlementTroopsContainerField));
+            return IsVisible(Reflect.Get<GameObject>(GetDefencePanelTroops(), SettlementTroopsContainerField));
         }
 
         public Component TutorialButton
@@ -363,12 +363,12 @@ namespace SongsOfConquestAccess.Adapters
         /// the word the prefab has written on it.</summary>
         public Component BackButton
         {
-            get { return GetField<UIButton>(_menu, BackButtonField) as Component; }
+            get { return Reflect.Get<UIButton>(_menu, BackButtonField) as Component; }
         }
 
         public string BackLabel
         {
-            get { return GetButtonLabel(GetField<UIButton>(_menu, BackButtonField)); }
+            get { return GetButtonLabel(Reflect.Get<UIButton>(_menu, BackButtonField)); }
         }
 
         public bool IsBackVisible()
@@ -433,33 +433,33 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                return GetText(GetField<UITextMesh>(GetDefencePanelTroops(), TowersLevelTextField));
+                return GetText(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowersLevelTextField));
             }
         }
 
         public bool HasVisibleTowerSummary()
         {
-            return IsVisible(GetField<GameObject>(GetDefencePanelTroops(), TowerInfoContainerField))
-                && IsVisible(GetField<UITextMesh>(GetDefencePanelTroops(), TowersLevelTextField) as Component)
+            return IsVisible(Reflect.Get<GameObject>(GetDefencePanelTroops(), TowerInfoContainerField))
+                && IsVisible(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowersLevelTextField) as Component)
                 && !string.IsNullOrWhiteSpace(TowerSummary);
         }
 
         public string TowerInfoText
         {
-            get { return GetText(GetField<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField)); }
         }
 
         public bool HasVisibleNoTowersHelp()
         {
-            return IsVisible(GetField<GameObject>(GetDefencePanelTroops(), NoTowersContainerField))
-                && IsVisible(GetField<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField) as Component)
+            return IsVisible(Reflect.Get<GameObject>(GetDefencePanelTroops(), NoTowersContainerField))
+                && IsVisible(Reflect.Get<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField) as Component)
                 && !string.IsNullOrWhiteSpace(TowerInfoText);
         }
 
         /// <summary>The towers the panel is drawing, walked at most once a frame.</summary>
         public IReadOnlyList<TowerItem> GetTowerItems()
         {
-            Transform container = GetField<Transform>(GetDefencePanelTroops(), TowerContainerField);
+            Transform container = Reflect.Get<Transform>(GetDefencePanelTroops(), TowerContainerField);
             DefenceTowerEntry[] entries = _towerEntries.Under(container);
             List<TowerItem> result = new List<TowerItem>(entries.Length);
             for (int i = 0; i < entries.Length; i++)
@@ -472,7 +472,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<DefenceSlotListAdapter.Slot> GetGarrisonSlots()
         {
-            List<TroopHUDEntry> entries = GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField);
+            List<TroopHUDEntry> entries = Reflect.Get<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField);
             if (_garrison == null || !ReferenceEquals(_garrison.Entries, entries))
             {
                 _garrison = new DefenceSlotListAdapter(entries, _localization);
@@ -483,7 +483,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<DefenceSlotListAdapter.Slot> GetBallistaSlots()
         {
-            List<TroopHUDEntry> entries = GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField);
+            List<TroopHUDEntry> entries = Reflect.Get<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField);
             if (_ballistae == null || !ReferenceEquals(_ballistae.Entries, entries))
             {
                 _ballistae = new DefenceSlotListAdapter(entries, _localization);
@@ -502,62 +502,62 @@ namespace SongsOfConquestAccess.Adapters
             return _menu != null
                 && _menu.gameObject != null
                 && _menu.gameObject.activeInHierarchy
-                && GetField<Async>(_menu, AsyncField) != null;
+                && Reflect.Get<Async>(_menu, AsyncField) != null;
         }
 
         private DefencePanel GetDefencePanel()
         {
-            return GetField<DefencePanel>(_menu, DefencePanelField);
+            return Reflect.Get<DefencePanel>(_menu, DefencePanelField);
         }
 
         private DefencePanelTroops GetDefencePanelTroops()
         {
-            return GetField<DefencePanelTroops>(GetDefencePanel(), DefencePanelTroopsField);
+            return Reflect.Get<DefencePanelTroops>(GetDefencePanel(), DefencePanelTroopsField);
         }
 
         private DefencePanelWielder GetDefencePanelWielder()
         {
-            return GetField<DefencePanelWielder>(GetDefencePanel(), DefencePanelWielderField);
+            return Reflect.Get<DefencePanelWielder>(GetDefencePanel(), DefencePanelWielderField);
         }
 
         private PurchaseTroopsSubMenu GetPurchaseSubMenu()
         {
-            return GetField<PurchaseTroopsSubMenu>(_menu, PurchaseTroopsSubMenuField);
+            return Reflect.Get<PurchaseTroopsSubMenu>(_menu, PurchaseTroopsSubMenuField);
         }
 
         private UpgradeTroopsSubMenu GetUpgradeSubMenu()
         {
-            return GetField<UpgradeTroopsSubMenu>(_menu, UpgradeTroopsSubMenuField);
+            return Reflect.Get<UpgradeTroopsSubMenu>(_menu, UpgradeTroopsSubMenuField);
         }
 
         private UIButton GetDraftButton()
         {
-            return GetField<UIButton>(_menu, PurchaseTroopsButtonField);
+            return Reflect.Get<UIButton>(_menu, PurchaseTroopsButtonField);
         }
 
         private UIButton GetUpgradeButton()
         {
-            return GetField<UIButton>(_menu, UpgradeTroopsButtonField);
+            return Reflect.Get<UIButton>(_menu, UpgradeTroopsButtonField);
         }
 
         private UIButton GetTutorialButton()
         {
-            return GetField<UIButton>(_menu, TutorialButtonField);
+            return Reflect.Get<UIButton>(_menu, TutorialButtonField);
         }
 
         private UIButton GetCloseButton()
         {
-            return GetField<UIButton>(_menu, CloseButtonField);
+            return Reflect.Get<UIButton>(_menu, CloseButtonField);
         }
 
         private UIButton GetMoveToDefenceButton()
         {
-            return GetField<UIButton>(GetDefencePanelTroops(), MoveToDefenceButtonField);
+            return Reflect.Get<UIButton>(GetDefencePanelTroops(), MoveToDefenceButtonField);
         }
 
         private UIButton GetMoveToWielderButton()
         {
-            return GetField<UIButton>(GetDefencePanelTroops(), MoveToWielderButtonField);
+            return Reflect.Get<UIButton>(GetDefencePanelTroops(), MoveToWielderButtonField);
         }
 
         private static string GetButtonLabel(UIButton button)
@@ -590,11 +590,6 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.activeInHierarchy;
         }
 
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
-        }
-
         public sealed class TowerItem
         {
             private readonly DefenceTowerEntry _entry;
@@ -615,14 +610,14 @@ namespace SongsOfConquestAccess.Adapters
             /// stands on.</summary>
             public Component Source
             {
-                get { return GetField<Component>(_entry, TowerTooltipAreaField); }
+                get { return Reflect.Get<Component>(_entry, TowerTooltipAreaField); }
             }
 
             public string Label
             {
                 get
                 {
-                    Component tooltipArea = GetField<Component>(_entry, TowerTooltipAreaField);
+                    Component tooltipArea = Reflect.Get<Component>(_entry, TowerTooltipAreaField);
                     IDetails details;
                     if (NativeTooltipUtility.TryGetUiDetails(tooltipArea, out details) && details is DefenceTowerDetails towerDetails)
                     {
@@ -635,12 +630,12 @@ namespace SongsOfConquestAccess.Adapters
 
             public Tooltip Tooltip
             {
-                get { return Tooltip.ForComponent(GetField<Component>(_entry, TowerTooltipAreaField), _localization); }
+                get { return Tooltip.ForComponent(Reflect.Get<Component>(_entry, TowerTooltipAreaField), _localization); }
             }
 
             public void Focus()
             {
-                NativeSelectionUtility.Select(GetField<UIImage>(_entry, TowerTooltipAreaField));
+                NativeSelectionUtility.Select(Reflect.Get<UIImage>(_entry, TowerTooltipAreaField));
             }
         }
     }

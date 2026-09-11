@@ -60,7 +60,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsStoredWielderVisible
         {
-            get { return IsVisible(GetField<GameObject>(_panel, StoredWielderContainerField)); }
+            get { return IsVisible(Reflect.Get<GameObject>(_panel, StoredWielderContainerField)); }
         }
 
         public string StoredWielderName
@@ -119,7 +119,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                GameObject root = GetField<GameObject>(_panel, NoStoredWielderContainerField);
+                GameObject root = Reflect.Get<GameObject>(_panel, NoStoredWielderContainerField);
                 if (!_noStoredWielderProbed || !ReferenceEquals(_noStoredWielderRoot, root))
                 {
                     _noStoredWielderProbed = true;
@@ -137,17 +137,17 @@ namespace SongsOfConquestAccess.Adapters
         /// hover.</summary>
         public Component Portrait
         {
-            get { return GetField<Component>(_panel, PortraitImageField); }
+            get { return Reflect.Get<Component>(_panel, PortraitImageField); }
         }
 
         public Tooltip PortraitTooltip
         {
-            get { return Tooltip.ForComponent(GetField<Component>(_panel, PortraitImageField), _localization); }
+            get { return Tooltip.ForComponent(Reflect.Get<Component>(_panel, PortraitImageField), _localization); }
         }
 
         public void FocusPortrait()
         {
-            NativeSelectionUtility.Select(GetField<Component>(_panel, PortraitImageField));
+            NativeSelectionUtility.Select(Reflect.Get<Component>(_panel, PortraitImageField));
         }
 
         /// <summary>The stored wielder's army, or null before the band has been set up. Kept: the
@@ -156,7 +156,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                TroopHUD hud = GetField<TroopHUD>(_panel, TroopHudField);
+                TroopHUD hud = Reflect.Get<TroopHUD>(_panel, TroopHudField);
                 if (hud == null)
                 {
                     return null;
@@ -280,22 +280,22 @@ namespace SongsOfConquestAccess.Adapters
 
         private ICommanderState StoredCommander
         {
-            get { return GetField<ICommanderState>(_panel, StoredCommanderField); }
+            get { return Reflect.Get<ICommanderState>(_panel, StoredCommanderField); }
         }
 
         private UIButton GetStoreButton()
         {
-            return GetField<UIButton>(_panel, StoreButtonField);
+            return Reflect.Get<UIButton>(_panel, StoreButtonField);
         }
 
         private UIButton GetEjectButton()
         {
-            return GetField<UIButton>(_panel, EjectButtonField);
+            return Reflect.Get<UIButton>(_panel, EjectButtonField);
         }
 
         private UIButton GetTradeButton()
         {
-            return GetField<UIButton>(_panel, TradeButtonField);
+            return Reflect.Get<UIButton>(_panel, TradeButtonField);
         }
 
         private string GetButtonLabel(UIButton button, string localizationKey, string fallback)
@@ -357,11 +357,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsVisible(GameObject gameObject)
         {
             return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
     }
 }

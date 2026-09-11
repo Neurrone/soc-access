@@ -107,8 +107,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(KingdomInformationHUD), "_settings");
         private static readonly FieldInfo KingdomInformationHudInstallerSettingsField =
             AccessTools.Field(typeof(KingdomInformationHUDInstaller), "_hudSettings");
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(ObjectivesHUDInstaller), "Container");
         private static readonly TooltipAnchor[] ResourceTooltipAnchors =
         {
             TooltipAnchor.BottomLeft
@@ -197,7 +195,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 int level = commander.GetLevel();
-                string levelText = GetText(GetField<UITextMesh>(GetExperienceBar(), ExperienceBarLevelTextField));
+                string levelText = GetText(Reflect.Get<UITextMesh>(GetExperienceBar(), ExperienceBarLevelTextField));
                 int parsedLevel;
                 if (!string.IsNullOrWhiteSpace(levelText) && int.TryParse(levelText, out parsedLevel))
                 {
@@ -791,14 +789,14 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsWielderAmountVisible()
         {
             return IsWielderListMenuVisible()
-                && HudGroupVisible(GetField<GameObject>(WielderList, WielderAmountContainerField));
+                && HudGroupVisible(Reflect.Get<GameObject>(WielderList, WielderAmountContainerField));
         }
 
         /// <summary>The count the list writes over itself, in the game's own words
         /// ("Adventure/CommanderListHUD/WielderAmount").</summary>
         public string WielderAmountLabel
         {
-            get { return GetText(GetField<UITextMesh>(WielderList, WielderAmountTextField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(WielderList, WielderAmountTextField)); }
         }
 
         /// <summary>The wielder-limit explanation the game hangs on the count's hover area.</summary>
@@ -807,7 +805,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 return Tooltip.ForComponent(
-                    GetField<UITransform>(WielderList, WielderLimitTooltipAreaField),
+                    Reflect.Get<UITransform>(WielderList, WielderLimitTooltipAreaField),
                     LocalizationHandler);
             }
         }
@@ -971,19 +969,19 @@ namespace SongsOfConquestAccess.Adapters
         public string GetTeamQueueEntryLabel(int index)
         {
             TeamQueueEntryBehaviour entry = GetTeamQueueEntry(index);
-            UITextMesh text = GetField<UITextMesh>(entry, TeamQueueEntryNameTextField);
+            UITextMesh text = Reflect.Get<UITextMesh>(entry, TeamQueueEntryNameTextField);
             return SpokenLines.Clean(GetText(text));
         }
 
         public void FocusTeamQueueEntry(int index)
         {
-            UIButton button = GetField<UIButton>(GetTeamQueueEntry(index), TeamQueueEntryTooltipButtonField);
+            UIButton button = Reflect.Get<UIButton>(GetTeamQueueEntry(index), TeamQueueEntryTooltipButtonField);
             NativeSelectionUtility.Select(button);
         }
 
         public Tooltip GetTeamQueueEntryTooltip(int index)
         {
-            UIButton button = GetField<UIButton>(GetTeamQueueEntry(index), TeamQueueEntryTooltipButtonField);
+            UIButton button = Reflect.Get<UIButton>(GetTeamQueueEntry(index), TeamQueueEntryTooltipButtonField);
             return Tooltip.ForComponent(button, LocalizationHandler);
         }
 
@@ -1110,7 +1108,7 @@ namespace SongsOfConquestAccess.Adapters
                     if (_commanderHudSettings == null)
                     {
                         CommanderHUDInstaller installer = FindSameSceneComponent<CommanderHUDInstaller>();
-                        _commanderHudSettings = GetField<CommanderHUD.Settings>(installer, CommanderHudInstallerSettingsField);
+                        _commanderHudSettings = Reflect.Get<CommanderHUD.Settings>(installer, CommanderHudInstallerSettingsField);
                     }
                 }
 
@@ -1128,13 +1126,13 @@ namespace SongsOfConquestAccess.Adapters
                     if (_resourceHudSettings == null)
                     {
                         ResourceHUD resourceHud = Resolve<ResourceHUD>();
-                        _resourceHudSettings = GetField<ResourceHUD.Settings>(resourceHud, ResourceHudSettingsField);
+                        _resourceHudSettings = Reflect.Get<ResourceHUD.Settings>(resourceHud, ResourceHudSettingsField);
                     }
 
                     if (_resourceHudSettings == null)
                     {
                         ResourceHUDInstaller installer = FindSameSceneComponent<ResourceHUDInstaller>();
-                        _resourceHudSettings = GetField<ResourceHUD.Settings>(installer, ResourceHudInstallerSettingsField);
+                        _resourceHudSettings = Reflect.Get<ResourceHUD.Settings>(installer, ResourceHudInstallerSettingsField);
                     }
                 }
 
@@ -1152,7 +1150,7 @@ namespace SongsOfConquestAccess.Adapters
                     if (_hudStateSettings == null)
                     {
                         AdventureHUDStateHandlerInstaller installer = FindSameSceneComponent<AdventureHUDStateHandlerInstaller>();
-                        _hudStateSettings = GetField<AdventureHUDStateHandler.Settings>(installer, AdventureHudStateHandlerInstallerSettingsField);
+                        _hudStateSettings = Reflect.Get<AdventureHUDStateHandler.Settings>(installer, AdventureHudStateHandlerInstallerSettingsField);
                     }
                 }
 
@@ -1213,7 +1211,7 @@ namespace SongsOfConquestAccess.Adapters
                     _objectivesHudSettings = Resolve<ObjectivesHUD.Settings>();
                     if (_objectivesHudSettings == null)
                     {
-                        _objectivesHudSettings = GetField<ObjectivesHUD.Settings>(ObjectivesInstaller, ObjectivesHudInstallerSettingsField);
+                        _objectivesHudSettings = Reflect.Get<ObjectivesHUD.Settings>(ObjectivesInstaller, ObjectivesHudInstallerSettingsField);
                     }
                 }
 
@@ -1227,7 +1225,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 if (_objectivesEntryContainer == null)
                 {
-                    _objectivesEntryContainer = GetField<Transform>(ObjectivesInstaller, ObjectivesHudInstallerEntryContainerField);
+                    _objectivesEntryContainer = Reflect.Get<Transform>(ObjectivesInstaller, ObjectivesHudInstallerEntryContainerField);
                 }
 
                 return _objectivesEntryContainer;
@@ -1288,13 +1286,13 @@ namespace SongsOfConquestAccess.Adapters
                     if (_kingdomInformationSettings == null)
                     {
                         KingdomInformationHUD hud = Resolve<KingdomInformationHUD>();
-                        _kingdomInformationSettings = GetField<KingdomInformationHUD.Settings>(hud, KingdomInformationHudSettingsField);
+                        _kingdomInformationSettings = Reflect.Get<KingdomInformationHUD.Settings>(hud, KingdomInformationHudSettingsField);
                     }
 
                     if (_kingdomInformationSettings == null)
                     {
                         KingdomInformationHUDInstaller installer = FindSameSceneComponent<KingdomInformationHUDInstaller>();
-                        _kingdomInformationSettings = GetField<KingdomInformationHUD.Settings>(installer, KingdomInformationHudInstallerSettingsField);
+                        _kingdomInformationSettings = Reflect.Get<KingdomInformationHUD.Settings>(installer, KingdomInformationHudInstallerSettingsField);
                     }
                 }
 
@@ -1311,7 +1309,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (_endTurnHud == null && !_endTurnHudProbed)
                 {
                     _endTurnHudProbed = true;
-                    DiContainer container = GetInstallerContainer(FindSameSceneComponent<EndTurnHUDInstaller>());
+                    DiContainer container = Reflect.InstallerContainer(FindSameSceneComponent<EndTurnHUDInstaller>());
                     _endTurnHud = container != null ? container.TryResolve<EndTurnHUD>() : null;
                 }
 
@@ -1330,7 +1328,7 @@ namespace SongsOfConquestAccess.Adapters
                     if (_endTurnSettings == null)
                     {
                         EndTurnHUDInstaller installer = FindSameSceneComponent<EndTurnHUDInstaller>();
-                        _endTurnSettings = GetField<EndTurnHUD.Settings>(installer, EndTurnHudInstallerSettingsField);
+                        _endTurnSettings = Reflect.Get<EndTurnHUD.Settings>(installer, EndTurnHudInstallerSettingsField);
                     }
                 }
 
@@ -1363,31 +1361,31 @@ namespace SongsOfConquestAccess.Adapters
         private AdventureEssenceContainer GetAdventureEssenceContainer()
         {
             CommanderHUDPortrait portrait = CommanderSettings != null ? CommanderSettings.Portrait : null;
-            return GetField<AdventureEssenceContainer>(portrait, CommanderHudPortraitEssenceContainerField);
+            return Reflect.Get<AdventureEssenceContainer>(portrait, CommanderHudPortraitEssenceContainerField);
         }
 
         private ExperienceBar GetExperienceBar()
         {
             CommanderHUDPortrait portrait = CommanderSettings != null ? CommanderSettings.Portrait : null;
-            return GetField<ExperienceBar>(portrait, CommanderHudPortraitExperienceBarField);
+            return Reflect.Get<ExperienceBar>(portrait, CommanderHudPortraitExperienceBarField);
         }
 
         private Component GetExperienceTooltipComponent()
         {
-            UIImage image = GetField<UIImage>(GetExperienceBar(), ExperienceBarTooltipImageField);
+            UIImage image = Reflect.Get<UIImage>(GetExperienceBar(), ExperienceBarTooltipImageField);
             return image as Component;
         }
 
         private UIButton GetLevelUpButton()
         {
-            return GetField<UIButton>(GetExperienceBar(), ExperienceBarLevelUpButtonField);
+            return Reflect.Get<UIButton>(GetExperienceBar(), ExperienceBarLevelUpButtonField);
         }
 
         private Component GetEssenceTooltipComponent(EssenceType essenceType)
         {
             AdventureEssenceContainer container = GetAdventureEssenceContainer();
             FieldInfo field = GetEssenceTooltipField(essenceType);
-            Image image = GetField<Image>(container, field);
+            Image image = Reflect.Get<Image>(container, field);
             if (image == null)
             {
                 return null;
@@ -1449,14 +1447,14 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             TroopHUD troopHud = CommanderSettings != null ? CommanderSettings.TroopHUD : null;
-            List<TroopHUDEntry> entries = GetField<List<TroopHUDEntry>>(troopHud, TroopHudTroopsField);
+            List<TroopHUDEntry> entries = Reflect.Get<List<TroopHUDEntry>>(troopHud, TroopHudTroopsField);
             return entries != null && index < entries.Count ? entries[index] : null;
         }
 
         private UIButton GetMoveToDestinationButton()
         {
             MovementActionButton movementActionButton = CommanderSettings != null ? CommanderSettings.MovementActionButton : null;
-            return GetField<UIButton>(movementActionButton, MovementActionButtonMoveButtonField);
+            return Reflect.Get<UIButton>(movementActionButton, MovementActionButtonMoveButtonField);
         }
 
         private ResourceHUD.ResourceEntry GetResourceEntry(ResourceType resourceType)
@@ -1633,19 +1631,19 @@ namespace SongsOfConquestAccess.Adapters
 
         private int GetNotificationEntryCount()
         {
-            List<INotificationHUDEntry> entries = GetField<List<INotificationHUDEntry>>(NotificationHud, NotificationHudActiveEntriesField);
+            List<INotificationHUDEntry> entries = Reflect.Get<List<INotificationHUDEntry>>(NotificationHud, NotificationHudActiveEntriesField);
             return entries != null ? entries.Count : 0;
         }
 
         private NotificationHUDEntry GetNotificationEntry(int index)
         {
-            List<INotificationHUDEntry> entries = GetField<List<INotificationHUDEntry>>(NotificationHud, NotificationHudActiveEntriesField);
+            List<INotificationHUDEntry> entries = Reflect.Get<List<INotificationHUDEntry>>(NotificationHud, NotificationHudActiveEntriesField);
             return entries != null && index >= 0 && index < entries.Count ? entries[index] as NotificationHUDEntry : null;
         }
 
         private UIButton GetNotificationButton(int index)
         {
-            NotificationHUDEntry.Settings settings = GetField<NotificationHUDEntry.Settings>(GetNotificationEntry(index), NotificationHudEntrySettingsField);
+            NotificationHUDEntry.Settings settings = Reflect.Get<NotificationHUDEntry.Settings>(GetNotificationEntry(index), NotificationHudEntrySettingsField);
             return settings == null
                 ? null
                 : FirstActiveButton(
@@ -1659,13 +1657,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private int GetTownListEntryCount()
         {
-            List<ITownListHUDEntry> entries = GetField<List<ITownListHUDEntry>>(TownList, TownListEntriesField);
+            List<ITownListHUDEntry> entries = Reflect.Get<List<ITownListHUDEntry>>(TownList, TownListEntriesField);
             return entries != null ? entries.Count : 0;
         }
 
         private ITownListHUDEntry GetTownListEntry(int index)
         {
-            List<ITownListHUDEntry> entries = GetField<List<ITownListHUDEntry>>(TownList, TownListEntriesField);
+            List<ITownListHUDEntry> entries = Reflect.Get<List<ITownListHUDEntry>>(TownList, TownListEntriesField);
             return entries != null && index >= 0 && index < entries.Count ? entries[index] : null;
         }
 
@@ -1808,19 +1806,19 @@ namespace SongsOfConquestAccess.Adapters
 
         private int GetTeamQueueEntryCount()
         {
-            List<TeamQueueEntryBehaviour> entries = GetField<List<TeamQueueEntryBehaviour>>(TeamQueueHud, TeamQueueEntriesField);
+            List<TeamQueueEntryBehaviour> entries = Reflect.Get<List<TeamQueueEntryBehaviour>>(TeamQueueHud, TeamQueueEntriesField);
             return entries != null ? entries.Count : 0;
         }
 
         private TeamQueueEntryBehaviour GetTeamQueueEntry(int index)
         {
-            List<TeamQueueEntryBehaviour> entries = GetField<List<TeamQueueEntryBehaviour>>(TeamQueueHud, TeamQueueEntriesField);
+            List<TeamQueueEntryBehaviour> entries = Reflect.Get<List<TeamQueueEntryBehaviour>>(TeamQueueHud, TeamQueueEntriesField);
             return entries != null && index >= 0 && index < entries.Count ? entries[index] : null;
         }
 
         private string GetRoundTextLabel()
         {
-            UITextMesh[] texts = GetField<UITextMesh[]>(TeamQueueHud, TeamQueueRoundTextsField);
+            UITextMesh[] texts = Reflect.Get<UITextMesh[]>(TeamQueueHud, TeamQueueRoundTextsField);
             if (texts == null)
             {
                 return string.Empty;
@@ -1846,54 +1844,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private T Resolve<T>() where T : class
         {
-            if (Container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return Container.Resolve<T>();
-            }
-            catch
-            {
-                return null;
-            }
+            return Reflect.Resolve<T>(Container);
         }
 
-        private static T ResolveFromInstaller<T>(object installer) where T : class
+        private static T ResolveFromInstaller<T>(MonoInstallerBase installer) where T : class
         {
-            DiContainer container = GetInstallerContainer(installer);
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private static DiContainer GetInstallerContainer(object installer)
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            }
-            catch
-            {
-                return null;
-            }
+            return Reflect.Resolve<T>(Reflect.InstallerContainer(installer));
         }
 
         private T FindSameSceneComponent<T>() where T : Component
@@ -1927,11 +1883,6 @@ namespace SongsOfConquestAccess.Adapters
                 && component.gameObject != null
                 && component.gameObject.scene.IsValid()
                 && component.gameObject.scene.isLoaded;
-        }
-
-        private static T GetField<T>(object instance, FieldInfo field) where T : class
-        {
-            return instance != null && field != null ? field.GetValue(instance) as T : null;
         }
 
         private static void InvokeNoArgs(object instance, MethodInfo method)

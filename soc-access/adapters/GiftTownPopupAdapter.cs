@@ -49,54 +49,54 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GiftHeader
         {
-            get { return GetText(GetField<IUITextMesh>(GiftHeaderField)); }
+            get { return GetText(Reflect.Get<IUITextMesh>(_popup, GiftHeaderField)); }
         }
 
         public string RequestHeader
         {
-            get { return GetText(GetField<IUITextMesh>(RequestHeaderField)); }
+            get { return GetText(Reflect.Get<IUITextMesh>(_popup, RequestHeaderField)); }
         }
 
         public bool IsRequestMenuVisible()
         {
-            return IsPresent() && IsGameObjectVisible(GetField<Component>(RequestButtonParentField));
+            return IsPresent() && IsGameObjectVisible(Reflect.Get<Component>(_popup, RequestButtonParentField));
         }
 
         public IReadOnlyList<TownItem> GetGiftTowns()
         {
-            return GetTownItems("gift", GetField<Component>(GiftButtonParentField));
+            return GetTownItems("gift", Reflect.Get<Component>(_popup, GiftButtonParentField));
         }
 
         public IReadOnlyList<TownItem> GetRequestTowns()
         {
-            return GetTownItems("request", GetField<Component>(RequestButtonParentField));
+            return GetTownItems("request", Reflect.Get<Component>(_popup, RequestButtonParentField));
         }
 
         /// <summary>The cross the popup draws at its top right. The game only draws it outside gamepad
         /// mode (<c>GiftTownPopup.Show</c>), so it is absent rather than merely refusing there.</summary>
         public Component CloseButton
         {
-            get { return GetField<UIButton>(CloseButtonField) as Component; }
+            get { return Reflect.Get<UIButton>(_popup, CloseButtonField) as Component; }
         }
 
         public bool IsCloseVisible()
         {
-            return IsPresent() && MenuButtonAdapterBase.IsButtonVisible(GetField<UIButton>(CloseButtonField));
+            return IsPresent() && MenuButtonAdapterBase.IsButtonVisible(Reflect.Get<UIButton>(_popup, CloseButtonField));
         }
 
         public bool ActivateClose()
         {
-            return NativeSelectionUtility.Click(GetField<UIButton>(CloseButtonField));
+            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_popup, CloseButtonField));
         }
 
         public Tooltip CloseTooltip
         {
-            get { return Tooltip.ForComponent(GetField<UIButton>(CloseButtonField) as Component, _localization); }
+            get { return Tooltip.ForComponent(Reflect.Get<UIButton>(_popup, CloseButtonField) as Component, _localization); }
         }
 
         public void FocusClose()
         {
-            NativeSelectionUtility.Select(GetField<UIButton>(CloseButtonField));
+            NativeSelectionUtility.Select(Reflect.Get<UIButton>(_popup, CloseButtonField));
         }
 
         private IReadOnlyList<TownItem> GetTownItems(string rowId, Component parent)
@@ -124,11 +124,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return items;
-        }
-
-        private T GetField<T>(FieldInfo field) where T : class
-        {
-            return _popup != null && field != null ? field.GetValue(_popup) as T : null;
         }
 
         private static string GetText(IUITextMesh textMesh)

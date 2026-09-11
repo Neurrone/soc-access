@@ -63,7 +63,7 @@ namespace SongsOfConquestAccess.Adapters
         public CodexMenuAdapter(CodexMenu menu)
         {
             _menu = menu;
-            _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
+            _localization = Reflect.Get<ILocalizationHandler>(menu, LocalizationField);
         }
 
         public bool IsPresent()
@@ -127,7 +127,7 @@ namespace SongsOfConquestAccess.Adapters
                 return true;
             }
 
-            UIButton button = GetField<UIButton>(tabButton, CategoryTabButtonField);
+            UIButton button = Reflect.Get<UIButton>(tabButton, CategoryTabButtonField);
             if (button != null)
             {
                 return NativeSelectionUtility.Click(button);
@@ -149,7 +149,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string sectionLabel = CleanLabel(UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(section, CategorySectionTextField)));
+                string sectionLabel = CleanLabel(UITextMeshTextUtility.GetEffectiveText(Reflect.Get<UITextMesh>(section, CategorySectionTextField)));
                 List<CodexContentButton> buttons = section.Buttons;
                 List<ArticleItem> articles = new List<ArticleItem>();
                 bool containsSelectedArticle = false;
@@ -161,7 +161,7 @@ namespace SongsOfConquestAccess.Adapters
                         continue;
                     }
 
-                    UITextMesh textMesh = GetField<UITextMesh>(button, ContentButtonTextField);
+                    UITextMesh textMesh = Reflect.Get<UITextMesh>(button, ContentButtonTextField);
                     string label = CleanLabel(UITextMeshTextUtility.GetEffectiveText(textMesh));
                     if (string.IsNullOrWhiteSpace(label))
                     {
@@ -204,7 +204,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            UIButton button = GetField<UIButton>(item.Button, ContentButtonButtonField);
+            UIButton button = Reflect.Get<UIButton>(item.Button, ContentButtonButtonField);
             if (button != null)
             {
                 return NativeSelectionUtility.Click(button);
@@ -215,7 +215,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string FormatContentButtonLabel(string label, CodexContentButton button)
         {
-            CodexCategoryContentDefinition definition = GetField<CodexCategoryContentDefinition>(button, ContentButtonDefinitionField);
+            CodexCategoryContentDefinition definition = Reflect.Get<CodexCategoryContentDefinition>(button, ContentButtonDefinitionField);
             return definition != null && definition.HasContentColor
                 ? ArtifactSpeechFormatter.FormatName(_localization, label, definition.ContentColor)
                 : label;
@@ -441,13 +441,13 @@ namespace SongsOfConquestAccess.Adapters
         private UIToggle GetTutorialToggle()
         {
             CodexTutorialSettings settings = GetTutorialSettings();
-            return GetField<UIToggle>(settings, TutorialToggleField);
+            return Reflect.Get<UIToggle>(settings, TutorialToggleField);
         }
 
         private UIButton GetResetButton()
         {
             CodexTutorialSettings settings = GetTutorialSettings();
-            return GetField<UIButton>(settings, ResetButtonField);
+            return Reflect.Get<UIButton>(settings, ResetButtonField);
         }
 
         private CodexTutorialSettings GetTutorialSettings()
@@ -562,7 +562,7 @@ namespace SongsOfConquestAccess.Adapters
 
                     if (component is UnitCodexContentInfoSection
                         && FieldReferencesText(component, "_header", textMesh)
-                        && string.IsNullOrWhiteSpace(GetVisibleText(GetField<UITextMesh>(component, UnitInfoDescriptionField))))
+                        && string.IsNullOrWhiteSpace(GetVisibleText(Reflect.Get<UITextMesh>(component, UnitInfoDescriptionField))))
                     {
                         return false;
                     }
@@ -591,17 +591,17 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            AddTextMeshItems(items, CodexContentItemKind.Heading, GetField<UITextMesh>(content, WielderNameTextField));
-            AddTextMeshItems(items, CodexContentItemKind.Text, GetField<UITextMesh>(content, WielderClassTextField));
-            AddTextMeshItems(items, CodexContentItemKind.Text, GetField<UITextMesh>(content, WielderDescriptionTextField));
-            AddStatItem(items, "Commanders/Tooltip/Offense", "Offence", GetField<UITextMesh>(content, WielderOffenseStatTextField));
-            AddStatItem(items, "Commanders/Tooltip/Defense", "Defence", GetField<UITextMesh>(content, WielderDefenceStatTextField));
-            AddStatItem(items, "Commanders/Tooltip/Movement", "Movement", GetField<UITextMesh>(content, WielderMovementStatTextField));
-            AddStatItem(items, "Commanders/Tooltip/ViewRadius", "View radius", GetField<UITextMesh>(content, WielderViewRadiusStatTextField));
-            AddStatItem(items, "Commanders/Tooltip/Command", "Command", GetField<UITextMesh>(content, WielderCommandStatTextField));
-            AddWielderInfoSection(items, GetField<WielderCodexContentInfoSection>(content, WielderStartingTroopsField));
-            AddWielderInfoSection(items, GetField<WielderCodexContentInfoSection>(content, WielderSkillsField));
-            AddWielderInfoSection(items, GetField<WielderCodexContentInfoSection>(content, WielderSpecializationField));
+            AddTextMeshItems(items, CodexContentItemKind.Heading, Reflect.Get<UITextMesh>(content, WielderNameTextField));
+            AddTextMeshItems(items, CodexContentItemKind.Text, Reflect.Get<UITextMesh>(content, WielderClassTextField));
+            AddTextMeshItems(items, CodexContentItemKind.Text, Reflect.Get<UITextMesh>(content, WielderDescriptionTextField));
+            AddStatItem(items, "Commanders/Tooltip/Offense", "Offence", Reflect.Get<UITextMesh>(content, WielderOffenseStatTextField));
+            AddStatItem(items, "Commanders/Tooltip/Defense", "Defence", Reflect.Get<UITextMesh>(content, WielderDefenceStatTextField));
+            AddStatItem(items, "Commanders/Tooltip/Movement", "Movement", Reflect.Get<UITextMesh>(content, WielderMovementStatTextField));
+            AddStatItem(items, "Commanders/Tooltip/ViewRadius", "View radius", Reflect.Get<UITextMesh>(content, WielderViewRadiusStatTextField));
+            AddStatItem(items, "Commanders/Tooltip/Command", "Command", Reflect.Get<UITextMesh>(content, WielderCommandStatTextField));
+            AddWielderInfoSection(items, Reflect.Get<WielderCodexContentInfoSection>(content, WielderStartingTroopsField));
+            AddWielderInfoSection(items, Reflect.Get<WielderCodexContentInfoSection>(content, WielderSkillsField));
+            AddWielderInfoSection(items, Reflect.Get<WielderCodexContentInfoSection>(content, WielderSpecializationField));
             return true;
         }
 
@@ -630,13 +630,13 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                AddTextMeshItems(items, CodexContentItemKind.Heading, GetField<UITextMesh>(section, UnitContentSectionHeaderField));
+                AddTextMeshItems(items, CodexContentItemKind.Heading, Reflect.Get<UITextMesh>(section, UnitContentSectionHeaderField));
                 if (i < definitions.Count)
                 {
                     AddUnitEssenceItem(items, section, definitions[i]);
                 }
 
-                AddTextMeshItems(items, CodexContentItemKind.Text, GetField<UITextMesh>(section, UnitContentSectionDescriptionField));
+                AddTextMeshItems(items, CodexContentItemKind.Text, Reflect.Get<UITextMesh>(section, UnitContentSectionDescriptionField));
 
                 // Same pass, one level down: only on a redraw.
                 UnitCodexContentInfoSection[] infoSections = section.GetComponentsInChildren<UnitCodexContentInfoSection>(false);
@@ -684,7 +684,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             GameObject selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
             CodexContentButton button = selected != null ? selected.GetComponent<CodexContentButton>() : null;
-            return GetField<CodexCategoryContentDefinition>(button, ContentButtonDefinitionField);
+            return Reflect.Get<CodexCategoryContentDefinition>(button, ContentButtonDefinitionField);
         }
 
         private void AddUnitEssenceItem(List<CodexContentItem> items, UnitCodexContentSection section, IUnitDefinition definition)
@@ -700,7 +700,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            TroopViewEssenceController essenceController = GetField<TroopViewEssenceController>(section, UnitContentSectionEssenceControllerField);
+            TroopViewEssenceController essenceController = Reflect.Get<TroopViewEssenceController>(section, UnitContentSectionEssenceControllerField);
             RectTransform sourceTransform = essenceController != null
                 ? ((Component)essenceController).GetComponent<RectTransform>()
                 : ((Component)section).GetComponent<RectTransform>();
@@ -720,8 +720,8 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            UITextMesh header = GetField<UITextMesh>(section, UnitInfoHeaderField);
-            UITextMesh description = GetField<UITextMesh>(section, UnitInfoDescriptionField);
+            UITextMesh header = Reflect.Get<UITextMesh>(section, UnitInfoHeaderField);
+            UITextMesh description = Reflect.Get<UITextMesh>(section, UnitInfoDescriptionField);
             string descriptionText = GetVisibleText(description);
             AddTextMeshItems(
                 items,
@@ -750,8 +750,8 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            AddTextMeshItems(items, CodexContentItemKind.Heading, GetField<UITextMesh>(section, WielderInfoHeaderField));
-            AddTextMeshItems(items, CodexContentItemKind.Text, GetField<UITextMesh>(section, WielderInfoDescriptionField));
+            AddTextMeshItems(items, CodexContentItemKind.Heading, Reflect.Get<UITextMesh>(section, WielderInfoHeaderField));
+            AddTextMeshItems(items, CodexContentItemKind.Text, Reflect.Get<UITextMesh>(section, WielderInfoDescriptionField));
         }
 
         private static void AddTextMeshItems(List<CodexContentItem> items, CodexContentItemKind kind, UITextMesh textMesh)
@@ -864,11 +864,6 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
             FieldInfo field = provider != null ? AccessTools.Field(provider.GetType(), fieldName) : null;
             return field != null ? field.GetValue(provider) as T : null;
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         public sealed class TabItem

@@ -61,7 +61,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPresent()
         {
-            RectTransform topContainer = GetField<RectTransform>(_menu, TopContainerField);
+            RectTransform topContainer = Reflect.Get<RectTransform>(_menu, TopContainerField);
             return _menu != null
                 && topContainer != null
                 && ((Component)topContainer).gameObject.activeInHierarchy
@@ -71,18 +71,18 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The entity's type name ("Small Settlement"), drawn BELOW the custom name.</summary>
         public string EntityName
         {
-            get { return GetText(GetField<UITextMesh>(_menu, NameTextField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, NameTextField)); }
         }
 
         /// <summary>The entity's own name ("Crowpoint"), drawn ABOVE the type name.</summary>
         public string CustomName
         {
-            get { return GetText(GetField<UITextMesh>(_menu, CustomNameTextField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, CustomNameTextField)); }
         }
 
         public bool IsCustomNameVisible
         {
-            get { return IsActive(GetField<GameObject>(_menu, CustomNameContainerField)) && !string.IsNullOrWhiteSpace(CustomName); }
+            get { return IsActive(Reflect.Get<GameObject>(_menu, CustomNameContainerField)) && !string.IsNullOrWhiteSpace(CustomName); }
         }
 
         public string BlueprintDescription
@@ -94,18 +94,18 @@ namespace SongsOfConquestAccess.Adapters
         /// than collapsed.</summary>
         public IList<string> BlueprintDescriptionLines
         {
-            get { return GetLines(GetField<UITextMesh>(_menu, DescriptionTextField)); }
+            get { return GetLines(Reflect.Get<UITextMesh>(_menu, DescriptionTextField)); }
         }
 
         /// <summary>The text the blueprint description is drawn as.</summary>
         public Component BlueprintDescriptionComponent
         {
-            get { return GetField<UITextMesh>(_menu, DescriptionTextField); }
+            get { return Reflect.Get<UITextMesh>(_menu, DescriptionTextField); }
         }
 
         public bool IsBlueprintDescriptionVisible
         {
-            get { return IsActive(GetField<GameObject>(_menu, DescriptionTextContainerField)) && !string.IsNullOrWhiteSpace(BlueprintDescription); }
+            get { return IsActive(Reflect.Get<GameObject>(_menu, DescriptionTextContainerField)) && !string.IsNullOrWhiteSpace(BlueprintDescription); }
         }
 
         public string StoredWielderName
@@ -127,22 +127,22 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The one native control the stored wielder is drawn as: clicking it ejects.</summary>
         public Component StoredWielderButton
         {
-            get { return GetField<UIButton>(_menu, StoredWielderButtonField); }
+            get { return Reflect.Get<UIButton>(_menu, StoredWielderButtonField); }
         }
 
         public bool IsStoredWielderVisible
         {
-            get { return IsActive(GetField<UIButton>(_menu, StoredWielderButtonField)); }
+            get { return IsActive(Reflect.Get<UIButton>(_menu, StoredWielderButtonField)); }
         }
 
         public Tooltip StoredWielderTooltip
         {
-            get { return TooltipWithLines(GetField<UIImage>(_menu, StoredWielderImageField)); }
+            get { return TooltipWithLines(Reflect.Get<UIImage>(_menu, StoredWielderImageField)); }
         }
 
         public bool ActivateEjectWielder()
         {
-            return NativeSelectionUtility.Click(GetField<UIButton>(_menu, StoredWielderButtonField));
+            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_menu, StoredWielderButtonField));
         }
 
         public bool IsEjectWielderEnabled()
@@ -171,7 +171,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                GameObject parent = GetField<GameObject>(_menu, UpgradesParentField);
+                GameObject parent = Reflect.Get<GameObject>(_menu, UpgradesParentField);
                 return parent != null ? parent.transform : null;
             }
         }
@@ -183,30 +183,30 @@ namespace SongsOfConquestAccess.Adapters
                 int used;
                 int total;
                 GetUpgradeCounts(out used, out total);
-                return total > 0 && IsActive(GetField<GameObject>(_menu, UpgradesParentField));
+                return total > 0 && IsActive(Reflect.Get<GameObject>(_menu, UpgradesParentField));
             }
         }
 
         public string SiegeState
         {
-            get { return GetText(GetField<UITextMesh>(_menu, SiegeStateDescriptionField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, SiegeStateDescriptionField)); }
         }
 
         /// <summary>The text the siege state is drawn as.</summary>
         public Component SiegeStateComponent
         {
-            get { return GetField<UITextMesh>(_menu, SiegeStateDescriptionField); }
+            get { return Reflect.Get<UITextMesh>(_menu, SiegeStateDescriptionField); }
         }
 
         public bool IsSiegeStateVisible
         {
-            get { return IsActive(GetField<GameObject>(_menu, SiegeStateDescriptionContainerField)) && !string.IsNullOrWhiteSpace(SiegeState); }
+            get { return IsActive(Reflect.Get<GameObject>(_menu, SiegeStateDescriptionContainerField)) && !string.IsNullOrWhiteSpace(SiegeState); }
         }
 
         /// <summary>The controller drawing the round dots the town status is counted off.</summary>
         public Component TownStatusComponent
         {
-            get { return GetField<TownStatusController>(_menu, TownStatusControllerField); }
+            get { return Reflect.Get<TownStatusController>(_menu, TownStatusControllerField); }
         }
 
         /// <summary>How many rounds of the claim the game has drawn as filled.</summary>
@@ -218,7 +218,7 @@ namespace SongsOfConquestAccess.Adapters
                 List<TownStatusControllerRoundEntry> entries = TownStatusEntries;
                 for (int i = 0; entries != null && i < entries.Count; i++)
                 {
-                    Transform filledSlot = GetField<Transform>(entries[i], TownStatusFilledSlotField);
+                    Transform filledSlot = Reflect.Get<Transform>(entries[i], TownStatusFilledSlotField);
                     if (filledSlot != null && ((Component)filledSlot).gameObject.activeSelf)
                     {
                         filled++;
@@ -243,7 +243,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                TownStatusController controller = GetField<TownStatusController>(_menu, TownStatusControllerField);
+                TownStatusController controller = Reflect.Get<TownStatusController>(_menu, TownStatusControllerField);
                 List<TownStatusControllerRoundEntry> entries = TownStatusEntries;
                 return IsActive(controller) && entries != null && entries.Count > 0;
             }
@@ -261,7 +261,7 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<DescriptionRow> GetDescriptionRows()
         {
             List<DescriptionRow> rows = new List<DescriptionRow>();
-            MiniMenuDescription description = GetField<MiniMenuDescription>(_menu, DescriptionField);
+            MiniMenuDescription description = Reflect.Get<MiniMenuDescription>(_menu, DescriptionField);
             if (!IsActive(description))
             {
                 return rows;
@@ -294,8 +294,8 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                UITextMesh text = GetField<UITextMesh>(entry, DescriptionEntryTextField);
-                UIImage icon = GetField<UIImage>(entry, DescriptionEntryIconField);
+                UITextMesh text = Reflect.Get<UITextMesh>(entry, DescriptionEntryTextField);
+                UIImage icon = Reflect.Get<UIImage>(entry, DescriptionEntryIconField);
                 IList<string> label = GetLines(text);
                 if (label.Count == 0)
                 {
@@ -325,7 +325,7 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<ActionButton> GetActions()
         {
             List<ActionButton> buttons = new List<ActionButton>();
-            MiniMenuActions actions = GetField<MiniMenuActions>(_menu, ActionsField);
+            MiniMenuActions actions = Reflect.Get<MiniMenuActions>(_menu, ActionsField);
             if (actions == null || actions.ActiveEntries == null)
             {
                 return buttons;
@@ -339,8 +339,8 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                UIButton button = GetField<UIButton>(entry, ActionButtonField);
-                UIImage background = GetField<UIImage>(entry, ActionBackgroundImageField);
+                UIButton button = Reflect.Get<UIButton>(entry, ActionButtonField);
+                UIImage background = Reflect.Get<UIImage>(entry, ActionBackgroundImageField);
                 IGameAction gameAction = entry.GameAction;
                 buttons.Add(new ActionButton(
                     "map-entity-action-" + i + "-" + gameAction.ActionType,
@@ -371,24 +371,24 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                TownStatusController controller = GetField<TownStatusController>(_menu, TownStatusControllerField);
-                return GetField<List<TownStatusControllerRoundEntry>>(controller, TownStatusEntriesField);
+                TownStatusController controller = Reflect.Get<TownStatusController>(_menu, TownStatusControllerField);
+                return Reflect.Get<List<TownStatusControllerRoundEntry>>(controller, TownStatusEntriesField);
             }
         }
 
         private IMapEntity Entity
         {
-            get { return GetField<IMapEntity>(_menu, EntityField); }
+            get { return Reflect.Get<IMapEntity>(_menu, EntityField); }
         }
 
         private IClientAdventureFacade Facade
         {
-            get { return GetField<IClientAdventureFacade>(_menu, AdventureFacadeField); }
+            get { return Reflect.Get<IClientAdventureFacade>(_menu, AdventureFacadeField); }
         }
 
         private ILocalizationHandler Localization
         {
-            get { return GetField<ILocalizationHandler>(_menu, LocalizationField); }
+            get { return Reflect.Get<ILocalizationHandler>(_menu, LocalizationField); }
         }
 
         private string GetLocalizedText(string key, string fallback)
@@ -401,7 +401,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             used = 0;
             total = 0;
-            List<MapEntityHUDUpgradeSlot> slots = GetField<List<MapEntityHUDUpgradeSlot>>(_menu, SlotsField);
+            List<MapEntityHUDUpgradeSlot> slots = Reflect.Get<List<MapEntityHUDUpgradeSlot>>(_menu, SlotsField);
             if (slots == null)
             {
                 return;
@@ -416,7 +416,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 total++;
-                UIImage filledSlot = GetField<UIImage>(slot, FilledSlotField);
+                UIImage filledSlot = Reflect.Get<UIImage>(slot, FilledSlotField);
                 if (IsActive(filledSlot))
                 {
                     used++;
@@ -523,11 +523,6 @@ namespace SongsOfConquestAccess.Adapters
         private static IList<string> GetLines(UITextMesh text)
         {
             return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(text) });
-        }
-
-        private static T GetField<T>(object instance, FieldInfo field) where T : class
-        {
-            return instance != null && field != null ? field.GetValue(instance) as T : null;
         }
 
         private static bool IsActive(Component component)

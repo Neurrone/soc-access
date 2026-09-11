@@ -41,9 +41,9 @@ namespace SongsOfConquestAccess.Adapters
         public WorldChoiceMenuAdapter(WorldChoiceMenu menu)
         {
             _menu = menu;
-            _settings = GetField<WorldChoiceMenu.Settings>(menu, SettingsField);
-            _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
-            _facade = GetField<IClientAdventureFacade>(menu, AdventureFacadeField);
+            _settings = Reflect.Get<WorldChoiceMenu.Settings>(menu, SettingsField);
+            _localization = Reflect.Get<ILocalizationHandler>(menu, LocalizationField);
+            _facade = Reflect.Get<IClientAdventureFacade>(menu, AdventureFacadeField);
         }
 
         public object SourceKey
@@ -261,13 +261,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private List<IWorldMapChoiceButton> GetRewardButtons()
         {
-            List<IWorldMapChoiceButton> buttons = GetField<List<IWorldMapChoiceButton>>(_menu, RewardButtonsField);
+            List<IWorldMapChoiceButton> buttons = Reflect.Get<List<IWorldMapChoiceButton>>(_menu, RewardButtonsField);
             return buttons ?? new List<IWorldMapChoiceButton>();
         }
 
         private List<IWorldMapChoiceButton> GetPenaltyButtons()
         {
-            List<IWorldMapChoiceButton> buttons = GetField<List<IWorldMapChoiceButton>>(_menu, PenaltyButtonsField);
+            List<IWorldMapChoiceButton> buttons = Reflect.Get<List<IWorldMapChoiceButton>>(_menu, PenaltyButtonsField);
             return buttons ?? new List<IWorldMapChoiceButton>();
         }
 
@@ -318,11 +318,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return System.Text.RegularExpressions.Regex.Replace(text, @"-\s+(\d)", "-$1");
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         /// <summary>One card the menu draws, with everything about it the screen asks for.</summary>

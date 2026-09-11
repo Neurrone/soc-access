@@ -120,12 +120,12 @@ namespace SongsOfConquestAccess.Adapters
         public BuildMenuAdapter(BuildMenu menu)
         {
             _menu = menu;
-            _facade = GetField<IClientAdventureFacade>(menu, FacadeField);
-            _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
-            _selectionHandler = GetField<ISelectionHandler>(menu, SelectionHandlerField);
-            _gameConfig = GetField<object>(menu, GameConfigField);
-            _buildingRequirementValidator = GetField<IBuildingRequirementValidator>(menu, BuildingRequirementValidatorField);
-            _researchLookup = GetField<IResearchLookup>(menu, ResearchLookupField);
+            _facade = Reflect.Get<IClientAdventureFacade>(menu, FacadeField);
+            _localization = Reflect.Get<ILocalizationHandler>(menu, LocalizationField);
+            _selectionHandler = Reflect.Get<ISelectionHandler>(menu, SelectionHandlerField);
+            _gameConfig = Reflect.Get<object>(menu, GameConfigField);
+            _buildingRequirementValidator = Reflect.Get<IBuildingRequirementValidator>(menu, BuildingRequirementValidatorField);
+            _researchLookup = Reflect.Get<IResearchLookup>(menu, ResearchLookupField);
         }
 
         /// <summary>Drop what is kept for the current frame only. Called wherever the mod drives the
@@ -145,7 +145,7 @@ namespace SongsOfConquestAccess.Adapters
                 && _menu.gameObject != null
                 && _menu.gameObject.activeInHierarchy
                 && _menu.IsOpen
-                && GetField<object>(_menu, AsyncField) != null;
+                && Reflect.Get<object>(_menu, AsyncField) != null;
         }
 
         public BuildSiteSize SelectedCategory
@@ -365,8 +365,8 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                BuildMenuHeaderSection header = GetField<BuildMenuHeaderSection>(_menu, HeaderSectionField);
-                return GetText(GetField<UITextMesh>(header, HeaderNameField));
+                BuildMenuHeaderSection header = Reflect.Get<BuildMenuHeaderSection>(_menu, HeaderSectionField);
+                return GetText(Reflect.Get<UITextMesh>(header, HeaderNameField));
             }
         }
 
@@ -376,8 +376,8 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                BuildMenuHeaderSection header = GetField<BuildMenuHeaderSection>(_menu, HeaderSectionField);
-                return GetLines(GetField<UITextMesh>(header, HeaderDescriptionField));
+                BuildMenuHeaderSection header = Reflect.Get<BuildMenuHeaderSection>(_menu, HeaderSectionField);
+                return GetLines(Reflect.Get<UITextMesh>(header, HeaderDescriptionField));
             }
         }
 
@@ -411,8 +411,8 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<TierItem> GetTiers()
         {
             List<TierItem> items = new List<TierItem>();
-            BuildMenuHeaderSection header = GetField<BuildMenuHeaderSection>(_menu, HeaderSectionField);
-            IDictionary<int, UIButton> buttons = GetField<Dictionary<int, UIButton>>(header, HeaderLevelToButtonField);
+            BuildMenuHeaderSection header = Reflect.Get<BuildMenuHeaderSection>(_menu, HeaderSectionField);
+            IDictionary<int, UIButton> buttons = Reflect.Get<Dictionary<int, UIButton>>(header, HeaderLevelToButtonField);
             if (buttons == null || buttons.Count <= 1)
             {
                 return items;
@@ -571,7 +571,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (SelectedTier == 1 && IsVisible(GetField<UITransform>(_menu, PurchaseAreaField) as Component))
+                if (SelectedTier == 1 && IsVisible(Reflect.Get<UITransform>(_menu, PurchaseAreaField) as Component))
                 {
                     string visibleCost = LargeCostText;
                     if (!string.IsNullOrWhiteSpace(visibleCost))
@@ -607,19 +607,19 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                GameObject container = GetField<GameObject>(_menu, CannotBuyContainerField);
+                GameObject container = Reflect.Get<GameObject>(_menu, CannotBuyContainerField);
                 if (!IsVisible(container))
                 {
                     return string.Empty;
                 }
 
-                return GetText(GetField<UITextMesh>(_menu, CannotBuyTextField));
+                return GetText(Reflect.Get<UITextMesh>(_menu, CannotBuyTextField));
             }
         }
 
         public bool IsBuildButtonVisible()
         {
-            return IsVisible(GetField<GameObject>(_menu, PurchaseButtonContainerField));
+            return IsVisible(Reflect.Get<GameObject>(_menu, PurchaseButtonContainerField));
         }
 
         public bool IsBuildButtonEnabled()
@@ -729,12 +729,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private IMapEntity CurrentBuildSite
         {
-            get { return GetField<IMapEntity>(_menu, CurrentBuildSiteField); }
+            get { return Reflect.Get<IMapEntity>(_menu, CurrentBuildSiteField); }
         }
 
         private BuildOnBuildSiteAction CurrentAction
         {
-            get { return GetField<BuildOnBuildSiteAction>(_menu, SelectedActionField); }
+            get { return Reflect.Get<BuildOnBuildSiteAction>(_menu, SelectedActionField); }
         }
 
         private int SiblingIndex
@@ -750,7 +750,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                IList siblings = GetField<IList>(_menu, AllSiblingsField);
+                IList siblings = Reflect.Get<IList>(_menu, AllSiblingsField);
                 return siblings != null ? siblings.Count : 0;
             }
         }
@@ -780,7 +780,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                LargeCostSection section = GetField<LargeCostSection>(_menu, LargeCostSectionField);
+                LargeCostSection section = Reflect.Get<LargeCostSection>(_menu, LargeCostSectionField);
                 if (section == null)
                 {
                     return string.Empty;
@@ -846,7 +846,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Length; i++)
             {
                 BuildMenuDescriptionEntry entry = entries[i];
-                string text = GetText(GetField<UITextMesh>(entry, DescriptionEntryTextField));
+                string text = GetText(Reflect.Get<UITextMesh>(entry, DescriptionEntryTextField));
                 if (string.IsNullOrWhiteSpace(text))
                 {
                     continue;
@@ -881,7 +881,7 @@ namespace SongsOfConquestAccess.Adapters
             BuildMenuDescriptionEntry[] entries = GetEntries(section);
             for (int i = 0; i < entries.Length; i++)
             {
-                string text = GetText(GetField<UITextMesh>(entries[i], DescriptionEntryTextField));
+                string text = GetText(Reflect.Get<UITextMesh>(entries[i], DescriptionEntryTextField));
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     lines.Add(text);
@@ -925,7 +925,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetSectionHeader(BuildMenuDescriptionSection section)
         {
-            return GetText(GetField<UITextMesh>(section, DescriptionSectionHeaderField));
+            return GetText(Reflect.Get<UITextMesh>(section, DescriptionSectionHeaderField));
         }
 
         private void FocusEntry(BuildMenuDescriptionEntry entry)
@@ -945,13 +945,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private Component GetEntryTooltipComponent(BuildMenuDescriptionEntry entry)
         {
-            Component background = GetField<UIImage>(entry, DescriptionEntryBackgroundField) as Component;
+            Component background = Reflect.Get<UIImage>(entry, DescriptionEntryBackgroundField) as Component;
             if (background != null)
             {
                 return background;
             }
 
-            return GetField<UIImage>(entry, DescriptionEntryIconField) as Component;
+            return Reflect.Get<UIImage>(entry, DescriptionEntryIconField) as Component;
         }
 
         private bool FocusBuilding(BuildMenuButton buildButton)
@@ -971,7 +971,7 @@ namespace SongsOfConquestAccess.Adapters
         private IReadOnlyList<BuildMenuButton> GetActiveBuildButtons()
         {
             List<BuildMenuButton> buttons = new List<BuildMenuButton>();
-            foreach (object entry in GetActivePoolEntries(GetField<object>(_menu, BuildMenuButtonPoolField)))
+            foreach (object entry in GetActivePoolEntries(Reflect.Get<object>(_menu, BuildMenuButtonPoolField)))
             {
                 BuildMenuButton button = entry as BuildMenuButton;
                 if (button != null && IsVisible(button as Component))
@@ -996,7 +996,7 @@ namespace SongsOfConquestAccess.Adapters
 
             _sectionsFrame = frame;
             List<BuildMenuDescriptionSection> sections = new List<BuildMenuDescriptionSection>();
-            foreach (object entry in GetActivePoolEntries(GetField<object>(_menu, BuildMenuIncomePoolField)))
+            foreach (object entry in GetActivePoolEntries(Reflect.Get<object>(_menu, BuildMenuIncomePoolField)))
             {
                 BuildMenuDescriptionSection section = entry as BuildMenuDescriptionSection;
                 if (section != null)
@@ -1050,37 +1050,37 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIButton GetBuildButton(BuildMenuButton buildButton)
         {
-            return GetField<UIButton>(buildButton, BuildMenuButtonButtonField);
+            return Reflect.Get<UIButton>(buildButton, BuildMenuButtonButtonField);
         }
 
         private UIButton GetTutorialButton()
         {
-            return GetField<UIButton>(_menu, TutorialButtonField);
+            return Reflect.Get<UIButton>(_menu, TutorialButtonField);
         }
 
         private UIButton GetPreviousBuildSiteButton()
         {
-            return GetField<UIButton>(_menu, LeftNavigationButtonField);
+            return Reflect.Get<UIButton>(_menu, LeftNavigationButtonField);
         }
 
         private UIButton GetNextBuildSiteButton()
         {
-            return GetField<UIButton>(_menu, RightNavigationButtonField);
+            return Reflect.Get<UIButton>(_menu, RightNavigationButtonField);
         }
 
         private UIButton GetSmallTabButton()
         {
-            return GetField<UIButton>(_menu, SmallBuildingsTabButtonField);
+            return Reflect.Get<UIButton>(_menu, SmallBuildingsTabButtonField);
         }
 
         private UIButton GetMediumTabButton()
         {
-            return GetField<UIButton>(_menu, MediumBuildingsTabButtonField);
+            return Reflect.Get<UIButton>(_menu, MediumBuildingsTabButtonField);
         }
 
         private UIButton GetLargeTabButton()
         {
-            return GetField<UIButton>(_menu, LargeBuildingsTabButtonField);
+            return Reflect.Get<UIButton>(_menu, LargeBuildingsTabButtonField);
         }
 
         private UIButton GetCategoryButton(BuildSiteSize size)
@@ -1098,8 +1098,8 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIButton GetTierButton(int level)
         {
-            BuildMenuHeaderSection header = GetField<BuildMenuHeaderSection>(_menu, HeaderSectionField);
-            IDictionary<int, UIButton> buttons = GetField<Dictionary<int, UIButton>>(header, HeaderLevelToButtonField);
+            BuildMenuHeaderSection header = Reflect.Get<BuildMenuHeaderSection>(_menu, HeaderSectionField);
+            IDictionary<int, UIButton> buttons = Reflect.Get<Dictionary<int, UIButton>>(header, HeaderLevelToButtonField);
             if (buttons == null || !buttons.ContainsKey(level))
             {
                 return null;
@@ -1110,28 +1110,28 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIToggle GetAutoSelectToggle()
         {
-            return GetField<UIToggle>(_menu, AutoSelectBuildSiteToggleField);
+            return Reflect.Get<UIToggle>(_menu, AutoSelectBuildSiteToggleField);
         }
 
         private UIButton GetCloseButton()
         {
-            return GetField<UIButton>(_menu, BackgroundCloseButtonField);
+            return Reflect.Get<UIButton>(_menu, BackgroundCloseButtonField);
         }
 
         private UIButton GetPurchaseButton()
         {
-            return GetField<UIButton>(_menu, PurchaseButtonField);
+            return Reflect.Get<UIButton>(_menu, PurchaseButtonField);
         }
 
         private void AddCostPart(List<string> parts, LargeCostSection section, FieldInfo entryField, FieldInfo textField, ResourceType resourceType)
         {
-            UITransform entry = GetField<UITransform>(section, entryField);
+            UITransform entry = Reflect.Get<UITransform>(section, entryField);
             if (entry == null || !entry.Active)
             {
                 return;
             }
 
-            string amount = GetText(GetField<UITextMesh>(section, textField));
+            string amount = GetText(Reflect.Get<UITextMesh>(section, textField));
             int parsedAmount;
             if (!string.IsNullOrWhiteSpace(amount) && int.TryParse(amount, out parsedAmount))
             {
@@ -1488,11 +1488,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsVisible(GameObject gameObject)
         {
             return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         public sealed class CategoryItem

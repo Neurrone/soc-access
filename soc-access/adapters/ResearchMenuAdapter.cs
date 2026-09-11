@@ -70,12 +70,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public IClientAdventureFacade Facade
         {
-            get { return GetField<IClientAdventureFacade>(_menu, FacadeField); }
+            get { return Reflect.Get<IClientAdventureFacade>(_menu, FacadeField); }
         }
 
         public bool IsPresent()
         {
-            GameObject container = GetField<GameObject>(_menu, ContainerField);
+            GameObject container = Reflect.Get<GameObject>(_menu, ContainerField);
             return _menu != null
                 && container != null
                 && container.activeInHierarchy
@@ -87,7 +87,7 @@ namespace SongsOfConquestAccess.Adapters
         /// that says which faction's research is showing.</summary>
         public string HeaderText
         {
-            get { return GetText(GetField<UITextMesh>(_menu, HeaderTextField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, HeaderTextField)); }
         }
 
         /// <summary>The tutorial button the menu draws at the top left.</summary>
@@ -117,7 +117,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasFactionSelector()
         {
-            return IsVisible(GetField<RectTransform>(_menu, MixedFactionsContainerField) as Component)
+            return IsVisible(Reflect.Get<RectTransform>(_menu, MixedFactionsContainerField) as Component)
                 && GetFactions().Count > 0;
         }
 
@@ -125,7 +125,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<FactionItem> items = new List<FactionItem>();
             UIButton[] buttons = GetFactionButtons();
-            IFactionLookup factionLookup = GetField<IFactionLookup>(_menu, FactionLookupField);
+            IFactionLookup factionLookup = Reflect.Get<IFactionLookup>(_menu, FactionLookupField);
             int selectedFactionIndex = SelectedFactionIndex;
             for (int i = 0; i < buttons.Length; i++)
             {
@@ -319,7 +319,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetBuildingLabel(ResearchMenuBuildingTabButton tab, int index)
         {
-            UITextMesh name = GetField<UITextMesh>(tab, BuildingTabNameField);
+            UITextMesh name = Reflect.Get<UITextMesh>(tab, BuildingTabNameField);
             string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(name));
             return string.IsNullOrWhiteSpace(label) ? "Building " + (index + 1) : label;
         }
@@ -327,13 +327,13 @@ namespace SongsOfConquestAccess.Adapters
         // The paragraphs the game wrote the tab's description in, kept apart rather than collapsed.
         private IList<string> GetBuildingDescription(ResearchMenuBuildingTabButton tab)
         {
-            UITextMesh description = GetField<UITextMesh>(tab, BuildingTabDescriptionField);
+            UITextMesh description = Reflect.Get<UITextMesh>(tab, BuildingTabDescriptionField);
             return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(description) });
         }
 
         private string GetCategoryLabel(ResearchMenuCategory category, int index)
         {
-            UITextMesh name = GetField<UITextMesh>(category, CategoryNameField);
+            UITextMesh name = Reflect.Get<UITextMesh>(category, CategoryNameField);
             string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(name));
             return string.IsNullOrWhiteSpace(label) ? "Research category " + (index + 1) : label;
         }
@@ -421,7 +421,7 @@ namespace SongsOfConquestAccess.Adapters
                 return new ResearchMenuStackButton[0];
             }
 
-            UITransform container = GetField<UITransform>(category, CategoryButtonsContainerField);
+            UITransform container = Reflect.Get<UITransform>(category, CategoryButtonsContainerField);
             return _categoryButtons.Under(container as Component);
         }
 
@@ -437,29 +437,29 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIButton[] GetFactionButtons()
         {
-            return GetField<UIButton[]>(_menu, MixedFactionButtonsField) ?? new UIButton[0];
+            return Reflect.Get<UIButton[]>(_menu, MixedFactionButtonsField) ?? new UIButton[0];
         }
 
         private IReadOnlyList<ResearchMenuBuildingTabButton> GetTabButtons()
         {
-            return GetField<List<ResearchMenuBuildingTabButton>>(_menu, AllTabButtonsField)
+            return Reflect.Get<List<ResearchMenuBuildingTabButton>>(_menu, AllTabButtonsField)
                 ?? new List<ResearchMenuBuildingTabButton>();
         }
 
         private IReadOnlyList<ResearchMenuCategory> GetNativeCategories()
         {
-            return GetField<List<ResearchMenuCategory>>(_menu, CategoriesField)
+            return Reflect.Get<List<ResearchMenuCategory>>(_menu, CategoriesField)
                 ?? new List<ResearchMenuCategory>();
         }
 
         private DynamicUITabGroup GetBuildingsTabGroup()
         {
-            return GetField<DynamicUITabGroup>(_menu, BuildingsTabGroupField);
+            return Reflect.Get<DynamicUITabGroup>(_menu, BuildingsTabGroupField);
         }
 
         private UIButton GetTutorialButton()
         {
-            return GetField<UIButton>(_menu, TutorialButtonField);
+            return Reflect.Get<UIButton>(_menu, TutorialButtonField);
         }
 
         private static UIButton GetButton(ResearchMenuBuildingTabButton tab)
@@ -469,7 +469,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private ILocalizationHandler GetLocalization()
         {
-            return GetField<ILocalizationHandler>(_menu, LocalizationField);
+            return Reflect.Get<ILocalizationHandler>(_menu, LocalizationField);
         }
 
         private string Localize(string key, string fallback)
@@ -481,11 +481,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsVisible(Component component)
         {
             return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         public sealed class FactionItem

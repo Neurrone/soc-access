@@ -142,14 +142,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public string FeaturedName
         {
-            get { return GetText(GetField<TMP_Text>(FeaturedNameField)); }
+            get { return GetText(Reflect.Cast<TMP_Text>(_home, FeaturedNameField)); }
         }
 
         public string FeaturedSubscribeLabel
         {
             get
             {
-                string text = GetText(GetField<TMP_Text>(FeaturedSubscribeTextField));
+                string text = GetText(Reflect.Cast<TMP_Text>(_home, FeaturedSubscribeTextField));
                 return !string.IsNullOrWhiteSpace(text) ? text : _subscribeLabel;
             }
         }
@@ -259,7 +259,7 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<RowItem> GetRows()
         {
             List<RowItem> rows = new List<RowItem>();
-            ModListRow[] nativeRows = GetField<ModListRow[]>(RowsField);
+            ModListRow[] nativeRows = Reflect.Cast<ModListRow[]>(_home, RowsField);
             if (nativeRows == null)
             {
                 return rows;
@@ -705,19 +705,19 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetItemLabel(ListItem item)
         {
-            TMP_Text title = GetField<TMP_Text>(item, "title");
+            TMP_Text title = Reflect.Cast<TMP_Text>(item, "title");
             return GetText(title);
         }
 
         private string GetProgressText(ListItem item)
         {
-            object progressTab = GetField<object>(item, "progressTab");
+            object progressTab = Reflect.Cast<object>(item, "progressTab");
             if (progressTab == null)
             {
                 return string.Empty;
             }
 
-            TMP_Text text = GetField<TMP_Text>(progressTab, "progressBarText");
+            TMP_Text text = Reflect.Cast<TMP_Text>(progressTab, "progressBarText");
             return GetText(text);
         }
 
@@ -824,7 +824,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private ModProfile[] GetFeaturedProfiles()
         {
-            return GetField<ModProfile[]>(FeaturedProfilesField);
+            return Reflect.Cast<ModProfile[]>(_home, FeaturedProfilesField);
         }
 
         private int GetFeaturedIndex()
@@ -839,29 +839,13 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            object value = GetField<object>(item, "profile");
+            object value = Reflect.Cast<object>(item, "profile");
             if (value is ModProfile)
             {
                 return (ModProfile)value;
             }
 
             return null;
-        }
-
-        private T GetField<T>(FieldInfo field)
-        {
-            return field != null && _home != null ? (T)field.GetValue(_home) : default(T);
-        }
-
-        private static T GetField<T>(object instance, string name)
-        {
-            if (instance == null)
-            {
-                return default(T);
-            }
-
-            FieldInfo field = ResolveField(instance.GetType(), name);
-            return field != null ? (T)field.GetValue(instance) : default(T);
         }
 
         /// <summary>The handle for one named field of one runtime type, resolved once. The field is

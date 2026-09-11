@@ -107,11 +107,11 @@ namespace SongsOfConquestAccess.Adapters
         public CommanderSheetAdapter(CommanderSheet sheet)
         {
             _sheet = sheet;
-            _facade = GetField<IClientAdventureFacade>(sheet, FacadeField);
-            _localization = GetField<ILocalizationHandler>(sheet, LocalizationField);
-            _wielderLookup = GetField<IWielderLookup>(sheet, WielderLookupField);
-            _inventory = GetField<InventoryHUD>(sheet, InventoryField);
-            _artifactLookup = GetField<IArtifactLookup>(_inventory, InventoryLookupField);
+            _facade = Reflect.Get<IClientAdventureFacade>(sheet, FacadeField);
+            _localization = Reflect.Get<ILocalizationHandler>(sheet, LocalizationField);
+            _wielderLookup = Reflect.Get<IWielderLookup>(sheet, WielderLookupField);
+            _inventory = Reflect.Get<InventoryHUD>(sheet, InventoryField);
+            _artifactLookup = Reflect.Get<IArtifactLookup>(_inventory, InventoryLookupField);
             _slots = new InventorySlotReader(
                 () => _inventory,
                 () => CommanderId,
@@ -120,13 +120,13 @@ namespace SongsOfConquestAccess.Adapters
                 _artifactLookup,
                 "CommanderSheetAdapter",
                 InventorySlotReader.MouseInstructionKeys);
-            _skills = GetField<CommanderSheetSkills>(sheet, SkillsField);
-            _skillLookup = GetField<ISkillLookup>(_skills, SkillLookupField);
-            _specialization = GetField<CommanderSheetSpecialization>(sheet, SpecializationField);
-            _bacteriaLookup = GetField<IBacteriaLookup>(_specialization, BacteriaLookupField);
-            _factionLookup = GetField<IFactionLookup>(_specialization, FactionLookupField);
-            _statsInfo = GetField<CommanderStatsInfo>(_specialization, StatsInfoField);
-            _modifierTabs = GetField<CommanderSheetModifierTabNavigation>(sheet, ModifierTabsField);
+            _skills = Reflect.Get<CommanderSheetSkills>(sheet, SkillsField);
+            _skillLookup = Reflect.Get<ISkillLookup>(_skills, SkillLookupField);
+            _specialization = Reflect.Get<CommanderSheetSpecialization>(sheet, SpecializationField);
+            _bacteriaLookup = Reflect.Get<IBacteriaLookup>(_specialization, BacteriaLookupField);
+            _factionLookup = Reflect.Get<IFactionLookup>(_specialization, FactionLookupField);
+            _statsInfo = Reflect.Get<CommanderStatsInfo>(_specialization, StatsInfoField);
+            _modifierTabs = Reflect.Get<CommanderSheetModifierTabNavigation>(sheet, ModifierTabsField);
         }
 
         public object SourceKey
@@ -160,13 +160,13 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The wielder's name, as the sheet draws it at the top.</summary>
         public string CommanderName
         {
-            get { return UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(_sheet, NameField)); }
+            get { return UITextMeshTextUtility.GetEffectiveText(Reflect.Get<UITextMesh>(_sheet, NameField)); }
         }
 
         /// <summary>The race and title drawn under the name ("Human Commander").</summary>
         public string CommanderClass
         {
-            get { return UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(_sheet, ClassField)); }
+            get { return UITextMeshTextUtility.GetEffectiveText(Reflect.Get<UITextMesh>(_sheet, ClassField)); }
         }
 
         /// <summary>The close cross this sheet's <c>AdventureMenuBackground</c> draws at the top right;
@@ -190,24 +190,24 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIButton GetCloseButton()
         {
-            return GetField<UIButton>(_sheet, BackgroundCloseButtonField);
+            return Reflect.Get<UIButton>(_sheet, BackgroundCloseButtonField);
         }
 
         /// <summary>The tutorial button the sheet draws only until the tutorial has been seen.</summary>
         public Component TutorialButton
         {
-            get { return GetField<UIButton>(_sheet, TutorialButtonField) as Component; }
+            get { return Reflect.Get<UIButton>(_sheet, TutorialButtonField) as Component; }
         }
 
         public bool IsTutorialButtonVisible()
         {
-            UIButton button = GetField<UIButton>(_sheet, TutorialButtonField);
+            UIButton button = Reflect.Get<UIButton>(_sheet, TutorialButtonField);
             return button != null && ((Component)button).gameObject.activeInHierarchy;
         }
 
         public string GetTutorialButtonLabel()
         {
-            UIButton button = GetField<UIButton>(_sheet, TutorialButtonField);
+            UIButton button = Reflect.Get<UIButton>(_sheet, TutorialButtonField);
             string label = MenuButtonTextUtility.GetAllVisibleText(button);
             return string.IsNullOrWhiteSpace(label)
                 ? GameText.Get(_localization, "Tutorial/CodexCategory/Tutorials", "Tutorials")
@@ -216,7 +216,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool ActivateTutorial()
         {
-            UIButton button = GetField<UIButton>(_sheet, TutorialButtonField);
+            UIButton button = Reflect.Get<UIButton>(_sheet, TutorialButtonField);
             if (button == null || !button.Interactable)
             {
                 return false;
@@ -351,7 +351,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetActiveModifierListLabel()
         {
-            UITextMesh title = GetField<UITextMesh>(_modifierTabs, ModifierTitleField);
+            UITextMesh title = Reflect.Get<UITextMesh>(_modifierTabs, ModifierTitleField);
             string label = UITextMeshTextUtility.GetEffectiveText(title);
             return string.IsNullOrWhiteSpace(label) ? "Modifiers" : label;
         }
@@ -365,7 +365,7 @@ namespace SongsOfConquestAccess.Adapters
                 CommanderSheetSummaryEntry[] entries = _modifierEntries.Under(content);
                 for (int i = 0; i < entries.Length; i++)
                 {
-                    UITextMesh text = GetField<UITextMesh>(entries[i], SummaryEntryTextField);
+                    UITextMesh text = Reflect.Get<UITextMesh>(entries[i], SummaryEntryTextField);
                     string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
                     if (!string.IsNullOrWhiteSpace(label))
                     {
@@ -376,7 +376,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (items.Count == 0)
             {
-                UITextMesh noneText = GetField<UITextMesh>(_modifierTabs, NoModifiersTextField);
+                UITextMesh noneText = Reflect.Get<UITextMesh>(_modifierTabs, NoModifiersTextField);
                 string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(noneText));
                 items.Add(new LabeledItem(string.IsNullOrWhiteSpace(label) ? "None" : label));
             }
@@ -477,16 +477,16 @@ namespace SongsOfConquestAccess.Adapters
             switch (type)
             {
                 case StatEntryType.Offense:
-                    tooltipImage = GetField<UIImage>(_statsInfo, OffenseTooltipImageField);
+                    tooltipImage = Reflect.Get<UIImage>(_statsInfo, OffenseTooltipImageField);
                     break;
                 case StatEntryType.Defense:
-                    tooltipImage = GetField<UIImage>(_statsInfo, DefenceTooltipImageField);
+                    tooltipImage = Reflect.Get<UIImage>(_statsInfo, DefenceTooltipImageField);
                     break;
                 case StatEntryType.Movement:
-                    tooltipImage = GetField<UIImage>(_statsInfo, MovementTooltipImageField);
+                    tooltipImage = Reflect.Get<UIImage>(_statsInfo, MovementTooltipImageField);
                     break;
                 case StatEntryType.View:
-                    tooltipImage = GetField<UIImage>(_statsInfo, ViewTooltipImageField);
+                    tooltipImage = Reflect.Get<UIImage>(_statsInfo, ViewTooltipImageField);
                     break;
             }
 
@@ -575,7 +575,7 @@ namespace SongsOfConquestAccess.Adapters
         /// the entry cannot be read.</summary>
         private string GetSkillLevelText(bool powers, int index, SkillReference skill)
         {
-            UITextMesh level = GetField<UITextMesh>(GetSkillEntryComponent(powers, index), SkillEntryLevelField);
+            UITextMesh level = Reflect.Get<UITextMesh>(GetSkillEntryComponent(powers, index), SkillEntryLevelField);
             string text = UITextMeshTextUtility.GetEffectiveText(level);
             return string.IsNullOrWhiteSpace(text) ? skill.Level.ToString(CultureInfo.CurrentCulture) : text;
         }
@@ -592,8 +592,8 @@ namespace SongsOfConquestAccess.Adapters
         private Component GetSkillEntryComponent(bool powers, int index)
         {
             List<CommanderSheetSkillEntry> entries = powers
-                ? GetField<List<CommanderSheetSkillEntry>>(_skills, PowerEntriesField)
-                : GetField<List<CommanderSheetSkillEntry>>(_skills, SkillEntriesField);
+                ? Reflect.Get<List<CommanderSheetSkillEntry>>(_skills, PowerEntriesField)
+                : Reflect.Get<List<CommanderSheetSkillEntry>>(_skills, SkillEntriesField);
             if (entries == null || index < 0 || index >= entries.Count)
             {
                 return null;
@@ -621,17 +621,17 @@ namespace SongsOfConquestAccess.Adapters
             switch (categoryIndex)
             {
                 case 1:
-                    return GetField<UIButton>(_modifierTabs, TemporaryModifierButtonField);
+                    return Reflect.Get<UIButton>(_modifierTabs, TemporaryModifierButtonField);
                 case 2:
-                    return GetField<UIButton>(_modifierTabs, GearModifierButtonField);
+                    return Reflect.Get<UIButton>(_modifierTabs, GearModifierButtonField);
                 default:
-                    return GetField<UIButton>(_modifierTabs, TroopModifierButtonField);
+                    return Reflect.Get<UIButton>(_modifierTabs, TroopModifierButtonField);
             }
         }
 
         private Transform GetContentTransform(FieldInfo field)
         {
-            GameObject content = GetField<GameObject>(_modifierTabs, field);
+            GameObject content = Reflect.Get<GameObject>(_modifierTabs, field);
             return content != null ? content.transform : null;
         }
 
@@ -648,11 +648,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return skill.Skill.ToString();
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         public sealed class LabeledItem

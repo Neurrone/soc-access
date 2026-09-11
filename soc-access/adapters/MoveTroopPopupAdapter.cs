@@ -37,7 +37,7 @@ namespace SongsOfConquestAccess.Adapters
         public MoveTroopPopupAdapter(TroopHUDEntryMovable movable)
         {
             _movable = movable;
-            _localization = GetField<ILocalizationHandler>(LocalizationField);
+            _localization = Reflect.Get<ILocalizationHandler>(_movable, LocalizationField);
         }
 
         public object SourceKey
@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetText(GetField<IUITextMesh>(HeaderTextField)); }
+            get { return GetText(Reflect.Get<IUITextMesh>(_movable, HeaderTextField)); }
         }
 
         /// <summary>The split button's own name, read from the game's localization rather than off the
@@ -65,7 +65,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 List<string> texts = new List<string>(2);
-                IUITextMesh amount = GetField<IUITextMesh>(AmountTextField);
+                IUITextMesh amount = Reflect.Get<IUITextMesh>(_movable, AmountTextField);
                 Component component = amount as Component;
                 Transform container = component != null ? component.transform.parent : null;
                 if (container == null)
@@ -116,7 +116,7 @@ namespace SongsOfConquestAccess.Adapters
                 return _hotkeysImage;
             }
 
-            GameObject container = GetField<GameObject>(NonPortraitContainerField);
+            GameObject container = Reflect.Get<GameObject>(_movable, NonPortraitContainerField);
             Transform root = container != null ? container.transform : null;
             if (root == null)
             {
@@ -160,7 +160,7 @@ namespace SongsOfConquestAccess.Adapters
         /// about, and the component the line's node is drawn by.</summary>
         public Component MaxTroopSizeText
         {
-            get { return GetField<IUITextMesh>(AmountTextField) as Component; }
+            get { return Reflect.Get<IUITextMesh>(_movable, AmountTextField) as Component; }
         }
 
         public Component SliderComponent
@@ -170,17 +170,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public Component MoveAllLeftButton
         {
-            get { return GetField<UIButton>(MoveAllButtonLeftField); }
+            get { return Reflect.Get<UIButton>(_movable, MoveAllButtonLeftField); }
         }
 
         public Component SplitEqualButton
         {
-            get { return GetField<UIButton>(SplitHalfButtonField); }
+            get { return Reflect.Get<UIButton>(_movable, SplitHalfButtonField); }
         }
 
         public Component MoveAllRightButton
         {
-            get { return GetField<UIButton>(MoveAllButtonRightField); }
+            get { return Reflect.Get<UIButton>(_movable, MoveAllButtonRightField); }
         }
 
         public bool MoveAllLeft()
@@ -190,13 +190,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsMoveAllLeftEnabled()
         {
-            UIButton button = GetField<UIButton>(MoveAllButtonLeftField);
+            UIButton button = Reflect.Get<UIButton>(_movable, MoveAllButtonLeftField);
             return IsButtonEnabled(button);
         }
 
         public Tooltip MoveAllLeftTooltip
         {
-            get { return Tooltip.ForComponent(GetField<UIButton>(MoveAllButtonLeftField), _localization); }
+            get { return Tooltip.ForComponent(Reflect.Get<UIButton>(_movable, MoveAllButtonLeftField), _localization); }
         }
 
         public bool SplitEqual()
@@ -206,12 +206,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsSplitEqualEnabled()
         {
-            return IsButtonEnabled(GetField<UIButton>(SplitHalfButtonField));
+            return IsButtonEnabled(Reflect.Get<UIButton>(_movable, SplitHalfButtonField));
         }
 
         public Tooltip SplitEqualTooltip
         {
-            get { return Tooltip.ForComponent(GetField<UIButton>(SplitHalfButtonField), _localization); }
+            get { return Tooltip.ForComponent(Reflect.Get<UIButton>(_movable, SplitHalfButtonField), _localization); }
         }
 
         public bool MoveAllRight()
@@ -221,12 +221,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsMoveAllRightEnabled()
         {
-            return IsButtonEnabled(GetField<UIButton>(MoveAllButtonRightField));
+            return IsButtonEnabled(Reflect.Get<UIButton>(_movable, MoveAllButtonRightField));
         }
 
         public Tooltip MoveAllRightTooltip
         {
-            get { return Tooltip.ForComponent(GetField<UIButton>(MoveAllButtonRightField), _localization); }
+            get { return Tooltip.ForComponent(Reflect.Get<UIButton>(_movable, MoveAllButtonRightField), _localization); }
         }
 
         public bool Confirm()
@@ -250,12 +250,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string LeftAmount
         {
-            get { return GetText(GetField<IUITextMesh>(LeftPortraitAmountField)); }
+            get { return GetText(Reflect.Get<IUITextMesh>(_movable, LeftPortraitAmountField)); }
         }
 
         public string RightAmount
         {
-            get { return GetText(GetField<IUITextMesh>(RightPortraitAmountField)); }
+            get { return GetText(Reflect.Get<IUITextMesh>(_movable, RightPortraitAmountField)); }
         }
 
         public int GetSliderValue()
@@ -308,7 +308,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private UISlider GetSlider()
         {
-            return GetField<UISlider>(SliderField);
+            return Reflect.Get<UISlider>(_movable, SliderField);
         }
 
         private bool IsMovableActive()
@@ -333,11 +333,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             object value = CurrentStateField != null ? CurrentStateField.GetValue(_movable) : null;
             return value != null ? value.ToString() : string.Empty;
-        }
-
-        private T GetField<T>(FieldInfo field) where T : class
-        {
-            return _movable != null && field != null ? field.GetValue(_movable) as T : null;
         }
 
         private static string GetText(IUITextMesh textMesh)

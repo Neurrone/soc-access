@@ -67,7 +67,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string title = GetText(GetField<TMP_Text>(TitleField));
+                string title = GetText(Reflect.Cast<TMP_Text>(_collection, TitleField));
                 return !string.IsNullOrWhiteSpace(title) ? title : _collectionLabel;
             }
         }
@@ -103,7 +103,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public TMP_InputField SearchField
         {
-            get { return GetField<TMP_InputField>(SearchFieldInfo); }
+            get { return Reflect.Cast<TMP_InputField>(_collection, SearchFieldInfo); }
         }
 
         public string SearchFieldLabel
@@ -121,10 +121,10 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                Button button = GetField<Button>(CheckForUpdatesButtonField);
+                Button button = Reflect.Cast<Button>(_collection, CheckForUpdatesButtonField);
                 return new ButtonAction(
                     "check-updates",
-                    GetText(GetField<TMP_Text>(CheckForUpdatesTextField)),
+                    GetText(Reflect.Cast<TMP_Text>(_collection, CheckForUpdatesTextField)),
                     FocusCheckForUpdates,
                     CheckForUpdates,
                     () => button != null && button.gameObject.activeInHierarchy && button.interactable,
@@ -134,12 +134,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public DropdownItem FilterDropdown
         {
-            get { return BuildDropdown("filter", GetField<MultiTargetDropdown>(FilterDropdownField)); }
+            get { return BuildDropdown("filter", Reflect.Cast<MultiTargetDropdown>(_collection, FilterDropdownField)); }
         }
 
         public DropdownItem SortDropdown
         {
-            get { return BuildDropdown("sort", GetField<MultiTargetDropdown>(SortDropdownField)); }
+            get { return BuildDropdown("sort", Reflect.Cast<MultiTargetDropdown>(_collection, SortDropdownField)); }
         }
 
         public string ItemsLabel
@@ -150,7 +150,7 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<CollectionItem> GetItems()
         {
             List<CollectionItem> result = new List<CollectionItem>();
-            Transform parent = GetField<Transform>(ListItemParentField);
+            Transform parent = Reflect.Cast<Transform>(_collection, ListItemParentField);
             if (parent == null)
             {
                 return result;
@@ -354,13 +354,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool FocusCheckForUpdates()
         {
-            Button button = GetField<Button>(CheckForUpdatesButtonField);
+            Button button = Reflect.Cast<Button>(_collection, CheckForUpdatesButtonField);
             return SelectViaModIoNavigation(button);
         }
 
         private bool CheckForUpdates()
         {
-            Button button = GetField<Button>(CheckForUpdatesButtonField);
+            Button button = Reflect.Cast<Button>(_collection, CheckForUpdatesButtonField);
             if (button != null && button.gameObject.activeInHierarchy && button.interactable)
             {
                 button.onClick.Invoke();
@@ -413,40 +413,40 @@ namespace SongsOfConquestAccess.Adapters
 
         private CollectionItem BuildCollectionItem(int index, ListItem item)
         {
-            string title = GetText(GetField<TMP_Text>(item, "title"));
+            string title = GetText(Reflect.Cast<TMP_Text>(item, "title"));
             if (string.IsNullOrWhiteSpace(title))
             {
                 return null;
             }
 
             List<string> statusParts = new List<string>();
-            AddIfNotEmpty(statusParts, GetText(GetField<TMP_Text>(item, "subscriptionStatus")));
-            AddIfNotEmpty(statusParts, GetText(GetField<TMP_Text>(item, "installStatus")));
-            AddIfNotEmpty(statusParts, GetText(GetField<TMP_Text>(item, "errorInstallingText")));
+            AddIfNotEmpty(statusParts, GetText(Reflect.Cast<TMP_Text>(item, "subscriptionStatus")));
+            AddIfNotEmpty(statusParts, GetText(Reflect.Cast<TMP_Text>(item, "installStatus")));
+            AddIfNotEmpty(statusParts, GetText(Reflect.Cast<TMP_Text>(item, "errorInstallingText")));
             AddProgress(statusParts, item);
-            AddIfNotEmpty(statusParts, GetText(GetField<TMP_Text>(item, "fileSize")));
-            AddIfNotEmpty(statusParts, GetText(GetField<TMP_Text>(item, "otherSubscribersText")));
+            AddIfNotEmpty(statusParts, GetText(Reflect.Cast<TMP_Text>(item, "fileSize")));
+            AddIfNotEmpty(statusParts, GetText(Reflect.Cast<TMP_Text>(item, "otherSubscribersText")));
 
             return new CollectionItem(
                 index,
                 title,
                 string.Join(". ", statusParts.ToArray()),
                 item,
-                GetField<MultiTargetToggle>(item, "enabledOrDisabledToggle"),
-                GetField<Button>(item, "unsubscribeButton"),
-                GetField<Button>(item, "moreOptionsButton"));
+                Reflect.Cast<MultiTargetToggle>(item, "enabledOrDisabledToggle"),
+                Reflect.Cast<Button>(item, "unsubscribeButton"),
+                Reflect.Cast<Button>(item, "moreOptionsButton"));
         }
 
         private static void AddProgress(List<string> parts, ListItem item)
         {
-            GameObject progressBar = GetField<GameObject>(item, "progressBar");
+            GameObject progressBar = Reflect.Cast<GameObject>(item, "progressBar");
             if (progressBar == null || !progressBar.activeInHierarchy)
             {
                 return;
             }
 
-            string text = GetText(GetField<TMP_Text>(item, "progressBarText"));
-            string percent = GetText(GetField<TMP_Text>(item, "progressBarPercentageText"));
+            string text = GetText(Reflect.Cast<TMP_Text>(item, "progressBarText"));
+            string percent = GetText(Reflect.Cast<TMP_Text>(item, "progressBarPercentageText"));
             if (string.IsNullOrWhiteSpace(text))
             {
                 AddIfNotEmpty(parts, percent);
@@ -498,22 +498,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 FocusItem(_selectedItem);
             }
-        }
-
-        private T GetField<T>(FieldInfo field)
-        {
-            return field != null && _collection != null ? (T)field.GetValue(_collection) : default(T);
-        }
-
-        private static T GetField<T>(object instance, string name)
-        {
-            if (instance == null)
-            {
-                return default(T);
-            }
-
-            FieldInfo field = AccessTools.Field(instance.GetType(), name);
-            return field != null ? (T)field.GetValue(instance) : default(T);
         }
 
         private static bool IsCollectionListItem(ListItem item)

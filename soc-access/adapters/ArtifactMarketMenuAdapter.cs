@@ -91,10 +91,10 @@ namespace SongsOfConquestAccess.Adapters
         public ArtifactMarketMenuAdapter(ArtifactMarketMenu menu)
         {
             _menu = menu;
-            _inventory = GetField<InventoryHUD>(menu, InventoryField);
-            _facade = GetField<IClientAdventureFacade>(menu, FacadeField);
-            _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
-            _artifactLookup = GetField<IArtifactLookup>(menu, ArtifactLookupField);
+            _inventory = Reflect.Get<InventoryHUD>(menu, InventoryField);
+            _facade = Reflect.Get<IClientAdventureFacade>(menu, FacadeField);
+            _localization = Reflect.Get<ILocalizationHandler>(menu, LocalizationField);
+            _artifactLookup = Reflect.Get<IArtifactLookup>(menu, ArtifactLookupField);
             _slots = new InventorySlotReader(
                 () => _inventory,
                 () => CommanderId,
@@ -129,7 +129,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPresent()
         {
             return _menu != null
-                && GetField<object>(_menu, AsyncField) != null
+                && Reflect.Get<object>(_menu, AsyncField) != null
                 && _inventory != null
                 && _inventory.IsArtifactShopInventory
                 && ((Component)_menu).gameObject.activeInHierarchy;
@@ -139,7 +139,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string title = GetText(GetField<UITextMesh>(_menu, HeaderTextField));
+                string title = GetText(Reflect.Get<UITextMesh>(_menu, HeaderTextField));
                 return string.IsNullOrWhiteSpace(title)
                     ? ModText.Get(_localization, ModStrings.Scanner.ArtifactMarkets)
                     : title;
@@ -148,7 +148,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Description
         {
-            get { return GetText(GetField<UITextMesh>(_menu, DescriptionTextField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, DescriptionTextField)); }
         }
 
         public string EquipmentLabel
@@ -200,7 +200,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIButton GetCloseButton()
         {
-            return GetField<UIButton>(_menu, BackgroundCloseButtonField);
+            return Reflect.Get<UIButton>(_menu, BackgroundCloseButtonField);
         }
 
         public int ActiveCategoryIndex
@@ -267,7 +267,7 @@ namespace SongsOfConquestAccess.Adapters
         /// hangs <c>HandleSwitchedCategory</c> on.</summary>
         public bool SelectCategory(int categoryIndex)
         {
-            UIToggleGroup group = GetField<UIToggleGroup>(_menu, CategoryTabGroupField);
+            UIToggleGroup group = Reflect.Get<UIToggleGroup>(_menu, CategoryTabGroupField);
             if (group == null || categoryIndex < 0 || categoryIndex >= GetCategoryToggles().Length)
             {
                 return false;
@@ -290,13 +290,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIToggle[] GetCategoryToggles()
         {
-            UIToggleGroup group = GetField<UIToggleGroup>(_menu, CategoryTabGroupField);
+            UIToggleGroup group = Reflect.Get<UIToggleGroup>(_menu, CategoryTabGroupField);
             return group == null ? new UIToggle[0] : _categoryToggles.Under((Component)group);
         }
 
         public IReadOnlyList<MarketArtifactItem> GetMarketArtifacts()
         {
-            GameObject gridContainer = GetField<GameObject>(_menu, GridContainerField);
+            GameObject gridContainer = Reflect.Get<GameObject>(_menu, GridContainerField);
             ArtifactMarketEntry[] drawn = gridContainer == null
                 ? NoEntries
                 : _marketEntries.Under(gridContainer.transform);
@@ -361,7 +361,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            return NativeSelectionUtility.Click(GetField<UIButton>(entry, MarketEntryButtonField));
+            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(entry, MarketEntryButtonField));
         }
 
         /// <summary>The wielder's equipment and backpack, and every gesture the game gives an
@@ -447,37 +447,37 @@ namespace SongsOfConquestAccess.Adapters
         /// selected.</summary>
         public bool IsNoSelectionShown
         {
-            get { return IsActive(GetField<GameObject>(_menu, NoSelectionContainerField)); }
+            get { return IsActive(Reflect.Get<GameObject>(_menu, NoSelectionContainerField)); }
         }
 
         /// <summary>The prompt the band draws while nothing is selected.</summary>
         public string NoSelectionText
         {
-            get { return FirstText(GetField<GameObject>(_menu, NoSelectionContainerField)); }
+            get { return FirstText(Reflect.Get<GameObject>(_menu, NoSelectionContainerField)); }
         }
 
         /// <summary>The container the prompt is drawn in, one of the band's three.</summary>
         public Component NoSelectionContainer
         {
-            get { return ContainerTransform(GetField<GameObject>(_menu, NoSelectionContainerField)); }
+            get { return ContainerTransform(Reflect.Get<GameObject>(_menu, NoSelectionContainerField)); }
         }
 
         /// <summary>The container the purchase is drawn in, one of the band's three.</summary>
         public Component BuyContainer
         {
-            get { return ContainerTransform(GetField<GameObject>(_menu, BuyContainerField)); }
+            get { return ContainerTransform(Reflect.Get<GameObject>(_menu, BuyContainerField)); }
         }
 
         /// <summary>The container the sale is drawn in, one of the band's three.</summary>
         public Component SellContainer
         {
-            get { return ContainerTransform(GetField<GameObject>(_menu, SellContainerField)); }
+            get { return ContainerTransform(Reflect.Get<GameObject>(_menu, SellContainerField)); }
         }
 
         /// <summary>Whether the band is showing the artifact the player is buying.</summary>
         public bool IsBuyShown
         {
-            get { return IsActive(GetField<GameObject>(_menu, BuyContainerField)); }
+            get { return IsActive(Reflect.Get<GameObject>(_menu, BuyContainerField)); }
         }
 
         /// <summary>The tooltip on the Buy band's icon: the game hangs the artifact's details on it
@@ -485,13 +485,13 @@ namespace SongsOfConquestAccess.Adapters
         /// sees hovering the band.</summary>
         public Tooltip BuyItemTooltip
         {
-            get { return Tooltip.ForComponent(GetField<UIImage>(_menu, BuyItemIconField) as Component, _localization); }
+            get { return Tooltip.ForComponent(Reflect.Get<UIImage>(_menu, BuyItemIconField) as Component, _localization); }
         }
 
         /// <summary>The name of the artifact the Buy band is about, as the band draws it.</summary>
         public string BuyItemName
         {
-            get { return GetText(GetField<UITextMesh>(_menu, BuyItemTitleField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, BuyItemTitleField)); }
         }
 
         /// <summary>The word on the Buy button, as the band draws it above it.</summary>
@@ -500,9 +500,9 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 string title = GetBandButtonTitle(
-                    GetField<GameObject>(_menu, BuyContainerField),
-                    GetField<UITextMesh>(_menu, BuyItemTitleField),
-                    GetField<PurchaseButton>(_menu, BuyButtonField));
+                    Reflect.Get<GameObject>(_menu, BuyContainerField),
+                    Reflect.Get<UITextMesh>(_menu, BuyItemTitleField),
+                    Reflect.Get<PurchaseButton>(_menu, BuyButtonField));
                 return string.IsNullOrWhiteSpace(title) ? ModText.Get(_localization, ModStrings.Screens.BuyArtifact) : title;
             }
         }
@@ -517,29 +517,29 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The Buy button itself, for the focus visual and the node's identity.</summary>
         public Component BuyButton
         {
-            get { return GetField<PurchaseButton>(_menu, BuyButtonField) as Component; }
+            get { return Reflect.Get<PurchaseButton>(_menu, BuyButtonField) as Component; }
         }
 
         /// <summary>Whether the game will take the purchase: it turns the button off when the team
         /// cannot afford the price, and says nothing about why.</summary>
         public bool CanBuySelectedArtifact()
         {
-            PurchaseButton buyButton = GetField<PurchaseButton>(_menu, BuyButtonField);
+            PurchaseButton buyButton = Reflect.Get<PurchaseButton>(_menu, BuyButtonField);
             return GetSelectedBuyArtifact() != null && buyButton != null && buyButton.Interactable;
         }
 
         /// <summary>Buy, through the game's own click on its Buy button.</summary>
         public bool BuySelectedMarketArtifact()
         {
-            PurchaseButton buyButton = GetField<PurchaseButton>(_menu, BuyButtonField);
-            return NativeSelectionUtility.Click(GetField<UIButton>(buyButton, PurchaseButtonButtonField));
+            PurchaseButton buyButton = Reflect.Get<PurchaseButton>(_menu, BuyButtonField);
+            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(buyButton, PurchaseButtonButtonField));
         }
 
         /// <summary>Whether the band is showing the artifact the player has picked out to sell.
         /// </summary>
         public bool IsSellShown
         {
-            get { return IsActive(GetField<GameObject>(_menu, SellContainerField)); }
+            get { return IsActive(Reflect.Get<GameObject>(_menu, SellContainerField)); }
         }
 
         /// <summary>The tooltip on the Sell band's icon: the game hangs the artifact's details on it
@@ -547,20 +547,20 @@ namespace SongsOfConquestAccess.Adapters
         /// sees hovering the band.</summary>
         public Tooltip SellItemTooltip
         {
-            get { return Tooltip.ForComponent(GetField<UIImage>(_menu, SellItemIconField) as Component, _localization); }
+            get { return Tooltip.ForComponent(Reflect.Get<UIImage>(_menu, SellItemIconField) as Component, _localization); }
         }
 
         /// <summary>The name of the artifact the Sell band is about, as the band draws it.</summary>
         public string SellItemName
         {
-            get { return GetText(GetField<UITextMesh>(_menu, SellItemTitleField)); }
+            get { return GetText(Reflect.Get<UITextMesh>(_menu, SellItemTitleField)); }
         }
 
         /// <summary>Whether the Sell button is drawn at all: the game hides it for an artifact it
         /// treats as important (<c>ArtifactMarketMenu.SetArtifact</c>).</summary>
         public bool IsSellButtonShown
         {
-            get { return IsActive(ButtonObject(GetField<PurchaseButton>(_menu, SellButtonField))); }
+            get { return IsActive(ButtonObject(Reflect.Get<PurchaseButton>(_menu, SellButtonField))); }
         }
 
         /// <summary>The word on the Sell button, as the band draws it above it.</summary>
@@ -568,7 +568,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string title = GetText(GetField<UITextMesh>(_menu, SellButtonTitleField));
+                string title = GetText(Reflect.Get<UITextMesh>(_menu, SellButtonTitleField));
                 return string.IsNullOrWhiteSpace(title) ? ModText.Get(_localization, ModStrings.Screens.Sell) : title;
             }
         }
@@ -578,7 +578,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                IArtifactState artifact = GetField<IArtifactState>(_menu, SelectedSellArtifactField);
+                IArtifactState artifact = Reflect.Get<IArtifactState>(_menu, SelectedSellArtifactField);
                 if (artifact == null || _facade == null || _facade.Artifacts == null)
                 {
                     return string.Empty;
@@ -591,20 +591,20 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The Sell button itself, for the focus visual and the node's identity.</summary>
         public Component SellButton
         {
-            get { return GetField<PurchaseButton>(_menu, SellButtonField) as Component; }
+            get { return Reflect.Get<PurchaseButton>(_menu, SellButtonField) as Component; }
         }
 
         public bool CanSellSelectedArtifact()
         {
-            PurchaseButton sellButton = GetField<PurchaseButton>(_menu, SellButtonField);
+            PurchaseButton sellButton = Reflect.Get<PurchaseButton>(_menu, SellButtonField);
             return sellButton != null && sellButton.Interactable;
         }
 
         /// <summary>Sell, through the game's own click on its Sell button.</summary>
         public bool SellSelectedArtifact()
         {
-            PurchaseButton sellButton = GetField<PurchaseButton>(_menu, SellButtonField);
-            return NativeSelectionUtility.Click(GetField<UIButton>(sellButton, PurchaseButtonButtonField));
+            PurchaseButton sellButton = Reflect.Get<PurchaseButton>(_menu, SellButtonField);
+            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(sellButton, PurchaseButtonButtonField));
         }
 
         /// <summary>The one text a selection band draws that is neither the artifact's name nor a
@@ -668,7 +668,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private WielderInteractHeader GetWielderInteractHeader()
         {
-            return GetField<WielderInteractHeader>(_menu, WielderInteractHeaderField);
+            return Reflect.Get<WielderInteractHeader>(_menu, WielderInteractHeaderField);
         }
 
         private string GetArtifactBuyCostLabel(IArtifactState artifact)
@@ -736,7 +736,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private IArtifactState GetSelectedBuyArtifact()
         {
-            return GetField<IArtifactState>(_menu, SelectedBuyArtifactField);
+            return Reflect.Get<IArtifactState>(_menu, SelectedBuyArtifactField);
         }
 
         private string GetArtifactName(IArtifactState artifact)
@@ -767,11 +767,6 @@ namespace SongsOfConquestAccess.Adapters
             int leftIndex = left != null ? ((Component)left).transform.GetSiblingIndex() : 0;
             int rightIndex = right != null ? ((Component)right).transform.GetSiblingIndex() : 0;
             return leftIndex.CompareTo(rightIndex);
-        }
-
-        private static T GetField<T>(object owner, FieldInfo field) where T : class
-        {
-            return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
         private static T GetFieldValue<T>(object owner, FieldInfo field, T fallback)

@@ -70,7 +70,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPresent()
         {
-            UITransform container = GetField<UITransform>(ContainerField);
+            UITransform container = Reflect.Get<UITransform>(_menu, ContainerField);
             return _menu != null
                 && container != null
                 && container.Active
@@ -81,13 +81,13 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (_rows == null)
             {
-                IMenuFactoryCollection factory = GetField<IMenuFactoryCollection>(FactoryField);
+                IMenuFactoryCollection factory = Reflect.Get<IMenuFactoryCollection>(_menu, FactoryField);
                 if (factory == null)
                 {
                     return new MenuRow[0];
                 }
 
-                UITransform content = GetField<UITransform>(ContentContainerField);
+                UITransform content = Reflect.Get<UITransform>(_menu, ContentContainerField);
                 _rows = new MenuRowMemo(factory, content != null ? content.MonoTransform : null, _rowSettings);
             }
 
@@ -96,17 +96,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public MenuRowButton GetCancelButton()
         {
-            return MenuRows.Button("game-settings-cancel", GetField<UIButton>(CancelButtonField), _localization);
+            return MenuRows.Button("game-settings-cancel", Reflect.Get<UIButton>(_menu, CancelButtonField), _localization);
         }
 
         public MenuRowButton GetApplyButton()
         {
-            return MenuRows.Button("game-settings-confirm", GetField<UIButton>(ApplyButtonField), _localization);
-        }
-
-        private T GetField<T>(FieldInfo field) where T : class
-        {
-            return _menu != null && field != null ? field.GetValue(_menu) as T : null;
+            return MenuRows.Button("game-settings-confirm", Reflect.Get<UIButton>(_menu, ApplyButtonField), _localization);
         }
     }
 }
