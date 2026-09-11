@@ -464,7 +464,7 @@ namespace SongsOfConquestAccess.Adapters
             List<TowerItem> result = new List<TowerItem>(entries.Length);
             for (int i = 0; i < entries.Length; i++)
             {
-                result.Add(new TowerItem("defences-tower-" + (i + 1), i + 1, entries[i], _localization));
+                result.Add(new TowerItem(i + 1, entries[i], _localization));
             }
 
             return result;
@@ -571,15 +571,12 @@ namespace SongsOfConquestAccess.Adapters
             private readonly ILocalizationHandler _localization;
             private readonly int _number;
 
-            public TowerItem(string id, int number, DefenceTowerEntry entry, ILocalizationHandler localization)
+            public TowerItem(int number, DefenceTowerEntry entry, ILocalizationHandler localization)
             {
-                Id = id ?? string.Empty;
                 _number = number;
                 _entry = entry;
                 _localization = localization;
             }
-
-            public string Id { get; private set; }
 
             /// <summary>The tooltip area the game draws for the tower, which is what a row about it
             /// stands on.</summary>

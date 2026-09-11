@@ -595,15 +595,17 @@ namespace SongsOfConquestAccess.Adapters
                 _index = index;
             }
 
-            public string Id
+            /// <summary>Where the menu drew this candidate in its own list.</summary>
+            public int Index
             {
-                get
-                {
-                    string uniqueName = _entry != null && _entry.CommanderDefinition != null ? _entry.CommanderDefinition.UniqueName : string.Empty;
-                    return string.IsNullOrWhiteSpace(uniqueName)
-                        ? "purchase-wielder-entry-" + _index
-                        : "purchase-wielder-" + uniqueName.Replace(" ", "-").Replace("/", "-").ToLowerInvariant();
-                }
+                get { return _index; }
+            }
+
+            /// <summary>The game's own unique name for the commander this candidate offers, or empty
+            /// where the menu has no definition for it.</summary>
+            public string UniqueName
+            {
+                get { return _entry != null && _entry.CommanderDefinition != null ? _entry.CommanderDefinition.UniqueName : string.Empty; }
             }
 
             /// <summary>The wielder's own name.</summary>

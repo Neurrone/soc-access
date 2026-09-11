@@ -97,7 +97,6 @@ namespace SongsOfConquestAccess.Adapters
             protected ILocalizationHandler Localization { get; private set; }
             protected IFactionLookup FactionLookup { get; private set; }
 
-            public abstract string IdPrefix { get; }
             public abstract string TroopName { get; }
             public abstract Tooltip Tooltip { get; }
             public abstract string NoTroopsText { get; }
@@ -150,27 +149,6 @@ namespace SongsOfConquestAccess.Adapters
             protected TroopReference TroopReference
             {
                 get { return Entry != null ? Entry.TroopReference : default(TroopReference); }
-            }
-
-            protected string BuildIdPrefix()
-            {
-                TroopReference reference = TroopReference;
-                return "recruit-"
-                    + reference.FactionIndex
-                    + "-"
-                    + reference.UnitIndex
-                    + "-"
-                    + BuildStableUpgradeId(reference.UpgradeType);
-            }
-
-            private static string BuildStableUpgradeId(TroopUpgradeType upgradeType)
-            {
-                if (upgradeType.IsEssenceUpgrade())
-                {
-                    return TroopUpgradeType.Upgraded.ToString().ToLowerInvariant();
-                }
-
-                return upgradeType.ToString().ToLowerInvariant();
             }
 
             protected string ResolveTroopName()
@@ -276,7 +254,6 @@ namespace SongsOfConquestAccess.Adapters
                 _entry = entry;
             }
 
-            public override string IdPrefix { get { return BuildIdPrefix(); } }
             public override string TroopName { get { return ResolveTroopName(); } }
             public override Tooltip Tooltip { get { return BuildEntryTooltip(); } }
             public override string NoTroopsText { get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, NoTroopsTextField)); } }
@@ -463,7 +440,6 @@ namespace SongsOfConquestAccess.Adapters
                 _entry = entry;
             }
 
-            public override string IdPrefix { get { return BuildIdPrefix(); } }
             public override string TroopName { get { return ResolveTroopName(); } }
             public override Tooltip Tooltip { get { return BuildEntryTooltip(); } }
             public override string NoTroopsText { get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, NoTroopsTextField)); } }

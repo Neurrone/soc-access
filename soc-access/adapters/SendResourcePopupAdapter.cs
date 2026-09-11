@@ -136,12 +136,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private ResourceItem BuildSendItem(ResourceType type, FieldInfo buttonField, FieldInfo tooltipButtonField)
         {
-            return new ResourceItem(this, "send", type, Reflect.Get<UIButton>(_popup, buttonField), Reflect.Get<UIButton>(_popup, tooltipButtonField));
+            return new ResourceItem(this, SendResourceAction.Send, type, Reflect.Get<UIButton>(_popup, buttonField), Reflect.Get<UIButton>(_popup, tooltipButtonField));
         }
 
         private ResourceItem BuildRequestItem(ResourceType type, FieldInfo buttonField, FieldInfo tooltipButtonField)
         {
-            return new ResourceItem(this, "request", type, Reflect.Get<UIButton>(_popup, buttonField), Reflect.Get<UIButton>(_popup, tooltipButtonField));
+            return new ResourceItem(this, SendResourceAction.Request, type, Reflect.Get<UIButton>(_popup, buttonField), Reflect.Get<UIButton>(_popup, tooltipButtonField));
         }
 
         private string GetResourceName(ResourceType type)
@@ -155,16 +155,17 @@ namespace SongsOfConquestAccess.Adapters
             private readonly UIButton _button;
             private readonly UIButton _tooltipButton;
 
-            public ResourceItem(SendResourcePopupAdapter adapter, string rowId, ResourceType type, UIButton button, UIButton tooltipButton)
+            public ResourceItem(SendResourcePopupAdapter adapter, SendResourceAction action, ResourceType type, UIButton button, UIButton tooltipButton)
             {
                 _adapter = adapter;
                 _button = button;
                 _tooltipButton = tooltipButton;
+                Action = action;
                 Type = type;
-                Id = "resource-popup-" + rowId + "-" + type.ToString().ToLowerInvariant();
             }
 
-            public string Id { get; private set; }
+            /// <summary>Which of the popup's two rows this button sits in.</summary>
+            public SendResourceAction Action { get; private set; }
 
             public ResourceType Type { get; private set; }
 
@@ -274,5 +275,12 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
         }
+    }
+
+    /// <summary>The two things the popup's buttons do with a resource.</summary>
+    public enum SendResourceAction
+    {
+        Send,
+        Request
     }
 }

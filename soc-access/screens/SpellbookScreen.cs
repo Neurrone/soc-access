@@ -419,7 +419,7 @@ namespace SongsOfConquestAccess.Screens
 
             for (int i = 0; i < spells.Count; i++)
             {
-                AddSpell(builder, spells[i]);
+                AddSpell(builder, spells[i], key);
             }
 
             if (named)
@@ -457,7 +457,7 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        private void AddSpell(GraphBuilder builder, SpellbookAdapter.SpellItem item)
+        private void AddSpell(GraphBuilder builder, SpellbookAdapter.SpellItem item, string columnKey)
         {
             if (item == null || item.Entry == null)
             {
@@ -483,7 +483,7 @@ namespace SongsOfConquestAccess.Screens
                 0,
                 () => it.CanAddToQuickbar);
             builder.AddItem(new DrawnNode(
-                ControlId.For(it.Entry, "spellbook:spell/" + it.Id),
+                ControlId.For(it.Entry, "spellbook:spell/" + columnKey + "-" + it.SpellId),
                 vtable,
                 it.Entry));
         }

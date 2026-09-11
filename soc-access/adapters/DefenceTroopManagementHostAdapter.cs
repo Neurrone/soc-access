@@ -13,7 +13,7 @@ namespace SongsOfConquestAccess.Adapters
             _adapter = adapter;
         }
 
-        public string IdPrefix { get { return "defences"; } }
+        public TroopManagementHostKind Kind { get { return TroopManagementHostKind.Defence; } }
         public string Title { get { return _adapter != null ? _adapter.Title : string.Empty; } }
         public PurchaseTroopsSubMenuAdapter PurchaseTroops { get { return _adapter != null ? _adapter.PurchaseTroops : null; } }
         public UpgradeTroopsSubMenuAdapter UpgradeTroops { get { return _adapter != null ? _adapter.UpgradeTroops : null; } }

@@ -230,7 +230,7 @@ namespace SongsOfConquestAccess.Adapters
                     groups.Add(group, items);
                 }
 
-                items.Add(new SpellItem(this, entry, group.ToString().ToLowerInvariant() + "-" + entry.SpellDefinition.Id));
+                items.Add(new SpellItem(this, entry, entry.SpellDefinition.Id));
             }
 
             return groups;
@@ -1028,14 +1028,15 @@ namespace SongsOfConquestAccess.Adapters
             private readonly SpellbookAdapter _adapter;
             private readonly SpellbookSpellEntry _entry;
 
-            public SpellItem(SpellbookAdapter adapter, SpellbookSpellEntry entry, string id)
+            public SpellItem(SpellbookAdapter adapter, SpellbookSpellEntry entry, ushort spellId)
             {
                 _adapter = adapter;
                 _entry = entry;
-                Id = id;
+                SpellId = spellId;
             }
 
-            public string Id { get; private set; }
+            /// <summary>The game's own id for the spell this card draws.</summary>
+            public ushort SpellId { get; private set; }
 
             public SpellbookSpellEntry Entry { get { return _entry; } }
 

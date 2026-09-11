@@ -152,7 +152,39 @@ namespace SongsOfConquestAccess.Screens
                 // The row is drawn as an icon with a number beside it; selecting the icon is what the
                 // mouse resting on it would do, and is what the game draws its tooltip for.
                 vtable.OnFocusVisual = () => NativeSelectionUtility.Select(target);
-                builder.AddItem(new DrawnNode(ControlId.For(target, "level-up:" + stat.Id), vtable, target));
+                builder.AddItem(new DrawnNode(ControlId.For(target, StatId(stat.Kind)), vtable, target));
+            }
+        }
+
+        /// <summary>What each stat row is called in a node id.</summary>
+        private static string StatId(CommanderStatKind kind)
+        {
+            switch (kind)
+            {
+                case CommanderStatKind.Defence:
+                    return "level-up:level-up-stat-defense";
+                case CommanderStatKind.Movement:
+                    return "level-up:level-up-stat-movement";
+                case CommanderStatKind.View:
+                    return "level-up:level-up-stat-view";
+                case CommanderStatKind.SpellDamagePower:
+                    return "level-up:level-up-stat-spell-damage-power";
+                default:
+                    return "level-up:level-up-stat-offense";
+            }
+        }
+
+        /// <summary>What each skill card is called in a node id.</summary>
+        private static string SkillId(LevelUpSkillSlot slot)
+        {
+            switch (slot)
+            {
+                case LevelUpSkillSlot.Middle:
+                    return "level-up:level-up-skill-middle";
+                case LevelUpSkillSlot.Right:
+                    return "level-up:level-up-skill-right";
+                default:
+                    return "level-up:level-up-skill-left";
             }
         }
 
@@ -188,7 +220,7 @@ namespace SongsOfConquestAccess.Screens
                 // The card reveals itself on pointer enter and hides again on pointer exit; nothing
                 // else makes the game show which card the keyboard is on.
                 vtable.OnFocusVisual = () => PointerHover.MoveTo(button);
-                ControlId id = ControlId.For(button, "level-up:" + choice.Id);
+                ControlId id = ControlId.For(button, SkillId(choice.Slot));
                 builder.AddItem(button == null
                     ? (NodeDeclaration)new SyntheticNode(id, vtable)
                     : new DrawnNode(id, vtable, button));

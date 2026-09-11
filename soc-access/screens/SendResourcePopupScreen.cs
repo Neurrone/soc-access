@@ -128,8 +128,16 @@ namespace SongsOfConquestAccess.Screens
                 vtable.Announcements.Add(GraphNodes.ValuePart(() => it.Reason));
                 vtable.Announcements.Add(GraphNodes.ValuePart(() => it.OtherTeamAmount));
                 vtable.OnFocusVisual = it.Focus;
-                builder.AddItem(new DrawnNode(ControlId.For(it.Component, it.Id), vtable, it.Component));
+                builder.AddItem(new DrawnNode(ControlId.For(it.Component, Id(it)), vtable, it.Component));
             }
+        }
+
+        /// <summary>What one resource button is called in a node id: which row it is in and which
+        /// resource it moves.</summary>
+        private static string Id(SendResourcePopupAdapter.ResourceItem resource)
+        {
+            string row = resource.Action == SendResourceAction.Request ? "request" : "send";
+            return "resource-popup-" + row + "-" + resource.Type.ToString().ToLowerInvariant();
         }
 
         // ---- the close ----

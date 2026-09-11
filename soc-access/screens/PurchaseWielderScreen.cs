@@ -124,7 +124,7 @@ namespace SongsOfConquestAccess.Screens
                 vtable.Announcements.Add(GraphNodes.SelectedPart(() => it.IsSelected));
                 // Arrival IS the selection: the click refills the details pane and nothing else.
                 vtable.OnFocusVisual = () => it.Focus();
-                ControlId id = ControlId.For(button, "purchase-wielder:entry/" + entry.Id);
+                ControlId id = ControlId.For(button, "purchase-wielder:entry/" + EntryId(entry));
                 builder.AddItem(new DrawnNode(id, vtable, button));
                 if (entry.IsSelected)
                 {
@@ -135,6 +135,16 @@ namespace SongsOfConquestAccess.Screens
             // The candidate the menu is showing, so arriving reads the details the player can see.
             builder.LandStopOn(selected);
             builder.SetStart(selected);
+        }
+
+        /// <summary>What one candidate is called in a node id: the game's own unique name for the
+        /// commander where it has one, and the row it was drawn in where it has none.</summary>
+        private static string EntryId(PurchaseWielderMenuAdapter.EntryItem entry)
+        {
+            string uniqueName = entry.UniqueName;
+            return string.IsNullOrWhiteSpace(uniqueName)
+                ? "purchase-wielder-entry-" + entry.Index
+                : "purchase-wielder-" + uniqueName.Replace(" ", "-").Replace("/", "-").ToLowerInvariant();
         }
 
         /// <summary>What the entry's own overlays say about the wielder: the game draws a frame around

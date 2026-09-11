@@ -35,11 +35,24 @@ namespace SongsOfConquestAccess.Screens
             get { return Live; }
         }
 
-        /// <summary>Which host drew this page, which is how the detector tells one menu's sub-page
-        /// from another's.</summary>
+        /// <summary>Which host drew this page, in control keys - which is how one menu's sub-page is
+        /// told from another's.</summary>
         public string HostIdPrefix
         {
-            get { return Live != null ? Live.IdPrefix : string.Empty; }
+            get { return Live != null ? IdPrefix(Live.Kind) : string.Empty; }
+        }
+
+        private static string IdPrefix(TroopManagementHostKind kind)
+        {
+            switch (kind)
+            {
+                case TroopManagementHostKind.Dwelling:
+                    return "dwelling";
+                case TroopManagementHostKind.Defence:
+                    return "defences";
+                default:
+                    return "settlement";
+            }
         }
 
         /// <summary>What this page is, in control keys: "draft-troops" or "upgrade-troops".</summary>

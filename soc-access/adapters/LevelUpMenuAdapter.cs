@@ -140,26 +140,26 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<StatItem> items = new List<StatItem>();
             CommanderStatsInfo statsInfo = _settings != null ? _settings.StatsInfo : null;
-            AddStat(items, "offense", GameText.Get(_localization, "Commanders/Tooltip/Offense", "Offence"), statsInfo, OffenseTextField, OffenseTooltipImageField);
-            AddStat(items, "defense", GameText.Get(_localization, "Commanders/Tooltip/Defense", "Defence"), statsInfo, DefenceTextField, DefenceTooltipImageField);
-            AddStat(items, "movement", GameText.Get(_localization, "Commanders/Tooltip/Movement", "Movement"), statsInfo, MovementTextField, MovementTooltipImageField);
-            AddStat(items, "view", GameText.Get(_localization, "Commanders/Tooltip/ViewRadius", "View Radius"), statsInfo, ViewTextField, ViewTooltipImageField);
-            AddStat(items, "spell-damage-power", GameText.Get(_localization, "Commanders/Tooltip/SpellDamagePower", "Spell Damage Power"), statsInfo, SpellDamagePowerTextField, SpellDamagePowerTooltipImageField);
+            AddStat(items, CommanderStatKind.Offence, GameText.Get(_localization, "Commanders/Tooltip/Offense", "Offence"), statsInfo, OffenseTextField, OffenseTooltipImageField);
+            AddStat(items, CommanderStatKind.Defence, GameText.Get(_localization, "Commanders/Tooltip/Defense", "Defence"), statsInfo, DefenceTextField, DefenceTooltipImageField);
+            AddStat(items, CommanderStatKind.Movement, GameText.Get(_localization, "Commanders/Tooltip/Movement", "Movement"), statsInfo, MovementTextField, MovementTooltipImageField);
+            AddStat(items, CommanderStatKind.View, GameText.Get(_localization, "Commanders/Tooltip/ViewRadius", "View Radius"), statsInfo, ViewTextField, ViewTooltipImageField);
+            AddStat(items, CommanderStatKind.SpellDamagePower, GameText.Get(_localization, "Commanders/Tooltip/SpellDamagePower", "Spell Damage Power"), statsInfo, SpellDamagePowerTextField, SpellDamagePowerTooltipImageField);
             return items;
         }
 
         public IReadOnlyList<SkillChoice> GetSkillChoices()
         {
             List<SkillChoice> choices = new List<SkillChoice>();
-            AddSkillChoice(choices, "left", 0, _settings != null ? _settings.LeftSkill : null);
-            AddSkillChoice(choices, "middle", 1, _settings != null ? _settings.MiddleSkill : null);
-            AddSkillChoice(choices, "right", 2, _settings != null ? _settings.RightSkill : null);
+            AddSkillChoice(choices, LevelUpSkillSlot.Left, 0, _settings != null ? _settings.LeftSkill : null);
+            AddSkillChoice(choices, LevelUpSkillSlot.Middle, 1, _settings != null ? _settings.MiddleSkill : null);
+            AddSkillChoice(choices, LevelUpSkillSlot.Right, 2, _settings != null ? _settings.RightSkill : null);
             return choices;
         }
 
         private void AddStat(
             List<StatItem> items,
-            string id,
+            CommanderStatKind kind,
             string fallbackLabel,
             CommanderStatsInfo statsInfo,
             FieldInfo textField,
@@ -177,14 +177,14 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             items.Add(new StatItem(
-                "level-up-stat-" + id,
+                kind,
                 fallbackLabel,
                 value,
                 tooltipComponent,
                 Tooltip.ForComponent(tooltipComponent, _localization)));
         }
 
-        private void AddSkillChoice(List<SkillChoice> choices, string id, int headerIndex, CommanderLevelUpSkillComponent component)
+        private void AddSkillChoice(List<SkillChoice> choices, LevelUpSkillSlot slot, int headerIndex, CommanderLevelUpSkillComponent component)
         {
             if (component == null || !component.gameObject.activeInHierarchy)
             {
@@ -199,7 +199,7 @@ namespace SongsOfConquestAccess.Adapters
             Component buttonComponent = button as Component;
 
             choices.Add(new SkillChoice(
-                "level-up-skill-" + id,
+                slot,
                 choiceHeader,
                 BuildSkillNameAndLevel(skillName, skillLevel),
                 description,
@@ -251,16 +251,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class StatItem
         {
-            public StatItem(string id, string label, string value, Component target, Tooltip tooltip)
+            public StatItem(CommanderStatKind kind, string label, string value, Component target, Tooltip tooltip)
             {
-                Id = id ?? string.Empty;
+                Kind = kind;
                 Label = label ?? string.Empty;
                 Value = value ?? string.Empty;
                 Target = target;
                 Tooltip = tooltip;
             }
 
-            public string Id { get; private set; }
+            /// <summary>Which of the wielder's five stats this row is.</summary>
+            public CommanderStatKind Kind { get; private set; }
 
             /// <summary>The stat's name, as the game's own localization has it.</summary>
             public string Label { get; private set; }
@@ -277,7 +278,7 @@ namespace SongsOfConquestAccess.Adapters
         public sealed class SkillChoice
         {
             public SkillChoice(
-                string id,
+                LevelUpSkillSlot slot,
                 string header,
                 string nameAndLevel,
                 IList<string> description,
@@ -286,7 +287,7 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> activate,
                 Func<bool> isVisible)
             {
-                Id = id ?? string.Empty;
+                Slot = slot;
                 Header = header ?? string.Empty;
                 NameAndLevel = nameAndLevel ?? string.Empty;
                 DescriptionLines = description ?? new List<string>();
@@ -296,7 +297,8 @@ namespace SongsOfConquestAccess.Adapters
                 IsVisible = isVisible;
             }
 
-            public string Id { get; private set; }
+            /// <summary>Which of the three cards the menu drew this as.</summary>
+            public LevelUpSkillSlot Slot { get; private set; }
 
             /// <summary>The header the menu draws over the card ("New Skill", "Upgrade Command"),
             /// read off the settings' own header text mesh.</summary>
@@ -321,5 +323,23 @@ namespace SongsOfConquestAccess.Adapters
             public Func<bool> IsVisible { get; private set; }
         }
 
+    }
+
+    /// <summary>The five stats the level-up menu draws for the wielder.</summary>
+    public enum CommanderStatKind
+    {
+        Offence,
+        Defence,
+        Movement,
+        View,
+        SpellDamagePower
+    }
+
+    /// <summary>The three skill cards the menu draws, in the order its settings list them.</summary>
+    public enum LevelUpSkillSlot
+    {
+        Left,
+        Middle,
+        Right
     }
 }
