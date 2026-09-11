@@ -16,6 +16,7 @@ using SongsOfConquest.Common.Bacterias;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquest;
 using SongsOfConquest.Common.Skills;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
@@ -244,10 +245,10 @@ namespace SongsOfConquestAccess.Adapters
                 return items;
             }
 
-            AddStat(items, commander, StatEntryType.Offense, GameText.Get(_localization, "Commanders/Tooltip/Offense", "Offence"), commander.Stats.Offense.GetValue(), commander.Stats.Offense.OriginalValue);
-            AddStat(items, commander, StatEntryType.Defense, GameText.Get(_localization, "Commanders/Tooltip/Defense", "Defence"), commander.Stats.Defense.GetValue(), commander.Stats.Defense.OriginalValue);
-            AddStat(items, commander, StatEntryType.Movement, GameText.Get(_localization, "Commanders/Tooltip/Movement", "Movement"), (int)commander.Stats.Movement.GetValue(), (int)commander.Stats.Movement.OriginalValue);
-            AddStat(items, commander, StatEntryType.View, GameText.Get(_localization, "Commanders/Tooltip/ViewRadius", "View Radius"), (int)commander.Stats.ViewRadius.GetValue(), (int)commander.Stats.ViewRadius.OriginalValue);
+            AddStat(items, StatEntryType.Offense, GameText.Get(_localization, "Commanders/Tooltip/Offense", "Offence"), commander.Stats.Offense.GetValue());
+            AddStat(items, StatEntryType.Defense, GameText.Get(_localization, "Commanders/Tooltip/Defense", "Defence"), commander.Stats.Defense.GetValue());
+            AddStat(items, StatEntryType.Movement, GameText.Get(_localization, "Commanders/Tooltip/Movement", "Movement"), (int)commander.Stats.Movement.GetValue());
+            AddStat(items, StatEntryType.View, GameText.Get(_localization, "Commanders/Tooltip/ViewRadius", "View Radius"), (int)commander.Stats.ViewRadius.GetValue());
             return items;
         }
 
@@ -284,7 +285,7 @@ namespace SongsOfConquestAccess.Adapters
                 string text = details != null
                     ? details.GetBacteriaDescription(_localization, hasDifferentDurations: true)
                     : string.Empty;
-                items.Add(new LabeledItem("specialization-" + i, SpokenLines.Clean(text)));
+                items.Add(new LabeledItem(SpokenLines.Clean(text)));
             }
 
             return _specializationRows.Keep(items);
@@ -294,17 +295,16 @@ namespace SongsOfConquestAccess.Adapters
         {
             return new[]
             {
-                BuildModifierCategory("modifier-category-troop", "Commanders/Details/Modifiers/TroopModTitle", "Troop modifiers", 0),
-                BuildModifierCategory("modifier-category-temporary", "Commanders/Details/Modifiers/TemporaryModTitle", "Temporary modifiers", 1),
-                BuildModifierCategory("modifier-category-gear", "Commanders/Details/Modifiers/GearModTitle", "Gear modifiers", 2)
+                BuildModifierCategory("Commanders/Details/Modifiers/TroopModTitle", "Troop modifiers", 0),
+                BuildModifierCategory("Commanders/Details/Modifiers/TemporaryModTitle", "Temporary modifiers", 1),
+                BuildModifierCategory("Commanders/Details/Modifiers/GearModTitle", "Gear modifiers", 2)
             };
         }
 
-        private ModifierCategory BuildModifierCategory(string id, string key, string fallback, int index)
+        private ModifierCategory BuildModifierCategory(string key, string fallback, int index)
         {
             UIButton button = GetModifierCategoryButton(index);
             return new ModifierCategory(
-                id,
                 GetLocalizedText(key, fallback),
                 index,
                 button as Component,
@@ -369,7 +369,7 @@ namespace SongsOfConquestAccess.Adapters
                     string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
                     if (!string.IsNullOrWhiteSpace(label))
                     {
-                        items.Add(new LabeledItem("modifier-" + i, label));
+                        items.Add(new LabeledItem(label));
                     }
                 }
             }
@@ -378,7 +378,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 UITextMesh noneText = GetField<UITextMesh>(_modifierTabs, NoModifiersTextField);
                 string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(noneText));
-                items.Add(new LabeledItem("modifiers-none", string.IsNullOrWhiteSpace(label) ? "None" : label));
+                items.Add(new LabeledItem(string.IsNullOrWhiteSpace(label) ? "None" : label));
             }
 
             return items;
@@ -430,7 +430,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (!powers)
             {
-                int commandIndex = skills.FindIndex(skill => (int)skill.Skill == 12);
+                int commandIndex = skills.FindIndex(skill => skill.Skill == SkillTypes.Command);
                 if (commandIndex > 0)
                 {
                     SkillReference command = skills[commandIndex];
@@ -448,7 +448,6 @@ namespace SongsOfConquestAccess.Adapters
                     int capturedIndex = i;
                     bool capturedPowers = powers;
                     items.Add(new LabeledItem(
-                        (powers ? "power-" : "skill-") + i,
                         text,
                         value: GetSkillLevelText(capturedPowers, capturedIndex, skill),
                         onFocus: () => SelectSkillEntry(capturedPowers, capturedIndex),
@@ -464,10 +463,9 @@ namespace SongsOfConquestAccess.Adapters
             return _facade != null && CommanderId >= 0 ? _facade.Commanders.Get(CommanderId) : null;
         }
 
-        private void AddStat(List<LabeledItem> items, ICommanderState commander, StatEntryType type, string label, int value, int originalValue)
+        private void AddStat(List<LabeledItem> items, StatEntryType type, string label, int value)
         {
             items.Add(new LabeledItem(
-                "stat-" + type,
                 label,
                 value: value.ToString(CultureInfo.CurrentCulture),
                 tooltip: Tooltip.ForComponent(GetStatTooltipComponent(type), _localization)));
@@ -659,16 +657,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class LabeledItem
         {
-            public LabeledItem(string id, string label, string value = null, Action onFocus = null, Tooltip tooltip = null)
+            public LabeledItem(string label, string value = null, Action onFocus = null, Tooltip tooltip = null)
             {
-                Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
                 Value = value ?? string.Empty;
                 OnFocus = onFocus;
                 Tooltip = tooltip;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
 
             /// <summary>The number the game draws beside the name - a stat's value, a skill's level -
@@ -680,16 +676,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class ModifierCategory
         {
-            public ModifierCategory(string id, string label, int index, Component button = null, Tooltip tooltip = null)
+            public ModifierCategory(string label, int index, Component button = null, Tooltip tooltip = null)
             {
-                Id = id;
                 Label = label;
                 Index = index;
                 Button = button;
                 Tooltip = tooltip;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public int Index { get; private set; }
 
