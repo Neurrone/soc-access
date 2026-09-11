@@ -19,7 +19,6 @@ using SongsOfConquest.Common.Spells;
 using SongsOfConquest.Utilities;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Events.Combat;
-using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -150,12 +149,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             PublishEvent(new HudNotificationEvent(text));
-        }
-
-        private static void MoveCombatCursorToLocalActingTroop(int troopId)
-        {
-            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
-            screen?.MoveCursorToLocalActingTroop(troopId);
         }
 
         [HookWritable]
@@ -1188,7 +1181,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (pending.Kind == CombatNarrationItemKind.NewTurn)
                 {
                     _currentTurnTroopId = pending.TroopId;
-                    MoveCombatCursorToLocalActingTroop(pending.TroopId);
+                    _activeAdapter?.RequestActingTroopFocus(pending.TroopId);
                 }
                 else if (pending.Kind == CombatNarrationItemKind.BattleResult)
                 {

@@ -141,6 +141,7 @@ namespace SongsOfConquestAccess.Screens
         protected override CombatAdapter Adapt(object menu)
         {
             CombatAdapter adapter = new CombatAdapter((BattleSceneInstaller)menu);
+            adapter.AttachActingTroopFocus(HandleActingTroopFocusRequest);
             CombatEventNarrator.SetActiveAdapter(adapter);
             SocAccessMod.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.CombatEvents);
             return adapter;
@@ -236,10 +237,10 @@ namespace SongsOfConquestAccess.Screens
         {
             AccessibilityEventBus.Subscribe(HandleAccessibilityEvent);
             Live?.AttachSpellCastBegin(HandleSpellCastBegin);
-            Live?.AttachSpellTargetingNarration();
+            Live?.AttachSpellTargetingNarration(HandleSpellTargetInstruction);
             Live?.AttachAbilityTargetingBegin(HandleAbilityTargetingBegin);
             Live?.AttachAbilityTargetingEnd(HandleAbilityTargetingEnd);
-            Live?.AnnounceVisibleSpellTargetInstruction();
+            AnnounceVisibleSpellTargetInstruction();
             _instruction = InstructionText;
         }
 
@@ -388,7 +389,31 @@ namespace SongsOfConquestAccess.Screens
         /// confirms the target of a spell or an ability being aimed and is otherwise silent.</summary>
         private void ConfirmTarget()
         {
-            Grid().ConfirmTarget();
+            SpeakSpellTargetSelection(Grid().ConfirmTarget());
+        }
+
+        /// <summary>What confirming a spell target did, in words: a target taken says how many times
+        /// this tile is now aimed at, a target given back says so, and a click that changed nothing
+        /// is silent.</summary>
+        private static void SpeakSpellTargetSelection(CombatSpellTargetSelection selection)
+        {
+            if (!selection.Clicked)
+            {
+                return;
+            }
+
+            if (selection.Count > selection.PreviousCount)
+            {
+                Speak(selection.Count > 1
+                    ? ModText.Get(ModStrings.UI.SelectedCount, selection.Count)
+                    : ModText.Get(ModStrings.UI.Selected));
+            }
+            else if (selection.Count < selection.PreviousCount && selection.StillTargeting)
+            {
+                Speak(selection.Count > 0
+                    ? ModText.Get(ModStrings.UI.SelectedCount, selection.Count)
+                    : ModText.Get(ModStrings.UI.Unselected));
+            }
         }
 
         /// <summary>Backslash on the board: the game's own right click, which is how a troop moves
@@ -892,6 +917,17 @@ namespace SongsOfConquestAccess.Screens
                 && BoardNodeId.Equals(navigator.FocusedKey);
         }
 
+        /// <summary>Whether this is the page the player is on: the navigator is handed the screen the
+        /// manager has made current, so a menu over the battlefield reads as not it.</summary>
+        private bool IsCurrentScreen
+        {
+            get
+            {
+                GraphNavigator navigator = Navigator;
+                return navigator != null && ReferenceEquals(navigator.Screen, this);
+            }
+        }
+
         private bool IsAiming
         {
             get { return Live != null && Live.GetTargetingMode() != CombatTargetingMode.None; }
@@ -903,6 +939,17 @@ namespace SongsOfConquestAccess.Screens
         }
 
         // ---- the cursor, driven from elsewhere ----
+
+        /// <summary>The narration's "a new turn has begun": the cursor goes to the troop, but only
+        /// while the battlefield is the page the player is on - a pause menu or a popup over it keeps
+        /// its own cursor, as it did when the narrator looked the screen up itself.</summary>
+        private void HandleActingTroopFocusRequest(int troopId)
+        {
+            if (IsCurrentScreen)
+            {
+                MoveCursorToLocalActingTroop(troopId);
+            }
+        }
 
         public void MoveCursorToLocalActingTroop(int troopId)
         {
@@ -1089,14 +1136,46 @@ namespace SongsOfConquestAccess.Screens
             Navigator?.FocusNode(BoardNodeId, announce: false);
             Grid()?.HandleTargetingBegin();
 
-            string instruction = Live != null ? Live.BuildAbilityTargetInstruction(targeting) : string.Empty;
+            string instruction = Live != null
+                ? NameAndInstruction(Live.GetCurrentAbilityName(), Live.GetAbilityTargetInstruction(targeting))
+                : string.Empty;
             Live?.Hud.SetAbilityTargetInstructionText(instruction);
-            if (!string.IsNullOrWhiteSpace(instruction))
-            {
-                SpeechPipeline.Output(new SpeechRequest(instruction, interrupt: false));
-            }
+            Speak(instruction);
 
             _instruction = InstructionText;
+        }
+
+        /// <summary>The game asked for a spell's target: the spell's name and what it wants aimed at,
+        /// as one line, kept for the board's stop name and said once.</summary>
+        private void HandleSpellTargetInstruction(string spellName, string instruction)
+        {
+            string text = NameAndInstruction(spellName, instruction);
+            Live?.Hud.SetSpellTargetInstructionText(text);
+            Speak(text);
+        }
+
+        /// <summary>An aim that was already up when the battlefield took the cursor - a spell begun
+        /// from a menu the page replaced - is read on arrival.</summary>
+        private void AnnounceVisibleSpellTargetInstruction()
+        {
+            if (Live == null || Live.GetTargetingMode() != CombatTargetingMode.Spell)
+            {
+                return;
+            }
+
+            Speak(InstructionText);
+        }
+
+        /// <summary>What is being aimed and what the game wants aimed at, as one line; either alone
+        /// where the other is missing.</summary>
+        private static string NameAndInstruction(string name, string instruction)
+        {
+            if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(instruction))
+            {
+                return ModText.Get(ModStrings.UI.LabelValue, name, instruction);
+            }
+
+            return !string.IsNullOrWhiteSpace(name) ? name : instruction;
         }
 
         private void HandleAbilityTargetingEnd(bool usedAbility)
@@ -1104,10 +1183,20 @@ namespace SongsOfConquestAccess.Screens
             Live?.Hud.ClearAbilityTargetInstructionText();
             if (!usedAbility)
             {
-                SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Combat.AbilityCancelled), interrupt: false));
+                Speak(ModText.Get(ModStrings.Combat.AbilityCancelled));
             }
 
             _instruction = InstructionText;
+        }
+
+        /// <summary>Queued behind whatever the same keypress has already said, as everything the
+        /// battlefield says is.</summary>
+        private static void Speak(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
+            }
         }
 
         /// <summary>The instruction the board's stop is named by, watched passively. The first

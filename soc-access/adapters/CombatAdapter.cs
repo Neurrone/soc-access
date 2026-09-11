@@ -28,7 +28,6 @@ using SongsOfConquest.Server.Battle;
 using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 using SongsOfConquest.Utilities;
 using SongsOfConquestAccess.UI;
@@ -50,6 +49,38 @@ namespace SongsOfConquestAccess.Adapters
     {
         CurrentPlayer,
         Enemy
+    }
+
+    /// <summary>What confirming a spell target DID, as facts rather than words: whether the native
+    /// click ran at all, how many times the tile was a selected target before and after it, and
+    /// whether the game is still aiming. <see cref="Screens.CombatScreen"/> words it.</summary>
+    public struct CombatSpellTargetSelection
+    {
+        private CombatSpellTargetSelection(bool clicked, int previousCount, int count, bool stillTargeting)
+        {
+            Clicked = clicked;
+            PreviousCount = previousCount;
+            Count = count;
+            StillTargeting = stillTargeting;
+        }
+
+        public bool Clicked { get; private set; }
+
+        public int PreviousCount { get; private set; }
+
+        public int Count { get; private set; }
+
+        public bool StillTargeting { get; private set; }
+
+        public static CombatSpellTargetSelection None
+        {
+            get { return new CombatSpellTargetSelection(false, 0, 0, false); }
+        }
+
+        public static CombatSpellTargetSelection Confirmed(int previousCount, int count, bool stillTargeting)
+        {
+            return new CombatSpellTargetSelection(true, previousCount, count, stillTargeting);
+        }
     }
 
     public sealed class CombatAdapter : IPresent, IDisposable
@@ -99,6 +130,10 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FieldInfo _attackPreviewAdditionalTextField;
         private readonly FocusedTileOverlay _cursorOverlay = new FocusedTileOverlay("SongsOfConquestAccess_CombatCursor");
         private Action<ISpellDefinition, string> _targetInstructionHandler;
+        // The screen's: it is handed the spell name and the instruction and does the wording.
+        private Action<string, string> _spellTargetInstructionHandler;
+        // The screen's: the narration asks for the cursor when a new turn begins.
+        private Action<int> _actingTroopFocusHandler;
         private Action _spellTargetingEndHandler;
         private Action<ISpellDefinition> _beginCastHandler;
         // The delegate this adapter handed the battle HUD's signals, held here rather than on the
@@ -742,13 +777,17 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public void AttachSpellTargetingNarration()
+        /// <summary>Listen for the game asking for a spell target. The two facts it asks with - the
+        /// spell's name and the instruction - are handed to the screen, which words and speaks
+        /// them.</summary>
+        public void AttachSpellTargetingNarration(Action<string, string> handler)
         {
-            if (_battleHudSignals == null || _targetInstructionHandler != null)
+            if (_battleHudSignals == null || handler == null || _targetInstructionHandler != null)
             {
                 return;
             }
 
+            _spellTargetInstructionHandler = handler;
             _targetInstructionHandler = HandleTargetInstruction;
             _spellTargetingEndHandler = HandleSpellTargetingEnd;
             _battleHudSignals.OnRequestTargetInstruction =
@@ -781,6 +820,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             _targetInstructionHandler = null;
             _spellTargetingEndHandler = null;
+            _spellTargetInstructionHandler = null;
         }
 
         public void AttachSpellCastBegin(Action handler)
@@ -805,6 +845,19 @@ namespace SongsOfConquestAccess.Adapters
             _battleHudSignals.OnBeginCast =
                 (Action<ISpellDefinition>)Delegate.Remove(_battleHudSignals.OnBeginCast, _beginCastHandler);
             _beginCastHandler = null;
+        }
+
+        /// <summary>The screen's answer to "a new turn has begun, put the cursor on the troop". The
+        /// narration asks THIS BATTLE'S adapter rather than reaching for whatever screen happens to
+        /// be on top, and the screen decides whether the cursor is its to move.</summary>
+        public void AttachActingTroopFocus(Action<int> handler)
+        {
+            _actingTroopFocusHandler = handler;
+        }
+
+        public void RequestActingTroopFocus(int troopId)
+        {
+            _actingTroopFocusHandler?.Invoke(troopId);
         }
 
         public void AttachAbilityTargetingBegin(Action<TroopAbilityTargeting> handler)
@@ -857,34 +910,20 @@ namespace SongsOfConquestAccess.Adapters
             _endAbilityTargetingHandler = null;
         }
 
-        public void AnnounceVisibleSpellTargetInstruction()
-        {
-            if (GetTargetingMode() != CombatTargetingMode.Spell)
-            {
-                return;
-            }
-
-            string text = Hud != null ? Hud.TargetingInstructionText : string.Empty;
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
-            }
-        }
-
-        public string BuildAbilityTargetInstruction(TroopAbilityTargeting targeting)
+        /// <summary>The acting troop's ability, as the game names it.</summary>
+        public string GetCurrentAbilityName()
         {
             IBattleTroopState current = GetCurrentTroop();
             ITroopAbilityDefinition ability = current != null && _abilityUtility != null
                 ? _abilityUtility.GetAbilityDefinition(current)
                 : null;
-            string abilityName = ability != null ? SpokenLines.Clean(GameText.Get(_localization, ability.NameKey, string.Empty)) : string.Empty;
-            string instruction = SpokenLines.Clean(GameText.Get(_localization, "Battle/AbilityTargeting/" + targeting, string.Empty));
-            if (!string.IsNullOrWhiteSpace(abilityName) && !string.IsNullOrWhiteSpace(instruction))
-            {
-                return abilityName + ": " + instruction;
-            }
+            return ability != null ? SpokenLines.Clean(GameText.Get(_localization, ability.NameKey, string.Empty)) : string.Empty;
+        }
 
-            return !string.IsNullOrWhiteSpace(abilityName) ? abilityName : instruction;
+        /// <summary>The game's own instruction for what an ability wants aimed at.</summary>
+        public string GetAbilityTargetInstruction(TroopAbilityTargeting targeting)
+        {
+            return SpokenLines.Clean(GameText.Get(_localization, "Battle/AbilityTargeting/" + targeting, string.Empty));
         }
 
         public CombatTargetingMode GetTargetingMode()
@@ -965,11 +1004,11 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public bool ConfirmSpellTarget(Vector2Int point)
+        public CombatSpellTargetSelection ConfirmSpellTarget(Vector2Int point)
         {
             if (GetTargetingMode() != CombatTargetingMode.Spell || !IsValidTile(point))
             {
-                return false;
+                return CombatSpellTargetSelection.None;
             }
 
             int previousSelectionCount = CountSpellTargetSelections(point);
@@ -977,7 +1016,7 @@ namespace SongsOfConquestAccess.Adapters
             if (_spellPrimaryClickMethod == null || _mouseKeyboardSpellInputModule == null)
             {
                 SocAccessMod.Instance?.LogWarning("CombatAdapter cannot confirm spell target because native HandlePrimaryClick was not found");
-                return false;
+                return CombatSpellTargetSelection.None;
             }
 
             try
@@ -987,28 +1026,13 @@ namespace SongsOfConquestAccess.Adapters
             catch (Exception exception)
             {
                 SocAccessMod.Instance?.LogWarning("CombatAdapter failed to invoke native spell primary click: " + exception.Message);
-                return false;
+                return CombatSpellTargetSelection.None;
             }
 
-            int selectionCount = CountSpellTargetSelections(point);
-            if (selectionCount > previousSelectionCount)
-            {
-                SpeechPipeline.Output(new SpeechRequest(
-                    selectionCount > 1
-                        ? ModText.Get(ModStrings.UI.SelectedCount, selectionCount)
-                        : ModText.Get(ModStrings.UI.Selected),
-                    interrupt: false));
-            }
-            else if (selectionCount < previousSelectionCount && GetTargetingMode() == CombatTargetingMode.Spell)
-            {
-                SpeechPipeline.Output(new SpeechRequest(
-                    selectionCount > 0
-                        ? ModText.Get(ModStrings.UI.SelectedCount, selectionCount)
-                        : ModText.Get(ModStrings.UI.Unselected),
-                    interrupt: false));
-            }
-
-            return true;
+            return CombatSpellTargetSelection.Confirmed(
+                previousSelectionCount,
+                CountSpellTargetSelections(point),
+                GetTargetingMode() == CombatTargetingMode.Spell);
         }
 
         public bool ConfirmAbilityTarget(Vector2Int point)
@@ -1063,8 +1087,11 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        public CombatInspectContext BeginInspect(Vector2Int point)
+        /// <summary>Pin the inspection on a tile, or answer null with the reason the caller words:
+        /// an empty tile the acting troop cannot walk to has no path to inspect.</summary>
+        public CombatInspectContext BeginInspect(Vector2Int point, out bool notInMovementRange)
         {
+            notInMovementRange = false;
             CombatTile tile = GetTile(point);
             if (tile == null)
             {
@@ -1079,6 +1106,12 @@ namespace SongsOfConquestAccess.Adapters
             if (tile.Entity != null)
             {
                 return BeginEntityInspect(tile.Entity);
+            }
+
+            if (!IsReachable(point))
+            {
+                notInMovementRange = true;
+                return null;
             }
 
             return BeginPathInspect(point);
@@ -1614,15 +1647,7 @@ namespace SongsOfConquestAccess.Adapters
         private void HandleTargetInstruction(ISpellDefinition spell, string instruction)
         {
             string spellName = spell != null ? SpokenLines.Clean(GameText.Get(_localization, spell.NameKey, string.Empty)) : string.Empty;
-            instruction = SpokenLines.Clean(instruction);
-            string text = !string.IsNullOrWhiteSpace(spellName) && !string.IsNullOrWhiteSpace(instruction)
-                ? spellName + ": " + instruction
-                : (!string.IsNullOrWhiteSpace(spellName) ? spellName : instruction);
-            Hud?.SetSpellTargetInstructionText(text);
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
-            }
+            _spellTargetInstructionHandler?.Invoke(spellName, SpokenLines.Clean(instruction));
         }
 
         private void HandleSpellTargetingEnd()
@@ -1767,12 +1792,6 @@ namespace SongsOfConquestAccess.Adapters
 
         private CombatInspectContext BeginPathInspect(Vector2Int point)
         {
-            if (!IsReachable(point))
-            {
-                SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.NotInMovementRange), interrupt: false));
-                return null;
-            }
-
             PathNode[] path = GetPathTo(point);
             _cursorManager?.SetCurrentTile(point);
             _gridManager?.SetCurrentTile(point, path);

@@ -108,18 +108,27 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>Enter on the board: while a spell or an ability is being aimed it confirms the
         /// target under the cursor. The game binds no confirm key in battle otherwise, so anywhere
-        /// else it does nothing.</summary>
-        public bool ConfirmTarget()
+        /// else it does nothing. What a spell confirmation DID is handed back for the screen to say.
+        /// </summary>
+        public CombatSpellTargetSelection ConfirmTarget()
         {
             if (_adapter == null)
             {
-                return false;
+                return CombatSpellTargetSelection.None;
             }
 
             CombatTargetingMode mode = _adapter.GetTargetingMode();
-            return mode == CombatTargetingMode.Spell
-                ? _adapter.ConfirmSpellTarget(_cursor)
-                : mode == CombatTargetingMode.Ability && _adapter.ConfirmAbilityTarget(_cursor);
+            if (mode == CombatTargetingMode.Spell)
+            {
+                return _adapter.ConfirmSpellTarget(_cursor);
+            }
+
+            if (mode == CombatTargetingMode.Ability)
+            {
+                _adapter.ConfirmAbilityTarget(_cursor);
+            }
+
+            return CombatSpellTargetSelection.None;
         }
 
         /// <summary>Escape while the board has the cursor: it gives up whatever sub-mode is on - the
@@ -392,9 +401,15 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
-            CombatInspectContext context = _adapter != null ? _adapter.BeginInspect(_cursor) : null;
+            bool notInMovementRange = false;
+            CombatInspectContext context = _adapter != null ? _adapter.BeginInspect(_cursor, out notInMovementRange) : null;
             if (context == null)
             {
+                if (notInMovementRange)
+                {
+                    SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.NotInMovementRange), interrupt: false));
+                }
+
                 return true;
             }
 
