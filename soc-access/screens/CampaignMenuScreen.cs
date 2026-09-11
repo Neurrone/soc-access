@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
-using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -89,35 +87,17 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            List<KeyValuePair<string, IMenuButtonAdapter>> cards = DrawnCards();
-            if (cards.Count > 0)
-            {
-                builder.BeginStop(CardsStop);
-                foreach (KeyValuePair<string, IMenuButtonAdapter> card in cards)
-                {
-                    builder.AddItem(new DrawnNode(
-                        ControlId.For(card.Value.Button, card.Key),
-                        Card(card.Value),
-                        card.Value.Button));
-                }
-            }
+            MenuCardPage.BuildCards(builder, CardsStop, DrawnCards(), Card);
 
             // Back at x 21 and Options at x 1233 of the header band: declared left to right, the
             // order they are drawn in.
-            List<KeyValuePair<string, IMenuButtonAdapter>> header = new List<KeyValuePair<string, IMenuButtonAdapter>>(2);
-            Add(header, "campaign:back", Live.BackButton);
-            Add(header, "campaign:options", Live.OptionsButton);
-            if (header.Count > 0)
-            {
-                builder.BeginStop(HeaderStop);
-                foreach (KeyValuePair<string, IMenuButtonAdapter> button in header)
-                {
-                    builder.AddItem(new DrawnNode(
-                        ControlId.For(button.Value.Button, button.Key),
-                        GraphNodes.Button(button.Value.GetLabel, () => button.Value.Activate(), button.Value.IsEnabled),
-                        button.Value.Button));
-                }
-            }
+            MenuCardPage.BuildHeader(
+                builder,
+                HeaderStop,
+                "campaign:back",
+                Live.BackButton,
+                "campaign:options",
+                Live.OptionsButton);
         }
 
         /// <summary>
@@ -172,54 +152,13 @@ namespace SongsOfConquestAccess.Screens
             IReadOnlyList<CampaignButtonAdapter> campaigns = Live.CampaignButtons;
             for (int i = 0; campaigns != null && i < campaigns.Count; i++)
             {
-                Add(band, "campaign:card/" + i, campaigns[i]);
+                MenuCardPage.AddDrawn(band, "campaign:card/" + i, campaigns[i]);
             }
 
-            Add(band, "campaign:tales", Live.TalesButton);
-            SortByDrawnLeft(band);
-            Add(band, "campaign:community", Live.CustomCampaignButton);
+            MenuCardPage.AddDrawn<IMenuButtonAdapter>(band, "campaign:tales", Live.TalesButton);
+            MenuCardPage.SortByDrawnLeft(band);
+            MenuCardPage.AddDrawn<IMenuButtonAdapter>(band, "campaign:community", Live.CustomCampaignButton);
             return band;
-        }
-
-        private static void Add(List<KeyValuePair<string, IMenuButtonAdapter>> list, string key, IMenuButtonAdapter item)
-        {
-            if (item != null && item.Button != null && item.IsVisible())
-            {
-                list.Add(new KeyValuePair<string, IMenuButtonAdapter>(key, item));
-            }
-        }
-
-        // Insertion sort by drawn left edge, leftmost first; stable, so two cards at one x keep
-        // declaration order.
-        private static void SortByDrawnLeft(List<KeyValuePair<string, IMenuButtonAdapter>> items)
-        {
-            List<float> lefts = new List<float>(items.Count);
-            for (int i = 0; i < items.Count; i++)
-            {
-                lefts.Add(Left(items[i].Value));
-            }
-
-            for (int i = 1; i < items.Count; i++)
-            {
-                KeyValuePair<string, IMenuButtonAdapter> moving = items[i];
-                float left = lefts[i];
-                int j = i - 1;
-                while (j >= 0 && lefts[j] > left)
-                {
-                    items[j + 1] = items[j];
-                    lefts[j + 1] = lefts[j];
-                    j--;
-                }
-
-                items[j + 1] = moving;
-                lefts[j + 1] = left;
-            }
-        }
-
-        private static float Left(IMenuButtonAdapter item)
-        {
-            Component component = item.Button;
-            return component != null ? component.transform.position.x : 0f;
         }
     }
 }

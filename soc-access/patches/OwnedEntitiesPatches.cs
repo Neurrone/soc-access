@@ -1,10 +1,7 @@
-using System;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Common.Entities;
-using SongsOfConquestAccess.Events;
-using UnityEngine;
 
 namespace SongsOfConquestAccess
 {
@@ -22,78 +19,33 @@ namespace SongsOfConquestAccess
         [HarmonyPrefix]
         private static void CategoryTextClickedPrefix(KingdomEntityOverviewCategoryEntry __instance, ref IMapEntity __state)
         {
-            __state = GetCategoryParent(__instance);
+            __state = KingdomOverviewFocus.ReadEntity(
+                __instance, CategoryParentField, "OwnedEntitiesPatches failed to read category parent");
         }
 
         [HarmonyPatch(typeof(KingdomEntityOverviewCategoryEntry), "HandleCategoryTextClicked")]
         [HarmonyPostfix]
         private static void CategoryTextClickedPostfix(IMapEntity __state)
         {
-            if (__state != null)
-            {
-                AccessibilityEventBus.Publish(new MapCameraFocusEvent(__state.Position, announce: true));
-            }
+            KingdomOverviewFocus.Focus(__state);
         }
 
         [HarmonyPatch(typeof(KingdomEntityOverviewClaimedEntry), "HandleButtonClicked")]
         [HarmonyPrefix]
         private static void ClaimedEntryButtonClickedPrefix(KingdomEntityOverviewClaimedEntry __instance, ref IMapEntity __state)
         {
-            __state = GetCurrentEntity(__instance);
+            __state = KingdomOverviewFocus.ReadCycled(
+                __instance,
+                ClaimedEntryMapEntitiesField,
+                ClaimedEntryCurrentCycleIndexField,
+                "OwnedEntitiesPatches failed to read current owned entity row target");
         }
 
         [HarmonyPatch(typeof(KingdomEntityOverviewClaimedEntry), "HandleButtonClicked")]
         [HarmonyPostfix]
         private static void ClaimedEntryButtonClickedPostfix(IMapEntity __state)
         {
-            if (__state != null)
-            {
-                AccessibilityEventBus.Publish(new MapCameraFocusEvent(__state.Position, announce: true));
-            }
-        }
-
-        private static IMapEntity GetCategoryParent(KingdomEntityOverviewCategoryEntry entry)
-        {
-            if (entry == null || CategoryParentField == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return CategoryParentField.GetValue(entry) as IMapEntity;
-            }
-            catch (Exception ex)
-            {
-                SocAccessMod.Instance?.LogWarning("OwnedEntitiesPatches failed to read category parent: " + ex.Message);
-                return null;
-            }
-        }
-
-        private static IMapEntity GetCurrentEntity(KingdomEntityOverviewClaimedEntry entry)
-        {
-            if (entry == null || ClaimedEntryMapEntitiesField == null || ClaimedEntryCurrentCycleIndexField == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                IMapEntity[] entities = ClaimedEntryMapEntitiesField.GetValue(entry) as IMapEntity[];
-                object indexValue = ClaimedEntryCurrentCycleIndexField.GetValue(entry);
-                int index = indexValue is int ? (int)indexValue : -1;
-                if (entities == null || index < 0 || index >= entities.Length)
-                {
-                    return null;
-                }
-
-                return entities[index];
-            }
-            catch (Exception ex)
-            {
-                SocAccessMod.Instance?.LogWarning("OwnedEntitiesPatches failed to read current owned entity row target: " + ex.Message);
-                return null;
-            }
+            KingdomOverviewFocus.Focus(__state);
         }
     }
 }

@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
-using SongsOfConquest.Client.UI;
-using SongsOfConquestAccess.UI;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -27,6 +24,9 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(KingdomTroopOverviewIncomeEntry), "_amount");
         private static readonly MethodInfo TownClickMethod =
             AccessTools.Method(typeof(KingdomTroopOverviewTownEntry), "HandleTownNameClicked");
+
+        /// <summary>What GetTowns answers before the menu has drawn.</summary>
+        private static readonly TownItem[] NoTowns = new TownItem[0];
 
         private readonly KingdomTroopOverviewMenu _menu;
 
@@ -53,37 +53,12 @@ namespace SongsOfConquestAccess.Adapters
             {
                 if (_title == null)
                 {
-                    _title = ReadTitle();
+                    _title = KingdomOverviewRead.FindTitle<
+                        KingdomTroopOverviewTownEntry, KingdomTroopOverviewIncomeEntry>((Component)_menu);
                 }
 
                 return _title;
             }
-        }
-
-        private string ReadTitle()
-        {
-            if (_menu == null)
-            {
-                return string.Empty;
-            }
-
-            UITextMesh[] texts = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
-            for (int i = 0; i < texts.Length; i++)
-            {
-                UITextMesh text = texts[i];
-                if (text == null || IsOverviewEntryText(text))
-                {
-                    continue;
-                }
-
-                string candidate = NormalizeText(text);
-                if (!string.IsNullOrWhiteSpace(candidate))
-                {
-                    return candidate;
-                }
-            }
-
-            return string.Empty;
         }
 
         /// <summary>The towns in hierarchy order, which is the order the menu draws them. Read off
@@ -95,26 +70,13 @@ namespace SongsOfConquestAccess.Adapters
                 _towns = ReadTowns();
             }
 
-            return _towns ?? new List<TownItem>();
+            return (IReadOnlyList<TownItem>)_towns ?? NoTowns;
         }
 
         private List<TownItem> ReadTowns()
         {
-            List<TownItem> towns = new List<TownItem>();
-            KingdomTroopOverviewTownEntry[] entries =
-                ((Component)_menu).GetComponentsInChildren<KingdomTroopOverviewTownEntry>(includeInactive: false);
-            for (int i = 0; i < entries.Length; i++)
-            {
-                KingdomTroopOverviewTownEntry entry = entries[i];
-                if (entry == null || !entry.gameObject.activeInHierarchy)
-                {
-                    continue;
-                }
-
-                towns.Add(BuildTown(entry));
-            }
-
-            return towns;
+            return KingdomOverviewRead.FindEntries<KingdomTroopOverviewTownEntry, TownItem>(
+                (Component)_menu, BuildTown);
         }
 
         /// <summary>The game's own hide path, which is what clicking the blocker behind the menu
@@ -132,38 +94,33 @@ namespace SongsOfConquestAccess.Adapters
 
         private static TownItem BuildTown(KingdomTroopOverviewTownEntry entry)
         {
-            List<RowItem> rows = new List<RowItem>();
-            KingdomTroopOverviewIncomeEntry[] incomes =
-                entry.GetComponentsInChildren<KingdomTroopOverviewIncomeEntry>(includeInactive: false);
-            for (int i = 0; i < incomes.Length; i++)
-            {
-                KingdomTroopOverviewIncomeEntry income = incomes[i];
-                if (income == null || !income.gameObject.activeInHierarchy)
-                {
-                    continue;
-                }
-
-                string troop = NormalizeText(GetText(income, IncomeTextField));
-                if (string.IsNullOrWhiteSpace(troop))
-                {
-                    continue;
-                }
-
-                rows.Add(new RowItem(
-                    income,
-                    income.Button,
-                    troop,
-                    NormalizeText(GetText(income, IncomeAmountField)),
-                    () => ClickIncome(income),
-                    () => FocusButton(income.Button)));
-            }
+            List<RowItem> rows =
+                KingdomOverviewRead.FindEntries<KingdomTroopOverviewIncomeEntry, RowItem>(entry, BuildRow);
 
             return new TownItem(
                 entry,
-                NormalizeText(GetText(entry, TownNameTextField)),
-                NormalizeText(GetText(entry, UpgradeTextField)),
+                KingdomOverviewRead.ReadText(entry, TownNameTextField),
+                KingdomOverviewRead.ReadText(entry, UpgradeTextField),
                 () => ClickTown(entry),
                 rows);
+        }
+
+        /// <summary>One recruitable troop line, or null where the game drew no name.</summary>
+        private static RowItem BuildRow(KingdomTroopOverviewIncomeEntry income)
+        {
+            string troop = KingdomOverviewRead.ReadText(income, IncomeTextField);
+            if (string.IsNullOrWhiteSpace(troop))
+            {
+                return null;
+            }
+
+            return new RowItem(
+                income,
+                income.Button,
+                troop,
+                KingdomOverviewRead.ReadText(income, IncomeAmountField),
+                () => ClickIncome(income),
+                () => KingdomOverviewRead.FocusButton(income.Button));
         }
 
         // The town's name is a UITextMesh whose click is delivered by UITransform.Update from the real
@@ -193,52 +150,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool ClickIncome(KingdomTroopOverviewIncomeEntry entry)
         {
             return entry != null && NativeSelectionUtility.Click(entry.Button);
-        }
-
-        private static bool FocusButton(UIButton button)
-        {
-            Selectable selectable = button != null ? button.GetSelectable() : null;
-            return NativeSelectionUtility.Select(selectable);
-        }
-
-        private static UITextMesh GetText(object target, FieldInfo field)
-        {
-            return GetField<UITextMesh>(target, field);
-        }
-
-        private static T GetField<T>(object target, FieldInfo field) where T : class
-        {
-            if (target == null || field == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return field.GetValue(target) as T;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static string NormalizeText(UITextMesh text)
-        {
-            return text != null
-                ? SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text))
-                : string.Empty;
-        }
-
-        private static bool IsOverviewEntryText(UITextMesh text)
-        {
-            if (text == null)
-            {
-                return true;
-            }
-
-            return text.GetComponentInParent<KingdomTroopOverviewTownEntry>() != null
-                || text.GetComponentInParent<KingdomTroopOverviewIncomeEntry>() != null;
         }
 
         /// <summary>One settlement's entry.</summary>

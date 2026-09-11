@@ -40,13 +40,5 @@ namespace SongsOfConquestAccess.Scanner
         {
             return ModText.Get(ModStrings.Common.CountOf, index, count);
         }
-
-        public static void AddIfPresent(List<string> parts, string text)
-        {
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                parts.Add(text);
-            }
-        }
     }
 }

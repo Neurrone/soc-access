@@ -160,7 +160,7 @@ namespace SongsOfConquestAccess.Audio
                 return steps;
             }
 
-            float gap = Clamp(TargetWindowSeconds / audible.Count, MinimumGapSeconds, MaximumGapSeconds);
+            float gap = Mathf.Clamp(TargetWindowSeconds / audible.Count, MinimumGapSeconds, MaximumGapSeconds);
             float time = 0f;
             for (int i = 0; i < audible.Count; i++)
             {
@@ -221,16 +221,6 @@ namespace SongsOfConquestAccess.Audio
             _gameObject = new GameObject("SongsOfConquestAccess_SweepPlayer");
             _gameObject.hideFlags = HideFlags.HideInHierarchy;
             _gameObject.AddComponent<SweepTicker>();
-        }
-
-        private static float Clamp(float value, float min, float max)
-        {
-            if (value < min)
-            {
-                return min;
-            }
-
-            return value > max ? max : value;
         }
 
         private sealed class SweepTicker : MonoBehaviour

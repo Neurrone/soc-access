@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
@@ -50,21 +51,6 @@ namespace SongsOfConquestAccess.Scanner
         /// </summary>
         public ScannerCommandResult ExecuteInitialLanding()
         {
-            return ExecuteInitialLandingCore();
-        }
-
-        public ScannerCommandResult ExecuteSearch(string query)
-        {
-            return ExecuteSearchCore(query);
-        }
-
-        public ScannerCommandResult ExecuteLookAround(int radius)
-        {
-            return ExecuteLookAroundCore(radius);
-        }
-
-        private ScannerCommandResult ExecuteInitialLandingCore()
-        {
             Vector2Int origin = GetCursor();
             _snapshot = BuildSnapshot(origin);
             if (_snapshot == null || _snapshot.IsEmpty)
@@ -78,7 +64,7 @@ namespace SongsOfConquestAccess.Scanner
             return BuildCommandResult(includePath: true);
         }
 
-        private ScannerCommandResult ExecuteSearchCore(string query)
+        public ScannerCommandResult ExecuteSearch(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
             {
@@ -108,7 +94,7 @@ namespace SongsOfConquestAccess.Scanner
             return BuildCommandResult(includePath: true);
         }
 
-        private ScannerCommandResult ExecuteLookAroundCore(int radius)
+        public ScannerCommandResult ExecuteLookAround(int radius)
         {
             Vector2Int origin = GetCursor();
             ScannerSnapshot source = BuildSnapshot(origin);
@@ -153,14 +139,9 @@ namespace SongsOfConquestAccess.Scanner
 
         public ScannerCommandResult ExecuteMoveCategory(int delta)
         {
-            return ExecuteMoveCategoryCore(delta);
-        }
-
-        private ScannerCommandResult ExecuteMoveCategoryCore(int delta)
-        {
             if (!_hasBuiltSnapshot)
             {
-                return ExecuteInitialLandingCore();
+                return ExecuteInitialLanding();
             }
 
             if (_snapshot != null && _snapshot.IsTemporarySnapshot)
@@ -202,14 +183,9 @@ namespace SongsOfConquestAccess.Scanner
 
         public ScannerCommandResult ExecuteMoveSubcategory(int delta)
         {
-            return ExecuteMoveSubcategoryCore(delta);
-        }
-
-        private ScannerCommandResult ExecuteMoveSubcategoryCore(int delta)
-        {
             if (!_hasBuiltSnapshot)
             {
-                return ExecuteInitialLandingCore();
+                return ExecuteInitialLanding();
             }
 
             if (_snapshot == null || !_snapshot.IsTemporarySnapshot)
@@ -251,14 +227,9 @@ namespace SongsOfConquestAccess.Scanner
 
         public ScannerCommandResult ExecuteMoveItem(int delta)
         {
-            return ExecuteMoveItemCore(delta);
-        }
-
-        private ScannerCommandResult ExecuteMoveItemCore(int delta)
-        {
             if (!_hasBuiltSnapshot)
             {
-                return ExecuteInitialLandingCore();
+                return ExecuteInitialLanding();
             }
 
             bool locatedCurrent = _snapshot != null && _snapshot.IsTemporarySnapshot
@@ -307,21 +278,16 @@ namespace SongsOfConquestAccess.Scanner
             return true;
         }
 
-        public ScannerCommandResult ExecuteMoveInstance(int delta)
-        {
-            return ExecuteMoveInstanceCore(delta);
-        }
-
         /// <summary>
         /// Walks the copies of the thing the item cycle is sitting on, so a
         /// map with a dozen chests costs one stop in the outer cycle and the
         /// dozen are only visited when the player asks for them.
         /// </summary>
-        private ScannerCommandResult ExecuteMoveInstanceCore(int delta)
+        public ScannerCommandResult ExecuteMoveInstance(int delta)
         {
             if (!_hasBuiltSnapshot)
             {
-                return ExecuteInitialLandingCore();
+                return ExecuteInitialLanding();
             }
 
             bool locatedCurrent = _snapshot != null && _snapshot.IsTemporarySnapshot
@@ -367,11 +333,6 @@ namespace SongsOfConquestAccess.Scanner
             return true;
         }
 
-        public ScannerCommandResult ExecuteMoveCustomCategoryEntry(string categoryKey, int delta)
-        {
-            return ExecuteMoveCustomCategoryEntryCore(categoryKey, delta);
-        }
-
         /// <summary>
         /// Walks one custom category from a single key, as one flat list of
         /// instances taken nearest first and with the item grouping ignored.
@@ -386,7 +347,7 @@ namespace SongsOfConquestAccess.Scanner
         /// jump, the bearing readout, the return key and the beep, acts on
         /// whatever this lands on exactly as it does for the paging cycles.
         /// </summary>
-        private ScannerCommandResult ExecuteMoveCustomCategoryEntryCore(string categoryKey, int delta)
+        public ScannerCommandResult ExecuteMoveCustomCategoryEntry(string categoryKey, int delta)
         {
             if (string.IsNullOrWhiteSpace(categoryKey))
             {
@@ -714,11 +675,6 @@ namespace SongsOfConquestAccess.Scanner
 
         public ScannerCommandResult ExecuteJumpToCurrent()
         {
-            return ExecuteJumpToCurrentCore();
-        }
-
-        private ScannerCommandResult ExecuteJumpToCurrentCore()
-        {
             if (!RebuildForCurrentResultAction())
             {
                 return NoResults();
@@ -739,11 +695,6 @@ namespace SongsOfConquestAccess.Scanner
         }
 
         public ScannerCommandResult ExecuteSpeakDistanceAndDirection()
-        {
-            return ExecuteSpeakDistanceAndDirectionCore();
-        }
-
-        private ScannerCommandResult ExecuteSpeakDistanceAndDirectionCore()
         {
             if (!_hasBuiltSnapshot)
             {
@@ -1084,7 +1035,7 @@ namespace SongsOfConquestAccess.Scanner
         {
             return _directionMode == ScannerDirectionMode.Hex
                 ? BuildHexDirections(origin, target)
-                : BuildSquareDirections(origin, target);
+                : ScannerDirectionUtility.BuildSquareDirections(origin, target);
         }
 
         private static ScannerCommandResult NoResults()
@@ -1211,11 +1162,6 @@ namespace SongsOfConquestAccess.Scanner
             return 0;
         }
 
-        private static IReadOnlyList<ScannerDirectionStep> BuildSquareDirections(Vector2Int origin, Vector2Int target)
-        {
-            return ScannerDirectionUtility.BuildSquareDirections(origin, target);
-        }
-
         private static IReadOnlyList<ScannerDirectionStep> BuildHexDirections(Vector2Int origin, Vector2Int target)
         {
             List<ScannerDirectionStep> result = new List<ScannerDirectionStep>();
@@ -1258,10 +1204,10 @@ namespace SongsOfConquestAccess.Scanner
             };
 
             int bestIndex = 0;
-            int bestDistance = HexDistance(neighbors[0], target);
+            int bestDistance = DirectionalCueMath.HexDistance(neighbors[0], target);
             for (int i = 1; i < neighbors.Length; i++)
             {
-                int distance = HexDistance(neighbors[i], target);
+                int distance = DirectionalCueMath.HexDistance(neighbors[i], target);
                 if (distance < bestDistance)
                 {
                     bestDistance = distance;
@@ -1287,20 +1233,6 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             return new Vector2Int(point.x + xDelta, point.y + yDelta);
-        }
-
-        private static int HexDistance(Vector2Int left, Vector2Int right)
-        {
-            OffsetToCube(left, out int leftX, out int leftY, out int leftZ);
-            OffsetToCube(right, out int rightX, out int rightY, out int rightZ);
-            return Math.Max(Math.Abs(leftX - rightX), Math.Max(Math.Abs(leftY - rightY), Math.Abs(leftZ - rightZ)));
-        }
-
-        private static void OffsetToCube(Vector2Int point, out int cubeX, out int cubeY, out int cubeZ)
-        {
-            cubeX = point.x - (point.y - (point.y & 1)) / 2;
-            cubeZ = point.y;
-            cubeY = -cubeX - cubeZ;
         }
 
         private static void AddHexDirectionStep(List<ScannerDirectionStep> result, ScannerDirection direction)

@@ -1,10 +1,7 @@
-using System;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Common.Entities;
-using SongsOfConquestAccess.Events;
-using UnityEngine;
 
 namespace SongsOfConquestAccess
 {
@@ -22,78 +19,33 @@ namespace SongsOfConquestAccess
         [HarmonyPrefix]
         private static void TownNameClickedPrefix(KingdomTroopOverviewTownEntry __instance, ref IMapEntity __state)
         {
-            __state = GetTown(__instance);
+            __state = KingdomOverviewFocus.ReadEntity(
+                __instance, TownEntryTownField, "TroopOverviewPatches failed to read town entry target");
         }
 
         [HarmonyPatch(typeof(KingdomTroopOverviewTownEntry), "HandleTownNameClicked")]
         [HarmonyPostfix]
         private static void TownNameClickedPostfix(IMapEntity __state)
         {
-            if (__state != null)
-            {
-                AccessibilityEventBus.Publish(new MapCameraFocusEvent(__state.Position, announce: true));
-            }
+            KingdomOverviewFocus.Focus(__state);
         }
 
         [HarmonyPatch(typeof(KingdomTroopOverviewIncomeEntry), "HandleButtonClicked")]
         [HarmonyPrefix]
         private static void IncomeEntryButtonClickedPrefix(KingdomTroopOverviewIncomeEntry __instance, ref IMapEntity __state)
         {
-            __state = GetCurrentEntity(__instance);
+            __state = KingdomOverviewFocus.ReadCycled(
+                __instance,
+                IncomeEntryMapEntitiesField,
+                IncomeEntryCurrentCycleIndexField,
+                "TroopOverviewPatches failed to read current troop overview row target");
         }
 
         [HarmonyPatch(typeof(KingdomTroopOverviewIncomeEntry), "HandleButtonClicked")]
         [HarmonyPostfix]
         private static void IncomeEntryButtonClickedPostfix(IMapEntity __state)
         {
-            if (__state != null)
-            {
-                AccessibilityEventBus.Publish(new MapCameraFocusEvent(__state.Position, announce: true));
-            }
-        }
-
-        private static IMapEntity GetTown(KingdomTroopOverviewTownEntry entry)
-        {
-            if (entry == null || TownEntryTownField == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return TownEntryTownField.GetValue(entry) as IMapEntity;
-            }
-            catch (Exception ex)
-            {
-                SocAccessMod.Instance?.LogWarning("TroopOverviewPatches failed to read town entry target: " + ex.Message);
-                return null;
-            }
-        }
-
-        private static IMapEntity GetCurrentEntity(KingdomTroopOverviewIncomeEntry entry)
-        {
-            if (entry == null || IncomeEntryMapEntitiesField == null || IncomeEntryCurrentCycleIndexField == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                IMapEntity[] entities = IncomeEntryMapEntitiesField.GetValue(entry) as IMapEntity[];
-                object indexValue = IncomeEntryCurrentCycleIndexField.GetValue(entry);
-                int index = indexValue is int ? (int)indexValue : -1;
-                if (entities == null || index < 0 || index >= entities.Length)
-                {
-                    return null;
-                }
-
-                return entities[index];
-            }
-            catch (Exception ex)
-            {
-                SocAccessMod.Instance?.LogWarning("TroopOverviewPatches failed to read current troop overview row target: " + ex.Message);
-                return null;
-            }
+            KingdomOverviewFocus.Focus(__state);
         }
     }
 }

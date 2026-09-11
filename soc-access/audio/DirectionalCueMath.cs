@@ -64,14 +64,14 @@ namespace SongsOfConquestAccess.Audio
                 pitchSemitonesPerRow = SquarePitchSemitonesPerRow;
             }
 
-            float gain = Clamp(1f - distance / AudibleDistanceTiles, 0f, 1f);
+            float gain = Mathf.Clamp(1f - distance / AudibleDistanceTiles, 0f, 1f);
             if (gain <= 0f)
             {
                 return false;
             }
 
-            pan = Clamp(columnDelta / panSaturationTiles, -1f, 1f);
-            semitones = Clamp(rowDelta * pitchSemitonesPerRow, -PitchMaxSemitones, PitchMaxSemitones);
+            pan = Mathf.Clamp(columnDelta / panSaturationTiles, -1f, 1f);
+            semitones = Mathf.Clamp(rowDelta * pitchSemitonesPerRow, -PitchMaxSemitones, PitchMaxSemitones);
             gainScale = gain;
             return true;
         }
@@ -103,16 +103,6 @@ namespace SongsOfConquestAccess.Audio
             cubeX = point.x - (point.y - (point.y & 1)) / 2;
             cubeZ = point.y;
             cubeY = -cubeX - cubeZ;
-        }
-
-        private static float Clamp(float value, float min, float max)
-        {
-            if (value < min)
-            {
-                return min;
-            }
-
-            return value > max ? max : value;
         }
     }
 }
