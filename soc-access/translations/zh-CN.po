@@ -3932,3 +3932,8 @@ msgstr "确认"
 msgctxt "Screens.ShowTutorials"
 msgid "Show tutorials"
 msgstr "显示教程"
+
+#. Screens.ChatSend
+msgctxt "Screens.ChatSend"
+msgid "Send"
+msgstr "发送"

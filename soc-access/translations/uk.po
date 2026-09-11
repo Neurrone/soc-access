@@ -3992,3 +3992,8 @@ msgstr "Підтвердити"
 msgctxt "Screens.ShowTutorials"
 msgid "Show tutorials"
 msgstr "Показувати навчання"
+
+#. Screens.ChatSend
+msgctxt "Screens.ChatSend"
+msgid "Send"
+msgstr "Надіслати"

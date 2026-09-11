@@ -3932,3 +3932,8 @@ msgstr "決定"
 msgctxt "Screens.ShowTutorials"
 msgid "Show tutorials"
 msgstr "チュートリアルを表示"
+
+#. Screens.ChatSend
+msgctxt "Screens.ChatSend"
+msgid "Send"
+msgstr "送信"

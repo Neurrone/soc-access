@@ -813,6 +813,10 @@
             /// caption for the row, {1} the tiers built and {2} the tiers it has.</summary>
             public static readonly ModString UpgradeTiers = new ModString("Screens.UpgradeTiers", "{0} {1} / {2}");
 
+            /// <summary>The chat window's send button, when neither the button nor the game's key
+            /// carries a word for it.</summary>
+            public static readonly ModString ChatSend = new ModString("Screens.ChatSend", "Send");
+
             public static readonly ModString CodexTabNumber = new ModString("Screens.CodexTabNumber", "Tab {0}");
             public static readonly ModString CodexCategoryNumber = new ModString("Screens.CodexCategoryNumber", "Category {0}");
             public static readonly ModString CampaignNumber = new ModString("Screens.CampaignNumber", "Campaign {0}");

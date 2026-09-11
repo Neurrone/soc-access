@@ -3932,3 +3932,8 @@ msgstr "확인"
 msgctxt "Screens.ShowTutorials"
 msgid "Show tutorials"
 msgstr "튜토리얼 표시"
+
+#. Screens.ChatSend
+msgctxt "Screens.ChatSend"
+msgid "Send"
+msgstr "보내기"

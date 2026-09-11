@@ -3962,3 +3962,8 @@ msgstr "Conferma"
 msgctxt "Screens.ShowTutorials"
 msgid "Show tutorials"
 msgstr "Mostra tutorial"
+
+#. Screens.ChatSend
+msgctxt "Screens.ChatSend"
+msgid "Send"
+msgstr "Invia"

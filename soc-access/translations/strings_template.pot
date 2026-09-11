@@ -3519,6 +3519,11 @@ msgctxt "Screens.UpgradeTiers"
 msgid "{0} {1} / {2}"
 msgstr ""
 
+#. Screens.ChatSend
+msgctxt "Screens.ChatSend"
+msgid "Send"
+msgstr ""
+
 #. Screens.CodexTabNumber
 msgctxt "Screens.CodexTabNumber"
 msgid "Tab {0}"

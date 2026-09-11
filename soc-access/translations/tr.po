@@ -3932,3 +3932,8 @@ msgstr "Onayla"
 msgctxt "Screens.ShowTutorials"
 msgid "Show tutorials"
 msgstr "Öğreticileri göster"
+
+#. Screens.ChatSend
+msgctxt "Screens.ChatSend"
+msgid "Send"
+msgstr "Gönder"

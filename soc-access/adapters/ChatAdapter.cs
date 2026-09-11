@@ -241,9 +241,22 @@ namespace SongsOfConquestAccess.Adapters
             get { return Tooltip.ForComponent(Dropdown, LocalizationHandler); }
         }
 
+        /// <summary>The send button's own label, or the game's word for it, or the mod's: the
+        /// window's button carries its text, and "Common/Chat/Send" is the game log's key for the
+        /// same word, which the chat window's handler did not resolve in-game (2026-09-12).</summary>
         public string SendLabel
         {
-            get { return GameText.Get(LocalizationHandler, "Common/Chat/Send", string.Empty); }
+            get
+            {
+                ChatWindowBehavior.Settings settings = WindowSettings;
+                string native = settings != null ? MenuRows.Label(settings.sendButton) : null;
+                if (!string.IsNullOrWhiteSpace(native))
+                {
+                    return native;
+                }
+
+                return GameText.Get(LocalizationHandler, "Common/Chat/Send", ModText.Get(ModStrings.Screens.ChatSend));
+            }
         }
 
         public bool Send()
