@@ -96,15 +96,7 @@ namespace SongsOfConquestAccess.Localization
                 return string.Empty;
             }
 
-            List<string> nonEmptyParts = new List<string>();
-            for (int i = 0; i < parts.Count; i++)
-            {
-                if (!string.IsNullOrWhiteSpace(parts[i]))
-                {
-                    nonEmptyParts.Add(parts[i]);
-                }
-            }
-
+            List<string> nonEmptyParts = NonEmpty(parts);
             if (nonEmptyParts.Count == 0)
             {
                 return string.Empty;
@@ -156,15 +148,7 @@ namespace SongsOfConquestAccess.Localization
                 return string.Empty;
             }
 
-            List<string> nonEmptyParts = new List<string>();
-            for (int i = 0; i < parts.Count; i++)
-            {
-                if (!string.IsNullOrWhiteSpace(parts[i]))
-                {
-                    nonEmptyParts.Add(parts[i]);
-                }
-            }
-
+            List<string> nonEmptyParts = NonEmpty(parts);
             if (nonEmptyParts.Count == 0)
             {
                 return string.Empty;
@@ -246,6 +230,22 @@ namespace SongsOfConquestAccess.Localization
             }
 
             return catalog.TryGetText(key, out text);
+        }
+
+        /// <summary>The parts worth joining. A missing part must not bring a separator with it,
+        /// so it is dropped before the fold rather than folded in as an empty string.</summary>
+        private static List<string> NonEmpty(IReadOnlyList<string> parts)
+        {
+            List<string> nonEmptyParts = new List<string>();
+            for (int i = 0; i < parts.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(parts[i]))
+                {
+                    nonEmptyParts.Add(parts[i]);
+                }
+            }
+
+            return nonEmptyParts;
         }
 
         private static ILocalizationHandler GetCurrentLocalization()

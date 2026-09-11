@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Scanner;
@@ -758,13 +759,16 @@ namespace SongsOfConquestAccess
 
         private static KeybindConfig GetKeybindConfig(string actionKey)
         {
-            if (string.IsNullOrWhiteSpace(actionKey))
-            {
-                return null;
-            }
+            return Lookup(_keybinds, actionKey);
+        }
 
-            KeybindConfig config;
-            return _keybinds.TryGetValue(actionKey, out config) ? config : null;
+        /// <summary>The shape every one of the config lookups has: no key, or a key nothing was
+        /// bound under, means no config.</summary>
+        private static T Lookup<T>(Dictionary<string, T> configs, string key)
+            where T : class
+        {
+            T config;
+            return !string.IsNullOrWhiteSpace(key) && configs.TryGetValue(key, out config) ? config : null;
         }
 
         private static void BindAudioCues(ConfigFile config)
@@ -803,13 +807,7 @@ namespace SongsOfConquestAccess
 
         private static AudioCueConfig GetAudioCueConfig(string cueKey)
         {
-            if (string.IsNullOrWhiteSpace(cueKey))
-            {
-                return null;
-            }
-
-            AudioCueConfig config;
-            return _audioCues.TryGetValue(cueKey, out config) ? config : null;
+            return Lookup(_audioCues, cueKey);
         }
 
         private static void SaveAndInvalidateCue(string cueKey)
@@ -871,13 +869,7 @@ namespace SongsOfConquestAccess
 
         private static ScannerCustomCategoryConfig GetScannerCustomCategoryConfig(string taxonomyKey)
         {
-            if (string.IsNullOrWhiteSpace(taxonomyKey))
-            {
-                return null;
-            }
-
-            ScannerCustomCategoryConfig config;
-            return _scannerCustomCategories.TryGetValue(taxonomyKey, out config) ? config : null;
+            return Lookup(_scannerCustomCategories, taxonomyKey);
         }
 
         private static bool MutateScannerCustomCategory(
@@ -1001,13 +993,7 @@ namespace SongsOfConquestAccess
 
         private static AnnouncementGroupConfig GetAnnouncementConfig(AnnouncementGroupDefinition group)
         {
-            if (group == null)
-            {
-                return null;
-            }
-
-            AnnouncementGroupConfig config;
-            return _announcementGroups.TryGetValue(group.Key, out config) ? config : null;
+            return group == null ? null : Lookup(_announcementGroups, group.Key);
         }
 
         private static AnnouncementElementConfig GetAnnouncementElementConfig(
@@ -1105,7 +1091,7 @@ namespace SongsOfConquestAccess
             }
 
             string[] parts = key.Split('_');
-            string result = string.Empty;
+            StringBuilder result = new StringBuilder();
             for (int i = 0; i < parts.Length; i++)
             {
                 if (string.IsNullOrEmpty(parts[i]))
@@ -1113,10 +1099,10 @@ namespace SongsOfConquestAccess
                     continue;
                 }
 
-                result += char.ToUpperInvariant(parts[i][0]) + parts[i].Substring(1);
+                result.Append(char.ToUpperInvariant(parts[i][0])).Append(parts[i], 1, parts[i].Length - 1);
             }
 
-            return result + ".";
+            return result.Append('.').ToString();
         }
 
         private sealed class AnnouncementGroupConfig

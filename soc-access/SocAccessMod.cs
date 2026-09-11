@@ -126,7 +126,9 @@ namespace SongsOfConquestAccess
             Step("dev routes", () => _modRoutes?.Unregister());
             _modRoutes = null;
             Step("update handler", () => _host.SetUpdateHandler(null));
-            Step("routes", _host.UnregisterAllModRoutes);
+            // The route table is not dropped here: the loader drops it itself the moment Stop
+            // returns, on every path that reaches Stop at all, and a mod that threw halfway must
+            // not leave routes standing either.
             Step("coroutines", _host.StopAllCoroutines);
             Step("mod options entries", Adapters.ModOptionsEntries.Remove);
             Step("mod dialogs", UI.ModDialog.CloseAll);
