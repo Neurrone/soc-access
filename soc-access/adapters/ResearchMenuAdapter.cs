@@ -169,11 +169,12 @@ namespace SongsOfConquestAccess.Adapters
 
                 int index = i;
                 UIButton button = GetButton(tab);
-                string label = GetBuildingLabel(tab, index);
+                string label = GetBuildingLabel(tab);
                 IList<string> description = GetBuildingDescription(tab);
                 int mapEntityId = BuildingTabMapEntityIdField != null ? (int)BuildingTabMapEntityIdField.GetValue(tab) : 0;
                 items.Add(new BuildingItem(
                     label,
+                    index,
                     description,
                     mapEntityId < 0,
                     index == SelectedBuildingIndex,
@@ -224,9 +225,10 @@ namespace SongsOfConquestAccess.Adapters
                         : null;
                     UIButton button = stackButton.Button;
                     int itemIndex = j;
-                    string name = SpokenText.Get(GetLocalization(), stack != null ? stack.NameKey : null, "Research " + (itemIndex + 1));
+                    string name = SpokenText.Get(GetLocalization(), stack != null ? stack.NameKey : null, string.Empty);
                     researchItems.Add(new ResearchItem(
                         name,
+                        itemIndex,
                         GetOwnedTier(stack, owned),
                         tierHeader,
                         button as Component,
@@ -239,7 +241,8 @@ namespace SongsOfConquestAccess.Adapters
                 if (researchItems.Count > 0)
                 {
                     items.Add(new CategoryItem(
-                        GetCategoryLabel(category, i),
+                        GetCategoryLabel(category),
+                        i,
                         researchItems));
                 }
             }
@@ -312,11 +315,11 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Select(button as Component);
         }
 
-        private string GetBuildingLabel(ResearchMenuBuildingTabButton tab, int index)
+        private string GetBuildingLabel(ResearchMenuBuildingTabButton tab)
         {
             UITextMesh name = Reflect.Get<UITextMesh>(tab, BuildingTabNameField);
             string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(name));
-            return string.IsNullOrWhiteSpace(label) ? "Building " + (index + 1) : label;
+            return label;
         }
 
         // The paragraphs the game wrote the tab's description in, kept apart rather than collapsed.
@@ -326,11 +329,11 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(description) });
         }
 
-        private string GetCategoryLabel(ResearchMenuCategory category, int index)
+        private string GetCategoryLabel(ResearchMenuCategory category)
         {
             UITextMesh name = Reflect.Get<UITextMesh>(category, CategoryNameField);
             string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(name));
-            return string.IsNullOrWhiteSpace(label) ? "Research category " + (index + 1) : label;
+            return label;
         }
 
         /// <summary>The local team's global research, asked for once per page. The game answers
@@ -496,6 +499,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             public BuildingItem(
                 string label,
+                int index,
                 IList<string> description,
                 bool missingBuilding,
                 bool isSelected,
@@ -504,6 +508,7 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> activate)
             {
                 Label = label ?? string.Empty;
+                Index = index;
                 DescriptionLines = description ?? new List<string>();
                 MissingBuilding = missingBuilding;
                 IsSelected = isSelected;
@@ -512,7 +517,11 @@ namespace SongsOfConquestAccess.Adapters
                 Activate = activate;
             }
 
+            /// <summary>The building's own name, and empty where the game draws none.</summary>
             public string Label { get; private set; }
+
+            /// <summary>Where the page drew this tab in its own bar.</summary>
+            public int Index { get; private set; }
 
             /// <summary>What the tab draws under its name, one line per paragraph.</summary>
             public IList<string> DescriptionLines { get; private set; }
@@ -535,13 +544,18 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class CategoryItem
         {
-            public CategoryItem(string label, IReadOnlyList<ResearchItem> items)
+            public CategoryItem(string label, int index, IReadOnlyList<ResearchItem> items)
             {
                 Label = label ?? string.Empty;
+                Index = index;
                 Items = items ?? new ResearchItem[0];
             }
 
+            /// <summary>The category's own name, and empty where the game draws none.</summary>
             public string Label { get; private set; }
+
+            /// <summary>Where the page drew this category in its own list.</summary>
+            public int Index { get; private set; }
             public IReadOnlyList<ResearchItem> Items { get; private set; }
         }
 
@@ -549,6 +563,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             public ResearchItem(
                 string label,
+                int index,
                 int ownedTier,
                 string tierHeader,
                 Component button,
@@ -558,6 +573,7 @@ namespace SongsOfConquestAccess.Adapters
                 Tooltip tooltip)
             {
                 Label = label ?? string.Empty;
+                Index = index;
                 OwnedTier = ownedTier;
                 TierHeader = tierHeader ?? string.Empty;
                 Button = button;
@@ -567,7 +583,12 @@ namespace SongsOfConquestAccess.Adapters
                 Tooltip = tooltip;
             }
 
+            /// <summary>The stack's own name, and empty where the game names it nothing.</summary>
             public string Label { get; private set; }
+
+            /// <summary>Where the category drew this stack in its own list.</summary>
+            public int Index { get; private set; }
+
             public int OwnedTier { get; private set; }
             public string TierHeader { get; private set; }
 

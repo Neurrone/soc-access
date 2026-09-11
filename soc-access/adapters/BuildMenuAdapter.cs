@@ -162,7 +162,7 @@ namespace SongsOfConquestAccess.Adapters
         /// through a field the menu holds, so it is read from the same key.</summary>
         public string HeaderText
         {
-            get { return SpokenText.Get(_localization, "Adventure/BuildMenu/Header", "Build"); }
+            get { return SpokenText.Get(_localization, "Adventure/BuildMenu/Header", string.Empty); }
         }
 
         /// <summary>Whether the menu is on a build site at all.</summary>
@@ -334,11 +334,12 @@ namespace SongsOfConquestAccess.Adapters
                 IMapEntityBlueprint blueprint = _facade != null ? _facade.MapEntities.GetBlueprint(action.BuildingBlueprintId) : null;
                 string label = blueprint != null && _localization != null
                     ? SpokenLines.Clean(_localization.GetText(blueprint.NameKey))
-                    : "Building " + (i + 1);
+                    : string.Empty;
                 BuildMenuButton captured = button;
                 BuildOnBuildSiteAction capturedAction = action;
                 items.Add(new BuildingItem(
                     label,
+                    i + 1,
                     () => capturedAction == null || capturedAction.CanExecute(),
                     () => ReferenceEquals(captured.BuildAction, CurrentAction),
                     GetBuildButton(captured) as Component,
@@ -430,11 +431,6 @@ namespace SongsOfConquestAccess.Adapters
                 int level = pair.Key;
                 UIButton button = pair.Value;
                 string label = GetButtonLabel(button);
-                if (string.IsNullOrWhiteSpace(label))
-                {
-                    label = "Tier " + level;
-                }
-
                 items.Add(new TierItem(
                     label,
                     level,
@@ -648,8 +644,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string label = GetButtonLabel(GetPurchaseButton());
-                return string.IsNullOrWhiteSpace(label) ? "Build" : label;
+                return GetButtonLabel(GetPurchaseButton());
             }
         }
 
@@ -679,8 +674,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string label = GetButtonLabel(GetPreviousBuildSiteButton());
-                return string.IsNullOrWhiteSpace(label) ? "Previous" : label;
+                return GetButtonLabel(GetPreviousBuildSiteButton());
             }
         }
 
@@ -688,8 +682,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string label = GetButtonLabel(GetNextBuildSiteButton());
-                return string.IsNullOrWhiteSpace(label) ? "Next" : label;
+                return GetButtonLabel(GetNextBuildSiteButton());
             }
         }
 
@@ -1503,6 +1496,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public BuildingItem(
                 string label,
+                int number,
                 Func<bool> isAvailable,
                 Func<bool> isSelected,
                 Component button,
@@ -1512,6 +1506,7 @@ namespace SongsOfConquestAccess.Adapters
                 _isSelected = isSelected;
                 Button = button;
                 Label = label;
+                Number = number;
                 _isAvailable = isAvailable;
                 Focus = focus;
                 Tooltip = tooltip;
@@ -1519,7 +1514,13 @@ namespace SongsOfConquestAccess.Adapters
 
             private readonly Func<bool> _isSelected;
 
+            /// <summary>The building's own name, and empty where the game has no blueprint to
+            /// name it by.</summary>
             public string Label { get; private set; }
+
+            /// <summary>Which button of the grid this is, counting from one.</summary>
+            public int Number { get; private set; }
+
             public Func<bool> Focus { get; private set; }
             public Func<Tooltip> Tooltip { get; private set; }
 

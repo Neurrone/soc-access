@@ -3817,3 +3817,23 @@ msgctxt "Spatial.MovementOfMax"
 msgid "{0} / {1}"
 msgstr "{0} / {1}"
 
+
+#. Screens.BuildingNumber
+msgctxt "Screens.BuildingNumber"
+msgid "Building {0}"
+msgstr "建築 {0}"
+
+#. Screens.TierNumber
+msgctxt "Screens.TierNumber"
+msgid "Tier {0}"
+msgstr "等級 {0}"
+
+#. Screens.ResearchNumber
+msgctxt "Screens.ResearchNumber"
+msgid "Research {0}"
+msgstr "研究 {0}"
+
+#. Screens.ResearchCategoryNumber
+msgctxt "Screens.ResearchCategoryNumber"
+msgid "Research category {0}"
+msgstr "研究類別 {0}"

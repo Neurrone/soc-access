@@ -353,7 +353,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             UITextMesh title = Reflect.Get<UITextMesh>(_modifierTabs, ModifierTitleField);
             string label = UITextMeshTextUtility.GetEffectiveText(title);
-            return string.IsNullOrWhiteSpace(label) ? "Modifiers" : label;
+            return SpokenLines.Clean(label);
         }
 
         public IReadOnlyList<LabeledItem> GetActiveModifiers()
@@ -378,7 +378,10 @@ namespace SongsOfConquestAccess.Adapters
             {
                 UITextMesh noneText = Reflect.Get<UITextMesh>(_modifierTabs, NoModifiersTextField);
                 string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(noneText));
-                items.Add(new LabeledItem(string.IsNullOrWhiteSpace(label) ? "None" : label));
+                if (!string.IsNullOrWhiteSpace(label))
+                {
+                    items.Add(new LabeledItem(label));
+                }
             }
 
             return items;

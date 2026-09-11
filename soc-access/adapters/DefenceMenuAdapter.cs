@@ -139,7 +139,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string DefendingTroopsLabel
         {
-            get { return SpokenText.Get(_localization, "Adventure/TroopManagementMenu/DefendingTroopsHeader", "Defending troops"); }
+            get { return SpokenText.Get(_localization, "Adventure/TroopManagementMenu/DefendingTroopsHeader", string.Empty); }
         }
 
         /// <summary>The band the menu draws for the wielder stored in the settlement. Kept, so the

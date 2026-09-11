@@ -785,6 +785,10 @@
             public static readonly ModString AnnouncementVisited = new ModString("Screens.AnnouncementVisited", "Visited");
             public static readonly ModString AnnouncementWielder = new ModString("Screens.AnnouncementWielder", "Wielder");
             public static readonly ModString AnnouncementZoneOfControl = new ModString("Screens.AnnouncementZoneOfControl", "Zone of control");
+            public static readonly ModString BuildingNumber = new ModString("Screens.BuildingNumber", "Building {0}");
+            public static readonly ModString TierNumber = new ModString("Screens.TierNumber", "Tier {0}");
+            public static readonly ModString ResearchNumber = new ModString("Screens.ResearchNumber", "Research {0}");
+            public static readonly ModString ResearchCategoryNumber = new ModString("Screens.ResearchCategoryNumber", "Research category {0}");
         }
 
         public static class Scanner

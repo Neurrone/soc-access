@@ -3439,6 +3439,26 @@ msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr ""
 
+#. Screens.BuildingNumber
+msgctxt "Screens.BuildingNumber"
+msgid "Building {0}"
+msgstr ""
+
+#. Screens.TierNumber
+msgctxt "Screens.TierNumber"
+msgid "Tier {0}"
+msgstr ""
+
+#. Screens.ResearchNumber
+msgctxt "Screens.ResearchNumber"
+msgid "Research {0}"
+msgstr ""
+
+#. Screens.ResearchCategoryNumber
+msgctxt "Screens.ResearchCategoryNumber"
+msgid "Research category {0}"
+msgstr ""
+
 #. Scanner.All
 msgctxt "Scanner.All"
 msgid "All"

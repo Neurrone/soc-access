@@ -192,7 +192,9 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 BuildMenuAdapter.BuildingItem it = building;
-                string label = building.Label;
+                string label = string.IsNullOrWhiteSpace(building.Label)
+                    ? ModText.Get(ModStrings.Screens.BuildingNumber, building.Number)
+                    : building.Label;
                 NodeVtable vtable = GraphNodes.Button(
                     () => label,
                     () => { if (it.Focus != null) it.Focus(); },
@@ -369,7 +371,7 @@ namespace SongsOfConquestAccess.Screens
                 Component button = tier.Button;
                 BuildMenuAdapter.TierItem it = tier;
                 NodeVtable vtable = GraphNodes.Tab(
-                    () => it.Label,
+                    () => TierLabel(it),
                     () => it.IsSelected,
                     null,
                     it.Tooltip != null ? it.Tooltip() : null);
@@ -382,6 +384,15 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.EndRow();
+        }
+
+        /// <summary>What a tier tab is called: the words the game draws on it, or which tier it is
+        /// where it draws none.</summary>
+        private static string TierLabel(BuildMenuAdapter.TierItem tier)
+        {
+            return string.IsNullOrWhiteSpace(tier.Label)
+                ? ModText.Get(ModStrings.Screens.TierNumber, tier.Level)
+                : tier.Label;
         }
 
         /// <summary>One of the bands the details pane draws under a caption - the available research,

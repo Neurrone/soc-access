@@ -734,7 +734,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetTierLabel(int tier)
         {
-            return GameText.Get(GetLocalization(), "Spells/Spellbook/SpellTierHeader", "tier " + tier, tier).Trim();
+            return GameText.Get(GetLocalization(), "Spells/Spellbook/SpellTierHeader", string.Empty, tier).Trim();
         }
 
         private int GetEssenceAmount(EssenceType essence)

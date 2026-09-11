@@ -350,8 +350,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string label = GetButtonLabel(GetPurchaseButton());
-                return string.IsNullOrWhiteSpace(label) ? "Purchase" : label;
+                return GetButtonLabel(GetPurchaseButton());
             }
         }
 
