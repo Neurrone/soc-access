@@ -42,8 +42,6 @@ namespace SongsOfConquestAccess.Screens
         private const string FooterStop = "community-maps-collection-footer";
 
         private readonly GameTextEditor _editor = new GameTextEditor();
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The Collection page, read off mod.io's own singleton every frame
         /// (<see cref="CommunityMapsSources"/>). Whether it is the page SHOWING is the adapter's
         /// <c>IsPresent</c>, which reads the panel's own active state.</summary>
@@ -89,34 +87,12 @@ namespace SongsOfConquestAccess.Screens
             return Live != null && Live.Cancel();
         }
 
-        /// <summary>While the keyboard is on its way to the keyword box, what the player types next is
-        /// meant for that box and must not start a search of the page.</summary>
-        public override bool CapturesRawInput
+        /// <summary>The page's own editor, over the keyword box. GraphScreen takes the rest of its
+        /// lifecycle: the raw-input and field-ownership answers, the per-frame update, and the
+        /// abandon on leaving and on popping.</summary>
+        public override GameTextEditor Editor
         {
-            get { return _editor.Pending; }
-        }
-
-        public override bool OwnsGameField
-        {
-            get { return _editor.Pending || _editor.Editing; }
-        }
-
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
-            _editor.Update(IsActive());
-        }
-
-        public override void OnUnfocus()
-        {
-            base.OnUnfocus();
-            _editor.Abandon();
-        }
-
-        public override void OnPop()
-        {
-            base.OnPop();
-            _editor.Abandon();
+            get { return _editor; }
         }
 
         public override void Build(GraphBuilder builder)
@@ -186,30 +162,16 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the filtering band ----
 
-        /// <summary>The keyword box. It is one of mod.io's own TMP fields rather than one of the
-        /// game's, and the editing contract is the same; its label is the box's own placeholder, which
-        /// is the only thing the band writes next to it.</summary>
+        /// <summary>The keyword box. Its label is the box's own placeholder, which is the only thing
+        /// the band writes next to it.</summary>
         private void BuildKeyword(GraphBuilder builder)
         {
-            TMP_InputField field = Live.SearchField;
-            if (field == null || !field.gameObject.activeInHierarchy)
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.EditField(
+            GraphNodes.TmpEditField(
+                builder,
+                "community-maps-collection:keyword",
+                Live.SearchField,
                 () => Live.SearchFieldLabel,
-                () => _editor.Editing ? null : field.text,
-                () => _editor.Request(Live.SearchField),
-                () => field.interactable);
-            // Arriving puts the game's own selection on the box - the search filter panel's finding:
-            // without it an activation that follows a row whose focus visual selected one of mod.io's
-            // own controls selects the box but never makes it FOCUSED, and the edit ends in silence.
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(field);
-            builder.AddItem(new DrawnNode(
-                ControlId.For(field, "community-maps-collection:keyword"),
-                vtable,
-                field));
+                _editor);
         }
 
         private void BuildCheckForUpdates(GraphBuilder builder)
@@ -285,18 +247,6 @@ namespace SongsOfConquestAccess.Screens
             return new SyntheticNode(
                 ControlId.For(Marker(key), "community-maps-collection:" + key),
                 vtable);
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

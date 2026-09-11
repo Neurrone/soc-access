@@ -245,11 +245,7 @@ namespace SongsOfConquestAccess.Screens
         {
             // The menu draws no close control: the mouse closes it by clicking the blocker behind it,
             // so the node the keyboard needs is the mod's own, running the game's own hide.
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(_closeKey, "research:close"),
-                GraphNodes.Button(
-                    () => ModText.Get(ModStrings.Screens.Close),
-                    () => Live.Close())));
+            GraphNodes.ModClose(builder, "research:close", _closeKey, () => Live.Close());
         }
     }
 }

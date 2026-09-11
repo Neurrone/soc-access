@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using HarmonyLib;
 using ModIOBrowser;
+using ModIO.Util;
 using ModIOBrowser.Implementation;
 using UnityEngine;
 
@@ -51,76 +52,76 @@ namespace SongsOfConquestAccess.Screens
             get { return Browser.IsOpen; }
         }
 
+        /// <summary>One of mod.io's public panels while the browser is up, or null. The browser is
+        /// asked first and the instantiated flag second, because reading <c>Instance</c> on a
+        /// <c>SelfInstancingMonoSingleton</c> that has none CREATES one.</summary>
+        private static T Panel<T>() where T : SelfInstancingMonoSingleton<T>
+        {
+            return IsOpen && SelfInstancingMonoSingleton<T>.SingletonIsInstantiated()
+                ? SelfInstancingMonoSingleton<T>.Instance
+                : null;
+        }
+
         /// <summary>The Browse page, which also owns the tab pair drawn over both pages.</summary>
         public static Home Home
         {
-            get { return IsOpen && ModIOBrowser.Implementation.Home.SingletonIsInstantiated() ? ModIOBrowser.Implementation.Home.Instance : null; }
+            get { return Panel<Home>(); }
         }
 
         /// <summary>The Collection page.</summary>
         public static Collection Collection
         {
-            get { return IsOpen && ModIOBrowser.Implementation.Collection.SingletonIsInstantiated() ? ModIOBrowser.Implementation.Collection.Instance : null; }
+            get { return Panel<Collection>(); }
         }
 
         /// <summary>The details page one map or mod opens.</summary>
         public static Details Details
         {
-            get { return IsOpen && ModIOBrowser.Implementation.Details.SingletonIsInstantiated() ? ModIOBrowser.Implementation.Details.Instance : null; }
+            get { return Panel<Details>(); }
         }
 
         /// <summary>The search results page.</summary>
         public static SearchResults SearchResults
         {
-            get { return IsOpen && ModIOBrowser.Implementation.SearchResults.SingletonIsInstantiated() ? ModIOBrowser.Implementation.SearchResults.Instance : null; }
+            get { return Panel<SearchResults>(); }
         }
 
         /// <summary>The report popup.</summary>
         public static Reporting Reporting
         {
-            get { return IsOpen && ModIOBrowser.Implementation.Reporting.SingletonIsInstantiated() ? ModIOBrowser.Implementation.Reporting.Instance : null; }
+            get { return Panel<Reporting>(); }
         }
 
         /// <summary>The authentication flow, which walks several panels under one object.</summary>
         public static AuthenticationPanels AuthenticationPanels
         {
-            get
-            {
-                return IsOpen && ModIOBrowser.Implementation.AuthenticationPanels.SingletonIsInstantiated()
-                    ? ModIOBrowser.Implementation.AuthenticationPanels.Instance
-                    : null;
-            }
+            get { return Panel<AuthenticationPanels>(); }
         }
 
         /// <summary>The download queue popup.</summary>
         public static DownloadQueue DownloadQueue
         {
-            get { return IsOpen && ModIOBrowser.Implementation.DownloadQueue.SingletonIsInstantiated() ? ModIOBrowser.Implementation.DownloadQueue.Instance : null; }
+            get { return Panel<DownloadQueue>(); }
         }
 
         /// <summary>The five-digit code box the email flow ends on.</summary>
         public static KeyInput5DigitsUi KeyInput
         {
-            get { return IsOpen && ModIOBrowser.Implementation.KeyInput5DigitsUi.SingletonIsInstantiated() ? ModIOBrowser.Implementation.KeyInput5DigitsUi.Instance : null; }
+            get { return Panel<KeyInput5DigitsUi>(); }
         }
 
         /// <summary>The bar across the top of both pages, which draws the "Search &amp; filter"
         /// wording the screens read their own titles from.</summary>
         public static NavBar NavBar
         {
-            get { return IsOpen && ModIOBrowser.Implementation.NavBar.SingletonIsInstantiated() ? ModIOBrowser.Implementation.NavBar.Instance : null; }
+            get { return Panel<NavBar>(); }
         }
 
         /// <summary>mod.io's own translation table, which is what its wording is read through.
         /// </summary>
         public static TranslationManager Translations
         {
-            get
-            {
-                return IsOpen && ModIOBrowser.TranslationManager.SingletonIsInstantiated()
-                    ? ModIOBrowser.TranslationManager.Instance
-                    : null;
-            }
+            get { return Panel<TranslationManager>(); }
         }
 
         /// <summary>The search and filter panel. Internal to mod.io, so it comes back as

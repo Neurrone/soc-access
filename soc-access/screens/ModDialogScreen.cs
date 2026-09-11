@@ -104,23 +104,17 @@ namespace SongsOfConquestAccess.Screens
             return Cancel();
         }
 
-        public override bool OwnsGameField
+        /// <summary>The editor behind the text rows. GraphScreen drives it: without that tick a
+        /// request for the keyboard stayed pending forever and Enter on a name box did nothing
+        /// (owner, 2026-09-07).</summary>
+        public override GameTextEditor Editor
         {
-            get { return _rows.Editor.Editing || _rows.Editor.Pending; }
+            get { return _rows.Editor; }
         }
 
-        public override bool CapturesRawInput
-        {
-            get { return _rows.Editor.Pending; }
-        }
-
-        /// <summary>The editor behind the text rows is driven from here: without this tick a request
-        /// for the keyboard stayed pending forever and Enter on a name box did nothing (owner,
-        /// 2026-09-07).</summary>
         public override void OnUpdate()
         {
             base.OnUpdate();
-            _rows.Editor.Update(IsActive());
 
             // The game took the window away underneath, so the screen goes with it. A child is not
             // polled; it asks for itself.
@@ -128,18 +122,6 @@ namespace SongsOfConquestAccess.Screens
             {
                 CloseSelf();
             }
-        }
-
-        public override void OnUnfocus()
-        {
-            base.OnUnfocus();
-            _rows.Editor.Abandon();
-        }
-
-        public override void OnPop()
-        {
-            base.OnPop();
-            _rows.Editor.Abandon();
         }
 
         /// <summary>The window this screen reads, for whatever is drawing into it.</summary>

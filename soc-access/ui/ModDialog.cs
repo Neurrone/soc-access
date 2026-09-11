@@ -156,10 +156,11 @@ namespace SongsOfConquestAccess.UI
             get { return ReferenceEquals(Top, this); }
         }
 
-        /// <summary>The rows this dialog has drawn, read the way Options is read.</summary>
+        /// <summary>The rows this dialog has drawn, read the way Options is read. A dialog that is
+        /// standing has a memo: Open destroys and discards one whose Build did not finish.</summary>
         public IReadOnlyList<MenuRow> Rows
         {
-            get { return _rows != null ? _rows.Rows : MenuRows.Read(_factory); }
+            get { return _rows.Rows; }
         }
 
         /// <summary>The panel's own close button, as a row.</summary>
@@ -570,8 +571,20 @@ namespace SongsOfConquestAccess.UI
                 UnityEngine.Object.DestroyImmediate(_root);
             }
 
+            // Every one of these pointed into the object just destroyed, and a destroyed Unity
+            // object compares equal to null but is not null: a field still holding one answers a
+            // later read with a dead component rather than with nothing.
             _root = null;
+            _panelGroup = null;
+            _title = null;
+            _tabContainer = null;
+            _activeTab = null;
+            _autoScroller = null;
+            _closeButton = null;
+            _tabPrefab = null;
+            _rows = null;
             _tabs.Clear();
+            _selected = -1;
             _factory = null;
             _controller = null;
             DrawContent = null;

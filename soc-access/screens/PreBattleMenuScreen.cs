@@ -87,10 +87,6 @@ namespace SongsOfConquestAccess.Screens
         private TroopPlacementHexGrid _hexGrid;
         private PreBattleMenuAdapter _hexGridAdapter;
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor back on the same one: the menu gives no component a text line can be keyed on.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         // The tile tooltip is the game's whole troop-details capture and the graph is rebuilt for
         // every navigation operation, so it is composed once per tile - which is exactly as often as
         // the widget engine's focus commit composed it.
@@ -416,7 +412,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            drawn.Sort((left, right) => left.Key.CompareTo(right.Key));
+            DrawnOrder.SortByKey(drawn);
             builder.BeginStop(ButtonsStop);
             for (int i = 0; i < drawn.Count; i++)
             {
@@ -443,13 +439,8 @@ namespace SongsOfConquestAccess.Screens
             NodeVtable vtable = GraphNodes.Button(label, () => activate(), enabled, tooltip);
             vtable.OnFocusVisual = focus;
             into.Add(new KeyValuePair<float, NodeDeclaration>(
-                Left(button),
+                DrawnOrder.LeftOf(button),
                 new DrawnNode(ControlId.For(button, "pre-battle:" + key), vtable, button)));
-        }
-
-        private static float Left(Component button)
-        {
-            return button != null && button.transform != null ? button.transform.position.x : 0f;
         }
 
         /// <summary>The hint the menu draws under the board ("Drag troops to rearrange"), a stop of
@@ -533,26 +524,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddLine(GraphBuilder builder, string key, Func<string> text, Tooltip tooltip)
         {
-            if (string.IsNullOrWhiteSpace(text()))
-            {
-                return;
-            }
-
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(key), "pre-battle:" + key),
-                GraphNodes.Text(text, null, tooltip)));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
+            GraphNodes.TextLine(builder, Marker(key), "pre-battle:" + key, text, tooltip);
         }
     }
 }

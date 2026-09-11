@@ -63,27 +63,7 @@ namespace SongsOfConquestAccess.UI
         public static void SortByDrawnLeft<T>(List<KeyValuePair<string, T>> band, Func<T, Component> button)
             where T : class
         {
-            List<float> lefts = new List<float>(band.Count);
-            for (int i = 0; i < band.Count; i++)
-            {
-                lefts.Add(Left(button(band[i].Value)));
-            }
-
-            for (int i = 1; i < band.Count; i++)
-            {
-                KeyValuePair<string, T> moving = band[i];
-                float left = lefts[i];
-                int j = i - 1;
-                while (j >= 0 && lefts[j] > left)
-                {
-                    band[j + 1] = band[j];
-                    lefts[j + 1] = lefts[j];
-                    j--;
-                }
-
-                band[j + 1] = moving;
-                lefts[j + 1] = left;
-            }
+            DrawnOrder.SortByLeft(band, card => button(card.Value));
         }
 
         /// <summary>The card band as one stop, in the order the band is already in. An empty band
@@ -148,11 +128,6 @@ namespace SongsOfConquestAccess.UI
         private static Component ButtonOf<T>(T item) where T : class, IMenuButtonAdapter
         {
             return item.Button;
-        }
-
-        private static float Left(Component component)
-        {
-            return component != null ? component.transform.position.x : 0f;
         }
     }
 }

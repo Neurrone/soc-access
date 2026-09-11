@@ -42,7 +42,7 @@ namespace SongsOfConquestAccess.UI
 
         // A subject of its own per synthesized row, kept across rebuilds so the reconciler seats the
         // cursor on the same line: a caption that heads nothing, and the window's own close button.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
+        private readonly MarkerTable _markers = new MarkerTable();
 
         public MenuFormNodes(string prefix)
             : this(prefix, null, true)
@@ -133,7 +133,7 @@ namespace SongsOfConquestAccess.UI
                     else
                     {
                         builder.AddItem(new SyntheticNode(
-                            ControlId.For(Marker(caption.Id), _prefix + ":caption/" + caption.Id),
+                            ControlId.For(_markers.For(caption.Id), _prefix + ":caption/" + caption.Id),
                             GraphNodes.Text(caption.GetText)));
                     }
 
@@ -190,7 +190,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(button.Id), _prefix + ":" + button.Id),
+                ControlId.For(_markers.For(button.Id), _prefix + ":" + button.Id),
                 Button(button, label)));
         }
 
@@ -642,18 +642,6 @@ namespace SongsOfConquestAccess.UI
                 button.GetTooltip());
             vtable.OnFocusVisual = button.Focus;
             return vtable;
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

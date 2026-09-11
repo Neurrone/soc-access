@@ -65,16 +65,15 @@ namespace SongsOfConquestAccess.Screens
         private const string LeftKey = "trade:left";
         private const string RightKey = "trade:right";
 
-        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the band lines and the auto-arrange buttons are not drawn as
-        // controls of their own.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         // Each side's slot nodes, kept for as long as the adapter hands back the same slot list.
         // The nodes are closures that read the game when they are READ, so rebuilding them every
         // frame bought nothing but the allocation; the contributor owns the key and the rule
         // (ui/ArtifactSlotNodes.cs, Column). It is a field on the SCREEN because an adapter may hold
         // no graph concepts.
+        // A section the game has stopped answering for is reported once and then costs only its own
+        // rows. What has been reported is mod-owned and outlives any one menu instance.
+        private readonly SectionItems _sections = new SectionItems("TradingScreen");
+
         private readonly ArtifactSlotNodes.Column _leftColumn = new ArtifactSlotNodes.Column();
 
         private readonly ArtifactSlotNodes.Column _rightColumn = new ArtifactSlotNodes.Column();
@@ -255,7 +254,7 @@ namespace SongsOfConquestAccess.Screens
         /// the bar.</summary>
         private void BuildModifiers(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
         {
-            IReadOnlyList<TradingMenuAdapter.ModifierCategory> categories = Items(
+            IReadOnlyList<TradingMenuAdapter.ModifierCategory> categories = _sections.Of(
                 "modifier categories",
                 side.GetModifierCategories);
             List<CommanderBands.TabItem> tabs = new List<CommanderBands.TabItem>();
@@ -346,27 +345,21 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = Live.CloseButton;
-            if (close == null || !Live.IsCloseVisible())
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "trade:close",
+                Live.CloseButton,
+                Live.IsCloseVisible,
                 () => Live.ActivateClose());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, "trade:close"), vtable, close));
         }
 
         // ---- shared ----
 
-        private static IReadOnlyList<CommanderBands.Line> Lines(
+        private IReadOnlyList<CommanderBands.Line> Lines(
             string section,
             Func<IReadOnlyList<TradingMenuAdapter.LabeledItem>> getter)
         {
-            IReadOnlyList<TradingMenuAdapter.LabeledItem> items = Items(section, getter);
+            IReadOnlyList<TradingMenuAdapter.LabeledItem> items = _sections.Of(section, getter);
             List<CommanderBands.Line> lines = new List<CommanderBands.Line>();
             for (int i = 0; i < items.Count; i++)
             {
@@ -375,34 +368,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return lines;
-        }
-
-        /// <summary>One section's items, or none where reading them threw: a part of the menu the game
-        /// has stopped answering for costs its own rows and never the rest of the page.</summary>
-        private static IReadOnlyList<T> Items<T>(string section, Func<IReadOnlyList<T>> getter)
-        {
-            try
-            {
-                IReadOnlyList<T> items = getter != null ? getter() : null;
-                return items ?? new T[0];
-            }
-            catch (Exception exception)
-            {
-                SocAccessMod.Instance?.LogWarning("TradingScreen section " + section + " failed to build: " + exception);
-                return new T[0];
-            }
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
 
     }

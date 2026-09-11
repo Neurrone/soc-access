@@ -61,11 +61,6 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The one codex window the project container holds for the whole game.</summary>
         private readonly ScreenSource<ICodexMenu> _source = ScreenSource<ICodexMenu>.FromProject();
 
-        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
-        // cursor on the same line: the body's lines, which the mod reads off text meshes several of
-        // them share, and the footer's Close.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         protected override object ResolveMenu()
         {
             return _source.Current;
@@ -136,19 +131,12 @@ namespace SongsOfConquestAccess.Screens
 
                 int index = tab.Index;
                 string label = tab.Label;
-                NodeVtable vtable = GraphNodes.Tab(
+                // The guard also keeps the showing tab's native selection - which is the article the
+                // window is drawing - where the game put it.
+                NodeVtable vtable = GraphNodes.SwitchingTab(
                     () => label,
-                    () => Live.GetActiveTabIndex() == index);
-                // Focusing the tab IS switching to it; the guard keeps the showing tab's native
-                // selection - which is the article the window is drawing - where the game put it.
-                vtable.OnFocusVisual = () =>
-                {
-                    if (Live.GetActiveTabIndex() != index)
-                    {
-                        Live.FocusTab(index);
-                    }
-                };
-                vtable.OnActivate = () => Live.FocusTab(index);
+                    () => Live.GetActiveTabIndex() == index,
+                    () => Live.FocusTab(index));
                 builder.AddItem(new SyntheticNode(ControlId.Structural("codex:tab/" + index), vtable));
             }
         }
@@ -362,18 +350,6 @@ namespace SongsOfConquestAccess.Screens
                 vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
                 builder.AddItem(new DrawnNode(ControlId.For(close, "codex:close"), vtable, close));
             }
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

@@ -35,10 +35,6 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string ResultStop = "post-adventure-result";
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the menu gives no component the screen can key its texts on.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The one post-adventure window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<IPostAdventureMenu> _source =
             ScreenSource<IPostAdventureMenu>.FromScene(LoadedScenes.AdventureScene);
@@ -148,7 +144,7 @@ namespace SongsOfConquestAccess.Screens
             AddDrawn(drawn, Live.RestartMapButton);
             AddDrawn(drawn, Live.QuitToMainButton);
             AddDrawn(drawn, Live.LoadButton);
-            SortByLeftEdge(drawn);
+            DrawnOrder.SortByKey(drawn);
             for (int i = 0; i < drawn.Count; i++)
             {
                 AddButton(builder, "button/" + i, drawn[i].Value);
@@ -164,27 +160,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            Component component = button as Component;
-            float left = component != null && component.transform != null ? component.transform.position.x : 0f;
-            drawn.Add(new KeyValuePair<float, UIButton>(left, button));
-        }
-
-        /// <summary>Stable insertion sort, so two buttons at one x keep the order the menu declares
-        /// them in.</summary>
-        private static void SortByLeftEdge(List<KeyValuePair<float, UIButton>> drawn)
-        {
-            for (int i = 1; i < drawn.Count; i++)
-            {
-                KeyValuePair<float, UIButton> moving = drawn[i];
-                int j = i - 1;
-                while (j >= 0 && drawn[j].Key > moving.Key)
-                {
-                    drawn[j + 1] = drawn[j];
-                    j--;
-                }
-
-                drawn[j + 1] = moving;
-            }
+            drawn.Add(new KeyValuePair<float, UIButton>(DrawnOrder.LeftOf(button as Component), button));
         }
 
         private void AddButton(GraphBuilder builder, string key, UIButton button)
@@ -231,18 +207,6 @@ namespace SongsOfConquestAccess.Screens
             ControlId id = ControlId.For(Marker(key), "post-adventure:" + key);
             builder.AddItem(new SyntheticNode(id, GraphNodes.Paragraphs(lines)));
             return id;
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

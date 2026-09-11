@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
-using TMPro;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -30,8 +29,6 @@ namespace SongsOfConquestAccess.Screens
         private const string ButtonsStop = "search-filter-buttons";
 
         private readonly GameTextEditor _editor = new GameTextEditor();
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The search and filter panel, read off mod.io's own singleton every frame
         /// (<see cref="CommunityMapsSources"/>). mod.io hides this panel's game object when a search
         /// opens the results page, so the adapter's <c>IsPresent</c> is what answers "the player has
@@ -78,34 +75,12 @@ namespace SongsOfConquestAccess.Screens
             return Live != null && Live.Close();
         }
 
-        /// <summary>While the keyboard is on its way to the keyword box, what the player types next is
-        /// meant for that box and must not start a search of the panel.</summary>
-        public override bool CapturesRawInput
+        /// <summary>The page's own editor, over the keyword box. GraphScreen takes the rest of its
+        /// lifecycle: the raw-input and field-ownership answers, the per-frame update, and the
+        /// abandon on leaving and on popping.</summary>
+        public override GameTextEditor Editor
         {
-            get { return _editor.Pending; }
-        }
-
-        public override bool OwnsGameField
-        {
-            get { return _editor.Pending || _editor.Editing; }
-        }
-
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
-            _editor.Update(IsActive());
-        }
-
-        public override void OnUnfocus()
-        {
-            base.OnUnfocus();
-            _editor.Abandon();
-        }
-
-        public override void OnPop()
-        {
-            base.OnPop();
-            _editor.Abandon();
+            get { return _editor; }
         }
 
         public override void Build(GraphBuilder builder)
@@ -127,31 +102,16 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>The keyword box. It is one of mod.io's own TMP fields rather than one of the
-        /// game's, and the editing contract is the same; its label is the box's own placeholder,
-        /// which is the only thing the panel writes next to it.</summary>
+        /// <summary>The keyword box. Its label is the box's own placeholder, which is the only thing
+        /// the panel writes next to it.</summary>
         private void AddKeyword(GraphBuilder builder)
         {
-            TMP_InputField field = Live.SearchField;
-            if (field == null || !field.gameObject.activeInHierarchy)
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.EditField(
+            GraphNodes.TmpEditField(
+                builder,
+                "search-filter:keyword",
+                Live.SearchField,
                 () => Live.SearchFieldLabel,
-                () => _editor.Editing ? null : field.text,
-                () => _editor.Request(Live.SearchField),
-                () => field.interactable);
-            // Arriving puts the game's own selection on the box. Measured: without it, an activation
-            // that follows a tag row - whose focus visual selected mod.io's toggle - selects the box
-            // but never makes it FOCUSED, and the edit ends in silence; with it, the handover lands
-            // every time.
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(field);
-            builder.AddItem(new DrawnNode(
-                ControlId.For(field, "search-filter:keyword"),
-                vtable,
-                field));
+                _editor);
         }
 
         private void AddTags(GraphBuilder builder)
@@ -213,18 +173,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.AddItem(new SyntheticNode(ControlId.For(Marker(key), key), vtable));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

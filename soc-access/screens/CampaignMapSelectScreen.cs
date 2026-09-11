@@ -102,14 +102,9 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool ConsumesBack
+        public override IMenuButtonAdapter BackButton
         {
-            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
-        }
-
-        public override bool Back()
-        {
-            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
+            get { return Live != null ? Live.BackButton : null; }
         }
 
         public override void Build(GraphBuilder builder)
@@ -306,15 +301,10 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
         {
-            if (button == null || button.Button == null || !button.IsVisible())
+            if (button != null)
             {
-                return;
+                GraphNodes.MenuButton(builder, key, button, onFocusVisual: () => FocusNativeButton(button.Button));
             }
-
-            IMenuButtonAdapter it = button;
-            NodeVtable vtable = GraphNodes.Button(it.GetLabel, () => it.Activate(), it.IsEnabled);
-            vtable.OnFocusVisual = () => FocusNativeButton(it.Button);
-            builder.AddItem(new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button));
         }
 
         private void FocusNativeButton(UIButton button)

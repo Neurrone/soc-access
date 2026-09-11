@@ -125,7 +125,15 @@ namespace SongsOfConquestAccess.UI
         /// </summary>
         public static string NameWithPlace(string title, WielderInteract wielder)
         {
-            string place = wielder == null || !wielder.IsPresent ? null : wielder.CustomName;
+            return NameWithPlace(title, wielder == null || !wielder.IsPresent ? null : wielder.CustomName);
+        }
+
+        /// <summary>A page's name and the second name the page draws with it, as one: the settlement's
+        /// building and the name the player gave it, the defence menu's title and its subtitle, a
+        /// wielder's page and the place it has walked into. The second is dropped where it is already
+        /// the same words, and where either is empty the other stands alone.</summary>
+        public static string NameWithPlace(string title, string place)
+        {
             if (string.IsNullOrWhiteSpace(place) || SameText(title, place))
             {
                 return string.IsNullOrWhiteSpace(title) ? null : title;

@@ -49,11 +49,6 @@ namespace SongsOfConquestAccess.Screens
         private const string LootStop = "post-battle-loot";
         private const string ButtonsStop = "post-battle-buttons";
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor back on the same one: the menu gives no component the screen can key the XP figure,
-        // the returned-troops line or the "None" row on.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         // Resolving a portrait walks the menu's parents and the scene root, so each side is looked
         // for once per menu, hit or miss: a defender without a commander has no portrait to find,
         // and the search would otherwise run again every frame. A new menu starts both over.
@@ -317,21 +312,16 @@ namespace SongsOfConquestAccess.Screens
             Component accept = Live.IsAcceptButtonVisible() ? Live.AcceptButton : null;
             if (accept != null)
             {
-                drawn.Add(new KeyValuePair<float, NodeDeclaration>(Left(accept), AcceptNode(accept)));
+                drawn.Add(new KeyValuePair<float, NodeDeclaration>(DrawnOrder.LeftOf(accept), AcceptNode(accept)));
             }
 
             Component redo = Live.IsRedoManualBattleButtonVisible() ? Live.RedoManualBattleButton : null;
             if (redo != null)
             {
-                drawn.Add(new KeyValuePair<float, NodeDeclaration>(Left(redo), RedoNode(redo)));
+                drawn.Add(new KeyValuePair<float, NodeDeclaration>(DrawnOrder.LeftOf(redo), RedoNode(redo)));
             }
 
-            if (drawn.Count == 2 && drawn[1].Key < drawn[0].Key)
-            {
-                KeyValuePair<float, NodeDeclaration> first = drawn[0];
-                drawn[0] = drawn[1];
-                drawn[1] = first;
-            }
+            DrawnOrder.SortByKey(drawn);
 
             for (int i = 0; i < drawn.Count; i++)
             {
@@ -367,35 +357,11 @@ namespace SongsOfConquestAccess.Screens
             return new DrawnNode(ControlId.For(button, "post-battle:redo"), vtable, button);
         }
 
-        private static float Left(Component button)
-        {
-            return button != null && button.transform != null ? button.transform.position.x : 0f;
-        }
-
         // ---- the lines the menu gives nothing to key on ----
 
         private void AddLine(GraphBuilder builder, string key, Func<string> text)
         {
-            if (string.IsNullOrWhiteSpace(text()))
-            {
-                return;
-            }
-
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(key), "post-battle:" + key),
-                GraphNodes.Text(text)));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
+            GraphNodes.TextLine(builder, Marker(key), "post-battle:" + key, text);
         }
     }
 }

@@ -42,10 +42,6 @@ namespace SongsOfConquestAccess.Screens
         private const string ButtonsStop = "player-stats-buttons";
         private const string SheetKey = "player-stats:";
 
-        // A subject of its own per summary line, kept across rebuilds so the reconciler seats the
-        // cursor on the same line: the page draws them as labels the mod has nothing else to key on.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The page's navigation object, an unbound scene object found by one gated walk of
         /// its own scene's roots (<see cref="MenuSceneSources"/>).</summary>
         protected override object ResolveMenu()
@@ -82,14 +78,9 @@ namespace SongsOfConquestAccess.Screens
             get { return TabsStop; }
         }
 
-        public override bool ConsumesBack
+        public override IMenuButtonAdapter BackButton
         {
-            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
-        }
-
-        public override bool Back()
-        {
-            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
+            get { return Live != null ? Live.BackButton : null; }
         }
 
         public override void Build(GraphBuilder builder)
@@ -296,33 +287,8 @@ namespace SongsOfConquestAccess.Screens
         private void BuildButtons(GraphBuilder builder)
         {
             // Back (x 21) then Options (x 1233) of the header band, left to right.
-            AddButton(builder, "player-stats:back", Live.BackButton);
-            AddButton(builder, "player-stats:options", Live.OptionsButton);
-        }
-
-        private static void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
-        {
-            if (button == null || button.Button == null || !button.IsVisible())
-            {
-                return;
-            }
-
-            IMenuButtonAdapter it = button;
-            NodeVtable vtable = GraphNodes.Button(it.GetLabel, () => it.Activate(), it.IsEnabled);
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(it.Button);
-            builder.AddItem(new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
+            GraphNodes.MenuButton(builder, "player-stats:back", Live.BackButton);
+            GraphNodes.MenuButton(builder, "player-stats:options", Live.OptionsButton);
         }
     }
 }

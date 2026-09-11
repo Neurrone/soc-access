@@ -180,17 +180,11 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                NodeVtable vtable = GraphNodes.Tab(tab.GetLabel, tab.IsSelected, tab.IsVisible);
-                // Focusing the tab IS switching to it; the guard makes re-focusing the showing tab a
-                // no-op, so re-entering the column does not redraw the page.
-                vtable.OnFocusVisual = () =>
-                {
-                    if (!tab.IsSelected())
-                    {
-                        tab.Select();
-                    }
-                };
-                vtable.OnActivate = () => tab.Select();
+                NodeVtable vtable = GraphNodes.SwitchingTab(
+                    tab.GetLabel,
+                    tab.IsSelected,
+                    () => tab.Select(),
+                    tab.IsVisible);
                 builder.AddItem(new SyntheticNode(ControlId.Structural("mod-options:tab/" + i), vtable));
             }
         }

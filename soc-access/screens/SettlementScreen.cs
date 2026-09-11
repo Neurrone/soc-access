@@ -87,14 +87,7 @@ namespace SongsOfConquestAccess.Screens
 
                 string building = Live.Title;
                 string custom = Live.IsCustomNameVisible ? Live.CustomName : null;
-                if (string.IsNullOrWhiteSpace(custom) || SameText(building, custom))
-                {
-                    return string.IsNullOrWhiteSpace(building) ? null : building;
-                }
-
-                return string.IsNullOrWhiteSpace(building)
-                    ? custom
-                    : ModText.Get(ModStrings.Common.ListSeparator, building, custom);
+                return TroopHudRows.NameWithPlace(building, custom);
             }
         }
 
@@ -313,26 +306,12 @@ namespace SongsOfConquestAccess.Screens
         private void BuildClose(GraphBuilder builder)
         {
             WielderInteract wielder = Live.Wielder;
-            Component close = wielder == null ? null : wielder.CloseButton;
-            if (close == null || !wielder.IsCloseVisible)
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "settlement:close",
+                wielder == null ? null : wielder.CloseButton,
+                () => wielder.IsCloseVisible,
                 () => wielder.ActivateClose());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, "settlement:close"), vtable, close));
-        }
-
-        private static bool SameText(string left, string right)
-        {
-            return string.Equals(
-                (left ?? string.Empty).Trim(),
-                (right ?? string.Empty).Trim(),
-                System.StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }

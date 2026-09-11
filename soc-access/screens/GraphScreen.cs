@@ -19,8 +19,18 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public abstract class GraphScreen : Screen
     {
+        private readonly MarkerTable _markers = new MarkerTable();
+
         /// <summary>Declare the screen's controls. Called on every navigation operation.</summary>
         public abstract void Build(GraphBuilder builder);
+
+        /// <summary>This screen's own object for that node key, to mint a node id from. The object
+        /// belongs to this screen INSTANCE, so two screens using the same key still get two ids.
+        /// </summary>
+        protected object Marker(string key)
+        {
+            return _markers.For(key);
+        }
 
         /// <summary>Where focus lands on first arrival, as a Tab-stop key; null starts at the graph's
         /// own start node.</summary>
@@ -76,27 +86,54 @@ namespace SongsOfConquestAccess.Screens
             return false;
         }
 
+        /// <summary>THE PAGE'S OWN BACK CONTROL, where it draws one the back key should press - the
+        /// menu pages' and the lobby pages' Back button. Null (the usual answer) leaves the key to the
+        /// game.</summary>
+        public virtual IMenuButtonAdapter BackButton
+        {
+            get { return null; }
+        }
+
         /// <summary>The back key was pressed. Return true when the screen handled it; false lets the
-        /// game's own handling stand.</summary>
+        /// game's own handling stand. The default presses <see cref="BackButton"/>.</summary>
         public virtual bool Back()
         {
-            return false;
+            IMenuButtonAdapter back = BackButton;
+            return back != null && back.Activate();
         }
 
         /// <summary>Whether <see cref="Back"/> is going to claim the key, asked BEFORE it is pressed.
-        /// Screens overwhelmingly answer false: Escape belongs to the game, and only a surface the
-        /// mod itself put on the screen has any business taking the key away from it.</summary>
+        /// Screens overwhelmingly answer false: Escape belongs to the game, and only a surface the mod
+        /// itself put on the screen, or a page drawing a Back button of its own, has any business
+        /// taking the key away from it.</summary>
         public virtual bool ConsumesBack
         {
-            get { return false; }
+            get
+            {
+                IMenuButtonAdapter back = BackButton;
+                return back != null && back.IsVisible();
+            }
         }
 
-        /// <summary>Whether this screen's own editor holds or is about to hold a game text field, so
-        /// the arrival release leaves it alone. Screens that own a <see cref="GameTextEditor"/>
-        /// answer with its pending-or-editing state.</summary>
+        /// <summary>THE SCREEN'S OWN TEXT EDITOR, or null where the page has no box the player types
+        /// into. A screen that has one answers with it and gets its whole lifecycle from here: the
+        /// raw-input and field-ownership answers, the per-frame update, and the abandon on leaving and
+        /// on popping. A screen whose editor lives on a row group answers with that one.</summary>
+        public virtual GameTextEditor Editor
+        {
+            get { return null; }
+        }
+
+        /// <summary>Whether the screen is handing the keyboard to a game field and so must not have it
+        /// taken back. A screen with an <see cref="Editor"/> answers with its pending-or-editing
+        /// state.</summary>
         public virtual bool OwnsGameField
         {
-            get { return false; }
+            get
+            {
+                GameTextEditor editor = Editor;
+                return editor != null && (editor.Pending || editor.Editing);
+            }
         }
 
         /// <summary>Whether typing searches this screen. False for a screen whose whole point is a
@@ -110,7 +147,11 @@ namespace SongsOfConquestAccess.Screens
         /// editor asked for and not yet given - so typed letters must not start a search.</summary>
         public virtual bool CapturesRawInput
         {
-            get { return false; }
+            get
+            {
+                GameTextEditor editor = Editor;
+                return editor != null && editor.Pending;
+            }
         }
 
         /// <summary>What a search on this screen looks through - null (the usual answer) for the
@@ -175,6 +216,38 @@ namespace SongsOfConquestAccess.Screens
             if (!OwnsGameField && !GameTextEditor.Owned)
             {
                 GameTextFocus.Release();
+            }
+
+            // After the release and after the navigator, so the word a handover speaks follows the
+            // activation's own readout. Whether the page is still showing is what tells an edit the
+            // player ended from a window that went away under it: Enter in the box can send and close
+            // it, and an ending nobody is left to hear is not announced.
+            GameTextEditor editor = Editor;
+            if (editor != null)
+            {
+                editor.Update(IsActive());
+            }
+        }
+
+        /// <summary>The cursor has left the screen: an edit still being handed over is given up.
+        /// </summary>
+        public override void OnUnfocus()
+        {
+            base.OnUnfocus();
+            GameTextEditor editor = Editor;
+            if (editor != null)
+            {
+                editor.Abandon();
+            }
+        }
+
+        public override void OnPop()
+        {
+            base.OnPop();
+            GameTextEditor editor = Editor;
+            if (editor != null)
+            {
+                editor.Abandon();
             }
         }
 

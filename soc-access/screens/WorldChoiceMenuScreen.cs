@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
@@ -38,6 +37,10 @@ namespace SongsOfConquestAccess.Screens
 
         // A subject of its own for the body, which the menu draws as a plain text rather than as a
         // control, kept across rebuilds so the reconciler seats the cursor on the same one.
+        // A section the game has stopped answering for is reported once and then costs only its own
+        // rows. What has been reported is mod-owned and outlives any one menu instance.
+        private readonly SectionItems _sections = new SectionItems("WorldChoiceMenuScreen");
+
         private readonly object _bodyMarker = new object();
 
         /// <summary>The one world choice window the adventure scene holds for the whole game.</summary>
@@ -136,7 +139,7 @@ namespace SongsOfConquestAccess.Screens
         /// arriving is not choosing.</summary>
         private void BuildChoices(GraphBuilder builder)
         {
-            IReadOnlyList<WorldChoiceMenuAdapter.ChoiceItem> choices = Items("choices", Live.GetChoices);
+            IReadOnlyList<WorldChoiceMenuAdapter.ChoiceItem> choices = _sections.Of("choices", Live.GetChoices);
             for (int i = 0; i < choices.Count; i++)
             {
                 WorldChoiceMenuAdapter.ChoiceItem it = choices[i];
@@ -185,34 +188,12 @@ namespace SongsOfConquestAccess.Screens
         private void BuildClose(GraphBuilder builder)
         {
             WielderInteract wielder = Live.Wielder;
-            Component close = wielder == null ? null : wielder.CloseButton;
-            if (close == null || !wielder.IsCloseVisible)
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "world-choice:close",
+                wielder == null ? null : wielder.CloseButton,
+                () => wielder.IsCloseVisible,
                 () => wielder.ActivateClose());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, "world-choice:close"), vtable, close));
-        }
-
-        /// <summary>One section's items, or none where reading them threw: a part of the menu the game
-        /// has stopped answering for costs its own rows and never the rest of the page.</summary>
-        private static IReadOnlyList<T> Items<T>(string section, Func<IReadOnlyList<T>> getter)
-        {
-            try
-            {
-                IReadOnlyList<T> items = getter != null ? getter() : null;
-                return items ?? new T[0];
-            }
-            catch (Exception exception)
-            {
-                SocAccessMod.Instance?.LogWarning("WorldChoiceMenuScreen section " + section + " failed to build: " + exception);
-                return new T[0];
-            }
         }
 
     }

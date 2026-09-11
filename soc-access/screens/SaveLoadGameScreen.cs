@@ -60,10 +60,6 @@ namespace SongsOfConquestAccess.Screens
 
         private readonly GameTextEditor _editor = new GameTextEditor();
 
-        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
-        // cursor on the same line while what it says changes under it.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         public object SourceKey
         {
             get { return Live != null ? Live.SourceKey : null; }
@@ -103,34 +99,12 @@ namespace SongsOfConquestAccess.Screens
             get { return SavesStop; }
         }
 
-        /// <summary>While the keyboard is on its way to the game's box, what the player types next is
-        /// meant for that box and must not start a search.</summary>
-        public override bool CapturesRawInput
+        /// <summary>The page's own editor, over the save name box. GraphScreen takes the rest of its
+        /// lifecycle: the raw-input and field-ownership answers, the per-frame update, and the
+        /// abandon on leaving and on popping.</summary>
+        public override GameTextEditor Editor
         {
-            get { return _editor.Pending; }
-        }
-
-        public override bool OwnsGameField
-        {
-            get { return _editor.Pending || _editor.Editing; }
-        }
-
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
-            _editor.Update(IsActive());
-        }
-
-        public override void OnUnfocus()
-        {
-            base.OnUnfocus();
-            _editor.Abandon();
-        }
-
-        public override void OnPop()
-        {
-            base.OnPop();
-            _editor.Abandon();
+            get { return _editor; }
         }
 
         public override void Build(GraphBuilder builder)
@@ -341,7 +315,7 @@ namespace SongsOfConquestAccess.Screens
             Add(buttons, Live.LoadAsOnlineButton);
             Add(buttons, Live.LoadButton);
             Add(buttons, Live.SaveButton);
-            SortByDrawnTop(buttons);
+            DrawnOrder.SortByTop(buttons, item => item.Button);
             for (int i = 0; i < buttons.Count; i++)
             {
                 AddButton(builder, buttons[i]);
@@ -357,33 +331,6 @@ namespace SongsOfConquestAccess.Screens
             if (button != null && button.Button != null && button.IsVisible())
             {
                 buttons.Add(button);
-            }
-        }
-
-        // The same insertion sort as the rows', over the button column.
-        private static void SortByDrawnTop(List<SaveLoadGameMenuAdapter.ButtonItem> items)
-        {
-            List<float> tops = new List<float>(items.Count);
-            for (int i = 0; i < items.Count; i++)
-            {
-                Component component = items[i].Button;
-                tops.Add(component != null ? component.transform.position.y : 0f);
-            }
-
-            for (int i = 1; i < items.Count; i++)
-            {
-                SaveLoadGameMenuAdapter.ButtonItem moving = items[i];
-                float top = tops[i];
-                int j = i - 1;
-                while (j >= 0 && tops[j] < top)
-                {
-                    items[j + 1] = items[j];
-                    tops[j + 1] = tops[j];
-                    j--;
-                }
-
-                items[j + 1] = moving;
-                tops[j + 1] = top;
             }
         }
 
@@ -426,18 +373,6 @@ namespace SongsOfConquestAccess.Screens
                 Live.IsInputEnabled);
             vtable.OnFocusVisual = () => Live.FocusInput();
             builder.AddItem(new DrawnNode(ControlId.For(subject, "save-load:name"), vtable, subject));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

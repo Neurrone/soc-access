@@ -42,11 +42,6 @@ namespace SongsOfConquestAccess.Screens
         private const string SkillsStop = "level-up-skills";
         private const string CloseStop = "level-up-close";
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the menu gives no component for its heading, its identity line, the
-        // "Choose a Skill" caption or the max-level notice.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The one level-up window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<ICommanderLevelUpMenu> _source =
             ScreenSource<ICommanderLevelUpMenu>.FromScene(LoadedScenes.AdventureScene);
@@ -173,7 +168,7 @@ namespace SongsOfConquestAccess.Screens
                 builder.PushContext(caption);
             }
 
-            List<LevelUpMenuAdapter.SkillChoice> choices = DrawnOrder(Live.GetSkillChoices());
+            List<LevelUpMenuAdapter.SkillChoice> choices = InDrawnOrder(Live.GetSkillChoices());
             for (int i = 0; i < choices.Count; i++)
             {
                 LevelUpMenuAdapter.SkillChoice choice = choices[i];
@@ -218,7 +213,7 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The cards left to right as the menu draws them, measured off each card's own
         /// transform every build; the insertion sort is stable, so two cards at one x keep the
         /// settings' order.</summary>
-        private static List<LevelUpMenuAdapter.SkillChoice> DrawnOrder(
+        private static List<LevelUpMenuAdapter.SkillChoice> InDrawnOrder(
             IReadOnlyList<LevelUpMenuAdapter.SkillChoice> choices)
         {
             List<LevelUpMenuAdapter.SkillChoice> drawn = new List<LevelUpMenuAdapter.SkillChoice>();
@@ -235,22 +230,7 @@ namespace SongsOfConquestAccess.Screens
                 lefts.Add(choice.Button != null ? choice.Button.transform.position.x : 0f);
             }
 
-            for (int i = 1; i < drawn.Count; i++)
-            {
-                LevelUpMenuAdapter.SkillChoice moving = drawn[i];
-                float left = lefts[i];
-                int j = i - 1;
-                while (j >= 0 && lefts[j] > left)
-                {
-                    drawn[j + 1] = drawn[j];
-                    lefts[j + 1] = lefts[j];
-                    j--;
-                }
-
-                drawn[j + 1] = moving;
-                lefts[j + 1] = left;
-            }
-
+            DrawnOrder.SortAscending(drawn, lefts);
             return drawn;
         }
 
@@ -258,42 +238,17 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = Live.CloseButton;
-            if (close == null || !Live.IsCloseVisible())
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "level-up:close",
+                Live.CloseButton,
+                Live.IsCloseVisible,
                 () => Live.ActivateClose());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, "level-up:close"), vtable, close));
         }
 
         private void AddLine(GraphBuilder builder, string key, Func<string> text)
         {
-            if (string.IsNullOrWhiteSpace(text()))
-            {
-                return;
-            }
-
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(key), "level-up:" + key),
-                GraphNodes.Text(text)));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
+            GraphNodes.TextLine(builder, Marker(key), "level-up:" + key, text);
         }
 
     }

@@ -74,14 +74,9 @@ namespace SongsOfConquestAccess.Screens
             get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
-        public override bool ConsumesBack
+        public override IMenuButtonAdapter BackButton
         {
-            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
-        }
-
-        public override bool Back()
-        {
-            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
+            get { return Live != null ? Live.BackButton : null; }
         }
 
         public override void Build(GraphBuilder builder)
@@ -140,7 +135,7 @@ namespace SongsOfConquestAccess.Screens
             AddCard(band, "map-type:all-maps", Live.AllMapsButton);
             AddCard(band, "map-type:challenge-maps", Live.ChallengeMapsButton);
             AddCard(band, "map-type:random-maps", Live.RandomMapsButton);
-            SortByDrawnLeft(band);
+            DrawnOrder.SortByLeft(band, card => card.Value.Button);
             return band;
         }
 
@@ -161,40 +156,6 @@ namespace SongsOfConquestAccess.Screens
             {
                 list.Add(new KeyValuePair<string, IMenuButtonAdapter>(key, item));
             }
-        }
-
-        // Insertion sort by drawn left edge, leftmost first; stable, so two cards at one x keep
-        // declaration order.
-        private static void SortByDrawnLeft(
-            List<KeyValuePair<string, AdventureLobbyMapTypeAdapter.MapTypeMenuButtonAdapter>> items)
-        {
-            List<float> lefts = new List<float>(items.Count);
-            for (int i = 0; i < items.Count; i++)
-            {
-                lefts.Add(Left(items[i].Value));
-            }
-
-            for (int i = 1; i < items.Count; i++)
-            {
-                KeyValuePair<string, AdventureLobbyMapTypeAdapter.MapTypeMenuButtonAdapter> moving = items[i];
-                float left = lefts[i];
-                int j = i - 1;
-                while (j >= 0 && lefts[j] > left)
-                {
-                    items[j + 1] = items[j];
-                    lefts[j + 1] = lefts[j];
-                    j--;
-                }
-
-                items[j + 1] = moving;
-                lefts[j + 1] = left;
-            }
-        }
-
-        private static float Left(AdventureLobbyMapTypeAdapter.MapTypeMenuButtonAdapter item)
-        {
-            Component component = item.Button;
-            return component != null ? component.transform.position.x : 0f;
         }
     }
 }

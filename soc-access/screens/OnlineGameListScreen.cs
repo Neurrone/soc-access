@@ -82,14 +82,9 @@ namespace SongsOfConquestAccess.Screens
             get { return TableStop; }
         }
 
-        public override bool ConsumesBack
+        public override IMenuButtonAdapter BackButton
         {
-            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
-        }
-
-        public override bool Back()
-        {
-            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
+            get { return Live != null ? Live.BackButton : null; }
         }
 
         public override void Build(GraphBuilder builder)
@@ -272,19 +267,11 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
         {
-            if (button == null || button.Button == null || !button.IsVisible())
+            // Guarded here too, so a button the page is not drawing is never asked for a tooltip.
+            if (button != null && button.Button != null && button.IsVisible())
             {
-                return;
+                GraphNodes.MenuButton(builder, key, button, Live.GetButtonTooltip(button));
             }
-
-            IMenuButtonAdapter it = button;
-            NodeVtable vtable = GraphNodes.Button(
-                it.GetLabel,
-                () => it.Activate(),
-                it.IsEnabled,
-                Live.GetButtonTooltip(it));
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(it.Button as Component);
-            builder.AddItem(new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button));
         }
     }
 }

@@ -174,19 +174,9 @@ namespace SongsOfConquestAccess.Screens
                 buttons.Add(new KeyValuePair<string, Component>(CancelKey, Live.CancelButton));
             }
 
-            if (buttons.Count == 2 && Left(buttons[1].Value) < Left(buttons[0].Value))
-            {
-                KeyValuePair<string, Component> first = buttons[0];
-                buttons[0] = buttons[1];
-                buttons[1] = first;
-            }
+            DrawnOrder.SortByLeft(buttons, button => button.Value);
 
             return buttons;
-        }
-
-        private static float Left(Component button)
-        {
-            return button != null ? button.transform.position.x : 0f;
         }
     }
 }

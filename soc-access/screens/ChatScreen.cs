@@ -42,10 +42,6 @@ namespace SongsOfConquestAccess.Screens
 
         private readonly GameTextEditor _editor = new GameTextEditor();
 
-        // Subjects of their own for the lines the game gives no component for: a message is text the
-        // window renders into one mesh, and the way out is the mod's own row.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The chat window the game has up, drawn or not (<see cref="ChatSource"/>); the
         /// page is this screen only while the window is OPEN.</summary>
         protected override object ResolveMenu()
@@ -85,38 +81,12 @@ namespace SongsOfConquestAccess.Screens
             return Live != null && Live.Close();
         }
 
-        /// <summary>While the keyboard is on its way to the message box, what the player types next is
-        /// meant for that box and must not start a search.</summary>
-        public override bool CapturesRawInput
+        /// <summary>The page's own editor, over the message box. GraphScreen takes the rest of its
+        /// lifecycle: the raw-input and field-ownership answers, the per-frame update, and the
+        /// abandon on leaving and on popping.</summary>
+        public override GameTextEditor Editor
         {
-            get { return _editor.Pending; }
-        }
-
-        public override bool OwnsGameField
-        {
-            get { return _editor.Pending || _editor.Editing; }
-        }
-
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
-
-            // After the navigator, so the word the handover speaks follows the activation's own
-            // readout. IsPresent is what tells an edit the player ended from a window that went away
-            // under it: Enter in the box sends and the game may close the window with it.
-            _editor.Update(IsActive());
-        }
-
-        public override void OnUnfocus()
-        {
-            base.OnUnfocus();
-            _editor.Abandon();
-        }
-
-        public override void OnPop()
-        {
-            base.OnPop();
-            _editor.Abandon();
+            get { return _editor; }
         }
 
         /// <summary>A message has arrived while the window is open: it is spoken as it lands, the
@@ -295,18 +265,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return spoken;
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

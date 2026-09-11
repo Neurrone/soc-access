@@ -4,7 +4,6 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
-using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -116,7 +115,7 @@ namespace SongsOfConquestAccess.Screens
                 builder.SetStart(bodyId);
             }
 
-            List<ClaimMenuAdapter.ChoiceItem> choices = DrawnOrder(Live.GetChoices());
+            List<ClaimMenuAdapter.ChoiceItem> choices = InDrawnOrder(Live.GetChoices());
             for (int i = 0; i < choices.Count; i++)
             {
                 ClaimMenuAdapter.ChoiceItem choice = choices[i];
@@ -146,7 +145,7 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The choices top to bottom as the game draws them, measured off each toggle's own
         /// transform every build; the insertion sort is stable, so two choices at one height keep the
         /// adapter's order.</summary>
-        private static List<ClaimMenuAdapter.ChoiceItem> DrawnOrder(IReadOnlyList<ClaimMenuAdapter.ChoiceItem> choices)
+        private static List<ClaimMenuAdapter.ChoiceItem> InDrawnOrder(IReadOnlyList<ClaimMenuAdapter.ChoiceItem> choices)
         {
             List<ClaimMenuAdapter.ChoiceItem> drawn = new List<ClaimMenuAdapter.ChoiceItem>();
             List<float> tops = new List<float>();
@@ -162,22 +161,7 @@ namespace SongsOfConquestAccess.Screens
                 tops.Add(choice.Toggle.transform.position.y);
             }
 
-            for (int i = 1; i < drawn.Count; i++)
-            {
-                ClaimMenuAdapter.ChoiceItem moving = drawn[i];
-                float top = tops[i];
-                int j = i - 1;
-                while (j >= 0 && tops[j] < top)
-                {
-                    drawn[j + 1] = drawn[j];
-                    tops[j + 1] = tops[j];
-                    j--;
-                }
-
-                drawn[j + 1] = moving;
-                tops[j + 1] = top;
-            }
-
+            DrawnOrder.SortDescending(drawn, tops);
             return drawn;
         }
 

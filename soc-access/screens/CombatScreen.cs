@@ -79,15 +79,6 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public sealed class CombatScreen : LiveScreen<CombatAdapter>
     {
-        private static readonly EssenceType[] EssenceRowOrder =
-        {
-            EssenceType.Order,
-            EssenceType.Creation,
-            EssenceType.Chaos,
-            EssenceType.Arcana,
-            EssenceType.Destruction
-        };
-
         private const string ReturnToGridSoundKey = "Common_ClosePauseMenu";
 
         private const string BoardStop = "combat:board";
@@ -513,7 +504,7 @@ namespace SongsOfConquestAccess.Screens
                 builder.AddItem(new SyntheticNode(ControlId.Structural(key + "portrait"), vtable));
             }
 
-            AddButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 key + "ai-control",
                 aiDrawn,
@@ -525,7 +516,7 @@ namespace SongsOfConquestAccess.Screens
 
             BuildEssences(builder, commanders, side, key, essencesDrawn);
 
-            AddButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 key + "spells",
                 spellsDrawn,
@@ -534,7 +525,7 @@ namespace SongsOfConquestAccess.Screens
                 hud.IsSpellbookButtonEnabled,
                 spellsDrawn ? hud.SpellbookButtonTooltip : null,
                 hud.FocusSpellbookButton);
-            AddButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 key + "cancel-spell",
                 cancelSpellDrawn,
@@ -561,30 +552,12 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            string caption = GameText.Get("Common/CommanderInventory/Essences", string.Empty);
-            bool named = !string.IsNullOrWhiteSpace(caption);
-            if (named)
-            {
-                builder.PushContext(caption);
-            }
-
-            builder.SetRegion(key + "essences");
-            for (int i = 0; i < EssenceRowOrder.Length; i++)
-            {
-                EssenceType essence = EssenceRowOrder[i];
-                NodeVtable vtable = GraphNodes.Text(
-                    () => commanders.GetEssenceLabel(side, essence),
-                    null,
-                    commanders.GetEssenceTooltip(side, essence));
-                vtable.OnFocusVisual = () => commanders.FocusEssence(side, essence);
-                builder.AddItem(new SyntheticNode(ControlId.Structural(key + "essence:" + essence), vtable));
-            }
-
-            builder.SetRegion(null);
-            if (named)
-            {
-                builder.PopContext();
-            }
+            EssenceRows.Build(
+                builder,
+                key,
+                essence => commanders.GetEssenceLabel(side, essence),
+                essence => commanders.GetEssenceTooltip(side, essence),
+                essence => commanders.FocusEssence(side, essence));
         }
 
         // ---- the current troop ----
@@ -613,7 +586,7 @@ namespace SongsOfConquestAccess.Screens
                 builder.AddItem(new SyntheticNode(ControlId.Structural("combat:current-troop"), vtable));
             }
 
-            AddButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 "combat:ability",
                 abilityDrawn,
@@ -622,7 +595,7 @@ namespace SongsOfConquestAccess.Screens
                 hud.IsAbilityButtonEnabled,
                 abilityDrawn ? hud.AbilityButtonTooltip : null,
                 hud.FocusAbilityButton);
-            AddButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 "combat:cancel-ability",
                 cancelAbilityDrawn,
@@ -754,7 +727,7 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(MenuStop);
             builder.PushContext(ModText.Get(ModStrings.Screens.Menu));
-            AddButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 "combat:chat",
                 chatDrawn,
@@ -763,7 +736,7 @@ namespace SongsOfConquestAccess.Screens
                 () => chat.IsButtonEnabled(),
                 chatDrawn ? chat.ButtonTooltip : null,
                 () => chat.FocusButton());
-            AddButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 "combat:game-menu",
                 menuDrawn,
@@ -818,7 +791,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.BeginStop(EndTurnStop);
-            AddButton(
+            GraphNodes.SyntheticButton(
                 builder,
                 "combat:end-turn",
                 true,
@@ -830,26 +803,6 @@ namespace SongsOfConquestAccess.Screens
         }
 
         // ---- shared node plumbing ----
-
-        private static void AddButton(
-            GraphBuilder builder,
-            string key,
-            bool drawn,
-            Func<string> label,
-            Action activate,
-            Func<bool> enabled,
-            Tooltip tooltip,
-            Action focus)
-        {
-            if (!drawn)
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.Button(label, activate, enabled, tooltip);
-            vtable.OnFocusVisual = focus;
-            builder.AddItem(new SyntheticNode(ControlId.Structural(key), vtable));
-        }
 
         // ---- keys ----
 

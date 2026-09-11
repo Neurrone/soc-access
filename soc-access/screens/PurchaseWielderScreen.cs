@@ -45,11 +45,6 @@ namespace SongsOfConquestAccess.Screens
         private const string DetailsStop = "purchase-wielder-details";
         private const string CloseStop = "purchase-wielder-close";
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the quote, the four stats, the specialization and the purchase
-        // status are read off text meshes the details pane rebinds rather than off rows of their own.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         public PurchaseWielderMenuAdapter Adapter
         {
             get { return Live; }
@@ -348,18 +343,12 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = Live.CloseButton;
-            if (close == null || !Live.IsCloseVisible())
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "purchase-wielder:close",
+                Live.CloseButton,
+                Live.IsCloseVisible,
                 () => Live.ActivateClose());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, "purchase-wielder:close"), vtable, close));
         }
 
         // ---- shared ----
@@ -380,14 +369,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddLine(GraphBuilder builder, string key, Func<string> text)
         {
-            if (string.IsNullOrWhiteSpace(text()))
-            {
-                return;
-            }
-
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(key), "purchase-wielder:" + key),
-                GraphNodes.Text(text)));
+            GraphNodes.TextLine(builder, Marker(key), "purchase-wielder:" + key, text);
         }
 
         /// <summary>The same, for a text the pane may have written in more than one paragraph: one
@@ -403,18 +385,6 @@ namespace SongsOfConquestAccess.Screens
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker(key), "purchase-wielder:" + key),
                 GraphNodes.Paragraphs(() => paragraphs)));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
     }
 }

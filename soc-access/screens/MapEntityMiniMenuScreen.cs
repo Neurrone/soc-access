@@ -38,10 +38,6 @@ namespace SongsOfConquestAccess.Screens
         private const string ActionsStop = "map-entity-actions";
         private const string CloseStop = "map-entity-close";
 
-        // The lines the game gives no component of their own for, and the close, keyed by subjects
-        // held across rebuilds so the reconciler seats the cursor back on the same node.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         public MapEntityMiniMenuAdapter Adapter
         {
             get { return Live; }
@@ -257,23 +253,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker("close"), "map-entity:close"),
-                GraphNodes.Button(
-                    () => ModText.Get(ModStrings.Screens.Close),
-                    () => Live.Close())));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
+            GraphNodes.ModClose(builder, "map-entity:close", Marker("close"), () => Live.Close());
         }
     }
 }

@@ -50,10 +50,6 @@ namespace SongsOfConquestAccess.Screens
 
         private static readonly FieldInfo StatsMenuField = AccessTools.Field(typeof(PostAdventureMenu), "_statsMenu");
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the menu gives no component the screen can key its figures on.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The one post-adventure stats window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<IPostAdventureStatsMenu> _source =
             ScreenSource<IPostAdventureStatsMenu>.FromScene(LoadedScenes.AdventureScene);
@@ -160,7 +156,7 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>One tick per team, in the order the menu draws them down the page.</summary>
         private void BuildTeams(GraphBuilder builder)
         {
-            List<PostAdventureStatsAdapter.TeamOption> teams = DrawnOrder(Live.GetTeamOptions());
+            List<PostAdventureStatsAdapter.TeamOption> teams = InDrawnOrder(Live.GetTeamOptions());
             for (int i = 0; i < teams.Count; i++)
             {
                 PostAdventureStatsAdapter.TeamOption team = teams[i];
@@ -188,7 +184,7 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The teams top to bottom as the menu draws them, measured off each entry's own
         /// transform every build; the insertion sort is stable, so two entries at one y keep the
         /// order the menu spawned them in.</summary>
-        private static List<PostAdventureStatsAdapter.TeamOption> DrawnOrder(
+        private static List<PostAdventureStatsAdapter.TeamOption> InDrawnOrder(
             IReadOnlyList<PostAdventureStatsAdapter.TeamOption> teams)
         {
             List<PostAdventureStatsAdapter.TeamOption> drawn = new List<PostAdventureStatsAdapter.TeamOption>();
@@ -205,22 +201,7 @@ namespace SongsOfConquestAccess.Screens
                 tops.Add(team.Entry.transform != null ? team.Entry.transform.position.y : 0f);
             }
 
-            for (int i = 1; i < drawn.Count; i++)
-            {
-                PostAdventureStatsAdapter.TeamOption moving = drawn[i];
-                float top = tops[i];
-                int j = i - 1;
-                while (j >= 0 && tops[j] < top)
-                {
-                    drawn[j + 1] = drawn[j];
-                    tops[j + 1] = tops[j];
-                    j--;
-                }
-
-                drawn[j + 1] = moving;
-                tops[j + 1] = top;
-            }
-
+            DrawnOrder.SortDescending(drawn, tops);
             return drawn;
         }
 
@@ -304,22 +285,13 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = Live.CloseButton;
-            if (close == null || !Live.IsCloseButtonVisible())
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "post-adventure-stats:close",
+                Live.CloseButton,
+                Live.IsCloseButtonVisible,
                 () => Live.Close(),
                 Live.IsCloseButtonEnabled);
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(
-                ControlId.For(close, "post-adventure-stats:close"),
-                vtable,
-                close));
         }
 
         // ---- the lines the menu gives nothing to key on ----
@@ -334,18 +306,6 @@ namespace SongsOfConquestAccess.Screens
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker(key), "post-adventure-stats:" + key),
                 GraphNodes.Text(text)));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
         }
 
         private static PostAdventureStatsMenu GetStatsMenu(PostAdventureMenu resultMenu)

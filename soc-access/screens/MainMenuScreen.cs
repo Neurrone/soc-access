@@ -86,7 +86,7 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(MenuStop);
             IReadOnlyList<IMenuButtonAdapter> items = Live.TopLevelItems;
-            foreach (int index in DrawnOrder(items))
+            foreach (int index in InDrawnOrder(items))
             {
                 IMenuButtonAdapter item = items[index];
                 string key = "mainmenu:" + GetTopLevelItemId(index);
@@ -107,7 +107,7 @@ namespace SongsOfConquestAccess.Screens
                 group.OnCollapse = () => it.Close();
                 builder.BeginGroup(new DrawnNode(ControlId.For(item.Button, key), group, item.Button), expanded: foldout.IsOpen());
                 IReadOnlyList<IMenuButtonAdapter> children = foldout.Items;
-                foreach (int childIndex in DrawnOrder(children))
+                foreach (int childIndex in InDrawnOrder(children))
                 {
                     IMenuButtonAdapter child = children[childIndex];
                     builder.AddItem(new DrawnNode(
@@ -170,7 +170,7 @@ namespace SongsOfConquestAccess.Screens
         /// the drawn one. Measured off each button's own rectangle every build, so a layout the game
         /// changes is followed; a stable index tiebreak keeps two buttons at one height in list order.
         /// </summary>
-        private static List<int> DrawnOrder(IReadOnlyList<IMenuButtonAdapter> items)
+        private static List<int> InDrawnOrder(IReadOnlyList<IMenuButtonAdapter> items)
         {
             List<int> order = new List<int>();
             List<float> tops = new List<float>();
@@ -186,23 +186,7 @@ namespace SongsOfConquestAccess.Screens
                 tops.Add(Top(item));
             }
 
-            // Insertion sort by drawn top, highest first; stable, so equal heights keep list order.
-            for (int i = 1; i < order.Count; i++)
-            {
-                int index = order[i];
-                float top = tops[i];
-                int j = i - 1;
-                while (j >= 0 && tops[j] < top)
-                {
-                    order[j + 1] = order[j];
-                    tops[j + 1] = tops[j];
-                    j--;
-                }
-
-                order[j + 1] = index;
-                tops[j + 1] = top;
-            }
-
+            DrawnOrder.SortDescending(order, tops);
             return order;
         }
 

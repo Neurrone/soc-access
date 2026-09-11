@@ -75,16 +75,15 @@ namespace SongsOfConquestAccess.Screens
         private const string KeyPrefix = "artifact-market";
         private const string WielderKey = "artifact-market:wielder";
 
-        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the description and the auto-arrange button are not drawn as
-        // controls of their own.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         // This column's slot nodes, kept for as long as the adapter hands back the same slot list.
         // The nodes are closures that read the game when they are READ, so rebuilding them every
         // frame bought nothing but the allocation; the contributor owns the key and the rule
         // (ui/ArtifactSlotNodes.cs, Column). It is a field on the SCREEN because an adapter may hold
         // no graph concepts.
+        // A section the game has stopped answering for is reported once and then costs only its own
+        // rows. What has been reported is mod-owned and outlives any one menu instance.
+        private readonly SectionItems _sections = new SectionItems("ArtifactMarketScreen");
+
         private readonly ArtifactSlotNodes.Column _column = new ArtifactSlotNodes.Column();
 
         // The offers' nodes, kept for as long as the adapter hands back the same offer list (see
@@ -227,7 +226,7 @@ namespace SongsOfConquestAccess.Screens
         /// clears whatever is selected.</summary>
         private void BuildCategories(GraphBuilder builder)
         {
-            IReadOnlyList<ArtifactMarketMenuAdapter.CategoryItem> categories = Items("categories", Live.GetCategories);
+            IReadOnlyList<ArtifactMarketMenuAdapter.CategoryItem> categories = _sections.Of("categories", Live.GetCategories);
             if (categories.Count == 0)
             {
                 return;
@@ -261,7 +260,7 @@ namespace SongsOfConquestAccess.Screens
         /// category with no offer at all is one line saying so.</summary>
         private void BuildOffers(GraphBuilder builder)
         {
-            List<NodeDeclaration> nodes = OfferNodes(Items("offers", Live.GetMarketArtifacts));
+            List<NodeDeclaration> nodes = OfferNodes(_sections.Of("offers", Live.GetMarketArtifacts));
             for (int i = 0; i < nodes.Count; i++)
             {
                 builder.AddItem(nodes[i]);
@@ -438,48 +437,14 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = Live.CloseButton;
-            if (close == null || !Live.IsCloseVisible())
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "artifact-market:close",
+                Live.CloseButton,
+                Live.IsCloseVisible,
                 () => Live.ActivateClose());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, "artifact-market:close"), vtable, close));
         }
 
         // ---- shared ----
-
-        /// <summary>One section's items, or none where reading them threw: a part of the menu the game
-        /// has stopped answering for costs its own rows and never the rest of the page.</summary>
-        private static IReadOnlyList<T> Items<T>(string section, Func<IReadOnlyList<T>> getter)
-        {
-            try
-            {
-                IReadOnlyList<T> items = getter != null ? getter() : null;
-                return items ?? new T[0];
-            }
-            catch (Exception exception)
-            {
-                SocAccessMod.Instance?.LogWarning("ArtifactMarketScreen section " + section + " failed to build: " + exception);
-                return new T[0];
-            }
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
-        }
     }
 }

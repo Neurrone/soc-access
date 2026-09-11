@@ -146,20 +146,11 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 int index = i;
-                NodeVtable vtable = GraphNodes.Tab(
+                NodeVtable vtable = GraphNodes.SwitchingTab(
                     tab.GetLabel,
                     () => Live.GetActiveTabIndex() == index,
+                    () => tab.Select(),
                     tab.IsVisible);
-                // Focusing the tab IS switching to it; the guard makes re-focusing the showing tab a
-                // no-op, so re-entering the bar does not restart the page.
-                vtable.OnFocusVisual = () =>
-                {
-                    if (Live.GetActiveTabIndex() != index)
-                    {
-                        tab.Select();
-                    }
-                };
-                vtable.OnActivate = () => tab.Select();
                 builder.AddItem(new SyntheticNode(ControlId.Structural("options:tab/" + tab.Id), vtable));
             }
         }

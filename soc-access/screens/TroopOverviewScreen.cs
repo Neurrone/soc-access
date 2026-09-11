@@ -144,7 +144,7 @@ namespace SongsOfConquestAccess.Screens
         {
             KingdomTroopOverviewAdapter.TownItem it = town;
             NodeVtable vtable = GraphNodes.Button(() => it.Name, () => it.MoveCamera());
-            AddValue(vtable, it.Tier);
+            GraphNodes.AddValue(vtable, it.Tier);
             return vtable;
         }
 
@@ -156,32 +156,15 @@ namespace SongsOfConquestAccess.Screens
             KingdomTroopOverviewAdapter.RowItem it = row;
             NodeVtable vtable = GraphNodes.Button(() => it.Name, () => it.Activate());
             vtable.OnFocusVisual = () => it.Focus();
-            AddValue(vtable, it.Amount);
+            GraphNodes.AddValue(vtable, it.Amount);
             return vtable;
-        }
-
-        /// <summary>The figure the game drew at the right of the line, as that line's value. A line
-        /// the game draws no figure on says nothing beyond its name.</summary>
-        private static void AddValue(NodeVtable vtable, string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return;
-            }
-
-            string text = value;
-            vtable.Announcements.Add(GraphNodes.ValuePart(() => text, watch: false));
         }
 
         // ---- the close ----
 
         private void BuildClose(GraphBuilder builder)
         {
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(_closeKey, "troop-overview:close"),
-                GraphNodes.Button(
-                    () => ModText.Get(ModStrings.Screens.Close),
-                    () => Live.Close())));
+            GraphNodes.ModClose(builder, "troop-overview:close", _closeKey, () => Live.Close());
         }
     }
 }

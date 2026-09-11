@@ -188,17 +188,12 @@ namespace SongsOfConquestAccess.Screens
         private void BuildClose(GraphBuilder builder)
         {
             WielderInteract wielder = Live.Wielder;
-            Component close = wielder == null ? null : wielder.CloseButton;
-            if (close == null || !wielder.IsCloseVisible)
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                KeyPrefix + ":close-button",
+                wielder == null ? null : wielder.CloseButton,
+                () => wielder.IsCloseVisible,
                 () => wielder.ActivateClose());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, KeyPrefix + ":close-button"), vtable, close));
         }
     }
 }

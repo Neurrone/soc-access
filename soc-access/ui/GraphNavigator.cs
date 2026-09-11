@@ -193,13 +193,6 @@ namespace SongsOfConquestAccess.UI
             return int.TryParse(rest, out index) ? index : -1;
         }
 
-        /// <summary>The render the cursor is standing in - the last one built; null before the first
-        /// build.</summary>
-        public GraphRender Render
-        {
-            get { return _graph == null ? null : _graph.Current; }
-        }
-
         /// <summary>The tooltip the focused node points at, or null - what the tooltip actions menu
         /// opens on, read the way the widget engine's <c>CurrentWidget.GetTooltip()</c> is.</summary>
         public Tooltip FocusedTooltip
@@ -302,13 +295,6 @@ namespace SongsOfConquestAccess.UI
             {
                 Attach(null);
             }
-        }
-
-        /// <summary>Give up a landing still in flight - the mod is going away, and nothing may
-        /// outlive Stop.</summary>
-        public void ForgetPendingLanding()
-        {
-            _pendingFocus = null;
         }
 
         /// <summary>Give up the cursor entirely; the next EnsureFocus seats it again.</summary>

@@ -38,11 +38,6 @@ namespace SongsOfConquestAccess.Screens
         private const string DetailsStop = "build-details";
         private const string CloseStop = "build-close";
 
-        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the site summary, the selected building's description, the cost and
-        // the warning are read off text meshes the menu rebinds rather than off rows of their own.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The one build window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<IBuildMenu> _source =
             ScreenSource<IBuildMenu>.FromScene(LoadedScenes.AdventureScene);
@@ -446,18 +441,12 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = Live.CloseButton;
-            if (close == null || !Live.IsCloseVisible())
-            {
-                return;
-            }
-
-            // An icon with no text of its own, so the mod names it.
-            NodeVtable vtable = GraphNodes.Button(
-                () => ModText.Get(ModStrings.Screens.Close),
+            GraphNodes.DrawnClose(
+                builder,
+                "build:close",
+                Live.CloseButton,
+                Live.IsCloseVisible,
                 () => Live.ActivateClose());
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
-            builder.AddItem(new DrawnNode(ControlId.For(close, "build:close"), vtable, close));
         }
 
         // ---- shared ----
@@ -482,26 +471,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddLine(GraphBuilder builder, string key, Func<string> text)
         {
-            if (string.IsNullOrWhiteSpace(text()))
-            {
-                return;
-            }
-
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(key), "build:" + key),
-                GraphNodes.Text(text)));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
+            GraphNodes.TextLine(builder, Marker(key), "build:" + key, text);
         }
     }
 }

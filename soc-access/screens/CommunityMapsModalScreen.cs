@@ -5,7 +5,6 @@ using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
-using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -53,11 +52,6 @@ namespace SongsOfConquestAccess.Screens
         private const string ModalStop = "community-maps-modal";
 
         private readonly GameTextEditor _editor = new GameTextEditor();
-
-        // A subject of its own for each node the modal gives no component for, kept across rebuilds:
-        // the reconciler seats the cursor by SUBJECT before it looks at the structural key, so two
-        // nodes sharing one collapse onto whichever was declared first.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
         // The five-digit code as it was last spoken, so typing echoes the digit that changed rather
         // than the whole box. Mod-owned announcement state, which outlives the panel.
@@ -121,16 +115,12 @@ namespace SongsOfConquestAccess.Screens
             return Live != null && Live.Cancel();
         }
 
-        /// <summary>While the keyboard is on its way to the modal's text box, what the player types
-        /// next is meant for that box.</summary>
-        public override bool CapturesRawInput
+        /// <summary>The page's own editor, over the modal's text box. GraphScreen takes the rest of its
+        /// lifecycle: the raw-input and field-ownership answers, the per-frame update, and the
+        /// abandon on leaving and on popping.</summary>
+        public override GameTextEditor Editor
         {
-            get { return _editor.Pending; }
-        }
-
-        public override bool OwnsGameField
-        {
-            get { return _editor.Pending || _editor.Editing; }
+            get { return _editor; }
         }
 
         /// <summary>Off while the code panel is up: the letters and digits typed there are the code,
@@ -143,23 +133,8 @@ namespace SongsOfConquestAccess.Screens
         public override void OnUpdate()
         {
             base.OnUpdate();
-
-            // After the navigator, so a word about the edit follows the activation's own readout.
-            _editor.Update(IsActive());
             AnnounceTitleIfChanged();
             AnnounceCodeTyped();
-        }
-
-        public override void OnUnfocus()
-        {
-            base.OnUnfocus();
-            _editor.Abandon();
-        }
-
-        public override void OnPop()
-        {
-            base.OnPop();
-            _editor.Abandon();
         }
 
         public override void Build(GraphBuilder builder)
@@ -368,48 +343,8 @@ namespace SongsOfConquestAccess.Screens
                 }
             }
 
-            SortByDrawnLeft(actions);
+            DrawnOrder.SortByLeft(actions, action => action.Button);
             return actions;
-        }
-
-        // Insertion sort by drawn left edge, leftmost first; stable, so two buttons at one x keep
-        // declaration order.
-        private static void SortByDrawnLeft(List<CommunityMapsModalAdapter.ActionItem> items)
-        {
-            List<float> lefts = new List<float>(items.Count);
-            for (int i = 0; i < items.Count; i++)
-            {
-                Component button = items[i].Button;
-                lefts.Add(button != null ? button.transform.position.x : 0f);
-            }
-
-            for (int i = 1; i < items.Count; i++)
-            {
-                CommunityMapsModalAdapter.ActionItem moving = items[i];
-                float left = lefts[i];
-                int j = i - 1;
-                while (j >= 0 && lefts[j] > left)
-                {
-                    items[j + 1] = items[j];
-                    lefts[j + 1] = lefts[j];
-                    j--;
-                }
-
-                items[j + 1] = moving;
-                lefts[j + 1] = left;
-            }
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers[key] = marker;
-            }
-
-            return marker;
         }
 
         private static int CommonPrefixLength(string a, string b)

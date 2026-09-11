@@ -43,10 +43,6 @@ namespace SongsOfConquestAccess.Screens
         private const string CloseStop = "marketplace-close";
         private const string SheetKey = "marketplace:";
 
-        // Subjects of their own for the lines the menu gives no component the screen can key on, kept
-        // across rebuilds so the reconciler seats the cursor back on the same node.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
-
         /// <summary>The kingdom HUD's settings hold this menu (<see cref="HudSources"/>).</summary>
         private readonly ScreenSource<MarketplaceMenu> _source =
             ScreenSource<MarketplaceMenu>.FromOwner(HudSources.Kingdom, HudSources.Marketplace);
@@ -249,23 +245,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker("close"), "marketplace:close"),
-                GraphNodes.Button(
-                    () => ModText.Get(ModStrings.Screens.Close),
-                    () => Live.Close())));
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
+            GraphNodes.ModClose(builder, "marketplace:close", Marker("close"), () => Live.Close());
         }
     }
 }

@@ -115,22 +115,15 @@ namespace SongsOfConquestAccess.UI
             {
                 AnnounceTextChange(_lastText ?? string.Empty, text);
             }
+            else if (anchor != caret)
+            {
+                AnnounceSelection(anchor, caret, text);
+            }
             else
             {
-                bool wasSelecting = _lastAnchor != _lastCaret;
-                bool isSelecting = anchor != caret;
-                if (isSelecting)
-                {
-                    AnnounceSelection(anchor, caret, text);
-                }
-                else if (wasSelecting)
-                {
-                    AnnounceCharacterAtCaret(caret, text);
-                }
-                else
-                {
-                    AnnounceCharacterAtCaret(caret, text);
-                }
+                // Whether the previous state was a selection or a plain caret, the caret has moved and
+                // what it stands on is what is said.
+                AnnounceCharacterAtCaret(caret, text);
             }
 
             _lastText = text;
