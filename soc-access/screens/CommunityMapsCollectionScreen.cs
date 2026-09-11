@@ -162,30 +162,16 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the filtering band ----
 
-        /// <summary>The keyword box. It is one of mod.io's own TMP fields rather than one of the
-        /// game's, and the editing contract is the same; its label is the box's own placeholder, which
-        /// is the only thing the band writes next to it.</summary>
+        /// <summary>The keyword box. Its label is the box's own placeholder, which is the only thing
+        /// the band writes next to it.</summary>
         private void BuildKeyword(GraphBuilder builder)
         {
-            TMP_InputField field = Live.SearchField;
-            if (field == null || !field.gameObject.activeInHierarchy)
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.EditField(
+            GraphNodes.TmpEditField(
+                builder,
+                "community-maps-collection:keyword",
+                Live.SearchField,
                 () => Live.SearchFieldLabel,
-                () => _editor.Editing ? null : field.text,
-                () => _editor.Request(Live.SearchField),
-                () => field.interactable);
-            // Arriving puts the game's own selection on the box - the search filter panel's finding:
-            // without it an activation that follows a row whose focus visual selected one of mod.io's
-            // own controls selects the box but never makes it FOCUSED, and the edit ends in silence.
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(field);
-            builder.AddItem(new DrawnNode(
-                ControlId.For(field, "community-maps-collection:keyword"),
-                vtable,
-                field));
+                _editor);
         }
 
         private void BuildCheckForUpdates(GraphBuilder builder)

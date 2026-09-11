@@ -131,19 +131,12 @@ namespace SongsOfConquestAccess.Screens
 
                 int index = tab.Index;
                 string label = tab.Label;
-                NodeVtable vtable = GraphNodes.Tab(
+                // The guard also keeps the showing tab's native selection - which is the article the
+                // window is drawing - where the game put it.
+                NodeVtable vtable = GraphNodes.SwitchingTab(
                     () => label,
-                    () => Live.GetActiveTabIndex() == index);
-                // Focusing the tab IS switching to it; the guard keeps the showing tab's native
-                // selection - which is the article the window is drawing - where the game put it.
-                vtable.OnFocusVisual = () =>
-                {
-                    if (Live.GetActiveTabIndex() != index)
-                    {
-                        Live.FocusTab(index);
-                    }
-                };
-                vtable.OnActivate = () => Live.FocusTab(index);
+                    () => Live.GetActiveTabIndex() == index,
+                    () => Live.FocusTab(index));
                 builder.AddItem(new SyntheticNode(ControlId.Structural("codex:tab/" + index), vtable));
             }
         }

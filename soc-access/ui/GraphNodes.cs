@@ -541,6 +541,58 @@ namespace SongsOfConquestAccess.UI
             return vtable;
         }
 
+        /// <summary>A TMP TEXT BOX THE MOD HANDS THE KEYBOARD TO, as a node over the box itself: mod.io
+        /// draws its own TMP fields rather than the game's, and the editing contract is the same one
+        /// <see cref="GameTextEditor"/> runs everywhere. A box the panel is not drawing is not in the
+        /// tree. The label is whatever the panel writes beside it, usually the box's own placeholder.
+        ///
+        /// Arriving puts the game's own selection on the box. Measured on the search filter panel:
+        /// without it, an activation that follows a row whose focus visual selected one of mod.io's
+        /// own controls selects the box but never makes it FOCUSED, and the edit ends in silence.
+        /// </summary>
+        public static void TmpEditField(
+            GraphBuilder builder,
+            string key,
+            TMPro.TMP_InputField field,
+            Func<string> label,
+            GameTextEditor editor)
+        {
+            if (field == null || !field.gameObject.activeInHierarchy)
+            {
+                return;
+            }
+
+            NodeVtable vtable = EditField(
+                label,
+                () => editor.Editing ? null : field.text,
+                () => editor.Request(field),
+                () => field.interactable);
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(field);
+            builder.AddItem(new DrawnNode(ControlId.For(field, key), vtable, field));
+        }
+
+        /// <summary>A TAB WHOSE FOCUS IS THE SWITCH, which is what a tab bar the game drives by
+        /// selection is: walking onto a tab turns its page on. The guard makes re-focusing the showing
+        /// tab a no-op, so re-entering the bar does not restart the page or move a native selection
+        /// the game has put inside it; pressing it does the same switch.</summary>
+        public static NodeVtable SwitchingTab(
+            Func<string> label,
+            Func<bool> selected,
+            Action select,
+            Func<bool> enabled = null)
+        {
+            NodeVtable vtable = Tab(label, selected, enabled);
+            vtable.OnFocusVisual = () =>
+            {
+                if (!selected())
+                {
+                    select();
+                }
+            };
+            vtable.OnActivate = select;
+            return vtable;
+        }
+
         /// <summary>One entry of a list the player has opened to pick from. It carries no role word:
         /// the control that opened the list has just been read as the combo box it is, and repeating
         /// "list item" on every entry of a twenty-line list only slows the reading down. The entry the

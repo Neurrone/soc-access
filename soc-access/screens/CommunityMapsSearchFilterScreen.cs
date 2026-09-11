@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
-using TMPro;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -103,31 +102,16 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>The keyword box. It is one of mod.io's own TMP fields rather than one of the
-        /// game's, and the editing contract is the same; its label is the box's own placeholder,
-        /// which is the only thing the panel writes next to it.</summary>
+        /// <summary>The keyword box. Its label is the box's own placeholder, which is the only thing
+        /// the panel writes next to it.</summary>
         private void AddKeyword(GraphBuilder builder)
         {
-            TMP_InputField field = Live.SearchField;
-            if (field == null || !field.gameObject.activeInHierarchy)
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.EditField(
+            GraphNodes.TmpEditField(
+                builder,
+                "search-filter:keyword",
+                Live.SearchField,
                 () => Live.SearchFieldLabel,
-                () => _editor.Editing ? null : field.text,
-                () => _editor.Request(Live.SearchField),
-                () => field.interactable);
-            // Arriving puts the game's own selection on the box. Measured: without it, an activation
-            // that follows a tag row - whose focus visual selected mod.io's toggle - selects the box
-            // but never makes it FOCUSED, and the edit ends in silence; with it, the handover lands
-            // every time.
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(field);
-            builder.AddItem(new DrawnNode(
-                ControlId.For(field, "search-filter:keyword"),
-                vtable,
-                field));
+                _editor);
         }
 
         private void AddTags(GraphBuilder builder)
