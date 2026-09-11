@@ -56,9 +56,24 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo DropdownGetTextMethod =
             AccessTools.Method(typeof(UITextMeshDropdown), "GetText");
 
+        private static readonly LobbyRandomMapPreviewEntry[] NoEntries = new LobbyRandomMapPreviewEntry[0];
+
         private readonly LobbyRandomMapSelectionMenu _menu;
         private readonly LobbyNavigation _navigation;
         private readonly ILocalizationHandler _localization;
+
+        // One reader per drawn card, kept while the menu's list of cards is the one they were made
+        // for. The card's own facts - its title, its description, which card is chosen - are read
+        // off the entry every time they are asked for; what is kept is the reflection behind them,
+        // which a Build would otherwise pay four times a frame for the cards and again for the
+        // selected card's three toggles and its dropdown. The list is compared by its count and the
+        // identity of its first and last entry, all read from the game each frame, so a page that
+        // redraws its cards gets new readers.
+        private readonly Dictionary<LobbyRandomMapPreviewEntry, RandomLayoutItem> _items =
+            new Dictionary<LobbyRandomMapPreviewEntry, RandomLayoutItem>();
+        private int _entryCount = -1;
+        private LobbyRandomMapPreviewEntry _firstEntry;
+        private LobbyRandomMapPreviewEntry _lastEntry;
 
         public AdventureLobbyRandomLayoutAdapter(LobbyRandomMapSelectionMenu menu, LobbyNavigation navigation)
         {
@@ -110,7 +125,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 LobbyRandomMapPreviewEntry selected = _menu != null ? SelectedEntryRef(_menu) : null;
-                return selected != null ? new RandomLayoutItem(this, selected, _localization) : null;
+                return selected != null ? ItemFor(selected) : null;
             }
         }
 
@@ -123,7 +138,7 @@ namespace SongsOfConquestAccess.Adapters
                 LobbyRandomMapPreviewEntry entry = entries[i];
                 if (entry != null && IsVisible((Component)entry))
                 {
-                    items.Add(new RandomLayoutItem(this, entry, _localization));
+                    items.Add(ItemFor(entry));
                 }
             }
 
@@ -160,7 +175,35 @@ namespace SongsOfConquestAccess.Adapters
         private IReadOnlyList<LobbyRandomMapPreviewEntry> GetEntries()
         {
             List<LobbyRandomMapPreviewEntry> entries = _menu != null ? EntriesRef(_menu) : null;
-            return entries ?? new List<LobbyRandomMapPreviewEntry>();
+            if (entries == null)
+            {
+                return NoEntries;
+            }
+
+            int count = entries.Count;
+            LobbyRandomMapPreviewEntry first = count > 0 ? entries[0] : null;
+            LobbyRandomMapPreviewEntry last = count > 0 ? entries[count - 1] : null;
+            if (count != _entryCount || !ReferenceEquals(first, _firstEntry) || !ReferenceEquals(last, _lastEntry))
+            {
+                _items.Clear();
+                _entryCount = count;
+                _firstEntry = first;
+                _lastEntry = last;
+            }
+
+            return entries;
+        }
+
+        private RandomLayoutItem ItemFor(LobbyRandomMapPreviewEntry entry)
+        {
+            RandomLayoutItem item;
+            if (!_items.TryGetValue(entry, out item))
+            {
+                item = new RandomLayoutItem(this, entry, _localization);
+                _items.Add(entry, item);
+            }
+
+            return item;
         }
 
         private IMenuButtonAdapter CreateConfirmButton()
@@ -302,19 +345,27 @@ namespace SongsOfConquestAccess.Adapters
                 return _owner != null && _owner.ActivateLayout(Entry);
             }
 
+            // The card's toggles and its dropdown are serialized fields of the entry: the game sets
+            // them when it instantiates the card and never again, so they are resolved once per card
+            // rather than once per Build.
+            private IReadOnlyList<WinConditionToggleItem> _winConditions;
+            private LayoutDropdownItem _layoutDropdown;
+
             public IReadOnlyList<WinConditionToggleItem> GetWinConditionToggles()
             {
-                return new[]
+                return _winConditions ?? (_winConditions = new[]
                 {
                     new WinConditionToggleItem(GetEntryField<UIToggle>(Entry, EntryKingToggleField), AdventureWinCondition.LastTeamStanding, _localization),
                     new WinConditionToggleItem(GetEntryField<UIToggle>(Entry, EntryBeaconToggleField), AdventureWinCondition.Beacons, _localization),
                     new WinConditionToggleItem(GetEntryField<UIToggle>(Entry, EntryArtifactToggleField), AdventureWinCondition.FindTheEntity, _localization)
-                };
+                });
             }
 
             public LayoutDropdownItem GetLayoutDropdown()
             {
-                return new LayoutDropdownItem(GetEntryField<UITextMeshDropdown>(Entry, EntryLayoutDropdownField), _localization);
+                return _layoutDropdown ?? (_layoutDropdown = new LayoutDropdownItem(
+                    GetEntryField<UITextMeshDropdown>(Entry, EntryLayoutDropdownField),
+                    _localization));
             }
 
             private static string SanitizeId(string value)
