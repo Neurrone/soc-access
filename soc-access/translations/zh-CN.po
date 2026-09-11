@@ -1315,11 +1315,6 @@ msgctxt "Actions.NextWielder"
 msgid "Next Wielder"
 msgstr "下一个持有者"
 
-#. Actions.OpenModSettings
-msgctxt "Actions.OpenModSettings"
-msgid "Open Mod Settings"
-msgstr "打开模组设置"
-
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"

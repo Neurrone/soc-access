@@ -272,7 +272,6 @@
             public static readonly ModString NextBufferLine = new ModString("Actions.NextBufferLine", "Next Buffer Line");
             public static readonly ModString NextSettlement = new ModString("Actions.NextSettlement", "Next Settlement");
             public static readonly ModString NextWielder = new ModString("Actions.NextWielder", "Next Wielder");
-            public static readonly ModString OpenModSettings = new ModString("Actions.OpenModSettings", "Open Mod Settings");
             public static readonly ModString PreviousBuffer = new ModString("Actions.PreviousBuffer", "Previous Buffer");
             public static readonly ModString PreviousBufferLine = new ModString("Actions.PreviousBufferLine", "Previous Buffer Line");
             public static readonly ModString ReadThreat = new ModString("Actions.ReadThreat", "Read Threat");

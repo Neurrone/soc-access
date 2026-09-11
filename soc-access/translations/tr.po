@@ -1315,11 +1315,6 @@ msgctxt "Actions.NextWielder"
 msgid "Next Wielder"
 msgstr "Sonraki wielder"
 
-#. Actions.OpenModSettings
-msgctxt "Actions.OpenModSettings"
-msgid "Open Mod Settings"
-msgstr "Mod ayarlarını aç"
-
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"

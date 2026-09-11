@@ -14,7 +14,6 @@ This page summarizes the mod hotkeys used across the documentation.
 | `` ` ``        | Open tooltip actions menu when actions are available |
 | `Ctrl+R`       | Read your resources or essence                       |
 | `Alt+R`        | Read enemy essence in combat                         |
-| `Ctrl+M`       | Open mod settings                                    |
 
 ## Menus
 

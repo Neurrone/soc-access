@@ -85,7 +85,6 @@ namespace SongsOfConquestAccess.Input
             {
                 AccessibilityActions.SummarizeResources,
                 AccessibilityActions.SummarizeEnemyResources,
-                AccessibilityActions.OpenModSettings,
                 AccessibilityActions.PreviousBuffer,
                 AccessibilityActions.NextBuffer,
                 AccessibilityActions.PreviousBufferLine,

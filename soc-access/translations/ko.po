@@ -1315,11 +1315,6 @@ msgctxt "Actions.NextWielder"
 msgid "Next Wielder"
 msgstr "다음 위더"
 
-#. Actions.OpenModSettings
-msgctxt "Actions.OpenModSettings"
-msgid "Open Mod Settings"
-msgstr "모드 설정 열기"
-
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"

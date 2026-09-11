@@ -85,7 +85,7 @@ This works on the combat and troop deployment grids too, where the direction is 
 
 ## The Audio Glossary and Tuning
 
-Press `Ctrl+M` to open mod settings, then choose the `Audio` tab.
+Open mod settings with the `Mod options` button on the main menu or the pause menu, then choose the `Audio` tab.
 
 `Play tile sound cues` is the master switch for every cue described on this page. Turning it off silences all of them without losing the individual settings.
 

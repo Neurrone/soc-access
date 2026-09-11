@@ -1315,11 +1315,6 @@ msgctxt "Actions.NextWielder"
 msgid "Next Wielder"
 msgstr "次のウィールダー"
 
-#. Actions.OpenModSettings
-msgctxt "Actions.OpenModSettings"
-msgid "Open Mod Settings"
-msgstr "Mod設定を開く"
-
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"

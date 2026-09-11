@@ -1335,11 +1335,6 @@ msgctxt "Actions.NextWielder"
 msgid "Next Wielder"
 msgstr "Следующий герой"
 
-#. Actions.OpenModSettings
-msgctxt "Actions.OpenModSettings"
-msgid "Open Mod Settings"
-msgstr "Открыть настройки мода"
-
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"

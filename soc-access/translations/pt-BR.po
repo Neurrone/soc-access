@@ -1325,11 +1325,6 @@ msgctxt "Actions.NextWielder"
 msgid "Next Wielder"
 msgstr "Próximo portador"
 
-#. Actions.OpenModSettings
-msgctxt "Actions.OpenModSettings"
-msgid "Open Mod Settings"
-msgstr "Abrir configurações do mod"
-
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"

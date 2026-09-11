@@ -91,7 +91,7 @@ doctrine this engine was copied from.
   as the key, a blocker behind it and the layer beneath non-interactable), `screens/ModOptionsScreen.cs`
   and `ModDialogScreen.cs` reading them through the shared readers `adapters/MenuRows.cs`
   and `ui/MenuFormNodes.cs` that `OptionsScreen` also uses; `SocAccessMod.OpenModOptions()` is
-  the one door for the clicks and Ctrl+M.
+  the one door the drawn entries open it through.
 - `input/AccessibilityActions.cs` — the graph actions, all `InputClaimScope.Screen`:
   `ui_up/down/left/right`, `ui_coarse_decrease/increase` (Shift+Left/Right), `ui_next/prev`
   (Tab), `ui_home/end`, `ui_region_prev/next` (Alt+Up/Down), `ui_left_click` (Enter, NumpadEnter,

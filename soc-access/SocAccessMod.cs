@@ -85,7 +85,7 @@ namespace SongsOfConquestAccess
             _navigator = new GraphNavigator();
             _screenManager = new ScreenManager(_navigator, _reviewBufferManager, _reviewBufferController);
             RegisterScreens(_screenManager);
-            // One door for the drawn entries and for Ctrl+M alike; the manager itself gains nothing.
+            // One door for every drawn entry; the manager itself gains nothing.
             Adapters.ModOptionsEntries.Open = OpenModOptions;
             _inputRouter = new AccessibilityInputRouter(_screenManager);
             _navigator.TypedCharacters = _inputRouter.TakeTypedCharacters;
@@ -282,9 +282,8 @@ namespace SongsOfConquestAccess
         }
 
         /// <summary>Open the mod's own options. The drawn entries of
-        /// <see cref="Adapters.ModOptionsEntries"/> and the Ctrl+M route in
-        /// <c>ScreenManager.HandleGlobalAction</c> both come here, so one place decides what "mod
-        /// options" means and both routes change together.</summary>
+        /// <see cref="Adapters.ModOptionsEntries"/> come here, so one place decides what "mod
+        /// options" means.</summary>
         public bool OpenModOptions()
         {
             return ModOptionsScreen.Open();

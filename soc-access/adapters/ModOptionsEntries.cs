@@ -60,7 +60,7 @@ namespace SongsOfConquestAccess.Adapters
         /// read as two.</summary>
         private const float MainMenuPairGap = 40f;
 
-        /// <summary>What opening the dialog does. Set once by the mod, so the click and Ctrl+M go
+        /// <summary>What opening the dialog does. Set once by the mod, so every entry's click goes
         /// through one door.</summary>
         public static Func<bool> Open { get; set; }
 

@@ -19,9 +19,6 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction SummarizeEnemyResources = OneShot("summarize_enemy_resources", ModStrings.Actions.SummarizeEnemyResources, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.R, alt: true));
 
-        public static readonly InputAction OpenModSettings = OneShot("open_mod_settings", ModStrings.Actions.OpenModSettings, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.M, ctrl: true));
-
         public static readonly InputAction PreviousBuffer = OneShot("previous_buffer", ModStrings.Actions.PreviousBuffer, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.LeftArrow, ctrl: true));
 
@@ -44,7 +41,6 @@ namespace SongsOfConquestAccess.Input
         {
             SummarizeResources,
             SummarizeEnemyResources,
-            OpenModSettings,
             PreviousBuffer,
             NextBuffer,
             PreviousBufferLine,

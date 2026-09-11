@@ -1109,11 +1109,6 @@ msgctxt "Actions.NextWielder"
 msgid "Next Wielder"
 msgstr ""
 
-#. Actions.OpenModSettings
-msgctxt "Actions.OpenModSettings"
-msgid "Open Mod Settings"
-msgstr ""
-
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"

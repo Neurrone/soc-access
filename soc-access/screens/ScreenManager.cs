@@ -411,12 +411,6 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            if (action.Key == AccessibilityActions.OpenModSettings.Key)
-            {
-                // The drawn "Mod options" entries open the same door, so this route only knocks.
-                return SocAccessMod.Instance != null && SocAccessMod.Instance.OpenModOptions();
-            }
-
             if (action.Key == AccessibilityActions.SummarizeResources.Key)
             {
                 CombatScreen combatScreen = Get<CombatScreen>();
@@ -482,11 +476,6 @@ namespace SongsOfConquestAccess.Screens
             if (!AccessibilityActions.IsGlobalAction(action))
             {
                 return false;
-            }
-
-            if (action.Key == AccessibilityActions.OpenModSettings.Key)
-            {
-                return !(Current is ModOptionsScreen);
             }
 
             if (action.Key == AccessibilityActions.SummarizeResources.Key)
