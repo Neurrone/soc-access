@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -22,8 +21,6 @@ using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -42,7 +39,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo CommanderIdField = AccessTools.Field(typeof(CommanderSheet), "_commanderId");
         private static readonly MethodInfo CloseMethod = AccessTools.Method(typeof(CommanderSheet), "Close", new[] { typeof(bool), typeof(bool) });
         private static readonly FieldInfo BackgroundCloseButtonField = AccessTools.Field(typeof(AdventureMenuBackground), "_closeButton");
-        private static readonly FieldInfo MovableButtonField = AccessTools.Field(typeof(InventoryArtifactMovable), "_button");
 
         private static readonly FieldInfo BacteriaLookupField = AccessTools.Field(typeof(CommanderSheetSpecialization), "_bacteriaLookup");
         private static readonly FieldInfo FactionLookupField = AccessTools.Field(typeof(CommanderSheetSpecialization), "_factionLookup");
@@ -70,7 +66,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo SummaryEntryTextField = AccessTools.Field(typeof(CommanderSheetSummaryEntry), "_textMesh");
         private static readonly FieldInfo InventoryLookupField = AccessTools.Field(typeof(InventoryHUD), "_lookup");
         private static readonly FieldInfo InventoryCommandProcessorField = AccessTools.Field(typeof(InventoryHUD), "_commandProcessor");
-        private static readonly FieldInfo InventoryArtifactMapField = AccessTools.Field(typeof(InventoryHUD), "_artifactStateToGOMap");
 
         // The showing modifier tab's rows, walked at most once a frame: the build asks for them
         // and each row's live readout asks again. Keyed on the frame rather than held, because the
@@ -78,13 +73,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FrameSweep<CommanderSheetSummaryEntry> _modifierEntries =
             new FrameSweep<CommanderSheetSummaryEntry>("commander sheet modifiers", inactiveToo: false);
 
-        // The wielder's two artifact lists, kept while the game's own inventory is unchanged. The
-        // key is read off the game every frame (the wielder the sheet shows, the HUD, the pooled
-        // cells and what is in each of them), so an equip, an unequip, a move and an auto-arrange
-        // all rebuild with nothing having to say so (AGENTS.md, Screen Resolution).
-        private readonly SlotSnapshot<InventorySlotInfo> _equipment = new SlotSnapshot<InventorySlotInfo>();
-
-        private readonly SlotSnapshot<InventorySlotInfo> _backpack = new SlotSnapshot<InventorySlotInfo>();
+        // The wielder's artifacts, read the way every menu that draws an InventoryHUD reads them.
+        private readonly InventorySlotReader _slots;
 
         // The three bands whose rows are COMPOSED rather than read: the wielder's skills, their
         // powers and their specializations. Each row costs a localization lookup, a tooltip over the
@@ -102,8 +92,6 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
 
-        // The mouse rows every artifact tooltip ends with, resolved on the first slot that needs them.
-        private List<string> _mouseInstructionLines;
         private readonly IWielderLookup _wielderLookup;
         private readonly InventoryHUD _inventory;
         private readonly IArtifactLookup _artifactLookup;
@@ -123,6 +111,14 @@ namespace SongsOfConquestAccess.Adapters
             _wielderLookup = GetField<IWielderLookup>(sheet, WielderLookupField);
             _inventory = GetField<InventoryHUD>(sheet, InventoryField);
             _artifactLookup = GetField<IArtifactLookup>(_inventory, InventoryLookupField);
+            _slots = new InventorySlotReader(
+                () => _inventory,
+                () => CommanderId,
+                _facade,
+                _localization,
+                _artifactLookup,
+                "CommanderSheetAdapter",
+                InventorySlotReader.MouseInstructionKeys);
             _skills = GetField<CommanderSheetSkills>(sheet, SkillsField);
             _skillLookup = GetField<ISkillLookup>(_skills, SkillLookupField);
             _specialization = GetField<CommanderSheetSpecialization>(sheet, SpecializationField);
@@ -390,12 +386,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string EquipmentLabel
         {
-            get { return GetLocalizedText("Common/CommanderInventory/Equipment", "Equipment"); }
+            get { return _slots.EquipmentLabel; }
         }
 
         public string InventoryLabel
         {
-            get { return GetInventoryLabel(); }
+            get { return _slots.InventoryLabel; }
         }
 
         public IReadOnlyList<LabeledItem> GetSkills(bool powers)
@@ -499,440 +495,82 @@ namespace SongsOfConquestAccess.Adapters
             return tooltipImage as Component;
         }
 
+        /// <summary>The wielder's equipment and backpack, and every gesture the game gives an
+        /// artifact in them, read by the shared inventory reader.</summary>
         public IReadOnlyList<InventorySlotInfo> GetEquipmentSlots()
         {
-            InventorySlot[] slots = InventorySlotInfo.DrawnEquipmentSlots;
-            int commanderId = CommanderId;
-            List<int> key = _equipment.BeginKey();
-            key.Add(commanderId);
-            key.Add(InstanceId(_inventory));
-            for (int i = 0; i < slots.Length; i++)
-            {
-                InventoryHUDSlot keySlot = _inventory != null ? _inventory.GetSlot(slots[i]) : null;
-                IArtifactState keyArtifact = GetDisplayArtifactForEquipmentSlot(slots[i]);
-                key.Add(InstanceId(keySlot));
-                key.Add(InstanceId(keySlot != null ? keySlot.TryGetArtifact(0) : null));
-                key.Add(keyArtifact != null ? keyArtifact.Id : 0);
-                key.Add(keyArtifact != null ? (int)keyArtifact.EquippedInSlot : -1);
-                key.Add(keyArtifact != null ? keyArtifact.PositionIndex : -1);
-            }
-
-            IReadOnlyList<InventorySlotInfo> unchanged = _equipment.Unchanged();
-            if (unchanged != null)
-            {
-                return unchanged;
-            }
-
-            List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
-            string ownerName = GetCommanderName();
-            string inventoryLabel = GetInventoryLabel();
-            for (int i = 0; i < slots.Length; i++)
-            {
-                InventorySlot slot = slots[i];
-                InventoryHUDSlot nativeSlot = _inventory != null ? _inventory.GetSlot(slot) : null;
-                InventoryArtifactMovable nativeMovable = nativeSlot != null ? nativeSlot.TryGetArtifact(0) : null;
-                IArtifactState artifact = nativeMovable != null && nativeMovable.State != null
-                    ? nativeMovable.State
-                    : slot == InventorySlot.OffHand ? GetMainHandTwoHander() : null;
-                bool displayOnly = IsDisplayOnlyEquipmentArtifact(slot, artifact);
-                InventoryArtifactMovable artifactMovable = nativeMovable ?? GetArtifactMovable(artifact);
-                InventoryArtifactMovable movable = displayOnly ? null : artifactMovable;
-                InventorySlot capturedSlot = slot;
-                InventoryHUDSlot capturedNativeSlot = nativeSlot;
-                InventoryArtifactMovable capturedMovable = movable;
-                Selectable tooltipSelectable = movable != null
-                    ? movable.GetSelectable()
-                    : displayOnly && artifactMovable != null
-                        ? artifactMovable.GetSelectable()
-                        : GetEquipmentSlotSelectable(capturedSlot);
-                slotsInfo.Add(new InventorySlotInfo(
-                    commanderId,
-                    ownerName,
-                    slot,
-                    0,
-                    isBackpackSlot: false,
-                    GetInventorySlotName(slot),
-                    inventoryLabel,
-                    artifact != null ? GetArtifactName(artifact) : string.Empty,
-                    movable,
-                    nativeSlot,
-                    BuildEquipmentTooltip(artifact, tooltipSelectable, artifactMovable),
-                    () => SelectInventoryCell(capturedNativeSlot, capturedMovable, 0)));
-            }
-
-            return _equipment.Keep(slotsInfo);
+            return _slots.GetEquipmentSlots();
         }
 
         public IReadOnlyList<InventorySlotInfo> GetBackpackSlots()
         {
-            InventoryHUDSlot nativeSlot = _inventory != null ? _inventory.GetSlot(InventorySlot.None) : null;
-            int commanderId = CommanderId;
-            int cellCount = nativeSlot != null ? nativeSlot.CellsCount : 0;
-            List<int> key = _backpack.BeginKey();
-            key.Add(commanderId);
-            key.Add(InstanceId(nativeSlot));
-            for (int i = 0; i < cellCount; i++)
-            {
-                InventoryArtifactMovable keyMovable = nativeSlot.TryGetArtifact(i);
-                key.Add(InstanceId(keyMovable));
-                key.Add(keyMovable != null && keyMovable.State != null ? keyMovable.State.Id : 0);
-            }
-
-            IReadOnlyList<InventorySlotInfo> unchanged = _backpack.Unchanged();
-            if (unchanged != null)
-            {
-                return unchanged;
-            }
-
-            List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
-            string ownerName = GetCommanderName();
-            string inventoryLabel = GetInventoryLabel();
-
-            // What the backpack holds is read off the DRAWN cell, which already knows, rather than
-            // out of the owner's whole artifact list: the same source the key above is read from,
-            // and the two must agree. They did not while the list came from the facade - a move
-            // within the backpack reaches the HUD a frame before it reaches the facade, so a key
-            // that had already changed froze a list built from the position the artifact had just
-            // left (measured in-game 2026-09-10: HUD cell 5, facade position 9, for one frame).
-            for (int i = 0; i < cellCount; i++)
-            {
-                InventoryArtifactMovable movable = nativeSlot.TryGetArtifact(i);
-                IArtifactState artifact = movable != null ? movable.State : null;
-                int capturedIndex = i;
-                InventoryArtifactMovable capturedMovable = movable;
-                slotsInfo.Add(new InventorySlotInfo(
-                    commanderId,
-                    ownerName,
-                    InventorySlot.None,
-                    i,
-                    isBackpackSlot: true,
-                    string.Empty,
-                    inventoryLabel,
-                    artifact != null ? GetArtifactName(artifact) : string.Empty,
-                    movable,
-                    nativeSlot,
-                    BuildEquipmentTooltip(artifact, movable != null ? movable.GetSelectable() : GetInventorySlotSelectable(nativeSlot, i), movable),
-                    () => SelectInventoryCell(nativeSlot, capturedMovable, capturedIndex)));
-            }
-
-            return _backpack.Keep(slotsInfo);
+            return _slots.GetBackpackSlots();
         }
 
-        private void SelectInventoryCell(InventoryHUDSlot nativeSlot, InventoryArtifactMovable movable, int positionIndex)
-        {
-            if (movable != null)
-            {
-                NativeSelectionUtility.Select(movable.GetSelectable());
-                return;
-            }
-
-            Selectable selectable = GetInventorySlotSelectable(nativeSlot, positionIndex);
-            if (selectable != null)
-            {
-                NativeSelectionUtility.Select(selectable);
-            }
-        }
-
-        /// <summary>What a game object is, as a number a key can hold: zero for one the game has not
-        /// made or has destroyed, which Unity's own null answers for.</summary>
-        private static int InstanceId(Component component)
-        {
-            return component == null ? 0 : component.GetInstanceID();
-        }
-
-        private Selectable GetEquipmentSlotSelectable(InventorySlot slot)
-        {
-            InventoryHUDSlot nativeSlot = _inventory != null ? _inventory.GetSlot(slot) : null;
-            return nativeSlot != null ? nativeSlot.GetFirstSelectable() : null;
-        }
-
-        private Selectable GetInventorySlotSelectable(InventoryHUDSlot nativeSlot, int positionIndex)
-        {
-            InventoryHUDGridEntry entry = nativeSlot != null ? nativeSlot.TryGetEntry(positionIndex) : null;
-            return entry != null ? (Selectable)entry : null;
-        }
-
-        /// <summary>Put an artifact down on a slot, through the game's own check and its own move.
-        /// </summary>
         public DropResult DropArtifact(InventoryArtifactMovable movable, InventorySlotInfo target)
         {
-            return ArtifactDropUtility.DropArtifact(_facade, movable, target, "CommanderSheetAdapter artifact drop");
+            return _slots.DropArtifact(movable, target);
         }
 
-        /// <summary>Whether the artifact in the main hand takes BOTH hands - the definition's own slot
-        /// (<c>IArtifactLookup.GetSlot</c>), which is what makes the game draw a ghost of it in the off
-        /// hand. Read off the drawn main-hand cell, as the equipment rows are.</summary>
         public bool IsMainHandTwoHanded()
         {
-            return GetMainHandTwoHander() != null;
+            return _slots.IsMainHandTwoHanded();
         }
 
-        /// <summary>Whether an artifact fits the off hand ALONE - the one case the game's own
-        /// right-click resolution (<c>InventoryHUD.GetSlot(ArtifactSlot)</c>) sends to the off hand
-        /// rather than the main one.</summary>
         public bool IsOffHandOnlyArtifact(InventoryArtifactMovable movable)
         {
-            return movable != null
-                && movable.State != null
-                && _artifactLookup != null
-                && _artifactLookup.GetSlot(movable.State.Type) == ArtifactSlot.OffHand;
+            return _slots.IsOffHandOnlyArtifact(movable);
         }
 
-        /// <summary>The game's own name for the two-handed slot ("Both Hands").</summary>
         public string BothHandsSlotName
         {
-            get { return GetInventorySlotName(ArtifactSlot.BothHands.ToString()); }
+            get { return _slots.BothHandsSlotName; }
         }
 
-        /// <summary>Whether the game would accept this artifact in this slot at this position - the
-        /// same check its own drop makes (<c>CanRearrangeArtifact</c>), asked without doing anything.
-        /// </summary>
         public bool CanRearrangeArtifactTo(InventoryArtifactMovable movable, InventorySlotInfo target)
         {
-            InventoryHUDSlot nativeSlot = target != null ? target.NativeSlot : null;
-            if (_facade == null || movable == null || movable.State == null || nativeSlot == null)
-            {
-                return false;
-            }
-
-            try
-            {
-                return _facade.Commands.CanRearrangeArtifact(movable.State.Id, nativeSlot.Slot, target.PositionIndex).success;
-            }
-            catch (Exception ex)
-            {
-                SocAccessMod.Instance?.LogWarning("CommanderSheetAdapter could not ask whether an artifact fits: " + ex.Message);
-                return false;
-            }
+            return _slots.CanRearrangeArtifactTo(movable, target);
         }
 
-        /// <summary>The game's own notification for a rearrangement its Command skill blocks - what it
-        /// shows itself when the drop is refused with error code 10.</summary>
         public string RearrangeRefusalText
         {
-            get { return GetLocalizedText("Common/CommanderInventory/RearrangeArtifact/CannotRearrangeBecauseOfCommand", string.Empty); }
+            get { return _slots.RearrangeRefusalText; }
         }
 
         /// <summary>Nothing on this sheet listens to the inventory's left click.</summary>
         public bool AnswersLeftClick(InventorySlotInfo slot)
         {
-            return false;
+            return _slots.AnswersLeftClick(slot);
         }
 
-        /// <summary>The artifact's LEFT click, through the button the game hangs its own handler on -
-        /// inert on this sheet, and with Ctrl physically held the game's own drop on the ground.</summary>
         public bool LeftClickArtifact(InventorySlotInfo slot)
         {
-            return NativeSelectionUtility.Click(GetMovableButton(slot));
+            return _slots.LeftClickArtifact(slot);
         }
 
-        /// <summary>The artifact's RIGHT click, through the same button: equip, unequip or use, and
-        /// with Ctrl physically held the game's own destroy.</summary>
         public bool RightClickArtifact(InventorySlotInfo slot)
         {
-            return NativeSelectionUtility.RightClick(GetMovableButton(slot));
+            return _slots.RightClickArtifact(slot);
         }
 
-        /// <summary>What a right click on this artifact does, as the GAME decides it in
-        /// <c>InventoryArtifactMovable.GetDetails</c>: an artifact whose definition carries an action
-        /// is used, and every other one is equipped or unequipped by where it currently is.</summary>
         public ArtifactDetails.EquipInstruction GetArtifactInstruction(InventorySlotInfo slot)
         {
-            IArtifactState artifact = GetArtifactState(slot);
-            if (artifact == null)
-            {
-                return ArtifactDetails.EquipInstruction.None;
-            }
-
-            IArtifactDataDefinition definition = _artifactLookup != null ? _artifactLookup.GetDefinition(artifact.Type) : null;
-            if (definition != null && definition.Action != null)
-            {
-                return ArtifactDetails.EquipInstruction.Use;
-            }
-
-            return artifact.IsEquipped
-                ? ArtifactDetails.EquipInstruction.Unequip
-                : ArtifactDetails.EquipInstruction.Equip;
+            return _slots.GetArtifactInstruction(slot);
         }
 
-        /// <summary>The game's own text for the auto-arrange instruction, as it draws it in an
-        /// artifact's tooltip.</summary>
         public string AutoArrangeText
         {
-            get { return GetLocalizedText("Adventure/TooltipInstruction/AutoArrange", string.Empty); }
+            get { return _slots.AutoArrangeText; }
         }
 
-        /// <summary>Auto-arrange, the game's own middle click (<c>InventoryHUD.AutoArrangeArtifacts</c>).
-        /// Its second half only remembers which cell to re-select afterwards and needs an artifact to
-        /// remember, so with nothing in the inventory the command it runs is called on its own.</summary>
         public bool AutoArrangeArtifacts()
         {
-            if (_inventory == null)
-            {
-                return false;
-            }
-
-            InventoryArtifactMovable anyArtifact = FirstArtifactMovable();
-            if (anyArtifact != null)
-            {
-                _inventory.AutoArrangeArtifacts(anyArtifact);
-                return true;
-            }
-
-            if (_facade == null || CommanderId < 0)
-            {
-                return false;
-            }
-
-            _facade.Commands.EquipBestArtifacts(CommanderId);
-            return true;
-        }
-
-        private InventoryArtifactMovable FirstArtifactMovable()
-        {
-            IDictionary artifactMap = InventoryArtifactMapField != null && _inventory != null
-                ? InventoryArtifactMapField.GetValue(_inventory) as IDictionary
-                : null;
-            if (artifactMap == null)
-            {
-                return null;
-            }
-
-            foreach (object movable in artifactMap.Values)
-            {
-                InventoryArtifactMovable artifact = movable as InventoryArtifactMovable;
-                if (artifact != null)
-                {
-                    return artifact;
-                }
-            }
-
-            return null;
-        }
-
-        private IArtifactState GetArtifactState(InventorySlotInfo slot)
-        {
-            InventoryArtifactMovable movable = slot != null ? slot.Movable : null;
-            return movable != null ? movable.State : null;
-        }
-
-        private static IUIButton GetMovableButton(InventorySlotInfo slot)
-        {
-            InventoryArtifactMovable movable = slot != null ? slot.Movable : null;
-            return movable != null && MovableButtonField != null
-                ? MovableButtonField.GetValue(movable) as IUIButton
-                : null;
-        }
-
-        /// <summary>
-        /// An artifact's own tooltip, without the lines that tell a MOUSE what to press.
-        ///
-        /// <c>ArtifactDetails</c> ends its tooltip with a row per gesture ("&lt;rmb&gt; Equip",
-        /// "&lt;hl&gt;CTRL&lt;/hl&gt; + &lt;rmb&gt; Destroy", the drop and the auto-arrange), and the
-        /// keyboard gets those same gestures as usage hints on the slot itself, so the rows would be
-        /// said twice. They are removed by the localized text the game DREW them from rather than by
-        /// English, so a row this mod does not know about is left where it is and the player still
-        /// hears that something may be available.
-        /// </summary>
-        private Tooltip BuildEquipmentTooltip(IArtifactState artifact, Selectable selectable, InventoryArtifactMovable movable)
-        {
-            Tooltip tooltip = Tooltip.ForComponent(selectable, _localization);
-            if (tooltip == null || artifact == null || movable == null || _localization == null)
-            {
-                return tooltip;
-            }
-
-            List<string> instructionLines = GetMouseInstructionLines();
-            return new Tooltip(
-                () => RemoveExactLines(tooltip.TextLines, instructionLines),
-                tooltip.VisualMetadata,
-                isLong: () => tooltip.IsLong);
-        }
-
-        // The nine rows the game writes for a mouse. They are the same for every slot and for the
-        // window's whole life, so they are looked up once instead of nine times a slot a frame.
-        private List<string> GetMouseInstructionLines()
-        {
-            if (_mouseInstructionLines != null)
-            {
-                return _mouseInstructionLines;
-            }
-
-            List<string> lines = new List<string>();
-            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Equip");
-            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Unequip");
-            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Sell");
-            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Destroy");
-            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Destroy.Gamepad");
-            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Drop");
-            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Drop.Gamepad");
-            AddLocalizedLine(lines, "Adventure/TooltipInstruction/AutoArrange");
-            AddLocalizedLine(lines, "Adventure/TooltipInstruction/AutoArrange.Gamepad");
-            _mouseInstructionLines = lines;
-            return lines;
-        }
-
-        private InventoryArtifactMovable GetArtifactMovable(IArtifactState artifact)
-        {
-            if (artifact == null || InventoryArtifactMapField == null || _inventory == null)
-            {
-                return null;
-            }
-
-            IDictionary artifactMap = InventoryArtifactMapField.GetValue(_inventory) as IDictionary;
-            if (artifactMap == null || !artifactMap.Contains(artifact))
-            {
-                return null;
-            }
-
-            return artifactMap[artifact] as InventoryArtifactMovable;
-        }
-
-        private void AddLocalizedLine(List<string> lines, string key)
-        {
-            string line = _localization != null ? _localization.GetText(key) : string.Empty;
-            if (!string.IsNullOrWhiteSpace(line) && !lines.Contains(line))
-            {
-                lines.Add(line);
-            }
+            return _slots.AutoArrangeArtifacts();
         }
 
         private string GetLocalizedText(string key, string fallback)
         {
             return GameText.Get(_localization, key, fallback);
-        }
-
-        private static IReadOnlyList<string> RemoveExactLines(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)
-        {
-            if (lines == null || lines.Count == 0 || linesToRemove == null || linesToRemove.Count == 0)
-            {
-                return lines ?? new string[0];
-            }
-
-            List<string> result = new List<string>();
-            for (int i = 0; i < lines.Count; i++)
-            {
-                string line = lines[i];
-                if (!ContainsExact(linesToRemove, line))
-                {
-                    result.Add(line);
-                }
-            }
-
-            return result;
-        }
-
-        private static bool ContainsExact(IReadOnlyList<string> lines, string candidate)
-        {
-            for (int i = 0; i < lines.Count; i++)
-            {
-                if (string.Equals(lines[i], candidate, StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         /// <summary>The level the skill's own entry DRAWS beside its name; the reference's level where
@@ -999,89 +637,6 @@ namespace SongsOfConquestAccess.Adapters
             return content != null ? content.transform : null;
         }
 
-        /// <summary>The artifact an equipment slot DRAWS, read off the drawn cell rather than out of
-        /// the adventure's whole artifact list. <c>ArtifactFacade.GetForOwner</c> is a Where over
-        /// EVERY artifact in the game, and it was asked nine times a frame here and a tenth in
-        /// <see cref="IsMainHandTwoHanded"/>; the cell already holds the answer
-        /// (<c>InventoryHUDSlot.TryGetArtifact(0)</c>), and the movable's <c>State</c> is the same
-        /// <c>IArtifactState</c> the facade would have found.
-        ///
-        /// The off hand is the one slot with no movable of its own to read: when the main hand holds
-        /// a two-hander the game draws a GHOST there from the main hand's own movable
-        /// (<c>InventoryHUD.Refresh</c> calls <c>AddTintedArtifactImage</c> with the main-hand state
-        /// when <c>_lookup.GetSlot</c> answers <c>BothHands</c>), and that is what is answered here.
-        ///
-        /// The drawn cell lags the facade by at most one frame after a move - the HUD refreshes in
-        /// its own Update - so for that frame this answers what the player is looking at, which is
-        /// what the graph is for.</summary>
-        private IArtifactState GetDisplayArtifactForEquipmentSlot(InventorySlot slot)
-        {
-            InventoryArtifactMovable movable = GetEquippedMovable(slot);
-            if (movable != null && movable.State != null)
-            {
-                return movable.State;
-            }
-
-            return slot == InventorySlot.OffHand ? GetMainHandTwoHander() : null;
-        }
-
-        /// <summary>What the drawn equipment cell holds, or null for an empty one.</summary>
-        private InventoryArtifactMovable GetEquippedMovable(InventorySlot slot)
-        {
-            InventoryHUDSlot nativeSlot = _inventory != null ? _inventory.GetSlot(slot) : null;
-            return nativeSlot != null ? nativeSlot.TryGetArtifact(0) : null;
-        }
-
-        /// <summary>The main hand's artifact when it takes both hands, which is what the game draws
-        /// the off hand's ghost from; null otherwise.</summary>
-        private IArtifactState GetMainHandTwoHander()
-        {
-            InventoryArtifactMovable movable = GetEquippedMovable(InventorySlot.MainHand);
-            IArtifactState artifact = movable != null ? movable.State : null;
-            return artifact != null
-                && _artifactLookup != null
-                && _artifactLookup.GetSlot(artifact.Type) == ArtifactSlot.BothHands
-                ? artifact
-                : null;
-        }
-
-        private static bool IsDisplayOnlyEquipmentArtifact(InventorySlot slot, IArtifactState artifact)
-        {
-            return slot == InventorySlot.OffHand
-                && artifact != null
-                && artifact.EquippedInSlot == InventorySlot.MainHand;
-        }
-
-        private string GetArtifactName(IArtifactState artifact)
-        {
-            if (artifact == null)
-            {
-                return string.Empty;
-            }
-
-            try
-            {
-                return ArtifactSpeechFormatter.FormatName(artifact, _artifactLookup, _localization);
-            }
-            catch (Exception ex)
-            {
-                SocAccessMod.Instance?.LogWarning("CommanderSheetAdapter could not get artifact rarity color: " + ex.Message);
-                return _artifactLookup != null ? _artifactLookup.GetLocalizedName(artifact.Type) : artifact.Type.ToString();
-            }
-        }
-
-        private string GetCommanderName()
-        {
-            ICommanderState commander = GetCommander();
-            string name = commander != null && _facade != null ? _facade.Commanders.GetName(commander.Id) : string.Empty;
-            return SpokenLines.Clean(name);
-        }
-
-        private string GetInventoryLabel()
-        {
-            return GetLocalizedText("Common/CommanderInventory/Inventory", "Inventory");
-        }
-
         private string GetSkillName(SkillReference skill)
         {
             if (_localization != null)
@@ -1095,40 +650,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return skill.Skill.ToString();
-        }
-
-        private string GetInventorySlotName(InventorySlot slot)
-        {
-            return GetInventorySlotName(slot.ToString());
-        }
-
-        /// <summary>The game's own name for a slot. The localization answers a key it does not hold
-        /// with the key itself, so an echo is no name at all and the slot's own words are said
-        /// instead - as the market's and the trade's copies of this already did.</summary>
-        private string GetInventorySlotName(string slotName)
-        {
-            string key = "InventorySlots/" + slotName;
-            string text = _localization != null ? _localization.GetText(key) : string.Empty;
-            return string.IsNullOrWhiteSpace(text) || text == key
-                ? FormatSlotName(slotName)
-                : SpokenLines.Clean(text);
-        }
-
-        private static string FormatSlotName(string value)
-        {
-            string formatted = string.Empty;
-            for (int i = 0; i < value.Length; i++)
-            {
-                char c = value[i];
-                if (i > 0 && char.IsUpper(c))
-                {
-                    formatted += " ";
-                }
-
-                formatted += char.ToLowerInvariant(c);
-            }
-
-            return formatted;
         }
 
         private static T GetField<T>(object owner, FieldInfo field) where T : class
