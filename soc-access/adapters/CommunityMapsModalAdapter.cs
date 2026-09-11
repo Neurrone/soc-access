@@ -285,7 +285,7 @@ namespace SongsOfConquestAccess.Adapters
                 return result;
             }
 
-            string label = CleanText(keyInput.instructionText != null ? keyInput.instructionText.text : string.Empty);
+            string label = SpokenLines.Clean(keyInput.instructionText != null ? keyInput.instructionText.text : string.Empty);
             result.Add(new FiveDigitInputItem(0, label, keyInput));
             return result;
         }
@@ -459,8 +459,8 @@ namespace SongsOfConquestAccess.Adapters
                 return result;
             }
 
-            string modName = CleanText(GetText(Reflect.Cast<TMP_Text>(confirmUninstall.Collection, "uninstallConfirmationPanelModName")));
-            string fileSize = CleanText(GetText(Reflect.Cast<TMP_Text>(confirmUninstall.Collection, "uninstallConfirmationPanelFileSize")));
+            string modName = SpokenLines.Clean(GetText(Reflect.Cast<TMP_Text>(confirmUninstall.Collection, "uninstallConfirmationPanelModName")));
+            string fileSize = SpokenLines.Clean(GetText(Reflect.Cast<TMP_Text>(confirmUninstall.Collection, "uninstallConfirmationPanelFileSize")));
             List<string> lines = new List<string>();
             IReadOnlyList<string> panelTexts = GetPanelTextValues(confirmUninstall.Panel);
             for (int i = 0; i < panelTexts.Count; i++)
@@ -520,7 +520,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string value = CleanText(text.text);
+                string value = SpokenLines.Clean(text.text);
                 if (string.IsNullOrWhiteSpace(value) || !seen.Add(value))
                 {
                     continue;
@@ -681,7 +681,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            string label = CleanText(heading != null ? heading.text : string.Empty);
+            string label = SpokenLines.Clean(heading != null ? heading.text : string.Empty);
             string text = string.IsNullOrWhiteSpace(label) ? body : label + "\n" + body;
             result.Add(new TextItem(result.Count, text));
         }
@@ -722,7 +722,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (text == null
                     || !text.gameObject.activeInHierarchy
                     || text.GetComponentInParent<Button>() != null
-                    || string.IsNullOrWhiteSpace(CleanText(text.text)))
+                    || string.IsNullOrWhiteSpace(SpokenLines.Clean(text.text)))
                 {
                     continue;
                 }
@@ -810,7 +810,7 @@ namespace SongsOfConquestAccess.Adapters
             AddButtonAction(
                 result,
                 _authPanels.AuthenticationPanelBackButton,
-                CleanText(_authPanels.AuthenticationPanelBackButtonText != null ? _authPanels.AuthenticationPanelBackButtonText.text : string.Empty));
+                SpokenLines.Clean(_authPanels.AuthenticationPanelBackButtonText != null ? _authPanels.AuthenticationPanelBackButtonText.text : string.Empty));
             AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaSteamButton);
             AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaEmailButton);
             AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaExternalButton);
@@ -885,7 +885,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            string value = CleanText(text.text);
+            string value = SpokenLines.Clean(text.text);
             if (string.IsNullOrWhiteSpace(value))
             {
                 return;
@@ -970,7 +970,7 @@ namespace SongsOfConquestAccess.Adapters
             TMP_Text[] texts = PanelTexts.Under(button.transform);
             for (int i = 0; i < texts.Length; i++)
             {
-                string value = CleanText(texts[i] != null ? texts[i].text : string.Empty);
+                string value = SpokenLines.Clean(texts[i] != null ? texts[i].text : string.Empty);
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     return value;
@@ -985,7 +985,7 @@ namespace SongsOfConquestAccess.Adapters
             TMP_Text[] texts = PanelTexts.Under(transform);
             for (int i = 0; i < texts.Length; i++)
             {
-                string value = CleanText(texts[i] != null ? texts[i].text : string.Empty);
+                string value = SpokenLines.Clean(texts[i] != null ? texts[i].text : string.Empty);
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     return value;
@@ -998,18 +998,8 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetInputLabel(TMP_InputField field)
         {
             TMP_Text placeholder = field.placeholder as TMP_Text;
-            string placeholderText = CleanText(placeholder != null ? placeholder.text : string.Empty);
+            string placeholderText = SpokenLines.Clean(placeholder != null ? placeholder.text : string.Empty);
             return !string.IsNullOrWhiteSpace(placeholderText) ? placeholderText : field.name;
-        }
-
-        private static string CleanText(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            return text.Replace("<color=red>", string.Empty).Replace("</color>", string.Empty);
         }
 
         public sealed class TextItem

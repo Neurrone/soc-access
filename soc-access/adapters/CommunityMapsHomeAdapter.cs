@@ -7,6 +7,7 @@ using ModIO;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
 using SongsOfConquestAccess.Screens;
+using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.Localization;
 using TMPro;
 using UnityEngine;
@@ -476,7 +477,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             string translated = manager.Get(key);
-            return StripTmpMarkup(translated);
+            return SpokenLines.Clean(translated);
         }
 
         private bool PageFeatured(bool right)
@@ -878,7 +879,7 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(TMP_Text text)
         {
             return text != null && text.gameObject.activeInHierarchy
-                ? StripTmpMarkup(text.text)
+                ? SpokenLines.Clean(text.text)
                 : string.Empty;
         }
 
@@ -893,16 +894,6 @@ namespace SongsOfConquestAccess.Adapters
 
             object result = method.Invoke(null, null);
             return result is bool && (bool)result;
-        }
-
-        private static string StripTmpMarkup(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            return text.Replace("<color=red>", string.Empty).Replace("</color>", string.Empty);
         }
 
         public sealed class RowItem
