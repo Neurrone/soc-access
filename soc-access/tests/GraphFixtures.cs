@@ -57,7 +57,7 @@ namespace SongsOfConquestAccess.Tests
             return render.NodeAt(Id(key));
         }
 
-        public static ControlId Dest(GraphNode node, GraphDir dir)
+        private static ControlId Dest(GraphNode node, GraphDir dir)
         {
             Transition t;
             return node.Transitions.TryGetValue(dir, out t) && t != null ? t.Destination : null;
@@ -69,16 +69,28 @@ namespace SongsOfConquestAccess.Tests
             return d == null ? null : (string)d.StructuralKey;
         }
 
-        public static string Label(GraphNode node)
-        {
-            return node == null ? null : GraphAnnouncer.FirstPartText(node);
-        }
-
         /// <summary>A node's own structural key, or null for no node — the shape every navigation
         /// assertion is written in.</summary>
         public static string Key(GraphNode node)
         {
             return node == null ? null : (string)node.Id.StructuralKey;
+        }
+
+        /// <summary>Every structural key a render holds, which is how a screen's composition is
+        /// asserted without naming the order.</summary>
+        public static HashSet<string> Keys(GraphRender render)
+        {
+            HashSet<string> keys = new HashSet<string>();
+            foreach (ControlId id in render.Nodes.Keys)
+            {
+                string key = id.StructuralKey as string;
+                if (key != null)
+                {
+                    keys.Add(key);
+                }
+            }
+
+            return keys;
         }
 
         /// <summary>A tooltip section of the given loudness, spelled out line by line.</summary>

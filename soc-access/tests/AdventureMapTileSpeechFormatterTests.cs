@@ -13,13 +13,8 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileReadsWallAsTerrainWithImpassableStatus()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(12, 9))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = AdventureTerrainKind.Wall,
-                IsImpassable = true
-            };
+            AdventureMapTile tile = TileFixtures.Tile(12, 9, AdventureTerrainKind.Wall);
+            tile.IsImpassable = true;
 
             string text = CreateFormatter().DescribeTile(tile);
 
@@ -29,13 +24,8 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileReadsDirtRoadAsTheOnlyTerrain()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = AdventureTerrainKind.DirtRoad,
-                IsReachable = true
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.DirtRoad);
+            tile.IsReachable = true;
 
             string text = CreateFormatter().DescribeTile(tile);
 
@@ -45,12 +35,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileReadsGroundTerrainWithoutEnvironmentLayer()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(7, 4))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = AdventureTerrainKind.Grass
-            };
+            AdventureMapTile tile = TileFixtures.Tile(7, 4, AdventureTerrainKind.Grass);
 
             string text = CreateFormatter().DescribeTile(tile);
 
@@ -60,14 +45,9 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileDoesNotReadMovementCostByDefault()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                IsReachable = true,
-                ReachableMovementCost = 3f,
-                Terrain = AdventureTerrainKind.DirtRoad
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.DirtRoad);
+            tile.IsReachable = true;
+            tile.ReachableMovementCost = 3f;
 
             string text = CreateFormatter().DescribeTile(tile);
 
@@ -77,14 +57,9 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileReadsEnabledMovementCostAtEnd()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                IsReachable = true,
-                ReachableMovementCost = 3f,
-                Terrain = AdventureTerrainKind.DirtRoad
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.DirtRoad);
+            tile.IsReachable = true;
+            tile.ReachableMovementCost = 3f;
 
             string text = CreateFormatter(enableMovementCost: true).DescribeTile(tile);
 
@@ -94,14 +69,9 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileKeepsTheDecimalsOfAMovementCost()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                IsReachable = true,
-                ReachableMovementCost = 15.5f,
-                Terrain = AdventureTerrainKind.DirtRoad
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.DirtRoad);
+            tile.IsReachable = true;
+            tile.ReachableMovementCost = 15.5f;
 
             string text = CreateFormatter(enableMovementCost: true).DescribeTile(tile);
 
@@ -111,14 +81,9 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileReadsACostOfLessThanHalfAPointRatherThanCallingItFree()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                IsReachable = true,
-                ReachableMovementCost = 0.4f,
-                Terrain = AdventureTerrainKind.DirtRoad
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.DirtRoad);
+            tile.IsReachable = true;
+            tile.ReachableMovementCost = 0.4f;
 
             string text = CreateFormatter(enableMovementCost: true).DescribeTile(tile);
 
@@ -137,12 +102,8 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileDoesNotReadMovementCostForUnexploredTile()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = false,
-                IsVisible = false,
-                ReachableMovementCost = 3f
-            };
+            AdventureMapTile tile = TileFixtures.Bare(4, 2);
+            tile.ReachableMovementCost = 3f;
 
             string text = CreateFormatter(enableMovementCost: true).DescribeTile(tile);
 
@@ -152,12 +113,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileReadsTheWaysARoadLeadsOnAfterTheTerrain()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = AdventureTerrainKind.DirtRoad
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.DirtRoad);
             tile.SetRoadDirectionsSource(() => new[] { ScannerDirection.East, ScannerDirection.West });
 
             string text = CreateFormatter().DescribeTile(tile);
@@ -168,12 +124,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileReadsAForkAsThreeDirectionsWithoutNamingTheShape()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = AdventureTerrainKind.CobblestoneRoad
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.CobblestoneRoad);
             tile.SetRoadDirectionsSource(() => new[]
             {
                 ScannerDirection.North,
@@ -189,12 +140,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileSpellsOutRoadDirectionsWhenLongDirectionsAreOn()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = AdventureTerrainKind.DirtRoad
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.DirtRoad);
             tile.SetRoadDirectionsSource(() => new[] { ScannerDirection.East, ScannerDirection.West });
 
             string text = new AdventureMapTileSpeechFormatter(
@@ -210,13 +156,8 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileLeavesTerrainAloneWhenThereAreNoRoadDirections()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = AdventureTerrainKind.Grass,
-                IsReachable = true
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.Grass);
+            tile.IsReachable = true;
             tile.SetRoadDirectionsSource(() => new ScannerDirection[0]);
 
             string text = CreateFormatter().DescribeTile(tile);
@@ -228,13 +169,8 @@ namespace SongsOfConquestAccess.Tests
         public void DescribeTileSaysNothingAboutRoadDirectionsWhenTheyAreTurnedOff()
         {
             int calls = 0;
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = AdventureTerrainKind.DirtRoad,
-                IsReachable = true
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.DirtRoad);
+            tile.IsReachable = true;
             tile.SetRoadDirectionsSource(() =>
             {
                 calls++;
@@ -357,14 +293,9 @@ namespace SongsOfConquestAccess.Tests
         public void DescribeTileReadsNeitherTerrainNorRoadDirectionsUnderASettlement()
         {
             int calls = 0;
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = AdventureTerrainKind.DirtRoad,
-                IsReachable = true,
-                EntityCategory = AdventureEntityCategory.Settlement
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.DirtRoad);
+            tile.IsReachable = true;
+            tile.EntityCategory = AdventureEntityCategory.Settlement;
             tile.SetRoadDirectionsSource(() =>
             {
                 calls++;
@@ -380,14 +311,9 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileStillReadsTheTerrainUnderAWielder()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = AdventureTerrainKind.Grass,
-                EntityCategory = AdventureEntityCategory.Wielder,
-                Commander = new AdventureMapTile.CommanderInfo { Name = "Cecilia Stoutheart" }
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.Grass);
+            tile.EntityCategory = AdventureEntityCategory.Wielder;
+            tile.Commander = new AdventureMapTile.CommanderInfo { Name = "Cecilia Stoutheart" };
 
             string text = CreateFormatter().DescribeTile(tile);
 
@@ -396,14 +322,10 @@ namespace SongsOfConquestAccess.Tests
 
         private static AdventureMapTile CreateRouteTile(AdventureMapTile.PathIndicatorInfo indicator)
         {
-            return new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                Terrain = AdventureTerrainKind.Grass,
-                IsReachable = true,
-                PathIndicator = indicator
-            };
+            AdventureMapTile tile = TileFixtures.Tile(4, 2, AdventureTerrainKind.Grass);
+            tile.IsReachable = true;
+            tile.PathIndicator = indicator;
+            return tile;
         }
 
         private static AdventureMapTileSpeechFormatter CreateFormatter()

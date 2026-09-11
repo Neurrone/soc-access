@@ -174,7 +174,7 @@ namespace SongsOfConquestAccess.Tests
         public void TileWorksOutRoadDirectionsOnlyOnceAndOnlyWhenAsked()
         {
             int calls = 0;
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(10, 10));
+            AdventureMapTile tile = TileFixtures.Bare(10, 10);
             tile.SetRoadDirectionsSource(() =>
             {
                 calls++;
@@ -193,7 +193,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void TileWithoutARoadDirectionSourceCarriesOnNowhere()
         {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(10, 10));
+            AdventureMapTile tile = TileFixtures.Bare(10, 10);
 
             Assert.IsNotNull(tile.RoadDirections);
             Assert.AreEqual(0, tile.RoadDirections.Count);

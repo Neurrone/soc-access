@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Scanner;
 
@@ -70,10 +70,10 @@ namespace SongsOfConquestAccess.Tests
 
         private static ScannerCustomSlots Slots()
         {
-            ScannerCustomSlots slots = new ScannerCustomSlots();
-            slots.Set(1, new ScannerCustomCategory("Trade run"));
-            slots.Set(2, new ScannerCustomCategory("My scouting"));
-            return slots;
+            return ScannerFixtures.Slots(
+                null,
+                new ScannerCustomCategory("Trade run"),
+                new ScannerCustomCategory("My scouting"));
         }
     }
 }

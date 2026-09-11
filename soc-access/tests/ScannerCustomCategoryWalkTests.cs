@@ -2,6 +2,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Scanner;
 using UnityEngine;
+using static SongsOfConquestAccess.Tests.ScannerFixtures;
 
 namespace SongsOfConquestAccess.Tests
 {
@@ -312,13 +313,11 @@ namespace SongsOfConquestAccess.Tests
             Func<Vector2Int> cursorProvider,
             Func<ScannerSnapshot> snapshotBuilder)
         {
-            return new ScannerController(
+            return Controller(
                 _ => snapshotBuilder(),
                 cursorProvider,
                 (result, cursorHint) => ScannerResultRefresh.Valid(result.Position),
-                _ => true,
-                (result, directions, index, count, includeItemName) => null,
-                ScannerDirectionMode.Square);
+                _ => true);
         }
 
         /// <summary>
@@ -361,11 +360,6 @@ namespace SongsOfConquestAccess.Tests
             ScannerSnapshot snapshot = new ScannerSnapshot();
             snapshot.Add("pickups", ScannerSubcategoryKeys.All, Result("gold", "Gold", 2, 0));
             return snapshot;
-        }
-
-        private static ScannerResult Result(string key, string label, int x, int y)
-        {
-            return new ScannerResult(key, label, new Vector2Int(x, y));
         }
     }
 }

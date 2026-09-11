@@ -1,5 +1,3 @@
-using System.IO;
-using BepInEx.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Audio.Synth;
@@ -7,25 +5,12 @@ using SongsOfConquestAccess.Audio.Synth;
 namespace SongsOfConquestAccess.Tests
 {
     [TestClass]
-    public sealed class ModSettingsAudioCueTests
+    public sealed class ModSettingsAudioCueTests : ModSettingsFixture
     {
-        private string _configPath;
-
         [TestInitialize]
-        public void BindTemporaryConfig()
+        public void BindTheConfig()
         {
-            _configPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".cfg");
-            ModSettings.Bind(new ConfigFile(_configPath, saveOnInit: false));
-        }
-
-        [TestCleanup]
-        public void ResetSettings()
-        {
-            ModSettings.Reset();
-            if (File.Exists(_configPath))
-            {
-                File.Delete(_configPath);
-            }
+            BindTemporaryConfig();
         }
 
         [TestMethod]

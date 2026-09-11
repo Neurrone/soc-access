@@ -306,11 +306,6 @@ namespace SongsOfConquestAccess.Tests.Lint
             return entries;
         }
 
-        public static Dictionary<Site, int> Allowed(string allowlist)
-        {
-            return Allowed(allowlist, false);
-        }
-
         public static Dictionary<Site, int> Allowed(string allowlist, bool kinded)
         {
             Dictionary<Site, int> counts = new Dictionary<Site, int>();

@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Scanner;
 using UnityEngine;
+using static SongsOfConquestAccess.Tests.ScannerFixtures;
 
 namespace SongsOfConquestAccess.Tests
 {
@@ -202,19 +203,6 @@ namespace SongsOfConquestAccess.Tests
             }
 
             return keys.ToArray();
-        }
-
-        /// <summary>The three slots, filled from the front, which is what the
-        /// settings hand the synthesizer.</summary>
-        private static ScannerCustomSlots Slots(params ScannerCustomCategory[] categories)
-        {
-            ScannerCustomSlots slots = new ScannerCustomSlots();
-            for (int i = 0; i < categories.Length; i++)
-            {
-                slots.Set(i, categories[i]);
-            }
-
-            return slots;
         }
     }
 }
