@@ -53,6 +53,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo BackgroundCloseButtonField = AccessTools.Field(typeof(AdventureMenuBackground), "_closeButton");
         private static readonly FieldInfo MarketEntryButtonField = AccessTools.Field(typeof(ArtifactMarketEntry), "_button");
 
+        private static readonly ArtifactMarketEntry[] NoEntries = new ArtifactMarketEntry[0];
+
         private readonly ArtifactMarketMenu _menu;
         private readonly InventoryHUD _inventory;
         private readonly IClientAdventureFacade _facade;
@@ -68,6 +70,14 @@ namespace SongsOfConquestAccess.Adapters
 
         // Each filter's name, read off its toggle once (see GetCategoryLabel).
         private readonly Dictionary<UIToggle, string> _categoryLabels = new Dictionary<UIToggle, string>();
+
+        // The offers the grid is drawing, kept while it is drawing the same ones. Each costs a
+        // rarity-formatted name and a formatted price, and the 24 pooled cells are copied and
+        // sorted to read them in the order the grid draws them; the key is read off the game every
+        // frame (the wielder, the cells and what is in each of them), so a purchase, a sale and a
+        // switch of category all rebuild with nothing having to say so. The screen keeps its nodes
+        // for as long as this is the same list (screens/ArtifactMarketScreen.cs).
+        private readonly SlotSnapshot<MarketArtifactItem> _offers = new SlotSnapshot<MarketArtifactItem>();
         private readonly FrameSweep<ArtifactMarketEntry> _marketEntries =
             new FrameSweep<ArtifactMarketEntry>("artifact market grid", inactiveToo: false);
         private readonly FrameSweep<UITextMesh> _bandTexts =
@@ -286,17 +296,32 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<MarketArtifactItem> GetMarketArtifacts()
         {
-            List<MarketArtifactItem> items = new List<MarketArtifactItem>();
             GameObject gridContainer = GetField<GameObject>(_menu, GridContainerField);
-            if (gridContainer == null)
+            ArtifactMarketEntry[] drawn = gridContainer == null
+                ? NoEntries
+                : _marketEntries.Under(gridContainer.transform);
+            List<int> key = _offers.BeginKey();
+            key.Add(CommanderId);
+            for (int i = 0; i < drawn.Length; i++)
             {
-                return items;
+                ArtifactMarketEntry entry = drawn[i];
+                IArtifactState artifact = entry != null ? entry.ArtifactState : null;
+                key.Add(entry != null ? ((Component)entry).GetInstanceID() : 0);
+                key.Add(entry != null ? ((Component)entry).transform.GetSiblingIndex() : -1);
+                key.Add(artifact != null ? artifact.Id : 0);
+            }
+
+            IReadOnlyList<MarketArtifactItem> unchanged = _offers.Unchanged();
+            if (unchanged != null)
+            {
+                return unchanged;
             }
 
             // A copy, because the sweep's answer is shared for the rest of the frame and the order
             // it was walked in is what the next caller expects.
-            ArtifactMarketEntry[] entries = (ArtifactMarketEntry[])_marketEntries.Under(gridContainer.transform).Clone();
+            ArtifactMarketEntry[] entries = (ArtifactMarketEntry[])drawn.Clone();
             Array.Sort(entries, CompareSiblingIndex);
+            List<MarketArtifactItem> items = new List<MarketArtifactItem>();
             for (int i = 0; i < entries.Length; i++)
             {
                 ArtifactMarketEntry entry = entries[i];
@@ -313,7 +338,7 @@ namespace SongsOfConquestAccess.Adapters
                     Tooltip.ForComponent(entry.GetSelectable(), _localization)));
             }
 
-            return items;
+            return _offers.Keep(items);
         }
 
         public bool SelectMarketEntry(ArtifactMarketEntry entry)
