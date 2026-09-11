@@ -141,12 +141,19 @@ namespace SongsOfConquestAccess.Adapters
     ///
     /// The windows share one controller, so the screen reads <see cref="ActiveWindow"/> - the one
     /// whose game object is active - each frame and emits that window's nodes. The slider divides its
-    /// 0..1 range into five bands, which is how the game's own severity and occurrence read.
+    /// 0..1 range into five bands, the 0.2 grid the game's own severity and occurrence are read on.
     /// </summary>
     public sealed class BugReportAdapter : IBugReportAdapter
     {
-        // Five bands over the slider's range: the game maps 0..1 to None/Trivial/Minor/Major/Massive
-        // for severity and Never/Rarely/Sometimes/Often/Always for occurrence, on a 0.2 grid.
+        // Five bands - six stops - over the slider's range, which is the 0.2 grid the two sliders
+        // are read on. The game reads the raw 0..1 value against thresholds, not against a band
+        // count (Lavapotion.BugReporter.BugReportSeverityExtensions.CalculateSeverity and
+        // BugReportOccurenceExtensions.CalculateOccurence): severity is None at 0, then Trivial
+        // below 0.25, Minor below 0.5, Major below 0.75 and Critical above it, so the stops read
+        // None/Trivial/Minor/Major/Critical/Critical and the top two say the same thing; occurrence
+        // is Never at 0, HardlyEver below 0.2, Rarely below 0.4, Sometimes below 0.6, Often below
+        // 0.9 and Always above it, so the stops read Never/Rarely/Sometimes/Often/Often/Always -
+        // the top stop is the only Always there, which is why the grid keeps its sixth stop.
         private const int SliderBands = 5;
 
         // Controller fields.
