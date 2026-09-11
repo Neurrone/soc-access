@@ -375,10 +375,10 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        private DropdownItem BuildDropdown(string id, MultiTargetDropdown dropdown)
+        private DropdownItem BuildDropdown(string key, MultiTargetDropdown dropdown)
         {
             return new DropdownItem(
-                id,
+                key,
                 DropdownLabel(dropdown),
                 dropdown,
                 SetDropdownValue,
@@ -591,15 +591,15 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly Func<bool> _select;
 
-            public TabItem(string id, string label, bool isSelected, Func<bool> select)
+            public TabItem(string key, string label, bool isSelected, Func<bool> select)
             {
-                Id = id ?? string.Empty;
+                Key = key ?? string.Empty;
                 Label = label ?? string.Empty;
                 IsSelected = isSelected;
                 _select = select;
             }
 
-            public string Id { get; private set; }
+            public string Key { get; private set; }
 
             public string Label { get; private set; }
 
@@ -619,14 +619,14 @@ namespace SongsOfConquestAccess.Adapters
             private readonly Func<bool> _isVisible;
 
             public ButtonAction(
-                string id,
+                string key,
                 string label,
                 Func<bool> focus,
                 Func<bool> activate,
                 Func<bool> isEnabled,
                 Func<bool> isVisible)
             {
-                Id = id ?? string.Empty;
+                Key = key ?? string.Empty;
                 Label = label ?? string.Empty;
                 _focus = focus;
                 _activate = activate;
@@ -634,7 +634,7 @@ namespace SongsOfConquestAccess.Adapters
                 _isVisible = isVisible;
             }
 
-            public string Id { get; private set; }
+            public string Key { get; private set; }
 
             public string Label { get; private set; }
 
@@ -669,13 +669,13 @@ namespace SongsOfConquestAccess.Adapters
             private readonly Func<MultiTargetDropdown, bool> _focus;
 
             public DropdownItem(
-                string id,
+                string key,
                 string label,
                 MultiTargetDropdown dropdown,
                 Func<MultiTargetDropdown, int, bool> setValue,
                 Func<MultiTargetDropdown, bool> focus)
             {
-                Id = id ?? string.Empty;
+                Key = key ?? string.Empty;
                 Label = label ?? string.Empty;
                 _dropdown = dropdown;
                 _setValue = setValue;
@@ -692,7 +692,7 @@ namespace SongsOfConquestAccess.Adapters
                 FocusOption = index => DropdownPopup.FocusOption(_dropdown, index);
             }
 
-            public string Id { get; private set; }
+            public string Key { get; private set; }
 
             /// <summary>What the dropdown is choosing, in mod.io's own words ("Filter by:").</summary>
             public string Label { get; private set; }

@@ -162,7 +162,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddAction(
             List<ActionItem> actions,
-            string id,
+            string key,
             MethodInfo method,
             IReadOnlyList<Button> buttons,
             int spatialIndex)
@@ -184,7 +184,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            actions.Add(new ActionItem(actions.Count, id, label, button, () => Invoke(method)));
+            actions.Add(new ActionItem(actions.Count, key, label, button, () => Invoke(method)));
         }
 
         private Button FindButtonInvoking(string methodName)
@@ -465,10 +465,10 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly Func<bool> _activate;
 
-            public ActionItem(int index, string id, string label, Button button, Func<bool> activate)
+            public ActionItem(int index, string key, string label, Button button, Func<bool> activate)
             {
                 Index = index;
-                Id = id ?? string.Empty;
+                Key = key ?? string.Empty;
                 Label = label ?? string.Empty;
                 Button = button;
                 _activate = activate;
@@ -476,7 +476,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public int Index { get; private set; }
 
-            public string Id { get; private set; }
+            public string Key { get; private set; }
 
             public string Label { get; private set; }
 

@@ -252,7 +252,6 @@ namespace SongsOfConquestAccess.Adapters
                 UIButton button = TabButtonField != null && tab != null ? TabButtonField.GetValue(tab) as UIButton : null;
                 int index = i;
                 result.Add(new TabItem(
-                    "save-load-tab-" + index,
                     index,
                     button,
                     () => GetTabLabel(button),
@@ -391,10 +390,10 @@ namespace SongsOfConquestAccess.Adapters
             get { return SettingsField != null && _menu != null ? SettingsField.GetValue(_menu) as SaveLoadGameMenu.Settings : null; }
         }
 
-        private ButtonItem BuildButton(string id, UIButton button)
+        private ButtonItem BuildButton(string key, UIButton button)
         {
             return new ButtonItem(
-                id,
+                key,
                 button,
                 () => GetButtonLabel(button),
                 () => ActivateButton(button),
@@ -403,10 +402,10 @@ namespace SongsOfConquestAccess.Adapters
                 () => MenuButtonAdapterBase.IsButtonVisible(button));
         }
 
-        private ButtonItem BuildEnabledOnlyButton(string id, UIButton button)
+        private ButtonItem BuildEnabledOnlyButton(string key, UIButton button)
         {
             return new ButtonItem(
-                id,
+                key,
                 button,
                 () => GetButtonLabel(button),
                 () => ActivateButton(button),
@@ -489,7 +488,6 @@ namespace SongsOfConquestAccess.Adapters
             private readonly Func<bool> _isSelected;
 
             public TabItem(
-                string id,
                 int index,
                 UIButton button,
                 Func<string> getLabel,
@@ -499,7 +497,6 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> isEnabled,
                 Func<bool> isSelected)
             {
-                Id = id;
                 Index = index;
                 Button = button;
                 _getLabel = getLabel;
@@ -510,7 +507,6 @@ namespace SongsOfConquestAccess.Adapters
                 _isSelected = isSelected;
             }
 
-            public string Id { get; private set; }
             public int Index { get; private set; }
             public UIButton Button { get; private set; }
             public string GetLabel() { return _getLabel != null ? _getLabel() : string.Empty; }
@@ -534,11 +530,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public int Index { get; private set; }
-
-            public string Id
-            {
-                get { return "save-load-entry-" + Index; }
-            }
 
             public string SaveName
             {
@@ -638,7 +629,7 @@ namespace SongsOfConquestAccess.Adapters
             private readonly Func<bool> _isVisible;
 
             public ButtonItem(
-                string id,
+                string key,
                 UIButton button,
                 Func<string> getLabel,
                 Func<bool> activate,
@@ -646,7 +637,7 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> isEnabled,
                 Func<bool> isVisible)
             {
-                Id = id;
+                Key = key;
                 Button = button;
                 _getLabel = getLabel;
                 _activate = activate;
@@ -655,7 +646,7 @@ namespace SongsOfConquestAccess.Adapters
                 _isVisible = isVisible;
             }
 
-            public string Id { get; private set; }
+            public string Key { get; private set; }
 
             /// <summary>The drawn button, so a screen can read where it is drawn.</summary>
             public UIButton Button { get; private set; }

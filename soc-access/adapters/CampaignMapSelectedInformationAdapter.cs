@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
@@ -268,7 +268,7 @@ namespace SongsOfConquestAccess.Adapters
                 FocusOption = index => DropdownPopup.FocusOption(Dropdown, index);
             }
 
-            public string Id
+            public string Key
             {
                 get { return "campaign-map-difficulty"; }
             }

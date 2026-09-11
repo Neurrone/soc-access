@@ -265,7 +265,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                result.Add(new ResultItem(result.Count, BuildResultId(component, result.Count), title, component, listItem));
+                result.Add(new ResultItem(result.Count, title, component, listItem));
             }
 
             result.Sort(CompareResultPosition);
@@ -426,20 +426,6 @@ namespace SongsOfConquestAccess.Adapters
             return string.Empty;
         }
 
-        /// <summary>The mod's own id, which is what tells one result from another. <c>ModId</c> is a
-        /// struct wrapping a long with no <c>ToString</c> of its own, so reading it as an object and
-        /// printing it answered the type name for every row - which is why every result used to carry
-        /// the same identity.</summary>
-        private static string BuildResultId(Component component, int index)
-        {
-            object profile = Reflect.Typed<object>(component, "profile");
-            object idValue = profile != null ? Reflect.Typed<object>(profile, "id") : null;
-            string id = idValue is ModIO.ModId
-                ? ((ModIO.ModId)idValue).id.ToString(System.Globalization.CultureInfo.InvariantCulture)
-                : (idValue != null ? idValue.ToString() : string.Empty);
-            return !string.IsNullOrWhiteSpace(id) ? id : index.ToString();
-        }
-
         private static int CompareResultPosition(ResultItem left, ResultItem right)
         {
             if (left == null || right == null)
@@ -591,7 +577,7 @@ namespace SongsOfConquestAccess.Adapters
                 FocusOption = index => DropdownPopup.FocusOption(_dropdown, index);
             }
 
-            public string Id
+            public string Key
             {
                 get { return "sort"; }
             }
@@ -689,18 +675,15 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly TMP_Text _title;
 
-            public ResultItem(int index, string id, TMP_Text title, Component nativeComponent, ListItem nativeListItem)
+            public ResultItem(int index, TMP_Text title, Component nativeComponent, ListItem nativeListItem)
             {
                 DisplayIndex = index;
-                Id = id ?? index.ToString();
                 _title = title;
                 NativeComponent = nativeComponent;
                 NativeListItem = nativeListItem;
             }
 
             public int DisplayIndex { get; set; }
-
-            public string Id { get; private set; }
 
             /// <summary>The row's drawn title, read off the game's own text when the node is READ
             /// rather than when the row was found: the rows are a snapshot, and mod.io refills a

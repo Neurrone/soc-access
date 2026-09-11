@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
@@ -165,7 +165,7 @@ namespace SongsOfConquestAccess.Screens
                 () => action.Activate(),
                 () => action.IsEnabled);
             vtable.OnFocusVisual = action.Focus;
-            string key = "search-filter:action/" + action.Id;
+            string key = "search-filter:action/" + action.Key;
             if (action.Button != null)
             {
                 builder.AddItem(new DrawnNode(ControlId.For(action.Button, key), vtable, action.Button));

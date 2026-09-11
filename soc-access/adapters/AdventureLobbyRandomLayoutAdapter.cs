@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -291,12 +291,12 @@ namespace SongsOfConquestAccess.Adapters
 
             public LobbyRandomMapPreviewEntry Entry { get; private set; }
 
-            public string Id
+            public string Key
             {
                 get
                 {
                     string name = Entry != null && Entry.MapProviderData.name != null ? Entry.MapProviderData.name : Title;
-                    return string.IsNullOrWhiteSpace(name) ? "layout" : SanitizeId(name);
+                    return string.IsNullOrWhiteSpace(name) ? "layout" : SanitizeKey(name);
                 }
             }
 
@@ -345,7 +345,7 @@ namespace SongsOfConquestAccess.Adapters
                     _localization));
             }
 
-            private static string SanitizeId(string value)
+            private static string SanitizeKey(string value)
             {
                 char[] chars = value.ToLowerInvariant().ToCharArray();
                 for (int i = 0; i < chars.Length; i++)
@@ -382,7 +382,7 @@ namespace SongsOfConquestAccess.Adapters
                 get { return _toggle; }
             }
 
-            public string Id
+            public string Key
             {
                 get { return Condition.ToString().ToLowerInvariant(); }
             }
@@ -463,7 +463,7 @@ namespace SongsOfConquestAccess.Adapters
                 FocusOption = index => DropdownPopup.FocusOption(_dropdown, index);
             }
 
-            public string Id
+            public string Key
             {
                 get { return "random-layout-variant"; }
             }

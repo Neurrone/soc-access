@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -74,13 +74,13 @@ namespace SongsOfConquestAccess.Adapters
 
         /// <summary>One button read on its own - the window's own control rather than a drawn row.
         /// </summary>
-        public static MenuRowButton Button(string id, UIButton button)
+        public static MenuRowButton Button(string key, UIButton button)
         {
-            return Button(id, button, null);
+            return Button(key, button, null);
         }
 
         /// <summary>The same, with the handler this window's tooltips are resolved through.</summary>
-        public static MenuRowButton Button(string id, UIButton button, ILocalizationHandler localization)
+        public static MenuRowButton Button(string key, UIButton button, ILocalizationHandler localization)
         {
             if (button == null)
             {
@@ -88,7 +88,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return new MenuRowButton(
-                id,
+                key,
                 () => Label(button),
                 () => NativeSelectionUtility.Click(button),
                 () => NativeSelectionUtility.Select(button),
@@ -97,11 +97,12 @@ namespace SongsOfConquestAccess.Adapters
                 () => Tooltip.ForComponent(button, localization));
         }
 
-        /// <summary>What a row of this form is called: "options-toggle-3", "game-settings-text-0".
+        /// <summary>The stable KEY a row of this form is known by: "options-toggle-3",
+        /// "game-settings-text-0". The node id a screen builds from it is the screen's to spell.
         /// </summary>
-        private static string RowId(MenuRowSettings settings, string kind, int index)
+        private static string RowKey(MenuRowSettings settings, string kind, int index)
         {
-            return settings.IdPrefix + "-" + kind + "-" + index;
+            return settings.KeyPrefix + "-" + kind + "-" + index;
         }
 
         private static void AddTexts(List<MenuRow> items, IMenuFactoryCollection factory, MenuRowSettings settings)
@@ -120,7 +121,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowText(
-                        RowId(settings, "text", i),
+                        RowKey(settings, "text", i),
                         () => SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text)),
                         () => GameObjects.IsLive(component))));
             }
@@ -142,7 +143,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowInput(
-                        RowId(settings, "input", i),
+                        RowKey(settings, "input", i),
                         () => InputLabel(field),
                         () => field,
                         () => field.Active && field.Interactable,
@@ -175,7 +176,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowTimeInput(
-                        RowId(settings, "time-input", i),
+                        RowKey(settings, "time-input", i),
                         () => TimeInputLabel(field),
                         () => TimeInputChildField(field, TimeInputMinutesField),
                         () => TimeInputChildField(field, TimeInputSecondsField),
@@ -228,7 +229,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowDropdown(
-                        RowId(settings, "dropdown", i),
+                        RowKey(settings, "dropdown", i),
                         () => DropdownLabel(dropdown),
                         () => DropdownOptions(dropdown),
                         () => DropdownValue(dropdown),
@@ -264,7 +265,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowToggle(
-                        RowId(settings, "toggle", i),
+                        RowKey(settings, "toggle", i),
                         () => ToggleLabel(toggle),
                         () => toggle.ToggleValue = !toggle.ToggleValue,
                         () => toggle.ToggleValue,
@@ -291,7 +292,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowSlider(
-                        RowId(settings, "slider", i),
+                        RowKey(settings, "slider", i),
                         () => SliderLabel(slider),
                         () => ValueText(slider),
                         () => slider.SliderValue,
@@ -324,7 +325,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowButton(
-                        RowId(settings, settings.ButtonIdKind, i),
+                        RowKey(settings, settings.ButtonKeyKind, i),
                         () => Label(button),
                         () => NativeSelectionUtility.Click(button),
                         () => NativeSelectionUtility.Select(component),
@@ -361,11 +362,11 @@ namespace SongsOfConquestAccess.Adapters
 
                 items.Add(new MenuRow(
                     component.transform,
-                    MakeKeyBinding(RowId(settings, "keybind", i), widget, settings.KeyBindings)));
+                    MakeKeyBinding(RowKey(settings, "keybind", i), widget, settings.KeyBindings)));
             }
         }
 
-        private static MenuRowKeyBinding MakeKeyBinding(string id, IUIKeyBinding widget, KeyBindingSource source)
+        private static MenuRowKeyBinding MakeKeyBinding(string key, IUIKeyBinding widget, KeyBindingSource source)
         {
             Component component = widget as Component;
             // The game draws the override chip as an INTERACTABLE button and the default chip as a
@@ -384,7 +385,7 @@ namespace SongsOfConquestAccess.Adapters
             // page's build (2026-09-11).
             string actionName = null;
             return new MenuRowKeyBinding(
-                id,
+                key,
                 () => actionName ?? (actionName = ActionText(widget)),
                 () =>
                 {
@@ -820,15 +821,15 @@ namespace SongsOfConquestAccess.Adapters
     /// <summary>
     /// What tells one drawn form's rows from another's. The rows themselves are read the same way
     /// for every form; these are the three things a window owns rather than the reader: the word its
-    /// row ids begin with, which is what a screen's node keys are built from, what it calls a button
+    /// row keys begin with, which is what a screen's node ids are built from, what it calls a button
     /// row (the lobby's windows called theirs "content-button" before the reader was shared), and
     /// the handler its tooltips are resolved through - null on the Options window, whose controls
     /// carry their tooltip text already localized.
     /// </summary>
     public sealed class MenuRowSettings
     {
-        public string IdPrefix = "options";
-        public string ButtonIdKind = "button";
+        public string KeyPrefix = "options";
+        public string ButtonKeyKind = "button";
         public ILocalizationHandler Localization;
 
         /// <summary>The rebindable-action context (the Options window's Controls page); null for a
@@ -852,23 +853,23 @@ namespace SongsOfConquestAccess.Adapters
     /// <summary>A caption, or any text the form draws on a line of its own.</summary>
     public sealed class MenuRowText
     {
-        public MenuRowText(string id, Func<string> getText, Func<bool> isVisible)
+        public MenuRowText(string key, Func<string> getText, Func<bool> isVisible)
         {
-            Id = id;
+            Key = key;
             GetText = getText;
             IsVisible = isVisible;
         }
 
-        public string Id { get; private set; }
+        public string Key { get; private set; }
         public Func<string> GetText { get; private set; }
         public Func<bool> IsVisible { get; private set; }
     }
 
     public sealed class MenuRowButton
     {
-        public MenuRowButton(string id, Func<string> getLabel, Func<bool> activate, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
+        public MenuRowButton(string key, Func<string> getLabel, Func<bool> activate, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
         {
-            Id = id;
+            Key = key;
             GetLabel = getLabel;
             Activate = activate;
             Focus = focus;
@@ -877,7 +878,7 @@ namespace SongsOfConquestAccess.Adapters
             GetTooltip = getTooltip;
         }
 
-        public string Id { get; private set; }
+        public string Key { get; private set; }
         public Func<string> GetLabel { get; private set; }
         public Func<bool> Activate { get; private set; }
         public Action Focus { get; private set; }
@@ -890,9 +891,9 @@ namespace SongsOfConquestAccess.Adapters
     /// keyboard is the game's own affair and the mod's editor drives it directly.</summary>
     public sealed class MenuRowInput
     {
-        public MenuRowInput(string id, Func<string> getLabel, Func<IUITextMeshInputField> getField, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
+        public MenuRowInput(string key, Func<string> getLabel, Func<IUITextMeshInputField> getField, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
         {
-            Id = id;
+            Key = key;
             GetLabel = getLabel;
             GetField = getField;
             IsEnabled = isEnabled;
@@ -900,7 +901,7 @@ namespace SongsOfConquestAccess.Adapters
             GetTooltip = getTooltip;
         }
 
-        public string Id { get; private set; }
+        public string Key { get; private set; }
         public Func<string> GetLabel { get; private set; }
         public Func<IUITextMeshInputField> GetField { get; private set; }
         public Func<bool> IsEnabled { get; private set; }
@@ -914,7 +915,7 @@ namespace SongsOfConquestAccess.Adapters
     public sealed class MenuRowTimeInput
     {
         public MenuRowTimeInput(
-            string id,
+            string key,
             Func<string> getLabel,
             Func<IUITextMeshInputField> getMinutesField,
             Func<IUITextMeshInputField> getSecondsField,
@@ -922,7 +923,7 @@ namespace SongsOfConquestAccess.Adapters
             Func<bool> isVisible,
             Func<Tooltip> getTooltip)
         {
-            Id = id;
+            Key = key;
             GetLabel = getLabel;
             GetMinutesField = getMinutesField;
             GetSecondsField = getSecondsField;
@@ -931,7 +932,7 @@ namespace SongsOfConquestAccess.Adapters
             GetTooltip = getTooltip;
         }
 
-        public string Id { get; private set; }
+        public string Key { get; private set; }
         public Func<string> GetLabel { get; private set; }
         public Func<IUITextMeshInputField> GetMinutesField { get; private set; }
         public Func<IUITextMeshInputField> GetSecondsField { get; private set; }
@@ -942,9 +943,9 @@ namespace SongsOfConquestAccess.Adapters
 
     public sealed class MenuRowToggle
     {
-        public MenuRowToggle(string id, Func<string> getLabel, Action toggle, Func<bool> isChecked, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
+        public MenuRowToggle(string key, Func<string> getLabel, Action toggle, Func<bool> isChecked, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
         {
-            Id = id;
+            Key = key;
             GetLabel = getLabel;
             Toggle = toggle;
             IsChecked = isChecked;
@@ -954,7 +955,7 @@ namespace SongsOfConquestAccess.Adapters
             GetTooltip = getTooltip;
         }
 
-        public string Id { get; private set; }
+        public string Key { get; private set; }
         public Func<string> GetLabel { get; private set; }
         public Action Toggle { get; private set; }
         public Func<bool> IsChecked { get; private set; }
@@ -966,9 +967,9 @@ namespace SongsOfConquestAccess.Adapters
 
     public sealed class MenuRowDropdown : IDropList
     {
-        public MenuRowDropdown(string id, Func<string> getLabel, Func<IReadOnlyList<string>> getOptions, Func<int> getValue, Func<int, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip, Func<bool> openPopup, Func<bool> closePopup, Func<bool> isPopupOpen, Func<int, bool> focusOption)
+        public MenuRowDropdown(string key, Func<string> getLabel, Func<IReadOnlyList<string>> getOptions, Func<int> getValue, Func<int, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip, Func<bool> openPopup, Func<bool> closePopup, Func<bool> isPopupOpen, Func<int, bool> focusOption)
         {
-            Id = id;
+            Key = key;
             GetLabel = getLabel;
             GetOptions = getOptions;
             GetValue = getValue;
@@ -983,7 +984,7 @@ namespace SongsOfConquestAccess.Adapters
             FocusOption = focusOption;
         }
 
-        public string Id { get; private set; }
+        public string Key { get; private set; }
         public Func<string> GetLabel { get; private set; }
         public Func<IReadOnlyList<string>> GetOptions { get; private set; }
         public Func<int> GetValue { get; private set; }
@@ -1003,11 +1004,11 @@ namespace SongsOfConquestAccess.Adapters
 
     public sealed class MenuRowSlider
     {
-        public MenuRowSlider(string id, Func<string> getLabel, Func<string> getValueText, Func<float> getValue, Func<float> getMinimumValue, Func<float> getMaximumValue, Func<float> getStep, Func<float, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip, Func<string> getValueEditorLabel, Func<bool> openValueEditor)
+        public MenuRowSlider(string key, Func<string> getLabel, Func<string> getValueText, Func<float> getValue, Func<float> getMinimumValue, Func<float> getMaximumValue, Func<float> getStep, Func<float, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip, Func<string> getValueEditorLabel, Func<bool> openValueEditor)
         {
             GetValueEditorLabel = getValueEditorLabel;
             OpenValueEditor = openValueEditor;
-            Id = id;
+            Key = key;
             GetLabel = getLabel;
             GetValueText = getValueText;
             GetValue = getValue;
@@ -1021,7 +1022,7 @@ namespace SongsOfConquestAccess.Adapters
             GetTooltip = getTooltip;
         }
 
-        public string Id { get; private set; }
+        public string Key { get; private set; }
         public Func<string> GetLabel { get; private set; }
         public Func<string> GetValueText { get; private set; }
         public Func<float> GetValue { get; private set; }
@@ -1077,7 +1078,7 @@ namespace SongsOfConquestAccess.Adapters
     public sealed class MenuRowKeyBinding
     {
         public MenuRowKeyBinding(
-            string id,
+            string key,
             Func<string> getActionName,
             Func<string> getBindingText,
             Func<bool> hasOverride,
@@ -1091,7 +1092,7 @@ namespace SongsOfConquestAccess.Adapters
             Func<Tooltip> getClearTooltip,
             Func<Tooltip> getTooltip)
         {
-            Id = id;
+            Key = key;
             GetActionName = getActionName;
             GetBindingText = getBindingText;
             HasOverride = hasOverride;
@@ -1106,7 +1107,7 @@ namespace SongsOfConquestAccess.Adapters
             GetTooltip = getTooltip;
         }
 
-        public string Id { get; private set; }
+        public string Key { get; private set; }
 
         /// <summary>The gesture name the game draws (the row's primary cell).</summary>
         public Func<string> GetActionName { get; private set; }

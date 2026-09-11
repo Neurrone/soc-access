@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
@@ -215,7 +215,7 @@ namespace SongsOfConquestAccess.Screens
                 // Synthesized from the game's own option list: TMP builds a row per entry only while
                 // the popup is open, and the mod's row answers for the option either way.
                 builder.AddItem(new SyntheticNode(
-                    ControlId.Structural("droplist:" + item.Id + "/" + index),
+                    ControlId.Structural("droplist:" + item.Key + "/" + index),
                     vtable));
             }
         }

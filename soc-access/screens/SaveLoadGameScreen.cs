@@ -341,7 +341,7 @@ namespace SongsOfConquestAccess.Screens
                 () => it.Activate(),
                 it.IsEnabled);
             vtable.OnFocusVisual = () => it.Focus();
-            builder.AddItem(new DrawnNode(ControlId.For(it.Button, "save-load:" + it.Id), vtable, it.Button));
+            builder.AddItem(new DrawnNode(ControlId.For(it.Button, "save-load:" + it.Key), vtable, it.Button));
         }
 
         /// <summary>The save variant's name box, drawn beside the commands it belongs to. The plain

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquestAccess.Adapters;
@@ -143,7 +143,7 @@ namespace SongsOfConquestAccess.Screens
                     () => layout.IsSelected,
                     () => layout.Activate());
                 GraphNodes.ParagraphParts(vtable, () => layout.DescriptionLines);
-                ControlId id = ControlId.For(subject, "random-layout:card/" + layout.Id);
+                ControlId id = ControlId.For(subject, "random-layout:card/" + layout.Key);
                 builder.AddItem(new DrawnNode(id, vtable, subject));
                 if (layout.IsSelected)
                 {
@@ -207,7 +207,7 @@ namespace SongsOfConquestAccess.Screens
                     toggle.GetTooltip());
                 vtable.OnFocusVisual = toggle.Focus;
                 builder.AddItem(new DrawnNode(
-                    ControlId.For(subject, "random-layout:win-condition/" + toggle.Id),
+                    ControlId.For(subject, "random-layout:win-condition/" + toggle.Key),
                     vtable,
                     subject));
             }
@@ -241,7 +241,7 @@ namespace SongsOfConquestAccess.Screens
             builder.PushContext(label());
             builder.SetRegion(LayoutRegion);
             builder.AddItem(new DrawnNode(
-                ControlId.For(dropdownSubject, "random-layout:" + dropdown.Id),
+                ControlId.For(dropdownSubject, "random-layout:" + dropdown.Key),
                 combo,
                 dropdownSubject));
             builder.SetRegion(null);

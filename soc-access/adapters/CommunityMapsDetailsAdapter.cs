@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -185,15 +185,15 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        private static void AddAction(List<ActionItem> actions, string id, string label, string status, Func<bool> isSelected, Func<bool> activate)
+        private static void AddAction(List<ActionItem> actions, string key, string label, string status, Func<bool> isSelected, Func<bool> activate)
         {
             if (!string.IsNullOrWhiteSpace(label))
             {
-                actions.Add(new ActionItem(id, label, status, isSelected, activate));
+                actions.Add(new ActionItem(key, label, status, isSelected, activate));
             }
         }
 
-        private void AddDetail(List<DetailItem> details, string id, TMP_Text valueText)
+        private void AddDetail(List<DetailItem> details, string key, TMP_Text valueText)
         {
             string value = CommunityMapsText.Of(valueText);
             if (string.IsNullOrWhiteSpace(value))
@@ -207,7 +207,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            details.Add(new DetailItem(id, label, value));
+            details.Add(new DetailItem(key, label, value));
         }
 
         private bool RatePositive()
@@ -348,16 +348,16 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly Func<bool> _isSelected;
 
-            public ActionItem(string id, string label, string status, Func<bool> isSelected, Func<bool> activate)
+            public ActionItem(string key, string label, string status, Func<bool> isSelected, Func<bool> activate)
             {
-                Id = id ?? string.Empty;
+                Key = key ?? string.Empty;
                 Label = label ?? string.Empty;
                 Status = status ?? string.Empty;
                 _isSelected = isSelected;
                 Activate = activate;
             }
 
-            public string Id { get; private set; }
+            public string Key { get; private set; }
             public string Label { get; private set; }
             public string Status { get; private set; }
             public bool IsSelected { get { return _isSelected != null && _isSelected(); } }
@@ -366,14 +366,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class DetailItem
         {
-            public DetailItem(string id, string label, string value)
+            public DetailItem(string key, string label, string value)
             {
-                Id = id ?? string.Empty;
+                Key = key ?? string.Empty;
                 Label = label ?? string.Empty;
                 Value = value ?? string.Empty;
             }
 
-            public string Id { get; private set; }
+            public string Key { get; private set; }
             public string Label { get; private set; }
             public string Value { get; private set; }
         }

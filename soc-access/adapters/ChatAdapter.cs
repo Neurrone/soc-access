@@ -646,7 +646,7 @@ namespace SongsOfConquestAccess.Adapters
                 FocusOption = index => DropdownPopup.FocusOption(_dropdown, index);
             }
 
-            public string Id
+            public string Key
             {
                 get { return "chat-target"; }
             }
