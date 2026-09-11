@@ -79,6 +79,12 @@ namespace SongsOfConquestAccess.Adapters
         private bool _optionsButtonProbed;
         private GameLogHandleUI _gameLogHandle;
         private bool _gameLogHandleProbed;
+        private IReadOnlyList<QuickbarItem> _quickbarItems;
+        private int _quickbarItemsFrame = -1;
+        private IReadOnlyList<string> _battleLogEntries;
+        private int _battleLogCount = -1;
+        private string _battleLogFirst;
+        private string _battleLogLast;
         private PropertyInfo _queuePoolActiveItemsProperty;
         private Type _queuePoolType;
         private FieldInfo _troopViewStatusField;
@@ -216,11 +222,6 @@ namespace SongsOfConquestAccess.Adapters
         public Tooltip OptionsButtonTooltip
         {
             get { return Tooltip.ForComponent(GetOptionsButton(), _localization); }
-        }
-
-        public bool IsTargetingInstructionVisible()
-        {
-            return !string.IsNullOrWhiteSpace(TargetingInstructionText);
         }
 
         public void SetAbilityTargetInstructionText(string text)
@@ -361,7 +362,24 @@ namespace SongsOfConquestAccess.Adapters
             return IsSpellcastingContainerVisible() && GetQuickbarItems().Count > 0;
         }
 
+        /// <summary>The spell slots the game is drawing, built once a frame: the screen's build asks
+        /// whether the quickbar is worth a stop and then asks for the slots again, and the answer
+        /// cannot have changed between the two - the frame the game runs the entries in has not
+        /// moved. Keyed on the frame count, so nothing has to remember to drop it.</summary>
         public IReadOnlyList<QuickbarItem> GetQuickbarItems()
+        {
+            int frame = Time.frameCount;
+            if (_quickbarItems != null && _quickbarItemsFrame == frame)
+            {
+                return _quickbarItems;
+            }
+
+            _quickbarItemsFrame = frame;
+            _quickbarItems = BuildQuickbarItems();
+            return _quickbarItems;
+        }
+
+        private IReadOnlyList<QuickbarItem> BuildQuickbarItems()
         {
             List<QuickbarItem> items = new List<QuickbarItem>();
             Quickbar quickbar = GetQuickbar();
@@ -387,30 +405,6 @@ namespace SongsOfConquestAccess.Adapters
             return items;
         }
 
-        public int GetQuickbarSlotCount()
-        {
-            Quickbar quickbar = GetQuickbar();
-            List<QuickbarEntry> entries = quickbar != null && QuickbarEntriesField != null
-                ? QuickbarEntriesField.GetValue(quickbar) as List<QuickbarEntry>
-                : null;
-            return entries != null ? entries.Count : 0;
-        }
-
-        public QuickbarItem GetQuickbarItem(int index)
-        {
-            Quickbar quickbar = GetQuickbar();
-            List<QuickbarEntry> entries = quickbar != null && QuickbarEntriesField != null
-                ? QuickbarEntriesField.GetValue(quickbar) as List<QuickbarEntry>
-                : null;
-            if (entries == null || index < 0 || index >= entries.Count)
-            {
-                return null;
-            }
-
-            QuickbarEntry entry = entries[index];
-            return entry != null ? new QuickbarItem(this, entry, index) : null;
-        }
-
         public bool IsCurrentTroopIndicatorVisible()
         {
             return GetCurrentTroopId() >= 0;
@@ -419,11 +413,6 @@ namespace SongsOfConquestAccess.Adapters
         public int GetCurrentTroopId()
         {
             return BattleFacadeState.CurrentTroopId(_facade);
-        }
-
-        public bool IsQueueMenuVisible()
-        {
-            return GetQueueItems().Count > 0;
         }
 
         public IReadOnlyList<QueueItem> GetQueueItems()
@@ -459,22 +448,11 @@ namespace SongsOfConquestAccess.Adapters
             return items;
         }
 
-        public int GetQueueItemCount()
-        {
-            return GetQueueItems().Count;
-        }
-
-        public QueueItem GetQueueItem(int index)
-        {
-            IReadOnlyList<QueueItem> items = GetQueueItems();
-            return index >= 0 && index < items.Count ? items[index] : null;
-        }
-
-        public bool IsBattleLogMenuVisible()
-        {
-            return GetBattleLogEntries().Count > 0;
-        }
-
+        /// <summary>The battle log's lines, cleaned of the tags the game draws them with. Stripping
+        /// them is the cost here and the build asks every frame, so the cleaned list is kept while
+        /// the game's own log still reads the same. The log is a 32-deep stack that drops its oldest
+        /// entry when it is full, so the count alone would stop noticing once it filled: the ends of
+        /// the window are part of the key, and a push moves one of them.</summary>
         public IReadOnlyList<string> GetBattleLogEntries()
         {
             if (_gameLog == null)
@@ -490,6 +468,16 @@ namespace SongsOfConquestAccess.Adapters
                     return new string[0];
                 }
 
+                string first = entries.Count > 0 ? entries[0] : null;
+                string last = entries.Count > 0 ? entries[entries.Count - 1] : null;
+                if (_battleLogEntries != null
+                    && _battleLogCount == entries.Count
+                    && string.Equals(_battleLogFirst, first, StringComparison.Ordinal)
+                    && string.Equals(_battleLogLast, last, StringComparison.Ordinal))
+                {
+                    return _battleLogEntries;
+                }
+
                 List<string> result = new List<string>();
                 for (int i = 0; i < entries.Count; i++)
                 {
@@ -500,23 +488,16 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
 
+                _battleLogCount = entries.Count;
+                _battleLogFirst = first;
+                _battleLogLast = last;
+                _battleLogEntries = result;
                 return result;
             }
             catch
             {
                 return new string[0];
             }
-        }
-
-        public int GetBattleLogEntryCount()
-        {
-            return GetBattleLogEntries().Count;
-        }
-
-        public string GetBattleLogEntry(int index)
-        {
-            IReadOnlyList<string> entries = GetBattleLogEntries();
-            return index >= 0 && index < entries.Count ? entries[index] : string.Empty;
         }
 
         public void FocusBattleLog()
