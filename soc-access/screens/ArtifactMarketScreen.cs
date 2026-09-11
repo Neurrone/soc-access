@@ -87,6 +87,10 @@ namespace SongsOfConquestAccess.Screens
         // no graph concepts.
         private readonly ArtifactSlotNodes.Column _column = new ArtifactSlotNodes.Column();
 
+        // The offers' nodes, kept for as long as the adapter hands back the same offer list (see
+        // OfferNodes).
+        private readonly NodeMemo _offers = new NodeMemo();
+
         /// <summary>The one artifact market the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<ArtifactMarketMenu> _source =
             ScreenSource<ArtifactMarketMenu>.FromScene(LoadedScenes.AdventureScene);
@@ -257,8 +261,27 @@ namespace SongsOfConquestAccess.Screens
         /// category with no offer at all is one line saying so.</summary>
         private void BuildOffers(GraphBuilder builder)
         {
-            IReadOnlyList<ArtifactMarketMenuAdapter.MarketArtifactItem> offers = Items("offers", Live.GetMarketArtifacts);
-            bool any = false;
+            List<NodeDeclaration> nodes = OfferNodes(Items("offers", Live.GetMarketArtifacts));
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                builder.AddItem(nodes[i]);
+            }
+        }
+
+        /// <summary>The offers' nodes, built when the grid changes and read every frame after. Each
+        /// is a vtable and four closures that read the game when they are READ, so rebuilding them
+        /// for a grid that is drawing the same offers bought nothing but the allocation; the adapter
+        /// answers with the same list until the grid moves, so that list's identity is the key. It is
+        /// the bargain <c>ui/ArtifactSlotNodes.cs</c> makes for the slot columns.</summary>
+        private List<NodeDeclaration> OfferNodes(IReadOnlyList<ArtifactMarketMenuAdapter.MarketArtifactItem> offers)
+        {
+            List<NodeDeclaration> kept = _offers.For(offers);
+            if (kept != null)
+            {
+                return kept;
+            }
+
+            List<NodeDeclaration> nodes = new List<NodeDeclaration>(offers.Count);
             for (int i = 0; i < offers.Count; i++)
             {
                 ArtifactMarketMenuAdapter.MarketArtifactItem it = offers[i];
@@ -266,8 +289,6 @@ namespace SongsOfConquestAccess.Screens
                 {
                     continue;
                 }
-
-                any = true;
 
                 NodeVtable vtable = GraphNodes.Button(
                     () => it.Label,
@@ -277,18 +298,20 @@ namespace SongsOfConquestAccess.Screens
                 vtable.Announcements.Add(GraphNodes.ValuePart(() => it.CostLabel, watch: false));
                 // Selecting the game's own cell draws the artifact's tooltip and scrolls the grid.
                 vtable.OnFocusVisual = () => Live.SelectMarketEntry(it.Entry);
-                builder.AddItem(new DrawnNode(
+                nodes.Add(new DrawnNode(
                     ControlId.For(it.Entry, "artifact-market:offer/" + i),
                     vtable,
                     it.Entry));
             }
 
-            if (!any)
+            if (nodes.Count == 0)
             {
-                builder.AddItem(new SyntheticNode(
+                nodes.Add(new SyntheticNode(
                     ControlId.For(Marker("no-offers"), "artifact-market:no-offers"),
                     GraphNodes.Text(() => ModText.Get(ModStrings.Screens.Empty))));
             }
+
+            return _offers.Keep(offers, nodes);
         }
 
         /// <summary>
