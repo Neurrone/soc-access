@@ -283,21 +283,9 @@ namespace SongsOfConquestAccess.Screens
         private void BuildButtons(GraphBuilder builder)
         {
             // Back (x 21) and Options (x 1233) in the header band, then Confirm at the bottom right.
-            AddButton(builder, "challenge-map:back", Live.BackButton);
-            AddButton(builder, "challenge-map:options", Live.OptionsButton);
-            AddButton(builder, "challenge-map:confirm", Live.ConfirmButton);
-        }
-
-        private static void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
-        {
-            if (button == null || button.Button == null || !button.IsVisible())
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.Button(button.GetLabel, () => button.Activate(), button.IsEnabled);
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button.Button);
-            builder.AddItem(new DrawnNode(ControlId.For(button.Button, key), vtable, button.Button));
+            GraphNodes.MenuButton(builder, "challenge-map:back", Live.BackButton);
+            GraphNodes.MenuButton(builder, "challenge-map:options", Live.OptionsButton);
+            GraphNodes.MenuButton(builder, "challenge-map:confirm", Live.ConfirmButton);
         }
     }
 }

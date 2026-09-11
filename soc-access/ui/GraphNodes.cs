@@ -145,6 +145,22 @@ namespace SongsOfConquestAccess.UI
             return vtable;
         }
 
+        /// <summary>One of a menu page's own drawn buttons, declared straight onto the builder: a
+        /// button the game is not drawing is not in the tree at all, a drawn but disabled one stays
+        /// and says so, and arriving on it moves the game's own selection onto it so the page looks
+        /// where the cursor is.</summary>
+        public static void MenuButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
+        {
+            if (button == null || button.Button == null || !button.IsVisible())
+            {
+                return;
+            }
+
+            NodeVtable vtable = Button(button.GetLabel, () => button.Activate(), button.IsEnabled);
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button.Button);
+            builder.AddItem(new DrawnNode(ControlId.For(button.Button, key), vtable, button.Button));
+        }
+
         /// <summary>A container the player expands and collapses. Declare it with the builder's
         /// BeginGroup, which stamps the expanded state and parents the children onto it. A group
         /// that is also a button (opening it is what clicking it does) takes an activation too.</summary>

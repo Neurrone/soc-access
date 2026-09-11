@@ -182,7 +182,7 @@ namespace SongsOfConquestAccess.Screens
                 builder.EndGroup();
             }
 
-            AddButton(builder, "map-select:clear-filters", Live.GetClearFiltersButton());
+            GraphNodes.MenuButton(builder, "map-select:clear-filters", Live.GetClearFiltersButton());
             builder.PopContext();
         }
 
@@ -541,21 +541,9 @@ namespace SongsOfConquestAccess.Screens
         private void BuildButtons(GraphBuilder builder)
         {
             // Back (x 21) and Options (x 1233) in the header band, then Confirm at the bottom right.
-            AddButton(builder, "map-select:back", Live.BackButton);
-            AddButton(builder, "map-select:options", Live.OptionsButton);
-            AddButton(builder, "map-select:confirm", Live.SelectButton);
-        }
-
-        private static void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
-        {
-            if (button == null || button.Button == null || !button.IsVisible())
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.Button(button.GetLabel, () => button.Activate(), button.IsEnabled);
-            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button.Button);
-            builder.AddItem(new DrawnNode(ControlId.For(button.Button, key), vtable, button.Button));
+            GraphNodes.MenuButton(builder, "map-select:back", Live.BackButton);
+            GraphNodes.MenuButton(builder, "map-select:options", Live.OptionsButton);
+            GraphNodes.MenuButton(builder, "map-select:confirm", Live.SelectButton);
         }
 
         private static T At<T>(IReadOnlyList<T> items, int index) where T : class
