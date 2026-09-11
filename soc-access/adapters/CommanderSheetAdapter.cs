@@ -209,7 +209,7 @@ namespace SongsOfConquestAccess.Adapters
             UIButton button = Reflect.Get<UIButton>(_sheet, TutorialButtonField);
             string label = MenuButtonTextUtility.GetAllVisibleText(button);
             return string.IsNullOrWhiteSpace(label)
-                ? GameText.Get(_localization, "Tutorial/CodexCategory/Tutorials", "Tutorials")
+                ? GameText.Get(_localization, "Tutorial/CodexCategory/Tutorials", string.Empty)
                 : label;
         }
 
@@ -244,10 +244,10 @@ namespace SongsOfConquestAccess.Adapters
                 return items;
             }
 
-            AddStat(items, StatEntryType.Offense, GameText.Get(_localization, "Commanders/Tooltip/Offense", "Offence"), commander.Stats.Offense.GetValue());
-            AddStat(items, StatEntryType.Defense, GameText.Get(_localization, "Commanders/Tooltip/Defense", "Defence"), commander.Stats.Defense.GetValue());
-            AddStat(items, StatEntryType.Movement, GameText.Get(_localization, "Commanders/Tooltip/Movement", "Movement"), (int)commander.Stats.Movement.GetValue());
-            AddStat(items, StatEntryType.View, GameText.Get(_localization, "Commanders/Tooltip/ViewRadius", "View Radius"), (int)commander.Stats.ViewRadius.GetValue());
+            AddStat(items, StatEntryType.Offense, GameText.Get(_localization, "Commanders/Tooltip/Offense", string.Empty), commander.Stats.Offense.GetValue());
+            AddStat(items, StatEntryType.Defense, GameText.Get(_localization, "Commanders/Tooltip/Defense", string.Empty), commander.Stats.Defense.GetValue());
+            AddStat(items, StatEntryType.Movement, GameText.Get(_localization, "Commanders/Tooltip/Movement", string.Empty), (int)commander.Stats.Movement.GetValue());
+            AddStat(items, StatEntryType.View, GameText.Get(_localization, "Commanders/Tooltip/ViewRadius", string.Empty), (int)commander.Stats.ViewRadius.GetValue());
             return items;
         }
 
@@ -294,9 +294,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             return new[]
             {
-                BuildModifierCategory("Commanders/Details/Modifiers/TroopModTitle", "Troop modifiers", 0),
-                BuildModifierCategory("Commanders/Details/Modifiers/TemporaryModTitle", "Temporary modifiers", 1),
-                BuildModifierCategory("Commanders/Details/Modifiers/GearModTitle", "Gear modifiers", 2)
+                BuildModifierCategory("Commanders/Details/Modifiers/TroopModTitle", string.Empty, 0),
+                BuildModifierCategory("Commanders/Details/Modifiers/TemporaryModTitle", string.Empty, 1),
+                BuildModifierCategory("Commanders/Details/Modifiers/GearModTitle", string.Empty, 2)
             };
         }
 

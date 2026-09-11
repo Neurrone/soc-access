@@ -68,13 +68,13 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The game's own caption for experience.</summary>
         public string ExperienceCaption
         {
-            get { return Localize("Commanders/Tooltip/Experience", "Experience"); }
+            get { return Localize("Commanders/Tooltip/Experience", string.Empty); }
         }
 
         /// <summary>The game's own caption for a wielder's level.</summary>
         public string LevelCaption
         {
-            get { return Localize("Commanders/Tooltip/Level", "Level"); }
+            get { return Localize("Commanders/Tooltip/Level", string.Empty); }
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string LevelUpButtonLabel
         {
-            get { return Localize("Adventure/HUD/LevelUpButtonTooltip", "Level up"); }
+            get { return Localize("Adventure/HUD/LevelUpButtonTooltip", string.Empty); }
         }
 
         public void FocusLevelUpButton()
@@ -222,7 +222,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 string label = TooltipLines.First(InventoryButtonTooltip);
                 return string.IsNullOrWhiteSpace(label)
-                    ? Localize("Adventure/HUD/InventoryButton", "Inventory")
+                    ? Localize("Adventure/HUD/InventoryButton", string.Empty)
                     : label;
             }
         }
@@ -290,7 +290,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 string label = TooltipLines.First(SpellbookButtonTooltip);
                 return string.IsNullOrWhiteSpace(label)
-                    ? Localize("Common/HUD/SpellbookButton", "Spellbook")
+                    ? Localize("Common/HUD/SpellbookButton", string.Empty)
                     : label;
             }
         }

@@ -119,22 +119,22 @@ namespace SongsOfConquestAccess.Adapters
 
         public string OffenceHeader
         {
-            get { return SpokenText.Get(_localization, "Commanders/Tooltip/Offense", "Offense"); }
+            get { return SpokenText.Get(_localization, "Commanders/Tooltip/Offense", string.Empty); }
         }
 
         public string DefenceHeader
         {
-            get { return SpokenText.Get(_localization, "Commanders/Tooltip/Defense", "Defense"); }
+            get { return SpokenText.Get(_localization, "Commanders/Tooltip/Defense", string.Empty); }
         }
 
         public string MovementHeader
         {
-            get { return SpokenText.Get(_localization, "Commanders/Tooltip/Movement", "Movement"); }
+            get { return SpokenText.Get(_localization, "Commanders/Tooltip/Movement", string.Empty); }
         }
 
         public string ViewRadiusHeader
         {
-            get { return SpokenText.Get(_localization, "Commanders/Tooltip/ViewRadius", "View radius"); }
+            get { return SpokenText.Get(_localization, "Commanders/Tooltip/ViewRadius", string.Empty); }
         }
 
         public string Offence
@@ -446,7 +446,7 @@ namespace SongsOfConquestAccess.Adapters
                     : ModText.Get(
                         _localization,
                         ModStrings.UI.LabelValue,
-                        SpokenText.Get(_localization, "Adventure/BuildMenu/Cost", "Cost").TrimEnd(':'),
+                        SpokenText.Get(_localization, "Adventure/BuildMenu/Cost", string.Empty).TrimEnd(':'),
                         ModText.JoinList(_localization, parts));
             }
         }

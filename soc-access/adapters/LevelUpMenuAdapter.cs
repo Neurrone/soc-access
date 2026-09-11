@@ -140,11 +140,11 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<StatItem> items = new List<StatItem>();
             CommanderStatsInfo statsInfo = _settings != null ? _settings.StatsInfo : null;
-            AddStat(items, CommanderStatKind.Offence, GameText.Get(_localization, "Commanders/Tooltip/Offense", "Offence"), statsInfo, OffenseTextField, OffenseTooltipImageField);
-            AddStat(items, CommanderStatKind.Defence, GameText.Get(_localization, "Commanders/Tooltip/Defense", "Defence"), statsInfo, DefenceTextField, DefenceTooltipImageField);
-            AddStat(items, CommanderStatKind.Movement, GameText.Get(_localization, "Commanders/Tooltip/Movement", "Movement"), statsInfo, MovementTextField, MovementTooltipImageField);
-            AddStat(items, CommanderStatKind.View, GameText.Get(_localization, "Commanders/Tooltip/ViewRadius", "View Radius"), statsInfo, ViewTextField, ViewTooltipImageField);
-            AddStat(items, CommanderStatKind.SpellDamagePower, GameText.Get(_localization, "Commanders/Tooltip/SpellDamagePower", "Spell Damage Power"), statsInfo, SpellDamagePowerTextField, SpellDamagePowerTooltipImageField);
+            AddStat(items, CommanderStatKind.Offence, GameText.Get(_localization, "Commanders/Tooltip/Offense", string.Empty), statsInfo, OffenseTextField, OffenseTooltipImageField);
+            AddStat(items, CommanderStatKind.Defence, GameText.Get(_localization, "Commanders/Tooltip/Defense", string.Empty), statsInfo, DefenceTextField, DefenceTooltipImageField);
+            AddStat(items, CommanderStatKind.Movement, GameText.Get(_localization, "Commanders/Tooltip/Movement", string.Empty), statsInfo, MovementTextField, MovementTooltipImageField);
+            AddStat(items, CommanderStatKind.View, GameText.Get(_localization, "Commanders/Tooltip/ViewRadius", string.Empty), statsInfo, ViewTextField, ViewTooltipImageField);
+            AddStat(items, CommanderStatKind.SpellDamagePower, GameText.Get(_localization, "Commanders/Tooltip/SpellDamagePower", string.Empty), statsInfo, SpellDamagePowerTextField, SpellDamagePowerTooltipImageField);
             return items;
         }
 

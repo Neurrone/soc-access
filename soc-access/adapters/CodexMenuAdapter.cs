@@ -364,7 +364,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string TutorialsToggleLabel
         {
-            get { return SpokenText.Get(_localization, "Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
+            get { return SpokenText.Get(_localization, "Tutorial/TutorialPopup/ShowTutorialCheckbox", string.Empty); }
         }
 
         /// <summary>The tutorials toggle the footer draws, while it draws one.</summary>
@@ -613,10 +613,10 @@ namespace SongsOfConquestAccess.Adapters
             AddTextMeshItems(items, CodexContentItemKind.Heading, Reflect.Get<UITextMesh>(content, WielderNameTextField));
             AddTextMeshItems(items, CodexContentItemKind.Text, Reflect.Get<UITextMesh>(content, WielderClassTextField));
             AddTextMeshItems(items, CodexContentItemKind.Text, Reflect.Get<UITextMesh>(content, WielderDescriptionTextField));
-            AddStatItem(items, "Commanders/Tooltip/Offense", "Offence", Reflect.Get<UITextMesh>(content, WielderOffenseStatTextField));
-            AddStatItem(items, "Commanders/Tooltip/Defense", "Defence", Reflect.Get<UITextMesh>(content, WielderDefenceStatTextField));
-            AddStatItem(items, "Commanders/Tooltip/Movement", "Movement", Reflect.Get<UITextMesh>(content, WielderMovementStatTextField));
-            AddStatItem(items, "Commanders/Tooltip/ViewRadius", "View radius", Reflect.Get<UITextMesh>(content, WielderViewRadiusStatTextField));
+            AddStatItem(items, "Commanders/Tooltip/Offense", string.Empty, Reflect.Get<UITextMesh>(content, WielderOffenseStatTextField));
+            AddStatItem(items, "Commanders/Tooltip/Defense", string.Empty, Reflect.Get<UITextMesh>(content, WielderDefenceStatTextField));
+            AddStatItem(items, "Commanders/Tooltip/Movement", string.Empty, Reflect.Get<UITextMesh>(content, WielderMovementStatTextField));
+            AddStatItem(items, "Commanders/Tooltip/ViewRadius", string.Empty, Reflect.Get<UITextMesh>(content, WielderViewRadiusStatTextField));
             AddStatItem(items, "Commanders/Tooltip/Command", "Command", Reflect.Get<UITextMesh>(content, WielderCommandStatTextField));
             AddWielderInfoSection(items, Reflect.Get<WielderCodexContentInfoSection>(content, WielderStartingTroopsField));
             AddWielderInfoSection(items, Reflect.Get<WielderCodexContentInfoSection>(content, WielderSkillsField));
@@ -729,7 +729,7 @@ namespace SongsOfConquestAccess.Adapters
                 amounts.Add(new EssenceAmount(GetEssenceAmountText(allEssences[i].Item1, allEssences[i].Item2)));
             }
 
-            items.Add(new CodexContentItem(SpokenText.Get(_localization, "Units/Types/EssenceIntro", "Essence"), amounts, sourceTransform));
+            items.Add(new CodexContentItem(SpokenText.Get(_localization, "Units/Types/EssenceIntro", string.Empty), amounts, sourceTransform));
         }
 
         private static void AddUnitInfoSectionItems(List<CodexContentItem> items, UnitCodexContentInfoSection section)

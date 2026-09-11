@@ -1277,7 +1277,7 @@ namespace SongsOfConquestAccess.Adapters
                 Relationship = FormatSpatialRelationship(relationship),
                 RelationshipKind = ScannerRelationship(relationship),
                 IsOwnedByLocalTeam = commander != null && commander.TeamId == localTeamId,
-                MovementLabel = GameText.Get(_localizationHandler, "Commanders/Tooltip/Movement", "Movement")
+                MovementLabel = GameText.Get(_localizationHandler, "Commanders/Tooltip/Movement", string.Empty)
             };
 
             if (!info.IsOwnedByLocalTeam || commander == null)
