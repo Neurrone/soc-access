@@ -66,6 +66,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly ITroopAbilityUtility _abilityUtility;
         private readonly BattleViewManager _battleViewManager;
         private readonly ISpellsLookup _spellsLookup;
+        // Every recovery below says so the first time it happens; see FaultLog.
+        private readonly FaultLog _faults = new FaultLog("BattleHudAdapter");
         private string _spellTargetInstructionText;
         private string _abilityTargetInstructionText;
 
@@ -494,8 +496,9 @@ namespace SongsOfConquestAccess.Adapters
                 _battleLogEntries = result;
                 return result;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetBattleLogEntries", exception);
                 return new string[0];
             }
         }
@@ -679,8 +682,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.Troops != null ? _facade.Troops.Current : null;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetCurrentTroop", exception);
                 return null;
             }
         }
@@ -801,8 +805,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.Queue != null ? _facade.Queue.TurnsLeftInRound : 0;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetTurnsLeftInRound", exception);
                 return 0;
             }
         }
@@ -880,8 +885,9 @@ namespace SongsOfConquestAccess.Adapters
                 bool isEnemy = localTeamId >= 0 && troop.TeamId != localTeamId;
                 return new TroopInfo(name, size, troop.Stats != null, isEnemy, troop.Position);
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetTroopInfo", exception);
                 return TroopInfo.Unknown();
             }
         }
@@ -991,8 +997,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return Math.Max(1, spell.GetHighestAvailableTier(commander).Tier);
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetCurrentSpellTier", exception);
                 return 1;
             }
         }
@@ -1106,8 +1113,9 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         tier = Math.Max(1, spell.GetHighestAvailableTier(_adapter._facade.Commanders.Current).Tier);
                     }
-                    catch
+                    catch (Exception exception)
                     {
+                        _adapter._faults.Report("SpellTier", exception);
                         tier = 1;
                     }
 

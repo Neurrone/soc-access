@@ -156,6 +156,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IInputManager _inputManager;
         private readonly ILocalizationHandler _localization;
         private readonly HashSet<string> _unknownCombatInstructions = new HashSet<string>(StringComparer.Ordinal);
+        // Every recovery below says so the first time it happens; see FaultLog.
+        private readonly FaultLog _faults = new FaultLog("CombatAdapter");
         private Dictionary<string, TileInstruction> _combatInstructionKinds;
         private bool _combatInstructionKindsProbed;
         private readonly ICameraLookup _cameraLookup;
@@ -328,8 +330,11 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return container.Resolve(type);
             }
-            catch
+            catch (Exception exception)
             {
+                // Constructor-time and once per battle, so it says so every time.
+                SocAccessMod.Instance?.LogWarning(
+                    "CombatAdapter could not resolve " + typeName + ": " + exception.Message);
                 return null;
             }
         }
@@ -422,8 +427,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.Teams != null && _facade.Teams.IsCurrentLocal;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("IsLocalTurn", exception);
                 return false;
             }
         }
@@ -1999,8 +2005,9 @@ namespace SongsOfConquestAccess.Adapters
                     indicators.Add(CombatRangeIndicator.Deadly);
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("BuildAttackIndicators.Ranged", exception);
             }
 
             try
@@ -2010,8 +2017,9 @@ namespace SongsOfConquestAccess.Adapters
                     indicators.Add(CombatRangeIndicator.Melee);
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("BuildAttackIndicators.Melee", exception);
             }
 
             return indicators;
@@ -2037,8 +2045,9 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("BuildInfluenceIndicators", exception);
             }
 
             IBattleTroopState current = GetCurrentTroop();
@@ -2061,8 +2070,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return ZoneOfControlTriggerSystem.ExertsZoneOfControl(movingTroop, controllingTroop, point, _facade.Level);
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("IsInZoneOfControl", exception);
                 return false;
             }
         }
@@ -2205,8 +2215,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade.Level.GetElevation(point);
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("SafeGetElevation", exception);
                 return 0;
             }
         }
@@ -2235,8 +2246,9 @@ namespace SongsOfConquestAccess.Adapters
                 int localTeamId = GetLocalTeamId();
                 return localTeamId >= 0 && owningTeamId == localTeamId;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("IsFriendlyMapEntity", exception);
                 return false;
             }
         }
@@ -2260,8 +2272,9 @@ namespace SongsOfConquestAccess.Adapters
                 return _facade.Commands.CanAttack(current.Id, troop.Position)
                     || (IsMeleeOnly(current) && _facade.Level.AllEnemiesWithinMeleeReach(current).Contains(troop));
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("IsAttackable.Troop", exception);
                 return false;
             }
         }
@@ -2285,8 +2298,9 @@ namespace SongsOfConquestAccess.Adapters
                 return _facade.Commands.CanAttack(current.Id, entity.Position)
                     || (IsMeleeOnly(current) && _facade.Level.AllMapEntitiesWithinMeleeReach(current).Contains(entity));
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("IsAttackable.Entity", exception);
                 return false;
             }
         }
@@ -2333,8 +2347,9 @@ namespace SongsOfConquestAccess.Adapters
                     && _facade.MapEntities != null
                     && _facade.MapEntities.GetDangerousAuraMapEntityEffects(point).Any();
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("HasDangerousMapEntityEffect", exception);
                 return false;
             }
         }
@@ -2483,8 +2498,9 @@ namespace SongsOfConquestAccess.Adapters
                 string name = _facade != null && _facade.Commanders != null ? _facade.Commanders.GetShortName(commanderId) : string.Empty;
                 return new CommanderRef(commanderId, commander != null ? commander.TeamId : -1, GetLocalTeamId(), name);
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("CreateCommanderRef", exception);
                 return new CommanderRef(commanderId, -1, GetLocalTeamId(), ModText.Get(ModStrings.Combat.Wielder));
             }
         }
@@ -2498,8 +2514,9 @@ namespace SongsOfConquestAccess.Adapters
                     ? commander.Stats.Essences.GetValue(essenceType)
                     : 0;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetCommanderGeneratedEssenceAmount", exception);
                 return 0;
             }
         }
@@ -2617,8 +2634,9 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetAliveBattleTroopIdsForSide", exception);
             }
 
             return ids;
@@ -2664,8 +2682,9 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetAliveBattleTroopIdsForSide.Filtered", exception);
             }
 
             return ids;
@@ -2732,8 +2751,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.Troops != null ? _facade.Troops.Get(troopId) : null;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetTroop", exception);
                 return null;
             }
         }
@@ -2744,8 +2764,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.MapEntities != null ? _facade.MapEntities.Get(entityId) : null;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetMapEntity", exception);
                 return null;
             }
         }
@@ -2760,8 +2781,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return _facade != null && _facade.Queue != null ? _facade.Queue.CurrentTurn : 0;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetCurrentTurn", exception);
                 return 0;
             }
         }
@@ -2824,8 +2846,9 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetActingTroopIds", exception);
                 return troopIds;
             }
 
@@ -2877,8 +2900,9 @@ namespace SongsOfConquestAccess.Adapters
                     return name;
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("LocalizeSpellName", exception);
             }
 
             return LocalizeText("Spells/" + spellType);
@@ -2895,8 +2919,9 @@ namespace SongsOfConquestAccess.Adapters
                     return name;
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("LocalizeAbilityName", exception);
             }
 
             return LocalizeText("TroopAbilities/" + abilityType);

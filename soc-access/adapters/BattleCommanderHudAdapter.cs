@@ -52,6 +52,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly BattleHUDStateHandler.Settings _settings;
         private readonly IClientBattleFacade _facade;
         private readonly ILocalizationHandler _localization;
+        // Every recovery below says so the first time it happens; see FaultLog.
+        private readonly FaultLog _faults = new FaultLog("BattleCommanderHudAdapter");
 
         // One component lookup per side for the life of the battle, misses included: the combat
         // screen is a graph screen and asks these questions on every frame.
@@ -108,8 +110,9 @@ namespace SongsOfConquestAccess.Adapters
                     ? _facade.Commanders.GetName(commander.Id)
                     : string.Empty;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetPortraitLabel", exception);
                 name = string.Empty;
             }
 
@@ -295,8 +298,9 @@ namespace SongsOfConquestAccess.Adapters
                     : _facade.Teams.DefendingTeam;
                 return sideTeam != null && current.Id == sideTeam.Id;
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("IsAiControlSideActive", exception);
                 return false;
             }
         }
@@ -326,8 +330,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return commander.EssenceWallet.Amount(essenceType);
             }
-            catch
+            catch (Exception exception)
             {
+                _faults.Report("GetEssenceAmount", exception);
                 return 0;
             }
         }

@@ -313,13 +313,18 @@ namespace SongsOfConquestAccess.Events.Combat
                 : amount;
         }
 
+        /// <summary>The game's description with the amount in the place the language puts it. The one
+        /// thing that can go wrong is the description itself: a translator who wrote a brace the
+        /// formatter cannot read makes <c>string.Format</c> throw, and putting the amount where the
+        /// placeholder stands is the same answer by hand. Nothing else is caught, and the line is
+        /// still said with its amount in it, so this is a recovery rather than a swallow.</summary>
         private static string FormatLocalizedDescription(string format, string amount)
         {
             try
             {
                 return string.Format(format, amount);
             }
-            catch
+            catch (FormatException)
             {
                 return format.Replace("{0}", amount);
             }
