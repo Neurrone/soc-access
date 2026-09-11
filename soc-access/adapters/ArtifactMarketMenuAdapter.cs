@@ -65,6 +65,9 @@ namespace SongsOfConquestAccess.Adapters
         // a retired entry must not answer for the next category.
         private readonly FrameSweep<UIToggle> _categoryToggles =
             new FrameSweep<UIToggle>("artifact market categories");
+
+        // Each filter's name, read off its toggle once (see GetCategoryLabel).
+        private readonly Dictionary<UIToggle, string> _categoryLabels = new Dictionary<UIToggle, string>();
         private readonly FrameSweep<ArtifactMarketEntry> _marketEntries =
             new FrameSweep<ArtifactMarketEntry>("artifact market grid", inactiveToo: false);
         private readonly FrameSweep<UITextMesh> _bandTexts =
@@ -218,7 +221,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < toggles.Length; i++)
             {
                 UIToggle toggle = toggles[i];
-                string label = FirstLine(Tooltip.ForComponent(toggle, _localization));
+                string label = GetCategoryLabel(toggle);
                 items.Add(new CategoryItem(
                     string.IsNullOrWhiteSpace(label) ? ModText.Get(_localization, ModStrings.Scanner.All) : label,
                     i,
@@ -226,6 +229,28 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return items;
+        }
+
+        /// <summary>The game's own word for one filter. Reading a native tooltip draws the whole
+        /// details block, and the toggles are the menu's own children with the same word on them for
+        /// as long as it is open, so each is read ONCE rather than once a frame. The empty answer is
+        /// remembered too - the first toggle has no tooltip at all - so a toggle with no words costs
+        /// one read and not one per frame.</summary>
+        private string GetCategoryLabel(UIToggle toggle)
+        {
+            if (toggle == null)
+            {
+                return string.Empty;
+            }
+
+            string label;
+            if (!_categoryLabels.TryGetValue(toggle, out label))
+            {
+                label = FirstLine(Tooltip.ForComponent(toggle, _localization));
+                _categoryLabels[toggle] = label;
+            }
+
+            return label;
         }
 
         /// <summary>Switch to a category through the game's own toggle group, which is what the menu
