@@ -197,11 +197,17 @@ namespace SongsOfConquestAccess.Scanner
         public static int CompareByDistance(Vector2Int origin, ScannerResult left, ScannerResult right)
         {
             int distanceCompare = DistanceSquared(origin, left.Position).CompareTo(DistanceSquared(origin, right.Position));
-            if (distanceCompare != 0)
-            {
-                return distanceCompare;
-            }
+            return distanceCompare != 0 ? distanceCompare : CompareTieBreak(left, right);
+        }
 
+        /// <summary>
+        /// What every scanner order ends with: name, then position. Whatever a
+        /// comparison ranks results by first, this is what makes the order total,
+        /// so a walk that flattens a subcategory back into one list reproduces it
+        /// exactly.
+        /// </summary>
+        public static int CompareTieBreak(ScannerResult left, ScannerResult right)
+        {
             int labelCompare = string.Compare(left.Label, right.Label, StringComparison.OrdinalIgnoreCase);
             if (labelCompare != 0)
             {
@@ -386,7 +392,9 @@ namespace SongsOfConquestAccess.Scanner
             }
         }
 
-        private static int DistanceSquared(Vector2Int origin, Vector2Int point)
+        /// <summary>Squared tile distance, which is all any scanner order needs: it ranks the same
+        /// way the real distance does and stays in integers.</summary>
+        public static int DistanceSquared(Vector2Int origin, Vector2Int point)
         {
             int x = point.x - origin.x;
             int y = point.y - origin.y;

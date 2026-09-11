@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Localization;
 using UnityEngine;
@@ -36,69 +35,19 @@ namespace SongsOfConquestAccess.Scanner
                 ScannerSubcategoryKeys.All,
                 () => ModText.Get(ModStrings.Scanner.All));
             Dictionary<string, MatchInfo> matchInfoByKey = new Dictionary<string, MatchInfo>();
-            HashSet<string> addedToAll = new HashSet<string>();
-            Dictionary<string, HashSet<string>> addedToCategory = new Dictionary<string, HashSet<string>>();
 
-            for (int categoryIndex = 0; categoryIndex < source.Categories.Count; categoryIndex++)
+            ScannerProjection.Project(source, searchCategory, all, result =>
             {
-                ScannerCategory sourceCategory = source.Categories[categoryIndex];
-                if (sourceCategory == null || sourceCategory.IsCustom)
+                int tier = ScannerTextMatch.TierForLabel(result.Label, normalizedQuery);
+                if (tier == ScannerTextMatch.NoMatch)
                 {
-                    continue;
+                    return false;
                 }
 
-                ScannerSubcategory targetSubcategory = null;
-                for (int subcategoryIndex = 0; subcategoryIndex < sourceCategory.Subcategories.Count; subcategoryIndex++)
-                {
-                    ScannerSubcategory sourceSubcategory = sourceCategory.Subcategories[subcategoryIndex];
-                    if (sourceSubcategory == null)
-                    {
-                        continue;
-                    }
-
-                    foreach (ScannerResult result in sourceSubcategory.AllResults)
-                    {
-                        if (result == null)
-                        {
-                            continue;
-                        }
-
-                        int tier = ScannerTextMatch.TierForLabel(result.Label, normalizedQuery);
-                        if (tier == ScannerTextMatch.NoMatch)
-                        {
-                            continue;
-                        }
-
-                        int distance = DistanceSquared(origin, result.Position);
-                        RecordBestMatch(matchInfoByKey, result.Key, tier, distance);
-
-                        if (addedToAll.Add(result.Key))
-                        {
-                            all.Add(result);
-                        }
-
-                        HashSet<string> categoryKeys;
-                        if (!addedToCategory.TryGetValue(sourceCategory.Key, out categoryKeys))
-                        {
-                            categoryKeys = new HashSet<string>();
-                            addedToCategory[sourceCategory.Key] = categoryKeys;
-                        }
-
-                        if (categoryKeys.Add(result.Key))
-                        {
-                            if (targetSubcategory == null)
-                            {
-                                ScannerCategory labelSource = sourceCategory;
-                                targetSubcategory = searchCategory.GetOrAddSubcategory(
-                                    labelSource.Key,
-                                    () => labelSource.Label);
-                            }
-
-                            targetSubcategory.Add(result);
-                        }
-                    }
-                }
-            }
+                int distance = ScannerSnapshot.DistanceSquared(origin, result.Position);
+                RecordBestMatch(matchInfoByKey, result.Key, tier, distance);
+                return true;
+            });
 
             if (!all.HasResults)
             {
@@ -140,26 +89,7 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             int distanceCompare = leftInfo.DistanceSquared.CompareTo(rightInfo.DistanceSquared);
-            if (distanceCompare != 0)
-            {
-                return distanceCompare;
-            }
-
-            int labelCompare = string.Compare(left.Label, right.Label, StringComparison.OrdinalIgnoreCase);
-            if (labelCompare != 0)
-            {
-                return labelCompare;
-            }
-
-            int xCompare = left.Position.x.CompareTo(right.Position.x);
-            return xCompare != 0 ? xCompare : left.Position.y.CompareTo(right.Position.y);
-        }
-
-        private static int DistanceSquared(Vector2Int origin, Vector2Int point)
-        {
-            int x = point.x - origin.x;
-            int y = point.y - origin.y;
-            return x * x + y * y;
+            return distanceCompare != 0 ? distanceCompare : ScannerSnapshot.CompareTieBreak(left, right);
         }
     }
 }
