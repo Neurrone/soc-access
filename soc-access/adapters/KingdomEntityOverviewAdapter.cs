@@ -9,7 +9,6 @@ using SongsOfConquest.Common.Entities;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -58,6 +57,9 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_celestialOreIncomeText"),
         };
 
+        /// <summary>What GetCategories answers before the menu has drawn.</summary>
+        private static readonly CategoryItem[] NoCategories = new CategoryItem[0];
+
         private readonly KingdomEntityOverviewMenu _menu;
 
         // What the menu drew, read once. The game fills the whole page inside
@@ -83,37 +85,12 @@ namespace SongsOfConquestAccess.Adapters
             {
                 if (_title == null)
                 {
-                    _title = ReadTitle();
+                    _title = KingdomOverviewRead.FindTitle<
+                        KingdomEntityOverviewCategoryEntry, KingdomEntityOverviewClaimedEntry>((Component)_menu);
                 }
 
                 return _title;
             }
-        }
-
-        private string ReadTitle()
-        {
-            if (_menu == null)
-            {
-                return string.Empty;
-            }
-
-            UITextMesh[] texts = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
-            for (int i = 0; i < texts.Length; i++)
-            {
-                UITextMesh text = texts[i];
-                if (text == null || IsOverviewEntryText(text))
-                {
-                    continue;
-                }
-
-                string candidate = NormalizeText(text);
-                if (!string.IsNullOrWhiteSpace(candidate))
-                {
-                    return candidate;
-                }
-            }
-
-            return string.Empty;
         }
 
         /// <summary>The categories in hierarchy order, which is the order the menu draws them. Read
@@ -125,26 +102,13 @@ namespace SongsOfConquestAccess.Adapters
                 _categories = ReadCategories();
             }
 
-            return _categories ?? new List<CategoryItem>();
+            return (IReadOnlyList<CategoryItem>)_categories ?? NoCategories;
         }
 
         private List<CategoryItem> ReadCategories()
         {
-            List<CategoryItem> categories = new List<CategoryItem>();
-            KingdomEntityOverviewCategoryEntry[] entries =
-                ((Component)_menu).GetComponentsInChildren<KingdomEntityOverviewCategoryEntry>(includeInactive: false);
-            for (int i = 0; i < entries.Length; i++)
-            {
-                KingdomEntityOverviewCategoryEntry entry = entries[i];
-                if (entry == null || !entry.gameObject.activeInHierarchy)
-                {
-                    continue;
-                }
-
-                categories.Add(BuildCategory(entry));
-            }
-
-            return categories;
+            return KingdomOverviewRead.FindEntries<KingdomEntityOverviewCategoryEntry, CategoryItem>(
+                (Component)_menu, BuildCategory);
         }
 
         /// <summary>The game's own hide path, which is what clicking the blocker behind the menu
@@ -165,50 +129,45 @@ namespace SongsOfConquestAccess.Adapters
             List<IncomeItem> incomes = new List<IncomeItem>(IncomeResources.Length);
             for (int i = 0; i < IncomeResources.Length; i++)
             {
-                UITextMesh text = GetText(entry, IncomeTextFields[i]);
+                UITextMesh text = KingdomOverviewRead.GetText(entry, IncomeTextFields[i]);
                 incomes.Add(new IncomeItem(
                     GameText.Get("Common/Resource/" + IncomeResources[i], string.Empty),
-                    NormalizeText(text),
+                    KingdomOverviewRead.NormalizeText(text),
                     text != null && text.gameObject.activeInHierarchy));
             }
 
             // Under ReadCategories, once per menu: the game builds these rows in Show and leaves
             // them alone until Hide.
-            List<RowItem> rows = new List<RowItem>();
-            KingdomEntityOverviewClaimedEntry[] buildings =
-                entry.GetComponentsInChildren<KingdomEntityOverviewClaimedEntry>(includeInactive: false);
-            for (int i = 0; i < buildings.Length; i++)
-            {
-                KingdomEntityOverviewClaimedEntry building = buildings[i];
-                if (building == null || !building.gameObject.activeInHierarchy)
-                {
-                    continue;
-                }
-
-                string name = NormalizeText(GetText(building, NameTextField));
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    continue;
-                }
-
-                rows.Add(new RowItem(
-                    building,
-                    building.Button,
-                    NormalizeText(GetText(building, AmountTextField)),
-                    name,
-                    WrittenText(GetText(building, LevelTextField)),
-                    () => ClickBuilding(building),
-                    () => FocusButton(building.Button)));
-            }
+            List<RowItem> rows =
+                KingdomOverviewRead.FindEntries<KingdomEntityOverviewClaimedEntry, RowItem>(entry, BuildRow);
 
             return new CategoryItem(
                 entry,
-                NormalizeText(GetText(entry, CategoryTextField)),
-                WrittenText(GetText(entry, UpgradeTextField)),
+                KingdomOverviewRead.ReadText(entry, CategoryTextField),
+                WrittenText(KingdomOverviewRead.GetText(entry, UpgradeTextField)),
                 GetParent(entry) != null,
                 () => ClickCategory(entry),
                 incomes,
                 rows);
+        }
+
+        /// <summary>One building line, or null where the game drew no name.</summary>
+        private static RowItem BuildRow(KingdomEntityOverviewClaimedEntry building)
+        {
+            string name = KingdomOverviewRead.ReadText(building, NameTextField);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return null;
+            }
+
+            return new RowItem(
+                building,
+                building.Button,
+                KingdomOverviewRead.ReadText(building, AmountTextField),
+                name,
+                WrittenText(KingdomOverviewRead.GetText(building, LevelTextField)),
+                () => ClickBuilding(building),
+                () => KingdomOverviewRead.FocusButton(building.Button));
         }
 
         // The category's name is a UITextMesh whose click is delivered by UITransform.Update from the
@@ -240,37 +199,9 @@ namespace SongsOfConquestAccess.Adapters
             return entry != null && NativeSelectionUtility.Click(entry.Button);
         }
 
-        private static bool FocusButton(UIButton button)
-        {
-            Selectable selectable = button != null ? button.GetSelectable() : null;
-            return NativeSelectionUtility.Select(selectable);
-        }
-
         private static IMapEntity GetParent(KingdomEntityOverviewCategoryEntry entry)
         {
-            return GetField<IMapEntity>(entry, ParentField);
-        }
-
-        private static UITextMesh GetText(object target, FieldInfo field)
-        {
-            return GetField<UITextMesh>(target, field);
-        }
-
-        private static T GetField<T>(object target, FieldInfo field) where T : class
-        {
-            if (target == null || field == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return field.GetValue(target) as T;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            return KingdomOverviewRead.GetField<IMapEntity>(entry, ParentField);
         }
 
         /// <summary>A tier text as the game wrote it: the claimed catch-all's rows and header get an
@@ -281,24 +212,6 @@ namespace SongsOfConquestAccess.Adapters
             return text != null
                 ? SpokenLines.Clean(UITextMeshTextUtility.GetStringBuilderText(text) ?? string.Empty)
                 : string.Empty;
-        }
-
-        private static string NormalizeText(UITextMesh text)
-        {
-            return text != null
-                ? SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text))
-                : string.Empty;
-        }
-
-        private static bool IsOverviewEntryText(UITextMesh text)
-        {
-            if (text == null)
-            {
-                return true;
-            }
-
-            return text.GetComponentInParent<KingdomEntityOverviewCategoryEntry>() != null
-                || text.GetComponentInParent<KingdomEntityOverviewClaimedEntry>() != null;
         }
 
         /// <summary>One settlement's entry, or the catch-all the game spawns for everything with no

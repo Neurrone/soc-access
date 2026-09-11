@@ -47,14 +47,6 @@ soc-access/adapters/DetailsTextUtility.cs | 1 | public T GetComponentInChildren<
 
 soc-access/adapters/DropdownPopup.cs | 1 | return component != null ? component.GetComponentInChildren<TMP_Dropdown>(true) : null;
 
-soc-access/adapters/KingdomEntityOverviewAdapter.cs | 1 | ((Component)_menu).GetComponentsInChildren<KingdomEntityOverviewCategoryEntry>(includeInactive: false);
-soc-access/adapters/KingdomEntityOverviewAdapter.cs | 1 | UITextMesh[] texts = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
-soc-access/adapters/KingdomEntityOverviewAdapter.cs | 1 | entry.GetComponentsInChildren<KingdomEntityOverviewClaimedEntry>(includeInactive: false);
-
-soc-access/adapters/KingdomTroopOverviewAdapter.cs | 1 | ((Component)_menu).GetComponentsInChildren<KingdomTroopOverviewTownEntry>(includeInactive: false);
-soc-access/adapters/KingdomTroopOverviewAdapter.cs | 1 | UITextMesh[] texts = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
-soc-access/adapters/KingdomTroopOverviewAdapter.cs | 1 | entry.GetComponentsInChildren<KingdomTroopOverviewIncomeEntry>(includeInactive: false);
-
 soc-access/adapters/MapEntityMiniMenuAdapter.cs | 1 | MapEntityHUDDescriptionEntry[] entries = description.GetComponentsInChildren<MapEntityHUDDescriptionEntry>(false);
 
 soc-access/adapters/MarketplaceMenuAdapter.cs | 2 | UITextMesh[] textMeshes = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: true);
