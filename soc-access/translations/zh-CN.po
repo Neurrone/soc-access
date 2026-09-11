@@ -3887,3 +3887,53 @@ msgstr "+{0}"
 msgctxt "Combat.Spell"
 msgid "Spell"
 msgstr "法术"
+
+#. Screens.CodexTabNumber
+msgctxt "Screens.CodexTabNumber"
+msgid "Tab {0}"
+msgstr "标签页 {0}"
+
+#. Screens.CodexCategoryNumber
+msgctxt "Screens.CodexCategoryNumber"
+msgid "Category {0}"
+msgstr "分类 {0}"
+
+#. UI.RankNumber
+msgctxt "UI.RankNumber"
+msgid "#{0}"
+msgstr "第{0}名"
+
+#. UI.ColumnGameName
+msgctxt "UI.ColumnGameName"
+msgid "Game name"
+msgstr "游戏名称"
+
+#. UI.ColumnPlayers
+msgctxt "UI.ColumnPlayers"
+msgid "Players"
+msgstr "玩家"
+
+#. Screens.CampaignNumber
+msgctxt "Screens.CampaignNumber"
+msgid "Campaign {0}"
+msgstr "战役 {0}"
+
+#. Screens.CustomCampaigns
+msgctxt "Screens.CustomCampaigns"
+msgid "Custom campaigns"
+msgstr "自定义战役"
+
+#. Screens.Tales
+msgctxt "Screens.Tales"
+msgid "Tales"
+msgstr "故事"
+
+#. Screens.Confirm
+msgctxt "Screens.Confirm"
+msgid "Confirm"
+msgstr "确认"
+
+#. Screens.ShowTutorials
+msgctxt "Screens.ShowTutorials"
+msgid "Show tutorials"
+msgstr "显示教程"

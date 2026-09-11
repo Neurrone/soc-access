@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
@@ -64,7 +64,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Header
         {
-            get { return Normalize(UITextMeshTextUtility.GetEffectiveText(HeaderTextRef(_menu))); }
+            get { return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(HeaderTextRef(_menu))); }
         }
 
         /// <summary>The paragraphs the game broke the showing page into, kept apart rather than
@@ -76,7 +76,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string TutorialsToggleLabel
         {
-            get { return SpokenText.Get("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
+            get { return SpokenText.Get("Tutorial/TutorialPopup/ShowTutorialCheckbox", ModText.Get(ModStrings.Screens.ShowTutorials)); }
         }
 
         /// <summary>The text mesh the panel writes each page's description into - one viewer the game
@@ -186,11 +186,6 @@ namespace SongsOfConquestAccess.Adapters
         private ITutorialEntry CurrentTutorial
         {
             get { return _menu != null ? CurrentTutorialRef(_menu) : null; }
-        }
-
-        private static string Normalize(string value)
-        {
-            return SpokenLines.Clean(value);
         }
     }
 }

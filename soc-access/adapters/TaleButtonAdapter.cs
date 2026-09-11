@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -20,8 +20,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<TaleButton, UITextMesh>("_campaignTitle");
         private static readonly AccessTools.FieldRef<TaleButton, UITextMesh> CampaignDescriptionRef =
             AccessTools.FieldRefAccess<TaleButton, UITextMesh>("_campaignDescription");
-        private static readonly AccessTools.FieldRef<TaleButton, GameObject> OwnedContainerRef =
-            AccessTools.FieldRefAccess<TaleButton, GameObject>("_ownedContainer");
         private static readonly AccessTools.FieldRef<TaleButton, GameObject> PurchaseContainerRef =
             AccessTools.FieldRefAccess<TaleButton, GameObject>("_purchaseContainer");
         private static readonly AccessTools.FieldRef<TaleButton, GameObject> ComingSoonContainerRef =
@@ -164,11 +162,6 @@ namespace SongsOfConquestAccess.Adapters
         private UITextMesh GetCampaignDescription()
         {
             return _taleButton != null ? CampaignDescriptionRef(_taleButton) : null;
-        }
-
-        private GameObject GetOwnedContainer()
-        {
-            return _taleButton != null ? OwnedContainerRef(_taleButton) : null;
         }
 
         private GameObject GetPurchaseContainer()

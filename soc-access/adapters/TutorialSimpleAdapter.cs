@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
@@ -57,24 +57,33 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Header
         {
-            get { return Normalize(UITextMeshTextUtility.GetEffectiveText(TitleTextRef(SimplePopup))); }
+            get { return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(TitleTextRef(SimplePopup))); }
         }
 
         public string Description
         {
-            get { return string.Join(" ", DescriptionLines); }
+            get { return _description.Joined(RawDescription); }
         }
 
         /// <summary>The paragraphs the game broke the tutorial's text into, kept apart rather than
         /// collapsed: the popup reads a paragraph at a time.</summary>
         public IList<string> DescriptionLines
         {
-            get { return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(BodyTextRef(SimplePopup)) }); }
+            get { return _description.Lines(RawDescription); }
+        }
+
+        // The text, split at most once a frame: the guard, the node and the screen's own name all
+        // ask for it (AGENTS.md, Performance).
+        private readonly BodyText _description = new BodyText();
+
+        private string RawDescription
+        {
+            get { return UITextMeshTextUtility.GetEffectiveText(BodyTextRef(SimplePopup)); }
         }
 
         public string TutorialsToggleLabel
         {
-            get { return SpokenText.Get("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
+            get { return SpokenText.Get("Tutorial/TutorialPopup/ShowTutorialCheckbox", ModText.Get(ModStrings.Screens.ShowTutorials)); }
         }
 
         /// <summary>The component the game draws the OK button with, or null where the popup has
@@ -127,11 +136,6 @@ namespace SongsOfConquestAccess.Adapters
         private TutorialSimplePopup SimplePopup
         {
             get { return _menu != null ? SimplePopupRef(_menu) : null; }
-        }
-
-        private static string Normalize(string value)
-        {
-            return SpokenLines.Clean(value);
         }
     }
 }

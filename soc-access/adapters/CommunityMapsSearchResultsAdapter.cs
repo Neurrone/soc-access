@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -388,29 +388,6 @@ namespace SongsOfConquestAccess.Adapters
             return string.Empty;
         }
 
-        private string GetActiveFilterText()
-        {
-            GameObject mainTag = Reflect.Cast<GameObject>(_results, MainTagField);
-            if (mainTag == null || !mainTag.activeInHierarchy)
-            {
-                return string.Empty;
-            }
-
-            List<string> parts = new List<string>();
-            AddIfNotEmpty(parts, GetCategoryLabel(CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_results, MainTagCategoryNameField))));
-            AddIfNotEmpty(parts, GetTagLabel(CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_results, MainTagNameField))));
-            AddIfNotEmpty(parts, CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_results, OtherTagsTextField)));
-            return string.Join(" ", parts.ToArray());
-        }
-
-        private string GetSearchPhraseText()
-        {
-            GameObject phrase = Reflect.Cast<GameObject>(_results, SearchPhraseField);
-            return phrase != null && phrase.activeInHierarchy
-                ? CommunityMapsText.Of(Reflect.Cast<TMP_Text>(_results, SearchPhraseTextField))
-                : string.Empty;
-        }
-
         private static Component GetOverlayItem(object overlay)
         {
             return overlay != null && OverlayListItemField != null
@@ -580,28 +557,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Join("\n", lines.ToArray());
-        }
-
-        private static string GetCategoryLabel(string categoryName)
-        {
-            if (string.IsNullOrWhiteSpace(categoryName))
-            {
-                return string.Empty;
-            }
-
-            string key = "ModBrowser/TagCategory/" + categoryName.Replace(" ", string.Empty);
-            return GameText.Get(key, categoryName);
-        }
-
-        private static string GetTagLabel(string tagName)
-        {
-            if (string.IsNullOrWhiteSpace(tagName))
-            {
-                return string.Empty;
-            }
-
-            string key = "ModBrowser/Tag/" + tagName.Replace(" ", string.Empty);
-            return GameText.Get(key, tagName);
         }
 
         private static void AddIfNotEmpty(List<string> parts, string value)

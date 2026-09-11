@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
@@ -119,7 +119,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 PlayerStatsAdapter.TabItem tab = tabs[i];
                 NodeVtable vtable = GraphNodes.Tab(
-                    () => tab.Label,
+                    () => TabLabel(tab),
                     () => Live.SelectedTabIndex == tab.Index);
                 vtable.OnActivate = () => Live.ActivateTab(tab.Index);
                 builder.AddItem(new SyntheticNode(
@@ -128,66 +128,80 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        /// <summary>What a tab is called: what the page drew on it, or - for a page that names it
+        /// nowhere the mod can read - the mod's own name for that half of the statistics.</summary>
+        private static string TabLabel(PlayerStatsAdapter.TabItem tab)
+        {
+            if (!string.IsNullOrWhiteSpace(tab.Label))
+            {
+                return tab.Label;
+            }
+
+            return ModText.Get(tab.IsOverall
+                ? ModStrings.Screens.PlayerStatsOverall
+                : ModStrings.Screens.PlayerStatsBattle);
+        }
+
         // ---- the panels of the showing tab ----
 
         private void BuildOverall(GraphSheet sheet)
         {
-            List(sheet, Live.OverallGeneralLabel, Live.GetOverallGeneralItems(), "overall-general");
+            List(sheet, Live.OverallGeneralLabel, Live.GetOverallGeneralItems());
             Table(
                 sheet,
                 Live.FactionsLabel,
                 new[] { ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnPlayDistribution },
-                new[] { "faction", "rank", "play-distribution" },
                 Live.GetFactionRows(),
-                "factions");
+                "factions",
+                "faction");
             Table(
                 sheet,
                 Live.TopMapsLabel,
                 new[] { ModStrings.UI.ColumnMap, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnDetails, ModStrings.UI.ColumnGames },
-                new[] { "map", "rank", "details", "games" },
                 Live.GetMapRows(),
-                "maps");
+                "maps",
+                "map");
             Table(
                 sheet,
                 Live.TopWieldersLabel,
                 new[] { ModStrings.UI.ColumnWielder, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnTimesRecruited },
-                new[] { "wielder", "rank", "faction", "times-recruited" },
                 Live.GetWielderRows(),
-                "wielders");
+                "wielders",
+                "wielder");
             Summary(sheet, "wielders", Live.WielderSummary, Live.WielderSummaryTransform);
             Table(
                 sheet,
                 Live.TopTroopsLabel,
                 new[] { ModStrings.UI.ColumnTroop, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnTimesTrained },
-                new[] { "troop", "rank", "faction", "times-trained" },
                 Live.GetTroopRows(),
-                "troops");
+                "troops",
+                "troop");
             Summary(sheet, "troops", Live.TroopSummary, Live.TroopSummaryTransform);
         }
 
         private void BuildBattle(GraphSheet sheet)
         {
-            List(sheet, Live.BattleGeneralLabel, Live.GetBattleGeneralItems(), "battle-general");
+            List(sheet, Live.BattleGeneralLabel, Live.GetBattleGeneralItems());
             Table(
                 sheet,
                 Live.SpellsLabel,
                 new[] { ModStrings.UI.ColumnSpell, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnTimesCast },
-                new[] { "spell", "rank", "times-cast" },
                 Live.GetSpellRows(),
-                "spells");
+                "spells",
+                "spell");
             Summary(sheet, "spells", Live.SpellSummary, Live.SpellSummaryTransform);
             Table(
                 sheet,
                 Live.EnemyTroopsLabel,
                 new[] { ModStrings.UI.ColumnTroop, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnKills },
-                new[] { "troop", "rank", "faction", "kills" },
                 Live.GetEnemyTroopRows(),
-                "enemy-troops");
+                "enemy-troops",
+                "enemy-troop");
         }
 
         /// <summary>A panel the page draws as plain lines rather than as a table: its caption is the
         /// region and each entry is a full-width line of it.</summary>
-        private void List(GraphSheet sheet, string caption, IReadOnlyList<PlayerStatsAdapter.LabeledItem> items, string key)
+        private void List(GraphSheet sheet, string caption, IReadOnlyList<PlayerStatsAdapter.LabeledItem> items)
         {
             sheet.Region(caption);
             for (int i = 0; items != null && i < items.Count; i++)
@@ -204,15 +218,21 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>One of the page's tables: its drawn caption is the region, the first column is the
-        /// row's own name and the rest are its figures.</summary>
+        /// <summary>
+        /// One of the page's tables: its drawn caption is the region, the first column is the row's
+        /// own name, the second is where the row sits in the table, and the rest are the figures the
+        /// game draws across it, in the order it draws them.
+        ///
+        /// The place is the SCREEN's wording - the page draws no rank anywhere, the mod says it - so
+        /// the row reports its index and this puts the number into <c>UI.RankNumber</c>.
+        /// </summary>
         private void Table(
             GraphSheet sheet,
             string caption,
             ModString[] columns,
-            string[] columnIds,
             IReadOnlyList<PlayerStatsAdapter.TableRowItem> rows,
-            string key)
+            string key,
+            string rowKey)
         {
             string[] captions = new string[columns.Length];
             for (int i = 0; i < columns.Length; i++)
@@ -229,16 +249,27 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                List<GraphSheet.SheetCell> cells = new List<GraphSheet.SheetCell>();
-                for (int c = 1; c < columnIds.Length; c++)
+                PlayerStatsAdapter.TableRowItem it = row;
+                List<GraphSheet.SheetCell> cells = new List<GraphSheet.SheetCell>
                 {
-                    string columnId = columnIds[c];
-                    cells.Add(new GraphSheet.SheetCell(c, 0, Cell(captions[c], row, () => row.GetCellValue(columnId))));
+                    new GraphSheet.SheetCell(
+                        RankColumn,
+                        0,
+                        Cell(captions[RankColumn], it, () => ModText.Get(ModStrings.UI.RankNumber, it.Index + 1))),
+                };
+                for (int c = RankColumn + 1; c < columns.Length; c++)
+                {
+                    int value = c - RankColumn - 1;
+                    cells.Add(new GraphSheet.SheetCell(c, 0, Cell(captions[c], it, () => it.Value(value))));
                 }
 
-                sheet.RowAt(Primary(row), key + "/" + row.Id, cells, row.SourceTransform);
+                sheet.RowAt(Primary(row), key + "/" + rowKey + "-" + row.Index, cells, row.SourceTransform);
             }
         }
+
+        /// <summary>Every table on the page draws the row's own name first and its place second.
+        /// </summary>
+        private const int RankColumn = 1;
 
         /// <summary>The lines a table draws under itself - a maximum, a total, the asterisk's
         /// footnote - as rows of that table's own region, one per drawn line.</summary>

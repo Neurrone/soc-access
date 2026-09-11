@@ -3917,3 +3917,53 @@ msgstr "+{0}"
 msgctxt "Combat.Spell"
 msgid "Spell"
 msgstr "Hechizo"
+
+#. Screens.CodexTabNumber
+msgctxt "Screens.CodexTabNumber"
+msgid "Tab {0}"
+msgstr "Pestaña {0}"
+
+#. Screens.CodexCategoryNumber
+msgctxt "Screens.CodexCategoryNumber"
+msgid "Category {0}"
+msgstr "Categoría {0}"
+
+#. UI.RankNumber
+msgctxt "UI.RankNumber"
+msgid "#{0}"
+msgstr "N.º {0}"
+
+#. UI.ColumnGameName
+msgctxt "UI.ColumnGameName"
+msgid "Game name"
+msgstr "Nombre de la partida"
+
+#. UI.ColumnPlayers
+msgctxt "UI.ColumnPlayers"
+msgid "Players"
+msgstr "Jugadores"
+
+#. Screens.CampaignNumber
+msgctxt "Screens.CampaignNumber"
+msgid "Campaign {0}"
+msgstr "Campaña {0}"
+
+#. Screens.CustomCampaigns
+msgctxt "Screens.CustomCampaigns"
+msgid "Custom campaigns"
+msgstr "Campañas personalizadas"
+
+#. Screens.Tales
+msgctxt "Screens.Tales"
+msgid "Tales"
+msgstr "Relatos"
+
+#. Screens.Confirm
+msgctxt "Screens.Confirm"
+msgid "Confirm"
+msgstr "Confirmar"
+
+#. Screens.ShowTutorials
+msgctxt "Screens.ShowTutorials"
+msgid "Show tutorials"
+msgstr "Mostrar tutoriales"

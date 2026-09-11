@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -48,21 +48,48 @@ namespace SongsOfConquestAccess.Adapters
                 && container.activeInHierarchy;
         }
 
+        /// <summary>The actions the menu is drawing, listed at most once a frame: the build asks for
+        /// the list and each row reads the game when it is asked. One item per game entry for the
+        /// life of the adapter, so the tooltip behind a row - which remembers whether the game's
+        /// details are a long dossier - is built once and not once per build (AGENTS.md,
+        /// Performance).</summary>
         public IReadOnlyList<ActionItem> GetActions()
         {
+            int frame = Time.frameCount;
+            if (_actions != null && _actionsFrame == frame)
+            {
+                return _actions;
+            }
+
+            _actionsFrame = frame;
             List<ActionItem> items = new List<ActionItem>();
             List<PlatformUserButtonEntry> entries = GetUserButtons();
             for (int i = 0; i < entries.Count; i++)
             {
                 PlatformUserButtonEntry entry = entries[i];
-                if (entry != null && GameObjects.IsLive(entry as Component))
+                if (entry == null || !GameObjects.IsLive(entry as Component))
                 {
-                    items.Add(new ActionItem(this, entry, i));
+                    continue;
                 }
+
+                ActionItem item;
+                if (!_actionsByEntry.TryGetValue(entry, out item))
+                {
+                    item = new ActionItem(this, entry, i);
+                    _actionsByEntry[entry] = item;
+                }
+
+                items.Add(item);
             }
 
-            return items;
+            _actions = items;
+            return _actions;
         }
+
+        private readonly Dictionary<PlatformUserButtonEntry, ActionItem> _actionsByEntry =
+            new Dictionary<PlatformUserButtonEntry, ActionItem>();
+        private IReadOnlyList<ActionItem> _actions;
+        private int _actionsFrame = -1;
 
         public void HideNativeTooltip()
         {
@@ -160,10 +187,25 @@ namespace SongsOfConquestAccess.Adapters
                 get { return Button != null && Button.Interactable; }
             }
 
+            /// <summary>The row's native tooltip, built once for this row: a tooltip remembers
+            /// whether the game's details behind it are a long dossier, and a fresh one per build
+            /// asked the game again every frame.</summary>
             public Tooltip Tooltip
             {
-                get { return Tooltip.ForComponent(Button as Component, _adapter != null ? _adapter.GetLocalization() : null); }
+                get
+                {
+                    if (!_tooltipBuilt)
+                    {
+                        _tooltipBuilt = true;
+                        _tooltip = Tooltip.ForComponent(Button as Component, _adapter != null ? _adapter.GetLocalization() : null);
+                    }
+
+                    return _tooltip;
+                }
             }
+
+            private Tooltip _tooltip;
+            private bool _tooltipBuilt;
 
             private UIButton Button
             {

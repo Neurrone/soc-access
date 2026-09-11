@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
@@ -80,15 +80,14 @@ namespace SongsOfConquestAccess.Screens
                     GraphNodes.Text(() => Live.Header)));
             }
 
-            // The description is broken into its paragraphs ONCE: the guard and the node ask the
-            // same question, and the paragraph node counts them at build.
-            IList<string> descriptionLines = Live.DescriptionLines;
-            if (descriptionLines.Count > 0)
+            // The guard and the node ask the same question, and the adapter splits the text at most
+            // once a frame, so the node reads the live answer rather than one captured here.
+            if (Live.DescriptionLines.Count > 0)
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "tutorial-simple:body");
                 builder.AddItem(new SyntheticNode(
                     bodyId,
-                    GraphNodes.Paragraphs(() => descriptionLines)));
+                    GraphNodes.Paragraphs(() => Live.DescriptionLines)));
                 // Focus starts on the body: arrival says the title once as the screen name and then
                 // what the tutorial has to say.
                 builder.SetStart(bodyId);

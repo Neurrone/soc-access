@@ -79,10 +79,29 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 Component window = GetSettingsField<object>("WindowTransform") as Component;
-                Transform header = window != null ? window.transform.Find("SubHeader") : null;
-                UITextMesh textMesh = header != null ? header.GetComponent<UITextMesh>() : null;
-                return textMesh != null ? UITextMeshTextUtility.GetEffectiveText(textMesh) : null;
+                if (!_titleProbed || !ReferenceEquals(window, _titleWindow))
+                {
+                    // Found once per window rather than per read: the screen names itself every
+                    // frame and Find walks the window's children by name (AGENTS.md, Performance).
+                    _titleWindow = window;
+                    _titleProbed = true;
+                    Transform header = window != null ? window.transform.Find("SubHeader") : null;
+                    _titleTextMesh = header != null ? header.GetComponent<UITextMesh>() : null;
+                }
+
+                return _titleTextMesh != null ? UITextMeshTextUtility.GetEffectiveText(_titleTextMesh) : null;
             }
+        }
+
+        private Component _titleWindow;
+        private UITextMesh _titleTextMesh;
+        private bool _titleProbed;
+
+        /// <summary>The handler the window itself localizes through, for the wording a screen
+        /// composes from what this adapter reports.</summary>
+        public ILocalizationHandler Localization
+        {
+            get { return _localization; }
         }
 
         public bool Close()
@@ -104,7 +123,11 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < providers.Length; i++)
             {
                 ICodexProvider provider = providers[i];
-                string label = SpokenText.Get(_localization, provider != null ? provider.NameKey : null, provider != null ? provider.NameKey : "Tab " + (i + 1));
+                // The provider's own name, or nothing: what a tab with no name is CALLED is the
+                // screen's wording, not the adapter's.
+                string label = provider != null
+                    ? SpokenText.Get(_localization, provider.NameKey, provider.NameKey)
+                    : string.Empty;
                 items.Add(new TabItem(label, i, i == activeIndex));
             }
 
@@ -136,11 +159,62 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.PointerClick(tabComponent);
         }
 
+        /// <summary>The drawn categories and the articles under them. Read once per redraw: pulling
+        /// each article's label off its text mesh allocates a string per article, and the list only
+        /// changes when the window re-spawns its category sections. The key is what the game's own
+        /// section pool is drawing - how many sections, which the first and last are, and how many
+        /// buttons they draw between them - read from the game on every call (AGENTS.md,
+        /// Performance). Which article is SELECTED is not part of it: each item answers that from
+        /// the event system when it is asked.</summary>
         public IReadOnlyList<ArticleGroupItem> GetArticleGroups()
         {
-            List<ArticleGroupItem> groups = new List<ArticleGroupItem>();
             IList sections = GetActivePoolEntries(CategorySectionPoolField);
-            GameObject selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
+            int drawnSections = 0;
+            int drawnButtons = 0;
+            object first = null;
+            object last = null;
+            for (int i = 0; i < sections.Count; i++)
+            {
+                CodexCategorySection section = sections[i] as CodexCategorySection;
+                if (section == null || !((Component)section).gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                drawnSections++;
+                first = first ?? section;
+                last = section;
+                List<CodexContentButton> buttons = section.Buttons;
+                for (int b = 0; buttons != null && b < buttons.Count; b++)
+                {
+                    CodexContentButton button = buttons[b];
+                    if (button != null && ((Component)button).gameObject.activeInHierarchy)
+                    {
+                        drawnButtons++;
+                    }
+                }
+            }
+
+            if (_articleGroups != null
+                && drawnSections == _articleSectionCount
+                && drawnButtons == _articleButtonCount
+                && ReferenceEquals(first, _firstArticleSection)
+                && ReferenceEquals(last, _lastArticleSection))
+            {
+                return _articleGroups;
+            }
+
+            _articleSectionCount = drawnSections;
+            _articleButtonCount = drawnButtons;
+            _firstArticleSection = first;
+            _lastArticleSection = last;
+            _articleGroups = ReadArticleGroups(sections);
+            return _articleGroups;
+        }
+
+        private IReadOnlyList<ArticleGroupItem> ReadArticleGroups(IList sections)
+        {
+            List<ArticleGroupItem> groups = new List<ArticleGroupItem>();
             for (int sectionIndex = 0; sectionIndex < sections.Count; sectionIndex++)
             {
                 CodexCategorySection section = sections[sectionIndex] as CodexCategorySection;
@@ -152,8 +226,7 @@ namespace SongsOfConquestAccess.Adapters
                 string sectionLabel = CleanLabel(UITextMeshTextUtility.GetEffectiveText(Reflect.Get<UITextMesh>(section, CategorySectionTextField)));
                 List<CodexContentButton> buttons = section.Buttons;
                 List<ArticleItem> articles = new List<ArticleItem>();
-                bool containsSelectedArticle = false;
-                for (int buttonIndex = 0; buttonIndex < buttons.Count; buttonIndex++)
+                for (int buttonIndex = 0; buttons != null && buttonIndex < buttons.Count; buttonIndex++)
                 {
                     CodexContentButton button = buttons[buttonIndex];
                     if (button == null || !((Component)button).gameObject.activeInHierarchy)
@@ -168,24 +241,33 @@ namespace SongsOfConquestAccess.Adapters
                         continue;
                     }
 
-                    label = FormatContentButtonLabel(label, button);
-                    bool isSelected = selected != null && selected == ((Component)button).gameObject;
-                    containsSelectedArticle = containsSelectedArticle || isSelected;
-                    articles.Add(new ArticleItem(label, button, isSelected, groups.Count, articles.Count));
+                    CodexCategoryContentDefinition definition = Reflect.Get<CodexCategoryContentDefinition>(button, ContentButtonDefinitionField);
+                    bool hasContentColor = definition != null && definition.HasContentColor;
+                    articles.Add(new ArticleItem(
+                        label,
+                        button,
+                        hasContentColor,
+                        hasContentColor ? definition.ContentColor : default(Color),
+                        groups.Count,
+                        articles.Count));
                 }
 
                 if (articles.Count > 0)
                 {
-                    groups.Add(new ArticleGroupItem(
-                        string.IsNullOrWhiteSpace(sectionLabel) ? "Category " + (groups.Count + 1) : sectionLabel,
-                        groups.Count,
-                        articles,
-                        containsSelectedArticle));
+                    groups.Add(new ArticleGroupItem(sectionLabel, groups.Count, articles));
                 }
             }
 
             return groups;
         }
+
+        // The categories and their articles as they were last drawn, with the key that says the
+        // window has redrawn them.
+        private IReadOnlyList<ArticleGroupItem> _articleGroups;
+        private int _articleSectionCount = -1;
+        private int _articleButtonCount = -1;
+        private object _firstArticleSection;
+        private object _lastArticleSection;
 
         public bool FocusArticle(ArticleItem item)
         {
@@ -211,14 +293,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return NativeSelectionUtility.PointerClick(item.Button as Component);
-        }
-
-        private string FormatContentButtonLabel(string label, CodexContentButton button)
-        {
-            CodexCategoryContentDefinition definition = Reflect.Get<CodexCategoryContentDefinition>(button, ContentButtonDefinitionField);
-            return definition != null && definition.HasContentColor
-                ? ArtifactSpeechFormatter.FormatName(_localization, label, definition.ContentColor)
-                : label;
         }
 
         public IReadOnlyList<CodexContentItem> GetContentItems()
@@ -685,7 +759,8 @@ namespace SongsOfConquestAccess.Adapters
 
             string label = SpokenText.Get(_localization, labelKey, fallbackLabel);
             RectTransform sourceTransform = ((Component)valueText).GetComponent<RectTransform>();
-            items.Add(new CodexContentItem(CodexContentItemKind.Text, label + ": " + value, sourceTransform));
+            // The stat's own name and its own amount; joining them is the screen's wording.
+            items.Add(new CodexContentItem(CodexContentItemKind.Text, label, value, sourceTransform));
         }
 
         private static void AddWielderInfoSection(List<CodexContentItem> items, WielderCodexContentInfoSection section)
@@ -794,36 +869,56 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class ArticleGroupItem
         {
-            public ArticleGroupItem(string label, int index, IReadOnlyList<ArticleItem> articles, bool containsSelectedArticle)
+            public ArticleGroupItem(string label, int index, IReadOnlyList<ArticleItem> articles)
             {
                 Label = label ?? string.Empty;
                 Index = index;
                 Articles = articles ?? new ArticleItem[0];
-                ContainsSelectedArticle = containsSelectedArticle;
             }
 
+            /// <summary>The category's own drawn name, empty where the game drew none.</summary>
             public string Label { get; private set; }
             public int Index { get; private set; }
             public IReadOnlyList<ArticleItem> Articles { get; private set; }
-            public bool ContainsSelectedArticle { get; private set; }
         }
 
         public sealed class ArticleItem
         {
-            public ArticleItem(string label, CodexContentButton button, bool isSelected, int categoryIndex, int articleIndex)
+            public ArticleItem(
+                string label,
+                CodexContentButton button,
+                bool hasContentColor,
+                Color contentColor,
+                int categoryIndex,
+                int articleIndex)
             {
                 Label = label;
                 Button = button;
-                IsSelected = isSelected;
+                HasContentColor = hasContentColor;
+                ContentColor = contentColor;
                 CategoryIndex = categoryIndex;
                 ArticleIndex = articleIndex;
             }
 
             public string Label { get; private set; }
             public CodexContentButton Button { get; private set; }
-            public bool IsSelected { get; private set; }
+
+            /// <summary>The article's own power-level colour, where its definition carries one.</summary>
+            public bool HasContentColor { get; private set; }
+            public Color ContentColor { get; private set; }
             public int CategoryIndex { get; private set; }
             public int ArticleIndex { get; private set; }
+
+            /// <summary>Whether the window is drawing THIS article, which is where the game's own
+            /// selection sits. Read when asked, so the list above can outlive the frame.</summary>
+            public bool IsSelected
+            {
+                get
+                {
+                    GameObject selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
+                    return selected != null && Button != null && selected == ((Component)Button).gameObject;
+                }
+            }
         }
 
         public enum CodexContentItemKind
@@ -846,9 +941,17 @@ namespace SongsOfConquestAccess.Adapters
         public sealed class CodexContentItem
         {
             public CodexContentItem(CodexContentItemKind kind, string text, RectTransform sourceTransform = null)
+                : this(kind, text, null, sourceTransform)
+            {
+            }
+
+            /// <summary>A line the game drew as a name and an amount side by side (a commander's
+            /// stats), each reported as the game wrote it.</summary>
+            public CodexContentItem(CodexContentItemKind kind, string text, string value, RectTransform sourceTransform)
             {
                 Kind = kind;
                 Text = text ?? string.Empty;
+                Value = value ?? string.Empty;
                 SourceTransform = sourceTransform;
                 Essences = new EssenceAmount[0];
             }
@@ -857,12 +960,17 @@ namespace SongsOfConquestAccess.Adapters
             {
                 Kind = CodexContentItemKind.Essence;
                 Text = essenceLabel ?? string.Empty;
+                Value = string.Empty;
                 SourceTransform = sourceTransform;
                 Essences = essences ?? new EssenceAmount[0];
             }
 
             public CodexContentItemKind Kind { get; private set; }
             public string Text { get; private set; }
+
+            /// <summary>The amount drawn beside <see cref="Text"/>, empty for a line that is only
+            /// text.</summary>
+            public string Value { get; private set; }
             public RectTransform SourceTransform { get; private set; }
             public IReadOnlyList<EssenceAmount> Essences { get; private set; }
         }

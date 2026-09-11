@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using _8_UILayer.ClientView.Menu.Paus;
+using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
@@ -355,8 +356,9 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>The game's own Options button on the main menu, or null while the menu is not
-        /// loaded. Cached, and looked for again only every <see cref="RescanFrames"/> frames, because
-        /// the scan behind it walks every loaded object of its type and this runs on the pump.
+        /// loaded. Cached, looked for only while the main menu is the scene the game has loaded, and
+        /// even then only every <see cref="RescanFrames"/> frames: the scan behind it walks every
+        /// loaded object of its type and builds an adapter per candidate, and this runs on the pump.
         /// </summary>
         private static UIButton MainMenuOptionsButton()
         {
@@ -365,7 +367,7 @@ namespace SongsOfConquestAccess.Adapters
                 return _mainMenuOptions;
             }
 
-            if (!DueForRescan(ref _mainMenuRescanFrame))
+            if (!AtMainMenu() || !DueForRescan(ref _mainMenuRescanFrame))
             {
                 return null;
             }
@@ -396,8 +398,9 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>The game's own Options item in the pause menu, read off the installer's
-        /// serialized settings so no container has to be resolved. Cached and throttled like the
-        /// main menu's.</summary>
+        /// serialized settings so no container has to be resolved. Cached and throttled like the main
+        /// menu's, and looked for only where a pause menu can be: not while the main menu owns the
+        /// screen.</summary>
         private static UIButton PauseMenuOptionsButton()
         {
             if (_pauseMenuOptions != null)
@@ -405,12 +408,21 @@ namespace SongsOfConquestAccess.Adapters
                 return _pauseMenuOptions;
             }
 
-            if (!DueForRescan(ref _pauseMenuRescanFrame))
+            if (MainMenuSceneLoader.UnsafeInstance != null || !DueForRescan(ref _pauseMenuRescanFrame))
             {
                 return null;
             }
 
             return _pauseMenuOptions = FindPauseMenuOptionsButton();
+        }
+
+        /// <summary>Whether the game has the main menu itself up, read from the game's own scene
+        /// loader as <see cref="MainMenuArrival"/> does rather than from a hook. The loader is bound
+        /// in the main-menu scene and disposed with it, so a null one is a game in play.</summary>
+        private static bool AtMainMenu()
+        {
+            MainMenuSceneLoader loader = MainMenuSceneLoader.UnsafeInstance;
+            return loader != null && loader.CurrentlyLoadedScene == MainMenuSceneType.MainMenu;
         }
 
         private static UIButton FindPauseMenuOptionsButton()

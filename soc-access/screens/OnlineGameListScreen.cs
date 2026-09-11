@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.Menu;
 using SongsOfConquestAccess.Adapters;
@@ -142,9 +142,11 @@ namespace SongsOfConquestAccess.Screens
 
             string[] captions =
             {
-                GameText.Get("Lobby/GameList/GameName", "Game Name"),
+                // Neither column is captioned by the game - the list draws no headings at all and
+                // neither key appears in the decompiled source - so the mod names them.
+                ModText.Get(ModStrings.UI.ColumnGameName),
                 ModText.Get(ModStrings.UI.Status),
-                GameText.Get("Common/Players", "Players")
+                ModText.Get(ModStrings.UI.ColumnPlayers)
             };
             BuildHeadingBand(builder, captions);
 
@@ -216,9 +218,23 @@ namespace SongsOfConquestAccess.Screens
             OnlineGameListAdapter.GameRow it = row;
             return new List<GraphSheet.SheetCell>
             {
-                new GraphSheet.SheetCell(1, 0, Cell(captions, 1, row, () => it.Status, it.GetCellTooltip("status"))),
+                new GraphSheet.SheetCell(1, 0, Cell(captions, 1, row, () => StatusText(it), it.GetCellTooltip("status"))),
                 new GraphSheet.SheetCell(2, 0, Cell(captions, 2, row, () => it.Players, null)),
             };
+        }
+
+        /// <summary>What a row's status column says: what the game says about the game - the join
+        /// command's words, or the reason its tooltip gives - and, for a game that cannot be joined
+        /// and gives no reason, the mod's own word for that.</summary>
+        private static string StatusText(OnlineGameListAdapter.GameRow row)
+        {
+            string status = row.Status;
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                return status;
+            }
+
+            return row.CanJoin ? string.Empty : ModText.Get(ModStrings.UI.StatusUnavailable);
         }
 
         /// <summary>One read-only cell: the drawn value alone, the column's caption being spoken as the

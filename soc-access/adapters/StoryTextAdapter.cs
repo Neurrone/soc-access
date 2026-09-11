@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using Lavapotion.Utilities;
@@ -52,14 +52,29 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
-            get { return string.Join(" ", BodyLines); }
+            get { return _body.Joined(RawBody); }
+        }
+
+        /// <summary>Whether the source is drawing any body at all.</summary>
+        public bool HasBody
+        {
+            get { return _body.HasAny(RawBody); }
         }
 
         /// <summary>The paragraphs the game broke the lore text into, kept apart rather than
         /// collapsed: the story is read a paragraph at a time.</summary>
         public IList<string> BodyLines
         {
-            get { return SpokenLines.Of(new[] { GetText(LoreTextRef) }); }
+            get { return _body.Lines(RawBody); }
+        }
+
+        // The body, split at most once a frame: the guard, the node and the screen's own name all
+        // ask for it (AGENTS.md, Performance).
+        private readonly BodyText _body = new BodyText();
+
+        private string RawBody
+        {
+            get { return GetText(LoreTextRef); }
         }
 
         public bool IsPresent()

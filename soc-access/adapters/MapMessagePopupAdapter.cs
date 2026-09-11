@@ -1,8 +1,9 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -40,19 +41,28 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
-            get { return string.Join(" ", BodyLines); }
+            get { return _body.Joined(RawBody); }
         }
 
         /// <summary>The paragraphs the game broke the message into, kept apart rather than collapsed:
         /// the popup reads a paragraph at a time.</summary>
         public IList<string> BodyLines
         {
-            get { return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(GetBodyText()) }); }
+            get { return _body.Lines(RawBody); }
+        }
+
+        // The body, split at most once a frame: the guard, the node and the screen's own name all
+        // ask for it (AGENTS.md, Performance).
+        private readonly BodyText _body = new BodyText();
+
+        private string RawBody
+        {
+            get { return UITextMeshTextUtility.GetEffectiveText(GetBodyText()); }
         }
 
         public string PositiveLabel
         {
-            get { return FirstNonEmpty(GetButtonText(GetOkButton()), "OK"); }
+            get { return FirstNonEmpty(GetButtonText(GetOkButton()), ModText.Get(ModStrings.Screens.Ok)); }
         }
 
         public string NegativeLabel

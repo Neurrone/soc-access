@@ -1,6 +1,8 @@
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 
@@ -115,7 +117,8 @@ namespace SongsOfConquestAccess.Screens
             // section repeating the description and the progress line would put each of them in the
             // review buffer twice (measured on the first build of this screen). The description is a
             // part per paragraph, which is one spoken line and one buffer line each.
-            NodeVtable vtable = GraphNodes.Button(item.GetLabel, () => item.Activate(), item.IsEnabled);
+            Func<string> label = campaign != null ? () => CardLabel(campaign) : (Func<string>)item.GetLabel;
+            NodeVtable vtable = GraphNodes.Button(label, () => item.Activate(), item.IsEnabled);
             if (campaign != null)
             {
                 GraphNodes.ParagraphParts(vtable, campaign.GetDescriptionLines);
@@ -134,6 +137,17 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return vtable;
+        }
+
+        /// <summary>A campaign card's label: which campaign of the page it is - the page draws the
+        /// number as a figure on the card, which reads as a bare digit - and then the card's own
+        /// title and subtitle.</summary>
+        private static string CardLabel(CampaignButtonAdapter campaign)
+        {
+            string number = campaign.CampaignNumber > 0
+                ? ModText.Get(ModStrings.Screens.CampaignNumber, campaign.CampaignNumber)
+                : string.Empty;
+            return MenuButtonTextUtility.JoinParts(number, campaign.GetLabel());
         }
 
         /// <summary>

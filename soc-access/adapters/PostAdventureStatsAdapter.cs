@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -149,11 +149,45 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 UITextMeshDropdown dropdown = GraphDropdown;
-                return dropdown != null ? new GraphDropList(this, dropdown) : null;
+                if (dropdown == null)
+                {
+                    return null;
+                }
+
+                // One list per dropdown: the list is eight closures over the same widget, and the
+                // build asks for it every frame (AGENTS.md, Performance).
+                if (_graphChooser == null || !ReferenceEquals(dropdown, _graphChooserDropdown))
+                {
+                    _graphChooserDropdown = dropdown;
+                    _graphChooser = new GraphDropList(this, dropdown);
+                }
+
+                return _graphChooser;
             }
         }
 
+        private GraphDropList _graphChooser;
+        private UITextMeshDropdown _graphChooserDropdown;
+
+        /// <summary>The teams the menu lists, built at most once a frame: the build asks for them
+        /// once for the ticks and again for the chart's columns.</summary>
         public IReadOnlyList<TeamOption> GetTeamOptions()
+        {
+            int frame = Time.frameCount;
+            if (_teamOptions != null && _teamOptionsFrame == frame)
+            {
+                return _teamOptions;
+            }
+
+            _teamOptionsFrame = frame;
+            _teamOptions = ReadTeamOptions();
+            return _teamOptions;
+        }
+
+        private IReadOnlyList<TeamOption> _teamOptions;
+        private int _teamOptionsFrame = -1;
+
+        private IReadOnlyList<TeamOption> ReadTeamOptions()
         {
             List<PostAdventureStatsMenuTeamEntry> entries = GetTeamEntries();
             List<TeamOption> options = new List<TeamOption>(entries.Count);
@@ -171,7 +205,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                options.Add(new TeamOption("post-adventure-stats-team-" + i, entry, label));
+                options.Add(new TeamOption(entry, label));
             }
 
             return options.ToArray();
@@ -235,7 +269,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                teams.Add(new GraphTeamColumn("team-" + option.Entry.Team.Id, option.Entry.Team.Id, option.Label));
+                teams.Add(new GraphTeamColumn(option.Entry.Team.Id, option.Label));
             }
 
             return teams.ToArray();
@@ -264,7 +298,7 @@ namespace SongsOfConquestAccess.Adapters
             List<GraphRoundRow> rows = new List<GraphRoundRow>();
             foreach (int round in rounds)
             {
-                rows.Add(new GraphRoundRow("round-" + round, round, values[round]));
+                rows.Add(new GraphRoundRow(round, values[round]));
             }
 
             _rows = rows.ToArray();
@@ -543,14 +577,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class TeamOption
         {
-            public TeamOption(string id, PostAdventureStatsMenuTeamEntry entry, string label)
+            public TeamOption(PostAdventureStatsMenuTeamEntry entry, string label)
             {
-                Id = id;
                 Entry = entry;
                 Label = label;
             }
-
-            public string Id { get; private set; }
 
             public PostAdventureStatsMenuTeamEntry Entry { get; private set; }
 
@@ -559,14 +590,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class GraphTeamColumn
         {
-            public GraphTeamColumn(string id, int teamId, string label)
+            public GraphTeamColumn(int teamId, string label)
             {
-                Id = id ?? string.Empty;
                 TeamId = teamId;
                 Label = label ?? string.Empty;
             }
-
-            public string Id { get; private set; }
 
             public int TeamId { get; private set; }
 
@@ -577,29 +605,20 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly Dictionary<int, GraphPoint> _values;
 
-            public GraphRoundRow(string id, int round, Dictionary<int, GraphPoint> values)
+            public GraphRoundRow(int round, Dictionary<int, GraphPoint> values)
             {
-                Id = id ?? string.Empty;
                 Round = round;
                 _values = values ?? new Dictionary<int, GraphPoint>();
             }
 
-            public string Id { get; private set; }
-
             public int Round { get; private set; }
 
-            public string GetValue(int teamId)
+            /// <summary>What one team's figure for this round is, and whether the round is one it
+            /// lost a battle in. Saying so is the screen's wording.</summary>
+            public GraphPoint GetPoint(int teamId)
             {
                 GraphPoint point;
-                if (!_values.TryGetValue(teamId, out point))
-                {
-                    return string.Empty;
-                }
-
-                string value = point.Value.ToString();
-                return point.BattleLost
-                    ? ModText.Get(ModStrings.UI.LabelValue, value, ModText.Get(ModStrings.UI.StatusBattleLost))
-                    : value;
+                return _values.TryGetValue(teamId, out point) ? point : null;
             }
         }
 

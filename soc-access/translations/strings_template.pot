@@ -2349,6 +2349,21 @@ msgctxt "UI.ModReady"
 msgid "Songs of Conquest Access v{0} ready"
 msgstr ""
 
+#. UI.RankNumber
+msgctxt "UI.RankNumber"
+msgid "#{0}"
+msgstr ""
+
+#. UI.ColumnGameName
+msgctxt "UI.ColumnGameName"
+msgid "Game name"
+msgstr ""
+
+#. UI.ColumnPlayers
+msgctxt "UI.ColumnPlayers"
+msgid "Players"
+msgstr ""
+
 #. Screens.AdventureMap
 msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
@@ -3507,6 +3522,41 @@ msgstr ""
 #. Screens.UpgradeTiers
 msgctxt "Screens.UpgradeTiers"
 msgid "{0} {1} / {2}"
+msgstr ""
+
+#. Screens.CodexTabNumber
+msgctxt "Screens.CodexTabNumber"
+msgid "Tab {0}"
+msgstr ""
+
+#. Screens.CodexCategoryNumber
+msgctxt "Screens.CodexCategoryNumber"
+msgid "Category {0}"
+msgstr ""
+
+#. Screens.CampaignNumber
+msgctxt "Screens.CampaignNumber"
+msgid "Campaign {0}"
+msgstr ""
+
+#. Screens.CustomCampaigns
+msgctxt "Screens.CustomCampaigns"
+msgid "Custom campaigns"
+msgstr ""
+
+#. Screens.Tales
+msgctxt "Screens.Tales"
+msgid "Tales"
+msgstr ""
+
+#. Screens.Confirm
+msgctxt "Screens.Confirm"
+msgid "Confirm"
+msgstr ""
+
+#. Screens.ShowTutorials
+msgctxt "Screens.ShowTutorials"
+msgid "Show tutorials"
 msgstr ""
 
 #. Scanner.All

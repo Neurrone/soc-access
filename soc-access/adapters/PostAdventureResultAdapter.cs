@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -34,29 +34,12 @@ namespace SongsOfConquestAccess.Adapters
             _menu = menu;
         }
 
+        /// <summary>What the menu drew over the outcome, empty where it drew nothing readable - in
+        /// which case whether it is a win or a loss (<see cref="IsVictory"/>, <see cref="IsDefeat"/>)
+        /// is what the screen names it by.</summary>
         public string ResultTitle
         {
-            get
-            {
-                CanvasGroup resultCanvas = ActiveResultCanvas;
-                string text = GetFirstVisibleText(resultCanvas);
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    return text;
-                }
-
-                if (IsVictory)
-                {
-                    return ModText.Get(ModStrings.Combat.Victory);
-                }
-
-                if (IsDefeat)
-                {
-                    return ModText.Get(ModStrings.Combat.Defeat);
-                }
-
-                return ModText.Get(ModStrings.Screens.PostAdventureResult);
-            }
+            get { return GetFirstVisibleText(ActiveResultCanvas) ?? string.Empty; }
         }
 
         public string Description
@@ -77,13 +60,11 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The heading the menu drew over the outcome's lines, empty where it drew
+        /// none.</summary>
         public string ObjectivesTitle
         {
-            get
-            {
-                string title = UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, DescriptionTitleField));
-                return !string.IsNullOrWhiteSpace(title) ? title : ModText.Get(ModStrings.Screens.Objectives);
-            }
+            get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, DescriptionTitleField)); }
         }
 
         public bool DescriptionVisible

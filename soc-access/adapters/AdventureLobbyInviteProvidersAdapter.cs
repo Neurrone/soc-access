@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -129,9 +129,11 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            public string Id
+            /// <summary>Where the provider sits in the panel's own list, counted from zero.
+            /// </summary>
+            public int Index
             {
-                get { return "invite-provider-" + _index; }
+                get { return _index; }
             }
 
             public string Label

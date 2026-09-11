@@ -540,6 +540,9 @@
             public static readonly ModString TroopWithSize = new ModString("UI.TroopWithSize", "{0}, {1} / {2}");
             public static readonly ModString Unselected = new ModString("UI.Unselected", "unselected");
             public static readonly ModString ModReady = new ModString("UI.ModReady", "Songs of Conquest Access v{0} ready");
+            public static readonly ModString RankNumber = new ModString("UI.RankNumber", "#{0}");
+            public static readonly ModString ColumnGameName = new ModString("UI.ColumnGameName", "Game name");
+            public static readonly ModString ColumnPlayers = new ModString("UI.ColumnPlayers", "Players");
         }
 
         public static class Screens
@@ -810,6 +813,14 @@
             /// <summary>How many of a map entity's upgrade tiers are built: {0} is the game's own
             /// caption for the row, {1} the tiers built and {2} the tiers it has.</summary>
             public static readonly ModString UpgradeTiers = new ModString("Screens.UpgradeTiers", "{0} {1} / {2}");
+
+            public static readonly ModString CodexTabNumber = new ModString("Screens.CodexTabNumber", "Tab {0}");
+            public static readonly ModString CodexCategoryNumber = new ModString("Screens.CodexCategoryNumber", "Category {0}");
+            public static readonly ModString CampaignNumber = new ModString("Screens.CampaignNumber", "Campaign {0}");
+            public static readonly ModString CustomCampaigns = new ModString("Screens.CustomCampaigns", "Custom campaigns");
+            public static readonly ModString Tales = new ModString("Screens.Tales", "Tales");
+            public static readonly ModString Confirm = new ModString("Screens.Confirm", "Confirm");
+            public static readonly ModString ShowTutorials = new ModString("Screens.ShowTutorials", "Show tutorials");
         }
 
         public static class Scanner

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -64,7 +64,26 @@ namespace SongsOfConquestAccess.Adapters
             get { return SpokenLines.Clean(GameText.Get(GetDropdownLocalization(), "Common/Cancel", string.Empty)); }
         }
 
+        /// <summary>The rows the dropdown spawned, listed at most once a frame: the build reads them
+        /// and so does the dropdown's own title, which is named after the first of them (AGENTS.md,
+        /// Performance).</summary>
         public IReadOnlyList<OptionItem> GetOptions()
+        {
+            int frame = Time.frameCount;
+            if (_options != null && _optionsFrame == frame)
+            {
+                return _options;
+            }
+
+            _optionsFrame = frame;
+            _options = ReadOptions();
+            return _options;
+        }
+
+        private IReadOnlyList<OptionItem> _options;
+        private int _optionsFrame = -1;
+
+        private IReadOnlyList<OptionItem> ReadOptions()
         {
             List<OptionItem> items = new List<OptionItem>();
             IReadOnlyList<IconDropdownEntry> entries = GetSpawnedEntries();
@@ -225,11 +244,6 @@ namespace SongsOfConquestAccess.Adapters
             public IconDropdownEntry Entry
             {
                 get { return _entry; }
-            }
-
-            public string Id
-            {
-                get { return "icon-dropdown-option-" + _index; }
             }
 
             public string TypeName

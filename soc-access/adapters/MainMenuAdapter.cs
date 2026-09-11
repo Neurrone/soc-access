@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu.Main;
@@ -37,8 +37,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<MainMenu, UIButton>("_loadGameButton");
         private static readonly AccessTools.FieldRef<MainMenu, UIButton> QuitButtonRef =
             AccessTools.FieldRefAccess<MainMenu, UIButton>("_quitButton");
-        private static readonly AccessTools.FieldRef<MainMenu, UIButton> MapEditorButtonRef =
-            AccessTools.FieldRefAccess<MainMenu, UIButton>("_mapEditorButton");
         private static readonly AccessTools.FieldRef<MainMenu, UIButton> CommunityMapsButtonRef =
             AccessTools.FieldRefAccess<MainMenu, UIButton>("_communityMapsButton");
         private static readonly AccessTools.FieldRef<MainMenu, FoldoutUIButton> ExtrasFoldoutRef =
@@ -71,8 +69,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<MainMenu, UIButton>("_startHotseatButton");
         private static readonly AccessTools.FieldRef<FoldoutUIButton, HoverEventsImage> FoldoutBackgroundRef =
             AccessTools.FieldRefAccess<FoldoutUIButton, HoverEventsImage>("_foldoutBackground");
-        private static readonly AccessTools.FieldRef<FoldoutUIButton, bool> FoldoutIsOverButtonRef =
-            AccessTools.FieldRefAccess<FoldoutUIButton, bool>("_isOverButton");
 
         private readonly MainMenu _mainMenu;
         private readonly List<IMenuButtonAdapter> _topLevelItems;
@@ -121,8 +117,7 @@ namespace SongsOfConquestAccess.Adapters
                 CreateMainMenuButton(CampaignButtonRef(_mainMenu)),
                 CreateMainMenuButton(SkirmishButtonRef(_mainMenu)),
                 CreateMainMenuButton(LoadGameButtonRef(_mainMenu)),
-                // Map editor is not accessible yet, so do not expose it in the main menu.
-                // CreateMainMenuButton(MapEditorButtonRef(_mainMenu)),
+                // The map editor is not accessible yet, so the main menu does not list it.
                 CreateMainMenuButton(CommunityMapsButtonRef(_mainMenu)),
                 ExtrasFoldout.TriggerButton,
                 CreateMainMenuButton(HotseatButtonRef(_mainMenu)),
@@ -298,6 +293,14 @@ namespace SongsOfConquestAccess.Adapters
                     && IsGameObjectActive(_itemContainer);
             }
 
+            /// <summary>Open the foldout the way the mouse does: raise the pointer-enter on the
+            /// trigger button. <c>UIButton.OnPointerEnter</c> plays the hover sound and raises
+            /// <c>OnHoverEnter</c>, which the foldout wires to its own <c>HandleEnterButton</c> in
+            /// Awake (decompiled <c>FoldoutUIButton</c>); that marks the pointer as over the button,
+            /// shows the background, raises <c>OnOpenedFoldout</c> and starts the foldout's own
+            /// <c>RefreshFoldout</c> coroutine - which the mod re-implementing those three steps by
+            /// reflection never did, so the unfold sound never played (AGENTS.md, Native Input
+            /// Equivalence).</summary>
             public bool Open()
             {
                 if (!IsVisible())
@@ -305,16 +308,7 @@ namespace SongsOfConquestAccess.Adapters
                     return false;
                 }
 
-                HoverEventsImage background = GetBackground();
-                if (background == null)
-                {
-                    return false;
-                }
-
-                MainMenuAdapter.FoldoutIsOverButtonRef(_foldout) = true;
-                background.gameObject.SetActive(true);
-                _foldout.OnOpenedFoldout?.Invoke(_foldout);
-                return true;
+                return NativeSelectionUtility.PointerEnter(Button);
             }
 
             public bool Close()
