@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.UI;
 
@@ -33,6 +34,59 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Empty;
+        }
+
+        /// <summary>Every line but the ones a caller names, matched exactly as the game wrote
+        /// them.</summary>
+        public static IReadOnlyList<string> Without(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)
+        {
+            if (lines == null || lines.Count == 0 || linesToRemove == null || linesToRemove.Count == 0)
+            {
+                return lines ?? new string[0];
+            }
+
+            List<string> result = new List<string>();
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (!Contains(linesToRemove, lines[i]))
+                {
+                    result.Add(lines[i]);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>Drop every copy of one line from a list being composed, matched as the game
+        /// wrote it.</summary>
+        public static void Remove(List<string> lines, string lineToRemove)
+        {
+            if (lines == null || string.IsNullOrWhiteSpace(lineToRemove))
+            {
+                return;
+            }
+
+            for (int i = lines.Count - 1; i >= 0; i--)
+            {
+                if (string.Equals(lines[i], lineToRemove, StringComparison.Ordinal))
+                {
+                    lines.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <summary>The list holds this line, character for character.</summary>
+        public static bool Contains(IReadOnlyList<string> lines, string candidate)
+        {
+            for (int i = 0; lines != null && i < lines.Count; i++)
+            {
+                if (string.Equals(lines[i], candidate, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

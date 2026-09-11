@@ -818,7 +818,7 @@ namespace SongsOfConquestAccess.Adapters
         public string GetWielderListEntryLabel(int index)
         {
             WielderListHUDEntry entry = GetWielderListEntry(index);
-            return entry != null && entry.Commander != null ? GetCommanderName(entry.Commander) : string.Empty;
+            return entry != null && entry.Commander != null ? AdventureMapEntityLabel.GetCommanderName(Facade, entry.Commander) : string.Empty;
         }
 
         public void FocusWielderListEntry(int index)
@@ -1355,7 +1355,7 @@ namespace SongsOfConquestAccess.Adapters
             ICommanderState commander = CommanderSettings != null && CommanderSettings.Portrait != null
                 ? CommanderSettings.Portrait.Commander
                 : SelectionHandler != null ? SelectionHandler.SelectedCommander : null;
-            return GetCommanderName(commander);
+            return AdventureMapEntityLabel.GetCommanderName(Facade, commander);
         }
 
         private AdventureEssenceContainer GetAdventureEssenceContainer()
@@ -1914,41 +1914,6 @@ namespace SongsOfConquestAccess.Adapters
         private string Localize(string key, string fallback)
         {
             return GameText.Get(LocalizationHandler, key, fallback);
-        }
-
-        private string Localize(string key)
-        {
-            if (string.IsNullOrWhiteSpace(key) || LocalizationHandler == null)
-            {
-                return string.Empty;
-            }
-
-            try
-            {
-                string text = LocalizationHandler.GetText(key);
-                return string.IsNullOrWhiteSpace(text) || text == key ? string.Empty : text;
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
-        }
-
-        private string GetCommanderName(ICommanderState commander)
-        {
-            if (commander == null || Facade == null || Facade.Commanders == null)
-            {
-                return string.Empty;
-            }
-
-            try
-            {
-                return Facade.Commanders.GetName(commander.Id);
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
         }
 
         private string GetMapEntityName(IMapEntity entity)

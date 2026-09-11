@@ -269,24 +269,6 @@ namespace SongsOfConquestAccess.Adapters
             return string.IsNullOrWhiteSpace(label) ? ModText.Get(ModStrings.Events.StoryCameraFocusMapEntity) : label;
         }
 
-        private static string Localize(ILocalizationHandler localizationHandler, string key)
-        {
-            if (string.IsNullOrWhiteSpace(key) || localizationHandler == null)
-            {
-                return string.Empty;
-            }
-
-            try
-            {
-                string text = localizationHandler.GetText(key);
-                return string.IsNullOrWhiteSpace(text) || text == key ? string.Empty : text;
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
-        }
-
         private static string FormatTile(Vector2Int tile)
         {
             return tile.x + ", " + tile.y;

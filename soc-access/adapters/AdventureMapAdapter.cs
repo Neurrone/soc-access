@@ -1197,7 +1197,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string name = FirstNonEmpty(tile.Commander.Name, GetCommanderName(commander));
+                string name = FirstNonEmpty(tile.Commander.Name, AdventureMapEntityLabel.GetCommanderName(_facade, commander));
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     continue;
@@ -1852,7 +1852,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 Vector2Int representative = ClosestPoint(points, origin);
-                string name = FirstNonEmpty(GetCommanderName(commander), ModText.Get(ModStrings.Spatial.Commander));
+                string name = FirstNonEmpty(AdventureMapEntityLabel.GetCommanderName(_facade, commander), ModText.Get(ModStrings.Spatial.Commander));
                 // One item holding every hostile commander's reach, so the
                 // item cycle spends one stop on zones of control however many
                 // enemies are on the map. The owner and the size tell the
@@ -1899,7 +1899,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string name = FirstNonEmpty(GetCommanderName(commander), ModText.Get(ModStrings.Spatial.Commander));
+                string name = FirstNonEmpty(AdventureMapEntityLabel.GetCommanderName(_facade, commander), ModText.Get(ModStrings.Spatial.Commander));
                 if (!ContainsString(tile.ZoneOfControlNames, name))
                 {
                     tile.ZoneOfControlNames.Add(name);
@@ -2842,7 +2842,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < artifactDetails.Artifacts.Length; i++)
             {
                 ArtifactDetails artifact = artifactDetails.Artifacts[i];
-                string name = Localize(artifact.NameKey);
+                string name = GameText.Get(_localizationHandler, artifact.NameKey, string.Empty);
                 string formattedName = ArtifactSpeechFormatter.FormatName(_localizationHandler, name, artifact.PowerLevelColor);
                 if (string.IsNullOrWhiteSpace(name) || name == formattedName)
                 {
@@ -2897,12 +2897,12 @@ namespace SongsOfConquestAccess.Adapters
 
                 if (IsPrimaryMapInstruction(row.InputType))
                 {
-                    RemoveExactLine(textLines, row.Text);
+                    TooltipLines.Remove(textLines, row.Text);
                     primary = ClassifyMapInstruction(row.Text);
                 }
                 else if (IsSecondaryMapInstruction(row.InputType))
                 {
-                    RemoveExactLine(textLines, row.Text);
+                    TooltipLines.Remove(textLines, row.Text);
                     secondary = ClassifyMapInstruction(row.Text);
                 }
             }
@@ -2949,7 +2949,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < MapInstructionKinds.Length; i++)
             {
                 TileInstruction kind = MapInstructionKinds[i];
-                string text = Localize("Adventure/TooltipInstruction/" + kind);
+                string text = GameText.Get(_localizationHandler, "Adventure/TooltipInstruction/" + kind, string.Empty);
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     kinds[text.Trim()] = kind;
@@ -2986,22 +2986,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return inputType == InputType.RightMouseClickOrCursorConfirm;
-        }
-
-        private static void RemoveExactLine(List<string> lines, string lineToRemove)
-        {
-            if (lines == null || string.IsNullOrWhiteSpace(lineToRemove))
-            {
-                return;
-            }
-
-            for (int i = lines.Count - 1; i >= 0; i--)
-            {
-                if (string.Equals(lines[i], lineToRemove, StringComparison.Ordinal))
-                {
-                    lines.RemoveAt(i);
-                }
-            }
         }
 
         public void EnsureTileInView(Vector2Int tile)
@@ -3752,7 +3736,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 Id = commander != null ? commander.Id : -1,
                 Raw = commander,
-                Name = GetCommanderName(commander),
+                Name = AdventureMapEntityLabel.GetCommanderName(_facade, commander),
                 IsSelected = ReferenceEquals(commander, selectedCommander),
                 Relationship = FormatSpatialRelationship(GetCommanderRelationship(commander, localTeamId)),
                 IsOwnedByLocalTeam = commander != null && commander.TeamId == localTeamId,
@@ -3896,23 +3880,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string FirstNonEmpty(string preferred, string fallback)
         {
             return string.IsNullOrWhiteSpace(preferred) ? fallback : preferred;
-        }
-
-        private string GetCommanderName(ICommanderState commander)
-        {
-            if (commander == null || _facade == null || _facade.Commanders == null)
-            {
-                return string.Empty;
-            }
-
-            try
-            {
-                return _facade.Commanders.GetName(commander.Id);
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
         }
 
         private static bool ContainsString(List<string> values, string value)
@@ -4115,7 +4082,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 if (preVisitDetails.Hint != MapEntityPreVisitDetails.PreVisitHint.None)
                 {
-                    tile.MapEntityHint = Localize("Adventure/Tooltips/PreVisitHint/" + preVisitDetails.Hint);
+                    tile.MapEntityHint = GameText.Get(_localizationHandler, "Adventure/Tooltips/PreVisitHint/" + preVisitDetails.Hint, string.Empty);
                 }
 
             }
@@ -4128,24 +4095,6 @@ namespace SongsOfConquestAccess.Adapters
         private string GetMapEntityName(IMapEntity entity)
         {
             return AdventureMapEntityLabel.GetMapEntityName(_facade, _selectionHandler, _localizationHandler, entity);
-        }
-
-        private string Localize(string key)
-        {
-            if (string.IsNullOrWhiteSpace(key) || _localizationHandler == null)
-            {
-                return string.Empty;
-            }
-
-            try
-            {
-                string text = _localizationHandler.GetText(key);
-                return string.IsNullOrWhiteSpace(text) || text == key ? string.Empty : text;
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
         }
 
         private enum LayerKind

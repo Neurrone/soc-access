@@ -453,7 +453,7 @@ namespace SongsOfConquestAccess.Adapters
             string disbandLine = GetLocalizedText("Adventure/TroopHUD/DisbandInstruction", "Disband Troop");
             List<string> instructionLines = new List<string> { disbandLine };
             return new Tooltip(
-                () => RemoveExactLines(tooltip.TextLines, instructionLines),
+                () => TooltipLines.Without(tooltip.TextLines, instructionLines),
                 tooltip.VisualMetadata,
                 isLong: () => tooltip.IsLong);
         }
@@ -481,39 +481,6 @@ namespace SongsOfConquestAccess.Adapters
 
             Vector3 position = component != null ? component.transform.position : Vector3.zero;
             return new Vector2(position.x, position.y);
-        }
-
-        private static IReadOnlyList<string> RemoveExactLines(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)
-        {
-            if (lines == null || lines.Count == 0 || linesToRemove == null || linesToRemove.Count == 0)
-            {
-                return lines ?? new string[0];
-            }
-
-            List<string> result = new List<string>();
-            for (int i = 0; i < lines.Count; i++)
-            {
-                string line = lines[i];
-                if (!ContainsExact(linesToRemove, line))
-                {
-                    result.Add(line);
-                }
-            }
-
-            return result;
-        }
-
-        private static bool ContainsExact(IReadOnlyList<string> lines, string candidate)
-        {
-            for (int i = 0; i < lines.Count; i++)
-            {
-                if (string.Equals(lines[i], candidate, StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         public sealed class SlotItem

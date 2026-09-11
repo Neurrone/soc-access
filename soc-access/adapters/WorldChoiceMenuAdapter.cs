@@ -228,7 +228,7 @@ namespace SongsOfConquestAccess.Adapters
                 return artifactName;
             }
 
-            return NormalizeChoiceText(UITextMeshTextUtility.Spoken(button != null ? button.TypeTextMesh : null));
+            return SpokenText.JoinMinusSign(UITextMeshTextUtility.Spoken(button != null ? button.TypeTextMesh : null));
         }
 
         private Tooltip GetChoiceTooltip(IWorldMapChoiceButton button)
@@ -303,16 +303,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
-        }
-
-        private static string NormalizeChoiceText(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            return System.Text.RegularExpressions.Regex.Replace(text, @"-\s+(\d)", "-$1");
         }
 
         /// <summary>One card the menu draws, with everything about it the screen asks for.</summary>

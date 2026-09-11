@@ -554,7 +554,7 @@ namespace SongsOfConquestAccess.Adapters
 
             List<string> instructionLines = GetMouseInstructionLines();
             return new Tooltip(
-                () => RemoveExactLines(tooltip.TextLines, instructionLines),
+                () => TooltipLines.Without(tooltip.TextLines, instructionLines),
                 tooltip.VisualMetadata,
                 isLong: () => tooltip.IsLong);
         }
@@ -578,41 +578,6 @@ namespace SongsOfConquestAccess.Adapters
 
             _mouseInstructionLines = lines;
             return lines;
-        }
-
-        /// <summary>Every line but the ones the game drew for a mouse, matched exactly as the game
-        /// wrote them.</summary>
-        public static IReadOnlyList<string> RemoveExactLines(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)
-        {
-            if (lines == null || lines.Count == 0 || linesToRemove == null || linesToRemove.Count == 0)
-            {
-                return lines ?? new string[0];
-            }
-
-            List<string> result = new List<string>();
-            for (int i = 0; i < lines.Count; i++)
-            {
-                string line = lines[i];
-                if (!ContainsExact(linesToRemove, line))
-                {
-                    result.Add(line);
-                }
-            }
-
-            return result;
-        }
-
-        private static bool ContainsExact(IReadOnlyList<string> lines, string candidate)
-        {
-            for (int i = 0; i < lines.Count; i++)
-            {
-                if (string.Equals(lines[i], candidate, StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private string GetArtifactName(IArtifactState artifact)

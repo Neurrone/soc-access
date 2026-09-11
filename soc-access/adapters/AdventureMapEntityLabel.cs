@@ -266,6 +266,24 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
+        /// <summary>The game's own name for a commander, empty where the game cannot answer.</summary>
+        public static string GetCommanderName(IClientAdventureFacade facade, ICommanderState commander)
+        {
+            if (commander == null || facade == null || facade.Commanders == null)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                return facade.Commanders.GetName(commander.Id);
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
         private static string Localize(ILocalizationHandler localization, string key)
         {
             if (string.IsNullOrWhiteSpace(key) || localization == null)

@@ -877,8 +877,8 @@ namespace SongsOfConquestAccess.Adapters
             ITroopAbilityDefinition ability = current != null && _abilityUtility != null
                 ? _abilityUtility.GetAbilityDefinition(current)
                 : null;
-            string abilityName = ability != null ? SpokenLines.Clean(Localize(ability.NameKey)) : string.Empty;
-            string instruction = SpokenLines.Clean(Localize("Battle/AbilityTargeting/" + targeting));
+            string abilityName = ability != null ? SpokenLines.Clean(GameText.Get(_localization, ability.NameKey, string.Empty)) : string.Empty;
+            string instruction = SpokenLines.Clean(GameText.Get(_localization, "Battle/AbilityTargeting/" + targeting, string.Empty));
             if (!string.IsNullOrWhiteSpace(abilityName) && !string.IsNullOrWhiteSpace(instruction))
             {
                 return abilityName + ": " + instruction;
@@ -1403,7 +1403,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                RemoveExactLine(textLines, row.Text);
+                TooltipLines.Remove(textLines, row.Text);
                 secondary = ClassifyCombatInstruction(row.Text);
             }
 
@@ -1457,7 +1457,7 @@ namespace SongsOfConquestAccess.Adapters
             string key,
             TileInstruction kind)
         {
-            string text = Localize(key);
+            string text = GameText.Get(_localization, key, string.Empty);
             if (!string.IsNullOrWhiteSpace(text))
             {
                 kinds[text.Trim()] = kind;
@@ -1472,22 +1472,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return inputType == InputType.RightMouseClickOrCursorConfirm;
-        }
-
-        private static void RemoveExactLine(List<string> lines, string lineToRemove)
-        {
-            if (lines == null || string.IsNullOrWhiteSpace(lineToRemove))
-            {
-                return;
-            }
-
-            for (int i = lines.Count - 1; i >= 0; i--)
-            {
-                if (string.Equals(lines[i], lineToRemove, StringComparison.Ordinal))
-                {
-                    lines.RemoveAt(i);
-                }
-            }
         }
 
         public void SetFocusedTileOverlay(Vector2Int tile)
@@ -1629,7 +1613,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private void HandleTargetInstruction(ISpellDefinition spell, string instruction)
         {
-            string spellName = spell != null ? SpokenLines.Clean(Localize(spell.NameKey)) : string.Empty;
+            string spellName = spell != null ? SpokenLines.Clean(GameText.Get(_localization, spell.NameKey, string.Empty)) : string.Empty;
             instruction = SpokenLines.Clean(instruction);
             string text = !string.IsNullOrWhiteSpace(spellName) && !string.IsNullOrWhiteSpace(instruction)
                 ? spellName + ": " + instruction
@@ -2925,7 +2909,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string LocalizeText(string key)
         {
-            return Localize(key);
+            return GameText.Get(_localization, key, string.Empty);
         }
 
         private string LocalizeSpellName(SpellTypes spellType)
@@ -2933,7 +2917,7 @@ namespace SongsOfConquestAccess.Adapters
             try
             {
                 ISpellDefinition definition = _spellsLookup != null ? _spellsLookup.GetSpellDefinition(spellType) : null;
-                string name = definition != null ? Localize(definition.NameKey) : string.Empty;
+                string name = definition != null ? GameText.Get(_localization, definition.NameKey, string.Empty) : string.Empty;
                 if (!string.IsNullOrWhiteSpace(name))
                 {
                     return name;
@@ -2951,7 +2935,7 @@ namespace SongsOfConquestAccess.Adapters
             try
             {
                 ITroopAbilityDefinition definition = _abilityUtility != null ? _abilityUtility.GetAbilityDefinition(abilityType) : null;
-                string name = definition != null ? Localize(definition.NameKey) : string.Empty;
+                string name = definition != null ? GameText.Get(_localization, definition.NameKey, string.Empty) : string.Empty;
                 if (!string.IsNullOrWhiteSpace(name))
                 {
                     return name;
@@ -2979,14 +2963,14 @@ namespace SongsOfConquestAccess.Adapters
             string customNameKey;
             if (entity.TryGetCustomNameKey(out customNameKey))
             {
-                string customName = Localize(customNameKey);
+                string customName = GameText.Get(_localization, customNameKey, string.Empty);
                 if (!string.IsNullOrWhiteSpace(customName))
                 {
                     return SpokenLines.Clean(customName);
                 }
             }
 
-            string localizedName = Localize(entity.NameKey);
+            string localizedName = GameText.Get(_localization, entity.NameKey, string.Empty);
             if (!string.IsNullOrWhiteSpace(localizedName))
             {
                 return SpokenLines.Clean(localizedName);
@@ -3003,24 +2987,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsDebris(IMapEntity entity)
         {
             return entity != null && (entity.BlueprintId == 24 || entity.BlueprintId == 25);
-        }
-
-        private string Localize(string key)
-        {
-            if (string.IsNullOrWhiteSpace(key) || _localization == null)
-            {
-                return string.Empty;
-            }
-
-            try
-            {
-                string text = _localization.GetText(key);
-                return string.IsNullOrWhiteSpace(text) || text == key ? string.Empty : text;
-            }
-            catch
-            {
-                return string.Empty;
-            }
         }
 
         private IDetails BuildEntityDetails(IMapEntity entity)

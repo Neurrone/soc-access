@@ -169,7 +169,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < pool.ActiveItems.Count; i++)
             {
                 IWorldMenuIconTextEntry entry = pool.ActiveItems[i];
-                string amount = NormalizeCostText(UITextMeshTextUtility.Spoken(entry != null ? entry.TypeTextMesh : null));
+                string amount = SpokenText.JoinMinusSign(UITextMeshTextUtility.Spoken(entry != null ? entry.TypeTextMesh : null));
                 if (!string.IsNullOrWhiteSpace(amount))
                 {
                     labels.Add(WithResourceName(entry, amount));
@@ -192,7 +192,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             string name = GetResourceName(type, ParseAmount(amount));
-            return string.IsNullOrWhiteSpace(name) ? amount : NormalizeCostText(amount + " " + name);
+            return string.IsNullOrWhiteSpace(name) ? amount : SpokenText.JoinMinusSign(SpokenLines.Clean(amount + " " + name));
         }
 
         /// <summary>Which resource each drawn icon stands for. <c>WorldConfirmMenu.Setup</c> gives the
@@ -254,19 +254,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetButtonText(UIButton button)
         {
             return MenuButtonTextUtility.GetStandardButtonLabel(button);
-        }
-
-        private static string NormalizeCostText(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            return System.Text.RegularExpressions.Regex.Replace(
-                SpokenLines.Clean(text),
-                @"-\s+(\d)",
-                "-$1");
         }
     }
 }
