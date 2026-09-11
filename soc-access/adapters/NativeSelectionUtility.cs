@@ -35,19 +35,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            Component component = button as Component;
-            IPointerClickHandler clickHandler = component as IPointerClickHandler;
-            if (clickHandler != null)
-            {
-                PointerEventData eventData = new PointerEventData(EventSystem.current)
-                {
-                    button = PointerEventData.InputButton.Left
-                };
-                clickHandler.OnPointerClick(eventData);
-                return true;
-            }
-
-            return false;
+            return PointerClick(button as Component);
         }
 
         /// <summary>The button's RIGHT click, raised the way the game's own pointer handler raises it:
