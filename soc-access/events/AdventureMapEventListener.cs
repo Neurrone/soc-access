@@ -42,7 +42,11 @@ namespace SongsOfConquestAccess.Events
         private readonly HashSet<int> _discoveredMapEntityIds = new HashSet<int>();
         private readonly Dictionary<int, string> _discoveredMapEntityLabelsById = new Dictionary<int, string>();
         private readonly HashSet<int> _knownLocalCommanderIds = new HashSet<int>();
-        private byte[] _lastExploration;
+        private readonly HashSet<int> _seenNonLocalCommanderIds = new HashSet<int>();
+        private readonly List<int> _staleNonLocalCommanderIds = new List<int>();
+        private int _lastExplorationLength = -1;
+        private long _lastDiscoverySweepKey;
+        private bool _hasDiscoverySweepKey;
         private bool _attached;
 
         public AdventureMapEventListener(
@@ -183,7 +187,8 @@ namespace SongsOfConquestAccess.Events
             }
 
             ClearPendingDiscoveries();
-            _lastExploration = null;
+            _lastExplorationLength = -1;
+            _hasDiscoverySweepKey = false;
             _lastVisibleNonLocalCommanders.Clear();
             _announcedVisibleNonLocalCommanders.Clear();
             _discoveredMapEntityIds.Clear();
@@ -426,24 +431,14 @@ namespace SongsOfConquestAccess.Events
         private void HandleFogUpdated()
         {
             RaiseMapChanged();
-            byte[] currentExploration = GetLocalExplorationSnapshot();
-            if (currentExploration == null || currentExploration.Length == 0)
+            int explorationLength = GetLocalExplorationLength();
+            if (explorationLength <= 0 || _lastExplorationLength != explorationLength)
             {
-                _lastExploration = currentExploration;
+                _lastExplorationLength = explorationLength;
                 RefreshMapEntityDiscoveryBaseline();
                 RefreshNonLocalCommanderVisibilityBaseline();
                 return;
             }
-
-            if (_lastExploration == null || _lastExploration.Length != currentExploration.Length)
-            {
-                _lastExploration = currentExploration;
-                RefreshMapEntityDiscoveryBaseline();
-                RefreshNonLocalCommanderVisibilityBaseline();
-                return;
-            }
-
-            _lastExploration = currentExploration;
 
             bool added = AddKnownMapEntityDiscoveries();
             added = RefreshNonLocalCommanderVisibility(announceTransitions: true) || added;
@@ -455,7 +450,7 @@ namespace SongsOfConquestAccess.Events
 
         private void CaptureDiscoveryBaseline()
         {
-            _lastExploration = GetLocalExplorationSnapshot();
+            _lastExplorationLength = GetLocalExplorationLength();
             RefreshMapEntityDiscoveryBaseline();
             RefreshNonLocalCommanderVisibilityBaseline();
         }
@@ -488,12 +483,30 @@ namespace SongsOfConquestAccess.Events
             }
         }
 
+        /// <summary>
+        /// Walks every map entity looking for newly identifiable ones. The fog manager raises
+        /// onFogUpdated every frame while a fog actor is moving, so the walk is gated on a key read
+        /// from the game each call: how much of the map is explored, where every commander stands,
+        /// and which commander is selected. Those are the sweep's inputs - a tile becomes known when
+        /// it is explored, and an entity's label comes from the scouting detail level, which the
+        /// game computes from the local partnership's commander positions. They change once per tile
+        /// step where the fog event fires once per frame.
+        /// </summary>
         private bool AddKnownMapEntityDiscoveries()
         {
             if (_facade == null || _facade.MapEntities == null)
             {
                 return false;
             }
+
+            long sweepKey = GetDiscoverySweepKey();
+            if (_hasDiscoverySweepKey && sweepKey == _lastDiscoverySweepKey)
+            {
+                return false;
+            }
+
+            _lastDiscoverySweepKey = sweepKey;
+            _hasDiscoverySweepKey = true;
 
             IEnumerable<IMapEntity> entities = _facade.MapEntities.All;
             if (entities == null)
@@ -554,6 +567,60 @@ namespace SongsOfConquestAccess.Events
                 AdventureMapRevealedKind.MapEntity);
         }
 
+        private long GetDiscoverySweepKey()
+        {
+            long key = 17;
+            key = Mix(key, GetLocalTeamId());
+
+            byte[] exploration = GetLocalExploration();
+            key = Mix(key, exploration == null ? -1 : exploration.Length);
+            int exploredCount = 0;
+            if (exploration != null)
+            {
+                for (int i = 0; i < exploration.Length; i++)
+                {
+                    if (exploration[i] != 0)
+                    {
+                        exploredCount++;
+                    }
+                }
+            }
+
+            key = Mix(key, exploredCount);
+
+            ICommanderState selected = _selectionHandler != null ? _selectionHandler.SelectedCommander : null;
+            key = Mix(key, selected != null ? selected.Id : -1);
+
+            IEnumerable<ICommanderState> commanders = _facade != null && _facade.Commanders != null
+                ? _facade.Commanders.All
+                : null;
+            if (commanders != null)
+            {
+                foreach (ICommanderState commander in commanders)
+                {
+                    if (commander == null)
+                    {
+                        continue;
+                    }
+
+                    key = Mix(key, commander.Id);
+                    key = Mix(key, commander.Position.x);
+                    key = Mix(key, commander.Position.y);
+                    key = Mix(key, commander.IsAlive ? 1 : 0);
+                }
+            }
+
+            return key;
+        }
+
+        private static long Mix(long key, int value)
+        {
+            unchecked
+            {
+                return (key * 1099511628211L) ^ value;
+            }
+        }
+
         private bool ShouldConsiderMapEntityDiscovery(IMapEntity entity)
         {
             return entity != null
@@ -586,7 +653,8 @@ namespace SongsOfConquestAccess.Events
                 return false;
             }
 
-            HashSet<int> seen = new HashSet<int>();
+            HashSet<int> seen = _seenNonLocalCommanderIds;
+            seen.Clear();
             bool added = false;
             foreach (ICommanderState commander in commanders)
             {
@@ -670,7 +738,8 @@ namespace SongsOfConquestAccess.Events
 
         private void RemoveStaleCommanderVisibility(HashSet<int> seen)
         {
-            List<int> stale = new List<int>();
+            List<int> stale = _staleNonLocalCommanderIds;
+            stale.Clear();
             foreach (int commanderId in _lastVisibleNonLocalCommanders.Keys)
             {
                 if (seen == null || !seen.Contains(commanderId))
@@ -1107,7 +1176,17 @@ namespace SongsOfConquestAccess.Events
             }
         }
 
-        private byte[] GetLocalExplorationSnapshot()
+        /// <summary>
+        /// The length of the local team's exploration array, or -1 when the game has none. Only the
+        /// length was ever compared against the previous update, so the array is read, never copied.
+        /// </summary>
+        private int GetLocalExplorationLength()
+        {
+            byte[] exploration = GetLocalExploration();
+            return exploration == null ? -1 : exploration.Length;
+        }
+
+        private byte[] GetLocalExploration()
         {
             int localTeamId = GetLocalTeamId();
             if (localTeamId < 0 || _facade == null || _facade.Level == null)
@@ -1115,15 +1194,7 @@ namespace SongsOfConquestAccess.Events
                 return null;
             }
 
-            byte[] exploration = _facade.Level.GetExplorationForTeam(localTeamId);
-            if (exploration == null)
-            {
-                return null;
-            }
-
-            byte[] copy = new byte[exploration.Length];
-            Array.Copy(exploration, copy, exploration.Length);
-            return copy;
+            return _facade.Level.GetExplorationForTeam(localTeamId);
         }
 
         private int GetLocalTeamId()
