@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate;
@@ -172,8 +173,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return fogManager != null && fogManager.GetFog(tile.x, tile.y) != 0;
             }
-            catch
+            catch (Exception exception)
             {
+                LogOnce.Warn("AdventureMapVisibility: reading whether a tile is known", exception);
                 return false;
             }
         }
@@ -184,8 +186,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return fogManager != null && fogManager.GetFog(tile.x, tile.y) == byte.MaxValue;
             }
-            catch
+            catch (Exception exception)
             {
+                LogOnce.Warn("AdventureMapVisibility: reading whether a tile is actively visible", exception);
                 return false;
             }
         }
@@ -207,8 +210,9 @@ namespace SongsOfConquestAccess.Adapters
                     && tileEntity.Id == entity.Id
                     && tileEntity.CanHover();
             }
-            catch
+            catch (Exception exception)
             {
+                LogOnce.Warn("AdventureMapVisibility: reading whether a tile is a map entity's identity tile", exception);
                 return false;
             }
         }

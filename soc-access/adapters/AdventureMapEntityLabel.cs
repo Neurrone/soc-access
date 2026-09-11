@@ -95,7 +95,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapEntityLabel failed to read map entity pre-visit label: " + exception.Message);
+                LogOnce.Warn("AdventureMapEntityLabel: reading a map entity's pre-visit label", exception);
                 return false;
             }
         }
@@ -132,7 +132,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapEntityLabel failed to read map entity interaction type: " + exception.Message);
+                LogOnce.Warn("AdventureMapEntityLabel: reading a map entity's interaction type", exception);
                 return false;
             }
         }
@@ -155,8 +155,9 @@ namespace SongsOfConquestAccess.Adapters
                     scoutingPosition = centerPoint;
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                LogOnce.Warn("AdventureMapEntityLabel: reading a map entity's centre point", exception);
             }
 
             ITeamState localTeam = facade.Teams.LocalTeamInControl;
@@ -170,8 +171,9 @@ namespace SongsOfConquestAccess.Adapters
                 var scouting = facade.CalculateScoutingDetailLevel(scoutingPosition, localTeam);
                 return new ScoutingInfo(scouting.Item1, scouting.Item2);
             }
-            catch
+            catch (Exception exception)
             {
+                LogOnce.Warn("AdventureMapEntityLabel: reading a tile's scouting detail level", exception);
                 return new ScoutingInfo(ScoutingDetailLevel.VeryFar, null);
             }
         }
@@ -278,8 +280,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return facade.Commanders.GetName(commander.Id);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                LogOnce.Warn("AdventureMapEntityLabel: reading a commander's name", exception);
                 return string.Empty;
             }
         }
@@ -295,8 +298,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return localization.GetText(key);
             }
-            catch
+            catch (Exception exception)
             {
+                LogOnce.Warn("AdventureMapEntityLabel: reading a localized string", exception);
                 return string.Empty;
             }
         }
@@ -347,7 +351,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureMapEntityLabel failed to read essence variant: " + exception.Message);
+                LogOnce.Warn("AdventureMapEntityLabel: reading a map entity's essence variant", exception);
                 return false;
             }
         }

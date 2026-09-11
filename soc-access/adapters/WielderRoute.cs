@@ -306,8 +306,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return fogManager.GetFog(position.x, position.y) == byte.MaxValue;
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                LogOnce.Warn("WielderRoute: reading the fog over a route tile", exception);
                 return false;
             }
         }

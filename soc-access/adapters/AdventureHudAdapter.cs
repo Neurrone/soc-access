@@ -149,6 +149,8 @@ namespace SongsOfConquestAccess.Adapters
         private bool _teamQueueHudProbed;
         private UIButton _optionsButton;
         private bool _optionsButtonProbed;
+        // What LogFailureOnce has already said, so it says each thing once.
+        private readonly HashSet<string> _loggedFailures = new HashSet<string>(StringComparer.Ordinal);
         // The canvas group each HUD container carries, resolved once. See HudGroupVisible.
         private readonly Dictionary<GameObject, CanvasGroup> _canvasGroups = new Dictionary<GameObject, CanvasGroup>();
         private List<ObjectiveEntrySnapshot> _objectiveSnapshots;
@@ -976,7 +978,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception ex)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureHudAdapter could not refresh the end-turn tooltip: " + ex.Message);
+                LogFailureOnce("refreshing the end-turn tooltip", ex);
             }
         }
 
@@ -1385,8 +1387,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return Facade.Commanders.GetTotalEssenceIncome(commander.Id, essenceType);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                LogFailureOnce("reading a wielder's essence income", exception);
                 return 0;
             }
         }
@@ -1568,7 +1571,7 @@ namespace SongsOfConquestAccess.Adapters
             return result;
         }
 
-        private static UITextMesh GetObjectiveEntryText(IObjectivesHUDEntry entry)
+        private UITextMesh GetObjectiveEntryText(IObjectivesHUDEntry entry)
         {
             if (entry == null || ObjectivesHudEntrySettingsField == null || ObjectivesHudEntryObjectiveTextField == null)
             {
@@ -1580,8 +1583,9 @@ namespace SongsOfConquestAccess.Adapters
                 object settings = ObjectivesHudEntrySettingsField.GetValue(entry);
                 return settings != null ? ObjectivesHudEntryObjectiveTextField.GetValue(settings) as UITextMesh : null;
             }
-            catch
+            catch (Exception exception)
             {
+                LogFailureOnce("reading an objective row's text mesh", exception);
                 return null;
             }
         }
@@ -1673,7 +1677,7 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
         }
 
-        private static Selectable GetWielderListSelectable(WielderListHUDEntry entry)
+        private Selectable GetWielderListSelectable(WielderListHUDEntry entry)
         {
             if (entry == null)
             {
@@ -1686,8 +1690,9 @@ namespace SongsOfConquestAccess.Adapters
                     ? entry.GetAliveSelectable()
                     : entry.GetDeadSelectable();
             }
-            catch
+            catch (Exception exception)
             {
+                LogFailureOnce("reading a wielder row's selectable", exception);
                 return null;
             }
         }
@@ -1699,7 +1704,7 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
         }
 
-        private static void RefreshWielderListEntryTooltip(WielderListHUDEntry entry)
+        private void RefreshWielderListEntryTooltip(WielderListHUDEntry entry)
         {
             if (entry == null || entry.Commander == null || WielderListEntryRefreshTooltipMethod == null)
             {
@@ -1712,7 +1717,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessMod.Instance?.LogWarning("AdventureHudAdapter failed to refresh wielder list tooltip: " + exception.Message);
+                LogFailureOnce("refreshing a wielder row's tooltip", exception);
             }
         }
 
@@ -1826,6 +1831,20 @@ namespace SongsOfConquestAccess.Adapters
             return GameObjects.IsGroupVisible(container, canvasGroup);
         }
 
+        /// <summary>A guarded game call that threw, reported once per adapter instance and per
+        /// subject; the map's build asks most of these on every frame, so a warning per failure would
+        /// bury the log. Per adapter, so it needs no reset: the adapter dies with the adventure.
+        /// </summary>
+        private void LogFailureOnce(string subject, Exception exception)
+        {
+            if (!_loggedFailures.Add(subject))
+            {
+                return;
+            }
+
+            SocAccessMod.Instance?.LogWarning("AdventureHudAdapter: " + subject + " threw: " + exception);
+        }
+
         private T Resolve<T>() where T : class
         {
             return Reflect.Resolve<T>(Container);
@@ -1861,7 +1880,7 @@ namespace SongsOfConquestAccess.Adapters
                 && source.gameObject.scene == component.gameObject.scene;
         }
 
-        private static void InvokeNoArgs(object instance, MethodInfo method)
+        private void InvokeNoArgs(object instance, MethodInfo method)
         {
             if (instance == null || method == null)
             {
@@ -1872,8 +1891,9 @@ namespace SongsOfConquestAccess.Adapters
             {
                 method.Invoke(instance, null);
             }
-            catch
+            catch (Exception exception)
             {
+                LogFailureOnce("invoking " + method.Name + " on the objectives panel", exception);
             }
         }
 
