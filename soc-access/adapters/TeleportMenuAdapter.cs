@@ -28,6 +28,9 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo CurrentAsyncField = AccessTools.Field(typeof(TeleportMenu), "_currentAsync");
 
         private readonly TeleportMenu _menu;
+        // The instruction mesh, found once per menu instance. See ReadInstructionText.
+        private UITextMesh _instructionText;
+        private bool _instructionTextProbed;
 
         public TeleportMenuAdapter(TeleportMenu menu)
         {
@@ -62,7 +65,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string InstructionText
         {
-            get { return FindInstructionText(); }
+            get { return ReadInstructionText(); }
         }
 
         public string PreviousLabel
@@ -163,12 +166,36 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Click(GetCancelButton());
         }
 
-        private string FindInstructionText()
+        /// <summary>
+        /// The menu's instruction line, read off the mesh the prefab carries it on.
+        ///
+        /// Finding that mesh means walking the whole menu subtree and ruling out the header, the
+        /// gamepad hints and the four button labels, and the map's build asks for this on every
+        /// frame the teleport menu is open. The walk is done ONCE per menu instance instead, the
+        /// miss included: the mesh is a fixed serialized label on the prefab - <c>TeleportMenu.Show</c>
+        /// writes the header and the gamepad texts and never this one - and Show activates the
+        /// container last, so by the time anything asks the subtree is complete. The text itself is
+        /// still read off the mesh live.
+        /// </summary>
+        private string ReadInstructionText()
+        {
+            if (!_instructionTextProbed)
+            {
+                _instructionTextProbed = true;
+                _instructionText = FindInstructionMesh();
+            }
+
+            return _instructionText != null
+                ? UITextMeshTextUtility.GetEffectiveText(_instructionText).Trim()
+                : string.Empty;
+        }
+
+        private UITextMesh FindInstructionMesh()
         {
             GameObject container = GetContainer();
             if (container == null)
             {
-                return string.Empty;
+                return null;
             }
 
             UITextMesh header = GetTextMesh(HeaderTextField);
@@ -208,11 +235,11 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                return value;
+                return text;
             }
 
             SocAccessMod.Instance?.LogWarning("TeleportMenuAdapter could not discover teleport instruction text from native UI");
-            return string.Empty;
+            return null;
         }
 
         private GameObject GetContainer()
