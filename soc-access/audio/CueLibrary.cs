@@ -253,6 +253,12 @@ namespace SongsOfConquestAccess.Audio
             return GetEffectiveSpec(key, ModSettings.GetCueDurationScale(key));
         }
 
+        /// <summary>
+        /// At the default scale the shared default spec is returned as it is: every cue play would
+        /// otherwise clone the spec and each of its segments. Nothing mutates what this returns -
+        /// the renderer and the clip cache only read it - so the shared instance is safe. A caller
+        /// that wants to edit a spec must clone it.
+        /// </summary>
         public static CueSpec GetEffectiveSpec(string key, int durationScale)
         {
             CueDefinition definition = GetCue(key);
@@ -261,13 +267,13 @@ namespace SongsOfConquestAccess.Audio
                 return null;
             }
 
-            CueSpec spec = definition.DefaultSpec.Clone();
             float scale = durationScale / 100f;
             if (scale <= 0f || scale == 1f)
             {
-                return spec;
+                return definition.DefaultSpec;
             }
 
+            CueSpec spec = definition.DefaultSpec.Clone();
             for (int i = 0; i < spec.Segments.Count; i++)
             {
                 CueSegment segment = spec.Segments[i];
