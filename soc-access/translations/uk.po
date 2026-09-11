@@ -3886,3 +3886,8 @@ msgstr "Вкладка {0}"
 msgctxt "Screens.CodexCategoryNumber"
 msgid "Category {0}"
 msgstr "Категорія {0}"
+
+#. UI.RankNumber
+msgctxt "UI.RankNumber"
+msgid "#{0}"
+msgstr "№ {0}"

@@ -3856,3 +3856,8 @@ msgstr "Scheda {0}"
 msgctxt "Screens.CodexCategoryNumber"
 msgid "Category {0}"
 msgstr "Categoria {0}"
+
+#. UI.RankNumber
+msgctxt "UI.RankNumber"
+msgid "#{0}"
+msgstr "n. {0}"

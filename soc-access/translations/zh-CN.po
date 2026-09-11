@@ -3826,3 +3826,8 @@ msgstr "标签页 {0}"
 msgctxt "Screens.CodexCategoryNumber"
 msgid "Category {0}"
 msgstr "分类 {0}"
+
+#. UI.RankNumber
+msgctxt "UI.RankNumber"
+msgid "#{0}"
+msgstr "第{0}名"

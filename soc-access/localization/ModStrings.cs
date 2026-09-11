@@ -528,6 +528,7 @@
             public static readonly ModString TroopWithSize = new ModString("UI.TroopWithSize", "{0}, {1} / {2}");
             public static readonly ModString Unselected = new ModString("UI.Unselected", "unselected");
             public static readonly ModString ModReady = new ModString("UI.ModReady", "Songs of Conquest Access v{0} ready");
+            public static readonly ModString RankNumber = new ModString("UI.RankNumber", "#{0}");
         }
 
         public static class Screens

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -153,12 +153,14 @@ namespace SongsOfConquestAccess.Adapters
                 && GetBattleMenu() != null;
         }
 
+        /// <summary>The page's two tabs, each with whatever the game drew on it - empty where the
+        /// page names it nowhere the mod can read, which the screen words.</summary>
         public IReadOnlyList<TabItem> GetTabs()
         {
             return new[]
             {
-                new TabItem("player-stats-tab-overall", OverallTabIndex, FindTabLabel(OverallTabIndex, ModText.Get(ModStrings.Screens.PlayerStatsOverall))),
-                new TabItem("player-stats-tab-battle", BattleTabIndex, FindTabLabel(BattleTabIndex, ModText.Get(ModStrings.Screens.PlayerStatsBattle)))
+                new TabItem("player-stats-tab-overall", OverallTabIndex, true, FindTabLabel(OverallTabIndex)),
+                new TabItem("player-stats-tab-battle", BattleTabIndex, false, FindTabLabel(BattleTabIndex))
             };
         }
 
@@ -182,26 +184,26 @@ namespace SongsOfConquestAccess.Adapters
         {
             PlayerStatsOverallMenu menu = GetOverallMenu();
             List<LabeledItem> items = new List<LabeledItem>();
-            AddLabelValueItem(items, "games-played", GetTextField(menu, OverallGamesPlayedField));
-            AddLabelValueItem(items, "games-won", GetTextField(menu, OverallGamesWonField));
-            AddLabelValueItem(items, "games-lost", GetTextField(menu, OverallGamesLostField));
-            AddFullTextItem(items, "hours-played", GetTextField(menu, OverallHoursPlayedField));
-            AddFullTextItem(items, "adventure-turns-played", GetTextField(menu, OverallAdventureTurnsPlayedField));
-            AddFullTextItem(items, "owned-artifacts", GetTextField(menu, OverallArtifactsField));
-            AddFullTextItem(items, "online-games", GetTextField(menu, OverallAdventureTurnsOnlinePlayedField));
+            AddLabelValueItem(items, "games-played", Reflect.Get<UITextMesh>(menu, OverallGamesPlayedField));
+            AddLabelValueItem(items, "games-won", Reflect.Get<UITextMesh>(menu, OverallGamesWonField));
+            AddLabelValueItem(items, "games-lost", Reflect.Get<UITextMesh>(menu, OverallGamesLostField));
+            AddFullTextItem(items, "hours-played", Reflect.Get<UITextMesh>(menu, OverallHoursPlayedField));
+            AddFullTextItem(items, "adventure-turns-played", Reflect.Get<UITextMesh>(menu, OverallAdventureTurnsPlayedField));
+            AddFullTextItem(items, "owned-artifacts", Reflect.Get<UITextMesh>(menu, OverallArtifactsField));
+            AddFullTextItem(items, "online-games", Reflect.Get<UITextMesh>(menu, OverallAdventureTurnsOnlinePlayedField));
             return items.ToArray();
         }
 
         public IReadOnlyList<TableRowItem> GetFactionRows()
         {
             PlayerStatsFactionEntry[] entries = Reflect.Get<PlayerStatsFactionEntry[]>(GetOverallMenu(), OverallFactionEntriesField);
-            List<TableRowItem> rows = new List<TableRowItem>();
-            if (entries == null)
-            {
-                return rows;
-            }
+            return _factionRows.Get(entries, () => ReadFactionRows(entries));
+        }
 
-            for (int i = 0; i < entries.Length; i++)
+        private IReadOnlyList<TableRowItem> ReadFactionRows(PlayerStatsFactionEntry[] entries)
+        {
+            List<TableRowItem> rows = new List<TableRowItem>();
+            for (int i = 0; entries != null && i < entries.Length; i++)
             {
                 PlayerStatsFactionEntry entry = entries[i];
                 if (!GameObjects.IsLive(entry))
@@ -209,23 +211,14 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string faction = GetText(Reflect.Get<UITextMesh>(entry, FactionTextField));
-                string percent = GetText(Reflect.Get<UITextMesh>(entry, FactionPercentTextField));
-                if (string.IsNullOrWhiteSpace(faction) && string.IsNullOrWhiteSpace(percent))
+                UITextMesh faction = Reflect.Get<UITextMesh>(entry, FactionTextField);
+                UITextMesh percent = Reflect.Get<UITextMesh>(entry, FactionPercentTextField);
+                if (string.IsNullOrWhiteSpace(GetText(faction)) && string.IsNullOrWhiteSpace(GetText(percent)))
                 {
                     continue;
                 }
 
-                rows.Add(new TableRowItem(
-                    "faction-" + i,
-                    faction,
-                    GetRectTransform(entry),
-                    new Dictionary<string, string>
-                    {
-                        { "rank", "#" + (i + 1) },
-                        { "faction", faction },
-                        { "play-distribution", percent }
-                    }));
+                rows.Add(new TableRowItem("faction-" + i, i, GetRectTransform(entry), faction, percent));
             }
 
             return rows.ToArray();
@@ -234,13 +227,13 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<TableRowItem> GetMapRows()
         {
             PlayerStatsMapEntry[] entries = Reflect.Get<PlayerStatsMapEntry[]>(GetOverallMenu(), OverallTopMapsField);
-            List<TableRowItem> rows = new List<TableRowItem>();
-            if (entries == null)
-            {
-                return rows;
-            }
+            return _mapRows.Get(entries, () => ReadMapRows(entries));
+        }
 
-            for (int i = 0; i < entries.Length; i++)
+        private IReadOnlyList<TableRowItem> ReadMapRows(PlayerStatsMapEntry[] entries)
+        {
+            List<TableRowItem> rows = new List<TableRowItem>();
+            for (int i = 0; entries != null && i < entries.Length; i++)
             {
                 PlayerStatsMapEntry entry = entries[i];
                 if (!GameObjects.IsLive(entry))
@@ -248,25 +241,17 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string map = GetText(Reflect.Get<UITextMesh>(entry, MapNameTextField));
-                string details = GetText(Reflect.Get<UITextMesh>(entry, MapDetailsTextField));
-                string games = GetText(Reflect.Get<UITextMesh>(entry, MapTimesPlayedTextField));
-                if (string.IsNullOrWhiteSpace(map) && string.IsNullOrWhiteSpace(details) && string.IsNullOrWhiteSpace(games))
+                UITextMesh map = Reflect.Get<UITextMesh>(entry, MapNameTextField);
+                UITextMesh details = Reflect.Get<UITextMesh>(entry, MapDetailsTextField);
+                UITextMesh games = Reflect.Get<UITextMesh>(entry, MapTimesPlayedTextField);
+                if (string.IsNullOrWhiteSpace(GetText(map))
+                    && string.IsNullOrWhiteSpace(GetText(details))
+                    && string.IsNullOrWhiteSpace(GetText(games)))
                 {
                     continue;
                 }
 
-                rows.Add(new TableRowItem(
-                    "map-" + i,
-                    map,
-                    GetRectTransform(entry),
-                    new Dictionary<string, string>
-                    {
-                        { "rank", "#" + (i + 1) },
-                        { "map", map },
-                        { "details", details },
-                        { "games", games }
-                    }));
+                rows.Add(new TableRowItem("map-" + i, i, GetRectTransform(entry), map, details, games));
             }
 
             return rows.ToArray();
@@ -275,13 +260,13 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<TableRowItem> GetWielderRows()
         {
             PlayerStatsWielderEntry[] entries = Reflect.Get<PlayerStatsWielderEntry[]>(GetOverallMenu(), OverallTopWieldersField);
-            List<TableRowItem> rows = new List<TableRowItem>();
-            if (entries == null)
-            {
-                return rows;
-            }
+            return _wielderRows.Get(entries, () => ReadWielderRows(entries));
+        }
 
-            for (int i = 0; i < entries.Length; i++)
+        private IReadOnlyList<TableRowItem> ReadWielderRows(PlayerStatsWielderEntry[] entries)
+        {
+            List<TableRowItem> rows = new List<TableRowItem>();
+            for (int i = 0; entries != null && i < entries.Length; i++)
             {
                 PlayerStatsWielderEntry entry = entries[i];
                 if (!GameObjects.IsLive(entry))
@@ -289,20 +274,13 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string wielder = GetText(Reflect.Get<UITextMesh>(entry, WielderNameField));
-                string faction = GetText(Reflect.Get<UITextMesh>(entry, WielderFactionNameField));
-                string amount = GetText(Reflect.Get<UITextMesh>(entry, WielderTimesPlayedField));
                 rows.Add(new TableRowItem(
                     "wielder-" + i,
-                    wielder,
+                    i,
                     GetRectTransform(entry),
-                    new Dictionary<string, string>
-                    {
-                        { "rank", "#" + (i + 1) },
-                        { "wielder", wielder },
-                        { "faction", faction },
-                        { "times-recruited", amount }
-                    }));
+                    Reflect.Get<UITextMesh>(entry, WielderNameField),
+                    Reflect.Get<UITextMesh>(entry, WielderFactionNameField),
+                    Reflect.Get<UITextMesh>(entry, WielderTimesPlayedField)));
             }
 
             return rows.ToArray();
@@ -313,21 +291,21 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 return JoinLines(
-                    GetText(GetTextField(GetOverallMenu(), OverallWielderMaxLevelField)),
-                    GetText(GetTextField(GetOverallMenu(), OverallPlayedWieldersField)),
+                    GetText(Reflect.Get<UITextMesh>(GetOverallMenu(), OverallWielderMaxLevelField)),
+                    GetText(Reflect.Get<UITextMesh>(GetOverallMenu(), OverallPlayedWieldersField)),
                     FindVisibleTextStartingWith(GetOverallMenu(), "*"));
             }
         }
 
         public RectTransform WielderSummaryTransform
         {
-            get { return GetRectTransform(GetTextField(GetOverallMenu(), OverallWielderMaxLevelField)); }
+            get { return GetRectTransform(Reflect.Get<UITextMesh>(GetOverallMenu(), OverallWielderMaxLevelField)); }
         }
 
         public IReadOnlyList<TableRowItem> GetTroopRows()
         {
             PlayerStatsTroopEntry[] entries = Reflect.Get<PlayerStatsTroopEntry[]>(GetOverallMenu(), OverallTopTroopsField);
-            return GetTroopRows(entries, "troop", "times-trained");
+            return _troopRows.Get(entries, () => ReadTroopRows(entries, "troop"));
         }
 
         public string TroopSummary
@@ -335,46 +313,46 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 return JoinLines(
-                    GetText(GetTextField(GetOverallMenu(), OverallTotalUnitsField)),
-                    GetText(GetTextField(GetOverallMenu(), OverallUniqueUnitsField)),
+                    GetText(Reflect.Get<UITextMesh>(GetOverallMenu(), OverallTotalUnitsField)),
+                    GetText(Reflect.Get<UITextMesh>(GetOverallMenu(), OverallUniqueUnitsField)),
                     FindVisibleTextStartingWith(GetOverallMenu(), "**"));
             }
         }
 
         public RectTransform TroopSummaryTransform
         {
-            get { return GetRectTransform(GetTextField(GetOverallMenu(), OverallTotalUnitsField)); }
+            get { return GetRectTransform(Reflect.Get<UITextMesh>(GetOverallMenu(), OverallTotalUnitsField)); }
         }
 
         public IReadOnlyList<LabeledItem> GetBattleGeneralItems()
         {
             PlayerStatsBattleMenu menu = GetBattleMenu();
             List<LabeledItem> items = new List<LabeledItem>();
-            AddLabelValueItem(items, "battles-played", GetTextField(menu, BattleBattlesPlayedField));
-            AddLabelValueItem(items, "battles-won", GetTextField(menu, BattleBattlesWonField));
-            AddLabelValueItem(items, "battles-lost", GetTextField(menu, BattleBattlesLostField));
-            AddLabelValueItem(items, "manual-battles", GetTextField(menu, BattleManualBattlesField));
-            AddLabelValueItem(items, "quick-battles", GetTextField(menu, BattleQuickBattlesField));
-            AddLabelValueItem(items, "battle-rounds-played", GetTextField(menu, BattleRoundsPlayedField));
-            AddLabelValueItem(items, "enemy-units-killed", GetTextField(menu, BattleEnemyUnitsKilledField));
-            AddLabelValueItem(items, "units-lost", GetTextField(menu, BattleUnitsLostField));
-            AddLabelValueItem(items, "total-damage", GetTextField(menu, BattleTotalDamageField));
-            AddLabelValueItem(items, "ranged-damage", GetTextField(menu, BattleRangedDamageField));
-            AddLabelValueItem(items, "melee-damage", GetTextField(menu, BattleMeleeDamageField));
-            AddLabelValueItem(items, "spells-damage", GetTextField(menu, BattleSpellsDamageField));
+            AddLabelValueItem(items, "battles-played", Reflect.Get<UITextMesh>(menu, BattleBattlesPlayedField));
+            AddLabelValueItem(items, "battles-won", Reflect.Get<UITextMesh>(menu, BattleBattlesWonField));
+            AddLabelValueItem(items, "battles-lost", Reflect.Get<UITextMesh>(menu, BattleBattlesLostField));
+            AddLabelValueItem(items, "manual-battles", Reflect.Get<UITextMesh>(menu, BattleManualBattlesField));
+            AddLabelValueItem(items, "quick-battles", Reflect.Get<UITextMesh>(menu, BattleQuickBattlesField));
+            AddLabelValueItem(items, "battle-rounds-played", Reflect.Get<UITextMesh>(menu, BattleRoundsPlayedField));
+            AddLabelValueItem(items, "enemy-units-killed", Reflect.Get<UITextMesh>(menu, BattleEnemyUnitsKilledField));
+            AddLabelValueItem(items, "units-lost", Reflect.Get<UITextMesh>(menu, BattleUnitsLostField));
+            AddLabelValueItem(items, "total-damage", Reflect.Get<UITextMesh>(menu, BattleTotalDamageField));
+            AddLabelValueItem(items, "ranged-damage", Reflect.Get<UITextMesh>(menu, BattleRangedDamageField));
+            AddLabelValueItem(items, "melee-damage", Reflect.Get<UITextMesh>(menu, BattleMeleeDamageField));
+            AddLabelValueItem(items, "spells-damage", Reflect.Get<UITextMesh>(menu, BattleSpellsDamageField));
             return items.ToArray();
         }
 
         public IReadOnlyList<TableRowItem> GetSpellRows()
         {
             List<PlayerStatsSpellEntry> entries = Reflect.Get<List<PlayerStatsSpellEntry>>(GetBattleMenu(), BattleTopSpellsField);
-            List<TableRowItem> rows = new List<TableRowItem>();
-            if (entries == null)
-            {
-                return rows;
-            }
+            return _spellRows.Get(entries, () => ReadSpellRows(entries));
+        }
 
-            for (int i = 0; i < entries.Count; i++)
+        private IReadOnlyList<TableRowItem> ReadSpellRows(List<PlayerStatsSpellEntry> entries)
+        {
+            List<TableRowItem> rows = new List<TableRowItem>();
+            for (int i = 0; entries != null && i < entries.Count; i++)
             {
                 PlayerStatsSpellEntry entry = entries[i];
                 if (!GameObjects.IsLive(entry))
@@ -382,18 +360,12 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string spell = GetText(Reflect.Get<UITextMesh>(entry, SpellNameField));
-                string amount = GetText(Reflect.Get<UITextMesh>(entry, SpellAmountField));
                 rows.Add(new TableRowItem(
                     "spell-" + i,
-                    spell,
+                    i,
                     GetRectTransform(entry),
-                    new Dictionary<string, string>
-                    {
-                        { "rank", "#" + (i + 1) },
-                        { "spell", spell },
-                        { "times-cast", amount }
-                    }));
+                    Reflect.Get<UITextMesh>(entry, SpellNameField),
+                    Reflect.Get<UITextMesh>(entry, SpellAmountField)));
             }
 
             return rows.ToArray();
@@ -404,20 +376,22 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 return JoinLines(
-                    GetText(GetTextField(GetBattleMenu(), BattleDifferentSpellsField)),
-                    GetText(GetTextField(GetBattleMenu(), BattleTotalSpellsField)));
+                    GetText(Reflect.Get<UITextMesh>(GetBattleMenu(), BattleDifferentSpellsField)),
+                    GetText(Reflect.Get<UITextMesh>(GetBattleMenu(), BattleTotalSpellsField)));
             }
         }
 
         public RectTransform SpellSummaryTransform
         {
-            get { return GetRectTransform(GetTextField(GetBattleMenu(), BattleDifferentSpellsField)); }
+            get { return GetRectTransform(Reflect.Get<UITextMesh>(GetBattleMenu(), BattleDifferentSpellsField)); }
         }
 
         public IReadOnlyList<TableRowItem> GetEnemyTroopRows()
         {
             List<PlayerStatsTroopEntry> entries = Reflect.Get<List<PlayerStatsTroopEntry>>(GetBattleMenu(), BattleTopEnemyTroopsField);
-            return GetTroopRows(entries != null ? entries.ToArray() : null, "enemy-troop", "kills");
+            return _enemyTroopRows.Get(
+                entries,
+                () => ReadTroopRows(entries != null ? entries.ToArray() : null, "enemy-troop"));
         }
 
         public string OverallGeneralLabel
@@ -470,15 +444,10 @@ namespace SongsOfConquestAccess.Adapters
             ScrollView.Reveal(FindScrollRect(), source);
         }
 
-        private IReadOnlyList<TableRowItem> GetTroopRows(PlayerStatsTroopEntry[] entries, string idPrefix, string amountColumnId)
+        private IReadOnlyList<TableRowItem> ReadTroopRows(PlayerStatsTroopEntry[] entries, string idPrefix)
         {
             List<TableRowItem> rows = new List<TableRowItem>();
-            if (entries == null)
-            {
-                return rows;
-            }
-
-            for (int i = 0; i < entries.Length; i++)
+            for (int i = 0; entries != null && i < entries.Length; i++)
             {
                 PlayerStatsTroopEntry entry = entries[i];
                 if (!GameObjects.IsLive(entry))
@@ -486,23 +455,73 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string troop = GetText(Reflect.Get<UITextMesh>(entry, TroopNameField));
-                string faction = GetText(Reflect.Get<UITextMesh>(entry, TroopFactionNameField));
-                string amount = GetText(Reflect.Get<UITextMesh>(entry, TroopAmountTextField));
                 rows.Add(new TableRowItem(
                     idPrefix + "-" + i,
-                    troop,
+                    i,
                     GetRectTransform(entry),
-                    new Dictionary<string, string>
-                    {
-                        { "rank", "#" + (i + 1) },
-                        { "troop", troop },
-                        { "faction", faction },
-                        { amountColumnId, amount }
-                    }));
+                    Reflect.Get<UITextMesh>(entry, TroopNameField),
+                    Reflect.Get<UITextMesh>(entry, TroopFactionNameField),
+                    Reflect.Get<UITextMesh>(entry, TroopAmountTextField)));
             }
 
             return rows.ToArray();
+        }
+
+        // One memo per table. The page's tables are read whole on every build, and a row was an
+        // object, a dictionary and four game-text reads each; now the rows are built only when the
+        // game's own entries change, and each one reads its text when it is asked (AGENTS.md,
+        // Performance).
+        private readonly RowMemo _factionRows = new RowMemo();
+        private readonly RowMemo _mapRows = new RowMemo();
+        private readonly RowMemo _wielderRows = new RowMemo();
+        private readonly RowMemo _troopRows = new RowMemo();
+        private readonly RowMemo _spellRows = new RowMemo();
+        private readonly RowMemo _enemyTroopRows = new RowMemo();
+
+        /// <summary>One table's rows, kept while the game is drawing the same entries: how many of
+        /// them are live, and which the first and last live ones are, all read from the game on every
+        /// call.</summary>
+        private sealed class RowMemo
+        {
+            private static readonly TableRowItem[] None = new TableRowItem[0];
+
+            private IReadOnlyList<TableRowItem> _rows;
+            private int _count = -1;
+            private object _first;
+            private object _last;
+
+            public IReadOnlyList<TableRowItem> Get(System.Collections.IList entries, Func<IReadOnlyList<TableRowItem>> read)
+            {
+                int count = 0;
+                object first = null;
+                object last = null;
+                for (int i = 0; entries != null && i < entries.Count; i++)
+                {
+                    Component entry = entries[i] as Component;
+                    if (!GameObjects.IsLive(entry))
+                    {
+                        continue;
+                    }
+
+                    count++;
+                    first = first ?? entry;
+                    last = entry;
+                }
+
+                if (_rows != null
+                    && count == _count
+                    && ReferenceEquals(first, _first)
+                    && ReferenceEquals(last, _last))
+                {
+                    return _rows;
+                }
+
+                _count = count;
+                _first = first;
+                _last = last;
+                _rows = read() ?? None;
+                return _rows;
+            }
         }
 
         private void AddFullTextItem(List<LabeledItem> items, string id, UITextMesh text)
@@ -685,7 +704,7 @@ namespace SongsOfConquestAccess.Adapters
             return string.Empty;
         }
 
-        private string FindTabLabel(int index, string fallback)
+        private string FindTabLabel(int index)
         {
             string expectedSuffix = index == OverallTabIndex ? "Overall" : "Battle";
             UITextMesh kept;
@@ -696,7 +715,7 @@ namespace SongsOfConquestAccess.Adapters
                 // the whole page for both tabs on every frame and take the fallback anyway.
                 if (kept == null)
                 {
-                    return fallback;
+                    return string.Empty;
                 }
 
                 string keptText = GetText(kept);
@@ -719,7 +738,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _tabLabels[index] = null;
-            return fallback;
+            return string.Empty;
         }
 
         private ScrollRect FindScrollRect()
@@ -773,11 +792,6 @@ namespace SongsOfConquestAccess.Adapters
             return loader != null && loader.CurrentlyLoadedScene == MainMenuSceneType.PlayerStats;
         }
 
-        private static UITextMesh GetTextField(object owner, FieldInfo field)
-        {
-            return Reflect.Get<UITextMesh>(owner, field);
-        }
-
         private static RectTransform GetRectTransform(Component component)
         {
             return component != null ? component.GetComponent<RectTransform>() : null;
@@ -802,40 +816,24 @@ namespace SongsOfConquestAccess.Adapters
             return string.Join("\n", result.ToArray());
         }
 
-        private static T FirstEntry<T>(IReadOnlyList<T> entries) where T : Component
-        {
-            if (entries == null)
-            {
-                return null;
-            }
-
-            for (int i = 0; i < entries.Count; i++)
-            {
-                if (GameObjects.IsLive(entries[i]))
-                {
-                    return entries[i];
-                }
-            }
-
-            return null;
-        }
-
-        private static T FirstEntry<T>(T[] entries) where T : Component
-        {
-            return FirstEntry((IReadOnlyList<T>)entries);
-        }
-
         public sealed class TabItem
         {
-            public TabItem(string id, int index, string label)
+            public TabItem(string id, int index, bool isOverall, string label)
             {
                 Id = id ?? string.Empty;
                 Index = index;
+                IsOverall = isOverall;
                 Label = label ?? string.Empty;
             }
 
             public string Id { get; private set; }
             public int Index { get; private set; }
+
+            /// <summary>Which of the two pages this tab shows, so a screen that has to name it
+            /// itself knows which one it is naming.</summary>
+            public bool IsOverall { get; private set; }
+
+            /// <summary>What the page drew on the tab, empty where it drew nothing readable.</summary>
             public string Label { get; private set; }
         }
 
@@ -853,28 +851,48 @@ namespace SongsOfConquestAccess.Adapters
             public RectTransform SourceTransform { get; private set; }
         }
 
+        /// <summary>One row of one of the page's tables: the entry's own name, the figures the game
+        /// draws across it IN THE ORDER IT DRAWS THEM, and where the row sits in the table. What the
+        /// figures are CALLED, and how the row's place is said, belong to the screen.</summary>
         public sealed class TableRowItem
         {
-            private readonly Dictionary<string, string> _values;
+            private static readonly UITextMesh[] NoValues = new UITextMesh[0];
 
-            public TableRowItem(string id, string label, RectTransform sourceTransform, Dictionary<string, string> values)
+            private readonly UITextMesh _label;
+            private readonly UITextMesh[] _values;
+
+            public TableRowItem(string id, int index, RectTransform sourceTransform, UITextMesh label, params UITextMesh[] values)
             {
                 Id = id ?? string.Empty;
-                Label = label ?? string.Empty;
+                Index = index;
                 SourceTransform = sourceTransform;
-                _values = values ?? new Dictionary<string, string>();
+                _label = label;
+                _values = values ?? NoValues;
             }
 
             public string Id { get; private set; }
-            public string Label { get; private set; }
+
+            /// <summary>Where the row sits in the table the game drew, counted from zero.</summary>
+            public int Index { get; private set; }
+
             public RectTransform SourceTransform { get; private set; }
 
-            public string GetCellValue(string columnId)
+            /// <summary>The entry's own name, read off the game when it is asked for.</summary>
+            public string Label
             {
-                string value;
-                return !string.IsNullOrWhiteSpace(columnId) && _values.TryGetValue(columnId, out value)
-                    ? value
-                    : string.Empty;
+                get { return GetText(_label); }
+            }
+
+            /// <summary>How many figures the row draws beside its name.</summary>
+            public int ValueCount
+            {
+                get { return _values.Length; }
+            }
+
+            /// <summary>One of those figures, read off the game when it is asked for.</summary>
+            public string Value(int index)
+            {
+                return index >= 0 && index < _values.Length ? GetText(_values[index]) : string.Empty;
             }
         }
     }

@@ -2309,6 +2309,11 @@ msgctxt "UI.ModReady"
 msgid "Songs of Conquest Access v{0} ready"
 msgstr ""
 
+#. UI.RankNumber
+msgctxt "UI.RankNumber"
+msgid "#{0}"
+msgstr ""
+
 #. Screens.AdventureMap
 msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
