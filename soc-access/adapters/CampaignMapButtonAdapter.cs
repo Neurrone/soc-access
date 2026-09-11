@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
@@ -33,20 +33,10 @@ namespace SongsOfConquestAccess.Adapters
             get { return _button != null ? _button.Definition : null; }
         }
 
-        public string GetLabel()
-        {
-            return GetDisplayName();
-        }
-
         public string GetDisplayName()
         {
             ICampaignMapDefinition definition = Definition;
             return SpokenLines.Clean(definition != null ? definition.DisplayName : string.Empty);
-        }
-
-        public string GetStatus()
-        {
-            return string.Empty;
         }
 
         public bool IsVisible()

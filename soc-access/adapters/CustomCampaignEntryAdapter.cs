@@ -1,4 +1,4 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using System.Collections.Generic;
 using System.Reflection;
 using SongsOfConquest.Client.Menu;
@@ -163,10 +163,20 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(fieldRef(_entry)));
             }
-            catch (System.NullReferenceException)
+            catch (System.NullReferenceException error)
             {
+                // The entry's serialized text can be missing on a row the page is still filling in.
+                // Said once - this runs for every text of every row on every build - and then quiet.
+                if (!_textFailureLogged)
+                {
+                    _textFailureLogged = true;
+                    SocAccessMod.Instance?.LogWarning("Custom campaign entry: reading a row's text threw: " + error);
+                }
+
                 return string.Empty;
             }
         }
+
+        private static bool _textFailureLogged;
     }
 }

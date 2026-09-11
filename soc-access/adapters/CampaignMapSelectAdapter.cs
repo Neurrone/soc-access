@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Main;
@@ -16,8 +16,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<CampaignMapSelectMenu, CampaignMapSelectMenu.Settings>("_settings");
         private static readonly AccessTools.FieldRef<CampaignMapSelectMenu, ICampaignDefinition> CampaignDefinitionRef =
             AccessTools.FieldRefAccess<CampaignMapSelectMenu, ICampaignDefinition>("_campaignDefinition");
-        private static readonly AccessTools.FieldRef<CampaignMapSelectMenu, CampaignState> CampaignStateRef =
-            AccessTools.FieldRefAccess<CampaignMapSelectMenu, CampaignState>("_campaignState");
         private static readonly AccessTools.FieldRef<CampaignMapSelectMenu, List<CampaignMapButton>> MapButtonsRef =
             AccessTools.FieldRefAccess<CampaignMapSelectMenu, List<CampaignMapButton>>("_mapButtons");
         private static readonly AccessTools.FieldRef<CampaignMapSelectMenu, CampaignMapButton> SelectedButtonRef =

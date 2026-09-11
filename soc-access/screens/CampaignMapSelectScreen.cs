@@ -171,7 +171,7 @@ namespace SongsOfConquestAccess.Screens
             CampaignMapSelectedInformationAdapter information = Live.Information;
             if (information == null || mission == null)
             {
-                return mission != null ? mission.GetLabel() : string.Empty;
+                return mission != null ? mission.GetDisplayName() : string.Empty;
             }
 
             if (information.MapDefinition != null && ReferenceEquals(information.MapDefinition, mission.Definition))
@@ -186,7 +186,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             string counter = information.GetMissionCounter(mission.GetDisplayName());
-            return string.IsNullOrWhiteSpace(counter) ? mission.GetLabel() : counter;
+            return string.IsNullOrWhiteSpace(counter) ? mission.GetDisplayName() : counter;
         }
 
         // ---- the panel describing the chosen mission ----

@@ -57,7 +57,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Header
         {
-            get { return Normalize(UITextMeshTextUtility.GetEffectiveText(TitleTextRef(SimplePopup))); }
+            get { return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(TitleTextRef(SimplePopup))); }
         }
 
         public string Description
@@ -136,11 +136,6 @@ namespace SongsOfConquestAccess.Adapters
         private TutorialSimplePopup SimplePopup
         {
             get { return _menu != null ? SimplePopupRef(_menu) : null; }
-        }
-
-        private static string Normalize(string value)
-        {
-            return SpokenLines.Clean(value);
         }
     }
 }

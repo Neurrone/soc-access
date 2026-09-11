@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
@@ -268,11 +268,6 @@ namespace SongsOfConquestAccess.Screens
             return vtable;
         }
 
-        /// <summary>
-        /// The character the player just typed into the code, or the deletion. The game reads those
-        /// keys itself and says nothing, so the screen watches the string it keeps and speaks only
-        /// what changed - which is what the widget this replaces did.
-        /// </summary>
         /// <summary>The authentication modal walks from Authentication to Terms of use to the code
         /// box IN PLACE: one game object, three pages, each with a heading of its own. The slot never
         /// changes under that, so the heading is compared here instead, once a frame while this is
@@ -296,6 +291,11 @@ namespace SongsOfConquestAccess.Screens
             SayNameIfChanged();
         }
 
+        /// <summary>
+        /// The character the player just typed into the code, or the deletion. The game reads those
+        /// keys itself and says nothing, so the screen watches the string it keeps and speaks only
+        /// what changed - which is what the widget this replaces did.
+        /// </summary>
         private void AnnounceCodeTyped()
         {
             if (State != CommunityMapsModalState.InputFiveDigits || !IsActive())

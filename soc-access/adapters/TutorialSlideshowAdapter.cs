@@ -64,7 +64,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Header
         {
-            get { return Normalize(UITextMeshTextUtility.GetEffectiveText(HeaderTextRef(_menu))); }
+            get { return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(HeaderTextRef(_menu))); }
         }
 
         /// <summary>The paragraphs the game broke the showing page into, kept apart rather than
@@ -186,11 +186,6 @@ namespace SongsOfConquestAccess.Adapters
         private ITutorialEntry CurrentTutorial
         {
             get { return _menu != null ? CurrentTutorialRef(_menu) : null; }
-        }
-
-        private static string Normalize(string value)
-        {
-            return SpokenLines.Clean(value);
         }
     }
 }
