@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -529,6 +529,35 @@ namespace SongsOfConquestAccess.Adapters
             return issues;
         }
 
+        // One record per widget for the life of the adapter, its snapshot fields written afresh on
+        // every read. The reporter's widgets are resolved once in the constructor and never change,
+        // so the tables are bounded by the window's controls; a build sees what it saw before, with
+        // one object and one tooltip instead of a new pair per frame. The tooltip matters most: it
+        // remembers whether the game's details are a long dossier for the life of the instance, and a
+        // fresh one per build asked the game again every frame (AGENTS.md, Performance).
+        private readonly Dictionary<Component, Tooltip> _tooltips = new Dictionary<Component, Tooltip>();
+        private readonly Dictionary<UIButton, BugReportButton> _buttonRecords = new Dictionary<UIButton, BugReportButton>();
+        private readonly Dictionary<UITextMeshInputField, BugReportField> _fieldRecords = new Dictionary<UITextMeshInputField, BugReportField>();
+        private readonly Dictionary<UISlider, BugReportSlider> _sliderRecords = new Dictionary<UISlider, BugReportSlider>();
+        private readonly Dictionary<UIToggle, BugReportToggle> _toggleRecords = new Dictionary<UIToggle, BugReportToggle>();
+
+        private Tooltip TooltipFor(Component component)
+        {
+            if (component == null)
+            {
+                return null;
+            }
+
+            Tooltip tooltip;
+            if (!_tooltips.TryGetValue(component, out tooltip))
+            {
+                tooltip = Tooltip.ForComponent(component, GlobalLocalizationVariables.LocalizationHandler);
+                _tooltips[component] = tooltip;
+            }
+
+            return tooltip;
+        }
+
         private BugReportButton ButtonOf(UIButton button, IList<string> details)
         {
             if (button == null)
@@ -536,17 +565,24 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            UIButton captured = button;
-            return new BugReportButton
+            BugReportButton record;
+            if (!_buttonRecords.TryGetValue(button, out record))
             {
-                Label = MenuButtonTextUtility.GetStandardButtonLabel(button),
-                Enabled = () => captured.Interactable,
-                Visible = MenuButtonAdapterBase.IsButtonVisible(button),
-                Subject = button,
-                Click = () => NativeSelectionUtility.Click(captured),
-                Tooltip = Tooltip.ForComponent(button, GlobalLocalizationVariables.LocalizationHandler),
-                Details = details,
-            };
+                UIButton captured = button;
+                record = new BugReportButton
+                {
+                    Enabled = () => captured.Interactable,
+                    Subject = captured,
+                    Click = () => NativeSelectionUtility.Click(captured),
+                    Tooltip = TooltipFor(captured),
+                };
+                _buttonRecords[button] = record;
+            }
+
+            record.Label = MenuButtonTextUtility.GetStandardButtonLabel(button);
+            record.Visible = MenuButtonAdapterBase.IsButtonVisible(button);
+            record.Details = details;
+            return record;
         }
 
         private BugReportField FieldOf(UITextMeshInputField field, string labelOverride = null)
@@ -556,16 +592,23 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            UITextMeshInputField captured = field;
-            return new BugReportField
+            BugReportField record;
+            if (!_fieldRecords.TryGetValue(field, out record))
             {
-                Label = string.IsNullOrWhiteSpace(labelOverride) ? Placeholder(field) : labelOverride,
-                Value = () => captured.InputFieldValue ?? string.Empty,
-                Enabled = field.Interactable,
-                Visible = field.Active,
-                Field = field,
-                Tooltip = Tooltip.ForComponent(field, GlobalLocalizationVariables.LocalizationHandler),
-            };
+                UITextMeshInputField captured = field;
+                record = new BugReportField
+                {
+                    Value = () => captured.InputFieldValue ?? string.Empty,
+                    Field = captured,
+                    Tooltip = TooltipFor(captured),
+                };
+                _fieldRecords[field] = record;
+            }
+
+            record.Label = string.IsNullOrWhiteSpace(labelOverride) ? Placeholder(field) : labelOverride;
+            record.Enabled = field.Interactable;
+            record.Visible = field.Active;
+            return record;
         }
 
         private BugReportSlider SliderOf(UISlider slider)
@@ -575,18 +618,25 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            UISlider captured = slider;
-            return new BugReportSlider
+            BugReportSlider record;
+            if (!_sliderRecords.TryGetValue(slider, out record))
             {
-                // The game composes this label into the slider's own text mesh; read it through
-                // GetEffectiveText, whose _stringBuilder path survives the hot-reload desync that
-                // reverts UITextMesh.Text to the prefab placeholder ("Le Severity...").
-                Label = () => SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(SliderTextMesh(captured))),
-                Enabled = slider.Interactable,
-                Visible = ((Component)slider).gameObject.activeInHierarchy,
-                Subject = slider,
-                Adjust = (sign, large) => Adjust(captured, sign, large),
-            };
+                UISlider captured = slider;
+                record = new BugReportSlider
+                {
+                    // The game composes this label into the slider's own text mesh; read it through
+                    // GetEffectiveText, whose _stringBuilder path survives the hot-reload desync that
+                    // reverts UITextMesh.Text to the prefab placeholder ("Le Severity...").
+                    Label = () => SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(SliderTextMesh(captured))),
+                    Subject = captured,
+                    Adjust = (sign, large) => Adjust(captured, sign, large),
+                };
+                _sliderRecords[slider] = record;
+            }
+
+            record.Enabled = slider.Interactable;
+            record.Visible = ((Component)slider).gameObject.activeInHierarchy;
+            return record;
         }
 
         private BugReportToggle ToggleOf(UIToggle toggle)
@@ -596,17 +646,24 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            UIToggle captured = toggle;
-            return new BugReportToggle
+            BugReportToggle record;
+            if (!_toggleRecords.TryGetValue(toggle, out record))
             {
-                Label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(toggle.GetTextMesh())),
-                State = () => captured.ToggleValue,
-                Enabled = toggle.Interactable,
-                Visible = toggle.Active,
-                Subject = toggle,
-                Toggle = () => Flip(captured),
-                Tooltip = Tooltip.ForComponent(toggle.GetTextMesh(), GlobalLocalizationVariables.LocalizationHandler),
-            };
+                UIToggle captured = toggle;
+                record = new BugReportToggle
+                {
+                    State = () => captured.ToggleValue,
+                    Subject = captured,
+                    Toggle = () => Flip(captured),
+                    Tooltip = TooltipFor(captured.GetTextMesh() as Component),
+                };
+                _toggleRecords[toggle] = record;
+            }
+
+            record.Label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(toggle.GetTextMesh()));
+            record.Enabled = toggle.Interactable;
+            record.Visible = toggle.Active;
+            return record;
         }
 
         // Move the slider by one band (a fifth of its range), or two with the coarse step. The value
@@ -676,11 +733,21 @@ namespace SongsOfConquestAccess.Adapters
                 string text = mesh != null ? UITextMeshTextUtility.GetEffectiveText(mesh) : placeholder.text;
                 return SpokenLines.Clean(text);
             }
-            catch (Exception)
+            catch (Exception error)
             {
+                // A destroyed input field throws rather than answering. Said once, because this runs
+                // on every build of the compose window.
+                if (!_placeholderFailureLogged)
+                {
+                    _placeholderFailureLogged = true;
+                    SocAccessMod.Instance?.LogWarning("Bug reporter: reading a field's prompt threw: " + error);
+                }
+
                 return string.Empty;
             }
         }
+
+        private static bool _placeholderFailureLogged;
 
         private static string Text(UITextMesh mesh)
         {
