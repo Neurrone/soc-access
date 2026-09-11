@@ -88,33 +88,14 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            List<KeyValuePair<string, CustomCampaignEntryAdapter>> cards = DrawnCards();
-            if (cards.Count > 0)
-            {
-                builder.BeginStop(CardsStop);
-                foreach (KeyValuePair<string, CustomCampaignEntryAdapter> card in cards)
-                {
-                    builder.AddItem(new DrawnNode(
-                        ControlId.For(card.Value.Button, card.Key),
-                        Card(card.Value),
-                        card.Value.Button));
-                }
-            }
-
-            List<KeyValuePair<string, IMenuButtonAdapter>> header = new List<KeyValuePair<string, IMenuButtonAdapter>>(2);
-            Add(header, "custom-campaign:back", Live.BackButton);
-            Add(header, "custom-campaign:options", Live.OptionsButton);
-            if (header.Count > 0)
-            {
-                builder.BeginStop(HeaderStop);
-                foreach (KeyValuePair<string, IMenuButtonAdapter> button in header)
-                {
-                    builder.AddItem(new DrawnNode(
-                        ControlId.For(button.Value.Button, button.Key),
-                        GraphNodes.Button(button.Value.GetLabel, () => button.Value.Activate(), button.Value.IsEnabled),
-                        button.Value.Button));
-                }
-            }
+            MenuCardPage.BuildCards(builder, CardsStop, DrawnCards(), CardButton, Card);
+            MenuCardPage.BuildHeader(
+                builder,
+                HeaderStop,
+                "custom-campaign:back",
+                Live.BackButton,
+                "custom-campaign:options",
+                Live.OptionsButton);
         }
 
         /// <summary>
@@ -158,64 +139,25 @@ namespace SongsOfConquestAccess.Screens
             IReadOnlyList<CustomCampaignEntryAdapter> entries = Live.CampaignEntries;
             for (int i = 0; entries != null && i < entries.Count; i++)
             {
-                AddCard(band, "custom-campaign:card/" + i, entries[i]);
+                MenuCardPage.AddDrawn(band, "custom-campaign:card/" + i, entries[i], CardButton, CardVisible);
             }
 
-            AddCard(band, "custom-campaign:find-more", Live.DownloadTip);
-            SortByDrawnLeft(band);
+            MenuCardPage.AddDrawn(band, "custom-campaign:find-more", Live.DownloadTip, CardButton, CardVisible);
+            MenuCardPage.SortByDrawnLeft(band, CardButton);
             return band;
         }
 
-        private static void AddCard(
-            List<KeyValuePair<string, CustomCampaignEntryAdapter>> list,
-            string key,
-            CustomCampaignEntryAdapter item)
+        /// <summary>The card's drawn button, which is what the node stands on: a community campaign
+        /// entry is not an <see cref="IMenuButtonAdapter"/>, so the band is told where to look.
+        /// </summary>
+        private static Component CardButton(CustomCampaignEntryAdapter item)
         {
-            if (item != null && item.Button != null && item.IsVisible())
-            {
-                list.Add(new KeyValuePair<string, CustomCampaignEntryAdapter>(key, item));
-            }
+            return item.Button;
         }
 
-        private static void Add(List<KeyValuePair<string, IMenuButtonAdapter>> list, string key, IMenuButtonAdapter item)
+        private static bool CardVisible(CustomCampaignEntryAdapter item)
         {
-            if (item != null && item.Button != null && item.IsVisible())
-            {
-                list.Add(new KeyValuePair<string, IMenuButtonAdapter>(key, item));
-            }
-        }
-
-        // Insertion sort by drawn left edge, leftmost first; stable, so two cards at one x keep
-        // declaration order.
-        private static void SortByDrawnLeft(List<KeyValuePair<string, CustomCampaignEntryAdapter>> items)
-        {
-            List<float> lefts = new List<float>(items.Count);
-            for (int i = 0; i < items.Count; i++)
-            {
-                lefts.Add(Left(items[i].Value));
-            }
-
-            for (int i = 1; i < items.Count; i++)
-            {
-                KeyValuePair<string, CustomCampaignEntryAdapter> moving = items[i];
-                float left = lefts[i];
-                int j = i - 1;
-                while (j >= 0 && lefts[j] > left)
-                {
-                    items[j + 1] = items[j];
-                    lefts[j + 1] = lefts[j];
-                    j--;
-                }
-
-                items[j + 1] = moving;
-                lefts[j + 1] = left;
-            }
-        }
-
-        private static float Left(CustomCampaignEntryAdapter item)
-        {
-            Component component = item.Button;
-            return component != null ? component.transform.position.x : 0f;
+            return item.IsVisible();
         }
 
         /// <summary>The card's own lines, joined as lines rather than as a sentence: they are the

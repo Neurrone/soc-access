@@ -3,7 +3,6 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
-using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -91,33 +90,14 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            List<KeyValuePair<string, TaleButtonAdapter>> cards = DrawnCards();
-            if (cards.Count > 0)
-            {
-                builder.BeginStop(CardsStop);
-                foreach (KeyValuePair<string, TaleButtonAdapter> card in cards)
-                {
-                    builder.AddItem(new DrawnNode(
-                        ControlId.For(card.Value.Button, card.Key),
-                        Card(card.Value),
-                        card.Value.Button));
-                }
-            }
-
-            List<KeyValuePair<string, IMenuButtonAdapter>> header = new List<KeyValuePair<string, IMenuButtonAdapter>>(2);
-            Add(header, "tale:back", Live.BackButton);
-            Add(header, "tale:options", Live.OptionsButton);
-            if (header.Count > 0)
-            {
-                builder.BeginStop(HeaderStop);
-                foreach (KeyValuePair<string, IMenuButtonAdapter> button in header)
-                {
-                    builder.AddItem(new DrawnNode(
-                        ControlId.For(button.Value.Button, button.Key),
-                        GraphNodes.Button(button.Value.GetLabel, () => button.Value.Activate(), button.Value.IsEnabled),
-                        button.Value.Button));
-                }
-            }
+            MenuCardPage.BuildCards(builder, CardsStop, DrawnCards(), Card);
+            MenuCardPage.BuildHeader(
+                builder,
+                HeaderStop,
+                "tale:back",
+                Live.BackButton,
+                "tale:options",
+                Live.OptionsButton);
         }
 
         /// <summary>
@@ -148,56 +128,11 @@ namespace SongsOfConquestAccess.Screens
             IReadOnlyList<TaleButtonAdapter> tales = Live.Tales;
             for (int i = 0; tales != null && i < tales.Count; i++)
             {
-                TaleButtonAdapter tale = tales[i];
-                if (tale != null && tale.Button != null && tale.IsVisible())
-                {
-                    band.Add(new KeyValuePair<string, TaleButtonAdapter>("tale:card/" + i, tale));
-                }
+                MenuCardPage.AddDrawn(band, "tale:card/" + i, tales[i]);
             }
 
-            SortByDrawnLeft(band);
+            MenuCardPage.SortByDrawnLeft(band);
             return band;
-        }
-
-        private static void Add(List<KeyValuePair<string, IMenuButtonAdapter>> list, string key, IMenuButtonAdapter item)
-        {
-            if (item != null && item.Button != null && item.IsVisible())
-            {
-                list.Add(new KeyValuePair<string, IMenuButtonAdapter>(key, item));
-            }
-        }
-
-        // Insertion sort by drawn left edge, leftmost first; stable, so two cards at one x keep
-        // declaration order.
-        private static void SortByDrawnLeft(List<KeyValuePair<string, TaleButtonAdapter>> items)
-        {
-            List<float> lefts = new List<float>(items.Count);
-            for (int i = 0; i < items.Count; i++)
-            {
-                lefts.Add(Left(items[i].Value));
-            }
-
-            for (int i = 1; i < items.Count; i++)
-            {
-                KeyValuePair<string, TaleButtonAdapter> moving = items[i];
-                float left = lefts[i];
-                int j = i - 1;
-                while (j >= 0 && lefts[j] > left)
-                {
-                    items[j + 1] = items[j];
-                    lefts[j + 1] = lefts[j];
-                    j--;
-                }
-
-                items[j + 1] = moving;
-                lefts[j + 1] = left;
-            }
-        }
-
-        private static float Left(TaleButtonAdapter item)
-        {
-            Component component = item.Button;
-            return component != null ? component.transform.position.x : 0f;
         }
     }
 }
