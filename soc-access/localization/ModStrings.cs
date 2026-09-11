@@ -306,6 +306,8 @@
             public static readonly ModString SummarizeResourcesTooltip = new ModString("Actions.SummarizeResourcesTooltip", "Summarizes your essence in combat");
             public static readonly ModPluralString TroopSplit = new ModPluralString("Actions.TroopSplit", "Split Off {0} Troop", "Split Off {0} Troops");
             public static readonly ModString UiBack = new ModString("Actions.UiBack", "Back");
+            /// <summary>The Keybinds row's tooltip for Back: what it does on the two screens with a grid.</summary>
+            public static readonly ModString UiBackTooltip = new ModString("Actions.UiBackTooltip", "Moves focus back to the adventure map or combat grid when elsewhere on those screens");
             public static readonly ModString UiCarry = new ModString("Actions.UiCarry", "Start drag");
             public static readonly ModString UiClearSearch = new ModString("Actions.UiClearSearch", "Clear typeahead");
             public static readonly ModString UiCoarseDecrease = new ModString("Actions.UiCoarseDecrease", "Decrease slider by 10%");

@@ -279,7 +279,8 @@ namespace SongsOfConquestAccess.Input
             .AddBinding(new KeyboardBinding(Key.Space));
 
         public static readonly InputAction UiBack = OneShot("ui_back", ModStrings.Actions.UiBack, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.Escape));
+            .AddBinding(new KeyboardBinding(Key.Escape))
+            .Describe(() => ModText.Get(ModStrings.Actions.UiBackTooltip));
 
         public static readonly InputAction HexGridWest = OneShot("hex_grid_west", ModStrings.Actions.HexGridWest, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.A));

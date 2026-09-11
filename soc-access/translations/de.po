@@ -1475,6 +1475,11 @@ msgctxt "Actions.UiBack"
 msgid "Back"
 msgstr "Zurück"
 
+#. Actions.UiBackTooltip
+msgctxt "Actions.UiBackTooltip"
+msgid "Moves focus back to the adventure map or combat grid when elsewhere on those screens"
+msgstr "Bringt den Fokus zurück zur Abenteuerkarte oder zum Kampfraster, wenn er sich auf diesen Bildschirmen woanders befindet"
+
 #. Actions.UiCarry
 msgctxt "Actions.UiCarry"
 msgid "Start drag"
