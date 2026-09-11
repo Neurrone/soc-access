@@ -297,7 +297,7 @@ namespace SongsOfConquestAccess.Adapters
                     if (tile.Elevation == elevation)
                     {
                         ScannerResult result = new ScannerResult(
-                            ScannerTileKey("terrain:elevated:" + elevation, tile.Point),
+                            ScannerTileKeys.For("terrain:elevated:" + elevation, tile.Point),
                             ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
                             tile.Point)
                         {
@@ -317,7 +317,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (tile.IsImpassable)
                 {
                     ScannerResult result = new ScannerResult(
-                        ScannerTileKey("terrain:impassable", tile.Point),
+                        ScannerTileKeys.For("terrain:impassable", tile.Point),
                         ModText.Get(ModStrings.Scanner.ImpassableTerrain),
                         tile.Point)
                     {
@@ -339,7 +339,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (tile.TroopSide.HasValue && IsOwnSide(placement, tile.TroopSide.Value) == own)
                 {
                     ScannerResult result = new ScannerResult(
-                        ScannerTileKey(own ? "troop:friendly" : "troop:enemy", tile.Point),
+                        ScannerTileKeys.For(own ? "troop:friendly" : "troop:enemy", tile.Point),
                         string.IsNullOrWhiteSpace(tile.TroopLabel) ? ModText.Get(ModStrings.Combat.UnknownTroop) : tile.TroopLabel,
                         tile.Point)
                     {
@@ -355,7 +355,7 @@ namespace SongsOfConquestAccess.Adapters
                     snapshot.Add(
                         ScannerCategoryKeys.Troops,
                         ScannerSubcategoryKeys.All,
-                        CloneResult(result));
+                        result.Clone());
                     snapshot.Add(
                         ScannerCategoryKeys.Troops,
                         own ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy,
@@ -371,7 +371,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (tile.SpawnSide.HasValue && IsOwnSide(placement, tile.SpawnSide.Value) == own)
                 {
                     ScannerResult result = new ScannerResult(
-                        ScannerTileKey(own ? "spawn:friendly" : "spawn:enemy", tile.Point),
+                        ScannerTileKeys.For(own ? "spawn:friendly" : "spawn:enemy", tile.Point),
                         ModText.Get(ModStrings.Spatial.SpawnPoint),
                         tile.Point)
                     {
@@ -390,7 +390,7 @@ namespace SongsOfConquestAccess.Adapters
                     snapshot.Add(
                         ScannerCategoryKeys.SpawnPoints,
                         ScannerSubcategoryKeys.All,
-                        CloneResult(result));
+                        result.Clone());
                     snapshot.Add(
                         ScannerCategoryKeys.SpawnPoints,
                         own ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy,
@@ -415,29 +415,6 @@ namespace SongsOfConquestAccess.Adapters
             return ShouldShowSide(tile.SpawnSide.Value)
                 ? ModText.Get(ModStrings.Scanner.SpawnPointEmpty)
                 : null;
-        }
-
-        private static string ScannerTileKey(string prefix, Vector2Int point)
-        {
-            return prefix + ":" + point.x + ":" + point.y;
-        }
-
-        private static ScannerResult CloneResult(ScannerResult result)
-        {
-            ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
-            {
-                NotVisible = result.NotVisible,
-                Unvisited = result.Unvisited,
-                Attackable = result.Attackable,
-                Relationship = result.Relationship,
-                StableReference = result.StableReference,
-                Kind = result.Kind,
-                ItemKey = result.ItemKey,
-                ItemLabel = result.ItemLabel,
-                InstanceLabel = result.InstanceLabel
-            };
-            clone.Points.AddRange(result.Points);
-            return clone;
         }
 
         private static string ScannerTroopItemKey(TroopPlacementTile tile)

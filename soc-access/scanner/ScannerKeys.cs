@@ -1,5 +1,16 @@
+﻿using UnityEngine;
+
 namespace SongsOfConquestAccess.Scanner
 {
+    /// <summary>Result keys for the things a scanner identifies by the tile they sit on.</summary>
+    public static class ScannerTileKeys
+    {
+        public static string For(string prefix, Vector2Int point)
+        {
+            return prefix + ":" + point.x + ":" + point.y;
+        }
+    }
+
     /// <summary>
     /// Stable identifiers for scanner categories. These are persisted in result
     /// keys and in custom category selectors, so they must never change once

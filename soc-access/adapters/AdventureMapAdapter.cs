@@ -1563,8 +1563,8 @@ namespace SongsOfConquestAccess.Adapters
                     EntityCategory = AdventureEntityCategory.Wielder
                 };
 
-                snapshot.Add(ScannerCategoryKeys.Wielders, ScannerSubcategoryKeys.All, CloneResult(result));
-                snapshot.Add(ScannerCategoryKeys.Wielders, ScannerRelationshipKey(relationship), CloneResult(result));
+                snapshot.Add(ScannerCategoryKeys.Wielders, ScannerSubcategoryKeys.All, result.Clone());
+                snapshot.Add(ScannerCategoryKeys.Wielders, ScannerRelationshipKey(relationship), result.Clone());
             }
         }
 
@@ -2151,12 +2151,12 @@ namespace SongsOfConquestAccess.Adapters
                 case MapEntityCategory.Town:
                 case MapEntityCategory.Settlement:
                 case MapEntityCategory.BuildSite:
-                    snapshot.Add(ScannerCategoryKeys.SettlementsAndBuildSites, ScannerSubcategoryKeys.All, CloneResult(result));
-                    snapshot.Add(ScannerCategoryKeys.SettlementsAndBuildSites, relationship, CloneResult(result));
+                    snapshot.Add(ScannerCategoryKeys.SettlementsAndBuildSites, ScannerSubcategoryKeys.All, result.Clone());
+                    snapshot.Add(ScannerCategoryKeys.SettlementsAndBuildSites, relationship, result.Clone());
                     break;
                 case MapEntityCategory.Building:
-                    snapshot.Add(ScannerCategoryKeys.Buildings, ScannerSubcategoryKeys.All, CloneResult(result));
-                    snapshot.Add(ScannerCategoryKeys.Buildings, relationship, CloneResult(result));
+                    snapshot.Add(ScannerCategoryKeys.Buildings, ScannerSubcategoryKeys.All, result.Clone());
+                    snapshot.Add(ScannerCategoryKeys.Buildings, relationship, result.Clone());
                     break;
             }
         }
@@ -2167,22 +2167,22 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         private void AddSpecialSiteResult(ScannerSnapshot snapshot, string subcategory, ScannerResult result)
         {
-            snapshot.Add(ScannerCategoryKeys.SpecialSites, ScannerSubcategoryKeys.All, CloneResult(result));
-            snapshot.Add(ScannerCategoryKeys.SpecialSites, subcategory, CloneResult(result));
+            snapshot.Add(ScannerCategoryKeys.SpecialSites, ScannerSubcategoryKeys.All, result.Clone());
+            snapshot.Add(ScannerCategoryKeys.SpecialSites, subcategory, result.Clone());
         }
 
         private void AddResourceGeneratorResult(ScannerSnapshot snapshot, string relationship, ScannerResult result)
         {
-            snapshot.Add(ScannerCategoryKeys.ResourceGenerators, ScannerSubcategoryKeys.All, CloneResult(result));
-            snapshot.Add(ScannerCategoryKeys.ResourceGenerators, relationship, CloneResult(result));
+            snapshot.Add(ScannerCategoryKeys.ResourceGenerators, ScannerSubcategoryKeys.All, result.Clone());
+            snapshot.Add(ScannerCategoryKeys.ResourceGenerators, relationship, result.Clone());
         }
 
         private void AddTroopSourceResult(ScannerSnapshot snapshot, IMapEntity entity, string relationship, ScannerResult result)
         {
             if (entity.HasComponent<IRecruitmentPoolComponent>() || entity.HasComponent<ITroopDwellingComponent>())
             {
-                snapshot.Add(ScannerCategoryKeys.TroopSources, ScannerSubcategoryKeys.All, CloneResult(result));
-                snapshot.Add(ScannerCategoryKeys.TroopSources, relationship, CloneResult(result));
+                snapshot.Add(ScannerCategoryKeys.TroopSources, ScannerSubcategoryKeys.All, result.Clone());
+                snapshot.Add(ScannerCategoryKeys.TroopSources, relationship, result.Clone());
             }
         }
 
@@ -2208,13 +2208,13 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            snapshot.Add(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.All, CloneResult(result));
+            snapshot.Add(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.All, result.Clone());
             if (IsUnvisited(entity))
             {
-                snapshot.Add(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.Unvisited, CloneResult(result));
+                snapshot.Add(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.Unvisited, result.Clone());
             }
 
-            snapshot.Add(ScannerCategoryKeys.Pickups, subcategory, CloneResult(result));
+            snapshot.Add(ScannerCategoryKeys.Pickups, subcategory, result.Clone());
         }
 
         private static bool IsScannerPickupEntity(IMapEntity entity)
@@ -2730,25 +2730,6 @@ namespace SongsOfConquestAccess.Adapters
             int x = point.x - origin.x;
             int y = point.y - origin.y;
             return x * x + y * y;
-        }
-
-        private static ScannerResult CloneResult(ScannerResult result)
-        {
-            ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
-            {
-                NotVisible = result.NotVisible,
-                Unvisited = result.Unvisited,
-                Attackable = result.Attackable,
-                Relationship = result.Relationship,
-                StableReference = result.StableReference,
-                Kind = result.Kind,
-                ItemKey = result.ItemKey,
-                ItemLabel = result.ItemLabel,
-                InstanceLabel = result.InstanceLabel,
-                EntityCategory = result.EntityCategory
-            };
-            clone.Points.AddRange(result.Points);
-            return clone;
         }
 
         private static string ScannerKey(string prefix, int id)

@@ -550,7 +550,7 @@ namespace SongsOfConquestAccess.Adapters
                     if (tile.Troop != null && IsFriendlyTroop(tile.Troop) == friendly)
                     {
                         ScannerResult result = new ScannerResult(
-                            ScannerTileKey(friendly ? "troop:friendly" : "troop:enemy", point),
+                            ScannerTileKeys.For(friendly ? "troop:friendly" : "troop:enemy", point),
                             FormatTroopGridLabel(tile.Troop),
                             point)
                         {
@@ -564,7 +564,7 @@ namespace SongsOfConquestAccess.Adapters
                                 : ScannerResultRelationship.Enemy,
                             Attackable = tile.IsTroopAttackable
                         };
-                        snapshot.Add(ScannerCategoryKeys.Troops, ScannerSubcategoryKeys.All, CloneResult(result));
+                        snapshot.Add(ScannerCategoryKeys.Troops, ScannerSubcategoryKeys.All, result.Clone());
                         snapshot.Add(ScannerCategoryKeys.Troops, friendly ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy, result);
                     }
                 }
@@ -591,7 +591,7 @@ namespace SongsOfConquestAccess.Adapters
                         {
                             bool friendlyGate = IsFriendlyMapEntity(mapEntity);
                             ScannerResult result = new ScannerResult(
-                                ScannerTileKey(friendlyGate ? "gate:friendly" : "gate:enemy", point),
+                                ScannerTileKeys.For(friendlyGate ? "gate:friendly" : "gate:enemy", point),
                                 GetMapEntityName(mapEntity),
                                 point)
                             {
@@ -600,13 +600,13 @@ namespace SongsOfConquestAccess.Adapters
                                     : ScannerResultRelationship.Enemy,
                                 Attackable = tile.IsEntityAttackable
                             };
-                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
+                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, result.Clone());
                             snapshot.Add(ScannerCategoryKeys.Entities, friendlyGate ? ScannerSubcategoryKeys.FriendlyGates : ScannerSubcategoryKeys.EnemyGates, result);
                         }
                         else if (tile.Entity != null)
                         {
                             ScannerResult result = new ScannerResult(
-                                ScannerTileKey("entity:attackable", point),
+                                ScannerTileKeys.For("entity:attackable", point),
                                 GetMapEntityName(tile.Entity),
                                 point)
                             {
@@ -616,16 +616,16 @@ namespace SongsOfConquestAccess.Adapters
                                 // and the one worth answering per result.
                                 Attackable = tile.IsEntityAttackable
                             };
-                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
+                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, result.Clone());
                             snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.Attackable, result);
                         }
                         else if (tile.MapEffects.Count > 0)
                         {
                             ScannerResult result = new ScannerResult(
-                                ScannerTileKey("entity:dangerous", point),
+                                ScannerTileKeys.For("entity:dangerous", point),
                                 GetMapEntityName(mapEntity),
                                 point);
-                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
+                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, result.Clone());
                             snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.Dangerous, result);
                         }
                     }
@@ -651,7 +651,7 @@ namespace SongsOfConquestAccess.Adapters
                         if (tile.Elevation == elevation)
                         {
                             ScannerResult result = new ScannerResult(
-                                ScannerTileKey("terrain:elevated:" + elevation, point),
+                                ScannerTileKeys.For("terrain:elevated:" + elevation, point),
                                 ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
                                 point)
                             {
@@ -678,7 +678,7 @@ namespace SongsOfConquestAccess.Adapters
                     if (tile.IsImpassable)
                     {
                         ScannerResult result = new ScannerResult(
-                            ScannerTileKey("terrain:impassable", point),
+                            ScannerTileKeys.For("terrain:impassable", point),
                             ModText.Get(ModStrings.Scanner.ImpassableTerrain),
                             point)
                         {
@@ -694,7 +694,7 @@ namespace SongsOfConquestAccess.Adapters
                             ScannerCategoryKeys.Terrain,
                             ScannerSubcategoryKeys.All,
                             new ScannerResult(
-                                ScannerTileKey("obstacle:blocked", point),
+                                ScannerTileKeys.For("obstacle:blocked", point),
                                 ModText.Get(ModStrings.Scanner.Blocked),
                                 point)
                             {
@@ -703,29 +703,6 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
             }
-        }
-
-        private static string ScannerTileKey(string prefix, Vector2Int point)
-        {
-            return prefix + ":" + point.x + ":" + point.y;
-        }
-
-        private static ScannerResult CloneResult(ScannerResult result)
-        {
-            ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
-            {
-                NotVisible = result.NotVisible,
-                Unvisited = result.Unvisited,
-                Attackable = result.Attackable,
-                Relationship = result.Relationship,
-                StableReference = result.StableReference,
-                Kind = result.Kind,
-                ItemKey = result.ItemKey,
-                ItemLabel = result.ItemLabel,
-                InstanceLabel = result.InstanceLabel
-            };
-            clone.Points.AddRange(result.Points);
-            return clone;
         }
 
         /// <summary>
