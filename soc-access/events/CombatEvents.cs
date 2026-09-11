@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using SongsOfConquest;
@@ -924,14 +924,6 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText() { return ModText.Get(ModStrings.Combat.Appears, Entity.Format()); }
     }
 
-    public sealed class MapEntityDestroyedEvent : IAccessibilityEvent
-    {
-        public MapEntityDestroyedEvent(EntityRef entity) { Entity = entity; }
-        public string Kind { get { return AccessibilityEvents.Combat.MapEntityDestroyed; } }
-        public EntityRef Entity { get; private set; }
-        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.Destroyed, Entity.Format()); }
-    }
-
     public sealed class TroopPushedEvent : IAccessibilityEvent
     {
         public TroopPushedEvent(TroopRef troop, Vector2Int from, Vector2Int to, IList<Vector2Int> path)
@@ -1070,32 +1062,9 @@ namespace SongsOfConquestAccess.Events.Combat
             return path != null ? new List<Vector2Int>(path) : new List<Vector2Int>();
         }
 
-        public static void AddAmount(List<string> parts, int amount, string name)
-        {
-            if (amount > 0)
-            {
-                parts.Add(amount + " " + name);
-            }
-        }
-
         public static string FormatList(IList<string> values)
         {
-            if (values == null || values.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            if (values.Count == 1)
-            {
-                return values[0];
-            }
-
-            if (values.Count == 2)
-            {
-                return ModText.JoinList(values.ToList());
-            }
-
-            return ModText.JoinList(values.ToList());
+            return ModText.JoinList(values != null ? new List<string>(values) : null);
         }
 
         public static string FormatEssenceAmounts(int order, int creation, int chaos, int arcana, int destruction)

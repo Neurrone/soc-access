@@ -755,7 +755,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return troop.HasPosition
-                ? ModText.Get(ModStrings.Combat.TroopAt, label, CombatAdapter.FormatPoint(troop.Position))
+                ? ModText.Get(ModStrings.Combat.TroopAt, label, CombatText.FormatPoint(troop.Position))
                 : label;
         }
 

@@ -138,7 +138,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         public string DescribeCoordinates(CombatTile tile)
         {
-            return tile == null ? string.Empty : CombatAdapter.FormatPoint(tile.Point);
+            return tile == null ? string.Empty : CombatText.FormatPoint(tile.Point);
         }
 
         private IEnumerable<AnnouncementPart> BuildTileParts(CombatTile tile)

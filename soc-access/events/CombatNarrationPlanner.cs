@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using SongsOfConquest.Common.Bacterias;
@@ -10,11 +10,6 @@ namespace SongsOfConquestAccess.Events
 {
     public sealed class CombatNarrationSnapshot
     {
-        public CombatNarrationSnapshot(int localTeamId, IEnumerable<int> yourAliveTroopIds, IEnumerable<int> enemyAliveTroopIds)
-            : this(localTeamId, yourAliveTroopIds, enemyAliveTroopIds, null, null, null, null)
-        {
-        }
-
         public CombatNarrationSnapshot(
             int localTeamId,
             IEnumerable<int> yourAliveTroopIds,
@@ -64,7 +59,10 @@ namespace SongsOfConquestAccess.Events
         private const int SpellRepel2BacteriaType = 259;
         private const int SpellRepel3BacteriaType = 260;
 
-        private readonly Queue<CombatNarrationItem> _pendingEvents = new Queue<CombatNarrationItem>();
+        // A LIST, not a queue: the only thing ever asked of it beyond appending is "is there a
+        // bacteria summary near the end I can merge into", and a queue can only answer that by
+        // copying itself.
+        private readonly List<CombatNarrationItem> _pendingEvents = new List<CombatNarrationItem>();
 
         public bool HasPendingEvents
         {
@@ -88,7 +86,7 @@ namespace SongsOfConquestAccess.Events
                 return;
             }
 
-            _pendingEvents.Enqueue(pending);
+            _pendingEvents.Add(pending);
         }
 
         public void EnqueueBacteriaSummary(CombatNarrationItem pending, CombatNarrationSnapshot snapshot)
@@ -121,7 +119,7 @@ namespace SongsOfConquestAccess.Events
                 return new List<CombatNarrationItem>();
             }
 
-            List<CombatNarrationItem> events = SuppressNonNarratableMapEntityCreations(_pendingEvents.ToList());
+            List<CombatNarrationItem> events = SuppressNonNarratableMapEntityCreations(new List<CombatNarrationItem>(_pendingEvents));
             events = SuppressTransientBacteriaAddRemovals(events);
             events = CoalesceBacteriaLifecycleEvents(events);
             events = SuppressInternalBacteriaRemovals(events);
@@ -406,12 +404,14 @@ namespace SongsOfConquestAccess.Events
             }
 
             CombatNarrationItem removal = left.Kind == CombatNarrationItemKind.BacteriaRemoved ? left : right;
-            List<int> shared = left.GetBacteriaTargetIds()
-                .Intersect(right.GetBacteriaTargetIds())
-                .ToList();
-            for (int i = 0; i < shared.Count; i++)
+            List<int> leftIds = left.GetBacteriaTargetIds();
+            List<int> rightIds = right.GetBacteriaTargetIds();
+            for (int i = 0; i < leftIds.Count; i++)
             {
-                removal.RemoveBacteriaTarget(shared[i]);
+                if (rightIds.Contains(leftIds[i]))
+                {
+                    removal.RemoveBacteriaTarget(leftIds[i]);
+                }
             }
         }
 
@@ -439,10 +439,9 @@ namespace SongsOfConquestAccess.Events
                 return null;
             }
 
-            CombatNarrationItem[] events = _pendingEvents.ToArray();
-            for (int i = events.Length - 1; i >= 0; i--)
+            for (int i = _pendingEvents.Count - 1; i >= 0; i--)
             {
-                CombatNarrationItem existing = events[i];
+                CombatNarrationItem existing = _pendingEvents[i];
                 if (existing.CanMergeBacteriaSummary(pending))
                 {
                     return existing;
@@ -567,7 +566,6 @@ namespace SongsOfConquestAccess.Events
                 case CombatNarrationItemKind.BacteriaModifierApplied:
                 case CombatNarrationItemKind.TroopCreated:
                 case CombatNarrationItemKind.MapEntityCreated:
-                case CombatNarrationItemKind.MapEntityDestroyed:
                 case CombatNarrationItemKind.Push:
                 case CombatNarrationItemKind.Teleport:
                     return true;
@@ -816,23 +814,36 @@ namespace SongsOfConquestAccess.Events
             BacteriaModifierTargets.Add(new CombatNarrationModifierTarget(target, changes));
         }
 
+        /// <summary>Every troop this summary is about, once each and in the order they were added.
+        /// Read inside the flush's nested passes, so it walks rather than building a LINQ pipeline.
+        /// </summary>
         public List<int> GetBacteriaTargetIds()
         {
-            if (Kind == CombatNarrationItemKind.BacteriaRemoved)
+            List<int> ids = new List<int>();
+            if (Kind == CombatNarrationItemKind.BacteriaRemoved && BacteriaTargets != null)
             {
-                return BacteriaTargets != null
-                    ? BacteriaTargets.Where(t => t != null).Select(t => t.TroopId).Distinct().ToList()
-                    : new List<int>();
+                for (int i = 0; i < BacteriaTargets.Count; i++)
+                {
+                    TroopRef target = BacteriaTargets[i];
+                    if (target != null && !ids.Contains(target.TroopId))
+                    {
+                        ids.Add(target.TroopId);
+                    }
+                }
+            }
+            else if (Kind == CombatNarrationItemKind.BacteriaModifierApplied && BacteriaModifierTargets != null)
+            {
+                for (int i = 0; i < BacteriaModifierTargets.Count; i++)
+                {
+                    CombatNarrationModifierTarget target = BacteriaModifierTargets[i];
+                    if (target != null && target.Target != null && !ids.Contains(target.Target.TroopId))
+                    {
+                        ids.Add(target.Target.TroopId);
+                    }
+                }
             }
 
-            if (Kind == CombatNarrationItemKind.BacteriaModifierApplied)
-            {
-                return BacteriaModifierTargets != null
-                    ? BacteriaModifierTargets.Where(t => t != null && t.Target != null).Select(t => t.Target.TroopId).Distinct().ToList()
-                    : new List<int>();
-            }
-
-            return new List<int>();
+            return ids;
         }
 
         public void RemoveBacteriaTarget(int troopId)
@@ -925,7 +936,6 @@ namespace SongsOfConquestAccess.Events
         WielderEssenceGenerated,
         TroopCreated,
         MapEntityCreated,
-        MapEntityDestroyed,
         Push,
         Ability,
         Teleport,

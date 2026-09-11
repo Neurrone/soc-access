@@ -388,6 +388,8 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
+            // A thing on the board being destroyed is deliberately quiet: the damage that
+            // destroyed it has already said so ("... destroying it").
             DestroyBattleMapEntityCommand.Response destroyedEntity = response as DestroyBattleMapEntityCommand.Response;
             if (destroyedEntity != null)
             {
@@ -456,6 +458,8 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
+            // The ability was already announced when it began. Completion is recognised here only
+            // so that HandleResponse can restart the batching wait for the effects that follow it.
             TroopAbilityActivationCompleteCommand.Response abilityComplete = response as TroopAbilityActivationCompleteCommand.Response;
             if (abilityComplete != null)
             {
