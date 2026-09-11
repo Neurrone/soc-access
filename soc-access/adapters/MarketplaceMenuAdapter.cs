@@ -421,22 +421,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string FormatResource(ResourceType resourceType)
         {
-            string key = "Common/Resource/" + resourceType;
-            string text = _localization != null ? _localization.GetText(key) : string.Empty;
-            if (!string.IsNullOrWhiteSpace(text) && text != key)
-            {
-                return SpokenLines.Clean(text);
-            }
-
-            switch (resourceType)
-            {
-                case ResourceType.AncientAmber:
-                    return "Ancient Amber";
-                case ResourceType.CelestialOre:
-                    return "Celestial Ore";
-                default:
-                    return resourceType.ToString();
-            }
+            return ResourceCosts.Name(_localization, resourceType);
         }
 
         private static T GetFieldValue<T>(object owner, FieldInfo field, T fallback)

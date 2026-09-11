@@ -1073,28 +1073,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetEssenceName(EssenceType type)
         {
-            string key = "Units/Types/" + type;
-            string localized = SpokenText.Get(_localization, key, string.Empty);
-            if (!string.IsNullOrWhiteSpace(localized) && localized != key)
-            {
-                return localized;
-            }
-
-            switch (type)
-            {
-                case EssenceType.Order:
-                    return "Order";
-                case EssenceType.Creation:
-                    return "Creation";
-                case EssenceType.Chaos:
-                    return "Chaos";
-                case EssenceType.Arcana:
-                    return "Arcana";
-                case EssenceType.Destruction:
-                    return "Destruction";
-                default:
-                    return type.ToString();
-            }
+            return EssenceText.Name(_localization, type);
         }
 
         private UIButton GetQueueEntryButton(IQueueHUDEntry entry)

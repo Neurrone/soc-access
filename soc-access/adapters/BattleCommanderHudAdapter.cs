@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using HarmonyLib;
 using SongsOfConquest;
 using SongsOfConquest.Client.Battle;
@@ -191,7 +190,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetEssenceLabel(CombatHudSide side, EssenceType essenceType)
         {
-            return SpokenText.Get(_localization, "Units/Types/" + essenceType, FormatEnumName(essenceType.ToString()))
+            return EssenceText.Name(_localization, essenceType)
                 + ", "
                 + GetEssenceAmount(side, essenceType);
         }
@@ -363,7 +362,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            parts.Add(SpokenText.Get(_localization, "Units/Types/" + essenceType, FormatEnumName(essenceType.ToString())) + " " + amount);
+            parts.Add(EssenceText.Name(_localization, essenceType) + " " + amount);
         }
 
         private Component GetEssenceTooltipComponent(CombatHudSide side, EssenceType essenceType)
@@ -397,14 +396,5 @@ namespace SongsOfConquestAccess.Adapters
             return Reflect.Get<Component>(container, field);
         }
 
-        private static string FormatEnumName(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return string.Empty;
-            }
-
-            return Regex.Replace(name, "([a-z])([A-Z])", "$1 $2");
-        }
     }
 }

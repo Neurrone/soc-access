@@ -1411,18 +1411,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetResourceName(ResourceType type, int amount)
         {
-            string key = "Common/Resource/" + type;
-            if (_localization != null)
-            {
-                string localized = _localization.GetPluralText(key, amount);
-                localized = localized != null ? localized.Trim() : string.Empty;
-                if (!string.IsNullOrWhiteSpace(localized) && localized != key)
-                {
-                    return localized;
-                }
-            }
-
-            return type.ToString();
+            return ResourceCosts.Name(_localization, type, amount);
         }
 
         private static string GetButtonLabel(UIButton button)

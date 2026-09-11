@@ -146,7 +146,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetResourceName(ResourceType type)
         {
-            return SpokenLines.Clean(GameText.Get(_localization, "Common/Resource/" + type, string.Empty));
+            return ResourceCosts.Name(_localization, type);
         }
 
         public sealed class ResourceItem

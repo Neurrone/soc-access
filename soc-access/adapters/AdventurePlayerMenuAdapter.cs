@@ -438,7 +438,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public string GetResourceLabel(ResourceType resourceType)
             {
-                string name = SpokenLines.Clean(GameText.Get(_adapter != null ? _adapter._localization : null, "Common/Resource/" + resourceType, string.Empty));
+                string name = ResourceCosts.Name(_adapter != null ? _adapter._localization : null, resourceType);
                 string amount = UITextMeshTextUtility.Spoken(GetResourceAmountText(resourceType));
                 string income = GameObjects.IsLive(GetResourceIncomeText(resourceType))
                     ? UITextMeshTextUtility.Spoken(GetResourceIncomeText(resourceType))

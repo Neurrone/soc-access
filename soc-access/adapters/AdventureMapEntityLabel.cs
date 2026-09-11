@@ -299,7 +299,7 @@ namespace SongsOfConquestAccess.Adapters
                 return baseName;
             }
 
-            string essenceName = GameText.Get(localization, "Units/Types/" + essence, essence.ToString());
+            string essenceName = EssenceText.Name(localization, essence);
             return string.IsNullOrWhiteSpace(essenceName)
                 ? baseName
                 : ModText.Get(localization, ModStrings.Common.EssenceVariant, baseName, essenceName);

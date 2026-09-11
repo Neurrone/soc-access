@@ -461,21 +461,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetEssenceName(EssenceType essenceType)
         {
-            switch (essenceType)
-            {
-                case EssenceType.Order:
-                    return SpokenText.Get(Localization, "Units/Types/Order", "Order");
-                case EssenceType.Creation:
-                    return SpokenText.Get(Localization, "Units/Types/Creation", "Creation");
-                case EssenceType.Chaos:
-                    return SpokenText.Get(Localization, "Units/Types/Chaos", "Chaos");
-                case EssenceType.Arcana:
-                    return SpokenText.Get(Localization, "Units/Types/Arcana", "Arcana");
-                case EssenceType.Destruction:
-                    return SpokenText.Get(Localization, "Units/Types/Destruction", "Destruction");
-                default:
-                    return SpokenLines.Clean(essenceType.ToString());
-            }
+            return EssenceText.Name(Localization, essenceType);
         }
 
         private Tooltip FirstTooltipWithLines(params Component[] components)

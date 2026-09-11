@@ -707,21 +707,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetResourceName(ResourceType resourceType)
         {
-            string fallback;
-            switch (resourceType)
-            {
-                case ResourceType.AncientAmber:
-                    fallback = "Ancient Amber";
-                    break;
-                case ResourceType.CelestialOre:
-                    fallback = "Celestial Ore";
-                    break;
-                default:
-                    fallback = resourceType.ToString();
-                    break;
-            }
-
-            return GameText.Get(_localization, "Common/Resource/" + resourceType, fallback);
+            return ResourceCosts.Name(_localization, resourceType);
         }
 
         private static string FormatAmount(int amount)

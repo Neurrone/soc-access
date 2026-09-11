@@ -260,7 +260,7 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The game's own name for gold.</summary>
         public string GoldName
         {
-            get { return GameText.Get(_localization, "Common/Resource/" + ResourceType.Gold, ResourceType.Gold.ToString()); }
+            get { return ResourceCosts.Name(_localization, ResourceType.Gold); }
         }
 
         /// <summary>Whether the game will take the click: it turns the button off when the local team

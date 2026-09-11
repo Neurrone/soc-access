@@ -239,14 +239,7 @@ namespace SongsOfConquestAccess.Adapters
         /// (<c>WorldChoiceMenu.cs</c> line 743).</summary>
         private static string GetResourceName(ResourceType type, int amount)
         {
-            if (GlobalLocalizationVariables.LocalizationHandler == null)
-            {
-                return type.ToString();
-            }
-
-            return GlobalLocalizationVariables.LocalizationHandler.GetPluralText(
-                new Resource(type, amount).GetLocalizationKey(),
-                amount);
+            return ResourceCosts.Name(GlobalLocalizationVariables.LocalizationHandler, type, amount);
         }
 
         /// <summary>The number out of the drawn amount ("-30"), for the plural form.</summary>

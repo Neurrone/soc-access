@@ -131,7 +131,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 UITextMesh text = KingdomOverviewRead.GetText(entry, IncomeTextFields[i]);
                 incomes.Add(new IncomeItem(
-                    GameText.Get("Common/Resource/" + IncomeResources[i], string.Empty),
+                    ResourceCosts.Name(IncomeResources[i]),
                     KingdomOverviewRead.NormalizeText(text),
                     text != null && text.gameObject.activeInHierarchy));
             }

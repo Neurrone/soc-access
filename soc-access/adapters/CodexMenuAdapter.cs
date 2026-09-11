@@ -814,42 +814,9 @@ namespace SongsOfConquestAccess.Adapters
             return rect != null && (rect.rect.width <= 0.1f || rect.rect.height <= 0.1f);
         }
 
-        private string GetEssenceName(EssenceType essenceType)
-        {
-            return SpokenText.Get(_localization, "Units/Types/" + essenceType, FormatEnumName(essenceType.ToString()));
-        }
-
         private string GetEssenceAmountText(EssenceType essenceType, int count)
         {
-            if (count <= 1)
-            {
-                return GetEssenceName(essenceType);
-            }
-
-            string essenceName = GetEssenceName(essenceType);
-            return SpokenText.Get(_localization, "Units/Types/" + essenceType + "Multiple", count + " " + essenceName, count);
-        }
-
-        private static string FormatEnumName(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
-            List<char> chars = new List<char>();
-            for (int i = 0; i < value.Length; i++)
-            {
-                char c = value[i];
-                if (i > 0 && char.IsUpper(c))
-                {
-                    chars.Add(' ');
-                }
-
-                chars.Add(c);
-            }
-
-            return new string(chars.ToArray());
+            return EssenceText.Amount(_localization, essenceType, count);
         }
 
         private T GetCurrentProviderField<T>(string fieldName) where T : class

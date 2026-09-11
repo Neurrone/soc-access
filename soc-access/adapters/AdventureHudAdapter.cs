@@ -464,7 +464,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetResourceName(ResourceType resourceType)
         {
-            return Localize("Common/Resource/" + resourceType, FormatEnumName(resourceType.ToString()));
+            return ResourceCosts.Name(LocalizationHandler, resourceType);
         }
 
         public void FocusResource(ResourceType resourceType)
@@ -1436,7 +1436,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetEssenceName(EssenceType essenceType)
         {
-            return Localize("Units/Types/" + essenceType, FormatEnumName(essenceType.ToString()));
+            return EssenceText.Name(LocalizationHandler, essenceType);
         }
 
         private TroopHUDEntry GetTroopSlot(int index)
@@ -1954,34 +1954,6 @@ namespace SongsOfConquestAccess.Adapters
         private string GetMapEntityName(IMapEntity entity)
         {
             return AdventureMapEntityLabel.GetMapEntityName(Facade, SelectionHandler, LocalizationHandler, entity);
-        }
-
-        private static string FormatEnumName(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
-            List<char> chars = new List<char>(value.Length + 4);
-            for (int i = 0; i < value.Length; i++)
-            {
-                char current = value[i];
-                if (i > 0 && char.IsUpper(current) && !char.IsUpper(value[i - 1]) && value[i - 1] != ' ')
-                {
-                    chars.Add(' ');
-                }
-
-                chars.Add(current);
-            }
-
-            string formatted = new string(chars.ToArray()).Trim();
-            if (formatted.Length == 0)
-            {
-                return string.Empty;
-            }
-
-            return char.ToUpperInvariant(formatted[0]) + (formatted.Length > 1 ? formatted.Substring(1) : string.Empty);
         }
 
         private sealed class ObjectiveEntrySnapshot

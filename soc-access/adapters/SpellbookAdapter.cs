@@ -816,27 +816,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetEssenceName(EssenceType type)
         {
-            string localized = Localize("Units/Types/" + type);
-            if (!string.IsNullOrWhiteSpace(localized) && localized != "Units/Types/" + type)
-            {
-                return localized;
-            }
-
-            switch (type)
-            {
-                case EssenceType.Order:
-                    return "Order";
-                case EssenceType.Creation:
-                    return "Creation";
-                case EssenceType.Chaos:
-                    return "Chaos";
-                case EssenceType.Arcana:
-                    return "Arcana";
-                case EssenceType.Destruction:
-                    return "Destruction";
-                default:
-                    return type.ToString();
-            }
+            return EssenceText.Name(GetLocalization(), type);
         }
 
         private string Localize(string key)

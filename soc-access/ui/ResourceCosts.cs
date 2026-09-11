@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquest.Common.Economy;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 
@@ -30,32 +31,32 @@ namespace SongsOfConquestAccess.UI
             return parts.Count == 0 ? string.Empty : ModText.JoinList(parts);
         }
 
-        /// <summary>The game's own name for a resource.</summary>
+        /// <summary>The game's own name for a resource, through the localization handler the game
+        /// currently holds.</summary>
         public static string Name(ResourceType resourceType)
         {
-            return GameText.Get("Common/Resource/" + resourceType, FormatEnumName(resourceType.ToString()));
+            return SpokenLines.Clean(GameText.Get(Key(resourceType), string.Empty));
         }
 
-        private static string FormatEnumName(string value)
+        /// <summary>The game's own name for a resource, through a menu's own handler.</summary>
+        public static string Name(ILocalizationHandler localization, ResourceType resourceType)
         {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
+            return SpokenLines.Clean(GameText.Get(localization, Key(resourceType), string.Empty));
+        }
 
-            List<char> chars = new List<char>();
-            for (int i = 0; i < value.Length; i++)
-            {
-                char c = value[i];
-                if (i > 0 && char.IsUpper(c) && !char.IsWhiteSpace(value[i - 1]))
-                {
-                    chars.Add(' ');
-                }
+        /// <summary>The game's own name for a resource in the plural form it uses for an amount:
+        /// the tables carry one form per count, and the game asks for them this way itself
+        /// (<c>Resource.ToString</c> reads GetPluralText off the same key).</summary>
+        public static string Name(ILocalizationHandler localization, ResourceType resourceType, int amount)
+        {
+            return SpokenLines.Clean(GameText.Plural(localization, Key(resourceType), amount, string.Empty));
+        }
 
-                chars.Add(char.ToLowerInvariant(c));
-            }
-
-            return new string(chars.ToArray());
+        /// <summary>The key the game itself composes for a resource's name
+        /// (<c>ResourceExtensions.GetLocalizationKey</c>).</summary>
+        public static string Key(ResourceType resourceType)
+        {
+            return "Common/Resource/" + resourceType;
         }
     }
 }
