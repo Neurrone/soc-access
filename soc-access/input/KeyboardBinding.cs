@@ -53,9 +53,11 @@ namespace SongsOfConquestAccess.Input
             AccessibilityInputRouter.KeyboardStateSnapshot state,
             out Key pressedKey)
         {
-            pressedKey = Key;
+            // The key that physically went down, numpad or main block, is what the router watches
+            // for the release; the binding's own key names only the pair.
+            pressedKey = keyControl != null ? keyControl.keyCode : Key;
             return keyControl != null
-                && Key == keyControl.keyCode
+                && KeyAliases.Canonical(Key) == KeyAliases.Canonical(keyControl.keyCode)
                 && state != null
                 && state.Ctrl == Ctrl
                 && state.Shift == Shift

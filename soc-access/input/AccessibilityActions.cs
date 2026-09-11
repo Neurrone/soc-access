@@ -240,15 +240,15 @@ namespace SongsOfConquestAccess.Input
         /// action plus <see cref="UiLeftClickCtrlBindingIndex"/>.
         /// </summary>
         public static readonly InputAction UiLeftClick = OneShot("ui_left_click", ModStrings.Actions.UiLeftClick, InputClaimScope.Screen)
+            // Enter here is the numpad's Enter too, as every Enter and digit binding is
+            // (KeyAliases), so the pair is written once.
             .AddBinding(new KeyboardBinding(Key.Enter))
-            .AddBinding(new KeyboardBinding(Key.NumpadEnter))
-            .AddBinding(new KeyboardBinding(Key.Enter, ctrl: true))
-            .AddBinding(new KeyboardBinding(Key.NumpadEnter, ctrl: true));
+            .AddBinding(new KeyboardBinding(Key.Enter, ctrl: true));
 
         /// <summary>Which of <see cref="UiLeftClick"/>'s bindings is Ctrl+Enter - what a usage hint
         /// for the Ctrl+left click names, since a hint addresses a chord as (action, binding
         /// index).</summary>
-        public const int UiLeftClickCtrlBindingIndex = 2;
+        public const int UiLeftClickCtrlBindingIndex = 1;
 
         // The way out of a type-ahead search: claimed only while one is live, so Backspace stays the
         // game's everywhere else.

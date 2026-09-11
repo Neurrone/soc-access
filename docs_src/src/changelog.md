@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Every mod gesture on `Enter` or a digit now answers the numpad key too, and a gesture rebound to a numpad key answers the main-block one, the way the game's own `1 or Numpad 1` bindings do
 - Custom scanner categories are now three fixed numbered slots per context instead of a list you add to. `,`, `.` and `/` always walk custom categories 1, 2 and 3, so there is no key to choose any more, and `Clear this custom category` empties a slot in place of deleting it. Categories you already had keep the slot their key gave them, and anything past the third is dropped
 
 - The `Keybinds` tab now lists the cursor keys (arrows, `Tab`, `Home`, `End`, clicks and the rest) as its first region and the review buffer as its own, puts the resource summaries with the adventure map and combat, the look-around keys with the adventure map, and orders the rest adventure map, scanner, hex grid, combat, bookmarks. The `Shift+arrow` rows read `Move to next interesting tile ...`, `D` reads `Describe map`, `Space` reads `Start drag` and `Backspace` reads `Clear typeahead`
