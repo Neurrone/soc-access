@@ -22,11 +22,15 @@ namespace SongsOfConquestAccess.Adapters
     {
         private static readonly FieldInfo CurrentEntriesField = AccessTools.Field(typeof(PurchaseTroopsSubMenu), "_currentEntries");
         private static readonly FieldInfo FactionLookupField = AccessTools.Field(typeof(PurchaseTroopsSubMenu), "_factionLookup");
-        private static readonly HashSet<string> LoggedTroopNameFailures = new HashSet<string>();
-
         private readonly PurchaseTroopsSubMenu _subMenu;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
+
+        // Which troop-name failures have already been written to the log. It belongs to the adapter
+        // because it is about THIS sub-menu instance: a build runs every frame, so a name the game
+        // has stopped answering would write a line a frame, and a sub-menu opened again is entitled
+        // to report it once more (AGENTS.md, "Screen Resolution").
+        private readonly HashSet<string> _reportedNameFailures = new HashSet<string>();
 
         public PurchaseTroopsSubMenuAdapter(PurchaseTroopsSubMenu subMenu, IClientAdventureFacade facade, ILocalizationHandler localization)
         {
@@ -68,14 +72,14 @@ namespace SongsOfConquestAccess.Adapters
                 PurchaseTroopsEntry active = entry as PurchaseTroopsEntry;
                 if (active != null)
                 {
-                    result.Add(new ActiveRecruitEntry(active, _facade, _localization, factionLookup));
+                    result.Add(new ActiveRecruitEntry(active, _facade, _localization, factionLookup, _reportedNameFailures));
                     continue;
                 }
 
                 PurchaseTroopsInactiveEntry inactive = entry as PurchaseTroopsInactiveEntry;
                 if (inactive != null)
                 {
-                    result.Add(new InactiveRecruitEntry(inactive, _facade, _localization, factionLookup));
+                    result.Add(new InactiveRecruitEntry(inactive, _facade, _localization, factionLookup, _reportedNameFailures));
                 }
             }
 
@@ -84,8 +88,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public abstract class RecruitEntry
         {
-            protected RecruitEntry(IPurchaseTroopsEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization, IFactionLookup factionLookup)
+            private readonly HashSet<string> _reportedNameFailures;
+
+            protected RecruitEntry(IPurchaseTroopsEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization, IFactionLookup factionLookup, HashSet<string> reportedNameFailures)
             {
+                _reportedNameFailures = reportedNameFailures;
                 Entry = entry;
                 Facade = facade;
                 Localization = localization;
@@ -97,7 +104,6 @@ namespace SongsOfConquestAccess.Adapters
             protected ILocalizationHandler Localization { get; private set; }
             protected IFactionLookup FactionLookup { get; private set; }
 
-            public abstract string IdPrefix { get; }
             public abstract string TroopName { get; }
             public abstract Tooltip Tooltip { get; }
             public abstract string NoTroopsText { get; }
@@ -152,27 +158,6 @@ namespace SongsOfConquestAccess.Adapters
                 get { return Entry != null ? Entry.TroopReference : default(TroopReference); }
             }
 
-            protected string BuildIdPrefix()
-            {
-                TroopReference reference = TroopReference;
-                return "recruit-"
-                    + reference.FactionIndex
-                    + "-"
-                    + reference.UnitIndex
-                    + "-"
-                    + BuildStableUpgradeId(reference.UpgradeType);
-            }
-
-            private static string BuildStableUpgradeId(TroopUpgradeType upgradeType)
-            {
-                if (upgradeType.IsEssenceUpgrade())
-                {
-                    return TroopUpgradeType.Upgraded.ToString().ToLowerInvariant();
-                }
-
-                return upgradeType.ToString().ToLowerInvariant();
-            }
-
             protected string ResolveTroopName()
             {
                 try
@@ -219,7 +204,7 @@ namespace SongsOfConquestAccess.Adapters
                 return Tooltip.ForComponent(target, Localization);
             }
 
-            private static void LogTroopNameFailure(TroopReference reference, string reason)
+            private void LogTroopNameFailure(TroopReference reference, string reason)
             {
                 string key = reference.FactionIndex
                     + ":"
@@ -228,7 +213,7 @@ namespace SongsOfConquestAccess.Adapters
                     + reference.UpgradeType
                     + ":"
                     + reason;
-                if (!LoggedTroopNameFailures.Add(key))
+                if (_reportedNameFailures != null && !_reportedNameFailures.Add(key))
                 {
                     return;
                 }
@@ -270,13 +255,12 @@ namespace SongsOfConquestAccess.Adapters
 
             private readonly PurchaseTroopsEntry _entry;
 
-            public ActiveRecruitEntry(PurchaseTroopsEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization, IFactionLookup factionLookup)
-                : base(entry, facade, localization, factionLookup)
+            public ActiveRecruitEntry(PurchaseTroopsEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization, IFactionLookup factionLookup, HashSet<string> reportedNameFailures)
+                : base(entry, facade, localization, factionLookup, reportedNameFailures)
             {
                 _entry = entry;
             }
 
-            public override string IdPrefix { get { return BuildIdPrefix(); } }
             public override string TroopName { get { return ResolveTroopName(); } }
             public override Tooltip Tooltip { get { return BuildEntryTooltip(); } }
             public override string NoTroopsText { get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, NoTroopsTextField)); } }
@@ -457,13 +441,12 @@ namespace SongsOfConquestAccess.Adapters
 
             private readonly PurchaseTroopsInactiveEntry _entry;
 
-            public InactiveRecruitEntry(PurchaseTroopsInactiveEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization, IFactionLookup factionLookup)
-                : base(entry, facade, localization, factionLookup)
+            public InactiveRecruitEntry(PurchaseTroopsInactiveEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization, IFactionLookup factionLookup, HashSet<string> reportedNameFailures)
+                : base(entry, facade, localization, factionLookup, reportedNameFailures)
             {
                 _entry = entry;
             }
 
-            public override string IdPrefix { get { return BuildIdPrefix(); } }
             public override string TroopName { get { return ResolveTroopName(); } }
             public override Tooltip Tooltip { get { return BuildEntryTooltip(); } }
             public override string NoTroopsText { get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_entry, NoTroopsTextField)); } }

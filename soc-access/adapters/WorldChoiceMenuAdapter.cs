@@ -37,6 +37,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly ILocalizationHandler _localization;
         private readonly IClientAdventureFacade _facade;
         private WielderInteract _wielder;
+        private PropertyInfo _activeItemsProperty;
+        private bool _activeItemsProbed;
 
         public WorldChoiceMenuAdapter(WorldChoiceMenu menu)
         {
@@ -90,7 +92,7 @@ namespace SongsOfConquestAccess.Adapters
                 && _settings != null
                 && AsyncField != null
                 && AsyncField.GetValue(_menu) != null
-                && (GetRewardButtons().Count > 0 || GetPenaltyButtons().Count > 0 || GetGenericChoiceButtons().Count > 0);
+                && HasAnyChoiceButton();
         }
 
         /// <summary>The button that commits the chosen card.</summary>
@@ -259,6 +261,60 @@ namespace SongsOfConquestAccess.Adapters
                 && ArtifactSpeechFormatter.TryFormatName(details, _localization, out artifactName);
         }
 
+        /// <summary>Whether the menu has drawn a card of any kind, asked without building the
+        /// lists the page builds: this runs on every screen's tick, the page's only when it is up.
+        /// </summary>
+        private bool HasAnyChoiceButton()
+        {
+            if (HasButtons(RewardButtonsField) || HasButtons(PenaltyButtonsField))
+            {
+                return true;
+            }
+
+            IEnumerable activeItems = GetActiveButtonPoolItems();
+            if (activeItems == null)
+            {
+                return false;
+            }
+
+            foreach (object item in activeItems)
+            {
+                IWorldMapChoiceButton button = item as IWorldMapChoiceButton;
+                if (button != null && button.Button != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool HasButtons(FieldInfo field)
+        {
+            List<IWorldMapChoiceButton> buttons = Reflect.Get<List<IWorldMapChoiceButton>>(_menu, field);
+            return buttons != null && buttons.Count > 0;
+        }
+
+        /// <summary>What the menu's own button pool is holding, through a property handle resolved
+        /// once for the life of the adapter: the pool's runtime type is one the mod cannot name at
+        /// compile time, and this is read on every tick.</summary>
+        private IEnumerable GetActiveButtonPoolItems()
+        {
+            object buttonPool = _menu != null && ButtonPoolField != null ? ButtonPoolField.GetValue(_menu) : null;
+            if (buttonPool == null)
+            {
+                return null;
+            }
+
+            if (!_activeItemsProbed)
+            {
+                _activeItemsProbed = true;
+                _activeItemsProperty = buttonPool.GetType().GetProperty("ActiveItems");
+            }
+
+            return _activeItemsProperty != null ? _activeItemsProperty.GetValue(buttonPool, null) as IEnumerable : null;
+        }
+
         private List<IWorldMapChoiceButton> GetRewardButtons()
         {
             List<IWorldMapChoiceButton> buttons = Reflect.Get<List<IWorldMapChoiceButton>>(_menu, RewardButtonsField);
@@ -273,9 +329,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private List<IWorldMapChoiceButton> GetGenericChoiceButtons()
         {
-            object buttonPool = _menu != null && ButtonPoolField != null ? ButtonPoolField.GetValue(_menu) : null;
-            PropertyInfo activeItemsProperty = buttonPool != null ? buttonPool.GetType().GetProperty("ActiveItems") : null;
-            IEnumerable activeItems = activeItemsProperty != null ? activeItemsProperty.GetValue(buttonPool, null) as IEnumerable : null;
+            IEnumerable activeItems = GetActiveButtonPoolItems();
             List<IWorldMapChoiceButton> buttons = new List<IWorldMapChoiceButton>();
             if (activeItems == null)
             {

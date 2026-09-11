@@ -25,9 +25,10 @@ namespace SongsOfConquestAccess.Adapters
 
         // The game keeps its cards in a dictionary, so every entry read is a KeyValuePair whose Value
         // property was looked up by name on every card on every build. The pair type is the same one
-        // every time.
-        private static Type PairType;
-        private static PropertyInfo PairValueProperty;
+        // every time, so the handle is resolved once per sub-menu instance and lives and dies with
+        // this adapter rather than in a static nothing resets.
+        private Type _pairType;
+        private PropertyInfo _pairValueProperty;
 
         private readonly UpgradeTroopsSubMenu _subMenu;
         private readonly ILocalizationHandler _localization;
@@ -129,7 +130,7 @@ namespace SongsOfConquestAccess.Adapters
             return result;
         }
 
-        private static object GetPairValue(object pair)
+        private object GetPairValue(object pair)
         {
             if (pair == null)
             {
@@ -137,13 +138,13 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             Type pairType = pair.GetType();
-            if (!ReferenceEquals(PairType, pairType))
+            if (!ReferenceEquals(_pairType, pairType))
             {
-                PairType = pairType;
-                PairValueProperty = pairType.GetProperty("Value");
+                _pairType = pairType;
+                _pairValueProperty = pairType.GetProperty("Value");
             }
 
-            return PairValueProperty != null ? PairValueProperty.GetValue(pair, null) : null;
+            return _pairValueProperty != null ? _pairValueProperty.GetValue(pair, null) : null;
         }
 
         private static string JoinVisibleText(UITextMesh[] textMeshes)
@@ -243,6 +244,18 @@ namespace SongsOfConquestAccess.Adapters
             public Component TargetTroopButton
             {
                 get { return Reflect.Get<UIButton>(_entry, TargetButtonField) as Component; }
+            }
+
+            /// <summary>Whether the card is drawing the portrait of the troop it would upgrade, and
+            /// the one it would upgrade them into.</summary>
+            public bool IsCurrentTroopVisible
+            {
+                get { return GameObjects.IsLive(Reflect.Get<UIButton>(_entry, CurrentButtonField) as Component); }
+            }
+
+            public bool IsTargetTroopVisible
+            {
+                get { return GameObjects.IsLive(Reflect.Get<UIButton>(_entry, TargetButtonField) as Component); }
             }
 
             public Component Slider

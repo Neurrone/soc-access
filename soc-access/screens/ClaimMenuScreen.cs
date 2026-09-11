@@ -120,9 +120,25 @@ namespace SongsOfConquestAccess.Screens
             {
                 ClaimMenuAdapter.ChoiceItem choice = choices[i];
                 builder.AddItem(new DrawnNode(
-                    ControlId.For(choice.Toggle, "claim-menu:" + choice.IdSuffix),
+                    ControlId.For(choice.Toggle, "claim-menu:" + IdSuffix(choice.Kind)),
                     Choice(choice),
                     choice.Toggle));
+            }
+        }
+
+        /// <summary>What each of the game's four choices is called in a node id.</summary>
+        private static string IdSuffix(ClaimChoiceKind kind)
+        {
+            switch (kind)
+            {
+                case ClaimChoiceKind.Raze:
+                    return "raze";
+                case ClaimChoiceKind.Loot:
+                    return "loot";
+                case ClaimChoiceKind.Convert:
+                    return "convert";
+                default:
+                    return "occupy";
             }
         }
 

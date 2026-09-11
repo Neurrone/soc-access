@@ -25,6 +25,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo HeaderField = AccessTools.Field(typeof(TownInteractionMenu), "_wielderInteractHeader");
         private static readonly FieldInfo BackToTopButtonField = AccessTools.Field(typeof(TownInteractionMenu), "_backToTopButton");
         private static readonly FieldInfo TutorialButtonField = AccessTools.Field(typeof(TownInteractionMenu), "_tutorialButton");
+        private static readonly FieldInfo RecruitmentPoolField = AccessTools.Field(typeof(TownInteractionMenu), "_recruitmentPool");
         private static readonly FieldInfo LandingPageContainerField = AccessTools.Field(typeof(TownInteractionMenu), "_landingPageContainer");
         private static readonly FieldInfo BuildingNameField = AccessTools.Field(typeof(TownInteractionMenu), "_buildingName");
         private static readonly FieldInfo PurchaseTroopsButtonField = AccessTools.Field(typeof(TownInteractionMenu), "_purchaseTroopsButton");
@@ -38,11 +39,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(TownInteractionMenu), "_adventureFacade");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(TownInteractionMenu), "_localizationHandler");
         private static readonly FieldInfo InteractingCommanderIdField = AccessTools.Field(typeof(TownInteractionMenu), "_interactingCommanderId");
-        private static readonly FieldInfo MapEntityField = AccessTools.Field(typeof(TownInteractionMenu), "_mapEntity");
 
         private static readonly FieldInfo HeaderCloseButtonField = AccessTools.Field(typeof(WielderInteractHeader), "_closeButton");
-        private static readonly FieldInfo HeaderPortraitField = AccessTools.Field(typeof(WielderInteractHeader), "_wielderPortrait");
-        private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
         private static readonly FieldInfo HeaderCustomNameContainerField = AccessTools.Field(typeof(WielderInteractHeader), "_customNameContainer");
         private static readonly FieldInfo HeaderCustomNameTextField = AccessTools.Field(typeof(WielderInteractHeader), "_customNameText");
 
@@ -83,15 +81,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetInteractingCommanderId(); }
         }
 
-        public int SettlementMapEntityId
-        {
-            get
-            {
-                IMapEntity mapEntity = Reflect.Get<IMapEntity>(_menu, MapEntityField);
-                return mapEntity != null ? mapEntity.Id : -1;
-            }
-        }
-
         /// <summary>The menu's own LANDING page is drawn: the page this adapter reads. A troop
         /// sub-page over it is a page of its own (<c>IsDraftPresent</c>, <c>IsUpgradePresent</c>),
         /// read by <c>TroopManagementScreenBase</c> through the host interface.</summary>
@@ -125,16 +114,6 @@ namespace SongsOfConquestAccess.Adapters
         public string CustomName
         {
             get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(GetHeader(), HeaderCustomNameTextField)); }
-        }
-
-        public string VisitingWielderName
-        {
-            get
-            {
-                int commanderId = GetInteractingCommanderId();
-                string name = commanderId >= 0 && _facade != null ? _facade.Commanders.GetName(commanderId) : string.Empty;
-                return SpokenLines.Clean(name);
-            }
         }
 
         /// <summary>The band the menu hangs across its top: the visiting wielder, their army and the
@@ -172,16 +151,6 @@ namespace SongsOfConquestAccess.Adapters
         public bool ActivateTutorial()
         {
             return NativeSelectionUtility.Click(GetTutorialButton());
-        }
-
-        public Tooltip VisitingWielderTooltip
-        {
-            get { return Tooltip.ForComponent(Reflect.Get<UIImage>(GetHeader(), HeaderPortraitField) as Component, _localization); }
-        }
-
-        public TroopHudAdapter VisitingTroops
-        {
-            get { return new TroopHudAdapter(Reflect.Get<TroopHUD>(GetHeader(), HeaderTroopHudField), _facade, _localization); }
         }
 
         /// <summary>The settlement's own army. Kept: the adapter wakes the game's drag ghost when it
@@ -477,12 +446,30 @@ namespace SongsOfConquestAccess.Adapters
             NativeTooltipUtility.HideTooltip();
         }
 
+        /// <summary>Whether the building this menu is about is still in the game. A menu holds its
+        /// recruitment pool - and with it the map entity - from one Show to the next and does not
+        /// clear it on Close, so a menu left open over an entity that has gone (a save loaded under
+        /// it, the building destroyed) keeps every other sign of being up: its object is still
+        /// active, its sub-page is still drawn, and its Async is still uncompleted because Close
+        /// never ran. The entity's own IsDisposed is what the game changes
+        /// (<c>AbstractMapEntity.Dispose</c>), so that is what is read.</summary>
+        private bool IsEntityAlive()
+        {
+            IRecruitmentPoolComponent pool = Reflect.Get<IRecruitmentPoolComponent>(_menu, RecruitmentPoolField);
+            IMapEntity entity = pool != null ? pool.MapEntity : null;
+            return entity != null && !entity.IsDisposed;
+        }
+
+        /// <summary>The menu object is up AND it is still about a building that exists: the landing
+        /// page, the draft page and the upgrade page are all pages of THIS town, so a town that has
+        /// gone takes all three with it.</summary>
         private bool IsMenuOpen()
         {
             return _menu != null
                 && _menu.gameObject != null
                 && _menu.gameObject.activeInHierarchy
-                && Reflect.Get<Async>(_menu, AsyncField) != null;
+                && Reflect.Get<Async>(_menu, AsyncField) != null
+                && IsEntityAlive();
         }
 
         private WielderInteractHeader GetHeader()

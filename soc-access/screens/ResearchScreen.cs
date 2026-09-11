@@ -162,7 +162,7 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 ResearchMenuAdapter.BuildingItem it = building;
-                NodeVtable vtable = GraphNodes.Tab(() => it.Label, () => it.IsSelected);
+                NodeVtable vtable = GraphNodes.Tab(() => BuildingLabel(it), () => it.IsSelected);
                 // Both drawn on the tab: what the building researches, and, when the team owns none
                 // of it, that nothing under the tab can be bought.
                 GraphNodes.ParagraphParts(vtable, () => it.DescriptionLines);
@@ -191,7 +191,7 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                builder.PushContext(category.Label);
+                builder.PushContext(CategoryLabel(category));
                 builder.SetRegion("research:category/" + c);
                 for (int i = 0; i < category.Items.Count; i++)
                 {
@@ -225,18 +225,45 @@ namespace SongsOfConquestAccess.Screens
             builder.LandStopOn(first);
         }
 
+        /// <summary>What a building tab is called: its own name, or where it is in the bar where
+        /// the game draws it none.</summary>
+        private static string BuildingLabel(ResearchMenuAdapter.BuildingItem building)
+        {
+            return string.IsNullOrWhiteSpace(building.Label)
+                ? ModText.Get(ModStrings.Screens.BuildingNumber, building.Index + 1)
+                : building.Label;
+        }
+
+        /// <summary>What a category is called: its own name, or where it is on the page where the
+        /// game draws it none.</summary>
+        private static string CategoryLabel(ResearchMenuAdapter.CategoryItem category)
+        {
+            return string.IsNullOrWhiteSpace(category.Label)
+                ? ModText.Get(ModStrings.Screens.ResearchCategoryNumber, category.Index + 1)
+                : category.Label;
+        }
+
+        /// <summary>What a stack is called: its own name, or where it is in its category where the
+        /// game names it nothing.</summary>
+        private static string StackName(ResearchMenuAdapter.ResearchItem item)
+        {
+            return string.IsNullOrWhiteSpace(item.Label)
+                ? ModText.Get(ModStrings.Screens.ResearchNumber, item.Index + 1)
+                : item.Label;
+        }
+
         /// <summary>What a stack reads as: its name, and the tier the team already owns of it.</summary>
         private static string ResearchLabel(ResearchMenuAdapter.ResearchItem item)
         {
             if (item.OwnedTier <= 0)
             {
-                return item.Label;
+                return StackName(item);
             }
 
             string tierHeader = string.IsNullOrWhiteSpace(item.TierHeader)
                 ? ModText.Get(ModStrings.Screens.Tier)
                 : item.TierHeader;
-            return ModText.Get(ModStrings.Screens.ResearchTier, item.Label, tierHeader, item.OwnedTier);
+            return ModText.Get(ModStrings.Screens.ResearchTier, StackName(item), tierHeader, item.OwnedTier);
         }
 
         // ---- the close ----

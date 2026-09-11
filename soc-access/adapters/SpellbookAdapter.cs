@@ -230,7 +230,7 @@ namespace SongsOfConquestAccess.Adapters
                     groups.Add(group, items);
                 }
 
-                items.Add(new SpellItem(this, entry, group.ToString().ToLowerInvariant() + "-" + entry.SpellDefinition.Id));
+                items.Add(new SpellItem(this, entry, entry.SpellDefinition.Id));
             }
 
             return groups;
@@ -506,28 +506,31 @@ namespace SongsOfConquestAccess.Adapters
             return new PointerEventData(EventSystem.current) { button = PointerEventData.InputButton.Left };
         }
 
-        public string GetSpellLabel(ISpellDefinition spell)
+        /// <summary>The spell's own name, and null where the entry holds no spell at all.</summary>
+        public string GetSpellName(ISpellDefinition spell)
         {
-            if (spell == null)
-            {
-                return ModText.Get(ModStrings.Screens.UnknownSpell);
-            }
+            return spell == null ? null : Localize(spell.NameKey);
+        }
 
-            string name = Localize(spell.NameKey);
+        /// <summary>The game's own heading for the tier this commander casts the spell at ("Tier 3"),
+        /// and empty where the commander reaches no tier of it.</summary>
+        public string GetSpellTierLabel(ISpellDefinition spell)
+        {
             int tier = GetCurrentTier(spell);
-            string cost = FormatCost(spell);
-            string result = name;
-            if (tier > 0)
+            return tier > 0 ? GetTierLabel(tier) : string.Empty;
+        }
+
+        /// <summary>What the spell costs, one essence at a time, as the game charges it.</summary>
+        public IReadOnlyList<SpellCost> GetSpellCosts(ISpellDefinition spell)
+        {
+            List<SpellCost> costs = new List<SpellCost>();
+            for (int i = 0; spell != null && spell.Cost != null && i < spell.Cost.Count; i++)
             {
-                result += ", " + GetTierLabel(tier);
+                SpellCostEntry cost = spell.Cost[i];
+                costs.Add(new SpellCost(cost.Amount, GetEssenceName(cost.Type)));
             }
 
-            if (!string.IsNullOrWhiteSpace(cost))
-            {
-                result += ", " + cost;
-            }
-
-            return result;
+            return costs;
         }
 
         public Tooltip GetSpellTooltip(SpellbookSpellEntry entry)
@@ -731,7 +734,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetTierLabel(int tier)
         {
-            return GameText.Get(GetLocalization(), "Spells/Spellbook/SpellTierHeader", "tier " + tier, tier).Trim();
+            return GameText.Get(GetLocalization(), "Spells/Spellbook/SpellTierHeader", string.Empty, tier).Trim();
         }
 
         private int GetEssenceAmount(EssenceType essence)
@@ -794,24 +797,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string FormatCost(ISpellDefinition spell)
         {
-            if (spell == null || spell.Cost == null || spell.Cost.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            List<string> parts = new List<string>();
-            for (int i = 0; i < spell.Cost.Count; i++)
-            {
-                SpellCostEntry cost = spell.Cost[i];
-                parts.Add(FormatCostEntry(cost));
-            }
-
-            return string.Join(", ", parts.ToArray());
-        }
-
-        private string FormatCostEntry(SpellCostEntry cost)
-        {
-            return cost.Amount + " " + GetEssenceName(cost.Type);
+            return SpellCosts.Text(GetSpellCosts(spell));
         }
 
         private string GetEssenceName(EssenceType type)
@@ -868,12 +854,14 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool IsInAdventure()
         {
-            return IsInAdventureField != null && (bool)IsInAdventureField.GetValue(_spellbook);
+            object value = IsInAdventureField != null ? IsInAdventureField.GetValue(_spellbook) : null;
+            return value is bool && (bool)value;
         }
 
         private bool IsCurrentTeamsTurn()
         {
-            return IsCurrentTeamsTurnField == null || (bool)IsCurrentTeamsTurnField.GetValue(_spellbook);
+            object value = IsCurrentTeamsTurnField != null ? IsCurrentTeamsTurnField.GetValue(_spellbook) : null;
+            return value is bool ? (bool)value : true;
         }
 
         private ILocalizationHandler GetLocalization()
@@ -1023,23 +1011,45 @@ namespace SongsOfConquestAccess.Adapters
             public Tooltip TierTooltip { get; private set; }
         }
 
+        /// <summary>One essence a spell charges: the amount the game asks for, and the game's own
+        /// name for that essence.</summary>
+        public sealed class SpellCost
+        {
+            public SpellCost(int amount, string essenceName)
+            {
+                Amount = amount;
+                EssenceName = essenceName ?? string.Empty;
+            }
+
+            public int Amount { get; private set; }
+
+            public string EssenceName { get; private set; }
+        }
+
         public sealed class SpellItem
         {
             private readonly SpellbookAdapter _adapter;
             private readonly SpellbookSpellEntry _entry;
 
-            public SpellItem(SpellbookAdapter adapter, SpellbookSpellEntry entry, string id)
+            public SpellItem(SpellbookAdapter adapter, SpellbookSpellEntry entry, ushort spellId)
             {
                 _adapter = adapter;
                 _entry = entry;
-                Id = id;
+                SpellId = spellId;
             }
 
-            public string Id { get; private set; }
+            /// <summary>The game's own id for the spell this card draws.</summary>
+            public ushort SpellId { get; private set; }
 
             public SpellbookSpellEntry Entry { get { return _entry; } }
 
-            public string Label { get { return _adapter.GetSpellLabel(_entry.SpellDefinition); } }
+            /// <summary>The spell's own name, and null where the card holds no spell.</summary>
+            public string Name { get { return _adapter.GetSpellName(_entry.SpellDefinition); } }
+
+            /// <summary>The game's heading for the tier this commander casts it at, or empty.</summary>
+            public string TierLabel { get { return _adapter.GetSpellTierLabel(_entry.SpellDefinition); } }
+
+            public IReadOnlyList<SpellCost> Costs { get { return _adapter.GetSpellCosts(_entry.SpellDefinition); } }
 
             /// <summary>Whether the game reads the spell as castable; it greys the ones it does not.
             /// </summary>
@@ -1086,9 +1096,21 @@ namespace SongsOfConquestAccess.Adapters
                 get { return _entry != null && _entry.Spell != null; }
             }
 
+            /// <summary>The spell's own name, and null where the slot holds none.</summary>
             public string SpellName
             {
-                get { return HasSpell ? _adapter.GetSpellLabel(_entry.Spell) : string.Empty; }
+                get { return HasSpell ? _adapter.GetSpellName(_entry.Spell) : null; }
+            }
+
+            /// <summary>The game's heading for the tier this commander casts it at, or empty.</summary>
+            public string TierLabel
+            {
+                get { return HasSpell ? _adapter.GetSpellTierLabel(_entry.Spell) : string.Empty; }
+            }
+
+            public IReadOnlyList<SpellCost> Costs
+            {
+                get { return HasSpell ? _adapter.GetSpellCosts(_entry.Spell) : new SpellCost[0]; }
             }
 
             public bool CanActivate { get { return _adapter.CanActivateQuickbar(); } }

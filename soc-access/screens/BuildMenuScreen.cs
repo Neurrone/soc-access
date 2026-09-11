@@ -112,7 +112,7 @@ namespace SongsOfConquestAccess.Screens
                     null);
             }
 
-            AddLine(builder, "current-site", () => Live.BuildSiteSummary);
+            AddLine(builder, "current-site", BuildSiteSummary);
 
             AddButton(
                 builder,
@@ -165,7 +165,8 @@ namespace SongsOfConquestAccess.Screens
                     () => it.IsSelected,
                     () => it.Enabled);
                 // Drawn under the bar: how long anything of this size takes to build.
-                vtable.Announcements.Add(GraphNodes.ValuePart(() => it.BuildTime, watch: false));
+                string buildTime = LabelledValue(Live.BuildTimeLabel, it.BuildTime);
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => buildTime, watch: false));
                 vtable.OnActivate = () => Live.ActivateCategory(it.Size);
                 vtable.OnFocusVisual = () => Live.SelectCategory(it.Size);
                 builder.AddItem(new DrawnNode(
@@ -191,7 +192,9 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 BuildMenuAdapter.BuildingItem it = building;
-                string label = building.Label;
+                string label = string.IsNullOrWhiteSpace(building.Label)
+                    ? ModText.Get(ModStrings.Screens.BuildingNumber, building.Number)
+                    : building.Label;
                 NodeVtable vtable = GraphNodes.Button(
                     () => label,
                     () => { if (it.Focus != null) it.Focus(); },
@@ -237,12 +240,69 @@ namespace SongsOfConquestAccess.Screens
             BuildRequirements(builder);
             // Both are composed off the pane the build has just read, so each is read once and the
             // node is declared over that string rather than over another read of it.
-            string cost = Live.CurrentTierCostText;
+            string cost = LabelledValue(Live.CostLabel, Live.CurrentTierCostBody);
             AddLine(builder, "cost", () => cost);
             string warning = Live.CannotBuyText;
             AddLine(builder, "warning", () => warning);
 
             BuildPurchase(builder);
+        }
+
+        /// <summary>Which build site the menu is on: how big it is, which of the map's sites it is,
+        /// and where it stands - or the mod's own line for a menu standing on no site at all. A site
+        /// the game has not resolved a size for has nothing to say rather than a line to throw over.
+        /// </summary>
+        private string BuildSiteSummary()
+        {
+            if (!Live.HasBuildSite)
+            {
+                return ModText.Get(ModStrings.Screens.NoBuildSiteSelected);
+            }
+
+            string size = Live.BuildSiteSizeLabel;
+            if (size == null)
+            {
+                return string.Empty;
+            }
+
+            List<string> parts = new List<string>();
+            parts.Add(size);
+            int number = Live.BuildSiteNumber;
+            int count = Live.BuildSiteCount;
+            if (number > 0 && count > 0)
+            {
+                parts.Add(ModText.Get(ModStrings.Common.CountOf, number, count));
+            }
+
+            Vector2Int position = Live.BuildSitePosition;
+            parts.Add(ModText.Get(ModStrings.Spatial.Coordinates, position.x, position.y));
+            return JoinList(parts);
+        }
+
+        /// <summary>The game's own heading and the value under it, as one line. Empty where the menu
+        /// draws no value, which is what says the line is not there.</summary>
+        private static string LabelledValue(string label, string value)
+        {
+            return string.IsNullOrWhiteSpace(value)
+                ? string.Empty
+                : ModText.Get(ModStrings.UI.LabelValue, label, value);
+        }
+
+        /// <summary>The parts one after another, as a list of equals rather than a sentence.</summary>
+        private static string JoinList(IReadOnlyList<string> parts)
+        {
+            if (parts == null || parts.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            string text = parts[0];
+            for (int i = 1; i < parts.Count; i++)
+            {
+                text = ModText.Get(ModStrings.Common.ListSeparator, text, parts[i]);
+            }
+
+            return text;
         }
 
         /// <summary>The building the pane is describing, read as the player sees it: the name and the
@@ -280,7 +340,7 @@ namespace SongsOfConquestAccess.Screens
                 return first;
             }
 
-            return first.TrimEnd('.') + ". " + second;
+            return ModText.Get(ModStrings.Common.SentenceSeparator, first.TrimEnd('.'), second);
         }
 
         /// <summary>The tier tabs the details pane draws as ONE bar, declared as one row: Left and
@@ -311,7 +371,7 @@ namespace SongsOfConquestAccess.Screens
                 Component button = tier.Button;
                 BuildMenuAdapter.TierItem it = tier;
                 NodeVtable vtable = GraphNodes.Tab(
-                    () => it.Label,
+                    () => TierLabel(it),
                     () => it.IsSelected,
                     null,
                     it.Tooltip != null ? it.Tooltip() : null);
@@ -324,6 +384,15 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.EndRow();
+        }
+
+        /// <summary>What a tier tab is called: the words the game draws on it, or which tier it is
+        /// where it draws none.</summary>
+        private static string TierLabel(BuildMenuAdapter.TierItem tier)
+        {
+            return string.IsNullOrWhiteSpace(tier.Label)
+                ? ModText.Get(ModStrings.Screens.TierNumber, tier.Level)
+                : tier.Label;
         }
 
         /// <summary>One of the bands the details pane draws under a caption - the available research,

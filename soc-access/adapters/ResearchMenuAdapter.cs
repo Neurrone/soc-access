@@ -55,6 +55,11 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FrameSweep<ResearchMenuStackButton> _categoryButtons =
             new FrameSweep<ResearchMenuStackButton>("research menu category", inactiveToo: false);
 
+        // The team's global research as a set, kept until the game's own answer changes shape.
+        private HashSet<ResearchTypes> _owned;
+        private int _ownedTeamId = -1;
+        private int _ownedCount = -1;
+
         public ResearchMenuAdapter(ResearchMenu menu)
         {
             _menu = menu;
@@ -169,11 +174,13 @@ namespace SongsOfConquestAccess.Adapters
 
                 int index = i;
                 UIButton button = GetButton(tab);
-                string label = GetBuildingLabel(tab, index);
+                string label = GetBuildingLabel(tab);
                 IList<string> description = GetBuildingDescription(tab);
-                int mapEntityId = BuildingTabMapEntityIdField != null ? (int)BuildingTabMapEntityIdField.GetValue(tab) : 0;
+                object mapEntityValue = BuildingTabMapEntityIdField != null ? BuildingTabMapEntityIdField.GetValue(tab) : null;
+                int mapEntityId = mapEntityValue is int ? (int)mapEntityValue : 0;
                 items.Add(new BuildingItem(
                     label,
+                    index,
                     description,
                     mapEntityId < 0,
                     index == SelectedBuildingIndex,
@@ -224,9 +231,10 @@ namespace SongsOfConquestAccess.Adapters
                         : null;
                     UIButton button = stackButton.Button;
                     int itemIndex = j;
-                    string name = SpokenText.Get(GetLocalization(), stack != null ? stack.NameKey : null, "Research " + (itemIndex + 1));
+                    string name = SpokenText.Get(GetLocalization(), stack != null ? stack.NameKey : null, string.Empty);
                     researchItems.Add(new ResearchItem(
                         name,
+                        itemIndex,
                         GetOwnedTier(stack, owned),
                         tierHeader,
                         button as Component,
@@ -239,7 +247,8 @@ namespace SongsOfConquestAccess.Adapters
                 if (researchItems.Count > 0)
                 {
                     items.Add(new CategoryItem(
-                        GetCategoryLabel(category, i),
+                        GetCategoryLabel(category),
+                        i,
                         researchItems));
                 }
             }
@@ -312,11 +321,11 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Select(button as Component);
         }
 
-        private string GetBuildingLabel(ResearchMenuBuildingTabButton tab, int index)
+        private string GetBuildingLabel(ResearchMenuBuildingTabButton tab)
         {
             UITextMesh name = Reflect.Get<UITextMesh>(tab, BuildingTabNameField);
             string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(name));
-            return string.IsNullOrWhiteSpace(label) ? "Building " + (index + 1) : label;
+            return label;
         }
 
         // The paragraphs the game wrote the tab's description in, kept apart rather than collapsed.
@@ -326,17 +335,21 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(description) });
         }
 
-        private string GetCategoryLabel(ResearchMenuCategory category, int index)
+        private string GetCategoryLabel(ResearchMenuCategory category)
         {
             UITextMesh name = Reflect.Get<UITextMesh>(category, CategoryNameField);
             string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(name));
-            return string.IsNullOrWhiteSpace(label) ? "Research category " + (index + 1) : label;
+            return label;
         }
 
         /// <summary>The local team's global research, asked for once per page. The game answers
         /// <c>HasGlobalResearch</c> with a scan of every research state, and the page used to ask it
         /// once per tier of every row; <c>GetGlobal</c> with disabled states included is the same
-        /// set in one scan.</summary>
+        /// set in one scan.
+        ///
+        /// The set itself is kept until the game's own answer changes shape - another team in
+        /// control, or one more state in it, which is the only way research is gained - so a build
+        /// that changes nothing refills nothing.</summary>
         private HashSet<ResearchTypes> GetOwnedGlobalResearch()
         {
             IClientAdventureFacade facade = Facade;
@@ -345,7 +358,14 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            IResearchState[] states = facade.Research.GetGlobal(facade.Teams.LocalTeamInControlId, includeDisabled: true);
+            int teamId = facade.Teams.LocalTeamInControlId;
+            IResearchState[] states = facade.Research.GetGlobal(teamId, includeDisabled: true);
+            int count = states != null ? states.Length : 0;
+            if (_owned != null && _ownedTeamId == teamId && _ownedCount == count)
+            {
+                return _owned;
+            }
+
             HashSet<ResearchTypes> owned = new HashSet<ResearchTypes>();
             for (int i = 0; states != null && i < states.Length; i++)
             {
@@ -355,6 +375,9 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
+            _ownedTeamId = teamId;
+            _ownedCount = count;
+            _owned = owned;
             return owned;
         }
 
@@ -424,9 +447,10 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                return _menu != null && SelectedFactionIndexField != null
-                    ? (int)SelectedFactionIndexField.GetValue(_menu)
-                    : 0;
+                object value = _menu != null && SelectedFactionIndexField != null
+                    ? SelectedFactionIndexField.GetValue(_menu)
+                    : null;
+                return value is int ? (int)value : 0;
             }
         }
 
@@ -496,6 +520,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             public BuildingItem(
                 string label,
+                int index,
                 IList<string> description,
                 bool missingBuilding,
                 bool isSelected,
@@ -504,6 +529,7 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> activate)
             {
                 Label = label ?? string.Empty;
+                Index = index;
                 DescriptionLines = description ?? new List<string>();
                 MissingBuilding = missingBuilding;
                 IsSelected = isSelected;
@@ -512,7 +538,11 @@ namespace SongsOfConquestAccess.Adapters
                 Activate = activate;
             }
 
+            /// <summary>The building's own name, and empty where the game draws none.</summary>
             public string Label { get; private set; }
+
+            /// <summary>Where the page drew this tab in its own bar.</summary>
+            public int Index { get; private set; }
 
             /// <summary>What the tab draws under its name, one line per paragraph.</summary>
             public IList<string> DescriptionLines { get; private set; }
@@ -535,13 +565,18 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class CategoryItem
         {
-            public CategoryItem(string label, IReadOnlyList<ResearchItem> items)
+            public CategoryItem(string label, int index, IReadOnlyList<ResearchItem> items)
             {
                 Label = label ?? string.Empty;
+                Index = index;
                 Items = items ?? new ResearchItem[0];
             }
 
+            /// <summary>The category's own name, and empty where the game draws none.</summary>
             public string Label { get; private set; }
+
+            /// <summary>Where the page drew this category in its own list.</summary>
+            public int Index { get; private set; }
             public IReadOnlyList<ResearchItem> Items { get; private set; }
         }
 
@@ -549,6 +584,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             public ResearchItem(
                 string label,
+                int index,
                 int ownedTier,
                 string tierHeader,
                 Component button,
@@ -558,6 +594,7 @@ namespace SongsOfConquestAccess.Adapters
                 Tooltip tooltip)
             {
                 Label = label ?? string.Empty;
+                Index = index;
                 OwnedTier = ownedTier;
                 TierHeader = tierHeader ?? string.Empty;
                 Button = button;
@@ -567,7 +604,12 @@ namespace SongsOfConquestAccess.Adapters
                 Tooltip = tooltip;
             }
 
+            /// <summary>The stack's own name, and empty where the game names it nothing.</summary>
             public string Label { get; private set; }
+
+            /// <summary>Where the category drew this stack in its own list.</summary>
+            public int Index { get; private set; }
+
             public int OwnedTier { get; private set; }
             public string TierHeader { get; private set; }
 

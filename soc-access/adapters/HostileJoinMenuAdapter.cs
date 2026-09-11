@@ -33,7 +33,7 @@ namespace SongsOfConquestAccess.Adapters
     /// close cross anywhere on this menu, and Escape is the game's - No in the choice stage, Done in
     /// the join stage (<c>HostileJoinMenu.ReregisterInput</c>).
     /// </summary>
-    public sealed class HostileJoinMenuAdapter : IPresent, IDisposable
+    public sealed class HostileJoinMenuAdapter : IPresent
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(HostileJoinMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(HostileJoinMenu), "_async");
@@ -43,13 +43,18 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(HostileJoinMenu), "_adventureFacade");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(HostileJoinMenu), "_localizationHandler");
 
+        // The menu's own Stage enum, which is private to it, and its two values. Resolved once off
+        // the game type so the stage is compared as the value it is rather than by its name.
+        private static readonly Type StageType = AccessTools.Inner(typeof(HostileJoinMenu), "Stage");
+        private static readonly object ChoiceStage = ParseStage("Choice");
+        private static readonly object JoinStage = ParseStage("Join");
+
         private readonly HostileJoinMenu _menu;
         private readonly HostileJoinMenu.Settings _settings;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
         private WielderInteract _wielder;
         private TroopHudAdapter _joiningTroops;
-        private bool _disposed;
 
         public HostileJoinMenuAdapter(HostileJoinMenu menu)
         {
@@ -106,14 +111,14 @@ namespace SongsOfConquestAccess.Adapters
                     return HostileJoinMenuStage.None;
                 }
 
-                if (IsNativeStage("Choice")
+                if (IsNativeStage(ChoiceStage)
                     && _settings.ChoiceStageContainer != null
                     && _settings.ChoiceStageContainer.activeInHierarchy)
                 {
                     return HostileJoinMenuStage.Choice;
                 }
 
-                if (IsNativeStage("Join")
+                if (IsNativeStage(JoinStage)
                     && _settings.JoinStageContainer != null
                     && _settings.JoinStageContainer.activeInHierarchy)
                 {
@@ -384,20 +389,20 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Select(_settings != null ? _settings.MassMoveButton : null);
         }
 
-        public void Dispose()
+        private bool IsNativeStage(object stage)
         {
-            if (_disposed)
+            if (stage == null || StageField == null)
             {
-                return;
+                return false;
             }
 
-            _disposed = true;
+            object value = StageField.GetValue(_menu);
+            return value != null && value.Equals(stage);
         }
 
-        private bool IsNativeStage(string stageName)
+        private static object ParseStage(string name)
         {
-            object value = StageField != null ? StageField.GetValue(_menu) : null;
-            return value != null && value.ToString() == stageName;
+            return StageType != null && Enum.IsDefined(StageType, name) ? Enum.Parse(StageType, name) : null;
         }
 
         private static string GetButtonText(UIButton button)

@@ -257,7 +257,9 @@ namespace SongsOfConquestAccess.Screens
 
             SpellbookAdapter.QuickbarItem it = item;
             ControlId id = ControlId.For(it.Entry, "spellbook:slot/" + index);
-            Func<string> label = () => it.HasSpell ? it.SpellName : ModText.Get(ModStrings.Screens.Empty);
+            Func<string> label = () => it.HasSpell
+                ? SpellCosts.Label(it.SpellName, it.TierLabel, it.Costs)
+                : ModText.Get(ModStrings.Screens.Empty);
             // The slot's click is the game's own, which casts in battle and does not exist on the
             // map: there the node declares no click, and Enter is consumed silently.
             Action activate = it.CanActivate ? () => it.Activate() : (Action)null;
@@ -324,7 +326,9 @@ namespace SongsOfConquestAccess.Screens
 
         private CarryItem PickUp(SpellbookAdapter.QuickbarItem item)
         {
-            return item.CanDrag ? new CarryItem(item.Entry, item.SpellName, SpellCargo) : null;
+            return item.CanDrag
+                ? new CarryItem(item.Entry, SpellCosts.Label(item.SpellName, item.TierLabel, item.Costs), SpellCargo)
+                : null;
         }
 
         /// <summary>A drop on a slot, through the game's own drag: a spell from another slot moves or
@@ -419,7 +423,7 @@ namespace SongsOfConquestAccess.Screens
 
             for (int i = 0; i < spells.Count; i++)
             {
-                AddSpell(builder, spells[i]);
+                AddSpell(builder, spells[i], key);
             }
 
             if (named)
@@ -457,7 +461,7 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        private void AddSpell(GraphBuilder builder, SpellbookAdapter.SpellItem item)
+        private void AddSpell(GraphBuilder builder, SpellbookAdapter.SpellItem item, string columnKey)
         {
             if (item == null || item.Entry == null)
             {
@@ -466,7 +470,7 @@ namespace SongsOfConquestAccess.Screens
 
             SpellbookAdapter.SpellItem it = item;
             NodeVtable vtable = GraphNodes.Button(
-                () => it.Label,
+                () => SpellCosts.Label(it.Name, it.TierLabel, it.Costs),
                 () => it.Activate(),
                 () => it.CanCast,
                 it.Tooltip);
@@ -483,7 +487,7 @@ namespace SongsOfConquestAccess.Screens
                 0,
                 () => it.CanAddToQuickbar);
             builder.AddItem(new DrawnNode(
-                ControlId.For(it.Entry, "spellbook:spell/" + it.Id),
+                ControlId.For(it.Entry, "spellbook:spell/" + columnKey + "-" + it.SpellId),
                 vtable,
                 it.Entry));
         }
@@ -492,7 +496,7 @@ namespace SongsOfConquestAccess.Screens
         {
             return Live.IsAutoPopulateChecked()
                 ? null
-                : new CarryItem(item.Entry, item.Label, SpellCargo);
+                : new CarryItem(item.Entry, SpellCosts.Label(item.Name, item.TierLabel, item.Costs), SpellCargo);
         }
 
         // ---- the close cross ----
@@ -517,15 +521,11 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>Every column's spells, or none where reading them threw.</summary>
         private Dictionary<SpellbookSpellGroup, List<SpellbookAdapter.SpellItem>> Grouped()
         {
-            try
-            {
-                return Live.GetSpellsByGroup();
-            }
-            catch (Exception exception)
-            {
-                SocAccessMod.Instance?.LogWarning("SpellbookScreen section spells failed to build: " + exception);
-                return null;
-            }
+            // Reported ONCE rather than once a frame, which is what SectionItems is for; the
+            // whole grid is the one section, so it is wrapped as a list of one.
+            IReadOnlyList<Dictionary<SpellbookSpellGroup, List<SpellbookAdapter.SpellItem>>> grid =
+                _sections.Of("spells", () => new[] { Live.GetSpellsByGroup() });
+            return grid.Count > 0 ? grid[0] : null;
         }
     }
 }

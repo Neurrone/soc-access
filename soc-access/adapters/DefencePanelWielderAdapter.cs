@@ -173,17 +173,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public string StoreLabel
         {
-            get { return GetButtonLabel(GetStoreButton(), "GameActions/Adventure/StoreCommander", "Store Wielder"); }
+            get { return GetButtonLabel(GetStoreButton(), "GameActions/Adventure/StoreCommander", string.Empty); }
         }
 
         public string EjectLabel
         {
-            get { return GetButtonLabel(GetEjectButton(), "GameActions/Adventure/EjectCommander", "Eject Wielder"); }
+            get { return GetButtonLabel(GetEjectButton(), "GameActions/Adventure/EjectCommander", string.Empty); }
         }
 
         public string TradeLabel
         {
-            get { return GetButtonLabel(GetTradeButton(), "Adventure/TooltipInstruction/Trade", "Trade"); }
+            get { return GetButtonLabel(GetTradeButton(), "Adventure/TooltipInstruction/Trade", string.Empty); }
         }
 
         /// <summary>The three buttons the band draws, for the screens that declare them as controls.

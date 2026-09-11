@@ -63,10 +63,10 @@ namespace SongsOfConquestAccess.Adapters
                 return choices;
             }
 
-            AddChoice(choices, "occupy", _settings.OccupyContainer, _settings.OccupyToggle);
-            AddChoice(choices, "raze", _settings.RazeContainer, _settings.RazeToggle);
-            AddChoice(choices, "loot", _settings.LootContainer, _settings.LootToggle);
-            AddChoice(choices, "convert", _settings.ConvertContainer, _settings.ConvertToggle);
+            AddChoice(choices, ClaimChoiceKind.Occupy, _settings.OccupyContainer, _settings.OccupyToggle);
+            AddChoice(choices, ClaimChoiceKind.Raze, _settings.RazeContainer, _settings.RazeToggle);
+            AddChoice(choices, ClaimChoiceKind.Loot, _settings.LootContainer, _settings.LootToggle);
+            AddChoice(choices, ClaimChoiceKind.Convert, _settings.ConvertContainer, _settings.ConvertToggle);
             return choices;
         }
 
@@ -79,7 +79,7 @@ namespace SongsOfConquestAccess.Adapters
         // TitleLayout/Title, the duration beside it in TitleLayout/Duration, and the paragraph below
         // in DescriptionText. They are handed out as they are drawn; what the reading order makes of
         // them is the screen's business.
-        private static void AddChoice(List<ChoiceItem> choices, string idSuffix, UITransform container, Toggle toggle)
+        private static void AddChoice(List<ChoiceItem> choices, ClaimChoiceKind kind, UITransform container, Toggle toggle)
         {
             Component containerComponent = container as Component;
             GameObject root = containerComponent != null ? containerComponent.gameObject : null;
@@ -92,7 +92,7 @@ namespace SongsOfConquestAccess.Adapters
             UITextMesh duration = FindText(root, "TitleLayout/Duration");
             UITextMesh description = FindText(root, "DescriptionText");
             choices.Add(new ChoiceItem(
-                idSuffix,
+                kind,
                 toggle,
                 () => UITextMeshTextUtility.Spoken(title),
                 () => UITextMeshTextUtility.Spoken(duration),
@@ -128,7 +128,7 @@ namespace SongsOfConquestAccess.Adapters
             private readonly Func<bool> _isEnabled;
 
             public ChoiceItem(
-                string idSuffix,
+                ClaimChoiceKind kind,
                 Component toggle,
                 Func<string> getTitle,
                 Func<string> getDuration,
@@ -137,7 +137,7 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> focus,
                 Func<bool> activate)
             {
-                IdSuffix = idSuffix ?? string.Empty;
+                Kind = kind;
                 Toggle = toggle;
                 GetTitle = getTitle;
                 GetDuration = getDuration;
@@ -147,7 +147,8 @@ namespace SongsOfConquestAccess.Adapters
                 Activate = activate;
             }
 
-            public string IdSuffix { get; private set; }
+            /// <summary>Which of the game's four choices this is.</summary>
+            public ClaimChoiceKind Kind { get; private set; }
 
             /// <summary>The component the game draws this choice with - its toggle.</summary>
             public Component Toggle { get; private set; }
@@ -164,5 +165,15 @@ namespace SongsOfConquestAccess.Adapters
                 get { return _isEnabled == null || _isEnabled(); }
             }
         }
+    }
+
+    /// <summary>The four things the game offers to do with a settlement just taken, in the order its
+    /// settings list them.</summary>
+    public enum ClaimChoiceKind
+    {
+        Occupy,
+        Raze,
+        Loot,
+        Convert
     }
 }

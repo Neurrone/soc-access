@@ -28,6 +28,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_localizationHandler");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_async");
         private static readonly FieldInfo ActiveEntriesField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_activeEntries");
+        private static readonly FieldInfo RecruitmentPoolField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_recruitmentPool");
 
 
         private static readonly FieldInfo EntryButtonField = AccessTools.Field(typeof(RallyPointTownEntry), "_button");
@@ -58,7 +59,8 @@ namespace SongsOfConquestAccess.Adapters
                 && subMenu != null
                 && subMenu.gameObject != null
                 && subMenu.gameObject.activeInHierarchy
-                && GetSourceItems().Count > 0;
+                && IsEntityAlive()
+                && IsAnySourceEntryDrawn();
         }
 
         public string Title
@@ -134,12 +136,36 @@ namespace SongsOfConquestAccess.Adapters
             return result;
         }
 
-        private bool IsMenuOpen()
+        /// <summary>Whether the building this menu is about is still in the game. The menus hold
+        /// their recruitment pool - and with it the map entity - from Show until the next Show, and
+        /// only the rally point clears it on Close, so a menu left open over an entity that has gone
+        /// (a save loaded under it, the building destroyed) keeps every other sign of being up: its
+        /// object is still active, its sub-menu is still drawn, and its Async is still uncompleted
+        /// because Close never ran. The entity's own IsDisposed is what the game changes
+        /// (<c>AbstractMapEntity.Dispose</c>), so that is what is read.</summary>
+        private bool IsEntityAlive()
         {
-            return _menu != null
-                && _menu.gameObject != null
-                && _menu.gameObject.activeInHierarchy
-                && Reflect.Get<Async>(_menu, AsyncField) != null;
+            IRallyPointRecruitmentPoolComponent pool =
+                Reflect.Get<IRallyPointRecruitmentPoolComponent>(_menu, RecruitmentPoolField);
+            IMapEntity entity = pool != null ? pool.MapEntity : null;
+            return entity != null && !entity.IsDisposed;
+        }
+
+        /// <summary>Whether the menu is drawing a town row at all, asked without building the list
+        /// the page builds: this runs on every screen's tick.</summary>
+        private bool IsAnySourceEntryDrawn()
+        {
+            List<RallyPointTownEntry> entries = Reflect.Get<List<RallyPointTownEntry>>(_menu, ActiveEntriesField);
+            for (int i = 0; entries != null && i < entries.Count; i++)
+            {
+                RallyPointTownEntry entry = entries[i];
+                if (entry != null && entry.gameObject != null && entry.gameObject.activeInHierarchy)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private WielderInteractHeader GetHeader()

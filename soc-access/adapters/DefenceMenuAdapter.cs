@@ -123,23 +123,9 @@ namespace SongsOfConquestAccess.Adapters
             get { return UITextMeshTextUtility.Spoken(Reflect.Get<UITextMesh>(_menu, SubTitleField)); }
         }
 
-        public string SettlementDefendingTroopsLabel
-        {
-            get
-            {
-                string name = Title;
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    name = Subtitle;
-                }
-
-                return string.IsNullOrWhiteSpace(name) ? "settlement defending troops" : name + " defending troops";
-            }
-        }
-
         public string DefendingTroopsLabel
         {
-            get { return SpokenText.Get(_localization, "Adventure/TroopManagementMenu/DefendingTroopsHeader", "Defending troops"); }
+            get { return SpokenText.Get(_localization, "Adventure/TroopManagementMenu/DefendingTroopsHeader", string.Empty); }
         }
 
         /// <summary>The band the menu draws for the wielder stored in the settlement. Kept, so the
@@ -268,8 +254,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetTutorialButtonLabel()
         {
-            string label = GetButtonLabel(GetTutorialButton());
-            return label;
+            return GetButtonLabel(GetTutorialButton());
         }
 
         public bool IsTutorialButtonVisible()
@@ -464,7 +449,7 @@ namespace SongsOfConquestAccess.Adapters
             List<TowerItem> result = new List<TowerItem>(entries.Length);
             for (int i = 0; i < entries.Length; i++)
             {
-                result.Add(new TowerItem("defences-tower-" + (i + 1), i + 1, entries[i], _localization));
+                result.Add(new TowerItem(i + 1, entries[i], _localization));
             }
 
             return result;
@@ -571,15 +556,12 @@ namespace SongsOfConquestAccess.Adapters
             private readonly ILocalizationHandler _localization;
             private readonly int _number;
 
-            public TowerItem(string id, int number, DefenceTowerEntry entry, ILocalizationHandler localization)
+            public TowerItem(int number, DefenceTowerEntry entry, ILocalizationHandler localization)
             {
-                Id = id ?? string.Empty;
                 _number = number;
                 _entry = entry;
                 _localization = localization;
             }
-
-            public string Id { get; private set; }
 
             /// <summary>The tooltip area the game draws for the tower, which is what a row about it
             /// stands on.</summary>

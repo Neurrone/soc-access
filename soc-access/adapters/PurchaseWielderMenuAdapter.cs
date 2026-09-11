@@ -301,25 +301,19 @@ namespace SongsOfConquestAccess.Adapters
             return GameObjects.IsLive(text as Component) && !string.IsNullOrWhiteSpace(UITextMeshTextUtility.Spoken(text));
         }
 
-        /// <summary>The specialization the pane draws, under the game's own caption, one line per
-        /// paragraph of it.</summary>
+        /// <summary>The game's own caption for the specialization block, without the colon the game
+        /// draws after it in some of its own labels.</summary>
+        public string SpecializationHeader
+        {
+            get { return SpokenText.Get(_localization, "Commanders/Tooltip/Specializations", string.Empty).TrimEnd(':'); }
+        }
+
+        /// <summary>The specialization the pane draws, one line per paragraph of it.</summary>
         public IList<string> SpecializationLines
         {
             get
             {
-                IList<string> body = UITextMeshTextUtility.SpokenLines(Reflect.Get<UITextMesh>(GetDetails(), DetailsSpecializationField));
-                if (body.Count == 0)
-                {
-                    return body;
-                }
-
-                string header = SpokenText.Get(_localization, "Commanders/Tooltip/Specializations", string.Empty);
-                if (!string.IsNullOrWhiteSpace(header))
-                {
-                    body[0] = header.TrimEnd(':') + ": " + body[0];
-                }
-
-                return body;
+                return UITextMeshTextUtility.SpokenLines(Reflect.Get<UITextMesh>(GetDetails(), DetailsSpecializationField));
             }
         }
 
@@ -356,8 +350,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string label = GetButtonLabel(GetPurchaseButton());
-                return string.IsNullOrWhiteSpace(label) ? "Purchase" : label;
+                return GetButtonLabel(GetPurchaseButton());
             }
         }
 
@@ -595,15 +588,17 @@ namespace SongsOfConquestAccess.Adapters
                 _index = index;
             }
 
-            public string Id
+            /// <summary>Where the menu drew this candidate in its own list.</summary>
+            public int Index
             {
-                get
-                {
-                    string uniqueName = _entry != null && _entry.CommanderDefinition != null ? _entry.CommanderDefinition.UniqueName : string.Empty;
-                    return string.IsNullOrWhiteSpace(uniqueName)
-                        ? "purchase-wielder-entry-" + _index
-                        : "purchase-wielder-" + uniqueName.Replace(" ", "-").Replace("/", "-").ToLowerInvariant();
-                }
+                get { return _index; }
+            }
+
+            /// <summary>The game's own unique name for the commander this candidate offers, or empty
+            /// where the menu has no definition for it.</summary>
+            public string UniqueName
+            {
+                get { return _entry != null && _entry.CommanderDefinition != null ? _entry.CommanderDefinition.UniqueName : string.Empty; }
             }
 
             /// <summary>The wielder's own name.</summary>
@@ -652,10 +647,19 @@ namespace SongsOfConquestAccess.Adapters
                 return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_entry, EntryButtonField));
             }
 
+            /// <summary>Arriving here selects the candidate, because the menu has no hover of its
+            /// own to do it: <c>PurchaseWielderEntry.Awake</c> hangs its whole selection on the
+            /// button's OnClicked, and <c>HandleClick</c> is what refills the details pane. So the
+            /// click IS the focus, as it is on a build menu row (<c>FocusBuilding</c>) - and, as
+            /// there, the candidate the menu is already showing is not clicked again, which would
+            /// replay the game's own selection sound on every landing.</summary>
             public void Focus()
             {
                 NativeSelectionUtility.Select(Reflect.Get<UIButton>(_entry, EntryButtonField) as Component);
-                Select();
+                if (!IsSelected)
+                {
+                    Select();
+                }
             }
         }
     }

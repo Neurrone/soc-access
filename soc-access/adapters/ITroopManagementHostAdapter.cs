@@ -16,9 +16,8 @@ namespace SongsOfConquestAccess.Adapters
     /// </summary>
     public interface ITroopManagementHostAdapter : IPresent
     {
-        /// <summary>Which host this is, for control keys and for the detector's own bookkeeping.
-        /// </summary>
-        string IdPrefix { get; }
+        /// <summary>Which of the three menus drew this page.</summary>
+        TroopManagementHostKind Kind { get; }
 
         /// <summary>The title the host draws over the page - the building's name.</summary>
         string Title { get; }
@@ -51,5 +50,13 @@ namespace SongsOfConquestAccess.Adapters
         Component CloseButton { get; }
         bool IsCloseVisible();
         bool Close();
+    }
+
+    /// <summary>The three menus that hang a troop sub-page inside their own window.</summary>
+    public enum TroopManagementHostKind
+    {
+        Settlement,
+        Dwelling,
+        Defence
     }
 }

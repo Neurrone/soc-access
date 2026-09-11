@@ -124,7 +124,7 @@ namespace SongsOfConquestAccess.Screens
                 vtable.Announcements.Add(GraphNodes.SelectedPart(() => it.IsSelected));
                 // Arrival IS the selection: the click refills the details pane and nothing else.
                 vtable.OnFocusVisual = () => it.Focus();
-                ControlId id = ControlId.For(button, "purchase-wielder:entry/" + entry.Id);
+                ControlId id = ControlId.For(button, "purchase-wielder:entry/" + EntryId(entry));
                 builder.AddItem(new DrawnNode(id, vtable, button));
                 if (entry.IsSelected)
                 {
@@ -135,6 +135,16 @@ namespace SongsOfConquestAccess.Screens
             // The candidate the menu is showing, so arriving reads the details the player can see.
             builder.LandStopOn(selected);
             builder.SetStart(selected);
+        }
+
+        /// <summary>What one candidate is called in a node id: the game's own unique name for the
+        /// commander where it has one, and the row it was drawn in where it has none.</summary>
+        private static string EntryId(PurchaseWielderMenuAdapter.EntryItem entry)
+        {
+            string uniqueName = entry.UniqueName;
+            return string.IsNullOrWhiteSpace(uniqueName)
+                ? "purchase-wielder-entry-" + entry.Index
+                : "purchase-wielder-" + uniqueName.Replace(" ", "-").Replace("/", "-").ToLowerInvariant();
         }
 
         /// <summary>What the entry's own overlays say about the wielder: the game draws a frame around
@@ -168,7 +178,7 @@ namespace SongsOfConquestAccess.Screens
             if (Live.HasSpecialization())
             {
                 builder.SetRegion("purchase-wielder:specialization");
-                AddParagraphs(builder, "specialization", () => Live.SpecializationLines);
+                AddParagraphs(builder, "specialization", SpecializationLines);
             }
 
             builder.SetRegion("purchase-wielder:purchase");
@@ -214,18 +224,37 @@ namespace SongsOfConquestAccess.Screens
             return lines;
         }
 
-        private static string JoinSentences(List<string> parts)
+        /// <summary>The specialization the pane draws, its first paragraph under the game's own
+        /// caption for the block.</summary>
+        private IList<string> SpecializationLines()
         {
-            List<string> filtered = new List<string>();
-            for (int i = 0; i < parts.Count; i++)
+            IList<string> body = Live.SpecializationLines;
+            string header = Live.SpecializationHeader;
+            if (body.Count > 0 && !string.IsNullOrWhiteSpace(header))
             {
-                if (!string.IsNullOrWhiteSpace(parts[i]))
-                {
-                    filtered.Add(parts[i]);
-                }
+                body[0] = ModText.Get(ModStrings.UI.LabelValue, header, body[0]);
             }
 
-            return string.Join(". ", filtered.ToArray());
+            return body;
+        }
+
+        /// <summary>The parts as sentences, one after another.</summary>
+        private static string JoinSentences(List<string> parts)
+        {
+            string text = null;
+            for (int i = 0; i < parts.Count; i++)
+            {
+                if (string.IsNullOrWhiteSpace(parts[i]))
+                {
+                    continue;
+                }
+
+                text = text == null
+                    ? parts[i]
+                    : ModText.Get(ModStrings.Common.SentenceSeparator, text, parts[i]);
+            }
+
+            return text ?? string.Empty;
         }
 
         private void BuildTroops(GraphBuilder builder)
