@@ -23,21 +23,15 @@ namespace SongsOfConquestAccess.Input
         private readonly System.Func<string> _getLabel;
 
         public InputAction(string key, string label, InputClaimScope claimScope)
-            : this(key, label, claimScope, InputRepeatPolicy.OneShotUntilRelease())
+            : this(key, () => label ?? string.Empty, claimScope)
         {
         }
 
-        public InputAction(string key, string label, InputClaimScope claimScope, InputRepeatPolicy repeatPolicy)
-            : this(key, () => label ?? string.Empty, claimScope, repeatPolicy)
-        {
-        }
-
-        public InputAction(string key, System.Func<string> getLabel, InputClaimScope claimScope, InputRepeatPolicy repeatPolicy)
+        public InputAction(string key, System.Func<string> getLabel, InputClaimScope claimScope)
         {
             Key = key ?? string.Empty;
             _getLabel = getLabel ?? (() => string.Empty);
             ClaimScope = claimScope;
-            RepeatPolicy = repeatPolicy ?? InputRepeatPolicy.OneShotUntilRelease();
         }
 
         public string Key { get; private set; }
@@ -58,8 +52,6 @@ namespace SongsOfConquestAccess.Input
         }
 
         public InputClaimScope ClaimScope { get; private set; }
-
-        public InputRepeatPolicy RepeatPolicy { get; private set; }
 
         /// <summary>The effective bindings the router matches against every keydown: the player's
         /// override where one is set, otherwise the compiled-in defaults. The router reads this live,
@@ -109,7 +101,7 @@ namespace SongsOfConquestAccess.Input
         /// reset-all expresses.</summary>
         public void ResetToDefault()
         {
-            _override = null;
+            ClearOverride();
         }
     }
 }

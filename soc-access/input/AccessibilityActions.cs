@@ -10,6 +10,24 @@ namespace SongsOfConquestAccess.Input
     // For example, the map cursor and the graph's own navigation both use the arrow keys, but different actions
     public static class AccessibilityActions
     {
+        /// <summary>The number row in the order the slots are numbered: 1 to 9 and then 0, which
+        /// stands for the tenth slot. Both the quick-split chords and the bookmark chords walk it.
+        /// Declared first because static field initialisers run in textual order and the action
+        /// arrays below are built from it.</summary>
+        private static readonly Key[] DigitKeys =
+        {
+            Key.Digit1,
+            Key.Digit2,
+            Key.Digit3,
+            Key.Digit4,
+            Key.Digit5,
+            Key.Digit6,
+            Key.Digit7,
+            Key.Digit8,
+            Key.Digit9,
+            Key.Digit0
+        };
+
         // Global actions are available on every accessibility screen. The input
         // router checks screen-claimed actions first, then global actions, so
         // screens can own keys before global fallbacks see them.
@@ -357,29 +375,15 @@ namespace SongsOfConquestAccess.Input
 
         private static InputAction[] CreateTroopSplitActions()
         {
-            Key[] digitKeys =
-            {
-                Key.Digit1,
-                Key.Digit2,
-                Key.Digit3,
-                Key.Digit4,
-                Key.Digit5,
-                Key.Digit6,
-                Key.Digit7,
-                Key.Digit8,
-                Key.Digit9,
-                Key.Digit0
-            };
-            InputAction[] actions = new InputAction[digitKeys.Length];
-            for (int i = 0; i < digitKeys.Length; i++)
+            InputAction[] actions = new InputAction[DigitKeys.Length];
+            for (int i = 0; i < DigitKeys.Length; i++)
             {
                 int size = i + 1;
                 actions[i] = new InputAction(
                         "troop_split_" + size,
                         () => ModText.Plural(ModStrings.Actions.TroopSplit, size, size),
-                        InputClaimScope.Screen,
-                        InputRepeatPolicy.OneShotUntilRelease())
-                    .AddBinding(new KeyboardBinding(digitKeys[i], ctrl: true));
+                        InputClaimScope.Screen)
+                    .AddBinding(new KeyboardBinding(DigitKeys[i], ctrl: true));
             }
 
             return actions;
@@ -416,7 +420,7 @@ namespace SongsOfConquestAccess.Input
 
         private static InputAction OneShot(string key, ModString label, InputClaimScope claimScope)
         {
-            return new InputAction(key, () => ModText.Get(label), claimScope, InputRepeatPolicy.OneShotUntilRelease());
+            return new InputAction(key, () => ModText.Get(label), claimScope);
         }
 
         /// <summary>
@@ -429,8 +433,7 @@ namespace SongsOfConquestAccess.Input
             return new InputAction(
                     key,
                     () => ModText.Get(label, slotNumber),
-                    InputClaimScope.FocusedWidget,
-                    InputRepeatPolicy.OneShotUntilRelease())
+                    InputClaimScope.FocusedWidget)
                 .AddBinding(new KeyboardBinding(boundKey, shift: shift));
         }
 
@@ -439,19 +442,6 @@ namespace SongsOfConquestAccess.Input
         /// English prefix.</summary>
         private static InputAction[] CreateBookmarkActions(string keyPrefix, ModString label, bool ctrl, bool shift, bool alt)
         {
-            Key[] digitKeys =
-            {
-                Key.Digit1,
-                Key.Digit2,
-                Key.Digit3,
-                Key.Digit4,
-                Key.Digit5,
-                Key.Digit6,
-                Key.Digit7,
-                Key.Digit8,
-                Key.Digit9,
-                Key.Digit0
-            };
             InputAction[] actions = new InputAction[AdventureBookmarkSlots.All.Length];
             for (int i = 0; i < AdventureBookmarkSlots.All.Length; i++)
             {
@@ -459,9 +449,8 @@ namespace SongsOfConquestAccess.Input
                 actions[i] = new InputAction(
                         keyPrefix + "_" + slot,
                         () => ModText.Get(label, slot),
-                        InputClaimScope.FocusedWidget,
-                        InputRepeatPolicy.OneShotUntilRelease())
-                    .AddBinding(new KeyboardBinding(digitKeys[i], ctrl, shift, alt));
+                        InputClaimScope.FocusedWidget)
+                    .AddBinding(new KeyboardBinding(DigitKeys[i], ctrl, shift, alt));
             }
 
             return actions;
