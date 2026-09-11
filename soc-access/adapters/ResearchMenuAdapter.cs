@@ -111,7 +111,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             string label = MenuButtonTextUtility.GetAllVisibleText(GetTutorialButton());
             return string.IsNullOrWhiteSpace(label)
-                ? GameText.Get(GetLocalization(), "Tutorial/CodexCategory/Tutorials", "Tutorials")
+                ? GameText.Get(GetLocalization(), "Tutorial/CodexCategory/Tutorials", string.Empty)
                 : label;
         }
 
@@ -404,7 +404,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetTierHeader()
         {
-            return SpokenText.Get(GetLocalization(), "Adventure/KingdomInformationHUD/ResearchTierHeader", "Tier");
+            return SpokenText.Get(GetLocalization(), "Adventure/KingdomInformationHUD/ResearchTierHeader", string.Empty);
         }
 
         private Tooltip BuildResearchTooltip(UIButton button)

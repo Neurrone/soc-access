@@ -125,7 +125,7 @@ namespace SongsOfConquestAccess.Adapters
             UIButton button = GetTutorialButton();
             string label = MenuButtonTextUtility.GetAllVisibleText(button);
             return string.IsNullOrWhiteSpace(label)
-                ? GameText.Get(GetLocalization(), "Tutorial/CodexCategory/Tutorials", "Tutorials")
+                ? GameText.Get(GetLocalization(), "Tutorial/CodexCategory/Tutorials", string.Empty)
                 : label;
         }
 

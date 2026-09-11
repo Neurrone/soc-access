@@ -210,7 +210,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             string label = GetButtonLabel(GetTutorialButton());
             return string.IsNullOrWhiteSpace(label)
-                ? GameText.Get(_localization, "Tutorial/CodexCategory/Tutorials", "Tutorials")
+                ? GameText.Get(_localization, "Tutorial/CodexCategory/Tutorials", string.Empty)
                 : label;
         }
 
@@ -449,7 +449,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string AvailableResearchHeader
         {
-            get { return SpokenText.Get(_localization, "Adventure/BuildMenu/AvailableResearch", "Available Research"); }
+            get { return SpokenText.Get(_localization, "Adventure/BuildMenu/AvailableResearch", string.Empty); }
         }
 
         public IReadOnlyList<SectionMenu> GetIncomeAndGarrisonMenus()
@@ -465,9 +465,9 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 string header = GetSectionHeader(section);
-                if (IsSectionHeader(header, "Adventure/BuildMenu/AvailableResearch", "Available Research")
-                    || IsSectionHeader(header, "Adventure/BuildMenu/Requirements", "Requirements")
-                    || IsSectionHeader(header, "Adventure/BuildMenu/Cost", "Cost"))
+                if (IsSectionHeader(header, "Adventure/BuildMenu/AvailableResearch", string.Empty)
+                    || IsSectionHeader(header, "Adventure/BuildMenu/Requirements", string.Empty)
+                    || IsSectionHeader(header, "Adventure/BuildMenu/Cost", string.Empty))
                 {
                     continue;
                 }
@@ -497,7 +497,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             int buildSiteId = CurrentBuildSite != null ? CurrentBuildSite.Id : -1;
-            BuildMenuDescriptionEntry[] nativeEntries = GetSectionEntries("Adventure/BuildMenu/Requirements", "Requirements");
+            BuildMenuDescriptionEntry[] nativeEntries = GetSectionEntries("Adventure/BuildMenu/Requirements", string.Empty);
             int nativeIndex = 0;
 
             if (requirements.RequiredBuildings != null)
@@ -541,7 +541,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string RequirementsHeader
         {
-            get { return SpokenText.Get(_localization, "Adventure/BuildMenu/Requirements", "Requirements"); }
+            get { return SpokenText.Get(_localization, "Adventure/BuildMenu/Requirements", string.Empty); }
         }
 
         /// <summary>The game's own heading for a price ("Cost"), without the colon the menu draws
@@ -569,7 +569,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 if (SelectedTier > 1)
                 {
-                    string sectionCost = GetSectionBody("Adventure/BuildMenu/Cost", "Cost");
+                    string sectionCost = GetSectionBody("Adventure/BuildMenu/Cost", string.Empty);
                     if (!string.IsNullOrWhiteSpace(sectionCost))
                     {
                         return sectionCost;
@@ -1126,11 +1126,11 @@ namespace SongsOfConquestAccess.Adapters
             switch (size)
             {
                 case BuildSiteSize.Medium:
-                    return SpokenText.Get(_localization, "Adventure/BuildMenu/Tabs/MediumBuildings", "Medium");
+                    return SpokenText.Get(_localization, "Adventure/BuildMenu/Tabs/MediumBuildings", string.Empty);
                 case BuildSiteSize.Large:
-                    return SpokenText.Get(_localization, "Adventure/BuildMenu/Tabs/LargeBuildings", "Large");
+                    return SpokenText.Get(_localization, "Adventure/BuildMenu/Tabs/LargeBuildings", string.Empty);
                 default:
-                    return SpokenText.Get(_localization, "Adventure/BuildMenu/Tabs/SmallBuildings", "Small");
+                    return SpokenText.Get(_localization, "Adventure/BuildMenu/Tabs/SmallBuildings", string.Empty);
             }
         }
 
@@ -1347,17 +1347,17 @@ namespace SongsOfConquestAccess.Adapters
             switch (size)
             {
                 case BuildSiteSize.Medium:
-                    return GetBuildSiteName("MapEntities/BuildSite/Medium", "medium build site");
+                    return GetBuildSiteName("MapEntities/BuildSite/Medium", string.Empty);
                 case BuildSiteSize.Large:
-                    return GetBuildSiteName("MapEntities/BuildSite/Large", "large build site");
+                    return GetBuildSiteName("MapEntities/BuildSite/Large", string.Empty);
                 case BuildSiteSize.LargeSettlement:
-                    return GetBuildSiteName("MapEntities/BuildSite/Large", "large build site");
+                    return GetBuildSiteName("MapEntities/BuildSite/Large", string.Empty);
                 case BuildSiteSize.SmallSettlement:
-                    return GetBuildSiteName("MapEntities/BuildSite/Small", "small build site");
+                    return GetBuildSiteName("MapEntities/BuildSite/Small", string.Empty);
                 case BuildSiteSize.Town:
-                    return SpokenText.Get(_localization, "MapEntities/Category/Town", "town");
+                    return SpokenText.Get(_localization, "MapEntities/Category/Town", string.Empty);
                 default:
-                    return GetBuildSiteName("MapEntities/BuildSite/Small", "small build site");
+                    return GetBuildSiteName("MapEntities/BuildSite/Small", string.Empty);
             }
         }
 
