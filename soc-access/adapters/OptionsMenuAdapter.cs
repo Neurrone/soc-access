@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -77,7 +77,26 @@ namespace SongsOfConquestAccess.Adapters
                 && settings.parent.Active;
         }
 
+        /// <summary>The window's tab row, built at most once a frame: each tab is an object and three
+        /// closures, and the build reads the list whole (AGENTS.md, Performance). What a tab says and
+        /// whether it is drawn are still read off the live button when they are asked.</summary>
         public IReadOnlyList<TabItem> GetTabs()
+        {
+            int frame = Time.frameCount;
+            if (_tabs != null && _tabsFrame == frame)
+            {
+                return _tabs;
+            }
+
+            _tabsFrame = frame;
+            _tabs = ReadTabs();
+            return _tabs;
+        }
+
+        private IReadOnlyList<TabItem> _tabs;
+        private int _tabsFrame = -1;
+
+        private IReadOnlyList<TabItem> ReadTabs()
         {
             List<TabItem> result = new List<TabItem>();
             List<UIButton> tabs = Reflect.Get<List<UIButton>>(_menu, TabsField);
