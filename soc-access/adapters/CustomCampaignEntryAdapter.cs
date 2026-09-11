@@ -1,7 +1,6 @@
 using HarmonyLib;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.UI;
@@ -25,7 +24,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(CustomCampaignEntry), "_modReference");
         private static readonly FieldInfo InstallationOverlayField =
             AccessTools.Field(typeof(CustomCampaignEntry), "_installationOverlay");
-        private static readonly Regex RichTextTagRegex = new Regex("<.*?>", RegexOptions.Compiled);
 
         private readonly CustomCampaignEntry _entry;
 
@@ -71,7 +69,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetActionText()
         {
-            return StripRichText(UITextMeshTextUtility.GetEffectiveButtonText(Button));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(Button));
         }
 
         public string GetInstallationText()
@@ -168,19 +166,12 @@ namespace SongsOfConquestAccess.Adapters
 
             try
             {
-                return StripRichText(UITextMeshTextUtility.GetEffectiveText(fieldRef(_entry)));
+                return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(fieldRef(_entry)));
             }
             catch (System.NullReferenceException)
             {
                 return string.Empty;
             }
-        }
-
-        private static string StripRichText(string value)
-        {
-            return string.IsNullOrWhiteSpace(value)
-                ? string.Empty
-                : RichTextTagRegex.Replace(value, string.Empty).Trim();
         }
     }
 }

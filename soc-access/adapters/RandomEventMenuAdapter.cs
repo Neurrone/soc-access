@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
@@ -15,8 +14,6 @@ namespace SongsOfConquestAccess.Adapters
 {
     public sealed class RandomEventMenuAdapter : IMessageDialogAdapter
     {
-        private static readonly Regex RichTextTagRegex = new Regex("<.*?>", RegexOptions.Compiled);
-
         private static readonly AccessTools.FieldRef<RandomEventMenu, RandomEventMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<RandomEventMenu, RandomEventMenu.Settings>("_settings");
         private static readonly AccessTools.FieldRef<RandomEventMenu, ILocalizationHandler> LocalizationHandlerRef =
@@ -212,7 +209,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return StripRichTextPreservingLines(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetButtonText(IUIButton button)
@@ -223,17 +220,6 @@ namespace SongsOfConquestAccess.Adapters
         private string GetLocalizedText(string key)
         {
             return SpokenLines.Clean(GameText.Get(GetLocalizationHandler(), key, string.Empty));
-        }
-
-        private static string StripRichTextPreservingLines(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
-            string withoutTags = RichTextTagRegex.Replace(value, string.Empty);
-            return withoutTags.Trim();
         }
 
         private static string FirstNonEmpty(string first, string fallback)

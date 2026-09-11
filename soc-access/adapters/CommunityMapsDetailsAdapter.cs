@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
@@ -30,7 +29,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo DownVotesField = AccessTools.Field(typeof(Details), "ModDetailsDownVotes");
         private static readonly FieldInfo UpVoteActiveOverlayField = AccessTools.Field(typeof(Details), "ModDetailsUpVoteActiveOverlay");
         private static readonly FieldInfo DownVoteActiveOverlayField = AccessTools.Field(typeof(Details), "ModDetailsDownVoteActiveOverlay");
-        private static readonly Regex RichTextTagRegex = new Regex("<.*?>", RegexOptions.Compiled);
 
         // The tag chips and the text inside each of them, walked at most once a frame: the outer
         // walk found the chips and then walked each chip again for its label, so a panel of twenty
@@ -158,7 +156,7 @@ namespace SongsOfConquestAccess.Adapters
                 return key ?? string.Empty;
             }
 
-            return CleanText(manager.Get(key));
+            return SpokenLines.Clean(manager.Get(key));
         }
 
         public bool Report()
@@ -379,7 +377,7 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(TMP_Text text)
         {
             return text != null && text.gameObject.activeInHierarchy
-                ? CleanText(text.text)
+                ? SpokenLines.Clean(text.text)
                 : string.Empty;
         }
 
@@ -393,17 +391,6 @@ namespace SongsOfConquestAccess.Adapters
             return name.EndsWith(" (1)", StringComparison.Ordinal)
                 ? name.Substring(0, name.Length - 4)
                 : name;
-        }
-
-        private static string CleanText(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            text = text.Replace("<br>", "\n").Replace("<br/>", "\n").Replace("<br />", "\n");
-            return RichTextTagRegex.Replace(text, string.Empty).Replace("\r\n", "\n").Replace('\r', '\n').Trim();
         }
 
         public sealed class ActionItem
