@@ -63,46 +63,6 @@ namespace SongsOfConquestAccess.Scanner
             return slots;
         }
 
-        /// <summary>
-        /// Reads the list format written before the slots existed: a next id,
-        /// then one record per category holding its id, name, selectors,
-        /// keywords and the quick key it was given. Everything but the name, the
-        /// selectors, the keywords and the key is dropped on the floor; the key
-        /// comes back as its raw token, which is what decides the slot the
-        /// category lands in.
-        /// </summary>
-        public static List<ScannerSavedCategory> DecodeLegacy(string text)
-        {
-            List<ScannerSavedCategory> saved = new List<ScannerSavedCategory>();
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return saved;
-            }
-
-            List<string> records = Split(text, RecordSeparator);
-            for (int i = 1; i < records.Count; i++)
-            {
-                List<string> fields = Split(records[i], FieldSeparator);
-                if (fields.Count < 2)
-                {
-                    continue;
-                }
-
-                ScannerCustomCategory category = new ScannerCustomCategory(Unescape(fields[1]));
-                if (string.IsNullOrWhiteSpace(category.Name))
-                {
-                    continue;
-                }
-
-                ReadSelectorsAndKeywords(category, fields, 2);
-                saved.Add(new ScannerSavedCategory(
-                    category,
-                    fields.Count > 4 ? Unescape(fields[4]) : string.Empty));
-            }
-
-            return saved;
-        }
-
         private static void AppendCategory(StringBuilder builder, ScannerCustomCategory category)
         {
             if (category == null)
@@ -270,23 +230,5 @@ namespace SongsOfConquestAccess.Scanner
 
             return builder.ToString();
         }
-    }
-
-    /// <summary>
-    /// One category read back out of the list format, with the quick-key token
-    /// it was saved under. Only the migration onto the three slots ever sees
-    /// one.
-    /// </summary>
-    public struct ScannerSavedCategory
-    {
-        public ScannerSavedCategory(ScannerCustomCategory category, string quickKeyToken)
-        {
-            Category = category;
-            QuickKeyToken = quickKeyToken ?? string.Empty;
-        }
-
-        public ScannerCustomCategory Category { get; private set; }
-
-        public string QuickKeyToken { get; private set; }
     }
 }

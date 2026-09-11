@@ -73,31 +73,5 @@ namespace SongsOfConquestAccess.Tests
             Assert.IsFalse(ModSettings.ClearScannerCustomCategory(Taxonomy, 0));
             Assert.IsNotNull(ModSettings.AddScannerCustomCategory(Taxonomy, 0, "Custom 1"));
         }
-
-        /// <summary>
-        /// A settings file written before the slots existed is read once through the list format:
-        /// the key a category held becomes the slot it keeps, and the list entry is emptied so the
-        /// move never happens twice.
-        /// </summary>
-        [TestMethod]
-        public void AListSavedByAnOlderBuildIsMovedOntoTheSlotsOnce()
-        {
-            ConfigFile config = new ConfigFile(_configPath, saveOnInit: false);
-            ConfigEntry<string> legacy = config.Bind(
-                "Scanner",
-                "Adventure.CustomCategories",
-                string.Empty,
-                string.Empty);
-            legacy.Value = "4;1|Threats||mine|slash;2|Pickups||gold|comma;3|Spare||";
-            ModSettings.Bind(config);
-
-            Assert.AreEqual("Pickups", ModSettings.GetScannerCustomCategory(Taxonomy, 0).Name);
-            Assert.AreEqual("Spare", ModSettings.GetScannerCustomCategory(Taxonomy, 1).Name);
-            Assert.AreEqual("Threats", ModSettings.GetScannerCustomCategory(Taxonomy, 2).Name);
-            CollectionAssert.AreEqual(
-                new List<string> { "gold" },
-                new List<string>(ModSettings.GetScannerCustomCategory(Taxonomy, 0).Keywords));
-            Assert.AreEqual(string.Empty, legacy.Value);
-        }
     }
 }

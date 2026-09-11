@@ -463,8 +463,7 @@ namespace SongsOfConquestAccess
         }
 
         /// <summary>
-        /// One taxonomy's three slots, decoded once and kept. Migration off the
-        /// list format happens here, on the first read after an upgrade.
+        /// One taxonomy's three slots, decoded once and kept.
         /// </summary>
         public static ScannerCustomSlots GetScannerCustomSlots(string taxonomyKey)
         {
@@ -817,8 +816,7 @@ namespace SongsOfConquestAccess
         }
 
         /// <summary>
-        /// The slots entry, and beside it the list entry older builds wrote, kept bound so that what
-        /// a player already saved can be moved onto the slots the first time they are read.
+        /// One slots entry per scanner context.
         /// </summary>
         private static void BindScannerCustomCategories(ConfigFile config)
         {
@@ -832,12 +830,7 @@ namespace SongsOfConquestAccess
                         "Scanner",
                         ToConfigKeyPrefix(taxonomyKey) + "CustomCategorySlots",
                         string.Empty,
-                        "The three player-defined scanner categories for this context. Edited through the mod settings screen."),
-                    Legacy = config.Bind(
-                        "Scanner",
-                        ToConfigKeyPrefix(taxonomyKey) + "CustomCategories",
-                        string.Empty,
-                        "Player-defined scanner categories as builds before the three fixed slots wrote them. Moved onto the slots once and then emptied.")
+                        "The three player-defined scanner categories for this context. Edited through the mod settings screen.")
                 };
             }
         }
@@ -858,36 +851,9 @@ namespace SongsOfConquestAccess
             if (config.Slots == null)
             {
                 config.Slots = ScannerCustomSlotsCodec.Decode(config.Entry != null ? config.Entry.Value : null);
-                MigrateScannerCustomCategories(taxonomyKey, config);
             }
 
             return config.Slots;
-        }
-
-        /// <summary>
-        /// Moves what an older build saved as a list onto the three slots, once. The list entry is
-        /// emptied as the slots are written, so this runs on one load and never again, and a player
-        /// who had more than three categories is told in the log which ones did not fit.
-        /// </summary>
-        private static void MigrateScannerCustomCategories(string taxonomyKey, ScannerCustomCategoryConfig config)
-        {
-            if (config.Legacy == null || string.IsNullOrWhiteSpace(config.Legacy.Value))
-            {
-                return;
-            }
-
-            IReadOnlyList<string> dropped;
-            config.Slots = ScannerCustomSlotsMigration.Migrate(
-                ScannerCustomSlotsCodec.DecodeLegacy(config.Legacy.Value),
-                out dropped);
-            config.Legacy.Value = string.Empty;
-            SaveScannerCustomSlots(taxonomyKey, config.Slots);
-            if (dropped.Count > 0)
-            {
-                SocAccessMod.Instance?.LogWarning(
-                    "Scanner custom categories for '" + taxonomyKey + "' no longer fit the three slots; dropped: "
-                    + string.Join(", ", new List<string>(dropped).ToArray()));
-            }
         }
 
         private static ScannerCustomCategoryConfig GetScannerCustomCategoryConfig(string taxonomyKey)
@@ -1165,7 +1131,6 @@ namespace SongsOfConquestAccess
         private sealed class ScannerCustomCategoryConfig
         {
             public ConfigEntry<string> Entry { get; set; }
-            public ConfigEntry<string> Legacy { get; set; }
             public ScannerCustomSlots Slots { get; set; }
         }
 
