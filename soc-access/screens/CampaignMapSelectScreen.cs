@@ -312,7 +312,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             IMenuButtonAdapter it = button;
-            NodeVtable vtable = GraphNodes.Button(it.GetLabel, () => it.Activate(), it.IsVisible);
+            NodeVtable vtable = GraphNodes.Button(it.GetLabel, () => it.Activate(), it.IsEnabled);
             vtable.OnFocusVisual = () => FocusNativeButton(it.Button);
             builder.AddItem(new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button));
         }
