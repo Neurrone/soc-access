@@ -35,7 +35,7 @@ namespace SongsOfConquestAccess.Events
                 return;
             }
 
-            string text = accessibilityEvent.GetSpeechText();
+            string text = AccessibilityEventBus.TextOf(accessibilityEvent);
             if (string.IsNullOrWhiteSpace(text))
             {
                 return;

@@ -20,6 +20,9 @@ namespace SongsOfConquestAccess.Events
 
         public static class Notification
         {
+            /// <summary>What every kind in this group starts with.</summary>
+            public const string Prefix = "notification.";
+
             public const string AdventureIcon = "notification.adventure.icon";
             public const string AdventureSimple = "notification.adventure.simple";
             public const string CommanderLevelUp = "notification.adventure.commander_level_up";
@@ -39,6 +42,9 @@ namespace SongsOfConquestAccess.Events
 
         public static class Combat
         {
+            /// <summary>What every kind in this group starts with.</summary>
+            public const string Prefix = "combat.";
+
             public const string NewTurn = "combat.turn.new";
             public const string NewRound = "combat.round.new";
             public const string QueueChanged = "combat.queue.changed";
