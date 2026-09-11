@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
@@ -15,28 +17,29 @@ namespace SongsOfConquestAccess.UI
     /// into the hint on the key that performs it - the primary row on left click, the secondary on
     /// right click - so the wording follows the player's bindings like every other hint.
     ///
-    /// One hint is declared per kind and gated on the live tooltip, because the vtable is built once
-    /// per frame while the cursor moves from tile to tile inside it. <paramref name="tooltip"/> is
-    /// therefore asked once per hint per buffer read and must be the screen's CACHED tile tooltip,
-    /// never a fresh adapter read.
+    /// ONE HINT PER KEY, and WHICH sentence it carries is decided when the buffer is READ, because
+    /// the vtable is built once per frame while the cursor moves from tile to tile inside it. The
+    /// tooltip is therefore asked once per hint per buffer read and must be the screen's CACHED tile
+    /// tooltip, never a fresh adapter read.
     /// </summary>
     public static class TileInstructionHints
     {
         /// <summary>What each kind is called on the key that performs it.</summary>
-        private static readonly Entry[] Table =
-        {
-            new Entry(TileInstruction.Select, ModStrings.Screens.TileSelectHint),
-            new Entry(TileInstruction.Visit, ModStrings.Screens.TileVisitHint),
-            new Entry(TileInstruction.Trade, ModStrings.Screens.TileTradeHint),
-            new Entry(TileInstruction.Repair, ModStrings.Screens.TileRepairHint),
-            new Entry(TileInstruction.Interact, ModStrings.Screens.TileInteractHint),
-            new Entry(TileInstruction.Pillage, ModStrings.Screens.TilePillageHint),
-            new Entry(TileInstruction.Attack, ModStrings.Screens.TileAttackHint),
-            new Entry(TileInstruction.Pickup, ModStrings.Screens.TilePickupHint),
-            new Entry(TileInstruction.Claim, ModStrings.Screens.TileClaimHint),
-            new Entry(TileInstruction.Teleport, ModStrings.Screens.TileTeleportHint),
-            new Entry(TileInstruction.Move, ModStrings.Screens.TileMoveHint),
-        };
+        private static readonly Dictionary<TileInstruction, ModString> Templates =
+            new Dictionary<TileInstruction, ModString>
+            {
+                { TileInstruction.Select, ModStrings.Screens.TileSelectHint },
+                { TileInstruction.Visit, ModStrings.Screens.TileVisitHint },
+                { TileInstruction.Trade, ModStrings.Screens.TileTradeHint },
+                { TileInstruction.Repair, ModStrings.Screens.TileRepairHint },
+                { TileInstruction.Interact, ModStrings.Screens.TileInteractHint },
+                { TileInstruction.Pillage, ModStrings.Screens.TilePillageHint },
+                { TileInstruction.Attack, ModStrings.Screens.TileAttackHint },
+                { TileInstruction.Pickup, ModStrings.Screens.TilePickupHint },
+                { TileInstruction.Claim, ModStrings.Screens.TileClaimHint },
+                { TileInstruction.Teleport, ModStrings.Screens.TileTeleportHint },
+                { TileInstruction.Move, ModStrings.Screens.TileMoveHint },
+            };
 
         public static void Add(NodeVtable vtable, Func<Tooltip> tooltip, Func<bool> when = null)
         {
@@ -45,55 +48,180 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            for (int i = 0; i < Table.Length; i++)
-            {
-                Entry entry = Table[i];
-                NodeHints.Add(
-                    vtable,
-                    entry.Template,
-                    AccessibilityActions.UiLeftClick.Key,
-                    0,
-                    () => Says(tooltip, when, entry.Kind, primary: true));
-            }
-
-            for (int i = 0; i < Table.Length; i++)
-            {
-                Entry entry = Table[i];
-                NodeHints.Add(
-                    vtable,
-                    entry.Template,
-                    AccessibilityActions.UiRightClick.Key,
-                    0,
-                    () => Says(tooltip, when, entry.Kind, primary: false));
-            }
+            vtable.Hints = new Instructions(tooltip, when, vtable.Hints);
         }
 
-        private static bool Says(Func<Tooltip> tooltip, Func<bool> when, TileInstruction kind, bool primary)
+        /// <summary>
+        /// A tile's hint list: whatever was declared before it, then the left click's sentence and
+        /// the right click's, then whatever is declared after.
+        ///
+        /// A <see cref="NodeHint"/>'s template is fixed when the hint is made, so saying what the
+        /// LIVE tooltip names used to mean declaring all eleven kinds on both keys and gating twenty
+        /// of the twenty-two off - twenty-two hint objects and twenty-two closures appended to the
+        /// tile's vtable on every build of the map and of the battle board. Reading the same
+        /// declaration the other way round costs nothing per frame and says the same two lines per
+        /// read: the list holds two hints, and which sentence each carries is chosen the moment it
+        /// is asked for, off the same tooltip the gate read.
+        /// </summary>
+        private sealed class Instructions : IList<NodeHint>
         {
-            if (when != null && !when())
+            /// <summary>A hint that says nothing, for a key the game named no action on: its gate
+            /// refuses, which is how <see cref="NodeHints.Lines"/> already skips a hint.</summary>
+            private static readonly NodeHint Silent = new NodeHint(
+                ModStrings.Screens.TileSelectHint,
+                AccessibilityActions.UiLeftClick.Key,
+                0,
+                () => false);
+
+            private readonly Func<Tooltip> _tooltip;
+
+            private readonly Func<bool> _when;
+
+            private readonly IList<NodeHint> _before;
+
+            private List<NodeHint> _after;
+
+            public Instructions(Func<Tooltip> tooltip, Func<bool> when, IList<NodeHint> before)
             {
-                return false;
+                _tooltip = tooltip;
+                _when = when;
+                _before = before != null && before.Count > 0 ? before : null;
             }
 
-            Tooltip it = tooltip();
-            if (it == null)
+            public int Count
             {
-                return false;
+                get { return Before + 2 + (_after == null ? 0 : _after.Count); }
             }
 
-            return (primary ? it.PrimaryInstruction : it.SecondaryInstruction) == kind;
-        }
-
-        private struct Entry
-        {
-            public Entry(TileInstruction kind, ModString template)
+            public bool IsReadOnly
             {
-                Kind = kind;
-                Template = template;
+                get { return false; }
             }
 
-            public readonly TileInstruction Kind;
-            public readonly ModString Template;
+            public NodeHint this[int index]
+            {
+                get
+                {
+                    int at = index - Before;
+                    if (at < 0)
+                    {
+                        return _before[index];
+                    }
+
+                    return at < 2 ? Hint(at == 0) : _after[at - 2];
+                }
+
+                set { throw new NotSupportedException("a tile's instruction hints are read off its tooltip"); }
+            }
+
+            public void Add(NodeHint hint)
+            {
+                if (_after == null)
+                {
+                    _after = new List<NodeHint>(1);
+                }
+
+                _after.Add(hint);
+            }
+
+            public IEnumerator<NodeHint> GetEnumerator()
+            {
+                for (int i = 0; i < Count; i++)
+                {
+                    yield return this[i];
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            public int IndexOf(NodeHint hint)
+            {
+                for (int i = 0; i < Count; i++)
+                {
+                    if (ReferenceEquals(this[i], hint))
+                    {
+                        return i;
+                    }
+                }
+
+                return -1;
+            }
+
+            public bool Contains(NodeHint hint)
+            {
+                return IndexOf(hint) >= 0;
+            }
+
+            public void CopyTo(NodeHint[] array, int at)
+            {
+                for (int i = 0; i < Count; i++)
+                {
+                    array[at + i] = this[i];
+                }
+            }
+
+            public void Insert(int index, NodeHint hint)
+            {
+                throw new NotSupportedException("a tile's instruction hints keep their place");
+            }
+
+            public void RemoveAt(int index)
+            {
+                throw new NotSupportedException("a tile's instruction hints keep their place");
+            }
+
+            public bool Remove(NodeHint hint)
+            {
+                throw new NotSupportedException("a tile's instruction hints keep their place");
+            }
+
+            public void Clear()
+            {
+                throw new NotSupportedException("a tile's instruction hints keep their place");
+            }
+
+            private int Before
+            {
+                get { return _before == null ? 0 : _before.Count; }
+            }
+
+            /// <summary>The sentence one of the two keys says right now, or the silent hint where the
+            /// gate refuses, the tooltip is gone, or the game named no action on that key. Guarded
+            /// because the read used to sit inside <see cref="NodeHints.Lines"/>'s own guard and a
+            /// tooltip that throws must still cost one line and not the whole readout.</summary>
+            private NodeHint Hint(bool primary)
+            {
+                try
+                {
+                    if (_when != null && !_when())
+                    {
+                        return Silent;
+                    }
+
+                    Tooltip it = _tooltip();
+                    TileInstruction kind = it == null
+                        ? TileInstruction.None
+                        : (primary ? it.PrimaryInstruction : it.SecondaryInstruction);
+
+                    ModString template;
+                    if (!Templates.TryGetValue(kind, out template))
+                    {
+                        return Silent;
+                    }
+
+                    return new NodeHint(
+                        template,
+                        primary ? AccessibilityActions.UiLeftClick.Key : AccessibilityActions.UiRightClick.Key);
+                }
+                catch (Exception e)
+                {
+                    SocAccessMod.Instance?.LogWarning("tile hints: reading the tile's instructions threw: " + e);
+                    return Silent;
+                }
+            }
         }
     }
 }
