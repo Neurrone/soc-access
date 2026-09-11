@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -51,7 +51,6 @@ namespace SongsOfConquestAccess
             MessageTriggerData messageData,
             ILocalizationHandler localizationHandler,
             IClientAdventureFacade adventureFacade,
-            object converter,
             ICommanderState interactingCommanderState)
         {
             if (messageData == null)
@@ -68,7 +67,6 @@ namespace SongsOfConquestAccess
             PublishCameraFocusForIdentifier(
                 messageData.Camera,
                 adventureFacade,
-                converter,
                 localizationHandler,
                 interactingCommanderState);
         }
@@ -100,12 +98,11 @@ namespace SongsOfConquestAccess
             }
 
             IClientAdventureFacade facade = GetDialogueFacade(__instance);
-            object converter = GetDialogueConverter(__instance);
             ILocalizationHandler localizationHandler = GlobalLocalizationVariables.LocalizationHandler;
 
             if (entry.Camera.TargetType == CameraFocusPointTargetType.Point)
             {
-                PublishCameraFocusForIdentifier(entry.Camera, facade, converter, localizationHandler, null);
+                PublishCameraFocusForIdentifier(entry.Camera, facade, localizationHandler, null);
                 return;
             }
 
@@ -127,7 +124,6 @@ namespace SongsOfConquestAccess
         private static void PublishCameraFocusForIdentifier(
             CameraFocusPointIdentifier camera,
             IClientAdventureFacade facade,
-            object converter,
             ILocalizationHandler localizationHandler,
             ICommanderState interactingCommanderState)
         {
@@ -135,7 +131,6 @@ namespace SongsOfConquestAccess
             {
                 StoryCameraFocusTarget target = StoryCameraFocusResolver.ResolvePointTarget(
                     facade,
-                    converter,
                     localizationHandler,
                     camera);
                 PublishIfTarget(StoryCameraFocusKind.Point, target, camera.reference);
