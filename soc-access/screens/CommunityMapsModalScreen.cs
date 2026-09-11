@@ -115,16 +115,12 @@ namespace SongsOfConquestAccess.Screens
             return Live != null && Live.Cancel();
         }
 
-        /// <summary>While the keyboard is on its way to the modal's text box, what the player types
-        /// next is meant for that box.</summary>
-        public override bool CapturesRawInput
+        /// <summary>The page's own editor, over the modal's text box. GraphScreen takes the rest of its
+        /// lifecycle: the raw-input and field-ownership answers, the per-frame update, and the
+        /// abandon on leaving and on popping.</summary>
+        public override GameTextEditor Editor
         {
-            get { return _editor.Pending; }
-        }
-
-        public override bool OwnsGameField
-        {
-            get { return _editor.Pending || _editor.Editing; }
+            get { return _editor; }
         }
 
         /// <summary>Off while the code panel is up: the letters and digits typed there are the code,
@@ -137,23 +133,8 @@ namespace SongsOfConquestAccess.Screens
         public override void OnUpdate()
         {
             base.OnUpdate();
-
-            // After the navigator, so a word about the edit follows the activation's own readout.
-            _editor.Update(IsActive());
             AnnounceTitleIfChanged();
             AnnounceCodeTyped();
-        }
-
-        public override void OnUnfocus()
-        {
-            base.OnUnfocus();
-            _editor.Abandon();
-        }
-
-        public override void OnPop()
-        {
-            base.OnPop();
-            _editor.Abandon();
         }
 
         public override void Build(GraphBuilder builder)

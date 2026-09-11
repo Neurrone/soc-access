@@ -191,33 +191,12 @@ namespace SongsOfConquestAccess.Screens
                 && Live.ActivateAction(DialogAction.Negative);
         }
 
-        /// <summary>While the keyboard is on its way to the game's field, what the player types next
-        /// is meant for that field and must not start a search.</summary>
-        public override bool CapturesRawInput
+        /// <summary>The page's own editor, over the dialog's field. GraphScreen takes the rest of its
+        /// lifecycle: the raw-input and field-ownership answers, the per-frame update, and the
+        /// abandon on leaving and on popping.</summary>
+        public override GameTextEditor Editor
         {
-            get { return _editor.Pending; }
-        }
-
-        public override bool OwnsGameField
-        {
-            get { return _editor.Pending || _editor.Editing; }
-        }
-
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
-
-            // After the navigator, so the word the handover speaks follows the activation's own
-            // readout. IsPresent is what tells an edit the player ended from a dialog that went away
-            // under it: an Enter in the field submits the dialog, and an ending nobody is left to
-            // hear is not announced.
-            _editor.Update(IsActive());
-        }
-
-        public override void OnUnfocus()
-        {
-            base.OnUnfocus();
-            _editor.Abandon();
+            get { return _editor; }
         }
 
         /// <summary>The page has gone. The slot goes with it, so the adapter releases the handler it
@@ -226,7 +205,6 @@ namespace SongsOfConquestAccess.Screens
         public override void OnPop()
         {
             base.OnPop();
-            _editor.Abandon();
             Forget();
         }
 

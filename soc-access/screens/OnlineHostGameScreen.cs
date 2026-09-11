@@ -84,34 +84,12 @@ namespace SongsOfConquestAccess.Screens
             return Live != null && Live.Cancel();
         }
 
-        /// <summary>While the keyboard is on its way to the name box, what the player types next is
-        /// meant for that box and must not start a search.</summary>
-        public override bool CapturesRawInput
+        /// <summary>The page's own editor, over the name box. GraphScreen takes the rest of its
+        /// lifecycle: the raw-input and field-ownership answers, the per-frame update, and the
+        /// abandon on leaving and on popping.</summary>
+        public override GameTextEditor Editor
         {
-            get { return _editor.Pending; }
-        }
-
-        public override bool OwnsGameField
-        {
-            get { return _editor.Pending || _editor.Editing; }
-        }
-
-        public override void OnUpdate()
-        {
-            base.OnUpdate();
-            _editor.Update(IsActive());
-        }
-
-        public override void OnUnfocus()
-        {
-            base.OnUnfocus();
-            _editor.Abandon();
-        }
-
-        public override void OnPop()
-        {
-            base.OnPop();
-            _editor.Abandon();
+            get { return _editor; }
         }
 
         public override void Build(GraphBuilder builder)

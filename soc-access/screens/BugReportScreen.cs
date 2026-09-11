@@ -84,25 +84,18 @@ namespace SongsOfConquestAccess.Screens
             return base.IsActive() && Live != null && Live.ActiveWindow != BugReportWindow.None;
         }
 
-        /// <summary>While the keyboard is on its way to a field, what the player types next is meant
-        /// for that field and must not start a search.</summary>
-        public override bool CapturesRawInput
+        /// <summary>The page's own editor, over the wizard's fields. GraphScreen takes the rest of its
+        /// lifecycle: the raw-input and field-ownership answers, the per-frame update, and the
+        /// abandon on leaving and on popping.</summary>
+        public override GameTextEditor Editor
         {
-            get { return _editor.Pending; }
-        }
-
-        public override bool OwnsGameField
-        {
-            get { return _editor.Pending || _editor.Editing; }
+            get { return _editor; }
         }
 
         public override void OnUpdate()
         {
             base.OnUpdate();
-            bool active = IsActive();
-            _editor.Update(active);
-
-            if (active)
+            if (IsActive())
             {
                 // The wizard turned in place: say the window's new header, which the manager's
                 // arrival-only announcement will not. SayNameIfChanged is silent when the header did
@@ -120,16 +113,9 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override void OnUnfocus()
-        {
-            base.OnUnfocus();
-            _editor.Abandon();
-        }
-
         public override void OnPop()
         {
             base.OnPop();
-            _editor.Abandon();
             _lastWindow = BugReportWindow.None;
             Forget();
         }

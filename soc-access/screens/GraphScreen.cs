@@ -101,12 +101,25 @@ namespace SongsOfConquestAccess.Screens
             get { return false; }
         }
 
-        /// <summary>Whether this screen's own editor holds or is about to hold a game text field, so
-        /// the arrival release leaves it alone. Screens that own a <see cref="GameTextEditor"/>
-        /// answer with its pending-or-editing state.</summary>
+        /// <summary>THE SCREEN'S OWN TEXT EDITOR, or null where the page has no box the player types
+        /// into. A screen that has one answers with it and gets its whole lifecycle from here: the
+        /// raw-input and field-ownership answers, the per-frame update, and the abandon on leaving and
+        /// on popping. A screen whose editor lives on a row group answers with that one.</summary>
+        public virtual GameTextEditor Editor
+        {
+            get { return null; }
+        }
+
+        /// <summary>Whether the screen is handing the keyboard to a game field and so must not have it
+        /// taken back. A screen with an <see cref="Editor"/> answers with its pending-or-editing
+        /// state.</summary>
         public virtual bool OwnsGameField
         {
-            get { return false; }
+            get
+            {
+                GameTextEditor editor = Editor;
+                return editor != null && (editor.Pending || editor.Editing);
+            }
         }
 
         /// <summary>Whether typing searches this screen. False for a screen whose whole point is a
@@ -120,7 +133,11 @@ namespace SongsOfConquestAccess.Screens
         /// editor asked for and not yet given - so typed letters must not start a search.</summary>
         public virtual bool CapturesRawInput
         {
-            get { return false; }
+            get
+            {
+                GameTextEditor editor = Editor;
+                return editor != null && editor.Pending;
+            }
         }
 
         /// <summary>What a search on this screen looks through - null (the usual answer) for the
@@ -185,6 +202,38 @@ namespace SongsOfConquestAccess.Screens
             if (!OwnsGameField && !GameTextEditor.Owned)
             {
                 GameTextFocus.Release();
+            }
+
+            // After the release and after the navigator, so the word a handover speaks follows the
+            // activation's own readout. Whether the page is still showing is what tells an edit the
+            // player ended from a window that went away under it: Enter in the box can send and close
+            // it, and an ending nobody is left to hear is not announced.
+            GameTextEditor editor = Editor;
+            if (editor != null)
+            {
+                editor.Update(IsActive());
+            }
+        }
+
+        /// <summary>The cursor has left the screen: an edit still being handed over is given up.
+        /// </summary>
+        public override void OnUnfocus()
+        {
+            base.OnUnfocus();
+            GameTextEditor editor = Editor;
+            if (editor != null)
+            {
+                editor.Abandon();
+            }
+        }
+
+        public override void OnPop()
+        {
+            base.OnPop();
+            GameTextEditor editor = Editor;
+            if (editor != null)
+            {
+                editor.Abandon();
             }
         }
 
