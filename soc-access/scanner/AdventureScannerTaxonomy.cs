@@ -1,4 +1,5 @@
 using SongsOfConquestAccess.Localization;
+using static SongsOfConquestAccess.Scanner.ScannerScope;
 
 namespace SongsOfConquestAccess.Scanner
 {
@@ -63,16 +64,6 @@ namespace SongsOfConquestAccess.Scanner
                 Subcategory(ScannerSubcategoryKeys.Neutral, ModStrings.Scanner.Neutral),
                 Subcategory(ScannerSubcategoryKeys.Friendly, ModStrings.Scanner.Friendly),
                 Subcategory(ScannerSubcategoryKeys.Enemy, ModStrings.Scanner.Enemy));
-        }
-
-        private static ScannerSubcategoryDefinition All()
-        {
-            return Subcategory(ScannerSubcategoryKeys.All, ModStrings.Scanner.All);
-        }
-
-        private static ScannerSubcategoryDefinition Subcategory(string key, ModString label)
-        {
-            return new ScannerSubcategoryDefinition(key, () => ModText.Get(label));
         }
     }
 }
