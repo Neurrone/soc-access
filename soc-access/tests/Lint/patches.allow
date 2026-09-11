@@ -47,8 +47,6 @@ soc-access/patches/LoadingScreenPatches.cs | 1 | [HarmonyPatch(typeof(LoadingScr
 soc-access/patches/OwnedEntitiesPatches.cs | 2 | [HarmonyPatch(typeof(KingdomEntityOverviewCategoryEntry), "HandleCategoryTextClicked")] | event
 soc-access/patches/OwnedEntitiesPatches.cs | 2 | [HarmonyPatch(typeof(KingdomEntityOverviewClaimedEntry), "HandleButtonClicked")] | event
 
-soc-access/patches/PlatformUserMenuPatches.cs | 1 | [HarmonyPatch(typeof(PlatformUserButtonEntry), "HandleClicked")] | interception
-
 soc-access/patches/StoryCameraFocusPatches.cs | 1 | [HarmonyPatch(typeof(AdventureDialogueCameraManager), "InitializeTargets")] | event
 soc-access/patches/StoryCameraFocusPatches.cs | 1 | [HarmonyPatch(typeof(AdventureDialogueCameraManager), "Show")] | event
 soc-access/patches/StoryCameraFocusPatches.cs | 1 | [HarmonyPatch(typeof(MessageTriggerUtility), "HandleMessageTrigger")] | event

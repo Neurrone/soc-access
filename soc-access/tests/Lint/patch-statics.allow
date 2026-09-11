@@ -6,4 +6,3 @@
 
 soc-access/patches/DynamicAssemblyTypesPatches.cs | 1 | private static bool _reported;
 
-soc-access/patches/PlatformUserMenuPatches.cs | 1 | private static float _lastActionTime = -100f;
