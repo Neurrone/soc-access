@@ -226,8 +226,9 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            UnityEngine.Object unityObject = value as UnityEngine.Object;
-            return unityObject == null ? true : unityObject != null;
+            // Unity's overloaded == answers true for a destroyed object, so `as` succeeding is no
+            // proof of life; only a value that is not a Unity object at all is alive by default.
+            return !(value is UnityEngine.Object) || (UnityEngine.Object)(object)value != null;
         }
 
         private static T ResolveFromProject()
