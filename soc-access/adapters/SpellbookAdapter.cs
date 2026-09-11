@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -588,62 +588,52 @@ namespace SongsOfConquestAccess.Adapters
 
         private IReadOnlyList<string> BuildSpellTooltipLines(ISpellDefinition spell)
         {
-            List<string> lines = new List<string>();
+            return SpellTooltipText.Lines(ReadSpellTooltipFacts(spell));
+        }
+
+        /// <summary>Everything the spellbook's tooltip says about a spell, read from the game WHEN
+        /// THE TOOLTIP IS READ: the game recomposes the tier details on the way through.
+        /// <see cref="SpellTooltipText"/> turns it into lines, the same composition the battle HUD's
+        /// quickbar tooltip uses. The cast text is the spellbook's own, because this book is also
+        /// open on the adventure map, where the battle HUD's never is.</summary>
+        private BattleHudAdapter.SpellTooltipFacts ReadSpellTooltipFacts(ISpellDefinition spell)
+        {
+            BattleHudAdapter.SpellTooltipFacts facts = new BattleHudAdapter.SpellTooltipFacts();
             if (spell == null)
             {
-                return lines;
+                return facts;
             }
 
             ICommanderState commander = GetCommander();
             ISpellsLookup lookup = GetSpellsLookup();
             ILocalizationHandler localization = GetLocalization();
-            string name = Localize(spell.NameKey);
             int tier = GetCurrentTier(spell);
-            lines.Add(tier > 0 ? name + ", " + GetTierLabel(tier) : name);
-
-            string lore = Localize(spell.DescriptionKey);
-            if (!string.IsNullOrWhiteSpace(lore))
-            {
-                lines.Add(lore);
-            }
+            facts.Name = Localize(spell.NameKey);
+            facts.TierLabel = tier > 0 ? GetTierLabel(tier) : string.Empty;
+            facts.Lore = Localize(spell.DescriptionKey);
 
             if (lookup != null && commander != null && localization != null)
             {
                 SpellDetails details = lookup.GetDetails((SpellTypes)spell.Id, commander);
                 if (details != null)
                 {
-                    string description = details.GetLocalizedTierDescription(details.CurrentTier, localization);
-                    if (!string.IsNullOrWhiteSpace(description))
-                    {
-                        string header = localization.GetText("Spells/Spellbook/SpellDescriptionHeader")
-                            + " ("
-                            + localization.GetText("Spells/Spellbook/SpellTierHeader", details.CurrentTier)
-                            + ")";
-                        lines.Add(header);
-                        lines.Add(description);
-                    }
-
-                    string duration = details.GetLocalizedTierDurationDescription(details.CurrentTier, localization);
-                    if (!string.IsNullOrWhiteSpace(duration))
-                    {
-                        lines.Add(localization.GetText("Spells/Spellbook/SpellDurationHeader") + ": " + duration);
-                    }
+                    facts.TierDescription = details.GetLocalizedTierDescription(details.CurrentTier, localization);
+                    facts.DescriptionHeader = localization.GetText("Spells/Spellbook/SpellDescriptionHeader");
+                    facts.DescriptionTierLabel = localization.GetText("Spells/Spellbook/SpellTierHeader", details.CurrentTier);
+                    facts.Duration = details.GetLocalizedTierDurationDescription(details.CurrentTier, localization);
+                    facts.DurationHeader = localization.GetText("Spells/Spellbook/SpellDurationHeader");
                 }
             }
 
-            string cost = FormatCost(spell);
-            if (!string.IsNullOrWhiteSpace(cost))
+            IReadOnlyList<SpellCost> costs = GetSpellCosts(spell);
+            for (int i = 0; i < costs.Count; i++)
             {
-                lines.Add(Localize("Spells/Spellbook/SpellCostHeader") + ": " + cost);
+                facts.Cost.Add(new BattleHudAdapter.EssenceCost(costs[i].Amount, costs[i].EssenceName));
             }
 
-            string castText = BuildCastText(spell, tier);
-            if (!string.IsNullOrWhiteSpace(castText))
-            {
-                lines.Add(castText);
-            }
-
-            return lines;
+            facts.CostHeader = Localize("Spells/Spellbook/SpellCostHeader");
+            facts.CastText = BuildCastText(spell, tier);
+            return facts;
         }
 
         private string BuildCastText(ISpellDefinition spell, int tier)
@@ -793,11 +783,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             ICommanderState commander = GetCommander();
             return spell != null && commander != null ? spell.GetHighestAvailableTier(commander).Tier : 0;
-        }
-
-        private string FormatCost(ISpellDefinition spell)
-        {
-            return SpellCosts.Text(GetSpellCosts(spell));
         }
 
         private string GetEssenceName(EssenceType type)
