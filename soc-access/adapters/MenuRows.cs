@@ -293,7 +293,7 @@ namespace SongsOfConquestAccess.Adapters
                     new MenuRowSlider(
                         RowId(settings, "slider", i),
                         () => SliderLabel(slider),
-                        () => SliderValueText(slider),
+                        () => ValueText(slider),
                         () => slider.SliderValue,
                         () => SliderMinimum(slider),
                         () => SliderMaximum(slider),
@@ -662,20 +662,14 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        private static string SliderValueText(IUISlider slider)
+        private static string ValueText(IUISlider slider)
         {
             if (slider == null)
             {
                 return string.Empty;
             }
 
-            float value = slider.SliderValue;
-            if (slider.DrawAsPercent)
-            {
-                return Math.Round(value * 100f) + "%";
-            }
-
-            return value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+            return SliderValueText.Of(slider.SliderValue, slider.DrawAsPercent);
         }
 
         private static float SliderStep(IUISlider slider)

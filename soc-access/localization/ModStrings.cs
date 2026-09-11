@@ -469,6 +469,7 @@
             public static readonly ModString NoDetails = new ModString("UI.NoDetails", "Nothing in here");
             public static readonly ModString NoScannerResults = new ModString("UI.NoScannerResults", "No scanner results");
             public static readonly ModString NotInMovementRange = new ModString("UI.NotInMovementRange", "Not in movement range");
+            public static readonly ModString Percent = new ModString("UI.Percent", "{0}%");
             public static readonly ModString PressSpaceSelectItemToDrag = new ModString("UI.PressSpaceSelectItemToDrag", "Press space to select an item to drag.");
             public static readonly ModString PressSpaceToDrag = new ModString("UI.PressSpaceToDrag", "Press space to drag.");
             public static readonly ModString ReviewBufferEvents = new ModString("UI.ReviewBufferEvents", "Events");

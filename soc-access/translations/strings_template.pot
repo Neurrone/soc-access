@@ -2014,6 +2014,11 @@ msgctxt "UI.NotInMovementRange"
 msgid "Not in movement range"
 msgstr ""
 
+#. UI.Percent
+msgctxt "UI.Percent"
+msgid "{0}%"
+msgstr ""
+
 #. UI.PressSpaceSelectItemToDrag
 msgctxt "UI.PressSpaceSelectItemToDrag"
 msgid "Press space to select an item to drag."
