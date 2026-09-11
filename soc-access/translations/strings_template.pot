@@ -459,6 +459,31 @@ msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
 msgstr ""
 
+#. Events.MapInputNotReady
+msgctxt "Events.MapInputNotReady"
+msgid "Map input is not ready."
+msgstr ""
+
+#. Events.MapInteractionNotReady
+msgctxt "Events.MapInteractionNotReady"
+msgid "Map interaction is not ready."
+msgstr ""
+
+#. Events.MapTileNotTargetable
+msgctxt "Events.MapTileNotTargetable"
+msgid "Could not target tile."
+msgstr ""
+
+#. Events.MapPrimaryActionFailed
+msgctxt "Events.MapPrimaryActionFailed"
+msgid "Could not perform primary action."
+msgstr ""
+
+#. Events.MapSecondaryActionFailed
+msgctxt "Events.MapSecondaryActionFailed"
+msgid "Could not perform secondary action."
+msgstr ""
+
 #. Graph.DragCancelled
 msgctxt "Graph.DragCancelled"
 msgid "Cancelled drag"
@@ -3472,6 +3497,16 @@ msgstr ""
 #. Screens.ResearchCategoryNumber
 msgctxt "Screens.ResearchCategoryNumber"
 msgid "Research category {0}"
+msgstr ""
+
+#. Screens.WielderExperience
+msgctxt "Screens.WielderExperience"
+msgid "{0}, {1} {2}, {3} / {4}"
+msgstr ""
+
+#. Screens.UpgradeTiers
+msgctxt "Screens.UpgradeTiers"
+msgid "{0} {1} / {2}"
 msgstr ""
 
 #. Scanner.All

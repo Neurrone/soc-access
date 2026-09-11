@@ -38,6 +38,9 @@ namespace SongsOfConquestAccess.Screens
         private const string ActionsStop = "map-entity-actions";
         private const string CloseStop = "map-entity-close";
 
+        private const string DescriptionRowKey = "map-entity-description-row-";
+        private const string ActionKeyPrefix = "map-entity-action-";
+
         public MapEntityMiniMenuAdapter Adapter
         {
             get { return Live; }
@@ -127,7 +130,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (Live.IsUpgradeSummaryVisible)
             {
-                AddText(builder, "upgrades", Live.UpgradesComponent, () => Live.UpgradeSummary);
+                AddText(builder, "upgrades", Live.UpgradesComponent, UpgradeSummary);
             }
 
             if (Live.IsSiegeStateVisible)
@@ -179,8 +182,22 @@ namespace SongsOfConquestAccess.Screens
 
                 MapEntityMiniMenuAdapter.DescriptionRow it = row;
                 NodeVtable vtable = GraphNodes.Paragraphs(() => it.Lines, it.GetTooltip());
-                builder.AddItem(new DrawnNode(ControlId.For(it.Component, it.Id), vtable, it.Component));
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(it.Component, DescriptionRowKey + it.Index),
+                    vtable,
+                    it.Component));
             }
+        }
+
+        /// <summary>How many of the entity's upgrade tiers are built, under the game's own caption for
+        /// the row of slots it counts them off.</summary>
+        private string UpgradeSummary()
+        {
+            return ModText.Get(
+                ModStrings.Screens.UpgradeTiers,
+                Live.UpgradeCaption,
+                Live.UpgradeTiersBuilt,
+                Live.UpgradeTiersTotal);
         }
 
         /// <summary>How far a raze or a conversion has got, counted off the round dots the game draws
@@ -245,7 +262,10 @@ namespace SongsOfConquestAccess.Screens
                     it.IsEnabled,
                     it.GetTooltip());
                 vtable.OnFocusVisual = () => { if (it.Focus != null) it.Focus(); };
-                builder.AddItem(new DrawnNode(ControlId.For(it.Component, it.Id), vtable, it.Component));
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(it.Component, ActionKeyPrefix + it.Index + "-" + it.ActionType),
+                    vtable,
+                    it.Component));
             }
         }
 

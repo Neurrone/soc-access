@@ -3837,19 +3837,38 @@ msgstr "연구 {0}"
 msgctxt "Screens.ResearchCategoryNumber"
 msgid "Research category {0}"
 msgstr "연구 분류 {0}"
-||||||| 3cea894
 
-#. Common.Parenthetical
-msgctxt "Common.Parenthetical"
-msgid "{0} ({1})"
-msgstr "{0} ({1})"
+#. Screens.WielderExperience
+msgctxt "Screens.WielderExperience"
+msgid "{0}, {1} {2}, {3} / {4}"
+msgstr "{0}, {1} {2}, {3} / {4}"
 
-#. Combat.Spell
-msgctxt "Combat.Spell"
-msgid "Spell"
-msgstr "주문"
+#. Screens.UpgradeTiers
+msgctxt "Screens.UpgradeTiers"
+msgid "{0} {1} / {2}"
+msgstr "{0} {1} / {2}"
 
-#. Common.PositiveAmount
-msgctxt "Common.PositiveAmount"
-msgid "+{0}"
-msgstr "+{0}"
+#. Events.MapInputNotReady
+msgctxt "Events.MapInputNotReady"
+msgid "Map input is not ready."
+msgstr "지도 입력이 준비되지 않았습니다."
+
+#. Events.MapInteractionNotReady
+msgctxt "Events.MapInteractionNotReady"
+msgid "Map interaction is not ready."
+msgstr "지도 상호작용이 준비되지 않았습니다."
+
+#. Events.MapTileNotTargetable
+msgctxt "Events.MapTileNotTargetable"
+msgid "Could not target tile."
+msgstr "타일을 대상으로 지정할 수 없습니다."
+
+#. Events.MapPrimaryActionFailed
+msgctxt "Events.MapPrimaryActionFailed"
+msgid "Could not perform primary action."
+msgstr "기본 동작을 수행할 수 없습니다."
+
+#. Events.MapSecondaryActionFailed
+msgctxt "Events.MapSecondaryActionFailed"
+msgid "Could not perform secondary action."
+msgstr "보조 동작을 수행할 수 없습니다."

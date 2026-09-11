@@ -304,11 +304,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            public string Id
-            {
-                get { return "adventure-player-" + Math.Max(TeamId, 0); }
-            }
-
             /// <summary>The row the menu draws this player as.</summary>
             public Component Entry
             {
@@ -436,16 +431,22 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            public string GetResourceLabel(ResourceType resourceType)
+            public string GetResourceName(ResourceType resourceType)
             {
-                string name = ResourceCosts.Name(_adapter != null ? _adapter._localization : null, resourceType);
-                string amount = UITextMeshTextUtility.Spoken(GetResourceAmountText(resourceType));
-                string income = GameObjects.IsLive(GetResourceIncomeText(resourceType))
-                    ? UITextMeshTextUtility.Spoken(GetResourceIncomeText(resourceType))
-                    : string.Empty;
+                return ResourceCosts.Name(_adapter != null ? _adapter._localization : null, resourceType);
+            }
 
-                string label = string.IsNullOrWhiteSpace(amount) ? name : name + " " + amount;
-                return string.IsNullOrWhiteSpace(income) ? label : label + ", " + income;
+            /// <summary>The amount the band draws beside a resource, empty where it draws none.</summary>
+            public string GetResourceAmountSpoken(ResourceType resourceType)
+            {
+                return UITextMeshTextUtility.Spoken(GetResourceAmountText(resourceType));
+            }
+
+            /// <summary>The income the band draws under a resource, empty where it draws none.</summary>
+            public string GetResourceIncomeSpoken(ResourceType resourceType)
+            {
+                UITextMesh income = GetResourceIncomeText(resourceType);
+                return GameObjects.IsLive(income) ? UITextMeshTextUtility.Spoken(income) : string.Empty;
             }
 
             public void FocusResource(ResourceType resourceType)
@@ -473,7 +474,7 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     UIButton button = Reflect.Get<UIButton>(_entry, NameButtonField);
                     return BuildAction(
-                        "platform-actions",
+                        ActionKind.PlatformActions,
                         button,
                         () => SpokenLines.Clean(GameText.Get(_adapter != null ? _adapter._localization : null, "Lobby/LobbyPlayerMenu/ShowPlayerActions", string.Empty)));
                 }
@@ -481,12 +482,12 @@ namespace SongsOfConquestAccess.Adapters
 
             public ActionItem Resources
             {
-                get { return BuildAction("resources", Reflect.Get<UIButton>(_entry, ResourceButtonField), null); }
+                get { return BuildAction(ActionKind.Resources, Reflect.Get<UIButton>(_entry, ResourceButtonField), null); }
             }
 
             public ActionItem Towns
             {
-                get { return BuildAction("towns", Reflect.Get<UIButton>(_entry, TownsButtonField), null); }
+                get { return BuildAction(ActionKind.Towns, Reflect.Get<UIButton>(_entry, TownsButtonField), null); }
             }
 
             public ActionItem NonAggressionPact
@@ -498,7 +499,7 @@ namespace SongsOfConquestAccess.Adapters
                         ? Reflect.Get<UIButton>(pactButton, NonAggressionPactInnerButtonField)
                         : null;
                     return BuildAction(
-                        "non-aggression-pact",
+                        ActionKind.NonAggressionPact,
                         button,
                         () => SpokenLines.Clean(GameText.Get(_adapter != null ? _adapter._localization : null, "Adventure/NonAggressionPact/TooltipTitle", string.Empty)));
                 }
@@ -506,7 +507,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public ActionItem SpectateBattle
             {
-                get { return BuildAction("spectate-battle", Reflect.Get<UIButton>(_entry, SpectateBattleButtonField), null); }
+                get { return BuildAction(ActionKind.SpectateBattle, Reflect.Get<UIButton>(_entry, SpectateBattleButtonField), null); }
             }
 
             public void FocusNative()
@@ -593,10 +594,10 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            private ActionItem BuildAction(string idSuffix, UIButton button, Func<string> fallbackLabel)
+            private ActionItem BuildAction(ActionKind kind, UIButton button, Func<string> fallbackLabel)
             {
                 return button != null
-                    ? new ActionItem(_adapter, Id + "-" + idSuffix, button, fallbackLabel)
+                    ? new ActionItem(_adapter, kind, button, fallbackLabel)
                     : null;
             }
 
@@ -623,21 +624,32 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The buttons a player's row can draw, one value per button the menu has.</summary>
+        public enum ActionKind
+        {
+            PlatformActions,
+            Resources,
+            Towns,
+            NonAggressionPact,
+            SpectateBattle
+        }
+
         public sealed class ActionItem
         {
             private readonly AdventurePlayerMenuAdapter _adapter;
             private readonly UIButton _button;
             private readonly Func<string> _fallbackLabel;
 
-            public ActionItem(AdventurePlayerMenuAdapter adapter, string id, UIButton button, Func<string> fallbackLabel)
+            public ActionItem(AdventurePlayerMenuAdapter adapter, ActionKind kind, UIButton button, Func<string> fallbackLabel)
             {
                 _adapter = adapter;
-                Id = id ?? string.Empty;
+                Kind = kind;
                 _button = button;
                 _fallbackLabel = fallbackLabel;
             }
 
-            public string Id { get; private set; }
+            /// <summary>Which of the row's buttons this is.</summary>
+            public ActionKind Kind { get; private set; }
 
             /// <summary>The button the game draws this action as.</summary>
             public Component Component

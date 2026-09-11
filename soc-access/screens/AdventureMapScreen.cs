@@ -489,7 +489,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (experienceDrawn)
             {
-                NodeVtable vtable = GraphNodes.Text(() => hud.ExperienceLabel, null, hud.ExperienceTooltip);
+                NodeVtable vtable = GraphNodes.Text(() => ExperienceLabel(hud), null, hud.ExperienceTooltip);
                 vtable.OnFocusVisual = hud.FocusExperience;
                 builder.AddItem(new SyntheticNode(ControlId.Structural("adventure-map:experience"), vtable));
             }
@@ -560,6 +560,28 @@ namespace SongsOfConquestAccess.Screens
                 isLong: () => NativeTooltipUtility.IsLongForComponent(target, portrait.RefreshTooltip));
         }
 
+        /// <summary>The experience bar as one line: the game's caption for it, the level reached and
+        /// the experience earned against what the next level asks for. Where no wielder is selected
+        /// there is nothing to count, so the caption stands alone.</summary>
+        private static string ExperienceLabel(AdventureHudAdapter hud)
+        {
+            int level;
+            int current;
+            int nextLevelExperience;
+            if (!hud.TryGetExperience(out level, out current, out nextLevelExperience))
+            {
+                return hud.ExperienceCaption;
+            }
+
+            return ModText.Get(
+                ModStrings.Screens.WielderExperience,
+                hud.ExperienceCaption,
+                hud.LevelCaption,
+                level,
+                current,
+                nextLevelExperience);
+        }
+
         private static void BuildEssences(GraphBuilder builder, AdventureHudAdapter hud, bool drawn)
         {
             if (!drawn)
@@ -617,11 +639,21 @@ namespace SongsOfConquestAccess.Screens
                 builder.AddItem(new SyntheticNode(
                     ResourceNodeId(resource),
                     Focused(
-                        GraphNodes.Text(() => hud.GetResourceLabel(resource), null, hud.GetResourceTooltip(resource)),
+                        GraphNodes.Text(() => ResourceLabel(hud, resource), null, hud.GetResourceTooltip(resource)),
                         () => hud.FocusResource(resource))));
             }
 
             builder.PopContext();
+        }
+
+        /// <summary>One entry of the treasury strip: the resource's name, what the strip draws beside
+        /// it and the income it draws under it.</summary>
+        private static string ResourceLabel(AdventureHudAdapter hud, ResourceType resource)
+        {
+            return ResourceStrip.Label(
+                hud.GetResourceName(resource),
+                hud.GetResourceAmountText(resource),
+                hud.GetResourceIncomeText(resource));
         }
 
         private static ControlId ResourceNodeId(ResourceType resource)
@@ -661,10 +693,18 @@ namespace SongsOfConquestAccess.Screens
             for (int i = 0; overviewDrawn && i < KingdomOverviewSlots; i++)
             {
                 int index = i;
+                // Checked here rather than handed to SyntheticButton, because the tooltip beside it
+                // is an argument: an undrawn slot would compose one for a node nothing draws. The
+                // wielder and town lists guard theirs the same way.
+                if (!hud.IsKingdomOverviewItemVisible(index))
+                {
+                    continue;
+                }
+
                 GraphNodes.SyntheticButton(
                     builder,
                     KingdomKeyPrefix + index,
-                    hud.IsKingdomOverviewItemVisible(index),
+                    true,
                     () => hud.GetKingdomOverviewLabel(index),
                     () => hud.ClickKingdomOverviewItem(index),
                     () => hud.IsKingdomOverviewItemEnabled(index),
@@ -792,7 +832,7 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 NodeVtable vtable = GraphNodes.Text(
-                    () => hud.GetObjectiveLabel(index),
+                    () => ObjectiveLabel(hud, index),
                     null,
                     hud.GetObjectiveTooltip(index));
                 vtable.OnFocusVisual = () => hud.FocusObjective(index);
@@ -801,6 +841,110 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.PopContext();
+        }
+
+        /// <summary>
+        /// One objective row: what the panel drew, prefixed by where the objective stands - a lose
+        /// condition, or complete or incomplete and whether it can still be reached - and followed,
+        /// where the entry has a single unfinished marker, by how far off it is and which way.
+        /// </summary>
+        private static string ObjectiveLabel(AdventureHudAdapter hud, int index)
+        {
+            string text = hud.GetObjectiveText(index);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return string.Empty;
+            }
+
+            List<string> parts = new List<string>();
+            if (hud.IsObjectiveLoseCondition(index))
+            {
+                parts.Add(ModText.Get(ModStrings.Screens.LoseCondition));
+            }
+            else
+            {
+                parts.Add(ModText.Get(hud.IsObjectiveComplete(index)
+                    ? ModStrings.Screens.ObjectiveCompleted
+                    : ModStrings.Screens.ObjectiveIncomplete));
+                if (!hud.CanObjectiveBeCompleted(index))
+                {
+                    parts.Add(ModText.Get(ModStrings.Screens.ObjectiveCannotBeCompleted));
+                }
+            }
+
+            parts.Add(text);
+
+            Vector2Int offset;
+            Vector2Int mapSize;
+            if (hud.TryGetObjectiveMarkerOffset(index, out offset, out mapSize))
+            {
+                parts.Add(ObjectiveMarkerDistance(offset, mapSize));
+                parts.Add(ObjectiveMarkerDirection(offset));
+            }
+
+            return ModText.JoinListWithCommas(parts);
+        }
+
+        /// <summary>How far the marker is, as a share of the map rather than in tiles, so the wording
+        /// means the same thing on a small map and a large one.</summary>
+        private static string ObjectiveMarkerDistance(Vector2Int offset, Vector2Int mapSize)
+        {
+            float normalizedX = offset.x / (float)mapSize.x;
+            float normalizedY = offset.y / (float)mapSize.y;
+            float distance = Mathf.Sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
+            if (distance <= 0.10f)
+            {
+                return ModText.Get(ModStrings.Screens.ObjectiveMarkerNearby);
+            }
+
+            if (distance <= 0.25f)
+            {
+                return ModText.Get(ModStrings.Screens.ObjectiveMarkerSomeDistance);
+            }
+
+            return ModText.Get(ModStrings.Screens.ObjectiveMarkerFarAway);
+        }
+
+        private static string ObjectiveMarkerDirection(Vector2Int offset)
+        {
+            if (offset.x == 0 && offset.y == 0)
+            {
+                return ModText.Get(ModStrings.Spatial.Here);
+            }
+
+            if (offset.y > 0)
+            {
+                if (offset.x > 0)
+                {
+                    return ModText.Get(ModStrings.Scanner.Northeast);
+                }
+
+                if (offset.x < 0)
+                {
+                    return ModText.Get(ModStrings.Scanner.Northwest);
+                }
+
+                return ModText.Get(ModStrings.Scanner.North);
+            }
+
+            if (offset.y < 0)
+            {
+                if (offset.x > 0)
+                {
+                    return ModText.Get(ModStrings.Scanner.Southeast);
+                }
+
+                if (offset.x < 0)
+                {
+                    return ModText.Get(ModStrings.Scanner.Southwest);
+                }
+
+                return ModText.Get(ModStrings.Scanner.South);
+            }
+
+            return offset.x > 0
+                ? ModText.Get(ModStrings.Scanner.East)
+                : ModText.Get(ModStrings.Scanner.West);
         }
 
         // ---- the notifications ----

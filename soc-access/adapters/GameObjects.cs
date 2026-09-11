@@ -44,7 +44,20 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            CanvasGroup canvasGroup = gameObject.GetComponent<CanvasGroup>();
+            return IsGroupVisible(gameObject, gameObject.GetComponent<CanvasGroup>());
+        }
+
+        /// <summary>As above, for a caller that has already resolved the container's canvas group and
+        /// keeps it: a HUD asks this of the same dozen fixed containers on every build, and the
+        /// component a container carries does not change under it. Pass null for a container that has
+        /// none - the rule is the same one, kept here so it has one definition.</summary>
+        public static bool IsGroupVisible(GameObject gameObject, CanvasGroup canvasGroup)
+        {
+            if (!IsLive(gameObject))
+            {
+                return false;
+            }
+
             if (canvasGroup == null)
             {
                 return true;

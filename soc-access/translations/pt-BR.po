@@ -3867,19 +3867,38 @@ msgstr "Pesquisa {0}"
 msgctxt "Screens.ResearchCategoryNumber"
 msgid "Research category {0}"
 msgstr "Categoria de pesquisa {0}"
-||||||| 3cea894
 
-#. Common.Parenthetical
-msgctxt "Common.Parenthetical"
-msgid "{0} ({1})"
-msgstr "{0} ({1})"
+#. Screens.WielderExperience
+msgctxt "Screens.WielderExperience"
+msgid "{0}, {1} {2}, {3} / {4}"
+msgstr "{0}, {1} {2}, {3} / {4}"
 
-#. Combat.Spell
-msgctxt "Combat.Spell"
-msgid "Spell"
-msgstr "Feitiço"
+#. Screens.UpgradeTiers
+msgctxt "Screens.UpgradeTiers"
+msgid "{0} {1} / {2}"
+msgstr "{0} {1} / {2}"
 
-#. Common.PositiveAmount
-msgctxt "Common.PositiveAmount"
-msgid "+{0}"
-msgstr "+{0}"
+#. Events.MapInputNotReady
+msgctxt "Events.MapInputNotReady"
+msgid "Map input is not ready."
+msgstr "A entrada do mapa não está pronta."
+
+#. Events.MapInteractionNotReady
+msgctxt "Events.MapInteractionNotReady"
+msgid "Map interaction is not ready."
+msgstr "A interação com o mapa não está pronta."
+
+#. Events.MapTileNotTargetable
+msgctxt "Events.MapTileNotTargetable"
+msgid "Could not target tile."
+msgstr "Não foi possível mirar no ladrilho."
+
+#. Events.MapPrimaryActionFailed
+msgctxt "Events.MapPrimaryActionFailed"
+msgid "Could not perform primary action."
+msgstr "Não foi possível executar a ação primária."
+
+#. Events.MapSecondaryActionFailed
+msgctxt "Events.MapSecondaryActionFailed"
+msgid "Could not perform secondary action."
+msgstr "Não foi possível executar a ação secundária."

@@ -236,13 +236,41 @@ namespace SongsOfConquestAccess.Screens
                     it.Tooltip);
                 Follow(vtable, it.Focus);
                 builder.AddItem(new DrawnNode(
-                    ControlId.For(it.Component, "adventure-players:action/" + it.Id),
+                    ControlId.For(it.Component, ActionKey(player, it.Kind)),
                     vtable,
                     it.Component));
             }
 
             builder.EndGroup();
             return id;
+        }
+
+        /// <summary>A row button's key: the player's team and which of the row's buttons it is, so a
+        /// button keeps its key whichever of its neighbours the row leaves out.</summary>
+        private static string ActionKey(
+            AdventurePlayerMenuAdapter.PlayerItem player,
+            AdventurePlayerMenuAdapter.ActionKind kind)
+        {
+            return "adventure-players:action/adventure-player-" + Math.Max(player.TeamId, 0) + "-" + ActionKindKey(kind);
+        }
+
+        private static string ActionKindKey(AdventurePlayerMenuAdapter.ActionKind kind)
+        {
+            switch (kind)
+            {
+                case AdventurePlayerMenuAdapter.ActionKind.PlatformActions:
+                    return "platform-actions";
+                case AdventurePlayerMenuAdapter.ActionKind.Resources:
+                    return "resources";
+                case AdventurePlayerMenuAdapter.ActionKind.Towns:
+                    return "towns";
+                case AdventurePlayerMenuAdapter.ActionKind.NonAggressionPact:
+                    return "non-aggression-pact";
+                case AdventurePlayerMenuAdapter.ActionKind.SpectateBattle:
+                    return "spectate-battle";
+                default:
+                    return "action";
+            }
         }
 
         /// <summary>The buttons the row is really drawing, in the order the adapter always lists them
@@ -326,17 +354,30 @@ namespace SongsOfConquestAccess.Screens
         {
             AdventurePlayerMenuAdapter.PlayerItem it = player;
             ResourceType lead = ResourceSummaryOrder[0];
-            NodeVtable vtable = GraphNodes.Text(() => it.GetResourceLabel(lead));
+            NodeVtable vtable = GraphNodes.Text(() => ResourceLabel(it, lead));
             for (int i = 1; i < ResourceSummaryOrder.Length; i++)
             {
                 ResourceType type = ResourceSummaryOrder[i];
-                vtable.Announcements.Add(GraphNodes.ValuePart(() => it.GetResourceLabel(type), watch: false));
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => ResourceLabel(it, type), watch: false));
             }
 
             vtable.OnFocusVisual = () => it.FocusResource(lead);
             builder.AddItem(new SyntheticNode(
                 ControlId.Structural("adventure-players:resources/" + it.TeamId),
                 vtable));
+        }
+
+        /// <summary>One entry of an ally's treasury band: the resource's name, what the band draws
+        /// beside it and the income it draws under it. Said the same way as the kingdom HUD's own
+        /// strip, which is why the wording is shared.</summary>
+        private static string ResourceLabel(
+            AdventurePlayerMenuAdapter.PlayerItem player,
+            ResourceType resource)
+        {
+            return ResourceStrip.Label(
+                player.GetResourceName(resource),
+                player.GetResourceAmountSpoken(resource),
+                player.GetResourceIncomeSpoken(resource));
         }
 
         // ---- the close ----

@@ -117,6 +117,15 @@
             public static readonly ModString WieldersNoLongerVisible = new ModString("Events.WieldersNoLongerVisible", "{0} no longer visible");
             public static readonly ModString WielderMoved = new ModString("Events.WielderMoved", "{0} moved to {1}");
             public static readonly ModString WielderTeleported = new ModString("Events.WielderTeleported", "{0} teleported to {1}");
+
+            /// <summary>The mod could not reach the game's own map input at all. Spoken inside
+            /// <see cref="ModError"/>; these are mod failures, not the game refusing an action.
+            /// </summary>
+            public static readonly ModString MapInputNotReady = new ModString("Events.MapInputNotReady", "Map input is not ready.");
+            public static readonly ModString MapInteractionNotReady = new ModString("Events.MapInteractionNotReady", "Map interaction is not ready.");
+            public static readonly ModString MapTileNotTargetable = new ModString("Events.MapTileNotTargetable", "Could not target tile.");
+            public static readonly ModString MapPrimaryActionFailed = new ModString("Events.MapPrimaryActionFailed", "Could not perform primary action.");
+            public static readonly ModString MapSecondaryActionFailed = new ModString("Events.MapSecondaryActionFailed", "Could not perform secondary action.");
         }
 
         public static class Graph
@@ -792,6 +801,15 @@
             public static readonly ModString TierNumber = new ModString("Screens.TierNumber", "Tier {0}");
             public static readonly ModString ResearchNumber = new ModString("Screens.ResearchNumber", "Research {0}");
             public static readonly ModString ResearchCategoryNumber = new ModString("Screens.ResearchCategoryNumber", "Research category {0}");
+
+            /// <summary>The selected wielder's experience bar as one line: {0} is the game's caption
+            /// for experience, {1} its caption for level, {2} the level reached, {3} the experience
+            /// earned and {4} the experience the next level asks for.</summary>
+            public static readonly ModString WielderExperience = new ModString("Screens.WielderExperience", "{0}, {1} {2}, {3} / {4}");
+
+            /// <summary>How many of a map entity's upgrade tiers are built: {0} is the game's own
+            /// caption for the row, {1} the tiers built and {2} the tiers it has.</summary>
+            public static readonly ModString UpgradeTiers = new ModString("Screens.UpgradeTiers", "{0} {1} / {2}");
         }
 
         public static class Scanner
