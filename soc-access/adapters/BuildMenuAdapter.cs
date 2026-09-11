@@ -90,7 +90,9 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IResearchLookup _researchLookup;
 
         // The pool's ActiveEntries property, looked up by name once per pool type rather than on
-        // every read of either pool.
+        // every read of either pool. Static and never reset on purpose: it is bounded by the two
+        // pool types the menu has, and it holds reflection handles off game types that outlive any
+        // menu, any screen and any reload - no game object and no per-menu state.
         private static readonly Dictionary<Type, PropertyInfo> ActiveEntriesByPoolType =
             new Dictionary<Type, PropertyInfo>();
 

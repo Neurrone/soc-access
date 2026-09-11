@@ -176,7 +176,8 @@ namespace SongsOfConquestAccess.Adapters
                 UIButton button = GetButton(tab);
                 string label = GetBuildingLabel(tab);
                 IList<string> description = GetBuildingDescription(tab);
-                int mapEntityId = BuildingTabMapEntityIdField != null ? (int)BuildingTabMapEntityIdField.GetValue(tab) : 0;
+                object mapEntityValue = BuildingTabMapEntityIdField != null ? BuildingTabMapEntityIdField.GetValue(tab) : null;
+                int mapEntityId = mapEntityValue is int ? (int)mapEntityValue : 0;
                 items.Add(new BuildingItem(
                     label,
                     index,
@@ -446,9 +447,10 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                return _menu != null && SelectedFactionIndexField != null
-                    ? (int)SelectedFactionIndexField.GetValue(_menu)
-                    : 0;
+                object value = _menu != null && SelectedFactionIndexField != null
+                    ? SelectedFactionIndexField.GetValue(_menu)
+                    : null;
+                return value is int ? (int)value : 0;
             }
         }
 

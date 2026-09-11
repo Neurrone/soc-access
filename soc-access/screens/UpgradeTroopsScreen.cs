@@ -111,8 +111,8 @@ namespace SongsOfConquestAccess.Screens
             vtable.OnFocusVisual = () => it.Focus();
             builder.BeginGroup(new DrawnNode(ControlId.For(card, key), vtable, card));
 
-            BuildPortrait(builder, it, key + "/current", it.CurrentTroopButton, () => it.CurrentTroopName, () => it.CurrentAmountText, () => it.ClickCurrentTroop(), it.CurrentTooltip);
-            BuildPortrait(builder, it, key + "/target", it.TargetTroopButton, () => it.TargetTroopName, () => it.TargetAmountText, () => it.ClickTargetTroop(), it.TargetTooltip);
+            BuildPortrait(builder, it, key + "/current", it.CurrentTroopButton, it.IsCurrentTroopVisible, () => it.CurrentTroopName, () => it.CurrentAmountText, () => it.ClickCurrentTroop(), it.CurrentTooltip);
+            BuildPortrait(builder, it, key + "/target", it.TargetTroopButton, it.IsTargetTroopVisible, () => it.TargetTroopName, () => it.TargetAmountText, () => it.ClickTargetTroop(), it.TargetTooltip);
             BuildSlider(builder, it, key + "/slider");
             BuildUpgradeButton(builder, it, key + "/upgrade");
 
@@ -141,12 +141,13 @@ namespace SongsOfConquestAccess.Screens
             UpgradeTroopsSubMenuAdapter.UpgradeEntry entry,
             string key,
             Component button,
+            bool visible,
             System.Func<string> name,
             System.Func<string> amount,
             System.Action activate,
             Tooltip tooltip)
         {
-            if (button == null || button.gameObject == null || !button.gameObject.activeInHierarchy)
+            if (button == null || !visible)
             {
                 return;
             }

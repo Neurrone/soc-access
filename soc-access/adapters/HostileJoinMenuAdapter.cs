@@ -43,6 +43,12 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(HostileJoinMenu), "_adventureFacade");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(HostileJoinMenu), "_localizationHandler");
 
+        // The menu's own Stage enum, which is private to it, and its two values. Resolved once off
+        // the game type so the stage is compared as the value it is rather than by its name.
+        private static readonly Type StageType = AccessTools.Inner(typeof(HostileJoinMenu), "Stage");
+        private static readonly object ChoiceStage = ParseStage("Choice");
+        private static readonly object JoinStage = ParseStage("Join");
+
         private readonly HostileJoinMenu _menu;
         private readonly HostileJoinMenu.Settings _settings;
         private readonly IClientAdventureFacade _facade;
@@ -105,14 +111,14 @@ namespace SongsOfConquestAccess.Adapters
                     return HostileJoinMenuStage.None;
                 }
 
-                if (IsNativeStage("Choice")
+                if (IsNativeStage(ChoiceStage)
                     && _settings.ChoiceStageContainer != null
                     && _settings.ChoiceStageContainer.activeInHierarchy)
                 {
                     return HostileJoinMenuStage.Choice;
                 }
 
-                if (IsNativeStage("Join")
+                if (IsNativeStage(JoinStage)
                     && _settings.JoinStageContainer != null
                     && _settings.JoinStageContainer.activeInHierarchy)
                 {
@@ -383,10 +389,20 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Select(_settings != null ? _settings.MassMoveButton : null);
         }
 
-        private bool IsNativeStage(string stageName)
+        private bool IsNativeStage(object stage)
         {
-            object value = StageField != null ? StageField.GetValue(_menu) : null;
-            return value != null && value.ToString() == stageName;
+            if (stage == null || StageField == null)
+            {
+                return false;
+            }
+
+            object value = StageField.GetValue(_menu);
+            return value != null && value.Equals(stage);
+        }
+
+        private static object ParseStage(string name)
+        {
+            return StageType != null && Enum.IsDefined(StageType, name) ? Enum.Parse(StageType, name) : null;
         }
 
         private static string GetButtonText(UIButton button)

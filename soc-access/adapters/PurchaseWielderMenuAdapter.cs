@@ -647,10 +647,19 @@ namespace SongsOfConquestAccess.Adapters
                 return NativeSelectionUtility.Click(Reflect.Get<UIButton>(_entry, EntryButtonField));
             }
 
+            /// <summary>Arriving here selects the candidate, because the menu has no hover of its
+            /// own to do it: <c>PurchaseWielderEntry.Awake</c> hangs its whole selection on the
+            /// button's OnClicked, and <c>HandleClick</c> is what refills the details pane. So the
+            /// click IS the focus, as it is on a build menu row (<c>FocusBuilding</c>) - and, as
+            /// there, the candidate the menu is already showing is not clicked again, which would
+            /// replay the game's own selection sound on every landing.</summary>
             public void Focus()
             {
                 NativeSelectionUtility.Select(Reflect.Get<UIButton>(_entry, EntryButtonField) as Component);
-                Select();
+                if (!IsSelected)
+                {
+                    Select();
+                }
             }
         }
     }

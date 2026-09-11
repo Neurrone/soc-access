@@ -854,12 +854,14 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool IsInAdventure()
         {
-            return IsInAdventureField != null && (bool)IsInAdventureField.GetValue(_spellbook);
+            object value = IsInAdventureField != null ? IsInAdventureField.GetValue(_spellbook) : null;
+            return value is bool && (bool)value;
         }
 
         private bool IsCurrentTeamsTurn()
         {
-            return IsCurrentTeamsTurnField == null || (bool)IsCurrentTeamsTurnField.GetValue(_spellbook);
+            object value = IsCurrentTeamsTurnField != null ? IsCurrentTeamsTurnField.GetValue(_spellbook) : null;
+            return value is bool ? (bool)value : true;
         }
 
         private ILocalizationHandler GetLocalization()
