@@ -295,7 +295,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 rows.Add(new DescriptionRow(
-                    "map-entity-description-row-" + i,
+                    i,
                     entry,
                     label,
                     () => FirstTooltipWithLines(icon, text)));
@@ -335,7 +335,8 @@ namespace SongsOfConquestAccess.Adapters
                 UIImage background = Reflect.Get<UIImage>(entry, ActionBackgroundImageField);
                 IGameAction gameAction = entry.GameAction;
                 buttons.Add(new ActionButton(
-                    "map-entity-action-" + i + "-" + gameAction.ActionType,
+                    i,
+                    gameAction.ActionType,
                     entry,
                     GetActionLabel(gameAction),
                     () => NativeSelectionUtility.Click(button),
@@ -488,15 +489,16 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class DescriptionRow
         {
-            public DescriptionRow(string id, Component component, IList<string> lines, System.Func<Tooltip> getTooltip)
+            public DescriptionRow(int index, Component component, IList<string> lines, System.Func<Tooltip> getTooltip)
             {
-                Id = id;
+                Index = index;
                 Component = component;
                 Lines = lines ?? new List<string>();
                 GetTooltip = getTooltip;
             }
 
-            public string Id { get; private set; }
+            /// <summary>Where the row sits among the entries the block drew.</summary>
+            public int Index { get; private set; }
 
             /// <summary>The entry the game draws the row as.</summary>
             public Component Component { get; private set; }
@@ -510,7 +512,8 @@ namespace SongsOfConquestAccess.Adapters
         public sealed class ActionButton
         {
             public ActionButton(
-                string id,
+                int index,
+                HUDActionType actionType,
                 Component component,
                 string label,
                 System.Func<bool> activate,
@@ -518,7 +521,8 @@ namespace SongsOfConquestAccess.Adapters
                 System.Func<bool> isEnabled,
                 System.Func<Tooltip> getTooltip)
             {
-                Id = id;
+                Index = index;
+                ActionType = actionType;
                 Component = component;
                 Label = label ?? string.Empty;
                 Activate = activate;
@@ -527,7 +531,11 @@ namespace SongsOfConquestAccess.Adapters
                 GetTooltip = getTooltip;
             }
 
-            public string Id { get; private set; }
+            /// <summary>Where the button sits among the actions the menu drew.</summary>
+            public int Index { get; private set; }
+
+            /// <summary>What the game calls the action this button performs.</summary>
+            public HUDActionType ActionType { get; private set; }
 
             /// <summary>The button the game draws the action as.</summary>
             public Component Component { get; private set; }

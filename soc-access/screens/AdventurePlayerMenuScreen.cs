@@ -236,13 +236,41 @@ namespace SongsOfConquestAccess.Screens
                     it.Tooltip);
                 Follow(vtable, it.Focus);
                 builder.AddItem(new DrawnNode(
-                    ControlId.For(it.Component, "adventure-players:action/" + it.Id),
+                    ControlId.For(it.Component, ActionKey(player, it.Kind)),
                     vtable,
                     it.Component));
             }
 
             builder.EndGroup();
             return id;
+        }
+
+        /// <summary>A row button's key: the player's team and which of the row's buttons it is, so a
+        /// button keeps its key whichever of its neighbours the row leaves out.</summary>
+        private static string ActionKey(
+            AdventurePlayerMenuAdapter.PlayerItem player,
+            AdventurePlayerMenuAdapter.ActionKind kind)
+        {
+            return "adventure-players:action/adventure-player-" + Math.Max(player.TeamId, 0) + "-" + ActionKindKey(kind);
+        }
+
+        private static string ActionKindKey(AdventurePlayerMenuAdapter.ActionKind kind)
+        {
+            switch (kind)
+            {
+                case AdventurePlayerMenuAdapter.ActionKind.PlatformActions:
+                    return "platform-actions";
+                case AdventurePlayerMenuAdapter.ActionKind.Resources:
+                    return "resources";
+                case AdventurePlayerMenuAdapter.ActionKind.Towns:
+                    return "towns";
+                case AdventurePlayerMenuAdapter.ActionKind.NonAggressionPact:
+                    return "non-aggression-pact";
+                case AdventurePlayerMenuAdapter.ActionKind.SpectateBattle:
+                    return "spectate-battle";
+                default:
+                    return "action";
+            }
         }
 
         /// <summary>The buttons the row is really drawing, in the order the adapter always lists them
