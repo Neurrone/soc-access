@@ -28,17 +28,8 @@ namespace SongsOfConquestAccess.Events
         private readonly AdventureMapRevealedRegistry _revealedRegistry;
         private readonly Dictionary<int, bool> _lastVisibleNonLocalCommanders = new Dictionary<int, bool>();
         private readonly Dictionary<int, bool> _announcedVisibleNonLocalCommanders = new Dictionary<int, bool>();
-        private readonly Dictionary<string, DiscoveryCount> _pendingDiscoveryCounts =
-            new Dictionary<string, DiscoveryCount>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, string> _pendingDiscoveryLabelsByKey = new Dictionary<string, string>();
-        private readonly Dictionary<string, PendingRevealedEntry> _pendingRevealedEntriesByKey =
-            new Dictionary<string, PendingRevealedEntry>();
-        private readonly List<string> _pendingDiscoveryOrder = new List<string>();
-        private readonly List<string> _pendingDiscoveryKeyOrder = new List<string>();
-        private readonly Dictionary<string, DiscoveryCount> _pendingHiddenWielderCounts =
-            new Dictionary<string, DiscoveryCount>(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, string> _pendingHiddenWielderLabelsByKey = new Dictionary<string, string>();
-        private readonly List<string> _pendingHiddenWielderOrder = new List<string>();
+        private readonly PendingAnnouncementLedger _pendingDiscoveries = new PendingAnnouncementLedger();
+        private readonly PendingAnnouncementLedger _pendingHiddenWielders = new PendingAnnouncementLedger();
         private readonly HashSet<int> _discoveredMapEntityIds = new HashSet<int>();
         private readonly Dictionary<int, string> _discoveredMapEntityLabelsById = new Dictionary<int, string>();
         private readonly HashSet<int> _knownLocalCommanderIds = new HashSet<int>();
@@ -771,161 +762,48 @@ namespace SongsOfConquestAccess.Events
             int stableReference,
             AdventureMapRevealedKind kind)
         {
-            if (string.IsNullOrWhiteSpace(label))
+            if (!_pendingDiscoveries.Add(objectKey, label))
             {
                 return false;
             }
 
-            if (!string.IsNullOrWhiteSpace(objectKey))
-            {
-                if (_pendingDiscoveryLabelsByKey.ContainsKey(objectKey))
-                {
-                    return false;
-                }
-
-                _pendingDiscoveryLabelsByKey[objectKey] = label;
-                _pendingRevealedEntriesByKey[objectKey] = new PendingRevealedEntry(
-                    objectKey,
-                    label,
-                    position,
-                    stableReference,
-                    kind);
-                _pendingDiscoveryKeyOrder.Add(objectKey);
-            }
-
-            DiscoveryCount count;
-            if (_pendingDiscoveryCounts.TryGetValue(label, out count))
-            {
-                count.Count++;
-                _pendingDiscoveryCounts[label] = count;
-            }
-            else
-            {
-                _pendingDiscoveryCounts[label] = new DiscoveryCount(label, 1);
-                _pendingDiscoveryOrder.Add(label);
-            }
-
+            _pendingDiscoveries.SetEntry(
+                objectKey,
+                new PendingRevealedEntry(objectKey, label, position, stableReference, kind));
             return true;
         }
 
         private bool RemovePendingDiscovery(string objectKey)
         {
-            if (string.IsNullOrWhiteSpace(objectKey))
-            {
-                return false;
-            }
-
-            string label;
-            if (!_pendingDiscoveryLabelsByKey.TryGetValue(objectKey, out label))
-            {
-                return false;
-            }
-
-            _pendingDiscoveryLabelsByKey.Remove(objectKey);
-            _pendingRevealedEntriesByKey.Remove(objectKey);
-            _pendingDiscoveryKeyOrder.Remove(objectKey);
-            DiscoveryCount count;
-            if (!_pendingDiscoveryCounts.TryGetValue(label, out count))
-            {
-                return true;
-            }
-
-            if (count.Count <= 1)
-            {
-                _pendingDiscoveryCounts.Remove(label);
-                _pendingDiscoveryOrder.Remove(label);
-            }
-            else
-            {
-                count.Count--;
-                _pendingDiscoveryCounts[label] = count;
-            }
-
-            return true;
+            return _pendingDiscoveries.Remove(objectKey);
         }
 
         private bool AddPendingHiddenWielder(string objectKey, string label)
         {
-            if (string.IsNullOrWhiteSpace(label))
-            {
-                return false;
-            }
-
-            if (!string.IsNullOrWhiteSpace(objectKey))
-            {
-                if (_pendingHiddenWielderLabelsByKey.ContainsKey(objectKey))
-                {
-                    return false;
-                }
-
-                _pendingHiddenWielderLabelsByKey[objectKey] = label;
-            }
-
-            DiscoveryCount count;
-            if (_pendingHiddenWielderCounts.TryGetValue(label, out count))
-            {
-                count.Count++;
-                _pendingHiddenWielderCounts[label] = count;
-            }
-            else
-            {
-                _pendingHiddenWielderCounts[label] = new DiscoveryCount(label, 1);
-                _pendingHiddenWielderOrder.Add(label);
-            }
-
-            return true;
+            return _pendingHiddenWielders.Add(objectKey, label);
         }
 
         private bool RemovePendingHiddenWielder(string objectKey)
         {
-            if (string.IsNullOrWhiteSpace(objectKey))
-            {
-                return false;
-            }
-
-            string label;
-            if (!_pendingHiddenWielderLabelsByKey.TryGetValue(objectKey, out label))
-            {
-                return false;
-            }
-
-            _pendingHiddenWielderLabelsByKey.Remove(objectKey);
-            DiscoveryCount count;
-            if (!_pendingHiddenWielderCounts.TryGetValue(label, out count))
-            {
-                return true;
-            }
-
-            if (count.Count <= 1)
-            {
-                _pendingHiddenWielderCounts.Remove(label);
-                _pendingHiddenWielderOrder.Remove(label);
-            }
-            else
-            {
-                count.Count--;
-                _pendingHiddenWielderCounts[label] = count;
-            }
-
-            return true;
+            return _pendingHiddenWielders.Remove(objectKey);
         }
 
         private void FlushPendingDiscoveriesIfReady()
         {
-            if ((_pendingDiscoveryOrder.Count == 0 && _pendingHiddenWielderOrder.Count == 0)
+            if ((_pendingDiscoveries.IsEmpty && _pendingHiddenWielders.IsEmpty)
                 || IsMovementInProgress())
             {
                 return;
             }
 
             RevalidatePendingMapEntityDiscoveries();
-            if (_pendingDiscoveryOrder.Count == 0 && _pendingHiddenWielderOrder.Count == 0)
+            if (_pendingDiscoveries.IsEmpty && _pendingHiddenWielders.IsEmpty)
             {
                 return;
             }
 
-            List<string> discoveredItems = BuildPendingItems(_pendingDiscoveryOrder, _pendingDiscoveryCounts);
-            List<string> hiddenWielders = BuildPendingItems(_pendingHiddenWielderOrder, _pendingHiddenWielderCounts);
+            List<string> discoveredItems = _pendingDiscoveries.BuildItems();
+            List<string> hiddenWielders = _pendingHiddenWielders.BuildItems();
             AddPendingDiscoveriesToRevealedRegistry();
             ApplyFlushedCommanderVisibilityStates();
             ClearPendingDiscoveries();
@@ -942,11 +820,12 @@ namespace SongsOfConquestAccess.Events
 
         private void RevalidatePendingMapEntityDiscoveries()
         {
-            for (int i = _pendingDiscoveryKeyOrder.Count - 1; i >= 0; i--)
+            IReadOnlyList<string> keys = _pendingDiscoveries.KeyOrder;
+            for (int i = keys.Count - 1; i >= 0; i--)
             {
-                string key = _pendingDiscoveryKeyOrder[i];
+                string key = keys[i];
                 PendingRevealedEntry entry;
-                if (!_pendingRevealedEntriesByKey.TryGetValue(key, out entry)
+                if (!_pendingDiscoveries.TryGetEntry(key, out entry)
                     || entry.Kind != AdventureMapRevealedKind.MapEntity)
                 {
                     continue;
@@ -971,105 +850,26 @@ namespace SongsOfConquestAccess.Events
                 bool labelChanged = !string.IsNullOrWhiteSpace(label) && !LabelsMatch(entry.Label, label);
                 if (revealTile != entry.Position || labelChanged)
                 {
-                    _pendingRevealedEntriesByKey[key] = new PendingRevealedEntry(
+                    _pendingDiscoveries.SetEntry(key, new PendingRevealedEntry(
                         entry.Key,
                         labelChanged ? label : entry.Label,
                         revealTile,
                         entry.StableReference,
-                        entry.Kind);
+                        entry.Kind));
                 }
 
                 if (labelChanged)
                 {
-                    ReplacePendingDiscoveryLabel(key, label);
+                    _pendingDiscoveries.ReplaceLabel(key, label);
                     _discoveredMapEntityLabelsById[entry.StableReference] = label;
                 }
             }
         }
 
-        private static List<string> BuildPendingItems(List<string> order, Dictionary<string, DiscoveryCount> counts)
-        {
-            List<string> items = new List<string>();
-            if (order == null || counts == null)
-            {
-                return items;
-            }
-
-            for (int i = 0; i < order.Count; i++)
-            {
-                DiscoveryCount count;
-                if (!counts.TryGetValue(order[i], out count))
-                {
-                    continue;
-                }
-
-                items.Add(count.Count <= 1
-                    ? count.Label
-                    : ModText.Get(ModStrings.Common.ResourceAmount, count.Count, count.Label));
-            }
-
-            return items;
-        }
-
         private void ClearPendingDiscoveries()
         {
-            _pendingDiscoveryCounts.Clear();
-            _pendingDiscoveryLabelsByKey.Clear();
-            _pendingRevealedEntriesByKey.Clear();
-            _pendingDiscoveryOrder.Clear();
-            _pendingDiscoveryKeyOrder.Clear();
-            _pendingHiddenWielderCounts.Clear();
-            _pendingHiddenWielderLabelsByKey.Clear();
-            _pendingHiddenWielderOrder.Clear();
-        }
-
-        private bool ReplacePendingDiscoveryLabel(string objectKey, string newLabel)
-        {
-            if (string.IsNullOrWhiteSpace(objectKey) || string.IsNullOrWhiteSpace(newLabel))
-            {
-                return false;
-            }
-
-            string oldLabel;
-            if (!_pendingDiscoveryLabelsByKey.TryGetValue(objectKey, out oldLabel)
-                || LabelsMatch(oldLabel, newLabel))
-            {
-                return false;
-            }
-
-            DecrementPendingDiscoveryCount(oldLabel);
-            _pendingDiscoveryLabelsByKey[objectKey] = newLabel;
-
-            DiscoveryCount count;
-            if (_pendingDiscoveryCounts.TryGetValue(newLabel, out count))
-            {
-                _pendingDiscoveryCounts[newLabel] = new DiscoveryCount(newLabel, count.Count + 1);
-            }
-            else
-            {
-                _pendingDiscoveryCounts[newLabel] = new DiscoveryCount(newLabel, 1);
-                _pendingDiscoveryOrder.Add(newLabel);
-            }
-
-            return true;
-        }
-
-        private void DecrementPendingDiscoveryCount(string label)
-        {
-            DiscoveryCount count;
-            if (string.IsNullOrWhiteSpace(label) || !_pendingDiscoveryCounts.TryGetValue(label, out count))
-            {
-                return;
-            }
-
-            if (count.Count <= 1)
-            {
-                _pendingDiscoveryCounts.Remove(label);
-                _pendingDiscoveryOrder.Remove(label);
-                return;
-            }
-
-            _pendingDiscoveryCounts[label] = new DiscoveryCount(label, count.Count - 1);
+            _pendingDiscoveries.Clear();
+            _pendingHiddenWielders.Clear();
         }
 
         private void AddPendingDiscoveriesToRevealedRegistry()
@@ -1079,10 +879,11 @@ namespace SongsOfConquestAccess.Events
                 return;
             }
 
-            for (int i = 0; i < _pendingDiscoveryKeyOrder.Count; i++)
+            IReadOnlyList<string> keys = _pendingDiscoveries.KeyOrder;
+            for (int i = 0; i < keys.Count; i++)
             {
                 PendingRevealedEntry entry;
-                if (!_pendingRevealedEntriesByKey.TryGetValue(_pendingDiscoveryKeyOrder[i], out entry))
+                if (!_pendingDiscoveries.TryGetEntry(keys[i], out entry))
                 {
                     continue;
                 }
@@ -1098,10 +899,11 @@ namespace SongsOfConquestAccess.Events
 
         private void ApplyFlushedCommanderVisibilityStates()
         {
-            for (int i = 0; i < _pendingDiscoveryKeyOrder.Count; i++)
+            IReadOnlyList<string> keys = _pendingDiscoveries.KeyOrder;
+            for (int i = 0; i < keys.Count; i++)
             {
                 PendingRevealedEntry entry;
-                if (_pendingRevealedEntriesByKey.TryGetValue(_pendingDiscoveryKeyOrder[i], out entry)
+                if (_pendingDiscoveries.TryGetEntry(keys[i], out entry)
                     && entry.Kind == AdventureMapRevealedKind.Wielder
                     && TryParseCommanderDiscoveryKey(entry.Key, out int commanderId))
                 {
@@ -1109,7 +911,7 @@ namespace SongsOfConquestAccess.Events
                 }
             }
 
-            foreach (string key in _pendingHiddenWielderLabelsByKey.Keys)
+            foreach (string key in _pendingHiddenWielders.KeyOrder)
             {
                 if (TryParseCommanderDiscoveryKey(key, out int commanderId))
                 {
@@ -1261,6 +1063,173 @@ namespace SongsOfConquestAccess.Events
         private string GetMapEntityName(IMapEntity entity)
         {
             return AdventureMapEntityLabel.GetMapEntityName(_facade, _selectionHandler, _localizationHandler, entity);
+        }
+
+        /// <summary>
+        /// One queue of announcements waiting for movement to finish: a line per distinct label
+        /// with how many objects carry it, in the order the labels first appeared, and the object
+        /// keys that contributed so one can be withdrawn again before the queue is spoken. The
+        /// listener keeps two, one for what was revealed and one for the wielders that went out of
+        /// sight, and a key never belongs to both at once.
+        /// </summary>
+        private sealed class PendingAnnouncementLedger
+        {
+            private readonly Dictionary<string, DiscoveryCount> _countsByLabel =
+                new Dictionary<string, DiscoveryCount>(StringComparer.OrdinalIgnoreCase);
+            private readonly Dictionary<string, string> _labelsByKey = new Dictionary<string, string>();
+            private readonly Dictionary<string, PendingRevealedEntry> _entriesByKey =
+                new Dictionary<string, PendingRevealedEntry>();
+            private readonly List<string> _labelOrder = new List<string>();
+            private readonly List<string> _keyOrder = new List<string>();
+
+            public bool IsEmpty
+            {
+                get { return _labelOrder.Count == 0; }
+            }
+
+            /// <summary>The object keys in the order they were added.</summary>
+            public IReadOnlyList<string> KeyOrder
+            {
+                get { return _keyOrder; }
+            }
+
+            public bool Add(string objectKey, string label)
+            {
+                if (string.IsNullOrWhiteSpace(label))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(objectKey))
+                {
+                    if (_labelsByKey.ContainsKey(objectKey))
+                    {
+                        return false;
+                    }
+
+                    _labelsByKey[objectKey] = label;
+                    _keyOrder.Add(objectKey);
+                }
+
+                Increment(label);
+                return true;
+            }
+
+            /// <summary>Attaches what the revealed registry needs; ignored for a key that is not queued.</summary>
+            public void SetEntry(string objectKey, PendingRevealedEntry entry)
+            {
+                if (string.IsNullOrWhiteSpace(objectKey) || !_labelsByKey.ContainsKey(objectKey))
+                {
+                    return;
+                }
+
+                _entriesByKey[objectKey] = entry;
+            }
+
+            public bool TryGetEntry(string objectKey, out PendingRevealedEntry entry)
+            {
+                entry = default(PendingRevealedEntry);
+                return !string.IsNullOrWhiteSpace(objectKey) && _entriesByKey.TryGetValue(objectKey, out entry);
+            }
+
+            public bool Remove(string objectKey)
+            {
+                if (string.IsNullOrWhiteSpace(objectKey))
+                {
+                    return false;
+                }
+
+                string label;
+                if (!_labelsByKey.TryGetValue(objectKey, out label))
+                {
+                    return false;
+                }
+
+                _labelsByKey.Remove(objectKey);
+                _entriesByKey.Remove(objectKey);
+                _keyOrder.Remove(objectKey);
+                Decrement(label);
+                return true;
+            }
+
+            /// <summary>Moves one queued object to a different label, keeping the counts right.</summary>
+            public bool ReplaceLabel(string objectKey, string newLabel)
+            {
+                if (string.IsNullOrWhiteSpace(objectKey) || string.IsNullOrWhiteSpace(newLabel))
+                {
+                    return false;
+                }
+
+                string oldLabel;
+                if (!_labelsByKey.TryGetValue(objectKey, out oldLabel) || LabelsMatch(oldLabel, newLabel))
+                {
+                    return false;
+                }
+
+                Decrement(oldLabel);
+                _labelsByKey[objectKey] = newLabel;
+                Increment(newLabel);
+                return true;
+            }
+
+            public List<string> BuildItems()
+            {
+                List<string> items = new List<string>();
+                for (int i = 0; i < _labelOrder.Count; i++)
+                {
+                    DiscoveryCount count;
+                    if (!_countsByLabel.TryGetValue(_labelOrder[i], out count))
+                    {
+                        continue;
+                    }
+
+                    items.Add(count.Count <= 1
+                        ? count.Label
+                        : ModText.Get(ModStrings.Common.ResourceAmount, count.Count, count.Label));
+                }
+
+                return items;
+            }
+
+            public void Clear()
+            {
+                _countsByLabel.Clear();
+                _labelsByKey.Clear();
+                _entriesByKey.Clear();
+                _labelOrder.Clear();
+                _keyOrder.Clear();
+            }
+
+            private void Increment(string label)
+            {
+                DiscoveryCount count;
+                if (_countsByLabel.TryGetValue(label, out count))
+                {
+                    _countsByLabel[label] = new DiscoveryCount(label, count.Count + 1);
+                    return;
+                }
+
+                _countsByLabel[label] = new DiscoveryCount(label, 1);
+                _labelOrder.Add(label);
+            }
+
+            private void Decrement(string label)
+            {
+                DiscoveryCount count;
+                if (string.IsNullOrWhiteSpace(label) || !_countsByLabel.TryGetValue(label, out count))
+                {
+                    return;
+                }
+
+                if (count.Count <= 1)
+                {
+                    _countsByLabel.Remove(label);
+                    _labelOrder.Remove(label);
+                    return;
+                }
+
+                _countsByLabel[label] = new DiscoveryCount(label, count.Count - 1);
+            }
         }
 
         private struct DiscoveryCount
