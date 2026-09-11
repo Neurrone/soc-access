@@ -40,6 +40,9 @@ namespace SongsOfConquestAccess.Screens
             Singleton.For("ModIOBrowser.Implementation.NotificationPopup");
         private static readonly Singleton InputNavigationSingleton =
             Singleton.For("ModIOBrowser.InputNavigation");
+        private static readonly Singleton SelectionOverlaySingleton =
+            Singleton.For("ModIOBrowser.Implementation.SelectionOverlayHandler");
+        private static readonly FieldInfo SearchResultOverlayField = SelectionOverlayField("SearchResultListItemOverlay");
 
         /// <summary>Whether the browser is up at all. Nothing below answers anything while this is
         /// false, and nothing below may be read without asking this first.</summary>
@@ -143,6 +146,29 @@ namespace SongsOfConquestAccess.Screens
         public static object InputNavigation
         {
             get { return InputNavigationSingleton.Current; }
+        }
+
+        /// <summary>The floating card mod.io moves onto the selected search result
+        /// (<c>SelectionOverlayHandler.MoveSelection</c> calls <c>Setup</c> on it), or null while no
+        /// row is selected. It is the handler's own field, so which row it replicates is read from
+        /// the game rather than looked for in the scene.</summary>
+        public static object SearchResultOverlay
+        {
+            get
+            {
+                object handler = SelectionOverlaySingleton.Current;
+                object overlay = handler != null && SearchResultOverlayField != null
+                    ? SearchResultOverlayField.GetValue(handler)
+                    : null;
+                Component component = overlay as Component;
+                return component != null && component.gameObject.activeInHierarchy ? component : null;
+            }
+        }
+
+        private static FieldInfo SelectionOverlayField(string name)
+        {
+            Type type = AccessTools.TypeByName("ModIOBrowser.Implementation.SelectionOverlayHandler");
+            return type != null ? AccessTools.Field(type, name) : null;
         }
 
         /// <summary>The game object of a component that came back as <c>object</c>.</summary>

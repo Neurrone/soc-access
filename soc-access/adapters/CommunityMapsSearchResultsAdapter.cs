@@ -67,7 +67,9 @@ namespace SongsOfConquestAccess.Adapters
         private string _summaryText;
         private string _footerText;
         private List<ResultItem> _resultItems = new List<ResultItem>();
+        private bool _overlayRead;
         private object _activeOverlay;
+        private Component _overlayItem;
         private bool _hasSelectedResult;
         private string _subscribeLabel;
         private string _moreOptionsLabel;
@@ -129,10 +131,27 @@ namespace SongsOfConquestAccess.Adapters
             _summaryText = BuildSummaryText();
             _footerText = BuildFooterText();
             _resultItems = ScanResults();
-            _activeOverlay = FindActiveOverlay();
-            _hasSelectedResult = GetOverlayItem(_activeOverlay) != null;
-            _subscribeLabel = GetOverlaySubscribeLabel(_activeOverlay);
-            _moreOptionsLabel = GetOverlayMoreOptionsLabel(_activeOverlay, _subscribeLabel);
+        }
+
+        /// <summary>The selection overlay on its own key. Nothing the page snapshot watches moves
+        /// when the player selects a different result, so the card is keyed on what mod.io's own
+        /// handler says it is replicating: the overlay while it is drawn, and the row it was last
+        /// set up over. Both are field reads.</summary>
+        private void EnsureOverlay()
+        {
+            object overlay = CommunityMapsSources.SearchResultOverlay;
+            Component item = GetOverlayItem(overlay);
+            if (_overlayRead && ReferenceEquals(overlay, _activeOverlay) && ReferenceEquals(item, _overlayItem))
+            {
+                return;
+            }
+
+            _overlayRead = true;
+            _activeOverlay = overlay;
+            _overlayItem = item;
+            _hasSelectedResult = item != null;
+            _subscribeLabel = GetOverlaySubscribeLabel(overlay);
+            _moreOptionsLabel = GetOverlayMoreOptionsLabel(overlay, _subscribeLabel);
         }
 
         private int ReadStatus()
@@ -260,27 +279,27 @@ namespace SongsOfConquestAccess.Adapters
 
         public string SubscribeLabel
         {
-            get { EnsureSnapshot(); return _subscribeLabel; }
+            get { EnsureOverlay(); return _subscribeLabel; }
         }
 
         public bool HasSelectedResult
         {
-            get { EnsureSnapshot(); return _hasSelectedResult; }
+            get { EnsureOverlay(); return _hasSelectedResult; }
         }
 
         public bool HasSubscribeAction
         {
-            get { EnsureSnapshot(); return _hasSelectedResult && !string.IsNullOrWhiteSpace(_subscribeLabel); }
+            get { EnsureOverlay(); return _hasSelectedResult && !string.IsNullOrWhiteSpace(_subscribeLabel); }
         }
 
         public bool HasMoreOptionsAction
         {
-            get { EnsureSnapshot(); return _hasSelectedResult && !string.IsNullOrWhiteSpace(_moreOptionsLabel); }
+            get { EnsureOverlay(); return _hasSelectedResult && !string.IsNullOrWhiteSpace(_moreOptionsLabel); }
         }
 
         public bool SubscribeSelected()
         {
-            EnsureSnapshot();
+            EnsureOverlay();
             if (_activeOverlay == null || OverlaySubscribeMethod == null)
             {
                 return false;
@@ -292,12 +311,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string MoreOptionsLabel
         {
-            get { EnsureSnapshot(); return _moreOptionsLabel; }
+            get { EnsureOverlay(); return _moreOptionsLabel; }
         }
 
         public bool OpenSelectedOptions()
         {
-            EnsureSnapshot();
+            EnsureOverlay();
             if (_activeOverlay == null || OverlayMoreOptionsMethod == null)
             {
                 return false;
@@ -392,26 +411,6 @@ namespace SongsOfConquestAccess.Adapters
                 : string.Empty;
         }
 
-        private object FindActiveOverlay()
-        {
-            if (SearchResultOverlayType == null)
-            {
-                return null;
-            }
-
-            UnityEngine.Object[] overlays = Resources.FindObjectsOfTypeAll(SearchResultOverlayType);
-            for (int i = 0; i < overlays.Length; i++)
-            {
-                Component component = overlays[i] as Component;
-                if (component != null && component.gameObject.activeInHierarchy)
-                {
-                    return overlays[i];
-                }
-            }
-
-            return null;
-        }
-
         private static Component GetOverlayItem(object overlay)
         {
             return overlay != null && OverlayListItemField != null
@@ -427,8 +426,8 @@ namespace SongsOfConquestAccess.Adapters
             return GetText(text);
         }
 
-        // Under EnsureSnapshot, which re-reads only when the result list's child count, its status
-        // or the searched phrase has moved - all read from the game.
+        // Under EnsureOverlay, which re-reads only when the overlay card or the row it
+        // replicates has moved - both read from the game.
         private static string GetOverlayMoreOptionsLabel(object overlay, string subscribeLabel)
         {
             Component component = overlay as Component;
@@ -574,8 +573,8 @@ namespace SongsOfConquestAccess.Adapters
             return GetText(text);
         }
 
-        // Under EnsureSnapshot, which re-reads only when the result list's child count, its status
-        // or the searched phrase has moved - all read from the game.
+        // Under EnsureOverlay, which re-reads only when the overlay card or the row it
+        // replicates has moved - both read from the game.
         private static string GetButtonLabel(Button button)
         {
             TMP_Text text = button != null ? button.GetComponentInChildren<TMP_Text>(false) : null;
