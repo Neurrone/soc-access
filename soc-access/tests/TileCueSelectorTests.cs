@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Audio;
-using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Scanner;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Tests
@@ -59,7 +59,7 @@ namespace SongsOfConquestAccess.Tests
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Grass);
             tile.IsExplored = false;
-            tile.Commander = Commander(ModStrings.Spatial.Enemy, isOwnedByLocalTeam: false);
+            tile.Commander = Commander(ScannerResultRelationship.Enemy, isOwnedByLocalTeam: false);
 
             CollectionAssert.AreEqual(new[] { CueLibrary.TerrainUnexplored }, ToArray(TileCueSelector.ForAdventureTile(tile)));
         }
@@ -87,7 +87,7 @@ namespace SongsOfConquestAccess.Tests
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Mountain);
             tile.MapEntityId = 42;
-            tile.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Enemy);
+            tile.MapEntityRelationshipKind = ScannerResultRelationship.Enemy;
 
             CollectionAssert.AreEqual(
                 new[] { CueLibrary.TerrainImpassable, CueLibrary.EntityEnemy },
@@ -100,7 +100,7 @@ namespace SongsOfConquestAccess.Tests
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Grass);
             tile.IsImpassable = true;
             tile.MapEntityId = 7;
-            tile.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Neutral);
+            tile.MapEntityRelationshipKind = ScannerResultRelationship.Neutral;
 
             CollectionAssert.AreEqual(
                 new[] { CueLibrary.TerrainGround },
@@ -112,7 +112,7 @@ namespace SongsOfConquestAccess.Tests
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Road);
             tile.IsImpassable = true;
-            tile.Commander = Commander(ModStrings.Spatial.Friendly, isOwnedByLocalTeam: true);
+            tile.Commander = Commander(ScannerResultRelationship.Friendly, isOwnedByLocalTeam: true);
 
             CollectionAssert.AreEqual(
                 new[] { CueLibrary.TerrainRoad, CueLibrary.EntityFriendly },
@@ -123,7 +123,7 @@ namespace SongsOfConquestAccess.Tests
         public void OwnedCommanderPlaysTheFriendlyOverlay()
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Grass);
-            tile.Commander = Commander(ModStrings.Spatial.Friendly, isOwnedByLocalTeam: true);
+            tile.Commander = Commander(ScannerResultRelationship.Friendly, isOwnedByLocalTeam: true);
 
             CollectionAssert.AreEqual(
                 new[] { CueLibrary.TerrainGround, CueLibrary.EntityFriendly },
@@ -134,7 +134,7 @@ namespace SongsOfConquestAccess.Tests
         public void AlliedCommanderPlaysTheFriendlyOverlay()
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Road);
-            tile.Commander = Commander(ModStrings.Spatial.Friendly, isOwnedByLocalTeam: false);
+            tile.Commander = Commander(ScannerResultRelationship.Friendly, isOwnedByLocalTeam: false);
 
             CollectionAssert.AreEqual(
                 new[] { CueLibrary.TerrainRoad, CueLibrary.EntityFriendly },
@@ -145,7 +145,7 @@ namespace SongsOfConquestAccess.Tests
         public void EnemyCommanderPlaysTheEnemyOverlay()
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Road);
-            tile.Commander = Commander(ModStrings.Spatial.Enemy, isOwnedByLocalTeam: false);
+            tile.Commander = Commander(ScannerResultRelationship.Enemy, isOwnedByLocalTeam: false);
 
             CollectionAssert.AreEqual(
                 new[] { CueLibrary.TerrainRoad, CueLibrary.EntityEnemy },
@@ -156,7 +156,7 @@ namespace SongsOfConquestAccess.Tests
         public void NeutralCommanderPlaysNoOverlay()
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Road);
-            tile.Commander = Commander(ModStrings.Spatial.Neutral, isOwnedByLocalTeam: false);
+            tile.Commander = Commander(ScannerResultRelationship.Neutral, isOwnedByLocalTeam: false);
 
             CollectionAssert.AreEqual(
                 new[] { CueLibrary.TerrainRoad },
@@ -170,7 +170,7 @@ namespace SongsOfConquestAccess.Tests
             // acknowledgment: the ground under it would only add noise.
             AdventureMapTile trove = ExploredTile(AdventureTerrainKind.Grass);
             trove.MapEntityId = 1;
-            trove.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Neutral);
+            trove.MapEntityRelationshipKind = ScannerResultRelationship.Neutral;
             trove.EntityCategory = AdventureEntityCategory.Pickup;
 
             CollectionAssert.AreEqual(new[] { CueLibrary.SweepPickup }, ToArray(TileCueSelector.ForAdventureTile(trove)));
@@ -181,7 +181,7 @@ namespace SongsOfConquestAccess.Tests
         {
             AdventureMapTile generator = ExploredTile(AdventureTerrainKind.Sand);
             generator.MapEntityId = 2;
-            generator.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Enemy);
+            generator.MapEntityRelationshipKind = ScannerResultRelationship.Enemy;
             generator.EntityCategory = AdventureEntityCategory.ResourceDeposit;
 
             IReadOnlyList<TileCue> cues = TileCueSelector.ForAdventureTile(generator);
@@ -195,7 +195,7 @@ namespace SongsOfConquestAccess.Tests
         public void AnOwnCommanderSoundsAsAFriendlyWielder()
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Road);
-            tile.Commander = Commander(ModStrings.Spatial.Friendly, isOwnedByLocalTeam: true);
+            tile.Commander = Commander(ScannerResultRelationship.Friendly, isOwnedByLocalTeam: true);
             tile.EntityCategory = AdventureEntityCategory.Wielder;
 
             CollectionAssert.AreEqual(
@@ -209,7 +209,7 @@ namespace SongsOfConquestAccess.Tests
             AdventureMapTile settlement = ExploredTile(AdventureTerrainKind.Mountain);
             settlement.IsImpassable = true;
             settlement.MapEntityId = 3;
-            settlement.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Neutral);
+            settlement.MapEntityRelationshipKind = ScannerResultRelationship.Neutral;
             settlement.EntityCategory = AdventureEntityCategory.Settlement;
 
             CollectionAssert.AreEqual(
@@ -222,7 +222,7 @@ namespace SongsOfConquestAccess.Tests
         {
             AdventureMapTile obstacle = ExploredTile(AdventureTerrainKind.Grass);
             obstacle.MapEntityId = 4;
-            obstacle.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Enemy);
+            obstacle.MapEntityRelationshipKind = ScannerResultRelationship.Enemy;
 
             IReadOnlyList<TileCue> cues = TileCueSelector.ForAdventureTile(obstacle);
 
@@ -245,7 +245,7 @@ namespace SongsOfConquestAccess.Tests
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Grass);
             tile.MapEntityId = 1;
-            tile.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Neutral);
+            tile.MapEntityRelationshipKind = ScannerResultRelationship.Neutral;
 
             Assert.IsNull(TileCueSelector.AffiliationCueKey(tile));
         }
@@ -253,18 +253,18 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void MapEntityRelationshipSelectsTheOverlayCue()
         {
-            AssertMapEntityOverlay(ModStrings.Spatial.Friendly, CueLibrary.EntityFriendly);
-            AssertMapEntityOverlay(ModStrings.Spatial.Enemy, CueLibrary.EntityEnemy);
-            AssertMapEntityOverlay(ModStrings.Spatial.Neutral, null);
+            AssertMapEntityOverlay(ScannerResultRelationship.Friendly, CueLibrary.EntityFriendly);
+            AssertMapEntityOverlay(ScannerResultRelationship.Enemy, CueLibrary.EntityEnemy);
+            AssertMapEntityOverlay(ScannerResultRelationship.Neutral, null);
         }
 
         [TestMethod]
         public void CommanderTakesPrecedenceOverTheMapEntity()
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Grass);
-            tile.Commander = Commander(ModStrings.Spatial.Enemy, isOwnedByLocalTeam: false);
+            tile.Commander = Commander(ScannerResultRelationship.Enemy, isOwnedByLocalTeam: false);
             tile.MapEntityId = 7;
-            tile.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Friendly);
+            tile.MapEntityRelationshipKind = ScannerResultRelationship.Friendly;
 
             CollectionAssert.AreEqual(
                 new[] { CueLibrary.TerrainGround, CueLibrary.EntityEnemy },
@@ -508,11 +508,11 @@ namespace SongsOfConquestAccess.Tests
         }
 
         /// <summary>A null expected cue means the affiliation is not marked at all.</summary>
-        private static void AssertMapEntityOverlay(ModString relationship, string expectedCue)
+        private static void AssertMapEntityOverlay(ScannerResultRelationship relationship, string expectedCue)
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Grass);
             tile.MapEntityId = 1;
-            tile.MapEntityRelationship = ModText.Get(relationship);
+            tile.MapEntityRelationshipKind = relationship;
 
             string[] expected = expectedCue == null
                 ? new[] { CueLibrary.TerrainGround }
@@ -533,11 +533,11 @@ namespace SongsOfConquestAccess.Tests
             return TileFixtures.Tile(5, 6, terrain);
         }
 
-        private static AdventureMapTile.CommanderInfo Commander(ModString relationship, bool isOwnedByLocalTeam)
+        private static AdventureMapTile.CommanderInfo Commander(ScannerResultRelationship relationship, bool isOwnedByLocalTeam)
         {
             return new AdventureMapTile.CommanderInfo
             {
-                Relationship = ModText.Get(relationship),
+                RelationshipKind = relationship,
                 IsOwnedByLocalTeam = isOwnedByLocalTeam
             };
         }

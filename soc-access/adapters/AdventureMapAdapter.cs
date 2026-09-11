@@ -634,7 +634,9 @@ namespace SongsOfConquestAccess.Adapters
                     PopulateMapEntityVisited(tile, entity, selectedCommander);
                 }
 
-                tile.MapEntityRelationship = FormatSpatialRelationship(GetMapEntityRelationship(entity, localTeamId));
+                string mapEntityRelationship = GetMapEntityRelationship(entity, localTeamId);
+                tile.MapEntityRelationship = FormatSpatialRelationship(mapEntityRelationship);
+                tile.MapEntityRelationshipKind = ScannerRelationship(mapEntityRelationship);
                 if (selectedCommander != null && _facade.Level.CanMoveToAndInteract(entity.Id, selectedCommander.Id))
                 {
                     float mapEntityMovementCost;
@@ -3858,13 +3860,15 @@ namespace SongsOfConquestAccess.Adapters
             ICommanderState selectedCommander,
             int localTeamId)
         {
+            string relationship = GetCommanderRelationship(commander, localTeamId);
             AdventureMapTile.CommanderInfo info = new AdventureMapTile.CommanderInfo
             {
                 Id = commander != null ? commander.Id : -1,
                 Raw = commander,
                 Name = AdventureMapEntityLabel.GetCommanderName(_facade, commander),
                 IsSelected = ReferenceEquals(commander, selectedCommander),
-                Relationship = FormatSpatialRelationship(GetCommanderRelationship(commander, localTeamId)),
+                Relationship = FormatSpatialRelationship(relationship),
+                RelationshipKind = ScannerRelationship(relationship),
                 IsOwnedByLocalTeam = commander != null && commander.TeamId == localTeamId,
                 MovementLabel = GameText.Get(_localizationHandler, "Commanders/Tooltip/Movement", "Movement")
             };

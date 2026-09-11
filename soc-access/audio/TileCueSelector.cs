@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Scanner;
 
 namespace SongsOfConquestAccess.Audio
 {
@@ -258,33 +257,29 @@ namespace SongsOfConquestAccess.Audio
 
             if (tile.Commander != null)
             {
-                return ForRelationship(tile.Commander.Relationship, tile.Commander.IsOwnedByLocalTeam);
+                return ForRelationship(tile.Commander.RelationshipKind, tile.Commander.IsOwnedByLocalTeam);
             }
 
             bool hasMapEntity = tile.MapEntity != null || tile.MapEntityId.HasValue;
-            return hasMapEntity ? ForRelationship(tile.MapEntityRelationship, false) : null;
+            return hasMapEntity ? ForRelationship(tile.MapEntityRelationshipKind, false) : null;
         }
 
         /// <summary>
-        /// The tile carries the relationship already localized, so it is compared against the same
-        /// ModStrings the adapter formatted it from rather than against raw English.
+        /// The affiliation cue for a relationship. Read off the tile's relationship VALUE: the tile
+        /// also carries the relationship as the localized words the map speaks, and a cue chosen by
+        /// comparing those words back against the strings they came from would be deciding what to
+        /// play from text written for a person to hear.
         /// </summary>
-        private static string ForRelationship(string relationship, bool isOwnedByLocalTeam)
+        private static string ForRelationship(ScannerResultRelationship relationship, bool isOwnedByLocalTeam)
         {
-            if (isOwnedByLocalTeam || Matches(relationship, ModStrings.Spatial.Friendly))
+            if (isOwnedByLocalTeam || relationship == ScannerResultRelationship.Friendly)
             {
                 return CueLibrary.EntityFriendly;
             }
 
             // Most map objects are neutral, so only ally and enemy are marked; silence keeps
             // affiliation audible where it matters and speech still names the entity.
-            return Matches(relationship, ModStrings.Spatial.Enemy) ? CueLibrary.EntityEnemy : null;
-        }
-
-        private static bool Matches(string relationship, ModString expected)
-        {
-            return !string.IsNullOrEmpty(relationship)
-                && string.Equals(relationship, ModText.Get(expected), StringComparison.OrdinalIgnoreCase);
+            return relationship == ScannerResultRelationship.Enemy ? CueLibrary.EntityEnemy : null;
         }
     }
 }

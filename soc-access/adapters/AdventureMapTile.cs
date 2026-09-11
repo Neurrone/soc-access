@@ -47,7 +47,13 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsSelected { get; set; }
 
+            /// <summary>How the commander stands to the local team, said the way the map says it.
+            /// </summary>
             public string Relationship { get; set; }
+
+            /// <summary>The same fact as a value, for anything that has to ACT on it - the audio
+            /// cues - rather than say it. A localized string cannot be compared back.</summary>
+            public Scanner.ScannerResultRelationship RelationshipKind { get; set; }
 
             public bool IsOwnedByLocalTeam { get; set; }
 
@@ -150,7 +156,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool MapEntityVisited { get; set; }
 
+        /// <summary>How what stands here relates to the local team, said the way the map says it.
+        /// </summary>
         public string MapEntityRelationship { get; set; }
+
+        /// <summary>The same fact as a value, for anything that has to ACT on it rather than say it.
+        /// </summary>
+        public Scanner.ScannerResultRelationship MapEntityRelationshipKind { get; set; }
 
         /// <summary>The commander or map entity on this tile classified the way the scanner
         /// classifies it; <see cref="AdventureEntityCategory.None"/> when nothing here qualifies.</summary>

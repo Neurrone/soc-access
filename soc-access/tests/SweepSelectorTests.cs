@@ -86,7 +86,7 @@ namespace SongsOfConquestAccess.Tests
             Add(source, ModStrings.Scanner.Wielders, "commander:1", position, AdventureEntityCategory.Wielder);
 
             Dictionary<Vector2Int, AdventureMapTile> tiles = new Dictionary<Vector2Int, AdventureMapTile>();
-            tiles[position] = CommanderTile(position, ModStrings.Spatial.Enemy);
+            tiles[position] = CommanderTile(position, ScannerResultRelationship.Enemy);
 
             IReadOnlyList<SweepEntry> entries = Select(source, point => Lookup(tiles, point));
 
@@ -108,8 +108,8 @@ namespace SongsOfConquestAccess.Tests
             Add(source, ModStrings.Scanner.ResourceGenerators, "entity:2", neutral, AdventureEntityCategory.ResourceDeposit);
 
             Dictionary<Vector2Int, AdventureMapTile> tiles = new Dictionary<Vector2Int, AdventureMapTile>();
-            tiles[friendly] = MapEntityTile(friendly, ModStrings.Spatial.Friendly);
-            tiles[neutral] = MapEntityTile(neutral, ModStrings.Spatial.Neutral);
+            tiles[friendly] = MapEntityTile(friendly, ScannerResultRelationship.Friendly);
+            tiles[neutral] = MapEntityTile(neutral, ScannerResultRelationship.Neutral);
 
             Dictionary<string, string[]> stacks = new Dictionary<string, string[]>();
             IReadOnlyList<SweepEntry> entries = Select(source, point => Lookup(tiles, point));
@@ -176,7 +176,7 @@ namespace SongsOfConquestAccess.Tests
                 new ScannerResult(key, key, position) { EntityCategory = entityCategory });
         }
 
-        private static AdventureMapTile CommanderTile(Vector2Int position, ModString relationship)
+        private static AdventureMapTile CommanderTile(Vector2Int position, ScannerResultRelationship relationship)
         {
             return new AdventureMapTile(position)
             {
@@ -184,19 +184,19 @@ namespace SongsOfConquestAccess.Tests
                 EntityCategory = AdventureEntityCategory.Wielder,
                 Commander = new AdventureMapTile.CommanderInfo
                 {
-                    Relationship = ModText.Get(relationship),
+                    RelationshipKind = relationship,
                     IsOwnedByLocalTeam = false
                 }
             };
         }
 
-        private static AdventureMapTile MapEntityTile(Vector2Int position, ModString relationship)
+        private static AdventureMapTile MapEntityTile(Vector2Int position, ScannerResultRelationship relationship)
         {
             return new AdventureMapTile(position)
             {
                 IsExplored = true,
                 MapEntityId = 1,
-                MapEntityRelationship = ModText.Get(relationship)
+                MapEntityRelationshipKind = relationship
             };
         }
 
