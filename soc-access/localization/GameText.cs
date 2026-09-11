@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Adapters;
 
 namespace SongsOfConquestAccess.Localization
 {
@@ -94,8 +95,9 @@ namespace SongsOfConquestAccess.Localization
                     : string.Format(CultureInfo.CurrentCulture, fallback, args);
                 return text;
             }
-            catch (FormatException)
+            catch (FormatException exception)
             {
+                LogOnce.Warn("GameText.FormatFallback: formatting a fallback string", exception);
                 return fallback;
             }
         }

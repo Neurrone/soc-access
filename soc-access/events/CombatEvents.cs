@@ -326,6 +326,8 @@ namespace SongsOfConquestAccess.Events.Combat
             }
             catch (FormatException)
             {
+                // Silent on purpose: the recovery says the same sentence with the same amount in
+                // the same place, so there is nothing a log would warn anyone about.
                 return format.Replace("{0}", amount);
             }
         }
