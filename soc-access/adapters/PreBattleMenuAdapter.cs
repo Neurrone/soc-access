@@ -879,7 +879,9 @@ namespace SongsOfConquestAccess.Adapters
             name = SpokenLines.Clean(name);
             if (string.IsNullOrWhiteSpace(name))
             {
-                return string.Empty;
+                // Said here, not left empty: an empty label reads as an empty tile to the tile
+                // formatter, the spawn-point description and the carried-troop label.
+                return ModText.Get(ModStrings.Combat.UnknownTroop);
             }
 
             return size > 0 ? ModText.Get(ModStrings.Combat.TroopQuantity, size, name) : name;
