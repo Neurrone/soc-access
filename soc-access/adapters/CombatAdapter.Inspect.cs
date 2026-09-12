@@ -140,6 +140,26 @@ namespace SongsOfConquestAccess.Adapters
                 () => NativeTooltipUtility.IsLong(details));
         }
 
+        /// <summary>What the game's own buff and nerf indicators over the stack on a tile SAY - the
+        /// modifiers drawn under each header the readout names - line by line as the game broke them.
+        ///
+        /// Reviewable and never spoken: the names are in the readout already, and what they do is a
+        /// stat block, which belongs where the dossier is and after it. Read when the lines are read,
+        /// so nothing here costs a frame; in inspect mode it is the pinned tile's, as the dossier is.
+        /// </summary>
+        public IList<string> ReadTroopEffectDetailLines(CombatInspectContext context, Vector2Int focusedTile)
+        {
+            if (context != null && focusedTile != context.PinnedTile)
+            {
+                return null;
+            }
+
+            CombatTile tile = GetTile(context != null ? context.PinnedTile : focusedTile);
+            return tile != null && tile.Troop != null && Hud != null
+                ? Hud.GetTroopEffectDetailLines(tile.Troop.Id)
+                : null;
+        }
+
         private VisualTooltipMetadata CreateScreenPointTooltipMetadata(IDetails details, Vector2Int tile)
         {
             ITooltipable tooltipable = GetBattleTooltipable();

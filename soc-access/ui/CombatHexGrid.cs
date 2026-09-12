@@ -84,6 +84,13 @@ namespace SongsOfConquestAccess.UI
             return _adapter != null ? _adapter.ReadAttackPreviewLines(_inspectContext, _cursor) : null;
         }
 
+        /// <summary>What the game's buff and nerf indicators over the stack on this tile say, read
+        /// when the node is read.</summary>
+        public IList<string> GetTroopEffectDetailLines()
+        {
+            return _adapter != null ? _adapter.ReadTroopEffectDetailLines(_inspectContext, _cursor) : null;
+        }
+
         /// <summary>Where the cursor stands - the tile the node's clicks act on.</summary>
         public Vector2Int CursorTile
         {

@@ -355,15 +355,22 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>What the board node reads, in the order it reads: the damage preview the mod
-        /// composed out of the game's own numbers, then the tile's dossier.
+        /// composed out of the game's own numbers, the tile's dossier, and then what the buff and
+        /// nerf indicators over the stack standing there say.
         ///
         /// The preview is a COMPOSED section rather than part of the dossier tooltip, which is what
         /// lets it be spoken on arrival while the dossier - a long tooltip - is only reviewed: a
         /// player who has not asked to hear long tooltips still hears what the attack would do,
-        /// which is the one thing a mouse player sees without asking.</summary>
+        /// which is the one thing a mouse player sees without asking.
+        ///
+        /// The indicators' own lines are a BUFFER section: the readout already names them
+        /// ("Momentum"), and what each one does is a stat block that belongs beside the dossier
+        /// rather than in front of the player on every step. A section of its own rather than lines
+        /// appended to the dossier, because they are a different hover surface and the dossier's
+        /// tooltip is the node's one tooltip.</summary>
         private IList<NodeSection> BoardSections(Tooltip tooltip)
         {
-            List<NodeSection> sections = new List<NodeSection>(2);
+            List<NodeSection> sections = new List<NodeSection>(3);
             sections.Add(NodeSection.Composed(() => Grid().GetAttackPreviewLines()));
             NodeSection dossier = GraphNodes.TooltipSection(tooltip);
             if (dossier != null)
@@ -371,6 +378,7 @@ namespace SongsOfConquestAccess.Screens
                 sections.Add(dossier);
             }
 
+            sections.Add(NodeSection.Buffer(() => Grid().GetTroopEffectDetailLines()));
             return sections;
         }
 

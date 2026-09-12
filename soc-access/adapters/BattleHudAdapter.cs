@@ -714,7 +714,7 @@ namespace SongsOfConquestAccess.Adapters
 
         /// <summary>What those indicators SAY, line by line as the game drew them - the modifiers
         /// under each header. Read when the lines are read; nothing here is kept.</summary>
-        public IReadOnlyList<string> GetTroopEffectDetailLines(int troopId)
+        public IList<string> GetTroopEffectDetailLines(int troopId)
         {
             List<string> lines = new List<string>();
             List<DetailsTextUtility> captures = CaptureTroopEffectDetails(troopId);
