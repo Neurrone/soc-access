@@ -40,8 +40,9 @@ namespace SongsOfConquestAccess.Screens
     /// focused. Home, End and Backspace are TRANSLATED onto the scanner's jump, distance and return
     /// and Space onto the acting-troop focus, as the map and the pre-battle page translate theirs, so
     /// an injected key behaves exactly as the physical one. Because the node's id never changes as the
-    /// cursor moves the navigator never announces a move; the grid says each landing itself, queued,
-    /// and the review buffer refills because the node's readout changed.
+    /// cursor moves, a step is not a move as far as the navigator is concerned; the grid therefore asks
+    /// it to read the node again as a landing (<see cref="GraphNavigator.ReannounceFocused"/>), which
+    /// is what gets the tile's tooltip and hints read on a step and refills the review buffer.
     ///
     /// THE BOARD'S STOP IS NAMED by the game's combat-grid word, or by the targeting instruction
     /// while a spell or an ability is being aimed, so entering it says what the game is asking for.
