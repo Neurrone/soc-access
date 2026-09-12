@@ -81,12 +81,21 @@ namespace SongsOfConquestAccess.Adapters
         // Only a DEFINITE answer is kept: a widget with no details yet is asked again, which is what
         // a row the game fills in later needs. The keys are weak, so an answer dies with its widget
         // and there is nothing to tear down.
-        private static readonly ConditionalWeakTable<Component, object> LongByComponent =
-            new ConditionalWeakTable<Component, object>();
+        //
+        // "Definite" is decided by the details object the game has filed on the widget: an answer
+        // stands while the widget's _overriddenDetails is the same object it was when the answer
+        // was read. A prefab's plain text answers short and the game files the real dossier later
+        // (a wielder portrait's, in a portrait-load callback) - that swap is a new object, so the
+        // answer is read again; a widget the game never composes for keeps its one answer.
+        private static readonly ConditionalWeakTable<Component, Answer> LongByComponent =
+            new ConditionalWeakTable<Component, Answer>();
 
-        private static readonly object Long = true;
-
-        private static readonly object Short = false;
+        private sealed class Answer
+        {
+            public UITransform Transform;
+            public object DetailsWhenAnswered;
+            public bool Long;
+        }
 
         public static bool IsLongForComponent(Component component)
         {
@@ -95,10 +104,15 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            object known;
+            Answer known;
             if (LongByComponent.TryGetValue(component, out known))
             {
-                return (bool)known;
+                if (ReferenceEquals(ReadOverriddenDetails(known.Transform), known.DetailsWhenAnswered))
+                {
+                    return known.Long;
+                }
+
+                LongByComponent.Remove(component);
             }
 
             IDetails details;
@@ -107,9 +121,23 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            bool answer = IsLong(details);
-            LongByComponent.Add(component, answer ? Long : Short);
-            return answer;
+            UITransform transform = ResolveTooltipable(component.gameObject) as UITransform;
+            LongByComponent.Add(component, new Answer
+            {
+                Transform = transform,
+                DetailsWhenAnswered = ReadOverriddenDetails(transform),
+                Long = IsLong(details),
+            });
+            return IsLong(details);
+        }
+
+        // The details the game has composed onto the widget, or null for a prefab's plain text and
+        // for a widget the mod cannot read this off.
+        private static object ReadOverriddenDetails(UITransform transform)
+        {
+            return ReferenceEquals(transform, null) || OverriddenDetailsField == null
+                ? null
+                : OverriddenDetailsField.GetValue(transform);
         }
 
         // The same question on a widget whose real details the game only composes when the pointer
