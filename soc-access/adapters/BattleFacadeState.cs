@@ -38,14 +38,30 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The troop whose turn it is; -1 when no troop is acting.</summary>
         public static int CurrentTroopId(IClientBattleFacade facade)
         {
-            return facade != null && facade.Troops != null && facade.Troops.Current != null
-                ? facade.Troops.Current.Id
-                : -1;
+            try
+            {
+                return facade != null && facade.Troops != null && facade.Troops.Current != null
+                    ? facade.Troops.Current.Id
+                    : -1;
+            }
+            catch (Exception exception)
+            {
+                LogOnce.Warn("BattleFacadeState.CurrentTroopId", exception);
+                return -1;
+            }
         }
 
         public static int CurrentRound(IClientBattleFacade facade)
         {
-            return facade != null && facade.Queue != null ? facade.Queue.CurrentRound : 0;
+            try
+            {
+                return facade != null && facade.Queue != null ? facade.Queue.CurrentRound : 0;
+            }
+            catch (Exception exception)
+            {
+                LogOnce.Warn("BattleFacadeState.CurrentRound", exception);
+                return 0;
+            }
         }
     }
 }
