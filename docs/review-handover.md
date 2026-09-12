@@ -69,8 +69,9 @@ Follow-ups, not regressions: `Common.ResourceAmount` is used in two argument ord
 (ResourceStrip vs the counts), a translator hazard; the combat troop label reads status-icon
 tooltips on every frame the cursor sits on a troop (7e79707, unmeasured); a mouse click made
 without moving the mouse after keyboard steps acts on the keyboard's tile (d4e754b); the
-teleport instruction mesh latches a miss for the adventure (216f8c7); the marketplace grid
-snapshot is never retaken once captioned (de8296e, unverified).
+teleport instruction mesh latches a miss for the adventure (216f8c7). The marketplace grid
+snapshot (de8296e) was checked in-game on the first open after a fresh load and on a reopen:
+every column reads its own caption (Sell -1, Sell -5, Purchase +1, Purchase +5); sound.
 
 ## Screens to test
 
