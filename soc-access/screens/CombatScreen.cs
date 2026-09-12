@@ -156,7 +156,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _gridAdapter = Live;
-            _grid = Live == null ? null : new CombatHexGrid(Live, this);
+            _grid = Live == null ? null : new CombatHexGrid(Live, this, ReadBoardTile);
             return _grid;
         }
 
@@ -666,7 +666,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 NodeVtable vtable = GraphNodes.Text(
                     () => ModText.Get(ModStrings.Screens.CurrentTroop, BuildTroopLabel(hud.GetCurrentTroopInfo())));
-                vtable.OnActivate = () => MoveCursorToTroop(hud.GetCurrentTroopId(), focusGrid: true, requireLocalCurrentTurn: false);
+                vtable.OnActivate = () => MoveCursorToTroop(hud.GetCurrentTroopId(), requireLocalCurrentTurn: false);
                 builder.AddItem(new SyntheticNode(ControlId.Structural("combat:current-troop"), vtable));
             }
 
@@ -743,7 +743,7 @@ namespace SongsOfConquestAccess.Screens
                     item.IsRoundMarker ? null : item.Tooltip);
                 if (!item.IsRoundMarker)
                 {
-                    vtable.OnActivate = () => MoveCursorToTroop(item.TroopId, focusGrid: true, requireLocalCurrentTurn: false);
+                    vtable.OnActivate = () => MoveCursorToTroop(item.TroopId, requireLocalCurrentTurn: false);
                     vtable.OnFocusVisual = item.Focus;
                     vtable.OnBlurVisual = item.Unfocus;
                 }
@@ -1012,10 +1012,10 @@ namespace SongsOfConquestAccess.Screens
 
         public void MoveCursorToLocalActingTroop(int troopId)
         {
-            MoveCursorToTroop(troopId, focusGrid: true, requireLocalCurrentTurn: true);
+            MoveCursorToTroop(troopId, requireLocalCurrentTurn: true);
         }
 
-        public bool MoveCursorToTroop(int troopId, bool focusGrid, bool requireLocalCurrentTurn)
+        public bool MoveCursorToTroop(int troopId, bool requireLocalCurrentTurn)
         {
             Vector2Int position;
             if (Live == null
@@ -1025,14 +1025,37 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            bool moved = Grid().MoveToTroop(position);
-            if (focusGrid && moved)
+            // The landing puts the cursor on the board and reads the tile, both through
+            // ReadBoardTile: nothing is focused or said from here.
+            return Grid().MoveToTroop(position);
+        }
+
+        /// <summary>
+        /// The board's tile cursor has landed on another tile, and the readout is deliberately the
+        /// NAVIGATOR's rather than the grid's. The whole board is one node, so a step inside it
+        /// moves no focus and the engine would say nothing on its own; a tile said in the grid
+        /// instead would be the bare label, without the dossier the "read long tooltips" setting
+        /// asks for and without the tile's usage hints - which is why a step onto a troop used to
+        /// say less than pressing Escape back onto that very tile.
+        /// </summary>
+        private void ReadBoardTile()
+        {
+            GraphNavigator navigator = Navigator;
+            if (navigator == null || !ReferenceEquals(navigator.Screen, this))
             {
-                // Silent: the grid has just read the tile it landed on, which is the whole answer.
-                Navigator?.FocusNode(BoardNodeId, announce: false);
+                return;
             }
 
-            return moved;
+            if (IsBoardFocused())
+            {
+                navigator.ReannounceFocused();
+                return;
+            }
+
+            // The cursor was walked from a HUD stop (the queue's Enter, a troop cycle, the
+            // turn-start narration): the landing on the board is what reads the tile, once - an
+            // announcing one, because a silent landing plus a re-announce would read nothing.
+            navigator.FocusNode(BoardNodeId);
         }
 
         public bool CanNavigateLocalActingTroops()
@@ -1171,7 +1194,7 @@ namespace SongsOfConquestAccess.Screens
                 return true;
             }
 
-            bool moved = MoveCursorToTroop(result.TroopId, focusGrid: true, requireLocalCurrentTurn: false);
+            bool moved = MoveCursorToTroop(result.TroopId, requireLocalCurrentTurn: false);
             if (!moved)
             {
                 cycle?.Reset();

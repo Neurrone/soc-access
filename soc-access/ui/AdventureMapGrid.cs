@@ -21,8 +21,10 @@ namespace SongsOfConquestAccess.UI
     /// (<c>ui-graph-plan.md</c> phase E). <see cref="AdventureMapScreen"/> declares ONE node for the
     /// whole map and hands this class every key that belongs to the map: the moves, the skips, the
     /// scanner, the bookmarks, the beacons and the sonar sweep. Because the node's identity never
-    /// changes as the cursor walks, the navigator has nothing to announce and this class says each
-    /// landing itself.
+    /// changes as the cursor walks, the navigator has nothing of its own to announce, so a landing
+    /// here asks it for the node's readout again (<see cref="GraphNavigator.ReannounceFocused"/>,
+    /// wired in as <c>readTile</c>) rather than saying the tile itself: the label alone said from
+    /// here would leave out the map node's tooltip and its usage hints.
     ///
     /// Queued rather than interrupting, which is what the widget engine's focus commit did
     /// (<c>UIManager.Update</c> spoke with <c>interrupt: false</c>): the input router has already
@@ -44,9 +46,15 @@ namespace SongsOfConquestAccess.UI
         private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
         private int _lookAroundRadius = DefaultLookAroundRadius;
 
-        public AdventureMapGrid(AdventureMapAdapter adapter)
+        // How a landing is read out: the screen hands the readout to the navigator, which composes
+        // the map node exactly as it composes a landing on it from the HUD. Never speech of this
+        // class's own - see ReadTile.
+        private readonly Action _readTile;
+
+        public AdventureMapGrid(AdventureMapAdapter adapter, Action readTile)
         {
             _adapter = adapter;
+            _readTile = readTile;
             _cursorTile = adapter != null ? adapter.GetInitialTile() : Vector2Int.zero;
             _bookmarks = new AdventureBookmarkManager(new AdventureBookmarkStore());
             _beacons = new AdventureBeaconAudio();
@@ -262,18 +270,24 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            SpeakTile();
+            ReadTile();
             PlayTileCues();
         }
 
-        /// <summary>The tile description, said the way the widget engine's focus commit said it:
-        /// queued behind whatever the same keypress has already said.</summary>
-        private void SpeakTile()
+        /// <summary>
+        /// The tile the cursor now stands on, read out - by the NAVIGATOR, deliberately, because the
+        /// map node's tooltip and its usage hints are only read where a landing is composed. The
+        /// label said from here instead would be the whole readout the player got.
+        ///
+        /// Called after whatever the same keypress has already said (a skip's "Skipped 3 tiles"),
+        /// so the order the player hears is unchanged: the readout is queued behind it rather than
+        /// interrupting, exactly as before.
+        /// </summary>
+        private void ReadTile()
         {
-            string label = GetLabel();
-            if (!string.IsNullOrWhiteSpace(label))
+            if (_readTile != null)
             {
-                SpeechPipeline.Output(new SpeechRequest(label, interrupt: false));
+                _readTile();
             }
         }
 

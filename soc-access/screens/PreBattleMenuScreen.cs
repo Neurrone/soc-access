@@ -111,7 +111,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _hexGridAdapter = Live;
-            _hexGrid = Live == null ? null : new TroopPlacementHexGrid(Live);
+            _hexGrid = Live == null ? null : new TroopPlacementHexGrid(Live, ReadGridTile);
             _tooltip = null;
             _tooltipRead = false;
             return _hexGrid;
@@ -512,6 +512,24 @@ namespace SongsOfConquestAccess.Screens
 
             string action = ModeAction(actionKey);
             return action != null && HexGrid().HandleAction(AccessibilityActions.FindByKey(action));
+        }
+
+        /// <summary>
+        /// The board's tile cursor has landed on another tile, and the readout is deliberately the
+        /// NAVIGATOR's rather than the grid's. The whole board is one node, so a step inside it
+        /// moves no focus and the engine would say nothing on its own; a tile said in the grid
+        /// instead would be the bare label, without the node's tooltip and without its usage hints.
+        ///
+        /// A landing only ever announces where the board already has the cursor: the one landing
+        /// that comes from elsewhere - the deployment changing under a side panel - is asked not to
+        /// announce at all (<see cref="TroopPlacementHexGrid.RebuildAfterPlacementChanged"/>).
+        /// </summary>
+        private void ReadGridTile()
+        {
+            if (IsGridFocused())
+            {
+                Navigator.ReannounceFocused();
+            }
         }
 
         private bool IsGridFocused()

@@ -18,8 +18,10 @@ namespace SongsOfConquestAccess.UI
     /// the whole board and hands this class every key that walks it: the six hex moves and their
     /// skips, the centre tile, inspect, the troop cycles, the relevant-tile walk, the threat readout
     /// and the scanner. Because the node's identity never changes as the cursor walks, the navigator
-    /// has nothing to announce and this class says each landing itself, queued rather than
-    /// interrupting, exactly as the widget engine's focus commit said it.
+    /// has nothing of its own to announce, so a landing here asks it for the node's readout again
+    /// (<see cref="GraphNavigator.ReannounceFocused"/>, wired in as <c>readTile</c>) rather than
+    /// saying the tile itself: the label alone said from here would leave out the dossier the
+    /// tooltip setting asks for and the tile's usage hints.
     ///
     /// THE GAME'S CLICKS ARE THE NODE'S, not this class's: Enter (confirm a spell or ability target
     /// while aiming) and Backslash (the right click a troop acts with) are declared on the node by
@@ -37,10 +39,16 @@ namespace SongsOfConquestAccess.UI
         private bool _componentWarningSpoken;
         private readonly HexGridScanner _scanner;
 
-        public CombatHexGrid(CombatAdapter adapter, CombatScreen screen)
+        // How a landing is read out: the screen hands the readout to the navigator, which composes
+        // the board node exactly as it composes a landing on it from the HUD. Never speech of this
+        // class's own - see ReadTile.
+        private readonly Action _readTile;
+
+        public CombatHexGrid(CombatAdapter adapter, CombatScreen screen, Action readTile)
         {
             _adapter = adapter;
             _screen = screen;
+            _readTile = readTile;
             _cursor = _adapter != null ? _adapter.GetInitialTile() : Vector2Int.zero;
             _scanner = new HexGridScanner(
                 origin => ScannerCustomCategorySynthesizer.ApplyFromSettings(
@@ -168,7 +176,7 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            SpeakTile();
+            ReadTile();
             PlayTileCues();
             return true;
         }
@@ -287,39 +295,26 @@ namespace SongsOfConquestAccess.UI
 
             _cursor = point;
             FocusCurrentTile(updateNativeFocus: true);
-            SpeakTile();
+            ReadTile();
             PlayTileCues();
             return true;
         }
 
-        /// <summary>The tile description, said the way the widget engine's focus commit said it:
-        /// queued behind whatever the same keypress has already said, so a skip's "Skipped 3 tiles"
-        /// is heard before the tile it landed on.</summary>
-        private void SpeakTile()
+        /// <summary>
+        /// The tile the cursor now stands on, read out - by the NAVIGATOR, deliberately, because the
+        /// board node's tooltip and its usage hints are only read where a landing is composed. The
+        /// label said from here instead would be the whole readout the player got, which is what
+        /// made a step onto a troop say less than pressing Escape back onto it.
+        ///
+        /// Called after whatever the same keypress has already said (a skip's "Skipped 3 tiles",
+        /// inspect's own lines), so the order the player hears is unchanged: the readout is queued
+        /// behind them rather than interrupting, exactly as before.
+        /// </summary>
+        private void ReadTile()
         {
-            string label = GetLabel();
-            if (!string.IsNullOrWhiteSpace(label))
+            if (_readTile != null)
             {
-                SpeechPipeline.Output(new SpeechRequest(label, interrupt: false));
-            }
-
-            SpeakAttackPreview();
-        }
-
-        /// <summary>What the game says an attack on this tile would do, said right after the tile
-        /// itself. The board's node identity never changes as the cursor walks, so the engine has no
-        /// arrival to read out here and this class says the node's own composed section itself -
-        /// exactly as it says the label. The lines come from the same reader the section and the
-        /// review buffer use, so the three cannot disagree.</summary>
-        private void SpeakAttackPreview()
-        {
-            IList<string> lines = GetAttackPreviewLines();
-            for (int i = 0; lines != null && i < lines.Count; i++)
-            {
-                if (!string.IsNullOrWhiteSpace(lines[i]))
-                {
-                    SpeechPipeline.Output(new SpeechRequest(lines[i], interrupt: false));
-                }
+                _readTile();
             }
         }
 
@@ -374,7 +369,7 @@ namespace SongsOfConquestAccess.UI
 
             _cursor = HexGridMoves.CenterTile;
             FocusCurrentTile(updateNativeFocus: true);
-            SpeakTile();
+            ReadTile();
             PlayTileCues();
             return true;
         }
@@ -493,7 +488,7 @@ namespace SongsOfConquestAccess.UI
 
             _cursor = point;
             FocusCurrentTile(updateNativeFocus: _inspectContext == null);
-            SpeakTile();
+            ReadTile();
             PlayTileCues();
             return true;
         }

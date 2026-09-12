@@ -205,7 +205,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _gridAdapter = Live;
-            _grid = Live == null ? null : new AdventureMapGrid(Live);
+            _grid = Live == null ? null : new AdventureMapGrid(Live, ReadMapTile);
             InvalidateTile();
             return _grid;
         }
@@ -1260,6 +1260,33 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
+        /// <summary>
+        /// The map's tile cursor has landed on another tile, and the readout is deliberately the
+        /// NAVIGATOR's rather than the grid's. The whole map is one node, so a step inside it moves
+        /// no focus and the engine would say nothing on its own; a tile said in the grid instead
+        /// would be the bare label, without the node's tooltip and without its usage hints.
+        /// </summary>
+        private void ReadMapTile()
+        {
+            GraphNavigator navigator = Navigator;
+            if (navigator == null || !ReferenceEquals(navigator.Screen, this))
+            {
+                // The map is not the page the player is on; a tile read at them would not be either.
+                return;
+            }
+
+            if (IsMapFocused())
+            {
+                navigator.ReannounceFocused();
+                return;
+            }
+
+            // The cursor was walked while focus sat on a HUD stop (the teleport menu picking a
+            // destination): the landing on the map is what reads the tile, once - an announcing
+            // one, because a silent landing plus a re-announce would read nothing.
+            navigator.FocusNode(MapNodeId);
+        }
+
         private bool IsMapFocused()
         {
             GraphNavigator navigator = Navigator;
@@ -1309,7 +1336,8 @@ namespace SongsOfConquestAccess.Screens
                 SpeechPipeline.Output(new SpeechRequest(instruction, interrupt: true));
             }
 
-            Navigator?.FocusNode(MapNodeId, announce: false);
+            // The landing on the map node is what reads the destination now (ReadMapTile), so the
+            // focus request is left to it: a silent one here would swallow that readout.
             Grid().FocusTile(adapter.CurrentDestination);
         }
 

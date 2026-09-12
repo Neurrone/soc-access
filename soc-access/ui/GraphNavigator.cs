@@ -297,6 +297,35 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
+        /// <summary>
+        /// Read the focused control out again on the next <see cref="EnsureFocus"/>, exactly as a
+        /// landing on it does - tooltip mode, sections and usage hints included.
+        ///
+        /// It exists for a control whose CONTENT the player moved within rather than moved off: a
+        /// tile grid's cursor (<see cref="CombatHexGrid"/>, <see cref="AdventureMapGrid"/>,
+        /// <see cref="TroopPlacementHexGrid"/>) walks a whole board inside ONE node, so the node's
+        /// identity never changes, the differ below has nothing to compare, and nothing is
+        /// announced. The grids used to say the tile themselves, which went round the single
+        /// announcement site and with it the node's tooltip and hints: a step onto an enemy read
+        /// less than pressing Escape back onto the very same tile did. Handing the readout back
+        /// here is the only way the whole of it reaches the player from the one place that
+        /// composes it.
+        ///
+        /// The node last spoken is KEPT, so the readout is diffed against the same chain as
+        /// before and reads as a landing within the same stop reads: the leaf alone, with no stop
+        /// context in front of it. The buffer and the live watch lose their baselines with the
+        /// readout, so both are taken again from what is about to be said.
+        /// </summary>
+        public void ReannounceFocused()
+        {
+            _lastSpokenKey = null;
+            _bufferKey = null;
+            _bufferReadout = null;
+            _bufferLines = null;
+            _liveKey = null;
+            _liveValues.Clear();
+        }
+
         /// <summary>Give up the cursor entirely; the next EnsureFocus seats it again.</summary>
         public void Blur()
         {
