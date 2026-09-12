@@ -292,6 +292,9 @@ namespace SongsOfConquestAccess.Screens
         public override void OnUpdate()
         {
             base.OnUpdate();
+            // Read from the game every frame: the mouse takes the game's hover back from the
+            // keyboard cursor the moment the physical pointer moves.
+            Live?.WatchHoverOwnership();
             WatchInstruction();
         }
 

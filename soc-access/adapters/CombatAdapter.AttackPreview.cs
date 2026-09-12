@@ -55,10 +55,12 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>The teardown <c>SocAccessMod.Stop</c> calls: let go of every attack preview the
-        /// captures are keyed on, so the next load starts holding nothing.</summary>
+        /// captures are keyed on, and of the battle holding the game's hover, so the next load
+        /// starts holding nothing.</summary>
         public static void Reset()
         {
             AttackPreviewAdditionalTexts.Clear();
+            _hoverOwner = null;
         }
 
         private List<string> CaptureAttackPreviewLines(bool targetIsEntity)

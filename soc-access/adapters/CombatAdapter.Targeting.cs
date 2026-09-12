@@ -233,6 +233,10 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             SynchronizeNativeHoverForInput(point);
+            // Aiming moves the game's hover too, so the keyboard owns it here as well: without that
+            // the game's own update would put the aim back under the physical pointer next frame.
+            ClearHoverPin();
+            TakeHoverOwnership();
             if (mode == CombatTargetingMode.Spell)
             {
                 _battleSpellController?.SetCurrentTile(point);

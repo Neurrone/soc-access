@@ -373,6 +373,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             DetachAbilityTargetingBegin();
             ClearFocusedTileOverlay();
+            ReleaseHoverOwnership();
             EndCombat();
         }
 
@@ -563,6 +564,10 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
+            // The keyboard cursor is where the game's hover is now, and stays there until the
+            // physical pointer moves; no inspection is pinning it any more.
+            ClearHoverPin();
+            TakeHoverOwnership();
             SetNativeCurrentTroopState();
             _attackPreviewHandler?.Hide();
             // The tile and the path travel down with the point: nothing between here and the hover
@@ -572,6 +577,13 @@ namespace SongsOfConquestAccess.Adapters
             if (tile != null && (tile.Troop != null || tile.Entity != null))
             {
                 SynchronizeNativeHoverForPreview(point, tile, path);
+            }
+            else
+            {
+                // An empty tile has no preview to ask for, but the hover still has to FOLLOW the
+                // cursor onto it: the game's own update, which used to move the hover here, does not
+                // run while the keyboard owns it.
+                SynchronizeNativeHoverForInput(point, tile, path);
             }
         }
 

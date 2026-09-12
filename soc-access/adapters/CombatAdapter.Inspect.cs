@@ -76,6 +76,10 @@ namespace SongsOfConquestAccess.Adapters
             NativeTooltipUtility.HideTooltip();
             _tooltipUtility?.ClearSpecific();
             _attackPreviewHandler?.Hide();
+            // The cursor has left the board or the screen: the mouse gets its hover back, and there
+            // is no inspection left to re-assert.
+            ClearHoverPin();
+            ReleaseHoverOwnership();
         }
 
         public Tooltip GetInspectTooltip(CombatInspectContext context, Vector2Int focusedTile)
@@ -372,6 +376,69 @@ namespace SongsOfConquestAccess.Adapters
             };
         }
 
+        /// <summary>Where an inspection left the game: the hover, the four managers and the damage
+        /// preview, all on the pinned tile. Called when the inspection begins, and again by
+        /// <see cref="ReassertHoverPin"/> when the mouse has taken the hover since.</summary>
+        private void PinNativeStackHover(IBattleTroopState troop, PathNode[] path)
+        {
+            _gridManager?.SetInspectedTroop(troop);
+            SetNativeCursorTile(troop.Position, path);
+            _cursorManager?.SetState(BattleCursorManager.State.InspectTroop);
+            _gridManager?.SetState(BattleGridManager.State.InspectTroop);
+            _pathManager?.SetState(BattlePathManager.State.InspectTroop);
+            _highlightManager?.SetState(BattleHighlightManager.State.InspectTroop);
+            SynchronizeNativeHoverForPreview(troop.Position, GetTile(troop.Position), path);
+            PinHoverOn(troop.Position);
+            TakeHoverOwnership();
+        }
+
+        private void PinNativeEntityHover(IMapEntity entity, PathNode[] path)
+        {
+            SetNativeCursorTile(entity.Position, path);
+            _cursorManager?.SetState(BattleCursorManager.State.InspectTile);
+            _gridManager?.SetState(BattleGridManager.State.InspectEntity);
+            _highlightManager?.SetState(BattleHighlightManager.State.InspectEntity);
+            _pathManager?.SetState(BattlePathManager.State.CurrentTroop);
+            SynchronizeNativeHoverForPreview(entity.Position);
+            PinHoverOn(entity.Position);
+            TakeHoverOwnership();
+        }
+
+        private void PinNativeTileHover(Vector2Int point, PathNode[] path)
+        {
+            SetNativeCursorTile(point, path);
+            SetNativeCurrentTroopState();
+            _attackPreviewHandler?.Hide();
+            PinHoverOn(point);
+            TakeHoverOwnership();
+        }
+
+        /// <summary>Put the game back on the tile the inspection pinned it to, for a board key
+        /// pressed after the mouse took the hover back. Nothing at all while the keyboard still owns
+        /// the hover, which is every key of an undisturbed inspection.</summary>
+        public void ReassertHoverPin()
+        {
+            if (!_hoverPinned || ReferenceEquals(_hoverOwner, this))
+            {
+                return;
+            }
+
+            Vector2Int point = _hoverPinTile;
+            CombatTile tile = GetTile(point);
+            if (tile != null && tile.Troop != null)
+            {
+                PinNativeStackHover(tile.Troop, GetPathTo(point));
+            }
+            else if (tile != null && tile.Entity != null)
+            {
+                PinNativeEntityHover(tile.Entity, GetPathToEntity(tile.Entity));
+            }
+            else
+            {
+                PinNativeTileHover(point, GetPathTo(point));
+            }
+        }
+
         private CombatInspectContext BeginStackInspect(IBattleTroopState troop)
         {
             if (troop == null)
@@ -380,13 +447,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             PathNode[] path = GetPathTo(troop.Position);
-            _gridManager?.SetInspectedTroop(troop);
-            SetNativeCursorTile(troop.Position, path);
-            _cursorManager?.SetState(BattleCursorManager.State.InspectTroop);
-            _gridManager?.SetState(BattleGridManager.State.InspectTroop);
-            _pathManager?.SetState(BattlePathManager.State.InspectTroop);
-            _highlightManager?.SetState(BattleHighlightManager.State.InspectTroop);
-            SynchronizeNativeHoverForPreview(troop.Position, GetTile(troop.Position), path);
+            PinNativeStackHover(troop, path);
 
             CombatInspectContext context = CombatInspectContext.ForStack(troop.Position);
             BuildStackRanges(troop, context);
@@ -397,9 +458,7 @@ namespace SongsOfConquestAccess.Adapters
         private CombatInspectContext BeginPathInspect(Vector2Int point)
         {
             PathNode[] path = GetPathTo(point);
-            SetNativeCursorTile(point, path);
-            SetNativeCurrentTroopState();
-            _attackPreviewHandler?.Hide();
+            PinNativeTileHover(point, path);
             CombatInspectContext context = CombatInspectContext.ForPath(point, ConvertPath(path));
             context.TooltipDetails = BuildTileDetails(point);
             return context;
@@ -413,12 +472,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             PathNode[] path = GetPathToEntity(entity);
-            SetNativeCursorTile(entity.Position, path);
-            _cursorManager?.SetState(BattleCursorManager.State.InspectTile);
-            _gridManager?.SetState(BattleGridManager.State.InspectEntity);
-            _highlightManager?.SetState(BattleHighlightManager.State.InspectEntity);
-            _pathManager?.SetState(BattlePathManager.State.CurrentTroop);
-            SynchronizeNativeHoverForPreview(entity.Position);
+            PinNativeEntityHover(entity, path);
 
             CombatInspectContext context = PathfinderExtensions.IsReachable(path, GetCurrentMovesLeft(), true)
                 ? CombatInspectContext.ForEntityPath(entity.Position, ConvertPath(path))

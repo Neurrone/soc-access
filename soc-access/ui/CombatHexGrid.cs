@@ -102,6 +102,8 @@ namespace SongsOfConquestAccess.UI
         public void HideOverlay()
         {
             _adapter?.ClearFocusedTileOverlay();
+            // The board no longer has the cursor, so the game's hover is the mouse's again.
+            _adapter?.ReleaseHoverOwnership();
         }
 
         /// <summary>Enter on the board: while a spell or an ability is being aimed it confirms the
@@ -477,6 +479,12 @@ namespace SongsOfConquestAccess.UI
             else if (updateNativeFocus)
             {
                 _adapter?.FocusTile(_cursor);
+            }
+            else
+            {
+                // Inspecting: the game's hover belongs to the pinned tile, not to the cursor walking
+                // the ranges - but if the mouse took it back since, this puts it on the pin again.
+                _adapter?.ReassertHoverPin();
             }
 
             _adapter?.SetFocusedTileOverlay(_cursor);

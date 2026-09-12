@@ -35,6 +35,7 @@ soc-access/patches/CombatPatches.cs | 1 | [HarmonyPatch(typeof(BattleHUDNotifica
 soc-access/patches/CombatPatches.cs | 1 | [HarmonyPatch(typeof(ClientBattleCommandsFacade), "OnResponseExecuted")] | event
 soc-access/patches/CombatPatches.cs | 1 | [HarmonyPatch(typeof(HumanBattleSpellController), "HandleHotkeyExitMenu")] | event
 soc-access/patches/CombatPatches.cs | 1 | [HarmonyPatch(typeof(HumanBattleSpellController), "HandleSpellCastCancelled")] | event
+soc-access/patches/CombatPatches.cs | 1 | [HarmonyPatch(typeof(MouseKeyboardHumanBattleControllerModule), "UpdateCurrentTile")] | interception
 soc-access/patches/CombatPatches.cs | 1 | [HarmonyPatch(typeof(NotificationPanel), "Show", new[] { typeof(string), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector2) })] | event
 
 soc-access/patches/CommunityMapsPatches.cs | 1 | return AccessTools.Method(typeof(Collection), "RefreshList"); | interception

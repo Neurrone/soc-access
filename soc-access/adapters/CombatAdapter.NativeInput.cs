@@ -21,6 +21,109 @@ namespace SongsOfConquestAccess.Adapters
 
     public sealed partial class CombatAdapter
     {
+        // WHO OWNS THE GAME'S HOVER. MouseKeyboardHumanBattleControllerModule.UpdateCurrentTile
+        // raycasts the physical mouse every frame and, whenever that answers a different tile,
+        // overwrites the hover, the path, the four managers and the damage previews. One frame after
+        // every keyboard step it therefore undid the sync below and faded the preview out. So the
+        // keyboard TAKES the hover whenever it syncs one, the game's own update is intercepted
+        // (CombatPatches) while it holds it, and the mouse takes it back the moment the physical
+        // pointer MOVES - the only sign the game gives that the player has gone back to it.
+        //
+        // The claim is per battle and the adapter IS the battle, but the prefix has no adapter to
+        // ask: the owner is held statically as the one battle that can be running, and the pointer
+        // watch, Dispose, ClearNativeTooltip and Reset all let go of it.
+        private static CombatAdapter _hoverOwner;
+
+        /// <summary>Whether the keyboard cursor owns the game's hover. The interception prefix on
+        /// <c>UpdateCurrentTile</c> reads it and lets the game's own update run untouched whenever it
+        /// answers false - including while the mod is deliberately calling that update itself, which
+        /// is how a synthesised click puts the game on the tile it is about to act on.</summary>
+        public static bool KeyboardOwnsHover
+        {
+            get { return _hoverOwner != null && !_hoverOwner._invokingNativeUpdate; }
+        }
+
+        // Where the game's own pointer was when the claim was last read: a MOVE rather than a
+        // position is what hands the hover back.
+        private Vector2 _pointerPosition;
+        private bool _pointerRead;
+        private bool _invokingNativeUpdate;
+
+        // The tile an inspection pinned the game's hover to. The cursor walking the inspected ranges
+        // does not move it, and a board key pressed after the mouse took the hover puts the game
+        // back here rather than on the cursor.
+        private bool _hoverPinned;
+        private Vector2Int _hoverPinTile;
+
+        /// <summary>The keyboard has just put the game's hover where its cursor is: hold it there
+        /// until the pointer moves. The pointer is baselined here, so the position it already had
+        /// is not read as a move.</summary>
+        private void TakeHoverOwnership()
+        {
+            _hoverOwner = this;
+            _pointerRead = TryReadPointerPosition(out _pointerPosition);
+        }
+
+        /// <summary>Give the hover back: the game's own <c>UpdateCurrentTile</c> runs untouched from
+        /// here on. The inspection's pin is NOT dropped - a board key re-asserts it.</summary>
+        public void ReleaseHoverOwnership()
+        {
+            if (ReferenceEquals(_hoverOwner, this))
+            {
+                _hoverOwner = null;
+            }
+        }
+
+        /// <summary>Read the game's own pointer, once a frame, and hand the hover back the moment it
+        /// has moved. Nothing tells the mod the player reached for the mouse; the screen asks.
+        /// </summary>
+        public void WatchHoverOwnership()
+        {
+            Vector2 position;
+            if (!ReferenceEquals(_hoverOwner, this) || !TryReadPointerPosition(out position))
+            {
+                return;
+            }
+
+            if (!_pointerRead)
+            {
+                _pointerRead = true;
+                _pointerPosition = position;
+                return;
+            }
+
+            if (position == _pointerPosition)
+            {
+                return;
+            }
+
+            _pointerPosition = position;
+            ReleaseHoverOwnership();
+        }
+
+        private bool TryReadPointerPosition(out Vector2 position)
+        {
+            position = Vector2.zero;
+            if (_inputManager == null || _inputManager.Screen == null || _inputManager.Screen.Primary == null)
+            {
+                return false;
+            }
+
+            position = _inputManager.Screen.Primary.Position;
+            return true;
+        }
+
+        private void PinHoverOn(Vector2Int point)
+        {
+            _hoverPinned = true;
+            _hoverPinTile = point;
+        }
+
+        private void ClearHoverPin()
+        {
+            _hoverPinned = false;
+        }
+
         /// <summary>Point the game's four battle managers at a tile, which is what the mouse moving
         /// over it does.</summary>
         private void SetNativeCursorTile(Vector2Int point, PathNode[] path)
@@ -60,6 +163,23 @@ namespace SongsOfConquestAccess.Adapters
             if (_humanBattleController == null || tile == null)
             {
                 return;
+            }
+
+            // The game's own update does two more things on a tile change, and while the keyboard
+            // owns the hover that update does not run: the spell HUD is told the hover left its
+            // target, and the spell controller is told where the hover is now. The aiming path calls
+            // SetCurrentTile itself (FocusTargetTile), so it is not doubled here.
+            if (_humanBattleController.CurrentHoverTile != point)
+            {
+                if (_battleHudSignals != null)
+                {
+                    _battleHudSignals.OnEndHoverSpellTarget.SafeInvoke();
+                }
+
+                if (GetTargetingMode() != CombatTargetingMode.Spell)
+                {
+                    _battleSpellController?.SetCurrentTile(point);
+                }
             }
 
             _humanBattleController.CurrentHoverTile = point;
@@ -180,7 +300,17 @@ namespace SongsOfConquestAccess.Adapters
             {
                 if (_updateCurrentTileMethod != null)
                 {
-                    _updateCurrentTileMethod.Invoke(_mouseKeyboardInputModule, Array.Empty<object>());
+                    // Deliberate, and over the pointer position the override has just put on the
+                    // tile: the interception stands aside for the length of the call.
+                    _invokingNativeUpdate = true;
+                    try
+                    {
+                        _updateCurrentTileMethod.Invoke(_mouseKeyboardInputModule, Array.Empty<object>());
+                    }
+                    finally
+                    {
+                        _invokingNativeUpdate = false;
+                    }
                 }
 
                 SynchronizeNativeHoverForInput(point);

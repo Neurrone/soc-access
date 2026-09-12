@@ -57,6 +57,19 @@ namespace SongsOfConquestAccess
             }
         }
 
+        /// <summary>THE KEYBOARD CURSOR OWNS THE GAME'S HOVER. This method raycasts the physical
+        /// mouse every frame and, on any tile change, overwrites the hover, the path, the four
+        /// battle managers and the damage previews - which undid the mod's own hover sync one frame
+        /// after every keyboard step. While the keyboard owns the hover it does not run; the moment
+        /// the pointer moves the adapter lets go and the game's own update resumes untouched.
+        /// </summary>
+        [HarmonyPatch(typeof(MouseKeyboardHumanBattleControllerModule), "UpdateCurrentTile")]
+        [HarmonyPrefix]
+        private static bool MouseKeyboardHumanBattleControllerModuleUpdateCurrentTilePrefix()
+        {
+            return !CombatAdapter.KeyboardOwnsHover;
+        }
+
         [HarmonyPatch(typeof(BattleAttackPreview), "AddAdditionalText")]
         [HarmonyPrefix]
         private static void BattleAttackPreviewAddAdditionalTextPrefix(BattleAttackPreview __instance, string AdditionalText)
