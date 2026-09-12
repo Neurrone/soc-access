@@ -126,8 +126,11 @@ namespace SongsOfConquestAccess.Audio
                 return cues;
             }
 
-            bool obstacle = tile.IsImpassable || tile.IsBlocked || tile.Entity != null || tile.EntityId >= 0;
-            if (obstacle)
+            // Only STATICALLY unwalkable ground thuds. A blocked tile is any tile the acting troop
+            // cannot walk onto, which is every tile a troop or an attackable thing stands on, and a
+            // board of obstacles is a board the cue cannot tell apart; the readout names whoever is
+            // standing there, and the ground under them sounds like ground.
+            if (tile.IsImpassable)
             {
                 AddElevatedGround(cues, elevation);
                 cues.Add(new TileCue(CueLibrary.TerrainImpassable, 0f, followsPrevious: elevation != null));

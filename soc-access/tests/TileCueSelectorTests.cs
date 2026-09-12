@@ -301,16 +301,19 @@ namespace SongsOfConquestAccess.Tests
                 ToArray(TileCueSelector.ForCombatTile(tile, isEnemyTroop: true, isActingTroop: true, isThreatened: false)));
         }
 
+        /// <summary>Statically unwalkable ground thuds and nothing else does: a blocked tile is any
+        /// tile the acting troop cannot walk onto, so every troop and every attackable thing stood on
+        /// one, and the board sounded like a wall.</summary>
         [TestMethod]
-        public void CombatObstacleTilesPlayTheObstacleCue()
+        public void OnlyImpassableCombatTilesPlayTheObstacleCue()
         {
             CombatTile impassable = new CombatTile(new Vector2Int(1, 1)) { IsImpassable = true };
             CombatTile blocked = new CombatTile(new Vector2Int(1, 2)) { IsBlocked = true };
             CombatTile withEntity = new CombatTile(new Vector2Int(1, 3)) { EntityId = 5 };
 
             CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForCombatTile(impassable, false, false, false)));
-            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForCombatTile(blocked, false, false, false)));
-            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForCombatTile(withEntity, false, false, false)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.HexEmpty }, ToArray(TileCueSelector.ForCombatTile(blocked, false, false, false)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.HexEmpty }, ToArray(TileCueSelector.ForCombatTile(withEntity, false, false, false)));
         }
 
         [TestMethod]
