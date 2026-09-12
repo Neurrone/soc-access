@@ -223,15 +223,13 @@ namespace SongsOfConquestAccess.Screens
         // ---- the settlement's own army ----
 
         /// <summary>The troops defending the settlement, under the game's own header for them, and the
-        /// two buttons that move a whole army in or out of it.</summary>
+        /// two buttons that move a whole army in or out of it. The rows only where the menu draws them
+        /// (a settlement without troop storage has none); the buttons whenever the game draws them,
+        /// which it decides on its own.</summary>
         private void BuildSettlementTroops(GraphBuilder builder)
         {
-            if (!Live.IsSettlementTroopsVisible())
-            {
-                return;
-            }
-
-            string caption = Live.DefendingTroopsLabel;
+            bool rowsDrawn = Live.IsSettlementTroopsVisible();
+            string caption = rowsDrawn ? Live.DefendingTroopsLabel : null;
             bool named = !string.IsNullOrWhiteSpace(caption);
             if (named)
             {
@@ -239,7 +237,11 @@ namespace SongsOfConquestAccess.Screens
                 builder.SetRegion(SettlementArmyKey);
             }
 
-            TroopHudRows.Rows(builder, SettlementTroops, TroopHudRows.RowPrefix(SettlementArmyKey));
+            if (rowsDrawn)
+            {
+                TroopHudRows.Rows(builder, SettlementTroops, TroopHudRows.RowPrefix(SettlementArmyKey));
+            }
+
             SettlementNodes.Button(
                 builder,
                 Live.MoveToDefenceButton,
