@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Input;
@@ -74,6 +75,13 @@ namespace SongsOfConquestAccess.UI
         public Tooltip GetTooltip()
         {
             return _adapter != null ? _adapter.GetInspectTooltip(_inspectContext, _cursor) : null;
+        }
+
+        /// <summary>What the game says an attack on this tile would do, read when the node is read.
+        /// </summary>
+        public IList<string> GetAttackPreviewLines()
+        {
+            return _adapter != null ? _adapter.ReadAttackPreviewLines(_inspectContext, _cursor) : null;
         }
 
         /// <summary>Where the cursor stands - the tile the node's clicks act on.</summary>
@@ -286,6 +294,25 @@ namespace SongsOfConquestAccess.UI
             if (!string.IsNullOrWhiteSpace(label))
             {
                 SpeechPipeline.Output(new SpeechRequest(label, interrupt: false));
+            }
+
+            SpeakAttackPreview();
+        }
+
+        /// <summary>What the game says an attack on this tile would do, said right after the tile
+        /// itself. The board's node identity never changes as the cursor walks, so the engine has no
+        /// arrival to read out here and this class says the node's own composed section itself -
+        /// exactly as it says the label. The lines come from the same reader the section and the
+        /// review buffer use, so the three cannot disagree.</summary>
+        private void SpeakAttackPreview()
+        {
+            IList<string> lines = GetAttackPreviewLines();
+            for (int i = 0; lines != null && i < lines.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(lines[i]))
+                {
+                    SpeechPipeline.Output(new SpeechRequest(lines[i], interrupt: false));
+                }
             }
         }
 

@@ -335,7 +335,14 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(BoardStop);
             builder.PushContext(BoardContext());
 
-            NodeVtable vtable = GraphNodes.Text(() => Grid().GetLabel(), null, TileTooltip());
+            Tooltip tooltip = TileTooltip();
+            NodeVtable vtable = new NodeVtable
+            {
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement> { GraphNodes.LabelPart(() => Grid().GetLabel()) },
+                Sections = BoardSections(tooltip),
+            };
+            GraphNodes.Aim(vtable, tooltip);
             vtable.OnActivate = ConfirmTarget;
             vtable.OnContextual = ContextualTile;
             vtable.OnFocusVisual = () => Grid().ShowOverlay();
@@ -345,6 +352,26 @@ namespace SongsOfConquestAccess.Screens
             builder.SetStart(BoardNodeId);
 
             builder.PopContext();
+        }
+
+        /// <summary>What the board node reads, in the order it reads: the damage preview the mod
+        /// composed out of the game's own numbers, then the tile's dossier.
+        ///
+        /// The preview is a COMPOSED section rather than part of the dossier tooltip, which is what
+        /// lets it be spoken on arrival while the dossier - a long tooltip - is only reviewed: a
+        /// player who has not asked to hear long tooltips still hears what the attack would do,
+        /// which is the one thing a mouse player sees without asking.</summary>
+        private IList<NodeSection> BoardSections(Tooltip tooltip)
+        {
+            List<NodeSection> sections = new List<NodeSection>(2);
+            sections.Add(NodeSection.Composed(() => Grid().GetAttackPreviewLines()));
+            NodeSection dossier = GraphNodes.TooltipSection(tooltip);
+            if (dossier != null)
+            {
+                sections.Add(dossier);
+            }
+
+            return sections;
         }
 
         private string BoardContext()

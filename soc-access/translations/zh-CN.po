@@ -2085,11 +2085,6 @@ msgctxt "Spatial.Attack"
 msgid "attack"
 msgstr "攻击"
 
-#. Spatial.AttackPreview
-msgctxt "Spatial.AttackPreview"
-msgid "Attack preview:"
-msgstr "攻击预览："
-
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
 msgid "Attack range"

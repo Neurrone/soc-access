@@ -389,6 +389,23 @@ namespace SongsOfConquestAccess.Tests
             );
         }
 
+        /// <summary>The shape the battlefield's tile has: words the mod composed about the tile - what
+        /// the game says an attack on it would do - beside the dossier the game assembles on hover,
+        /// which is long and therefore only reviewed. The composed words are heard whatever the
+        /// player's long-tooltip setting says, because the setting is about TOOLTIPS and these are
+        /// not one.</summary>
+        [TestMethod]
+        public void ComposedWordsSpeakBesideAnIndicatedDossier()
+        {
+            Assert.AreEqual(
+                "New Game, button, damage 199-290, kills 28-41. 2 of 3",
+                Readout(
+                    NodeSection.Composed(Tooltip("damage 199-290, kills 28-41.")),
+                    Section(TooltipMode.Indicate, "Hearts", "Health: 30/30")
+                )
+            );
+        }
+
         /// <summary>And the competition still holds among the TOOLTIPS: a control points at one, so
         /// the last of them is the only one heard, whatever else is declared beside them.</summary>
         [TestMethod]

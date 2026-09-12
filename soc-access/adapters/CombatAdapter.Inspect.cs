@@ -86,11 +86,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (context != null && context.TooltipDetails != null && focusedTile == context.PinnedTile)
             {
-                return CreateDetailsTooltip(
-                    context.TooltipDetails,
-                    context.PinnedTile,
-                    includeAttackPreview: true,
-                    attackPreviewTargetIsEntity: IsEntityInspectMode(context.Mode));
+                return CreateDetailsTooltip(context.TooltipDetails, context.PinnedTile);
             }
 
             if (context != null)
@@ -106,20 +102,12 @@ namespace SongsOfConquestAccess.Adapters
 
             if (tile.Troop != null && _tooltipUtility != null)
             {
-                return CreateDetailsTooltip(
-                    _tooltipUtility.GetInspectTroopDetails(tile.Troop),
-                    focusedTile,
-                    includeAttackPreview: true,
-                    attackPreviewTargetIsEntity: false);
+                return CreateDetailsTooltip(_tooltipUtility.GetInspectTroopDetails(tile.Troop), focusedTile);
             }
 
             if (tile.Entity != null)
             {
-                return CreateDetailsTooltip(
-                    BuildEntityDetails(tile.Entity),
-                    focusedTile,
-                    includeAttackPreview: true,
-                    attackPreviewTargetIsEntity: true);
+                return CreateDetailsTooltip(BuildEntityDetails(tile.Entity), focusedTile);
             }
 
             if (tile.IsReachable)
@@ -130,11 +118,11 @@ namespace SongsOfConquestAccess.Adapters
             return null;
         }
 
-        private Tooltip CreateDetailsTooltip(
-            IDetails details,
-            Vector2Int tile,
-            bool includeAttackPreview = false,
-            bool attackPreviewTargetIsEntity = false)
+        /// <summary>The tile's dossier: the game's own details block, and nothing the mod composed.
+        /// The damage preview used to be prepended here and is now the board node's own section
+        /// (<see cref="ReadAttackPreviewLines"/>), which is what lets it be spoken while this - a
+        /// long tooltip - is only reviewed.</summary>
+        private Tooltip CreateDetailsTooltip(IDetails details, Vector2Int tile)
         {
             if (details == null)
             {
@@ -145,35 +133,11 @@ namespace SongsOfConquestAccess.Adapters
             List<string> textLines = new List<string>(captured.TextLines);
             TileInstruction secondary = TakeCombatTooltipInstruction(captured.InstructionRows, textLines);
             return new Tooltip(
-                () => includeAttackPreview ? BuildTooltipLinesWithAttackPreview(textLines, attackPreviewTargetIsEntity) : textLines,
+                () => textLines,
                 CreateScreenPointTooltipMetadata(details, tile),
                 TileInstruction.None,
                 secondary,
                 () => NativeTooltipUtility.IsLong(details));
-        }
-
-        private IReadOnlyList<string> BuildTooltipLinesWithAttackPreview(IReadOnlyList<string> detailsLines, bool targetIsEntity)
-        {
-            List<string> previewLines = CaptureAttackPreviewLines(targetIsEntity);
-            if (previewLines.Count == 0)
-            {
-                return detailsLines;
-            }
-
-            List<string> lines = new List<string>();
-            lines.Add(ModText.Get(ModStrings.Spatial.AttackPreview));
-            lines.AddRange(previewLines);
-            if (detailsLines != null)
-            {
-                lines.AddRange(detailsLines);
-            }
-
-            return lines;
-        }
-
-        private static bool IsEntityInspectMode(CombatInspectMode mode)
-        {
-            return mode == CombatInspectMode.EntityPath || mode == CombatInspectMode.EntityOnly;
         }
 
         private VisualTooltipMetadata CreateScreenPointTooltipMetadata(IDetails details, Vector2Int tile)

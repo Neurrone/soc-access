@@ -178,7 +178,6 @@
         {
             public static readonly ModString Acting = new ModString("Spatial.Acting", "acting");
             public static readonly ModString Attack = new ModString("Spatial.Attack", "attack");
-            public static readonly ModString AttackPreview = new ModString("Spatial.AttackPreview", "Attack preview:");
             public static readonly ModString AttackRange = new ModString("Spatial.AttackRange", "Attack range");
             public static readonly ModString AridTrees = new ModString("Spatial.AridTrees", "Arid trees");
             public static readonly ModString Blocked = new ModString("Spatial.Blocked", "blocked");
