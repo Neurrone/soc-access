@@ -3942,3 +3942,8 @@ msgstr "튜토리얼 표시"
 msgctxt "Screens.ChatSend"
 msgid "Send"
 msgstr "보내기"
+
+#. Screens.StoreWielder
+msgctxt "Screens.StoreWielder"
+msgid "Store wielder"
+msgstr "위더 주둔시키기"

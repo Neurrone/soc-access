@@ -641,6 +641,7 @@
             public static readonly ModString MoveAllRight = new ModString("Screens.MoveAllRight", "Move all right");
             public static readonly ModString MoveAllToDefence = new ModString("Screens.MoveAllToDefence", "Move all to defence");
             public static readonly ModString MoveAllToWielder = new ModString("Screens.MoveAllToWielder", "Move all to wielder");
+            public static readonly ModString StoreWielder = new ModString("Screens.StoreWielder", "Store wielder");
             public static readonly ModString LeftRightDistribution = new ModString("Screens.LeftRightDistribution", "Left: {0}, right: {1}");
             public static readonly ModString MultiEssenceSpells = new ModString("Screens.MultiEssenceSpells", "Multi-essence spells");
             public static readonly ModString NamedLevel = new ModString("Screens.NamedLevel", "{0}, level {1}");

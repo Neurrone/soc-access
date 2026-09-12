@@ -3942,3 +3942,8 @@ msgstr "显示教程"
 msgctxt "Screens.ChatSend"
 msgid "Send"
 msgstr "发送"
+
+#. Screens.StoreWielder
+msgctxt "Screens.StoreWielder"
+msgid "Store wielder"
+msgstr "驻守持有者"

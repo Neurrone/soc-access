@@ -3972,3 +3972,8 @@ msgstr "Afficher les tutoriels"
 msgctxt "Screens.ChatSend"
 msgid "Send"
 msgstr "Envoyer"
+
+#. Screens.StoreWielder
+msgctxt "Screens.StoreWielder"
+msgid "Store wielder"
+msgstr "Stationner le porteur"

@@ -4002,3 +4002,8 @@ msgstr "Pokaż samouczki"
 msgctxt "Screens.ChatSend"
 msgid "Send"
 msgstr "Wyślij"
+
+#. Screens.StoreWielder
+msgctxt "Screens.StoreWielder"
+msgid "Store wielder"
+msgstr "Zakwateruj bohatera"

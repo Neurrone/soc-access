@@ -3942,3 +3942,8 @@ msgstr "チュートリアルを表示"
 msgctxt "Screens.ChatSend"
 msgid "Send"
 msgstr "送信"
+
+#. Screens.StoreWielder
+msgctxt "Screens.StoreWielder"
+msgid "Store wielder"
+msgstr "ウィールダーを駐留させる"

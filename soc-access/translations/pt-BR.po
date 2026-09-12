@@ -3972,3 +3972,8 @@ msgstr "Mostrar tutoriais"
 msgctxt "Screens.ChatSend"
 msgid "Send"
 msgstr "Enviar"
+
+#. Screens.StoreWielder
+msgctxt "Screens.StoreWielder"
+msgid "Store wielder"
+msgstr "Aquartelar o portador"

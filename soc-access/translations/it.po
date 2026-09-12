@@ -3972,3 +3972,8 @@ msgstr "Mostra tutorial"
 msgctxt "Screens.ChatSend"
 msgid "Send"
 msgstr "Invia"
+
+#. Screens.StoreWielder
+msgctxt "Screens.StoreWielder"
+msgid "Store wielder"
+msgstr "Acquartierare il portatore"

@@ -3942,3 +3942,8 @@ msgstr "Öğreticileri göster"
 msgctxt "Screens.ChatSend"
 msgid "Send"
 msgstr "Gönder"
+
+#. Screens.StoreWielder
+msgctxt "Screens.StoreWielder"
+msgid "Store wielder"
+msgstr "Wielder'ı yerleştir"

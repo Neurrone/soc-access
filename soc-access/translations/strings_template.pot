@@ -2794,6 +2794,11 @@ msgctxt "Screens.MoveAllToWielder"
 msgid "Move all to wielder"
 msgstr ""
 
+#. Screens.StoreWielder
+msgctxt "Screens.StoreWielder"
+msgid "Store wielder"
+msgstr ""
+
 #. Screens.LeftRightDistribution
 msgctxt "Screens.LeftRightDistribution"
 msgid "Left: {0}, right: {1}"

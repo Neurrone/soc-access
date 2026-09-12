@@ -4002,3 +4002,8 @@ msgstr "Показывать обучение"
 msgctxt "Screens.ChatSend"
 msgid "Send"
 msgstr "Отправить"
+
+#. Screens.StoreWielder
+msgctxt "Screens.StoreWielder"
+msgid "Store wielder"
+msgstr "Разместить героя в гарнизоне"

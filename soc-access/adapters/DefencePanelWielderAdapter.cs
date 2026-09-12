@@ -171,9 +171,12 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The store button's own text, or empty: it draws an icon, and the game has no key
+        /// for the action (GameActions/Adventure/StoreCommander is not in its tables; asked in-game
+        /// 2026-09-12), so the name is the mod's, in <c>SettlementNodes</c>.</summary>
         public string StoreLabel
         {
-            get { return GetButtonLabel(GetStoreButton(), "GameActions/Adventure/StoreCommander", string.Empty); }
+            get { return SpokenLines.Clean(MenuButtonTextUtility.GetAllVisibleText(GetStoreButton())); }
         }
 
         public string EjectLabel

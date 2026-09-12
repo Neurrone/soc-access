@@ -44,7 +44,11 @@ namespace SongsOfConquestAccess.UI
                 builder,
                 panel.StoreButton,
                 keyPrefix + ":store",
-                () => panel.StoreLabel,
+                // The button draws an icon and the game has no key for the action, so the name
+                // is the mod's unless the button ever carries text of its own.
+                () => string.IsNullOrWhiteSpace(panel.StoreLabel)
+                    ? ModText.Get(ModStrings.Screens.StoreWielder)
+                    : panel.StoreLabel,
                 () => panel.ActivateStore(),
                 panel.IsStoreEnabled,
                 panel.StoreTooltip,
