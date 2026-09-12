@@ -29,13 +29,62 @@ namespace SongsOfConquestAccess.Adapters
                 return new CombatTroopFacts(string.Empty, 0, 0, 0, false, false);
             }
 
+            bool reloading;
+            IReadOnlyList<string> restrictions = GetTroopRestrictionNames(troop, out reloading);
             return new CombatTroopFacts(
                 SpokenLines.Clean(_facade.Troops.GetName(troop.Id, troop.Stats.Size)),
                 troop.Stats.Size,
                 troop.CurrentHealth,
                 troop.Stats.MaxHealth.GetValue(),
                 IsEnemyTroop(troop),
-                IsActingTroop(troop));
+                IsActingTroop(troop),
+                reloading,
+                restrictions,
+                Hud != null ? Hud.GetTroopEffectNames(troop.Id) : null);
+        }
+
+        /// <summary>The game's own names for the restrictions the stack itself carries, and whether
+        /// one of them is Reloading, which the mod words for itself.
+        ///
+        /// Three of the game's six are said: the two that change what can be done TO the stack
+        /// (Invulnerable, MagicImmunity) and the one that changes what it can do this turn
+        /// (Reloading). The other three - the retaliation pair and the zone-of-control pass - are
+        /// facts about an exchange rather than about the stack standing there.</summary>
+        private IReadOnlyList<string> GetTroopRestrictionNames(IBattleTroopState troop, out bool reloading)
+        {
+            reloading = false;
+            List<string> names = new List<string>();
+            try
+            {
+                IList<BattleTroopRestriction> restrictions = troop.Restrictions;
+                for (int i = 0; restrictions != null && i < restrictions.Count; i++)
+                {
+                    BattleTroopRestriction restriction = restrictions[i];
+                    if (restriction == BattleTroopRestriction.Reloading)
+                    {
+                        reloading = true;
+                        continue;
+                    }
+
+                    if (restriction != BattleTroopRestriction.Invulnerable
+                        && restriction != BattleTroopRestriction.MagicImmunity)
+                    {
+                        continue;
+                    }
+
+                    string name = SpokenLines.Clean(LocalizeText("Units/Restrictions/" + restriction));
+                    if (!string.IsNullOrWhiteSpace(name) && !names.Contains(name))
+                    {
+                        names.Add(name);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                _faults.Report("GetTroopRestrictionNames", exception);
+            }
+
+            return names;
         }
 
         /// <summary>Everything a spoken row for an attackable thing is made of.</summary>

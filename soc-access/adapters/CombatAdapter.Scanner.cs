@@ -189,20 +189,6 @@ namespace SongsOfConquestAccess.Adapters
                         };
                         snapshot.Add(ScannerCategoryKeys.Terrain, ScannerSubcategoryKeys.All, result);
                     }
-
-                    if (tile.IsBlocked)
-                    {
-                        snapshot.Add(
-                            ScannerCategoryKeys.Terrain,
-                            ScannerSubcategoryKeys.All,
-                            new ScannerResult(
-                                ScannerTileKeys.For("obstacle:blocked", point),
-                                ModText.Get(ModStrings.Scanner.Blocked),
-                                point)
-                            {
-                                ItemKey = ScannerItemKeys.Blocked
-                            });
-                    }
                 }
             }
         }

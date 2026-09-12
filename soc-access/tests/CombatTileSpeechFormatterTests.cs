@@ -81,6 +81,43 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("Attack range", text);
         }
 
+        /// <summary>What the stack cannot do and what has been done to it comes between its name and
+        /// its health: the mod's short word for reloading, then the game's own restriction strings,
+        /// then the names of the game's own buff and nerf indicators.</summary>
+        [TestMethod]
+        public void TroopReadsRestrictionsAndEffectsBetweenTheNameAndTheHealth()
+        {
+            CombatTroopFacts troop = new CombatTroopFacts(
+                "Pulses",
+                11,
+                50,
+                50,
+                isEnemy: true,
+                isActing: false,
+                isReloading: true,
+                restrictionNames: new[] { "Invulnerable" },
+                effectNames: new[] { "Momentum x2" });
+
+            Assert.AreEqual(
+                "11 enemy Pulses, reloading, Invulnerable, Momentum x2, 50 / 50 health",
+                CombatTileSpeechFormatter.ComposeTroop(troop, attackable: false, facing: null));
+        }
+
+        /// <summary>A blocked tile is every tile a troop or an attackable thing stands on, so saying
+        /// so said nothing the readout had not already said. Statically unwalkable ground still says
+        /// it, because nothing else does.</summary>
+        [TestMethod]
+        public void TileSaysImpassableAndNoLongerSaysBlocked()
+        {
+            Assert.AreEqual("4, 2", Describe(new CombatTile(new Vector2Int(4, 2)) { IsBlocked = true }));
+            Assert.AreEqual("impassable, 4, 2", Describe(new CombatTile(new Vector2Int(4, 2)) { IsImpassable = true }));
+        }
+
+        private static string Describe(CombatTile tile)
+        {
+            return new CombatTileSpeechFormatter(null, null, includeEnemyInfluence: false).DescribeTile(tile);
+        }
+
         [TestMethod]
         public void ConfigurableAnnouncementComposerUsesSuffixBetweenRenderedPartsOnly()
         {

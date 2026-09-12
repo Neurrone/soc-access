@@ -57,6 +57,10 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(BattleTroopStatusPanel), "_cancelAbilityButton");
         private static readonly FieldInfo BattleViewManagerContainersField =
             AccessTools.Field(typeof(BattleViewManager), "_containers");
+        private static readonly FieldInfo TroopStatusPanelBuffIconField =
+            AccessTools.Field(typeof(BattleTroopStatusPanel), "_buffIcon");
+        private static readonly FieldInfo TroopStatusPanelNerfIconField =
+            AccessTools.Field(typeof(BattleTroopStatusPanel), "_nerfIcon");
 
         private readonly BattleHUDStateHandler _stateHandler;
         private readonly BattleHUDStateHandler.Settings _settings;
@@ -646,21 +650,25 @@ namespace SongsOfConquestAccess.Adapters
         private BattleTroopStatusPanel GetCurrentTroopStatusPanel()
         {
             IBattleTroopState current = GetCurrentTroop();
-            if (current == null)
-            {
-                return null;
-            }
+            return current != null ? GetTroopStatusPanel(current.Id) : null;
+        }
 
+        /// <summary>The panel the game draws over a troop on the battlefield - its ability button and
+        /// its buff and nerf indicators - reached through the view manager's own container for that
+        /// troop. The container type is looked up once and remembered, so this is a dictionary hit
+        /// and two field reads per call.</summary>
+        public BattleTroopStatusPanel GetTroopStatusPanel(int troopId)
+        {
             object containers = _battleViewManager != null && BattleViewManagerContainersField != null
                 ? BattleViewManagerContainersField.GetValue(_battleViewManager)
                 : null;
             System.Collections.IDictionary dictionary = containers as System.Collections.IDictionary;
-            if (dictionary == null || !dictionary.Contains(current.Id))
+            if (dictionary == null || !dictionary.Contains(troopId))
             {
                 return null;
             }
 
-            object container = dictionary[current.Id];
+            object container = dictionary[troopId];
             if (container == null)
             {
                 return null;
@@ -674,6 +682,77 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return _troopViewStatusField != null ? _troopViewStatusField.GetValue(container) as BattleTroopStatusPanel : null;
+        }
+
+        /// <summary>What the game's buff and nerf indicators on a troop are CALLED, buff first: the
+        /// header each group of the icon's own details is drawn under, the game's "x2" for a doubled
+        /// effect included.
+        ///
+        /// The ICONS are followed rather than the troop's bacteria list, because the game's rule for
+        /// which bacteria earn an indicator is its own (Mist grants the Invulnerable restriction and
+        /// no icon). An icon the game is not showing is never read: an inactive one still carries the
+        /// prefab's placeholder details.</summary>
+        public IReadOnlyList<string> GetTroopEffectNames(int troopId)
+        {
+            List<string> names = new List<string>();
+            List<DetailsTextUtility> captures = CaptureTroopEffectDetails(troopId);
+            for (int i = 0; i < captures.Count; i++)
+            {
+                IReadOnlyList<string> headers = captures[i].HeaderRows;
+                for (int row = 0; row < headers.Count; row++)
+                {
+                    string name = SpokenLines.Clean(headers[row]);
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        names.Add(name);
+                    }
+                }
+            }
+
+            return names;
+        }
+
+        /// <summary>What those indicators SAY, line by line as the game drew them - the modifiers
+        /// under each header. Read when the lines are read; nothing here is kept.</summary>
+        public IReadOnlyList<string> GetTroopEffectDetailLines(int troopId)
+        {
+            List<string> lines = new List<string>();
+            List<DetailsTextUtility> captures = CaptureTroopEffectDetails(troopId);
+            for (int i = 0; i < captures.Count; i++)
+            {
+                lines.AddRange(SpokenLines.Of(captures[i].TextLines));
+            }
+
+            return lines;
+        }
+
+        private List<DetailsTextUtility> CaptureTroopEffectDetails(int troopId)
+        {
+            List<DetailsTextUtility> captures = new List<DetailsTextUtility>(2);
+            BattleTroopStatusPanel panel = GetTroopStatusPanel(troopId);
+            if (panel == null)
+            {
+                return captures;
+            }
+
+            AddShownIconDetails(captures, panel, TroopStatusPanelBuffIconField);
+            AddShownIconDetails(captures, panel, TroopStatusPanelNerfIconField);
+            return captures;
+        }
+
+        private void AddShownIconDetails(List<DetailsTextUtility> captures, BattleTroopStatusPanel panel, FieldInfo iconField)
+        {
+            UIImage icon = Reflect.Get<UIImage>(panel, iconField);
+            if (icon == null || !icon.gameObject.activeInHierarchy)
+            {
+                return;
+            }
+
+            IDetails details;
+            if (NativeTooltipUtility.TryGetUiDetails(icon, out details))
+            {
+                captures.Add(DetailsTextUtility.Capture(details, _localization));
+            }
         }
 
         private IBattleTroopState GetCurrentTroop()

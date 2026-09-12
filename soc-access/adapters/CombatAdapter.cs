@@ -56,7 +56,16 @@ namespace SongsOfConquestAccess.Adapters
     /// the one acting. <see cref="UI.CombatTroopText"/> does the wording.</summary>
     public struct CombatTroopFacts
     {
-        public CombatTroopFacts(string name, int size, int currentHealth, int maxHealth, bool isEnemy, bool isActing)
+        public CombatTroopFacts(
+            string name,
+            int size,
+            int currentHealth,
+            int maxHealth,
+            bool isEnemy,
+            bool isActing,
+            bool isReloading = false,
+            IReadOnlyList<string> restrictionNames = null,
+            IReadOnlyList<string> effectNames = null)
         {
             Name = name ?? string.Empty;
             Size = size;
@@ -64,7 +73,12 @@ namespace SongsOfConquestAccess.Adapters
             MaxHealth = maxHealth;
             IsEnemy = isEnemy;
             IsActing = isActing;
+            IsReloading = isReloading;
+            RestrictionNames = restrictionNames ?? EmptyNames;
+            EffectNames = effectNames ?? EmptyNames;
         }
+
+        private static readonly string[] EmptyNames = new string[0];
 
         /// <summary>The game's own name for the stack at this size, cleaned, and empty where the
         /// game gives none: the general word a blank name falls back to is wording and belongs to
@@ -80,6 +94,20 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsEnemy { get; private set; }
 
         public bool IsActing { get; private set; }
+
+        /// <summary>Whether the stack carries the game's Reloading restriction. A flag rather than a
+        /// name because the game's own string for it is a sentence ("Can't perform ranged attacks"),
+        /// and the word a readout wants there is one the mod owns.</summary>
+        public bool IsReloading { get; private set; }
+
+        /// <summary>The game's own names for the restrictions the stack itself carries, apart from
+        /// Reloading: empty where it carries none.</summary>
+        public IReadOnlyList<string> RestrictionNames { get; private set; }
+
+        /// <summary>The game's own names for the buff and the nerf its status icons show, buffs
+        /// first, exactly as the icons' details head them - the game's "x2" for a doubled effect
+        /// included.</summary>
+        public IReadOnlyList<string> EffectNames { get; private set; }
     }
 
     /// <summary>A thing on the battlefield that can be attacked, as the facts a spoken row is made

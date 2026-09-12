@@ -2305,6 +2305,11 @@ msgctxt "Spatial.Reachable"
 msgid "reachable"
 msgstr "alcanzable"
 
+#. Spatial.Reloading
+msgctxt "Spatial.Reloading"
+msgid "reloading"
+msgstr "recargando"
+
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
@@ -3258,6 +3263,11 @@ msgctxt "Screens.AnnouncementElevation"
 msgid "Elevation"
 msgstr "Elevación"
 
+#. Screens.AnnouncementEffects
+msgctxt "Screens.AnnouncementEffects"
+msgid "Effects"
+msgstr "Efectos"
+
 #. Screens.AnnouncementEntityName
 msgctxt "Screens.AnnouncementEntityName"
 msgid "Entity name"
@@ -3277,11 +3287,6 @@ msgstr "Salud"
 msgctxt "Screens.AnnouncementItem"
 msgid "Item name"
 msgstr "Nombre del elemento"
-
-#. Screens.AnnouncementImpassableOrBlocked
-msgctxt "Screens.AnnouncementImpassableOrBlocked"
-msgid "Impassable or blocked"
-msgstr "Intransitable o bloqueado"
 
 #. Screens.AnnouncementInfluence
 msgctxt "Screens.AnnouncementInfluence"
@@ -3402,6 +3407,11 @@ msgstr "Intransitable"
 msgctxt "Screens.AnnouncementResultPosition"
 msgid "Result position"
 msgstr "Posición del resultado"
+
+#. Screens.AnnouncementRestrictions
+msgctxt "Screens.AnnouncementRestrictions"
+msgid "Restrictions"
+msgstr "Restricciones"
 
 #. Screens.AnnouncementSpawnPoint
 msgctxt "Screens.AnnouncementSpawnPoint"

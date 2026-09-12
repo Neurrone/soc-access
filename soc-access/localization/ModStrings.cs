@@ -228,6 +228,7 @@
             public static readonly ModString PrimaryPrefix = new ModString("Spatial.PrimaryPrefix", "primary ");
             public static readonly ModString RangeAndMovement = new ModString("Spatial.RangeAndMovement", "{0} and movement range");
             public static readonly ModString Reachable = new ModString("Spatial.Reachable", "reachable");
+            public static readonly ModString Reloading = new ModString("Spatial.Reloading", "reloading");
             public static readonly ModString Road = new ModString("Spatial.Road", "Road");
             public static readonly ModString RoadDirectionSeparator = new ModString("Spatial.RoadDirectionSeparator", "{0} {1}");
             public static readonly ModString Sand = new ModString("Spatial.Sand", "Sand");
@@ -765,13 +766,13 @@
             public static readonly ModString AnnouncementDestination = new ModString("Screens.AnnouncementDestination", "Destination");
             public static readonly ModString AnnouncementDirection = new ModString("Screens.AnnouncementDirection", "Direction");
             public static readonly ModString AnnouncementElevation = new ModString("Screens.AnnouncementElevation", "Elevation");
+            public static readonly ModString AnnouncementEffects = new ModString("Screens.AnnouncementEffects", "Effects");
             public static readonly ModString AnnouncementEntityName = new ModString("Screens.AnnouncementEntityName", "Entity name");
             public static readonly ModString AnnouncementExplorationState = new ModString("Screens.AnnouncementExplorationState", "Exploration state");
             public static readonly ModString AnnouncementFacingDirectionForBeamAttacks = new ModString("Screens.AnnouncementFacingDirectionForBeamAttacks", "Facing direction for troops with beam attacks");
             public static readonly ModString AnnouncementHealth = new ModString("Screens.AnnouncementHealth", "Health");
             public static readonly ModString AnnouncementImpassable = new ModString("Screens.AnnouncementImpassable", "Impassable");
             public static readonly ModString AnnouncementItem = new ModString("Screens.AnnouncementItem", "Item name");
-            public static readonly ModString AnnouncementImpassableOrBlocked = new ModString("Screens.AnnouncementImpassableOrBlocked", "Impassable or blocked");
             public static readonly ModString AnnouncementInfluence = new ModString("Screens.AnnouncementInfluence", "Influence");
             public static readonly ModString AnnouncementInteractionPoint = new ModString("Screens.AnnouncementInteractionPoint", "Interaction point");
             public static readonly ModString AnnouncementMapEntity = new ModString("Screens.AnnouncementMapEntity", "Map entity");
@@ -784,6 +785,7 @@
             public static readonly ModString AnnouncementReachable = new ModString("Screens.AnnouncementReachable", "Reachable");
             public static readonly ModString AnnouncementReachabilityOrRoutePreview = new ModString("Screens.AnnouncementReachabilityOrRoutePreview", "Reachability or route preview");
             public static readonly ModString AnnouncementResultPosition = new ModString("Screens.AnnouncementResultPosition", "Result position");
+            public static readonly ModString AnnouncementRestrictions = new ModString("Screens.AnnouncementRestrictions", "Restrictions");
             public static readonly ModString AnnouncementRoadDirections = new ModString("Screens.AnnouncementRoadDirections", "Road directions");
             public static readonly ModString AnnouncementSelected = new ModString("Screens.AnnouncementSelected", "Selected");
             public static readonly ModString AnnouncementSelectedForSpellcast = new ModString("Screens.AnnouncementSelectedForSpellcast", "Selected for spellcast");

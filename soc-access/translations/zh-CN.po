@@ -2285,6 +2285,11 @@ msgctxt "Spatial.Reachable"
 msgid "reachable"
 msgstr "可到达"
 
+#. Spatial.Reloading
+msgctxt "Spatial.Reloading"
+msgid "reloading"
+msgstr "装填中"
+
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
@@ -3233,6 +3238,11 @@ msgctxt "Screens.AnnouncementElevation"
 msgid "Elevation"
 msgstr "高度"
 
+#. Screens.AnnouncementEffects
+msgctxt "Screens.AnnouncementEffects"
+msgid "Effects"
+msgstr "效果"
+
 #. Screens.AnnouncementEntityName
 msgctxt "Screens.AnnouncementEntityName"
 msgid "Entity name"
@@ -3252,11 +3262,6 @@ msgstr "生命值"
 msgctxt "Screens.AnnouncementItem"
 msgid "Item name"
 msgstr "项目名称"
-
-#. Screens.AnnouncementImpassableOrBlocked
-msgctxt "Screens.AnnouncementImpassableOrBlocked"
-msgid "Impassable or blocked"
-msgstr "不可通行或被阻挡"
 
 #. Screens.AnnouncementInfluence
 msgctxt "Screens.AnnouncementInfluence"
@@ -3377,6 +3382,11 @@ msgstr "不可通行"
 msgctxt "Screens.AnnouncementResultPosition"
 msgid "Result position"
 msgstr "结果位置"
+
+#. Screens.AnnouncementRestrictions
+msgctxt "Screens.AnnouncementRestrictions"
+msgid "Restrictions"
+msgstr "限制"
 
 #. Screens.AnnouncementSpawnPoint
 msgctxt "Screens.AnnouncementSpawnPoint"

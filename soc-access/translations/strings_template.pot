@@ -894,6 +894,11 @@ msgctxt "Spatial.Reachable"
 msgid "reachable"
 msgstr ""
 
+#. Spatial.Reloading
+msgctxt "Spatial.Reloading"
+msgid "reloading"
+msgstr ""
+
 #. Spatial.Road
 msgctxt "Spatial.Road"
 msgid "Road"
@@ -3319,6 +3324,11 @@ msgctxt "Screens.AnnouncementElevation"
 msgid "Elevation"
 msgstr ""
 
+#. Screens.AnnouncementEffects
+msgctxt "Screens.AnnouncementEffects"
+msgid "Effects"
+msgstr ""
+
 #. Screens.AnnouncementEntityName
 msgctxt "Screens.AnnouncementEntityName"
 msgid "Entity name"
@@ -3347,11 +3357,6 @@ msgstr ""
 #. Screens.AnnouncementItem
 msgctxt "Screens.AnnouncementItem"
 msgid "Item name"
-msgstr ""
-
-#. Screens.AnnouncementImpassableOrBlocked
-msgctxt "Screens.AnnouncementImpassableOrBlocked"
-msgid "Impassable or blocked"
 msgstr ""
 
 #. Screens.AnnouncementInfluence
@@ -3412,6 +3417,11 @@ msgstr ""
 #. Screens.AnnouncementResultPosition
 msgctxt "Screens.AnnouncementResultPosition"
 msgid "Result position"
+msgstr ""
+
+#. Screens.AnnouncementRestrictions
+msgctxt "Screens.AnnouncementRestrictions"
+msgid "Restrictions"
 msgstr ""
 
 #. Screens.AnnouncementRoadDirections

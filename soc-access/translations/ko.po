@@ -2285,6 +2285,11 @@ msgctxt "Spatial.Reachable"
 msgid "reachable"
 msgstr "도달 가능"
 
+#. Spatial.Reloading
+msgctxt "Spatial.Reloading"
+msgid "reloading"
+msgstr "재장전 중"
+
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
@@ -3233,6 +3238,11 @@ msgctxt "Screens.AnnouncementElevation"
 msgid "Elevation"
 msgstr "고도"
 
+#. Screens.AnnouncementEffects
+msgctxt "Screens.AnnouncementEffects"
+msgid "Effects"
+msgstr "효과"
+
 #. Screens.AnnouncementEntityName
 msgctxt "Screens.AnnouncementEntityName"
 msgid "Entity name"
@@ -3252,11 +3262,6 @@ msgstr "체력"
 msgctxt "Screens.AnnouncementItem"
 msgid "Item name"
 msgstr "항목 이름"
-
-#. Screens.AnnouncementImpassableOrBlocked
-msgctxt "Screens.AnnouncementImpassableOrBlocked"
-msgid "Impassable or blocked"
-msgstr "통과 불가 또는 막힘"
 
 #. Screens.AnnouncementInfluence
 msgctxt "Screens.AnnouncementInfluence"
@@ -3377,6 +3382,11 @@ msgstr "통행 불가"
 msgctxt "Screens.AnnouncementResultPosition"
 msgid "Result position"
 msgstr "결과 위치"
+
+#. Screens.AnnouncementRestrictions
+msgctxt "Screens.AnnouncementRestrictions"
+msgid "Restrictions"
+msgstr "제한"
 
 #. Screens.AnnouncementSpawnPoint
 msgctxt "Screens.AnnouncementSpawnPoint"

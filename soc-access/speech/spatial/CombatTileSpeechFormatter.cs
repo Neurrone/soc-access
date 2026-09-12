@@ -71,7 +71,14 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 return string.Empty;
             }
 
-            CombatTroopFacts troop = _adapter.GetTroopFacts(tile.Troop);
+            BeamFacing? facing = _adapter.PerformsBeamAttacks(tile.Troop) ? _adapter.GetBeamFacing(tile.Troop) : null;
+            return ComposeTroop(_adapter.GetTroopFacts(tile.Troop), tile.IsTroopAttackable, facing);
+        }
+
+        /// <summary>A stack as the cursor reads it out, from the facts alone: what it is, what it
+        /// cannot do and what has been done to it, and the health it has left.</summary>
+        public static string ComposeTroop(CombatTroopFacts troop, bool attackable, BeamFacing? facing)
+        {
             List<AnnouncementPart> parts = new List<AnnouncementPart>();
             if (troop.IsActing)
             {
@@ -80,7 +87,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     ModText.Get(ModStrings.Spatial.Acting)));
             }
 
-            if (tile.IsTroopAttackable)
+            if (attackable)
             {
                 parts.Add(new AnnouncementPart(
                     CombatAnnouncementDefinitions.TroopKeys.Attackable,
@@ -99,9 +106,10 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.TroopName, CombatTroopText.Name(troop));
+            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.Restrictions, DescribeRestrictions(troop));
+            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.Effects, DescribeEffects(troop));
             AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.Health, CombatTroopText.Health(troop.CurrentHealth, troop.MaxHealth));
 
-            BeamFacing? facing = _adapter.PerformsBeamAttacks(tile.Troop) ? _adapter.GetBeamFacing(tile.Troop) : null;
             if (facing.HasValue)
             {
                 parts.Add(new AnnouncementPart(
@@ -110,6 +118,45 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             return ConfigurableAnnouncementComposer.Compose(CombatAnnouncementDefinitions.Troop, parts);
+        }
+
+        /// <summary>What the stack cannot do or cannot be done to, in the game's own words except for
+        /// Reloading: the game says that one as a sentence about ranged attacks, and a readout that
+        /// names a stack wants a word. The mod's word leads for that reason - the game's list order
+        /// among the three says nothing.</summary>
+        public static string DescribeRestrictions(CombatTroopFacts troop)
+        {
+            List<string> parts = new List<string>();
+            if (troop.IsReloading)
+            {
+                parts.Add(ModText.Get(ModStrings.Spatial.Reloading));
+            }
+
+            for (int i = 0; troop.RestrictionNames != null && i < troop.RestrictionNames.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(troop.RestrictionNames[i]))
+                {
+                    parts.Add(troop.RestrictionNames[i]);
+                }
+            }
+
+            return ModText.JoinListWithCommas(parts);
+        }
+
+        /// <summary>What the game's own buff and nerf indicators over the stack are called, buffs
+        /// first. The names alone: what they DO is in the tile's review buffer.</summary>
+        public static string DescribeEffects(CombatTroopFacts troop)
+        {
+            List<string> parts = new List<string>();
+            for (int i = 0; troop.EffectNames != null && i < troop.EffectNames.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(troop.EffectNames[i]))
+                {
+                    parts.Add(troop.EffectNames[i]);
+                }
+            }
+
+            return ModText.JoinListWithCommas(parts);
         }
 
         public string DescribeEntity(CombatTile tile)
@@ -163,10 +210,11 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 yield return occupant;
             }
 
-            string impassableOrBlocked = DescribeImpassableOrBlocked(tile);
-            if (!string.IsNullOrWhiteSpace(impassableOrBlocked))
+            if (tile.IsImpassable)
             {
-                yield return new AnnouncementPart(CombatAnnouncementDefinitions.TileKeys.ImpassableOrBlocked, impassableOrBlocked);
+                yield return new AnnouncementPart(
+                    CombatAnnouncementDefinitions.TileKeys.Impassable,
+                    ModText.Get(ModStrings.Spatial.Impassable));
             }
 
             string tileEffects = DescribeTileEffects(tile);
@@ -204,16 +252,6 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             return tile.Entity != null ? DescribeEntity(tile) : string.Empty;
-        }
-
-        private static string DescribeImpassableOrBlocked(CombatTile tile)
-        {
-            if (tile.IsImpassable)
-            {
-                return ModText.Get(ModStrings.Spatial.Impassable);
-            }
-
-            return tile.IsBlocked ? ModText.Get(ModStrings.Spatial.Blocked) : string.Empty;
         }
 
         private static string DescribeTileEffects(CombatTile tile)

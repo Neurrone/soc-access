@@ -2325,6 +2325,11 @@ msgctxt "Spatial.Reachable"
 msgid "reachable"
 msgstr "досяжно"
 
+#. Spatial.Reloading
+msgctxt "Spatial.Reloading"
+msgid "reloading"
+msgstr "перезарядка"
+
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
@@ -3283,6 +3288,11 @@ msgctxt "Screens.AnnouncementElevation"
 msgid "Elevation"
 msgstr "Висота"
 
+#. Screens.AnnouncementEffects
+msgctxt "Screens.AnnouncementEffects"
+msgid "Effects"
+msgstr "Ефекти"
+
 #. Screens.AnnouncementEntityName
 msgctxt "Screens.AnnouncementEntityName"
 msgid "Entity name"
@@ -3302,11 +3312,6 @@ msgstr "Здоров’я"
 msgctxt "Screens.AnnouncementItem"
 msgid "Item name"
 msgstr "Назва елемента"
-
-#. Screens.AnnouncementImpassableOrBlocked
-msgctxt "Screens.AnnouncementImpassableOrBlocked"
-msgid "Impassable or blocked"
-msgstr "Непрохідно або заблоковано"
 
 #. Screens.AnnouncementInfluence
 msgctxt "Screens.AnnouncementInfluence"
@@ -3427,6 +3432,11 @@ msgstr "Непрохідно"
 msgctxt "Screens.AnnouncementResultPosition"
 msgid "Result position"
 msgstr "Позиція результату"
+
+#. Screens.AnnouncementRestrictions
+msgctxt "Screens.AnnouncementRestrictions"
+msgid "Restrictions"
+msgstr "Обмеження"
 
 #. Screens.AnnouncementSpawnPoint
 msgctxt "Screens.AnnouncementSpawnPoint"

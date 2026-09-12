@@ -27,6 +27,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly NullDetailsElement NullElement = new NullDetailsElement();
         private readonly List<string> _parts = new List<string>();
         private readonly List<TooltipInstructionRow> _instructionRows = new List<TooltipInstructionRow>();
+        private readonly List<string> _headers = new List<string>();
         private ILocalizationHandler _localization;
         private ResourceType? _pendingResourceIconType;
 
@@ -87,6 +88,14 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<TooltipInstructionRow> InstructionRows
         {
             get { return _instructionRows; }
+        }
+
+        /// <summary>The heading each header-and-text row was drawn under, in order. The row itself is
+        /// in <see cref="TextLines"/> with its text joined on; this is for a caller that wants the
+        /// names a details block groups itself by without the detail under them.</summary>
+        public IReadOnlyList<string> HeaderRows
+        {
+            get { return _headers; }
         }
 
         public void RegisterSidePanelDescription(DetailsSidePanelDescription description)
@@ -189,6 +198,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public (IUITextMesh headerText, IUITextMesh descriptionText) AddTextWithHeader(string header, string details)
         {
+            if (!string.IsNullOrWhiteSpace(header))
+            {
+                _headers.Add(header);
+            }
+
             AddRow(header, details);
             return (NullElement, NullElement);
         }

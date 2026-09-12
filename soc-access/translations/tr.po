@@ -2285,6 +2285,11 @@ msgctxt "Spatial.Reachable"
 msgid "reachable"
 msgstr "ulaşılabilir"
 
+#. Spatial.Reloading
+msgctxt "Spatial.Reloading"
+msgid "reloading"
+msgstr "yeniden dolduruyor"
+
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
@@ -3233,6 +3238,11 @@ msgctxt "Screens.AnnouncementElevation"
 msgid "Elevation"
 msgstr "Yükseklik"
 
+#. Screens.AnnouncementEffects
+msgctxt "Screens.AnnouncementEffects"
+msgid "Effects"
+msgstr "Etkiler"
+
 #. Screens.AnnouncementEntityName
 msgctxt "Screens.AnnouncementEntityName"
 msgid "Entity name"
@@ -3252,11 +3262,6 @@ msgstr "Sağlık"
 msgctxt "Screens.AnnouncementItem"
 msgid "Item name"
 msgstr "Öğe adı"
-
-#. Screens.AnnouncementImpassableOrBlocked
-msgctxt "Screens.AnnouncementImpassableOrBlocked"
-msgid "Impassable or blocked"
-msgstr "Geçilemez veya engelli"
 
 #. Screens.AnnouncementInfluence
 msgctxt "Screens.AnnouncementInfluence"
@@ -3377,6 +3382,11 @@ msgstr "Geçilemez"
 msgctxt "Screens.AnnouncementResultPosition"
 msgid "Result position"
 msgstr "Sonuç konumu"
+
+#. Screens.AnnouncementRestrictions
+msgctxt "Screens.AnnouncementRestrictions"
+msgid "Restrictions"
+msgstr "Kısıtlamalar"
 
 #. Screens.AnnouncementSpawnPoint
 msgctxt "Screens.AnnouncementSpawnPoint"
