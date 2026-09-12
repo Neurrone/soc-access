@@ -366,8 +366,10 @@ Filled in as the loop is used; keep entries to one line each with the date.
   and only opens by walking in. A spawned fixture is removed with
   `game.server.Commands.ProcessServerRequest(new DestroyMapEntityCommand.Request(entityId))`
   (`SongsOfConquest.Common.Entities.Adventure`). Prefer these over walking: `map_move_north`
-  RAISES the row number and south lowers it, the grid's Enter is the game's own click (the
-  first press previews the path, the second walks), and a walk the game refuses says nothing
+  RAISES the row number and south lowers it, the grid's secondary action (`ui_right_click`) is
+  the game's own right click (the first press previews the path, "Cost: 1 this turn. X will
+  move e.", the second walks; Enter is the LEFT click, which selects what stands on the tile
+  and does nothing on empty ground), and a walk the game refuses says nothing
   at all - a two-tile market spawned on the road between the build sites and Gravekeep's
   entrance (`GetInteractionPoints(82)`: 74..76,49) boxed the wielder in silently, which
   `DevProbe.TilesAround` showed and the walk did not.

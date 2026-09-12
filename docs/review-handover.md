@@ -44,6 +44,34 @@ each on `main` from 0a6d953 (about 200 commits). Detail for another session is i
   no longer yields ". "; a gift/mini-menu title with a blank first name still starts with a
   separator.
 
+## Regression sweep of the run, 2026-09-12 (the session after)
+
+The run verified itself with static graph dumps, which cannot see a lifecycle or timing bug.
+Four reviewers re-read the whole diff (map and events, combat, menus and economy, shared
+infrastructure) for exactly that class, and the game was driven for the ones it could reach.
+Fixed, one commit each (2a26661..d98a891): the map's event listener attached while the loading
+screen was up and announced the whole map as revealed; the towns list's click went to the Unity
+Button nothing listens to; a walk into fog announced nothing (the sweep key was recorded before
+the fog was refreshed); the battle current-troop and round readers lost their catch; a troop the
+game cannot name read as an empty tile on the placement board; the tooltip dossier check
+remembered a prefab's plain text as short for the session; a toggled mod.io tag announced its
+old state; the Load window's rows froze in the previous layout's order after a tab switch; the
+Store Wielder button had no name (the game has no key for it); the settlement pages hid the two
+move-all buttons with the troop rows; the research owned-set and the artifact market's filter
+names could go stale.
+
+Left for you to decide, unchanged: a camera focus from a HUD control (towns list, wielders list,
+the game's own commander selection) now reads the tile as a landing on the map node, as before
+the map port (26a9cb2); the combat cursor landing from a HUD stop now carries the board's stop
+context (c9326fa); the challenge-map preview no longer speaks win conditions (50bd77e, your
+decision); the two battle HUD groups need interactable and blocksRaycasts (7dbb9cd, your rule).
+Follow-ups, not regressions: `Common.ResourceAmount` is used in two argument orders
+(ResourceStrip vs the counts), a translator hazard; the combat troop label reads status-icon
+tooltips on every frame the cursor sits on a troop (7e79707, unmeasured); a mouse click made
+without moving the mouse after keyboard steps acts on the keyboard's tile (d4e754b); the
+teleport instruction mesh latches a miss for the adventure (216f8c7); the marketplace grid
+snapshot is never retaken once captioned (de8296e, unverified).
+
 ## Screens to test
 
 - Combat: cursor tiles and cues, Inspect on a troop and an unreachable tile, spell and ability
