@@ -329,6 +329,11 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             toggle.isOn = !toggle.isOn;
+
+            // mod.io changes its chosen set in the toggle's handler, within this frame, and the
+            // state is read back for the announcement before the frame ends: the once-a-frame
+            // gathering above would answer with the set as it stood before the press.
+            _selectedTags = null;
             return true;
         }
 
