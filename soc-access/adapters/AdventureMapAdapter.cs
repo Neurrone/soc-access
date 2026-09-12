@@ -206,9 +206,13 @@ namespace SongsOfConquestAccess.Adapters
             Hud = new AdventureHudAdapter(this, _container);
         }
 
-        /// <summary>Start listening to this adventure's events. Called once per adapter, from the
-        /// screen's <c>Adapt</c>; <paramref name="onMapChanged"/> is what the screen hangs its tile
-        /// memo off, so nothing the game changes under a still cursor is read from the cache.</summary>
+        /// <summary>Start listening to this adventure's events. Called from the screen's
+        /// <c>OnPush</c>, never from <c>Adapt</c>: the adapter exists as soon as the adventure scene's
+        /// installer does, while the loading screen is still up and the map entities and fog are
+        /// still being filled in, and a listener attached then captures an EMPTY discovery baseline
+        /// and announces the whole loaded map as revealed. <paramref name="onMapChanged"/> is what
+        /// the screen hangs its tile memo off, so nothing the game changes under a still cursor is
+        /// read from the cache.</summary>
         public void AttachEvents(Action onMapChanged)
         {
             if (_eventListener != null)
@@ -233,11 +237,19 @@ namespace SongsOfConquestAccess.Adapters
             _eventListener?.Update();
         }
 
-        public void Dispose()
+        /// <summary>Stop listening, from the screen's <c>OnPop</c>. The next <see cref="AttachEvents"/>
+        /// builds a fresh listener with a fresh baseline, so what the game revealed while the map was
+        /// off the stack (a story sequence, the loading screen) is not announced afterwards.</summary>
+        public void DetachEvents()
         {
             AdventureMapEventListener listener = _eventListener;
             _eventListener = null;
             listener?.Detach();
+        }
+
+        public void Dispose()
+        {
+            DetachEvents();
             ClearFocusedTileOverlay();
         }
 

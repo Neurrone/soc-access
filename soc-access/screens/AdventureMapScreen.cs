@@ -180,13 +180,9 @@ namespace SongsOfConquestAccess.Screens
 
         protected override AdventureMapAdapter Adapt(object menu)
         {
-            AdventureMapAdapter adapter =
-                new AdventureMapAdapter((AdventureViewInstaller)menu, GetAdventureMapRevealedRegistry());
-
-            // The map's events are listened to for exactly as long as this adventure's adapter
-            // lives, and let go in its Dispose when the slot moves off it.
-            adapter.AttachEvents(InvalidateTile);
-            return adapter;
+            // The adapter is built as soon as the scene's installer exists, which is while the
+            // loading screen is still up; its events are attached in OnPush, once the map is up.
+            return new AdventureMapAdapter((AdventureViewInstaller)menu, GetAdventureMapRevealedRegistry());
         }
 
         /// <summary>The cursor is built over one adventure: a new one gets a new grid, and the audio
@@ -278,8 +274,14 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        /// <summary>The map's events are listened to for exactly as long as the map is up: attached
+        /// here, where the loading screen is gone and the map is filled in, so the listener's discovery
+        /// baseline is the loaded map and not the empty one the adapter was built over; detached in
+        /// <see cref="OnPop"/>. The listener itself lives on the adapter, which releases it in its
+        /// Dispose when the slot moves to another adventure.</summary>
         public override void OnPush()
         {
+            Live?.AttachEvents(InvalidateTile);
             AccessibilityEventBus.Subscribe(HandleAccessibilityEvent);
         }
 
@@ -301,6 +303,7 @@ namespace SongsOfConquestAccess.Screens
         public override void OnPop()
         {
             AccessibilityEventBus.Unsubscribe(HandleAccessibilityEvent);
+            Live?.DetachEvents();
             _isTopScreen = false;
             Grid()?.DisposeAudio();
             Grid()?.HideOverlay();
