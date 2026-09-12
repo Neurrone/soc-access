@@ -1428,9 +1428,11 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>The one way the game moves the cursor. It is read out only where the player is
-        /// actually standing on the map and looking at it; anywhere else the cursor is moved without a
-        /// word and focus is put back on the map without announcing that either.</summary>
+        /// <summary>The one way the game moves the cursor. It is read out only where the player is on
+        /// the map: on the map node it is the tile's own landing, and from a HUD control (a town in the
+        /// towns list, a wielder in the wielders list) it is a landing on the map node, whose readout
+        /// is the tile. Under another screen the cursor is moved without a word and focus is put back
+        /// on the map without announcing that either.</summary>
         private void MoveCursor(Vector2Int tile, bool announce)
         {
             // The events that land here (a camera focus published from a HUD click) arrive while the
@@ -1449,7 +1451,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             grid.FocusTileSilently(tile);
-            Navigator?.FocusNode(MapNodeId, announce: false);
+            Navigator?.FocusNode(MapNodeId, announce: announce && _isTopScreen);
         }
 
         // ---- the spoken resource summary (Ctrl+R, from the screen manager) ----

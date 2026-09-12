@@ -121,10 +121,15 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The entry's single click, which the game answers by centring the camera on the
+        /// town (<c>TownListUI.OnEntryUIEvent</c>, <c>Clicked</c>). The entry hands out the Unity
+        /// <c>Button</c>, which is a click handler of its own with nothing listening to it; the
+        /// game's handlers hang off the <c>UIButton</c> beside it, so that is what is clicked.</summary>
         public bool ClickTownListEntry(int index)
         {
             Selectable selectable = GetTownListEntry(index)?.GetSelectable();
-            return selectable != null && NativeSelectionUtility.PointerClick(selectable);
+            UIButton button = selectable != null ? selectable.GetComponent<UIButton>() : null;
+            return button != null && NativeSelectionUtility.Click(button);
         }
 
         public Tooltip GetTownListEntryTooltip(int index)
