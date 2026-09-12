@@ -58,7 +58,7 @@ namespace SongsOfConquestAccess.Adapters
         // The team's global research as a set, kept until the game's own answer changes shape.
         private HashSet<ResearchTypes> _owned;
         private int _ownedTeamId = -1;
-        private int _ownedCount = -1;
+        private int _ownedShape;
 
         public ResearchMenuAdapter(ResearchMenu menu)
         {
@@ -348,8 +348,8 @@ namespace SongsOfConquestAccess.Adapters
         /// set in one scan.
         ///
         /// The set itself is kept until the game's own answer changes shape - another team in
-        /// control, or one more state in it, which is the only way research is gained - so a build
-        /// that changes nothing refills nothing.</summary>
+        /// control, or a different list of states - so a build that changes nothing refills
+        /// nothing.</summary>
         private HashSet<ResearchTypes> GetOwnedGlobalResearch()
         {
             IClientAdventureFacade facade = Facade;
@@ -360,8 +360,16 @@ namespace SongsOfConquestAccess.Adapters
 
             int teamId = facade.Teams.LocalTeamInControlId;
             IResearchState[] states = facade.Research.GetGlobal(teamId, includeDisabled: true);
-            int count = states != null ? states.Length : 0;
-            if (_owned != null && _ownedTeamId == teamId && _ownedCount == count)
+            // The types themselves, folded, and not only how many: research is also LOST (a razed
+            // research building, a killed team), and one lost and one gained between two visits of
+            // this menu leave the count where it was.
+            int shape = 0;
+            for (int i = 0; states != null && i < states.Length; i++)
+            {
+                shape = unchecked(shape * 31 + (states[i] != null ? (int)states[i].Type + 1 : 0));
+            }
+
+            if (_owned != null && _ownedTeamId == teamId && _ownedShape == shape)
             {
                 return _owned;
             }
@@ -376,7 +384,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _ownedTeamId = teamId;
-            _ownedCount = count;
+            _ownedShape = shape;
             _owned = owned;
             return owned;
         }
