@@ -292,7 +292,23 @@ namespace SongsOfConquestAccess.Adapters
         {
             IReadOnlyList<SaveEntry> all = GetEntries();
             Component first = all.Count > 0 && all[0] != null ? all[0].Entry : null;
-            if (_visibleEntries != null && _visibleEntriesCount == all.Count && ReferenceEquals(_visibleEntriesFirst, first))
+            // Where the rows are drawn, summed: the layout settles a frame after the rows are spawned,
+            // and rows taken back from the game's pool still sit where the previous list left them,
+            // so the count and the first row alone would freeze the order read before the layout ran.
+            float layout = 0f;
+            for (int i = 0; i < all.Count; i++)
+            {
+                Component entry = all[i] != null ? all[i].Entry : null;
+                if (entry != null)
+                {
+                    layout += entry.transform.position.y;
+                }
+            }
+
+            if (_visibleEntries != null
+                && _visibleEntriesCount == all.Count
+                && ReferenceEquals(_visibleEntriesFirst, first)
+                && Mathf.Abs(_visibleEntriesLayout - layout) <= 0.5f)
             {
                 return _visibleEntries;
             }
@@ -309,6 +325,7 @@ namespace SongsOfConquestAccess.Adapters
             SortByDrawnTop(visible);
             _visibleEntriesCount = all.Count;
             _visibleEntriesFirst = first;
+            _visibleEntriesLayout = layout;
             _visibleEntries = visible;
             return _visibleEntries;
         }
@@ -461,6 +478,7 @@ namespace SongsOfConquestAccess.Adapters
         private IReadOnlyList<SaveEntry> _visibleEntries;
         private int _visibleEntriesCount = -1;
         private Component _visibleEntriesFirst;
+        private float _visibleEntriesLayout;
 
         private SaveLoadGameMenu.Settings Settings
         {
