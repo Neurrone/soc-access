@@ -161,7 +161,7 @@ namespace SongsOfConquestAccess
             _screenManager = null;
             Step("story camera", StoryCameraFocusPatches.Reset);
             Step("combat", CombatPatches.Reset);
-            Step("attack preview", Adapters.CombatAdapter.Reset);
+            Step("combat adapter", Adapters.CombatAdapter.Reset);
             Step("chat", Screens.ChatSource.Reset);
             Step("tooltips", TooltipPatches.Reset);
             Step("community maps keys", CommunityMapsFiveDigitInputDuplicateKeyPatches.Reset);
