@@ -350,7 +350,7 @@ namespace SongsOfConquestAccess.Events
                 && TrackNonLocalCommanderVisibility(commander, announceTransitions: true);
             if (IsLocalCommander(commander))
             {
-                AddKnownMapEntityDiscoveries();
+                InvalidateDiscoverySweep();
             }
 
             if (!ShouldPublishCommanderPositionEvent(commander, commander.Position))
@@ -386,7 +386,7 @@ namespace SongsOfConquestAccess.Events
                 && TrackNonLocalCommanderVisibility(commander, announceTransitions: true);
             if (IsLocalCommander(commander))
             {
-                AddKnownMapEntityDiscoveries();
+                InvalidateDiscoverySweep();
             }
 
             if (!ShouldPublishCommanderPositionEvent(commander, response.ToLocation))
@@ -483,6 +483,22 @@ namespace SongsOfConquestAccess.Events
         /// game computes from the local partnership's commander positions. They change once per tile
         /// step where the fog event fires once per frame.
         /// </summary>
+        /// <summary>
+        /// Called when a local commander has moved or teleported, INSTEAD of sweeping there. The
+        /// game's move response puts the commander at the end of the path and explores every path
+        /// point at once, but the fog the sweep reads (<c>FogRenderer</c>'s bytes) is copied from
+        /// that exploration only in the fog manager's next <c>RefreshFog</c>, which is also what
+        /// raises <c>onFogUpdated</c>. A sweep run from the move handler therefore sees the fog as
+        /// it was before the move, finds nothing, and records the post-move key; every fog update
+        /// that follows computes the same key and is skipped, so what the walk uncovered is never
+        /// announced. Dropping the key here makes the first fog update after the move sweep once,
+        /// over fresh fog, and the per-frame updates of the walk animation after it still skip.
+        /// </summary>
+        private void InvalidateDiscoverySweep()
+        {
+            _hasDiscoverySweepKey = false;
+        }
+
         private bool AddKnownMapEntityDiscoveries()
         {
             if (_facade == null || _facade.MapEntities == null)
