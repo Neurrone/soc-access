@@ -68,8 +68,9 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FrameSweep<UIToggle> _categoryToggles =
             new FrameSweep<UIToggle>("artifact market categories");
 
-        // Each filter's name, read off its toggle once (see GetCategoryLabel).
+        // Each filter's name, read off its toggle once per language (see GetCategoryLabel).
         private readonly Dictionary<UIToggle, string> _categoryLabels = new Dictionary<UIToggle, string>();
+        private ILanguageDefinition _categoryLabelsLanguage;
 
         // The offers the grid is drawing, kept while it is drawing the same ones. Each costs a
         // rarity-formatted name and a formatted price, and the 24 pooled cells are copied and
@@ -251,6 +252,14 @@ namespace SongsOfConquestAccess.Adapters
             if (toggle == null)
             {
                 return string.Empty;
+            }
+
+            // The adapter lives for the whole adventure, so a language change empties the table.
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
+            if (!ReferenceEquals(language, _categoryLabelsLanguage))
+            {
+                _categoryLabelsLanguage = language;
+                _categoryLabels.Clear();
             }
 
             string label;
