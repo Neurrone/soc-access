@@ -1,5 +1,5 @@
 {
-  "terrain": "Terrain dégagé, avec {5,3} au centre, {0,6} en haut à gauche et {10,0} en bas à droite. Le terrain juste en dessous du centre est occupé par {5,2}, que les troupes doivent contourner d'un côté ou de l'autre.",
+  "terrain": "Terrain dégagé, avec {5,3} au centre, {0,6} en haut à gauche et {10,0} en bas à droite. Le terrain juste en dessous du centre est occupé par {5,2}, et les troupes doivent passer d'un côté ou de l'autre.",
   "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche, et l'un d'eux se trouve sur {0,6}.",
   "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit, et l'un d'eux se trouve sur {10,0}."
 }

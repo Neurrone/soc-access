@@ -1,5 +1,5 @@
 {
-  "terrain": "Terrain dégagé, avec {5,3} au centre du champ de bataille. Le centre est bordé par {5,2} à gauche et en dessous, et par {7,3} à droite et au-dessus.",
+  "terrain": "Terrain dégagé, avec {5,3} au centre du champ de bataille. Le terrain à sa gauche et en dessous est occupé par {5,2}, celui à sa droite et au-dessus par {7,3}.",
   "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
   "defender": "Les points de déploiement du défenseur longent le bord droit."
 }
