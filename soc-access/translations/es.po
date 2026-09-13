@@ -3381,6 +3381,11 @@ msgctxt "Screens.TroopDeployment"
 msgid "Troop deployment"
 msgstr "Despliegue de tropas"
 
+#. Screens.AnnouncementChokePoint
+msgctxt "Screens.AnnouncementChokePoint"
+msgid "Choke point"
+msgstr "Paso estrecho"
+
 #. Screens.AnnouncementContent
 msgctxt "Screens.AnnouncementContent"
 msgid "Content"

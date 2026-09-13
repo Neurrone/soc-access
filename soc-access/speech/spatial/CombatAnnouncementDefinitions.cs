@@ -14,6 +14,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             new AnnouncementElementDefinition(TileKeys.Impassable, ModStrings.Screens.AnnouncementImpassable),
             new AnnouncementElementDefinition(TileKeys.TileEffects, ModStrings.Screens.AnnouncementTileEffects),
             new AnnouncementElementDefinition(TileKeys.Elevation, ModStrings.Screens.AnnouncementElevation),
+            new AnnouncementElementDefinition(TileKeys.ChokePoint, ModStrings.Screens.AnnouncementChokePoint),
             new AnnouncementElementDefinition(TileKeys.DecorativeFeatures, ModStrings.Screens.AnnouncementDecorativeFeatures),
             new AnnouncementElementDefinition(TileKeys.Coordinates, ModStrings.Screens.AnnouncementCoordinates),
             new AnnouncementElementDefinition(TileKeys.Influence, ModStrings.Screens.AnnouncementInfluence))
@@ -76,6 +77,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             public const string Impassable = "impassable";
             public const string TileEffects = "tile_effects";
             public const string Elevation = "elevation";
+            public const string ChokePoint = "choke_point";
             public const string DecorativeFeatures = "decorative_features";
             public const string Coordinates = "coordinates";
             public const string Influence = "influence";

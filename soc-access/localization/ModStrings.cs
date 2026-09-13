@@ -885,6 +885,7 @@
             public static readonly ModString AnnouncementActing = new ModString("Screens.AnnouncementActing", "Acting");
             public static readonly ModString AnnouncementAffiliation = new ModString("Screens.AnnouncementAffiliation", "Affiliation");
             public static readonly ModString AnnouncementAttackable = new ModString("Screens.AnnouncementAttackable", "Attackable");
+            public static readonly ModString AnnouncementChokePoint = new ModString("Screens.AnnouncementChokePoint", "Choke point");
             public static readonly ModString AnnouncementContent = new ModString("Screens.AnnouncementContent", "Content");
             public static readonly ModString AnnouncementCoordinates = new ModString("Screens.AnnouncementCoordinates", "Coordinates");
             public static readonly ModString AnnouncementDecorativeFeatures = new ModString("Screens.AnnouncementDecorativeFeatures", "Decorative features");

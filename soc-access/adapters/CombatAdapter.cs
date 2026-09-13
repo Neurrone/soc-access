@@ -579,6 +579,7 @@ namespace SongsOfConquestAccess.Adapters
             BattlefieldTerrain terrain = GetTerrain();
             tile.Kind = terrain != null ? terrain.GetKind(point) : BattlefieldCellKind.OffGrid;
             tile.Obstacle = terrain != null ? terrain.GetObstacle(point) : null;
+            tile.IsChokePoint = terrain != null && terrain.IsChokePoint(point);
             return tile;
         }
 

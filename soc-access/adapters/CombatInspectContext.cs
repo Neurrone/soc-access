@@ -37,6 +37,10 @@ namespace SongsOfConquestAccess.Adapters
         /// nameable on it. Null on open ground and wherever the obstacle has no name.</summary>
         public BattlefieldObstacle Obstacle { get; set; }
 
+        /// <summary>Whether this tile is one of the cells everything has to pass through, as the
+        /// shared analysis grouped them. The word for it belongs to the screens.</summary>
+        public bool IsChokePoint { get; set; }
+
         public IBattleTroopState Troop { get; set; }
 
         public int TroopId { get; set; } = -1;

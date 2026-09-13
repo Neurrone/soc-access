@@ -34,13 +34,15 @@ The cursor, the scanner's `Terrain` category and the written battlefield descrip
 | unreachable | Walkable ground no troop can ever stand on: a pocket sealed off behind cliffs or impassable hexes | Nothing reaches it from a spawn point, and it is not a cliff - a troop set down inside the pocket could walk it | Cursor, scanner, descriptions |
 | impassable | A hex nothing can enter at all | The game says it is not walkable, whatever is drawn on it; water is impassable too | Cursor, scanner |
 | wall of impassable cells | A line of impassable hexes that shapes movement | Three or more joined impassable hexes in a ridge shape | Scanner, descriptions |
-| choke point | The one or two hexes everything has to pass through | Removing them would leave the walkable board in two halves of at least five hexes | Scanner, descriptions |
+| choke point | The one or two hexes everything has to pass through | Removing them would leave the walkable board in two halves of at least five hexes | Cursor, scanner, descriptions |
 | wall | A siege layout's wall, which troops walk on | The layout is a siege and the hex carries the wall decoration | Cursor, scanner, descriptions |
 | tower | A siege layout's tower | The same, for the tower decoration | Cursor, scanner, descriptions |
 | stairs | The steps onto a siege layout's wall | The same, for the stairs decoration | Cursor, scanner, descriptions |
 | spawn point | A hex a side's troops can start on | The layout says so | Cursor, scanner, descriptions |
 
 `blocked` is never spoken on a battlefield. Whether a hex can be reached this turn is not a fact about the ground, and every hex an enemy stands on would be one. An impassable hex never says how high it stands either, on the combat grid or the deployment grid: no troop will ever be on it, so its height is nothing to plan around.
+
+A choke point is spoken after the ground it stands on, since the hex is still flat or raised ground and both facts are worth having: `elevated ground, height 1, choke point, 4, 4`. It is a `Choke point` element in `Tile announcements` on the combat and troop deployment tabs, on by default, so it can be turned off, moved elsewhere in the readout or given a suffix like any other element.
 
 The scanner's `Terrain` category holds one item per group, so a ridge is one stop in the item cycle and `Alt+Page Down` walks its hexes nearest first. A group names itself with its shape, its size and its height, as in `diagonal ridge of 7 cells, height 1`, `cliff of 3 cells`, `unreachable ground, 31 cells` or `wall of 4 impassable cells`.
 

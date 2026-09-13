@@ -748,6 +748,7 @@ namespace SongsOfConquestAccess.Adapters
                     tile.IsImpassable = (water != null && index < water.Length && water[index] != 0)
                         || (decorations != null && index < decorations.Length && IsBlocker(decorations[index]));
                     tile.Kind = terrain != null ? terrain.GetKind(point) : BattlefieldCellKind.OffGrid;
+                    tile.IsChokePoint = terrain != null && terrain.IsChokePoint(point);
                 }
             }
         }
@@ -1393,6 +1394,10 @@ namespace SongsOfConquestAccess.Adapters
         /// a cliff nothing can climb, impassable, or one of a siege layout's structures. The words
         /// for it belong to the screens.</summary>
         public BattlefieldCellKind Kind { get; set; }
+
+        /// <summary>Whether this tile is one of the cells everything has to pass through, as the
+        /// shared analysis grouped them. The word for it belongs to the screens.</summary>
+        public bool IsChokePoint { get; set; }
 
         public BattleSide? SpawnSide { get; set; }
 

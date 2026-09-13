@@ -72,6 +72,15 @@ namespace SongsOfConquestAccess.Speech.Spatial
                         : ground);
             }
 
+            if (tile.IsChokePoint)
+            {
+                // With the ground it stands on, and after it: a cell everything has to pass
+                // through is a fact about the shape of the board, the way its height is.
+                yield return new AnnouncementPart(
+                    TroopDeploymentAnnouncementDefinitions.TileKeys.ChokePoint,
+                    ModText.Get(ModStrings.Scanner.TerrainChokePoint));
+            }
+
             yield return new AnnouncementPart(
                 TroopDeploymentAnnouncementDefinitions.TileKeys.Coordinates,
                 DescribeCoordinates(tile));

@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Tests
 {
     /// <summary>What a tile of the pre-battle deployment board reads as.</summary>
     [TestClass]
-    public sealed class TroopPlacementTileSpeechFormatterTests
+    public sealed class TroopPlacementTileSpeechFormatterTests : ModSettingsFixture
     {
         [TestMethod]
         public void DescribeTileReadsAnEmptyTileAsItsCoordinatesAlone()
@@ -83,6 +83,34 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("1, 0", Describe(null, Tile(1, 0)));
         }
 
+        /// <summary>A cell everything has to pass through says so, and it says it with the ground
+        /// it stands on rather than instead of it: a choke cell is still flat or raised ground.
+        /// </summary>
+        [TestMethod]
+        public void DescribeTileReadsAChokePointAfterTheGroundAndOnlyOnAChokeCell()
+        {
+            Assert.AreEqual("choke point, 1, 0", Describe(null, Choke(BattlefieldCellKind.Flat, 0)));
+            Assert.AreEqual(
+                "elevated ground, height 1, choke point, 1, 0",
+                Describe(null, Choke(BattlefieldCellKind.Elevated, 1)));
+            Assert.AreEqual("1, 0", Describe(null, Ground(BattlefieldCellKind.Flat, 0)));
+        }
+
+        /// <summary>Switched off in the settings, the part is silent and the rest of the tile reads
+        /// as it did.</summary>
+        [TestMethod]
+        public void DescribeTileSaysNothingOfAChokePointWhenThePartIsSwitchedOff()
+        {
+            BindTemporaryConfig();
+            ModSettings.SetAnnouncementElementEnabled(
+                TroopDeploymentAnnouncementDefinitions.Tile,
+                TroopDeploymentAnnouncementDefinitions.Tile.GetElement(
+                    TroopDeploymentAnnouncementDefinitions.TileKeys.ChokePoint),
+                false);
+
+            Assert.AreEqual("1, 0", Describe(null, Choke(BattlefieldCellKind.Flat, 0)));
+        }
+
         [TestMethod]
         public void DescribeTileFallsBackToTheScreenNameWithNoTile()
         {
@@ -105,6 +133,13 @@ namespace SongsOfConquestAccess.Tests
         {
             return new TroopPlacementTileSpeechFormatter(
                 new TroopPlacementSnapshot(new Vector2Int(8, 6), ownSide, null));
+        }
+
+        private static TroopPlacementTile Choke(BattlefieldCellKind kind, byte elevation)
+        {
+            TroopPlacementTile tile = Ground(kind, elevation);
+            tile.IsChokePoint = true;
+            return tile;
         }
 
         private static TroopPlacementTile Ground(BattlefieldCellKind kind, byte elevation)

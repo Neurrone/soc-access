@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess.Tests
 {
     [TestClass]
-    public sealed class CombatTileSpeechFormatterTests
+    public sealed class CombatTileSpeechFormatterTests : ModSettingsFixture
     {
         [TestMethod]
         public void InspectRangeIndicatorsFormatsAttackRangeWithoutTroopName()
@@ -135,6 +135,40 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("wall, height 2, 4, 2", Describe(Ground(BattlefieldCellKind.Wall, 2)));
             Assert.AreEqual("tower, height 3, 4, 2", Describe(Ground(BattlefieldCellKind.Tower, 3)));
             Assert.AreEqual("stairs, height 1, 4, 2", Describe(Ground(BattlefieldCellKind.Stairs, 1)));
+        }
+
+        /// <summary>A cell everything has to pass through says so, and it says it with the ground
+        /// it stands on rather than instead of it: a choke cell is still flat or raised ground.
+        /// </summary>
+        [TestMethod]
+        public void TileSaysChokePointAfterTheGroundAndOnlyOnAChokeCell()
+        {
+            Assert.AreEqual("choke point, 4, 2", Describe(Choke(BattlefieldCellKind.Flat, 0)));
+            Assert.AreEqual(
+                "elevated ground, height 1, choke point, 4, 2",
+                Describe(Choke(BattlefieldCellKind.Elevated, 1)));
+            Assert.AreEqual("4, 2", Describe(Ground(BattlefieldCellKind.Flat, 0)));
+        }
+
+        /// <summary>Switched off in the settings, the part is silent and the rest of the tile reads
+        /// as it did.</summary>
+        [TestMethod]
+        public void TileSaysNothingOfAChokePointWhenThePartIsSwitchedOff()
+        {
+            BindTemporaryConfig();
+            ModSettings.SetAnnouncementElementEnabled(
+                CombatAnnouncementDefinitions.Tile,
+                CombatAnnouncementDefinitions.Tile.GetElement(CombatAnnouncementDefinitions.TileKeys.ChokePoint),
+                false);
+
+            Assert.AreEqual("4, 2", Describe(Choke(BattlefieldCellKind.Flat, 0)));
+        }
+
+        private static CombatTile Choke(BattlefieldCellKind kind, byte elevation)
+        {
+            CombatTile tile = Ground(kind, elevation);
+            tile.IsChokePoint = true;
+            return tile;
         }
 
         /// <summary>A blocked cell raised above the board, which every gatepost of a walled town

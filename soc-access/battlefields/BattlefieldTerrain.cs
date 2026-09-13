@@ -264,6 +264,7 @@ namespace SongsOfConquestAccess.Battlefields
         private readonly BattlefieldCellKind[,] _kinds;
         private readonly int[,] _elevations;
         private readonly BattlefieldObstacle[,] _obstacles;
+        private readonly bool[,] _chokePoints;
         private readonly List<BattlefieldRegion> _regions;
 
         private BattlefieldTerrain(
@@ -272,6 +273,7 @@ namespace SongsOfConquestAccess.Battlefields
             BattlefieldCellKind[,] kinds,
             int[,] elevations,
             BattlefieldObstacle[,] obstacles,
+            bool[,] chokePoints,
             List<BattlefieldRegion> regions)
         {
             _width = width;
@@ -279,6 +281,7 @@ namespace SongsOfConquestAccess.Battlefields
             _kinds = kinds;
             _elevations = elevations;
             _obstacles = obstacles;
+            _chokePoints = chokePoints;
             _regions = regions;
         }
 
@@ -399,8 +402,10 @@ namespace SongsOfConquestAccess.Battlefields
             AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Wall, BattlefieldRegionKind.Wall);
             AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Tower, BattlefieldRegionKind.Tower);
             AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Stairs, BattlefieldRegionKind.Stairs);
-            regions.AddRange(ChokePoints(width, height, enterable, elevations));
-            return new BattlefieldTerrain(width, height, kinds, elevations, obstacles, regions);
+            List<BattlefieldRegion> chokePoints = ChokePoints(width, height, enterable, elevations);
+            regions.AddRange(chokePoints);
+            return new BattlefieldTerrain(
+                width, height, kinds, elevations, obstacles, ChokePointMap(width, height, chokePoints), regions);
         }
 
         /// <summary>Which family of prop blocks a cell, from the bytes the caller read: water and
@@ -456,6 +461,35 @@ namespace SongsOfConquestAccess.Battlefields
             }
 
             return null;
+        }
+
+        /// <summary>Whether a cell is one of the cells everything has to pass through: a lookup
+        /// into the map the choke-point groups were painted onto, so asking per cell costs nothing
+        /// the analysis has not already paid for.</summary>
+        public bool IsChokePoint(Vector2Int point)
+        {
+            return Within(point, _width, _height) && _chokePoints[point.x, point.y];
+        }
+
+        /// <summary>Which cells the choke-point groups cover, one bit per cell. A choke cell is
+        /// still the ground it was - flat or elevated - so this is a flag beside the kind rather
+        /// than a kind of its own.</summary>
+        private static bool[,] ChokePointMap(int width, int height, List<BattlefieldRegion> chokePoints)
+        {
+            bool[,] map = new bool[Math.Max(1, width), Math.Max(1, height)];
+            for (int i = 0; i < chokePoints.Count; i++)
+            {
+                List<Vector2Int> cells = chokePoints[i].Cells;
+                for (int j = 0; j < cells.Count; j++)
+                {
+                    if (Within(cells[j], width, height))
+                    {
+                        map[cells[j].x, cells[j].y] = true;
+                    }
+                }
+            }
+
+            return map;
         }
 
         /// <summary>What blocks one cell, where the caller asked for obstacles and the cell is

@@ -3474,6 +3474,11 @@ msgctxt "Screens.AnnouncementAttackable"
 msgid "Attackable"
 msgstr ""
 
+#. Screens.AnnouncementChokePoint
+msgctxt "Screens.AnnouncementChokePoint"
+msgid "Choke point"
+msgstr ""
+
 #. Screens.AnnouncementContent
 msgctxt "Screens.AnnouncementContent"
 msgid "Content"

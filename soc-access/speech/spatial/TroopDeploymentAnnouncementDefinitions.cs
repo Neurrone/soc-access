@@ -12,6 +12,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             new AnnouncementElementDefinition(TileKeys.SpawnPoint, ModStrings.Screens.AnnouncementSpawnPoint),
             new AnnouncementElementDefinition(TileKeys.Impassable, ModStrings.Screens.AnnouncementImpassable),
             new AnnouncementElementDefinition(TileKeys.Elevation, ModStrings.Screens.AnnouncementElevation),
+            new AnnouncementElementDefinition(TileKeys.ChokePoint, ModStrings.Screens.AnnouncementChokePoint),
             new AnnouncementElementDefinition(TileKeys.Coordinates, ModStrings.Screens.AnnouncementCoordinates));
 
         public static readonly AnnouncementGroupDefinition ScannerContent = new AnnouncementGroupDefinition(
@@ -36,6 +37,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             public const string SpawnPoint = "spawn_point";
             public const string Impassable = "impassable";
             public const string Elevation = "elevation";
+            public const string ChokePoint = "choke_point";
             public const string Coordinates = "coordinates";
         }
     }
