@@ -2153,7 +2153,7 @@ msgstr "고지대, 높이 {0}"
 #. Spatial.EnemySpawnPoint
 msgctxt "Spatial.EnemySpawnPoint"
 msgid "enemy spawn point"
-msgstr "적 출현 지점"
+msgstr "적 배치 지점"
 
 #. Spatial.Enemy
 msgctxt "Spatial.Enemy"
@@ -2293,7 +2293,7 @@ msgstr "재장전 중"
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
-msgstr "출현 지점"
+msgstr "배치 지점"
 
 #. Spatial.Threatened
 msgctxt "Spatial.Threatened"

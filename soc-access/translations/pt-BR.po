@@ -2173,7 +2173,7 @@ msgstr "terreno elevado, altura {0}"
 #. Spatial.EnemySpawnPoint
 msgctxt "Spatial.EnemySpawnPoint"
 msgid "enemy spawn point"
-msgstr "ponto de surgimento hostil"
+msgstr "ponto de posicionamento hostil"
 
 #. Spatial.Enemy
 msgctxt "Spatial.Enemy"
@@ -2313,7 +2313,7 @@ msgstr "recarregando"
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
-msgstr "ponto de surgimento"
+msgstr "ponto de posicionamento"
 
 #. Spatial.Threatened
 msgctxt "Spatial.Threatened"

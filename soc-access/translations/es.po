@@ -2813,7 +2813,7 @@ msgstr "vacío"
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"
-msgstr "Puntos de aparición"
+msgstr "Puntos de despliegue"
 
 #. Events.Revealed
 msgctxt "Events.Revealed"

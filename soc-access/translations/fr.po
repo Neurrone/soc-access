@@ -2813,7 +2813,7 @@ msgstr "vide"
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"
-msgstr "Points d’apparition"
+msgstr "Points de déploiement"
 
 #. Events.Revealed
 msgctxt "Events.Revealed"

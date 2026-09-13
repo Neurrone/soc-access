@@ -2793,7 +2793,7 @@ msgstr "boş"
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"
-msgstr "Yerleştirme noktaları"
+msgstr "Çıkış noktaları"
 
 #. Events.Revealed
 msgctxt "Events.Revealed"
@@ -3389,7 +3389,7 @@ msgstr "Kısıtlamalar"
 #. Screens.AnnouncementSpawnPoint
 msgctxt "Screens.AnnouncementSpawnPoint"
 msgid "Spawn point"
-msgstr "Yerleşim noktası"
+msgstr "Çıkış noktası"
 
 #. Screens.AnnouncementTroop
 msgctxt "Screens.AnnouncementTroop"

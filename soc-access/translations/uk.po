@@ -2833,7 +2833,7 @@ msgstr "порожньо"
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"
-msgstr "Точки розміщення"
+msgstr "Точки появи"
 
 #. Events.Revealed
 msgctxt "Events.Revealed"
@@ -3439,7 +3439,7 @@ msgstr "Обмеження"
 #. Screens.AnnouncementSpawnPoint
 msgctxt "Screens.AnnouncementSpawnPoint"
 msgid "Spawn point"
-msgstr "Точка розміщення"
+msgstr "Точка появи"
 
 #. Screens.AnnouncementTroop
 msgctxt "Screens.AnnouncementTroop"
