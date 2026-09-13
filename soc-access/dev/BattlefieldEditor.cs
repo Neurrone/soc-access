@@ -88,8 +88,18 @@ namespace SongsOfConquestAccess.Dev
             }
         }
 
-        /// <summary>Load one layout, keyed "LevelType/PathName", into the open editor.</summary>
+        /// <summary>Load one layout, keyed "LevelType/PathName", into the open editor. Only the spawn
+        /// point entities are kept: the destructible obstacles are not shown to the player before
+        /// the fight, so the picture must not show them either.</summary>
         public static string Load(string key)
+        {
+            return Load(key, -1);
+        }
+
+        /// <summary>The same with every cell painted in one theme (0 Arleon, 1 Loth, 2 Barya, 3 Rana,
+        /// 4 Vanir, 5 Roots), the way a fight repaints the board from its surroundings; -1 keeps the
+        /// layout's own theme.</summary>
+        public static string Load(string key, int theme)
         {
             try
             {
@@ -106,6 +116,16 @@ namespace SongsOfConquestAccess.Dev
                 if (map == null)
                 {
                     return DevJson.Error("no such layout: " + key);
+                }
+
+                map.Contents.MapEntities.RemoveAll(e => e.Id != (ushort)BattleMapEntities.UtilityAttackerSpawnpoint
+                    && e.Id != (ushort)BattleMapEntities.UtilityDefenderSpawnpoint);
+                if (theme >= 0 && map.Contents.ThemesArray != null)
+                {
+                    for (int i = 0; i < map.Contents.ThemesArray.Length; i++)
+                    {
+                        map.Contents.ThemesArray[i] = (byte)theme;
+                    }
                 }
 
                 object facade = Facade();
