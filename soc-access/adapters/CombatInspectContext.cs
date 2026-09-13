@@ -33,6 +33,10 @@ namespace SongsOfConquestAccess.Adapters
         /// for it belong to the screens.</summary>
         public BattlefieldCellKind Kind { get; set; }
 
+        /// <summary>What blocks this tile, where it is blocked and the fight has painted something
+        /// nameable on it. Null on open ground and wherever the obstacle has no name.</summary>
+        public BattlefieldObstacle Obstacle { get; set; }
+
         public IBattleTroopState Troop { get; set; }
 
         public int TroopId { get; set; } = -1;

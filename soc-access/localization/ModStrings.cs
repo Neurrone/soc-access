@@ -73,6 +73,75 @@
             public static readonly ModString TerrainWater = new ModString("Audio.TerrainWater", "Water");
         }
 
+        /// <summary>
+        /// WHAT BLOCKS A BATTLEFIELD CELL, and how a whole feature is written into a description.
+        /// The game has no player-facing name for an obstacle, so these words are the owner's, one
+        /// per theme for each of the four decoration bytes a theme draws props for: 0 Arleon,
+        /// 1 Loth, 2 Barya, 3 Rana, 4 Vanir, 5 Roots, 6 Yulan, with 7 a second Arleon that reads as
+        /// Arleon. Each is singular and plural because a run of them is counted, and a cell full of
+        /// them takes whichever form names the cell: the plural where a cell holds many (boulders,
+        /// bushes), the singular where it holds one (a statue, a torch).
+        ///
+        /// These are spoken IN COMBAT ONLY. The placement page's preview draws a blocked cell as a
+        /// puck with no style, so there it stays plain impassable.
+        ///
+        /// The Description forms are the same features as an authored description names them: the
+        /// height in parentheses, and impassability never spoken - a wall of bushes is a wall of
+        /// bushes, not a wall of impassable bushes.
+        /// </summary>
+        public static class Battlefield
+        {
+            public static readonly ModPluralString ObstacleRock = new ModPluralString("Battlefield.ObstacleRock", "a boulder", "boulders");
+            public static readonly ModPluralString ObstacleGrowthArleon = new ModPluralString("Battlefield.ObstacleGrowthArleon", "a bush", "bushes");
+            public static readonly ModPluralString ObstacleGrowthLoth = new ModPluralString("Battlefield.ObstacleGrowthLoth", "a dark leafy plant", "dark leafy plants");
+            public static readonly ModPluralString ObstacleGrowthBarya = new ModPluralString("Battlefield.ObstacleGrowthBarya", "a desert plant", "desert plants");
+            public static readonly ModPluralString ObstacleGrowthRana = new ModPluralString("Battlefield.ObstacleGrowthRana", "a pink mushroom", "pink mushrooms");
+            public static readonly ModPluralString ObstacleGrowthVanir = new ModPluralString("Battlefield.ObstacleGrowthVanir", "purple heather", "purple heather");
+            public static readonly ModPluralString ObstacleGrowthRoots = new ModPluralString("Battlefield.ObstacleGrowthRoots", "a teal fungus", "teal fungi");
+            public static readonly ModPluralString ObstacleGrowthYulan = new ModPluralString("Battlefield.ObstacleGrowthYulan", "a purple flowering shrub", "purple flowering shrubs");
+            public static readonly ModPluralString ObstacleManufacturedArleon = new ModPluralString("Battlefield.ObstacleManufacturedArleon", "a knight statue", "knight statues");
+            public static readonly ModPluralString ObstacleManufacturedLoth = new ModPluralString("Battlefield.ObstacleManufacturedLoth", "a gargoyle statue", "gargoyle statues");
+            public static readonly ModPluralString ObstacleManufacturedBarya = new ModPluralString("Battlefield.ObstacleManufacturedBarya", "an animal statue", "animal statues");
+            public static readonly ModPluralString ObstacleManufacturedRana = new ModPluralString("Battlefield.ObstacleManufacturedRana", "a dragon statue", "dragon statues");
+            public static readonly ModPluralString ObstacleManufacturedVanir = new ModPluralString("Battlefield.ObstacleManufacturedVanir", "a standing stone", "standing stones");
+            public static readonly ModPluralString ObstacleManufacturedRoots = new ModPluralString("Battlefield.ObstacleManufacturedRoots", "a giant mushroom", "giant mushrooms");
+            public static readonly ModPluralString ObstacleManufacturedYulan = new ModPluralString("Battlefield.ObstacleManufacturedYulan", "a sage statue", "sage statues");
+            public static readonly ModPluralString ObstacleLightArleon = new ModPluralString("Battlefield.ObstacleLightArleon", "a torch", "torches");
+            public static readonly ModPluralString ObstacleLightLoth = new ModPluralString("Battlefield.ObstacleLightLoth", "a glowing crystal", "glowing crystals");
+            public static readonly ModPluralString ObstacleLightBarya = new ModPluralString("Battlefield.ObstacleLightBarya", "a golden torch", "golden torches");
+            public static readonly ModPluralString ObstacleLightRana = new ModPluralString("Battlefield.ObstacleLightRana", "a glowing pool", "glowing pools");
+            public static readonly ModPluralString ObstacleLightVanir = new ModPluralString("Battlefield.ObstacleLightVanir", "a torch", "torches");
+            public static readonly ModPluralString ObstacleLightRoots = new ModPluralString("Battlefield.ObstacleLightRoots", "glowing blue mushrooms", "glowing blue mushrooms");
+            public static readonly ModPluralString ObstacleLightYulan = new ModPluralString("Battlefield.ObstacleLightYulan", "a paper lantern", "paper lanterns");
+            public static readonly ModPluralString ObstacleFire = new ModPluralString("Battlefield.ObstacleFire", "fire", "fire");
+            public static readonly ModPluralString ObstacleWater = new ModPluralString("Battlefield.ObstacleWater", "water", "water");
+            public static readonly ModString DescriptionChokePoint = new ModString("Battlefield.DescriptionChokePoint", "a choke point");
+            public static readonly ModString DescriptionCliffs = new ModString("Battlefield.DescriptionCliffs", "cliffs");
+            public static readonly ModString DescriptionImpassableCell = new ModString("Battlefield.DescriptionImpassableCell", "an impassable cell");
+            public static readonly ModString DescriptionImpassableCells = new ModString("Battlefield.DescriptionImpassableCells", "impassable cells");
+            public static readonly ModString DescriptionImpassableWall = new ModString("Battlefield.DescriptionImpassableWall", "a wall of impassable cells");
+            public static readonly ModString DescriptionObstacleWall = new ModString("Battlefield.DescriptionObstacleWall", "a wall of {0}");
+            public static readonly ModString DescriptionPatch = new ModString("Battlefield.DescriptionPatch", "a patch (height {0})");
+            public static readonly ModString DescriptionRidge = new ModString("Battlefield.DescriptionRidge", "a ridge (height {0})");
+            public static readonly ModString DescriptionRidgeDiagonal = new ModString("Battlefield.DescriptionRidgeDiagonal", "a diagonal ridge (height {0})");
+            public static readonly ModString DescriptionRidgeVertical = new ModString("Battlefield.DescriptionRidgeVertical", "a vertical ridge (height {0})");
+            public static readonly ModString DescriptionSingleCell = new ModString("Battlefield.DescriptionSingleCell", "a single cell (height {0})");
+            public static readonly ModString DescriptionStairs = new ModString("Battlefield.DescriptionStairs", "stairs (height {0})");
+            public static readonly ModString DescriptionTower = new ModString("Battlefield.DescriptionTower", "a tower (height {0})");
+            public static readonly ModString DescriptionWall = new ModString("Battlefield.DescriptionWall", "a wall (height {0})");
+            // WHAT LIES AROUND THE BATTLEFIELD, from the three adventure tiles the game built the
+            // battle's scenery from. One clause per kind of ground, naming the directions it lies
+            // in, and no directions at all where it lies in all three.
+            public static readonly ModString Surroundings = new ModString("Battlefield.Surroundings", "The battlefield is surrounded by {0}.");
+            public static readonly ModString SurroundingDirection = new ModString("Battlefield.SurroundingDirection", "{0} to the {1}");
+            public static readonly ModString SurroundingFarmland = new ModString("Battlefield.SurroundingFarmland", "farmland");
+            public static readonly ModString SurroundingForest = new ModString("Battlefield.SurroundingForest", "forest");
+            public static readonly ModString SurroundingMountains = new ModString("Battlefield.SurroundingMountains", "mountains");
+            public static readonly ModString SurroundingOpenLand = new ModString("Battlefield.SurroundingOpenLand", "open land");
+            public static readonly ModString SurroundingWalls = new ModString("Battlefield.SurroundingWalls", "walls");
+            public static readonly ModString SurroundingWater = new ModString("Battlefield.SurroundingWater", "water");
+        }
+
         public static class Draft
         {
             public static readonly ModPluralString AvailableTroops = new ModPluralString("Draft.AvailableTroops", "{0} available", "{0} available");
@@ -211,6 +280,9 @@
             public static readonly ModString Health = new ModString("Spatial.Health", "{0} / {1} health");
             public static readonly ModString Here = new ModString("Spatial.Here", "here");
             public static readonly ModString Impassable = new ModString("Spatial.Impassable", "impassable");
+            // The same, with what is standing there: a fight paints the board with the ground the
+            // battle was joined on, so a blocked cell has something to be called.
+            public static readonly ModString ImpassableObstacle = new ModString("Spatial.ImpassableObstacle", "{0}, impassable");
             public static readonly ModString InteractionPoint = new ModString("Spatial.InteractionPoint", "Interaction point");
             public static readonly ModString Interactable = new ModString("Spatial.Interactable", "interactable");
             public static readonly ModString InteractableNextTurn = new ModString("Spatial.InteractableNextTurn", "interactable next turn");
@@ -916,6 +988,10 @@
             public static readonly ModPluralString TerrainCliffCells = new ModPluralString("Scanner.TerrainCliffCells", "cliff of {0} cell", "cliff of {0} cells");
             public static readonly ModPluralString TerrainImpassableCells = new ModPluralString("Scanner.TerrainImpassableCells", "impassable, {0} cell", "impassable, {0} cells");
             public static readonly ModPluralString TerrainImpassableWall = new ModPluralString("Scanner.TerrainImpassableWall", "wall of {0} impassable cell", "wall of {0} impassable cells");
+            // The same two groups where the cells have a name: the count and the words for what is
+            // standing there, most of it first.
+            public static readonly ModPluralString TerrainObstacleCells = new ModPluralString("Scanner.TerrainObstacleCells", "{1}, {0} cell, impassable", "{1}, {0} cells, impassable");
+            public static readonly ModPluralString TerrainObstacleWall = new ModPluralString("Scanner.TerrainObstacleWall", "wall of {0} {1}, impassable", "wall of {0} {1}, impassable");
             public static readonly ModPluralString TerrainPatch = new ModPluralString("Scanner.TerrainPatch", "patch of {0} cell, height {1}", "patch of {0} cells, height {1}");
             public static readonly ModPluralString TerrainRidge = new ModPluralString("Scanner.TerrainRidge", "ridge of {0} cell, height {1}", "ridge of {0} cells, height {1}");
             public static readonly ModPluralString TerrainRidgeDiagonal = new ModPluralString("Scanner.TerrainRidgeDiagonal", "diagonal ridge of {0} cell, height {1}", "diagonal ridge of {0} cells, height {1}");

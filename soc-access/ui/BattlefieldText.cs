@@ -91,17 +91,7 @@ namespace SongsOfConquestAccess.UI
                         ? ModText.Get(ModStrings.Scanner.TerrainCliff)
                         : ModText.Plural(ModStrings.Scanner.TerrainCliffCells, region.Count, region.Count);
                 case BattlefieldRegionKind.Impassable:
-                    if (region.Count == 1)
-                    {
-                        return ModText.Get(ModStrings.Spatial.Impassable);
-                    }
-
-                    return ModText.Plural(
-                        region.IsRidge
-                            ? ModStrings.Scanner.TerrainImpassableWall
-                            : ModStrings.Scanner.TerrainImpassableCells,
-                        region.Count,
-                        region.Count);
+                    return Impassable(region);
                 case BattlefieldRegionKind.ChokePoint:
                     return region.Count == 1
                         ? ModText.Get(ModStrings.Scanner.TerrainChokePoint)
@@ -115,6 +105,194 @@ namespace SongsOfConquestAccess.UI
                     return ModText.Get(ModStrings.Spatial.StairsHeight, region.Height);
                 default:
                     return string.Empty;
+            }
+        }
+
+        /// <summary>A group of blocked cells, named by what is standing on them where the fight has
+        /// given them a name and by their number alone where it has not (the placement page, whose
+        /// preview draws every blocked cell the same way).</summary>
+        private static string Impassable(BattlefieldRegion region)
+        {
+            if (region.Obstacles.Count == 0)
+            {
+                if (region.Count == 1)
+                {
+                    return ModText.Get(ModStrings.Spatial.Impassable);
+                }
+
+                return ModText.Plural(
+                    region.IsRidge
+                        ? ModStrings.Scanner.TerrainImpassableWall
+                        : ModStrings.Scanner.TerrainImpassableCells,
+                    region.Count,
+                    region.Count);
+            }
+
+            if (region.Count == 1)
+            {
+                return ModText.Get(ModStrings.Spatial.ImpassableObstacle, CellObstacle(region.Obstacles[0]));
+            }
+
+            return ModText.Plural(
+                region.IsRidge
+                    ? ModStrings.Scanner.TerrainObstacleWall
+                    : ModStrings.Scanner.TerrainObstacleCells,
+                region.Count,
+                region.Count,
+                ObstacleWords(region.Obstacles, region.Count));
+        }
+
+        /// <summary>What the cursor says about a blocked cell in a fight: what stands there and that
+        /// nothing can enter it. Empty where the obstacle has no name, which leaves the tile
+        /// formatter's plain "impassable" to say it.</summary>
+        public static string CellImpassable(BattlefieldObstacle obstacle)
+        {
+            string word = CellObstacle(obstacle);
+            return string.IsNullOrEmpty(word)
+                ? string.Empty
+                : ModText.Get(ModStrings.Spatial.ImpassableObstacle, word);
+        }
+
+        /// <summary>What a whole cell of one obstacle is called: the plural where a cell holds many
+        /// of them - boulders, bushes - and the singular where it holds one, a statue or a torch.
+        /// </summary>
+        public static string CellObstacle(BattlefieldObstacle obstacle)
+        {
+            if (obstacle == null)
+            {
+                return string.Empty;
+            }
+
+            bool one = obstacle.Kind == BattlefieldObstacleKind.Manufactured
+                || obstacle.Kind == BattlefieldObstacleKind.Light;
+            return Word(obstacle, one ? 1 : 2);
+        }
+
+        /// <summary>What a group of blocked cells is standing under, most of it first and joined as
+        /// a list. <paramref name="count"/> is the group's size, which is the number spoken beside
+        /// the words and so the number they have to agree with.</summary>
+        public static string ObstacleWords(List<BattlefieldObstacle> obstacles, int count)
+        {
+            if (obstacles == null || obstacles.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            List<string> words = new List<string>(obstacles.Count);
+            for (int i = 0; i < obstacles.Count; i++)
+            {
+                string word = Word(obstacles[i], count);
+                if (!string.IsNullOrEmpty(word))
+                {
+                    words.Add(word);
+                }
+            }
+
+            return ModText.JoinList(words);
+        }
+
+        /// <summary>One obstacle in the form <paramref name="count"/> asks for, in the words of the
+        /// theme the board is painted with. Empty for an obstacle nobody named - an unnamed
+        /// decoration byte, a standalone prop - which leaves the plain wording to say it.</summary>
+        private static string Word(BattlefieldObstacle obstacle, int count)
+        {
+            ModPluralString words;
+            return obstacle != null && TryWords(obstacle.Kind, obstacle.Theme, out words)
+                ? ModText.Plural(words, count)
+                : string.Empty;
+        }
+
+        /// <summary>The owner's word for one family of prop in one theme. Theme 7 is a second
+        /// Arleon, and a theme byte nobody knows reads as Arleon too rather than falling silent.
+        /// </summary>
+        private static bool TryWords(BattlefieldObstacleKind kind, int theme, out ModPluralString words)
+        {
+            switch (kind)
+            {
+                case BattlefieldObstacleKind.Rock:
+                    words = ModStrings.Battlefield.ObstacleRock;
+                    return true;
+                case BattlefieldObstacleKind.Fire:
+                    words = ModStrings.Battlefield.ObstacleFire;
+                    return true;
+                case BattlefieldObstacleKind.Water:
+                    words = ModStrings.Battlefield.ObstacleWater;
+                    return true;
+                case BattlefieldObstacleKind.Growth:
+                    words = Growth(theme);
+                    return true;
+                case BattlefieldObstacleKind.Manufactured:
+                    words = Manufactured(theme);
+                    return true;
+                case BattlefieldObstacleKind.Light:
+                    words = Light(theme);
+                    return true;
+                default:
+                    words = ModStrings.Battlefield.ObstacleRock;
+                    return false;
+            }
+        }
+
+        private static ModPluralString Growth(int theme)
+        {
+            switch (theme)
+            {
+                case 1:
+                    return ModStrings.Battlefield.ObstacleGrowthLoth;
+                case 2:
+                    return ModStrings.Battlefield.ObstacleGrowthBarya;
+                case 3:
+                    return ModStrings.Battlefield.ObstacleGrowthRana;
+                case 4:
+                    return ModStrings.Battlefield.ObstacleGrowthVanir;
+                case 5:
+                    return ModStrings.Battlefield.ObstacleGrowthRoots;
+                case 6:
+                    return ModStrings.Battlefield.ObstacleGrowthYulan;
+                default:
+                    return ModStrings.Battlefield.ObstacleGrowthArleon;
+            }
+        }
+
+        private static ModPluralString Manufactured(int theme)
+        {
+            switch (theme)
+            {
+                case 1:
+                    return ModStrings.Battlefield.ObstacleManufacturedLoth;
+                case 2:
+                    return ModStrings.Battlefield.ObstacleManufacturedBarya;
+                case 3:
+                    return ModStrings.Battlefield.ObstacleManufacturedRana;
+                case 4:
+                    return ModStrings.Battlefield.ObstacleManufacturedVanir;
+                case 5:
+                    return ModStrings.Battlefield.ObstacleManufacturedRoots;
+                case 6:
+                    return ModStrings.Battlefield.ObstacleManufacturedYulan;
+                default:
+                    return ModStrings.Battlefield.ObstacleManufacturedArleon;
+            }
+        }
+
+        private static ModPluralString Light(int theme)
+        {
+            switch (theme)
+            {
+                case 1:
+                    return ModStrings.Battlefield.ObstacleLightLoth;
+                case 2:
+                    return ModStrings.Battlefield.ObstacleLightBarya;
+                case 3:
+                    return ModStrings.Battlefield.ObstacleLightRana;
+                case 4:
+                    return ModStrings.Battlefield.ObstacleLightVanir;
+                case 5:
+                    return ModStrings.Battlefield.ObstacleLightRoots;
+                case 6:
+                    return ModStrings.Battlefield.ObstacleLightYulan;
+                default:
+                    return ModStrings.Battlefield.ObstacleLightArleon;
             }
         }
 

@@ -573,6 +573,7 @@ namespace SongsOfConquestAccess.Adapters
             tile.DecorativeFeature = GetDecorativeFeatureAt(point, tile.Entity);
             BattlefieldTerrain terrain = GetTerrain();
             tile.Kind = terrain != null ? terrain.GetKind(point) : BattlefieldCellKind.OffGrid;
+            tile.Obstacle = terrain != null ? terrain.GetObstacle(point) : null;
             return tile;
         }
 
@@ -598,7 +599,8 @@ namespace SongsOfConquestAccess.Adapters
                 _terrain = BattlefieldTerrain.Analyse(
                     _facade.Level.Size,
                     ReadTerrainCells(),
-                    map != null && map.Metadata.Type.IsSiege());
+                    map != null && map.Metadata.Type.IsSiege(),
+                    namesObstacles: true);
             }
             catch (Exception exception)
             {
@@ -620,12 +622,18 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     Vector2Int point = new Vector2Int(x, y);
                     bool onGrid = _facade.Level.IsPointWithinMap(point);
+                    // The theme is the PAINTED one: a fight repaints every cell from the adventure
+                    // ground it was joined on, so this is the boulders the player is looking at and
+                    // not the layout's own.
                     cells.Add(new BattlefieldCell(
                         point,
                         onGrid,
                         onGrid ? _facade.Level.GetElevation(point) : 0,
                         !onGrid || !_facade.Level.IsWalkableStatic(point),
-                        onGrid ? _facade.Level.GetDecoration(point) : 0));
+                        onGrid ? _facade.Level.GetDecoration(point) : 0,
+                        onGrid ? _facade.Level.GetEffect(point) : 0,
+                        onGrid && _facade.Level.GetWater(point) > 0,
+                        onGrid ? _facade.Level.GetTheme(point) : 0));
                 }
             }
 

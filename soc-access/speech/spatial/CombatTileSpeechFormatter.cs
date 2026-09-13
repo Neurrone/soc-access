@@ -212,9 +212,12 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             if (tile.IsImpassable)
             {
+                // What is standing there where the board has a name for it - "boulders,
+                // impassable" - and the bare word where it has none.
+                string impassable = BattlefieldText.CellImpassable(tile.Obstacle);
                 yield return new AnnouncementPart(
                     CombatAnnouncementDefinitions.TileKeys.Impassable,
-                    ModText.Get(ModStrings.Spatial.Impassable));
+                    string.IsNullOrEmpty(impassable) ? ModText.Get(ModStrings.Spatial.Impassable) : impassable);
             }
 
             string tileEffects = DescribeTileEffects(tile);

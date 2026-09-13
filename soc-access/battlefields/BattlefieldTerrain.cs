@@ -44,18 +44,73 @@ namespace SongsOfConquestAccess.Battlefields
         DiagonalRidge
     }
 
+    /// <summary>What an impassable cell is made of, as far as the bytes say: which family of prop
+    /// the theme draws there. The words for these are the screens' - every theme draws its own
+    /// boulders, its own plants and its own statues - and the analysis only says which family and
+    /// which theme.</summary>
+    public enum BattlefieldObstacleKind
+    {
+        None,
+        Rock,
+        Growth,
+        Manufactured,
+        Light,
+        Fire,
+        Water,
+        Other
+    }
+
+    /// <summary>What blocks a cell or a run of cells: the family of prop, the theme drawing it and
+    /// how many cells of a region it accounts for (one, for a single cell).</summary>
+    public sealed class BattlefieldObstacle
+    {
+        public BattlefieldObstacle(BattlefieldObstacleKind kind, int theme, int count)
+        {
+            Kind = kind;
+            Theme = theme;
+            Count = count;
+        }
+
+        public BattlefieldObstacleKind Kind { get; private set; }
+
+        /// <summary>The theme byte the cell is painted with, which in a fight is the adventure
+        /// ground the battle was joined on rather than the layout's own.</summary>
+        public int Theme { get; private set; }
+
+        public int Count { get; private set; }
+    }
+
     /// <summary>One cell as the game answers for it. The caller reads these facts from whatever it
     /// has - the placement page's <c>MapFormat</c>, the battle level facade, the dump's own
     /// loader - and the analysis needs nothing else.</summary>
     public sealed class BattlefieldCell
     {
         public BattlefieldCell(Vector2Int point, bool onGrid, int elevation, bool impassable, int decoration)
+            : this(point, onGrid, elevation, impassable, decoration, 0, false, 0)
+        {
+        }
+
+        /// <summary>The same cell where the caller can also say what is drawn on it: the effect
+        /// brush, whether it is water and the theme painting it, which is what an obstacle is
+        /// named from.</summary>
+        public BattlefieldCell(
+            Vector2Int point,
+            bool onGrid,
+            int elevation,
+            bool impassable,
+            int decoration,
+            int effect,
+            bool water,
+            int theme)
         {
             Point = point;
             OnGrid = onGrid;
             Elevation = elevation;
             Impassable = impassable;
             Decoration = decoration;
+            Effect = effect;
+            Water = water;
+            Theme = theme;
         }
 
         public Vector2Int Point { get; private set; }
@@ -67,6 +122,12 @@ namespace SongsOfConquestAccess.Battlefields
         public bool Impassable { get; private set; }
 
         public int Decoration { get; private set; }
+
+        public int Effect { get; private set; }
+
+        public bool Water { get; private set; }
+
+        public int Theme { get; private set; }
     }
 
     /// <summary>A group of cells that is one thing: what kind it is, what shape, how high it rises
@@ -74,11 +135,22 @@ namespace SongsOfConquestAccess.Battlefields
     public sealed class BattlefieldRegion
     {
         public BattlefieldRegion(BattlefieldRegionKind kind, BattlefieldRegionShape shape, int height, List<Vector2Int> cells)
+            : this(kind, shape, height, cells, null)
+        {
+        }
+
+        public BattlefieldRegion(
+            BattlefieldRegionKind kind,
+            BattlefieldRegionShape shape,
+            int height,
+            List<Vector2Int> cells,
+            List<BattlefieldObstacle> obstacles)
         {
             Kind = kind;
             Shape = shape;
             Height = height;
             Cells = cells ?? new List<Vector2Int>();
+            Obstacles = obstacles ?? new List<BattlefieldObstacle>();
             Key = kind.ToString().ToLowerInvariant()
                 + ":" + (Cells.Count > 0 ? Cells[0].x : -1)
                 + ":" + (Cells.Count > 0 ? Cells[0].y : -1);
@@ -92,6 +164,11 @@ namespace SongsOfConquestAccess.Battlefields
         public int Height { get; private set; }
 
         public List<Vector2Int> Cells { get; private set; }
+
+        /// <summary>What blocks this region, most cells first, where the caller asked for obstacles
+        /// at all. Empty everywhere else, which is what the placement page sees: its preview shows a
+        /// blocked cell as a puck with no style, so it has nothing to name.</summary>
+        public List<BattlefieldObstacle> Obstacles { get; private set; }
 
         public int Count
         {
@@ -137,6 +214,15 @@ namespace SongsOfConquestAccess.Battlefields
         private const int WallDecoration = 7;
         private const int StairsDecoration = 8;
 
+        /// <summary>The decoration bytes whose props the owner fixed words for, and the effect
+        /// brush that is fire. Every theme draws its own version of each, which is why the theme
+        /// travels with the kind.</summary>
+        private const int BoulderDecoration = 4;
+        private const int LightDecoration = 5;
+        private const int GrowthDecoration = 9;
+        private const int StatueDecoration = 10;
+        private const int FireEffect = 5;
+
         /// <summary>How big each half of a split has to be before the cells between them are worth
         /// calling a choke point: a pocket smaller than this is a corner, not a half of the board.
         /// </summary>
@@ -163,14 +249,22 @@ namespace SongsOfConquestAccess.Battlefields
         private readonly int _height;
         private readonly BattlefieldCellKind[,] _kinds;
         private readonly int[,] _elevations;
+        private readonly BattlefieldObstacle[,] _obstacles;
         private readonly List<BattlefieldRegion> _regions;
 
-        private BattlefieldTerrain(int width, int height, BattlefieldCellKind[,] kinds, int[,] elevations, List<BattlefieldRegion> regions)
+        private BattlefieldTerrain(
+            int width,
+            int height,
+            BattlefieldCellKind[,] kinds,
+            int[,] elevations,
+            BattlefieldObstacle[,] obstacles,
+            List<BattlefieldRegion> regions)
         {
             _width = width;
             _height = height;
             _kinds = kinds;
             _elevations = elevations;
+            _obstacles = obstacles;
             _regions = regions;
         }
 
@@ -188,12 +282,24 @@ namespace SongsOfConquestAccess.Battlefields
 
         public static BattlefieldTerrain Analyse(Vector2Int size, IEnumerable<BattlefieldCell> cells, bool isSiege)
         {
+            return Analyse(size, cells, isSiege, namesObstacles: false);
+        }
+
+        /// <summary>The same reading, with or without what blocks each impassable cell.
+        /// <paramref name="namesObstacles"/> is the fight: there the board wears the theme of the
+        /// ground the battle was joined on and the player sees boulders and bushes. On the
+        /// placement page the preview draws a blocked cell as a styleless puck, so nothing there
+        /// has a name to give.</summary>
+        public static BattlefieldTerrain Analyse(
+            Vector2Int size, IEnumerable<BattlefieldCell> cells, bool isSiege, bool namesObstacles)
+        {
             int width = Math.Max(0, size.x);
             int height = Math.Max(0, size.y);
             BattlefieldCellKind[,] kinds = new BattlefieldCellKind[Math.Max(1, width), Math.Max(1, height)];
             int[,] elevations = new int[Math.Max(1, width), Math.Max(1, height)];
             bool[,] enterable = new bool[Math.Max(1, width), Math.Max(1, height)];
             bool[,] elevated = new bool[Math.Max(1, width), Math.Max(1, height)];
+            BattlefieldObstacle[,] obstacles = new BattlefieldObstacle[Math.Max(1, width), Math.Max(1, height)];
 
             if (cells != null)
             {
@@ -218,6 +324,11 @@ namespace SongsOfConquestAccess.Battlefields
                     if (cell.Impassable)
                     {
                         kinds[x, y] = BattlefieldCellKind.Impassable;
+                        if (namesObstacles)
+                        {
+                            obstacles[x, y] = new BattlefieldObstacle(ObstacleKind(cell), cell.Theme, 1);
+                        }
+
                         continue;
                     }
 
@@ -249,19 +360,57 @@ namespace SongsOfConquestAccess.Battlefields
             }
 
             List<BattlefieldRegion> regions = new List<BattlefieldRegion>();
-            AddRegions(regions, width, height, kinds, elevations, BattlefieldCellKind.Elevated, BattlefieldRegionKind.Elevated);
-            AddRegions(regions, width, height, kinds, elevations, BattlefieldCellKind.Cliff, BattlefieldRegionKind.Cliff);
-            AddRegions(regions, width, height, kinds, elevations, BattlefieldCellKind.Impassable, BattlefieldRegionKind.Impassable);
-            AddRegions(regions, width, height, kinds, elevations, BattlefieldCellKind.Wall, BattlefieldRegionKind.Wall);
-            AddRegions(regions, width, height, kinds, elevations, BattlefieldCellKind.Tower, BattlefieldRegionKind.Tower);
-            AddRegions(regions, width, height, kinds, elevations, BattlefieldCellKind.Stairs, BattlefieldRegionKind.Stairs);
+            AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Elevated, BattlefieldRegionKind.Elevated);
+            AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Cliff, BattlefieldRegionKind.Cliff);
+            AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Impassable, BattlefieldRegionKind.Impassable);
+            AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Wall, BattlefieldRegionKind.Wall);
+            AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Tower, BattlefieldRegionKind.Tower);
+            AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Stairs, BattlefieldRegionKind.Stairs);
             regions.AddRange(ChokePoints(width, height, enterable, elevations));
-            return new BattlefieldTerrain(width, height, kinds, elevations, regions);
+            return new BattlefieldTerrain(width, height, kinds, elevations, obstacles, regions);
+        }
+
+        /// <summary>Which family of prop blocks a cell, from the bytes the caller read: water and
+        /// the fire brush answer for themselves, and the four decoration bytes the owner fixed
+        /// words for are the boulders, the growth, the statues and the lights. Anything else is an
+        /// obstacle with no name of its own, which stays plain impassable.</summary>
+        private static BattlefieldObstacleKind ObstacleKind(BattlefieldCell cell)
+        {
+            if (cell.Water)
+            {
+                return BattlefieldObstacleKind.Water;
+            }
+
+            if (cell.Effect == FireEffect)
+            {
+                return BattlefieldObstacleKind.Fire;
+            }
+
+            switch (cell.Decoration)
+            {
+                case BoulderDecoration:
+                    return BattlefieldObstacleKind.Rock;
+                case LightDecoration:
+                    return BattlefieldObstacleKind.Light;
+                case GrowthDecoration:
+                    return BattlefieldObstacleKind.Growth;
+                case StatueDecoration:
+                    return BattlefieldObstacleKind.Manufactured;
+                default:
+                    return BattlefieldObstacleKind.Other;
+            }
         }
 
         public BattlefieldCellKind GetKind(Vector2Int point)
         {
             return Within(point, _width, _height) ? _kinds[point.x, point.y] : BattlefieldCellKind.OffGrid;
+        }
+
+        /// <summary>What blocks one cell, where the caller asked for obstacles and the cell is
+        /// blocked at all; null everywhere else.</summary>
+        public BattlefieldObstacle GetObstacle(Vector2Int point)
+        {
+            return Within(point, _width, _height) ? _obstacles[point.x, point.y] : null;
         }
 
         /// <summary>The neighbours of a cell that a troop standing on it cannot step to because the
@@ -353,6 +502,7 @@ namespace SongsOfConquestAccess.Battlefields
             int height,
             BattlefieldCellKind[,] kinds,
             int[,] elevations,
+            BattlefieldObstacle[,] obstacles,
             BattlefieldCellKind cellKind,
             BattlefieldRegionKind regionKind)
         {
@@ -389,7 +539,8 @@ namespace SongsOfConquestAccess.Battlefields
                         regionKind,
                         ShapeOf(regionKind, members),
                         MaxElevation(members, elevations),
-                        members));
+                        members,
+                        ObstaclesOf(members, obstacles)));
                 }
             }
         }
@@ -536,6 +687,46 @@ namespace SongsOfConquestAccess.Battlefields
             }
 
             return degrees;
+        }
+
+        /// <summary>What a group of cells is blocked by, gathered into one entry per family and
+        /// theme, the biggest first so a run of six bushes and two boulders is named for its
+        /// bushes. Empty where nothing in it carries an obstacle.</summary>
+        private static List<BattlefieldObstacle> ObstaclesOf(List<Vector2Int> members, BattlefieldObstacle[,] obstacles)
+        {
+            List<BattlefieldObstacle> found = new List<BattlefieldObstacle>();
+            for (int i = 0; i < members.Count; i++)
+            {
+                BattlefieldObstacle obstacle = obstacles[members[i].x, members[i].y];
+                if (obstacle == null)
+                {
+                    continue;
+                }
+
+                int at = -1;
+                for (int j = 0; j < found.Count; j++)
+                {
+                    if (found[j].Kind == obstacle.Kind && found[j].Theme == obstacle.Theme)
+                    {
+                        at = j;
+                        break;
+                    }
+                }
+
+                if (at < 0)
+                {
+                    found.Add(obstacle);
+                }
+                else
+                {
+                    found[at] = new BattlefieldObstacle(obstacle.Kind, obstacle.Theme, found[at].Count + 1);
+                }
+            }
+
+            // The commonest first, and otherwise the order the cells were met in, so the same board
+            // always names them the same way round.
+            found.Sort((left, right) => right.Count.CompareTo(left.Count));
+            return found;
         }
 
         private static int MaxElevation(List<Vector2Int> members, int[,] elevations)
