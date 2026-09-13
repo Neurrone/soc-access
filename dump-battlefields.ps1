@@ -17,8 +17,8 @@
     -Mode Combat       From the main menu. Opens the map editor in its Battle context, which draws
                        a layout with the real props and no troops, loads each layout in turn and
                        saves the frame as battlefields\<LevelType>\<PathName>.combat.jpg. The
-                       editor's own panels are hidden for the frames and shown again after. The
-                       game is left in the editor.
+                       editor's own panels are hidden for the frames and shown again after, and
+                       the game is returned to the main menu.
 
     Both drive the dev server (docs\dev-loop.md), so the game must be running with it on
     (run-game.ps1). The dump code is soc-access\dev\BattlefieldDump.cs and BattlefieldEditor.cs.
@@ -162,5 +162,11 @@ try {
     }
 } finally {
     $null = Invoke-Eval 'SongsOfConquestAccess.Dev.BattlefieldEditor.Ui(true)'
+    $null = Invoke-Eval 'SongsOfConquestAccess.Dev.BattlefieldEditor.Close()'
+    $deadline = (Get-Date).AddSeconds(60)
+    do {
+        Start-Sleep -Seconds 2
+        $editor = Invoke-Eval 'SongsOfConquestAccess.Dev.BattlefieldEditor.State()'
+    } while ($editor.scene -notlike 'MainMenu*' -and (Get-Date) -lt $deadline)
 }
-Write-Host "Combat renders: $written of $($keys.Count) layouts in $Out"
+Write-Host "Combat renders: $written of $($keys.Count) layouts in $Out; the game is back at the main menu"

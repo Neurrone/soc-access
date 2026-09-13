@@ -46,6 +46,28 @@ namespace SongsOfConquestAccess.Dev
             }
         }
 
+        /// <summary>Back to the main menu, the editor's own File menu route, and the editor context
+        /// back to Adventure so the owner's next visit to the editor is the one they expect.</summary>
+        public static string Close()
+        {
+            try
+            {
+                ISceneLoader loader = ProjectContext.Instance.Container.TryResolve<ISceneLoader>();
+                if (loader == null)
+                {
+                    return DevJson.Error("no ISceneLoader");
+                }
+
+                MapEditorContextController.ResetContext();
+                loader.Load(MainMenuSceneType.MainMenu, SceneLoaderOptions.NoLoadingScreen);
+                return DevJson.Ok();
+            }
+            catch (Exception e)
+            {
+                return DevJson.Error(e.ToString());
+            }
+        }
+
         /// <summary>Which scene is up, and whether the editor's facade answers yet.</summary>
         public static string State()
         {
