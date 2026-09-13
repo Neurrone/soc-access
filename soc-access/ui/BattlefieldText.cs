@@ -281,8 +281,8 @@ namespace SongsOfConquestAccess.UI
             // "un mur de rochers", not "un mur de des rochers". Standing on its own the group is the
             // whole noun phrase and takes the description form, which carries the article a language
             // needs: "bloqué par des rochers". English spells the two alike and hears no difference.
-            bool wall = region.IsRidge && !NeverAWall(region.Obstacles);
-            string words = ObstacleWords(region.Obstacles, region.Count, wall);
+            bool wall = region.IsRidge && !NeverAWall(region.Obstacle);
+            string words = ObstacleWord(region.Obstacle, region.Count, wall);
             if (string.IsNullOrEmpty(words))
             {
                 if (region.IsRidge)
@@ -300,29 +300,16 @@ namespace SongsOfConquestAccess.UI
                 : words;
         }
 
-        /// <summary>Whether a group is nothing but stuff no wall is built out of: water and fire,
-        /// which there is no counting and no building with - "a wall of water" and "wall of 5
-        /// water" are not English, so a moat is water and a burning line is fire whatever shape it
-        /// lies in - and gateposts, which are the frame of a gate and not a wall of their own. A
-        /// group that mixes them with anything else is named as a wall like any other.</summary>
-        private static bool NeverAWall(List<BattlefieldObstacle> obstacles)
+        /// <summary>Whether a group is made of stuff no wall is built out of: water and fire, which
+        /// there is no counting and no building with - "a wall of water" and "wall of 5 water" are
+        /// not English, so a moat is water and a burning line is fire whatever shape it lies in -
+        /// and gateposts, which are the frame of a gate and not a wall of their own.</summary>
+        private static bool NeverAWall(BattlefieldObstacle obstacle)
         {
-            if (obstacles == null || obstacles.Count == 0)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < obstacles.Count; i++)
-            {
-                if (obstacles[i].Kind != BattlefieldObstacleKind.Water
-                    && obstacles[i].Kind != BattlefieldObstacleKind.Fire
-                    && obstacles[i].Kind != BattlefieldObstacleKind.Gatepost)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return obstacle != null
+                && (obstacle.Kind == BattlefieldObstacleKind.Water
+                    || obstacle.Kind == BattlefieldObstacleKind.Fire
+                    || obstacle.Kind == BattlefieldObstacleKind.Gatepost);
         }
 
         private static void Unknown(Action<string> onUnknownRegion, string placeholder)
@@ -391,7 +378,7 @@ namespace SongsOfConquestAccess.UI
         {
             // Empty where the fight named nothing, and where it named only obstacles nobody has a
             // word for: a lone standalone prop is impassable ground and nothing more.
-            string obstacles = ObstacleWords(region.Obstacles, region.Count, true);
+            string obstacles = ObstacleWord(region.Obstacle, region.Count, true);
             if (string.IsNullOrEmpty(obstacles))
             {
                 if (region.Count == 1)
@@ -409,11 +396,11 @@ namespace SongsOfConquestAccess.UI
 
             if (region.Count == 1)
             {
-                return ModText.Get(ModStrings.Spatial.ImpassableObstacle, CellObstacle(region.Obstacles[0]));
+                return ModText.Get(ModStrings.Spatial.ImpassableObstacle, CellObstacle(region.Obstacle));
             }
 
             return ModText.Plural(
-                region.IsRidge && !NeverAWall(region.Obstacles)
+                region.IsRidge && !NeverAWall(region.Obstacle)
                     ? ModStrings.Scanner.TerrainObstacleWall
                     : ModStrings.Scanner.TerrainObstacleCells,
                 region.Count,
@@ -446,38 +433,17 @@ namespace SongsOfConquestAccess.UI
             bool one = obstacle.Kind == BattlefieldObstacleKind.Manufactured
                 || obstacle.Kind == BattlefieldObstacleKind.Light
                 || obstacle.Kind == BattlefieldObstacleKind.Gatepost;
-            return Word(obstacle, one ? 1 : 2, true);
+            return ObstacleWord(obstacle, one ? 1 : 2, true);
         }
 
-        /// <summary>What a group of blocked cells is standing under, most of it first and joined as
-        /// a list. <paramref name="count"/> is the group's size, which is the number spoken beside
-        /// the words and so the number they have to agree with; <paramref name="bare"/> asks for
-        /// the bare nouns the scanner speaks rather than the noun phrases a description reads.
-        /// </summary>
-        public static string ObstacleWords(List<BattlefieldObstacle> obstacles, int count, bool bare)
-        {
-            if (obstacles == null || obstacles.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            List<string> words = new List<string>(obstacles.Count);
-            for (int i = 0; i < obstacles.Count; i++)
-            {
-                string word = Word(obstacles[i], count, bare);
-                if (!string.IsNullOrEmpty(word))
-                {
-                    words.Add(word);
-                }
-            }
-
-            return ModText.JoinList(words);
-        }
-
-        /// <summary>One obstacle in the form <paramref name="count"/> asks for, in the words of the
-        /// theme the board is painted with. Empty for an obstacle nobody named - an unnamed
-        /// decoration byte, a standalone prop - which leaves the plain wording to say it.</summary>
-        private static string Word(BattlefieldObstacle obstacle, int count, bool bare)
+        /// <summary>What a group of blocked cells is standing under, in the words of the theme the
+        /// board is painted with: one word, because a group is one family of prop and never a
+        /// mixture. <paramref name="count"/> is the group's size, which is the number spoken beside
+        /// the word and so the number it has to agree with; <paramref name="bare"/> asks for the
+        /// bare noun the scanner speaks rather than the noun phrase a description reads. Empty for
+        /// an obstacle nobody named - an unnamed decoration byte, a standalone prop - which leaves
+        /// the plain wording to say it.</summary>
+        public static string ObstacleWord(BattlefieldObstacle obstacle, int count, bool bare)
         {
             ModPluralString words;
             return obstacle != null && TryWords(obstacle.Kind, obstacle.Theme, bare, out words)

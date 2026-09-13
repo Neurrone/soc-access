@@ -88,31 +88,25 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(
                 ModText.Get(
                     ModStrings.Battlefield.DescriptionObstacleWall,
-                    BattlefieldText.ObstacleWords(wall.Obstacles, wall.Count, true)),
+                    BattlefieldText.ObstacleWord(wall.Obstacle, wall.Count, true)),
                 BattlefieldText.RegionDescription(wall));
 
-            Assert.AreEqual("a bush", BattlefieldText.ObstacleWords(wall.Obstacles, 1, false));
-            Assert.AreEqual("bush", BattlefieldText.ObstacleWords(wall.Obstacles, 1, true));
+            Assert.AreEqual("a bush", BattlefieldText.ObstacleWord(wall.Obstacle, 1, false));
+            Assert.AreEqual("bush", BattlefieldText.ObstacleWord(wall.Obstacle, 1, true));
         }
 
         /// <summary>A group of blocked cells is named by what is on it and how much of it there is,
-        /// and a long thin one is a wall of it. Where the group holds more than one thing, the
-        /// commonest comes first.</summary>
+        /// and a long thin one is a wall of it.</summary>
         [TestMethod]
         public void TheScannerNamesAGroupOfBlockedCellsByWhatIsOnThem()
         {
             Assert.AreEqual("bushes, impassable", ImpassableGroup(ArleonTheme, "G..", "...", "..."));
             Assert.AreEqual("bushes, 3 cells, impassable", ImpassableGroup(ArleonTheme, "GG.", "G..", "..."));
             Assert.AreEqual("wall of 5 bushes, impassable", ImpassableGroup(ArleonTheme, ".....", "GGGGG", "....."));
-            Assert.AreEqual(
-                "wall of 6 bushes and boulders, impassable",
-                ImpassableGroup(ArleonTheme, "......", "GGGGBB", "......"));
         }
 
         /// <summary>Water and fire are not counted and not built with: a line of either is what it
-        /// is and not a wall of it, in a description and in the scanner alike. A group that mixes
-        /// them with something countable is a wall of the list, as any other mixed group is.
-        /// </summary>
+        /// is and not a wall of it, in a description and in the scanner alike.</summary>
         [TestMethod]
         public void WaterAndFireAreNeverAWallOfThemselves()
         {
@@ -120,13 +114,86 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("fire", Expand("{0,1}", Analyse(ArleonTheme, true, ".....", "FFFFF", ".....")));
             Assert.AreEqual("water, 5 cells, impassable", ImpassableGroup(ArleonTheme, ".....", "WWWWW", "....."));
             Assert.AreEqual("fire, 5 cells, impassable", ImpassableGroup(ArleonTheme, ".....", "FFFFF", "....."));
+        }
 
-            Assert.AreEqual(
-                "a wall of water and boulders",
-                Expand("{0,1}", Analyse(ArleonTheme, true, "......", "WWWWBB", "......")));
-            Assert.AreEqual(
-                "wall of 6 water and boulders, impassable",
-                ImpassableGroup(ArleonTheme, "......", "WWWWBB", "......"));
+        /// <summary>TOUCHING IS NOT BEING THE SAME THING. A pond that runs up against a boulder
+        /// field is a pond and a boulder field, each named and counted on its own, rather than one
+        /// group a sentence would have to list two words for.</summary>
+        [TestMethod]
+        public void APondTouchingBouldersIsTwoRegions()
+        {
+            BattlefieldTerrain terrain = Analyse(ArleonTheme, true, "......", "WWWWBB", "......");
+            List<BattlefieldRegion> blocked = All(terrain, BattlefieldRegionKind.Impassable);
+
+            Assert.AreEqual(2, blocked.Count);
+            Assert.AreEqual("water, 4 cells, impassable", BattlefieldText.Region(blocked[0]));
+            Assert.AreEqual("boulders, 2 cells, impassable", BattlefieldText.Region(blocked[1]));
+            Assert.AreEqual("water", Expand("{0,1}", terrain));
+            Assert.AreEqual("boulders", Expand("{4,1}", terrain));
+        }
+
+        /// <summary>A group is one family of prop, so nothing it is ever called lists two of them:
+        /// the word inside "a wall of ..." is one word, and every cell of the group answers to it.
+        /// </summary>
+        [TestMethod]
+        public void NoGroupOfBlockedGroundCarriesTwoWords()
+        {
+            BattlefieldTerrain terrain = Analyse(ArleonTheme, true, "GGBBWW", "GBMLFW", "..PP..");
+
+            foreach (BattlefieldRegion region in All(terrain, BattlefieldRegionKind.Impassable))
+            {
+                Assert.AreEqual(region.ObstacleKind, region.Obstacle.Kind, region.Key);
+                for (int i = 0; i < region.Cells.Count; i++)
+                {
+                    Assert.AreEqual(
+                        region.ObstacleKind,
+                        terrain.GetObstacle(region.Cells[i]).Kind,
+                        "cell " + region.Cells[i] + " of " + region.Key);
+                }
+            }
+        }
+
+        /// <summary>The placement page reads the same bytes and splits blocked ground the same way;
+        /// only the words are withheld there, because nothing has painted the board yet.</summary>
+        [TestMethod]
+        public void ThePlacementPageSplitsBlockedGroundWhereTheFightDoes()
+        {
+            string[] rows = { "GGBBWW", "GBMLFW", "..PP.." };
+            CollectionAssert.AreEqual(
+                Groups(Analyse(ArleonTheme, true, rows)), Groups(Analyse(ArleonTheme, false, rows)));
+        }
+
+        /// <summary>The cells of every group of blocked ground, one string per group, so two
+        /// readings of the same board can be compared as a whole.</summary>
+        private static List<string> Groups(BattlefieldTerrain terrain)
+        {
+            List<string> groups = new List<string>();
+            foreach (BattlefieldRegion region in All(terrain, BattlefieldRegionKind.Impassable))
+            {
+                List<string> points = new List<string>(region.Cells.Count);
+                for (int i = 0; i < region.Cells.Count; i++)
+                {
+                    points.Add(region.Cells[i].x + "," + region.Cells[i].y);
+                }
+
+                groups.Add(string.Join(" ", points.ToArray()));
+            }
+
+            return groups;
+        }
+
+        private static List<BattlefieldRegion> All(BattlefieldTerrain terrain, BattlefieldRegionKind kind)
+        {
+            List<BattlefieldRegion> regions = new List<BattlefieldRegion>();
+            foreach (BattlefieldRegion region in terrain.Regions)
+            {
+                if (region.Kind == kind)
+                {
+                    regions.Add(region);
+                }
+            }
+
+            return regions;
         }
 
         /// <summary>The blocked pieces framing a walled town siege's gate are stonework, the same
@@ -164,7 +231,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void ThePlacementPageStillSaysImpassableAndNothingElse()
         {
-            BattlefieldTerrain terrain = Analyse(ArleonTheme, false, "......", "GGGGBB", "......");
+            BattlefieldTerrain terrain = Analyse(ArleonTheme, false, "......", "GGGGGG", "......");
             Assert.AreEqual(
                 "wall of 6 impassable cells",
                 BattlefieldText.Region(First(terrain, BattlefieldRegionKind.Impassable)));
@@ -203,7 +270,7 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("a wall of impassable cells", Expand("{0,1}", Analyse(ArleonTheme, false, ".....", "GGGGG", ".....")));
             Assert.AreEqual("a boulder", Expand("{0,0}", Analyse(ArleonTheme, true, "...", "...", "B..")));
             Assert.AreEqual("a wall of bushes", Expand("{0,1}", Analyse(ArleonTheme, true, ".....", "GGGGG", ".....")));
-            Assert.AreEqual("boulders and bushes", Expand("{0,1}", Analyse(ArleonTheme, true, "...", "BG.", "...")));
+            Assert.AreEqual("a boulder and a bush", Expand("{0,1} and {1,1}", Analyse(ArleonTheme, true, "...", "BG.", "...")));
         }
 
         /// <summary>A placeholder pointing at no group at all is an authoring mistake: it says
