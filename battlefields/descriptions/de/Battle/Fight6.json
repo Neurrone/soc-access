@@ -1,5 +1,5 @@
 {
-  "terrain": "Offenes Gelände in der Mitte, unten links {1,1}, unten rechts {9,1}, oben links {1,6} und oben rechts {11,6}. Links und rechts der Mitte stehen {3,3} und {8,3}.",
+  "terrain": "Offenes Gelände in der Mitte, unten links {1,1}, unten rechts {9,1}, oben links {1,6} und oben rechts {11,6}. Links und rechts der Mitte {3,3} und {9,4}.",
   "attacker": "Die Aufstellungspunkte des Angreifers sammeln sich in der Mitte des Schlachtfelds.",
   "defender": "Die Aufstellungspunkte des Verteidigers umgeben die des Angreifers, zwei in jeder Ecke und einer unten in der Mitte."
 }

@@ -1,5 +1,5 @@
 {
-  "terrain": "Offenes Gelände am unteren Rand, in die obere linke Ecke hinauf {3,6}, in die obere rechte {10,6}. Über den oberen Teil {6,4}; das Schlachtfeld zerfällt dadurch in eine linke und eine rechte Hälfte, die nur unten in der Mitte zusammentreffen, wo {6,2} liegt.",
+  "terrain": "Offenes Gelände am unteren Rand, in die obere linke Ecke hinauf {3,6}, in die obere rechte {10,6}. Über den ganzen oberen Teil {4,5}; die linke und die rechte Hälfte des Schlachtfelds treffen nur unten in der Mitte zusammen, wo {5,2} liegt.",
   "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, in der linken Hälfte.",
   "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang, und {10,6} trägt zwei davon."
 }

@@ -1,5 +1,5 @@
 {
-  "terrain": "Offenes Gelände zieht sich vom unteren Rand nach oben; links davon {3,0}, rechts davon {8,0}. {0,0} und {12,2} schließen den linken beziehungsweise den rechten Rand ab.",
+  "terrain": "Offenes Gelände zieht sich vom unteren Rand nach oben; links davon {3,0}, rechts davon {8,0}. Der linke Rand ist abgeriegelt: {1,0} und {0,3}; der rechte: {12,2}.",
   "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich quer über den oberen Teil des Schlachtfelds, und {3,0} trägt sieben davon.",
   "defender": "Die Aufstellungspunkte des Verteidigers füllen den unteren rechten Teil, und {8,0} trägt zehn davon."
 }

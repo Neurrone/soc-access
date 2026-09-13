@@ -1,5 +1,5 @@
 {
-  "terrain": "Offenes Gelände auf der linken Seite, die Türme des Verteidigers oben in der Mitte und unten in der Mitte, zu jedem eine Treppe vom Rand daneben hinauf und dazwischen in der Mitte eine Mauer. Hinter der Mauer liegt rechts in der Mitte {9,5} und unten rechts {8,0}. Die obere linke und die obere rechte Ecke schließen {0,6} und {12,6} ab.",
+  "terrain": "Offenes Gelände auf der linken Seite, die Türme des Verteidigers oben in der Mitte und unten in der Mitte, zu jedem eine Treppe vom Rand daneben hinauf und dazwischen in der Mitte eine Mauer. Hinter der Mauer liegt rechts in der Mitte {9,5} und unten rechts {8,0}. Die obere linke und die obere rechte Ecke sind abgeriegelt: {0,8} und {11,8}.",
   "attacker": "Die Aufstellungspunkte des Angreifers verteilen sich über das linke Drittel, auf offenem Gelände außerhalb der Türme.",
   "defender": "Die Aufstellungspunkte des Verteidigers füllen die Mitte und die rechte Seite, zwei davon auf den Türmen und vier auf der Mauer."
 }

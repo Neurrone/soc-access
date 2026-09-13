@@ -1,5 +1,5 @@
 {
-  "terrain": "Offenes Gelände, unten in der Mitte {5,0}, oben in der Mitte {6,6} und rechts in der Mitte {12,2}. {2,0} und {1,6} sperren den unteren beziehungsweise den oberen linken Teil ab, sodass der einzige Weg in die obere linke Ecke {0,5} ist.",
+  "terrain": "Offenes Gelände, unten in der Mitte {5,0}, oben in der Mitte {6,6} und rechts in der Mitte {12,2}. Die obere linke Ecke ist abgeriegelt: {3,6} und {3,7}; der einzige Weg hinein ist {0,5}.",
   "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich quer durch die Mitte des Schlachtfelds.",
   "defender": "Die Aufstellungspunkte des Verteidigers umgeben die des Angreifers; {5,0} trägt zwei davon, {6,6} zwei und {12,2} fünf."
 }

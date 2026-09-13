@@ -1,5 +1,5 @@
 {
-  "terrain": "Offenes Gelände, quer über den oberen linken Teil {3,6} und quer über den oberen rechten {8,6}, und der einzige Weg auf den Boden dazwischen ist {6,5}. Den unteren Teil des Schlachtfelds unterbrechen links {2,0}, in der Mitte {8,0} und dazwischen {5,2}.",
+  "terrain": "Offenes Gelände, quer über den oberen linken Teil {3,6}, quer über die obere Mitte {6,6} und quer über den oberen rechten Teil {8,6}, und der einzige Weg auf den Boden dazwischen ist {6,5}. Der untere Teil des Schlachtfelds ist unterbrochen: links {2,0}, in der Mitte {8,0} und dazwischen {6,2}.",
   "attacker": "Die Aufstellungspunkte des Angreifers verteilen sich über das linke Drittel.",
   "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über das rechte Drittel."
 }

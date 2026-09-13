@@ -8,7 +8,7 @@
       "defender": "Die Aufstellungspunkte des Verteidigers sammeln sich rechts in der Mitte, innerhalb der Klippen."
     },
     "Battle/Fight1": {
-      "terrain": "Flaches Gelände in der unteren linken Ecke, über den Rest des Schlachtfelds {6,0}. Am oberen Rand und bis in die Mitte hinunter {1,4}; der einzige Weg nach rechts ist {9,2}.",
+      "terrain": "Flaches Gelände in der unteren linken Ecke, über den Rest des Schlachtfelds {6,0}. Der obere Rand ist abgeriegelt: {0,5}; der einzige Weg nach rechts ist {9,2}.",
       "attacker": "Die Aufstellungspunkte des Angreifers füllen das flache Gelände in der unteren linken Ecke.",
       "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über das rechte Drittel, über {9,2} hinaus, wo {6,0} sie trägt."
     },
@@ -18,27 +18,27 @@
       "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über die rechte Seite des Schlachtfelds, und {5,0} trägt sie alle."
     },
     "Battle/Fight3": {
-      "terrain": "Offenes Gelände zieht sich vom unteren Rand nach oben; links davon {3,0}, rechts davon {8,0}. {0,0} und {12,2} schließen den linken beziehungsweise den rechten Rand ab.",
+      "terrain": "Offenes Gelände zieht sich vom unteren Rand nach oben; links davon {3,0}, rechts davon {8,0}. Der linke Rand ist abgeriegelt: {1,0} und {0,3}; der rechte: {12,2}.",
       "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich quer über den oberen Teil des Schlachtfelds, und {3,0} trägt sieben davon.",
       "defender": "Die Aufstellungspunkte des Verteidigers füllen den unteren rechten Teil, und {8,0} trägt zehn davon."
     },
     "Battle/Fight4": {
-      "terrain": "Offenes Gelände am unteren Rand, in die obere linke Ecke hinauf {3,6}, in die obere rechte {10,6}. Über den oberen Teil {6,4}; das Schlachtfeld zerfällt dadurch in eine linke und eine rechte Hälfte, die nur unten in der Mitte zusammentreffen, wo {6,2} liegt.",
+      "terrain": "Offenes Gelände am unteren Rand, in die obere linke Ecke hinauf {3,6}, in die obere rechte {10,6}. Über den ganzen oberen Teil {4,5}; die linke und die rechte Hälfte des Schlachtfelds treffen nur unten in der Mitte zusammen, wo {5,2} liegt.",
       "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, in der linken Hälfte.",
       "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang, und {10,6} trägt zwei davon."
     },
     "Battle/Fight5": {
-      "terrain": "Offenes Gelände auf der linken Seite; {2,1} bedeckt die Mitte und die rechte Seite. {6,5} und {0,0} schließen die obere Mitte beziehungsweise den unteren Rand ab, dazwischen in der Mitte {5,3}.",
+      "terrain": "Offenes Gelände auf der linken Seite; {2,1} bedeckt die Mitte und die rechte Seite. Die obere Mitte ist abgeriegelt: {5,7}; der untere Rand: {0,0} und {10,0}; dazwischen in der Mitte {5,3}.",
       "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, und {2,1} trägt einen davon.",
       "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über das rechte Drittel, und {2,1} trägt sie alle."
     },
     "Battle/Fight6": {
-      "terrain": "Offenes Gelände in der Mitte, unten links {1,1}, unten rechts {9,1}, oben links {1,6} und oben rechts {11,6}. Links und rechts der Mitte stehen {3,3} und {8,3}.",
+      "terrain": "Offenes Gelände in der Mitte, unten links {1,1}, unten rechts {9,1}, oben links {1,6} und oben rechts {11,6}. Links und rechts der Mitte {3,3} und {9,4}.",
       "attacker": "Die Aufstellungspunkte des Angreifers sammeln sich in der Mitte des Schlachtfelds.",
       "defender": "Die Aufstellungspunkte des Verteidigers umgeben die des Angreifers, zwei in jeder Ecke und einer unten in der Mitte."
     },
     "Battle/Hideout": {
-      "terrain": "Offenes Gelände, unten in der Mitte {5,0}, oben in der Mitte {6,6} und rechts in der Mitte {12,2}. {2,0} und {1,6} sperren den unteren beziehungsweise den oberen linken Teil ab, sodass der einzige Weg in die obere linke Ecke {0,5} ist.",
+      "terrain": "Offenes Gelände, unten in der Mitte {5,0}, oben in der Mitte {6,6} und rechts in der Mitte {12,2}. Die obere linke Ecke ist abgeriegelt: {3,6} und {3,7}; der einzige Weg hinein ist {0,5}.",
       "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich quer durch die Mitte des Schlachtfelds.",
       "defender": "Die Aufstellungspunkte des Verteidigers umgeben die des Angreifers; {5,0} trägt zwei davon, {6,6} zwei und {12,2} fünf."
     },
@@ -53,7 +53,7 @@
       "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über die Mitte und die rechte Seite; {5,5}, {8,7} und {9,3} tragen je einen davon."
     },
     "Battle/TrailerBattle": {
-      "terrain": "Offenes Gelände über die Mitte und die rechte Seite, in der Mitte {4,4} und rechts in der Mitte {11,3}, dazu Klippen oben links und oben in der Mitte. {0,0} füllt den unteren linken Teil und zieht sich am linken Rand hinauf, erreichbar nur über {5,3}; über fast den ganzen oberen Rand {9,6}.",
+      "terrain": "Offenes Gelände über die Mitte und die rechte Seite, in der Mitte {4,4} und rechts in der Mitte {11,3}, dazu Klippen oben links und oben in der Mitte. {0,0} füllt den unteren linken Teil und zieht sich am linken Rand hinauf; der einzige Weg dorthin ist {5,3}, und fast der ganze obere Rand ist abgeriegelt: {5,8} und {9,6}.",
       "attacker": "Die Aufstellungspunkte des Angreifers verteilen sich über die linke Seite des Schlachtfelds; {0,0} und {4,4} tragen je einen davon.",
       "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über die rechte Seite des Schlachtfelds, alle auf offenem Gelände."
     },
@@ -113,7 +113,7 @@
       "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang; {10,5} trägt drei davon und {8,0} einen."
     },
     "Battle_Plains/Plains": {
-      "terrain": "Offenes Gelände über das ganze Schlachtfeld, nahe dem unteren Rand {4,1} und {7,1} und in der Mitte {6,4}. Oben in der Mitte ist der Boden unterbrochen: {6,6}.",
+      "terrain": "Offenes Gelände über das ganze Schlachtfeld, nahe dem unteren Rand {4,1} und {7,1} und in der Mitte {6,4}. Oben in der Mitte ist der Boden unterbrochen: {5,7}.",
       "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, alle auf flachem Gelände.",
       "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang, alle auf flachem Gelände."
     },
@@ -193,7 +193,7 @@
       "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang; {4,2} und {4,5} liegen links von ihnen."
     },
     "Battle_Water/water3": {
-      "terrain": "Offenes Gelände, quer über den oberen linken Teil {3,6} und quer über den oberen rechten {8,6}, und der einzige Weg auf den Boden dazwischen ist {6,5}. Den unteren Teil des Schlachtfelds unterbrechen links {2,0}, in der Mitte {8,0} und dazwischen {5,2}.",
+      "terrain": "Offenes Gelände, quer über den oberen linken Teil {3,6}, quer über die obere Mitte {6,6} und quer über den oberen rechten Teil {8,6}, und der einzige Weg auf den Boden dazwischen ist {6,5}. Der untere Teil des Schlachtfelds ist unterbrochen: links {2,0}, in der Mitte {8,0} und dazwischen {6,2}.",
       "attacker": "Die Aufstellungspunkte des Angreifers verteilen sich über das linke Drittel.",
       "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über das rechte Drittel."
     },
@@ -203,7 +203,7 @@
       "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang, und {10,3} trägt sechs davon."
     },
     "Battle_Water/Water5": {
-      "terrain": "Offenes Gelände, unten links {3,1} und in der Mitte {8,4}. In der Mitte {4,2}, daran vorbei geht es oben oder unten herum, dazu in der oberen linken Ecke {0,6} und unten rechts {10,0}.",
+      "terrain": "Offenes Gelände, unten links {3,1} und in der Mitte {8,4}. Die Mitte ist versperrt: {5,3}, daran vorbei geht es oben oder unten herum; dazu in der oberen linken Ecke {0,6} und unten rechts {10,0}.",
       "attacker": "Die Aufstellungspunkte des Angreifers verteilen sich über die linke Hälfte, alle auf flachem Gelände.",
       "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über die rechte Hälfte, alle auf flachem Gelände."
     },
@@ -223,12 +223,12 @@
       "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich über die rechte Seite des Schlachtfelds hin."
     },
     "Battle_Woods/Woods1": {
-      "terrain": "Offenes Gelände, quer durch die Mitte {8,4}, links in der Mitte {0,3} und rechts in der Mitte {11,4}. {2,7} und {9,7} sperren den oberen linken beziehungsweise den oberen rechten Teil ab.",
+      "terrain": "Offenes Gelände, quer durch die Mitte {8,4}, links in der Mitte {0,3} und rechts in der Mitte {11,4}. Der obere linke Teil ist versperrt: {2,8}, der obere rechte: {9,7}.",
       "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, und {0,3} trägt einen davon.",
       "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang, und {11,4} trägt einen davon."
     },
     "Battle_Woods/Woods2": {
-      "terrain": "Offenes Gelände, unten in der Mitte {5,0}, oben in der Mitte {5,6} und in der oberen linken Ecke {0,7}; davor {1,7}, sodass die Ecke fast ganz abgeriegelt ist. Die untere Mitte ist versperrt: {9,2}.",
+      "terrain": "Offenes Gelände, unten in der Mitte {5,0}, oben in der Mitte {5,6} und in der oberen linken Ecke {0,7}; davor {1,8}, sodass die Ecke fast ganz abgeriegelt ist. Die untere Mitte ist versperrt: {9,2}.",
       "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, und {0,7} trägt einen davon.",
       "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang, alle auf flachem Gelände."
     },
@@ -258,7 +258,7 @@
       "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich auf der rechten Seite von oben nach unten."
     },
     "Battle_Woods/Woods8": {
-      "terrain": "Offenes Gelände, in der Mitte des Schlachtfelds {5,3}. Links davon und weiter unten {2,1}, rechts davon und weiter oben {7,3}.",
+      "terrain": "Offenes Gelände, in der Mitte des Schlachtfelds {5,3}. Links davon und weiter unten {5,2}, rechts davon und weiter oben {7,3}.",
       "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang.",
       "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang."
     },
@@ -318,7 +318,7 @@
       "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über die rechte Seite des Schlachtfelds; {8,6} und {8,2} tragen je einen davon."
     },
     "BattleCampaign/WieshFight": {
-      "terrain": "Offenes Gelände, oben in der Mitte {4,7} und {8,5} und unten in der Mitte {8,0}. {10,0} und {10,6} sperren die untere beziehungsweise die obere rechte Ecke ab, dahinter Klippen am rechten Rand entlang.",
+      "terrain": "Offenes Gelände, oben in der Mitte {4,7} und {8,5} und unten in der Mitte {8,0}. Die untere rechte Ecke ist versperrt: {11,0}, die obere rechte: {11,6}; dahinter Klippen am rechten Rand entlang.",
       "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang.",
       "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich über die rechte Seite des Schlachtfelds hin; {8,5} trägt zwei davon und {8,0} einen."
     },
@@ -328,7 +328,7 @@
       "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über die Mitte und die rechte Seite, sechs davon auf den Türmen und Mauern."
     },
     "BattleSmallSettlementSiege/SmallSettlementSiege": {
-      "terrain": "Offenes Gelände auf der linken Seite, die Türme des Verteidigers oben in der Mitte und unten in der Mitte, zu jedem eine Treppe vom Rand daneben hinauf und dazwischen in der Mitte eine Mauer. Hinter der Mauer liegt rechts in der Mitte {9,5} und unten rechts {8,0}. Die obere linke und die obere rechte Ecke schließen {0,6} und {12,6} ab.",
+      "terrain": "Offenes Gelände auf der linken Seite, die Türme des Verteidigers oben in der Mitte und unten in der Mitte, zu jedem eine Treppe vom Rand daneben hinauf und dazwischen in der Mitte eine Mauer. Hinter der Mauer liegt rechts in der Mitte {9,5} und unten rechts {8,0}. Die obere linke und die obere rechte Ecke sind abgeriegelt: {0,8} und {11,8}.",
       "attacker": "Die Aufstellungspunkte des Angreifers verteilen sich über das linke Drittel, auf offenem Gelände außerhalb der Türme.",
       "defender": "Die Aufstellungspunkte des Verteidigers füllen die Mitte und die rechte Seite, zwei davon auf den Türmen und vier auf der Mauer."
     },
