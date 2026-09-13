@@ -102,6 +102,7 @@ namespace SongsOfConquestAccess.UI
         public bool ClaimsAction(string actionKey)
         {
             return HexGridMoves.ClaimsAction(actionKey)
+                || actionKey == AccessibilityActions.DescribeBattlefield.Key
                 || HexGridScanner.ClaimsAction(actionKey);
         }
 
@@ -129,7 +130,23 @@ namespace SongsOfConquestAccess.UI
                 return SetCursor(HexGridMoves.CenterTile);
             }
 
+            if (action.Key == AccessibilityActions.DescribeBattlefield.Key)
+            {
+                return SpeakDescription();
+            }
+
             return false;
+        }
+
+        /// <summary>The authored description of this layout, the same three labelled lines the
+        /// Description stop holds, said as one breath. Queued behind whatever is already speaking,
+        /// as every other readout from this board is.</summary>
+        private bool SpeakDescription()
+        {
+            SpeechPipeline.Output(new SpeechRequest(
+                BattlefieldText.Spoken(_adapter != null ? _adapter.BattlefieldKey : null),
+                interrupt: false));
+            return true;
         }
 
         /// <summary>The board changed under the cursor - a troop was placed, moved or removed. The

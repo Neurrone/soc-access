@@ -3947,3 +3947,33 @@ msgstr "发送"
 msgctxt "Screens.StoreWielder"
 msgid "Store wielder"
 msgstr "驻守持有者"
+
+#. Actions.DescribeBattlefield
+msgctxt "Actions.DescribeBattlefield"
+msgid "Describe battlefield"
+msgstr "描述战场"
+
+#. Screens.Description
+msgctxt "Screens.Description"
+msgid "Description"
+msgstr "描述"
+
+#. Screens.DescriptionTerrain
+msgctxt "Screens.DescriptionTerrain"
+msgid "Terrain: {0}"
+msgstr "地形：{0}"
+
+#. Screens.DescriptionAttacker
+msgctxt "Screens.DescriptionAttacker"
+msgid "Attacker: {0}"
+msgstr "攻击方：{0}"
+
+#. Screens.DescriptionDefender
+msgctxt "Screens.DescriptionDefender"
+msgid "Defender: {0}"
+msgstr "防守方：{0}"
+
+#. Screens.NoBattlefieldDescription
+msgctxt "Screens.NoBattlefieldDescription"
+msgid "No description for this battlefield"
+msgstr "此战场没有描述"

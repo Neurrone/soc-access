@@ -194,6 +194,7 @@ namespace SongsOfConquestAccess.UI
                         || actionKey == AccessibilityActions.CombatPreviousEnemyTroop.Key))
                 || actionKey == AccessibilityActions.CombatFocusTimeline.Key
                 || actionKey == AccessibilityActions.ReadThreat.Key
+                || actionKey == AccessibilityActions.DescribeBattlefield.Key
                 || HexGridScanner.ClaimsAction(actionKey);
         }
 
@@ -266,7 +267,22 @@ namespace SongsOfConquestAccess.UI
                 return ReadThreat();
             }
 
+            if (action.Key == AccessibilityActions.DescribeBattlefield.Key)
+            {
+                return SpeakDescription();
+            }
+
             return false;
+        }
+
+        /// <summary>The authored description of this layout - the TERRAIN alone, unlabelled: where
+        /// each side started is behind the player once the fight is on.</summary>
+        private bool SpeakDescription()
+        {
+            SpeechPipeline.Output(new SpeechRequest(
+                BattlefieldText.SpokenTerrain(_adapter != null ? _adapter.BattlefieldKey : null),
+                interrupt: false));
+            return true;
         }
 
         private bool CanNavigateLocalActingTroops()

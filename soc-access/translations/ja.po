@@ -3947,3 +3947,33 @@ msgstr "送信"
 msgctxt "Screens.StoreWielder"
 msgid "Store wielder"
 msgstr "ウィールダーを駐留させる"
+
+#. Actions.DescribeBattlefield
+msgctxt "Actions.DescribeBattlefield"
+msgid "Describe battlefield"
+msgstr "戦場の説明"
+
+#. Screens.Description
+msgctxt "Screens.Description"
+msgid "Description"
+msgstr "説明"
+
+#. Screens.DescriptionTerrain
+msgctxt "Screens.DescriptionTerrain"
+msgid "Terrain: {0}"
+msgstr "地形：{0}"
+
+#. Screens.DescriptionAttacker
+msgctxt "Screens.DescriptionAttacker"
+msgid "Attacker: {0}"
+msgstr "攻撃側：{0}"
+
+#. Screens.DescriptionDefender
+msgctxt "Screens.DescriptionDefender"
+msgid "Defender: {0}"
+msgstr "防御側：{0}"
+
+#. Screens.NoBattlefieldDescription
+msgctxt "Screens.NoBattlefieldDescription"
+msgid "No description for this battlefield"
+msgstr "この戦場の説明はありません"

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SongsOfConquest.Client.Deployment;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
@@ -47,6 +48,12 @@ namespace SongsOfConquestAccess.Screens
     /// the existing "Invalid destination". The widget era's "draggable"/"dragging" wording is gone -
     /// the carry says both itself.
     ///
+    /// THE DESCRIPTION STOP is what the battlefield IS: the authored description of the layout this
+    /// battle is fought on (<see cref="BattlefieldDescriptions"/>, keyed by the map's own
+    /// LevelType/PathName), three lines of one node, followed by the drag hint that was this stop
+    /// before it. The same three lines answer Ctrl+D on the board, which is where a layout nobody
+    /// has described yet says so.
+    ///
     /// TYPE-AHEAD is on everywhere EXCEPT the board (owner ruling 2026-09-08): the side panels, the
     /// buttons and the hint search normally, while on the board the letters A, D, Q, E, Z and C are
     /// the hex moves. <see cref="AllowsTypeahead"/> is therefore a live answer rather than a
@@ -67,7 +74,7 @@ namespace SongsOfConquestAccess.Screens
         private const string DefenderStop = "pre-battle-defender";
         private const string GridStop = "pre-battle-grid";
         private const string ButtonsStop = "pre-battle-buttons";
-        private const string HintStop = "pre-battle-hint";
+        private const string DescriptionStop = "pre-battle-description";
 
         /// <summary>The cargo kind of a troop lifted off the deployment board. Its own kind rather
         /// than the army bar's "troop": the two carries are different drags with different noises,
@@ -254,7 +261,7 @@ namespace SongsOfConquestAccess.Screens
 
             BuildGrid(builder);
             BuildButtons(builder);
-            BuildHint(builder);
+            BuildDescription(builder);
 
             if (start != null)
             {
@@ -449,19 +456,51 @@ namespace SongsOfConquestAccess.Screens
                 new DrawnNode(ControlId.For(button, "pre-battle:" + key), vtable, button)));
         }
 
-        /// <summary>The hint the menu draws under the board ("Drag troops to rearrange"), a stop of
-        /// its own (owner ruling 2026-09-08) and built only while the menu is drawing it.</summary>
-        private void BuildHint(GraphBuilder builder)
+        /// <summary>
+        /// WHAT THIS BATTLEFIELD IS, and how to move a troop on it: the authored description of the
+        /// layout the battle is fought on, three lines of one node so the review buffer holds three,
+        /// and then the hint the menu draws under the board ("Drag troops to rearrange"), which was
+        /// this stop before the description joined it (owner ruling 2026-09-08).
+        ///
+        /// The build asks only WHETHER the layout is described, which is one dictionary hit; the
+        /// three lines are composed when the node is read. A layout nobody has written about yet has
+        /// no node at all rather than an empty one - the gesture is where "no description" is said.
+        /// </summary>
+        private void BuildDescription(GraphBuilder builder)
         {
-            if (string.IsNullOrWhiteSpace(Live.DragHintText))
+            BattlefieldDescription description;
+            bool described = BattlefieldDescriptions.TryGet(Live.BattlefieldKey, out description);
+            bool hint = !string.IsNullOrWhiteSpace(Live.DragHintText);
+            if (!described && !hint)
             {
                 return;
             }
 
-            builder.BeginStop(HintStop);
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker("hint"), "pre-battle:hint"),
-                GraphNodes.Text(() => Live.DragHintText)));
+            builder.BeginStop(DescriptionStop);
+            builder.PushContext(ModText.Get(ModStrings.Screens.Description));
+            if (described)
+            {
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(Marker("description"), "pre-battle:description"),
+                    GraphNodes.Paragraphs(() => Describe())));
+            }
+
+            if (hint)
+            {
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(Marker("hint"), "pre-battle:hint"),
+                    GraphNodes.Text(() => Live.DragHintText)));
+            }
+
+            builder.PopContext();
+        }
+
+        /// <summary>The description's three lines, composed when the node is read.</summary>
+        private IList<string> Describe()
+        {
+            BattlefieldDescription description;
+            BattlefieldDescriptions.TryGet(Live.BattlefieldKey, out description);
+            return BattlefieldText.Lines(description);
         }
 
         // ---- keys ----

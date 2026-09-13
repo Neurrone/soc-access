@@ -4007,3 +4007,33 @@ msgstr "Wyślij"
 msgctxt "Screens.StoreWielder"
 msgid "Store wielder"
 msgstr "Zakwateruj bohatera"
+
+#. Actions.DescribeBattlefield
+msgctxt "Actions.DescribeBattlefield"
+msgid "Describe battlefield"
+msgstr "Opisz pole bitwy"
+
+#. Screens.Description
+msgctxt "Screens.Description"
+msgid "Description"
+msgstr "Opis"
+
+#. Screens.DescriptionTerrain
+msgctxt "Screens.DescriptionTerrain"
+msgid "Terrain: {0}"
+msgstr "Teren: {0}"
+
+#. Screens.DescriptionAttacker
+msgctxt "Screens.DescriptionAttacker"
+msgid "Attacker: {0}"
+msgstr "Atakujący: {0}"
+
+#. Screens.DescriptionDefender
+msgctxt "Screens.DescriptionDefender"
+msgid "Defender: {0}"
+msgstr "Obrońca: {0}"
+
+#. Screens.NoBattlefieldDescription
+msgctxt "Screens.NoBattlefieldDescription"
+msgid "No description for this battlefield"
+msgstr "Brak opisu tego pola bitwy"

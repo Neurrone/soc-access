@@ -4007,3 +4007,33 @@ msgstr "Надіслати"
 msgctxt "Screens.StoreWielder"
 msgid "Store wielder"
 msgstr "Розмістити героя в гарнізоні"
+
+#. Actions.DescribeBattlefield
+msgctxt "Actions.DescribeBattlefield"
+msgid "Describe battlefield"
+msgstr "Описати поле бою"
+
+#. Screens.Description
+msgctxt "Screens.Description"
+msgid "Description"
+msgstr "Опис"
+
+#. Screens.DescriptionTerrain
+msgctxt "Screens.DescriptionTerrain"
+msgid "Terrain: {0}"
+msgstr "Місцевість: {0}"
+
+#. Screens.DescriptionAttacker
+msgctxt "Screens.DescriptionAttacker"
+msgid "Attacker: {0}"
+msgstr "Нападник: {0}"
+
+#. Screens.DescriptionDefender
+msgctxt "Screens.DescriptionDefender"
+msgid "Defender: {0}"
+msgstr "Захисник: {0}"
+
+#. Screens.NoBattlefieldDescription
+msgctxt "Screens.NoBattlefieldDescription"
+msgid "No description for this battlefield"
+msgstr "Для цього поля бою немає опису"

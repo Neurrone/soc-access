@@ -1044,6 +1044,11 @@ msgctxt "Actions.CombatPreviousEnemyTroop"
 msgid "Previous Enemy Troop"
 msgstr ""
 
+#. Actions.DescribeBattlefield
+msgctxt "Actions.DescribeBattlefield"
+msgid "Describe battlefield"
+msgstr ""
+
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"
 msgid "Describe map"
@@ -2639,6 +2644,26 @@ msgctxt "Screens.DefenderPortrait"
 msgid "Defender portrait"
 msgstr ""
 
+#. Screens.Description
+msgctxt "Screens.Description"
+msgid "Description"
+msgstr ""
+
+#. Screens.DescriptionTerrain
+msgctxt "Screens.DescriptionTerrain"
+msgid "Terrain: {0}"
+msgstr ""
+
+#. Screens.DescriptionAttacker
+msgctxt "Screens.DescriptionAttacker"
+msgid "Attacker: {0}"
+msgstr ""
+
+#. Screens.DescriptionDefender
+msgctxt "Screens.DescriptionDefender"
+msgid "Defender: {0}"
+msgstr ""
+
 #. Screens.Duration
 msgctxt "Screens.Duration"
 msgid "Duration"
@@ -2812,6 +2837,11 @@ msgstr ""
 #. Screens.NamedLevel
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
+msgstr ""
+
+#. Screens.NoBattlefieldDescription
+msgctxt "Screens.NoBattlefieldDescription"
+msgid "No description for this battlefield"
 msgstr ""
 
 #. Screens.NoBuildSiteSelected

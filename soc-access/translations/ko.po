@@ -3947,3 +3947,33 @@ msgstr "보내기"
 msgctxt "Screens.StoreWielder"
 msgid "Store wielder"
 msgstr "위더 주둔시키기"
+
+#. Actions.DescribeBattlefield
+msgctxt "Actions.DescribeBattlefield"
+msgid "Describe battlefield"
+msgstr "전장 설명"
+
+#. Screens.Description
+msgctxt "Screens.Description"
+msgid "Description"
+msgstr "설명"
+
+#. Screens.DescriptionTerrain
+msgctxt "Screens.DescriptionTerrain"
+msgid "Terrain: {0}"
+msgstr "지형: {0}"
+
+#. Screens.DescriptionAttacker
+msgctxt "Screens.DescriptionAttacker"
+msgid "Attacker: {0}"
+msgstr "공격자: {0}"
+
+#. Screens.DescriptionDefender
+msgctxt "Screens.DescriptionDefender"
+msgid "Defender: {0}"
+msgstr "방어자: {0}"
+
+#. Screens.NoBattlefieldDescription
+msgctxt "Screens.NoBattlefieldDescription"
+msgid "No description for this battlefield"
+msgstr "이 전장에 대한 설명이 없습니다"

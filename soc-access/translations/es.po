@@ -3977,3 +3977,33 @@ msgstr "Enviar"
 msgctxt "Screens.StoreWielder"
 msgid "Store wielder"
 msgstr "Acuartelar al portador"
+
+#. Actions.DescribeBattlefield
+msgctxt "Actions.DescribeBattlefield"
+msgid "Describe battlefield"
+msgstr "Describir campo de batalla"
+
+#. Screens.Description
+msgctxt "Screens.Description"
+msgid "Description"
+msgstr "Descripción"
+
+#. Screens.DescriptionTerrain
+msgctxt "Screens.DescriptionTerrain"
+msgid "Terrain: {0}"
+msgstr "Terreno: {0}"
+
+#. Screens.DescriptionAttacker
+msgctxt "Screens.DescriptionAttacker"
+msgid "Attacker: {0}"
+msgstr "Atacante: {0}"
+
+#. Screens.DescriptionDefender
+msgctxt "Screens.DescriptionDefender"
+msgid "Defender: {0}"
+msgstr "Defensor: {0}"
+
+#. Screens.NoBattlefieldDescription
+msgctxt "Screens.NoBattlefieldDescription"
+msgid "No description for this battlefield"
+msgstr "No hay descripción para este campo de batalla"

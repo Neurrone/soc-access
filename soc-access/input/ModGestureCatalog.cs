@@ -169,6 +169,7 @@ namespace SongsOfConquestAccess.Input
                 AccessibilityActions.HexGridSouthWest,
                 AccessibilityActions.HexGridSouthEast,
                 AccessibilityActions.HexGridFocusCenterTile,
+                AccessibilityActions.DescribeBattlefield,
                 AccessibilityActions.HexGridSkipWest,
                 AccessibilityActions.HexGridSkipEast,
                 AccessibilityActions.HexGridSkipNorthWest,

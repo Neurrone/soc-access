@@ -263,6 +263,7 @@
             public static readonly ModString CombatNextEnemyTroop = new ModString("Actions.CombatNextEnemyTroop", "Next Enemy Troop");
             public static readonly ModString CombatPreviousActingTroop = new ModString("Actions.CombatPreviousActingTroop", "Previous Acting Troop");
             public static readonly ModString CombatPreviousEnemyTroop = new ModString("Actions.CombatPreviousEnemyTroop", "Previous Enemy Troop");
+            public static readonly ModString DescribeBattlefield = new ModString("Actions.DescribeBattlefield", "Describe battlefield");
             public static readonly ModString DescribePosition = new ModString("Actions.DescribePosition", "Describe map");
             public static readonly ModString Dismiss = new ModString("Actions.Dismiss", "Dismiss");
             public static readonly ModString FirstBufferLine = new ModString("Actions.FirstBufferLine", "First Buffer Line");
@@ -607,6 +608,14 @@
             public static readonly ModString CombatPortraitDetail = new ModString("Screens.CombatPortraitDetail", "{0}, {1}, level {2}");
             public static readonly ModString Defender = new ModString("Screens.Defender", "Defender");
             public static readonly ModString DefenderPortrait = new ModString("Screens.DefenderPortrait", "Defender portrait");
+            /// <summary>The stop on the troop placement page that holds the authored description of
+            /// the battlefield layout the battle is fought on.</summary>
+            public static readonly ModString Description = new ModString("Screens.Description", "Description");
+            /// <summary>The three lines of an authored battlefield description, one per line so the
+            /// review buffer holds three. {0} is the authored text.</summary>
+            public static readonly ModString DescriptionTerrain = new ModString("Screens.DescriptionTerrain", "Terrain: {0}");
+            public static readonly ModString DescriptionAttacker = new ModString("Screens.DescriptionAttacker", "Attacker: {0}");
+            public static readonly ModString DescriptionDefender = new ModString("Screens.DescriptionDefender", "Defender: {0}");
             public static readonly ModString Duration = new ModString("Screens.Duration", "Duration");
             public static readonly ModString Empty = new ModString("Screens.Empty", "empty");
             public static readonly ModString Enabled = new ModString("Screens.Enabled", "Enabled");
@@ -645,6 +654,7 @@
             public static readonly ModString LeftRightDistribution = new ModString("Screens.LeftRightDistribution", "Left: {0}, right: {1}");
             public static readonly ModString MultiEssenceSpells = new ModString("Screens.MultiEssenceSpells", "Multi-essence spells");
             public static readonly ModString NamedLevel = new ModString("Screens.NamedLevel", "{0}, level {1}");
+            public static readonly ModString NoBattlefieldDescription = new ModString("Screens.NoBattlefieldDescription", "No description for this battlefield");
             public static readonly ModString NoBuildSiteSelected = new ModString("Screens.NoBuildSiteSelected", "No build site selected");
             public static readonly ModString None = new ModString("Screens.None", "None");
             public static readonly ModString NotReady = new ModString("Screens.NotReady", "Not ready");

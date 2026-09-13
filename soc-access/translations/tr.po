@@ -3947,3 +3947,33 @@ msgstr "Gönder"
 msgctxt "Screens.StoreWielder"
 msgid "Store wielder"
 msgstr "Wielder'ı yerleştir"
+
+#. Actions.DescribeBattlefield
+msgctxt "Actions.DescribeBattlefield"
+msgid "Describe battlefield"
+msgstr "Savaş alanını açıkla"
+
+#. Screens.Description
+msgctxt "Screens.Description"
+msgid "Description"
+msgstr "Açıklama"
+
+#. Screens.DescriptionTerrain
+msgctxt "Screens.DescriptionTerrain"
+msgid "Terrain: {0}"
+msgstr "Arazi: {0}"
+
+#. Screens.DescriptionAttacker
+msgctxt "Screens.DescriptionAttacker"
+msgid "Attacker: {0}"
+msgstr "Saldıran: {0}"
+
+#. Screens.DescriptionDefender
+msgctxt "Screens.DescriptionDefender"
+msgid "Defender: {0}"
+msgstr "Savunan: {0}"
+
+#. Screens.NoBattlefieldDescription
+msgctxt "Screens.NoBattlefieldDescription"
+msgid "No description for this battlefield"
+msgstr "Bu savaş alanı için açıklama yok"

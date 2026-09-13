@@ -1,4 +1,4 @@
-﻿using UnityEngine.InputSystem;
+using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Bookmarks;
 using SongsOfConquestAccess.Localization;
@@ -318,6 +318,11 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction HexGridSouthEast = OneShot("hex_grid_south_east", ModStrings.Actions.HexGridSouthEast, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.C));
 
+        /// <summary>The authored description of the battlefield layout, on the placement board and in
+        /// combat alike. Ctrl+D because plain D is the hex boards' move east.</summary>
+        public static readonly InputAction DescribeBattlefield = OneShot("describe_battlefield", ModStrings.Actions.DescribeBattlefield, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.D, ctrl: true));
+
         public static readonly InputAction HexGridFocusCenterTile = OneShot("hex_grid_focus_center_tile", ModStrings.Actions.HexGridFocusCenterTile, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Space, ctrl: true));
 
@@ -553,6 +558,7 @@ namespace SongsOfConquestAccess.Input
                 HexGridSouthWest,
                 HexGridSouthEast,
                 HexGridFocusCenterTile,
+                DescribeBattlefield,
                 HexGridSkipWest,
                 HexGridSkipEast,
                 HexGridSkipNorthWest,
