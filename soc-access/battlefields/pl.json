@@ -8,7 +8,7 @@
       "defender": "Punkty rozmieszczenia obrońcy skupiają się na środku po prawej, wewnątrz urwisk."
     },
     "Battle/Fight1": {
-      "terrain": "Płaski teren w lewym dolnym rogu, a na reszcie planszy {6,0}. Górna krawędź zamknięta: wzdłuż niej i w dół przez środek planszy {1,4}, a jedyna droga na prawą stronę to {9,2}.",
+      "terrain": "Płaski teren w lewym dolnym rogu, a na reszcie planszy {6,0}. Górna krawędź zamknięta: {0,5}, a jedyna droga na prawą stronę to {9,2}.",
       "attacker": "Punkty rozmieszczenia atakującego wypełniają płaski teren w lewym dolnym rogu.",
       "defender": "Punkty rozmieszczenia obrońcy rozciągają się w prawej trzeciej części planszy i zajmują {6,0} po drugiej stronie, do której prowadzi {9,2}."
     },
@@ -18,27 +18,27 @@
       "defender": "Punkty rozmieszczenia obrońcy rozciągają się po prawej stronie planszy, wszystkie zajmują {5,0}."
     },
     "Battle/Fight3": {
-      "terrain": "Otwarty teren biegnie od dolnej krawędzi do górnej, po jego lewej stronie {3,0}, a po prawej {8,0}. Lewa krawędź zamknięta: {0,0}, prawa: {12,2}.",
+      "terrain": "Otwarty teren biegnie od dolnej krawędzi do górnej, po jego lewej stronie {3,0}, a po prawej {8,0}. Lewa krawędź zamknięta: {1,0} i {0,3}, a prawa: {12,2}.",
       "attacker": "Punkty rozmieszczenia atakującego biegną u góry planszy, siedem z nich zajmuje {3,0}.",
       "defender": "Punkty rozmieszczenia obrońcy wypełniają dolną prawą część planszy, dziesięć z nich zajmuje {8,0}."
     },
     "Battle/Fight4": {
-      "terrain": "Otwarty teren wzdłuż dołu planszy, {3,6} wznosi się do lewego górnego rogu, a {10,6} do prawego górnego. Góra planszy wypełniona: {6,4}, co dzieli planszę na lewą i prawą połowę, które łączy tylko {6,2} u dołu na środku.",
+      "terrain": "Otwarty teren wzdłuż dołu planszy, {3,6} wznosi się do lewego górnego rogu, a {10,6} do prawego górnego. Góra planszy wypełniona: {4,5}, a lewą i prawą połowę planszy łączy tylko {5,2} u dołu na środku.",
       "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi, w lewej połowie.",
       "defender": "Punkty rozmieszczenia obrońcy biegną wzdłuż prawej krawędzi, dwa z nich zajmują {10,6}."
     },
     "Battle/Fight5": {
-      "terrain": "Otwarty teren po lewej, a {2,1} zajmuje środek i prawą stronę planszy. Góra na środku zamknięta: {6,5}, dolna krawędź: {0,0}, a między nimi, w centrum, {5,3}.",
+      "terrain": "Otwarty teren po lewej, a {2,1} zajmuje środek i prawą stronę planszy. Góra na środku zamknięta: {5,7}, dolna krawędź: {0,0} i {10,0}, a między nimi, w centrum, {5,3}.",
       "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi, jeden z nich zajmuje {2,1}.",
       "defender": "Punkty rozmieszczenia obrońcy rozciągają się w prawej trzeciej części planszy, wszystkie zajmują {2,1}."
     },
     "Battle/Fight6": {
-      "terrain": "Otwarty teren w centrum, {1,1} u dołu po lewej, {9,1} u dołu po prawej, {1,6} u góry po lewej i {11,6} u góry po prawej. {3,3} i {8,3} stoją po lewej i po prawej stronie centrum.",
+      "terrain": "Otwarty teren w centrum, {1,1} u dołu po lewej, {9,1} u dołu po prawej, {1,6} u góry po lewej i {11,6} u góry po prawej. Po lewej i po prawej stronie centrum {3,3} i {9,4}.",
       "attacker": "Punkty rozmieszczenia atakującego są skupione w centrum planszy.",
       "defender": "Punkty rozmieszczenia obrońcy otaczają punkty atakującego, po dwa w każdym rogu i jeden u dołu na środku."
     },
     "Battle/Hideout": {
-      "terrain": "Otwarty teren, {5,0} u dołu na środku, {6,6} u góry na środku i {12,2} na środku po prawej. Dolna lewa część zamknięta: {2,0}, górna lewa: {1,6}, a jedyna droga do lewego górnego rogu to {0,5}.",
+      "terrain": "Otwarty teren, {5,0} u dołu na środku, {6,6} u góry na środku i {12,2} na środku po prawej. Lewy górny róg zamknięty: {3,6} i {3,7}, a jedyna droga do niego to {0,5}.",
       "attacker": "Punkty rozmieszczenia atakującego biegną przez środek planszy.",
       "defender": "Punkty rozmieszczenia obrońcy otaczają punkty atakującego: dwa zajmują {5,0}, dwa {6,6}, a pięć zajmuje {12,2}."
     },
@@ -53,7 +53,7 @@
       "defender": "Punkty rozmieszczenia obrońcy rozciągają się przez centrum i prawą stronę planszy, jeden zajmuje {5,5}, jeden {8,7}, a jeden {9,3}."
     },
     "Battle/TrailerBattle": {
-      "terrain": "Otwarty teren w centrum i po prawej, {4,4} w centrum, {11,3} na środku po prawej, a urwiska u góry po lewej i u góry na środku. {0,0} wypełnia lewy dolny róg i biegnie w górę wzdłuż lewej krawędzi, a prowadzi tam tylko {5,3}; większość górnej krawędzi zamknięta: {9,6}.",
+      "terrain": "Otwarty teren w centrum i po prawej, {4,4} w centrum, {11,3} na środku po prawej, a urwiska u góry po lewej i u góry na środku. {0,0} wypełnia lewy dolny róg i biegnie w górę wzdłuż lewej krawędzi, a prowadzi tam tylko {5,3}; większość górnej krawędzi zamknięta: {5,8} i {9,6}.",
       "attacker": "Punkty rozmieszczenia atakującego rozciągają się po lewej stronie planszy, jeden z nich zajmuje {0,0}, a jeden {4,4}.",
       "defender": "Punkty rozmieszczenia obrońcy rozciągają się po prawej stronie planszy, wszystkie na otwartym terenie."
     },
@@ -113,7 +113,7 @@
       "defender": "Punkty rozmieszczenia obrońcy biegną wzdłuż prawej krawędzi, trzy z nich zajmują {10,5}, a jeden zajmuje {8,0}."
     },
     "Battle_Plains/Plains": {
-      "terrain": "Otwarty teren na całej planszy, {4,1} i {7,1} blisko dolnej krawędzi, a {6,4} w centrum. U góry na środku teren przerwany: {6,6}.",
+      "terrain": "Otwarty teren na całej planszy, {4,1} i {7,1} blisko dolnej krawędzi, a {6,4} w centrum. U góry na środku teren przerwany: {5,7}.",
       "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi, wszystkie na płaskim terenie.",
       "defender": "Punkty rozmieszczenia obrońcy biegną wzdłuż prawej krawędzi, wszystkie na płaskim terenie."
     },
@@ -193,7 +193,7 @@
       "defender": "Punkty rozmieszczenia obrońcy biegną wzdłuż prawej krawędzi; {4,2} i {4,5} zostają po ich lewej stronie."
     },
     "Battle_Water/water3": {
-      "terrain": "Otwarty teren, {3,6} przez górną lewą część planszy i {8,6} przez górną prawą, a jedyna droga na teren między nimi to {6,5}. Dół planszy przerywają {2,0} po lewej, {8,0} na środku i {5,2} między nimi.",
+      "terrain": "Otwarty teren, {3,6} przez górną lewą część planszy, {6,6} przez górną środkową i {8,6} przez górną prawą, a jedyna droga na teren między nimi to {6,5}. Dół planszy przerwany: {2,0} po lewej, {8,0} na środku i {6,2} między nimi.",
       "attacker": "Punkty rozmieszczenia atakującego rozciągają się w lewej trzeciej części planszy.",
       "defender": "Punkty rozmieszczenia obrońcy rozciągają się w prawej trzeciej części planszy."
     },
@@ -203,7 +203,7 @@
       "defender": "Punkty rozmieszczenia obrońcy biegną wzdłuż prawej krawędzi, sześć z nich zajmuje {10,3}."
     },
     "Battle_Water/Water5": {
-      "terrain": "Otwarty teren, {3,1} u dołu po lewej i {8,4} w centrum. Środek planszy zamknięty: {4,2}, przejść można powyżej albo poniżej; w lewym górnym rogu {0,6}, a u dołu po prawej {10,0}.",
+      "terrain": "Otwarty teren, {3,1} u dołu po lewej i {8,4} w centrum. Środek planszy zamknięty: {5,3}, przejść można powyżej albo poniżej; w lewym górnym rogu {0,6}, a u dołu po prawej {10,0}.",
       "attacker": "Punkty rozmieszczenia atakującego rozciągają się w lewej połowie planszy, wszystkie na płaskim terenie.",
       "defender": "Punkty rozmieszczenia obrońcy rozciągają się w prawej połowie planszy, wszystkie na płaskim terenie."
     },
@@ -223,12 +223,12 @@
       "defender": "Punkty rozmieszczenia obrońcy biegną po prawej stronie planszy."
     },
     "Battle_Woods/Woods1": {
-      "terrain": "Otwarty teren, {8,4} przez środek planszy, {0,3} na środku po lewej i {11,4} na środku po prawej. Górna lewa część zamknięta: {2,7}, górna prawa: {9,7}.",
+      "terrain": "Otwarty teren, {8,4} przez środek planszy, {0,3} na środku po lewej i {11,4} na środku po prawej. Górna lewa część zamknięta: {2,8}, górna prawa: {9,7}.",
       "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi, jeden z nich zajmuje {0,3}.",
       "defender": "Punkty rozmieszczenia obrońcy biegną wzdłuż prawej krawędzi, jeden z nich zajmuje {11,4}."
     },
     "Battle_Woods/Woods2": {
-      "terrain": "Otwarty teren, {5,0} u dołu na środku, {5,6} u góry na środku i {0,7} w lewym górnym rogu, prawie w całości zamkniętym: {1,7}. Dolna środkowa część planszy zamknięta: {9,2}.",
+      "terrain": "Otwarty teren, {5,0} u dołu na środku, {5,6} u góry na środku i {0,7} w lewym górnym rogu, prawie w całości zamkniętym: {1,8}. Dolna środkowa część planszy zamknięta: {9,2}.",
       "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi, jeden z nich zajmuje {0,7}.",
       "defender": "Punkty rozmieszczenia obrońcy biegną wzdłuż prawej krawędzi, wszystkie na płaskim terenie."
     },
@@ -258,7 +258,7 @@
       "defender": "Punkty rozmieszczenia obrońcy biegną z góry na dół po prawej stronie."
     },
     "Battle_Woods/Woods8": {
-      "terrain": "Otwarty teren, {5,3} w centrum planszy. Na lewo od niego i niżej {2,1}, a na prawo i wyżej {7,3}.",
+      "terrain": "Otwarty teren, {5,3} w centrum planszy. Na lewo od niego i niżej {5,2}, a na prawo i wyżej {7,3}.",
       "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi.",
       "defender": "Punkty rozmieszczenia obrońcy biegną wzdłuż prawej krawędzi."
     },
@@ -318,7 +318,7 @@
       "defender": "Punkty rozmieszczenia obrońcy rozciągają się po prawej stronie planszy, jeden z nich zajmuje {8,6}, a jeden {8,2}."
     },
     "BattleCampaign/WieshFight": {
-      "terrain": "Otwarty teren, {4,7} i {8,5} u góry na środku, a {8,0} u dołu na środku. Prawy dolny róg zamknięty: {10,0}, prawy górny: {10,6}, a za nimi, wzdłuż prawej krawędzi, urwiska.",
+      "terrain": "Otwarty teren, {4,7} i {8,5} u góry na środku, a {8,0} u dołu na środku. Prawy dolny róg zamknięty: {11,0}, prawy górny: {11,6}, a za nimi, wzdłuż prawej krawędzi, urwiska.",
       "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi.",
       "defender": "Punkty rozmieszczenia obrońcy biegną po prawej stronie planszy, dwa z nich zajmują {8,5}, a jeden zajmuje {8,0}."
     },
@@ -328,7 +328,7 @@
       "defender": "Punkty rozmieszczenia obrońcy rozciągają się przez centrum i prawą stronę planszy, sześć z nich na wieżach i murach."
     },
     "BattleSmallSettlementSiege/SmallSettlementSiege": {
-      "terrain": "Otwarty teren po lewej, wieże obrońcy u góry na środku i u dołu na środku, do każdej prowadzą schody z sąsiedniej krawędzi, a między nimi, w centrum, mur. Za murem {9,5} na środku po prawej i {8,0} u dołu po prawej. Lewy górny róg zamknięty: {0,6}, prawy górny: {12,6}.",
+      "terrain": "Otwarty teren po lewej, wieże obrońcy u góry na środku i u dołu na środku, do każdej prowadzą schody z sąsiedniej krawędzi, a między nimi, w centrum, mur. Za murem {9,5} na środku po prawej i {8,0} u dołu po prawej. Lewy górny róg zamknięty: {0,8}, prawy górny: {11,8}.",
       "attacker": "Punkty rozmieszczenia atakującego rozciągają się w lewej trzeciej części planszy, na otwartym terenie poza wieżami.",
       "defender": "Punkty rozmieszczenia obrońcy wypełniają centrum i prawą stronę planszy, dwa z nich na wieżach, a cztery na murze."
     },

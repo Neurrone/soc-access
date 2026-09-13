@@ -1,5 +1,5 @@
 {
-  "terrain": "Otwarty teren biegnie od dolnej krawędzi do górnej, po jego lewej stronie {3,0}, a po prawej {8,0}. Lewa krawędź zamknięta: {0,0}, prawa: {12,2}.",
+  "terrain": "Otwarty teren biegnie od dolnej krawędzi do górnej, po jego lewej stronie {3,0}, a po prawej {8,0}. Lewa krawędź zamknięta: {1,0} i {0,3}, a prawa: {12,2}.",
   "attacker": "Punkty rozmieszczenia atakującego biegną u góry planszy, siedem z nich zajmuje {3,0}.",
   "defender": "Punkty rozmieszczenia obrońcy wypełniają dolną prawą część planszy, dziesięć z nich zajmuje {8,0}."
 }

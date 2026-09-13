@@ -1,5 +1,5 @@
 {
-  "terrain": "Otwarty teren wzdłuż dołu planszy, {3,6} wznosi się do lewego górnego rogu, a {10,6} do prawego górnego. Góra planszy wypełniona: {6,4}, co dzieli planszę na lewą i prawą połowę, które łączy tylko {6,2} u dołu na środku.",
+  "terrain": "Otwarty teren wzdłuż dołu planszy, {3,6} wznosi się do lewego górnego rogu, a {10,6} do prawego górnego. Góra planszy wypełniona: {4,5}, a lewą i prawą połowę planszy łączy tylko {5,2} u dołu na środku.",
   "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi, w lewej połowie.",
   "defender": "Punkty rozmieszczenia obrońcy biegną wzdłuż prawej krawędzi, dwa z nich zajmują {10,6}."
 }

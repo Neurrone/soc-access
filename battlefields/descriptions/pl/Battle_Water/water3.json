@@ -1,5 +1,5 @@
 {
-  "terrain": "Otwarty teren, {3,6} przez górną lewą część planszy i {8,6} przez górną prawą, a jedyna droga na teren między nimi to {6,5}. Dół planszy przerywają {2,0} po lewej, {8,0} na środku i {5,2} między nimi.",
+  "terrain": "Otwarty teren, {3,6} przez górną lewą część planszy, {6,6} przez górną środkową i {8,6} przez górną prawą, a jedyna droga na teren między nimi to {6,5}. Dół planszy przerwany: {2,0} po lewej, {8,0} na środku i {6,2} między nimi.",
   "attacker": "Punkty rozmieszczenia atakującego rozciągają się w lewej trzeciej części planszy.",
   "defender": "Punkty rozmieszczenia obrońcy rozciągają się w prawej trzeciej części planszy."
 }

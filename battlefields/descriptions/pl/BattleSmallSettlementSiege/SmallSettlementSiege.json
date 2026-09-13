@@ -1,5 +1,5 @@
 {
-  "terrain": "Otwarty teren po lewej, wieże obrońcy u góry na środku i u dołu na środku, do każdej prowadzą schody z sąsiedniej krawędzi, a między nimi, w centrum, mur. Za murem {9,5} na środku po prawej i {8,0} u dołu po prawej. Lewy górny róg zamknięty: {0,6}, prawy górny: {12,6}.",
+  "terrain": "Otwarty teren po lewej, wieże obrońcy u góry na środku i u dołu na środku, do każdej prowadzą schody z sąsiedniej krawędzi, a między nimi, w centrum, mur. Za murem {9,5} na środku po prawej i {8,0} u dołu po prawej. Lewy górny róg zamknięty: {0,8}, prawy górny: {11,8}.",
   "attacker": "Punkty rozmieszczenia atakującego rozciągają się w lewej trzeciej części planszy, na otwartym terenie poza wieżami.",
   "defender": "Punkty rozmieszczenia obrońcy wypełniają centrum i prawą stronę planszy, dwa z nich na wieżach, a cztery na murze."
 }

@@ -1,5 +1,5 @@
 {
-  "terrain": "Otwarty teren, {4,7} i {8,5} u góry na środku, a {8,0} u dołu na środku. Prawy dolny róg zamknięty: {10,0}, prawy górny: {10,6}, a za nimi, wzdłuż prawej krawędzi, urwiska.",
+  "terrain": "Otwarty teren, {4,7} i {8,5} u góry na środku, a {8,0} u dołu na środku. Prawy dolny róg zamknięty: {11,0}, prawy górny: {11,6}, a za nimi, wzdłuż prawej krawędzi, urwiska.",
   "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi.",
   "defender": "Punkty rozmieszczenia obrońcy biegną po prawej stronie planszy, dwa z nich zajmują {8,5}, a jeden zajmuje {8,0}."
 }
