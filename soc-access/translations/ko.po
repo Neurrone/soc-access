@@ -3564,7 +3564,7 @@ msgstr "위더"
 #. Audio.TerrainGround
 msgctxt "Audio.TerrainGround"
 msgid "Open ground"
-msgstr "탁 트인 지면"
+msgstr "열린 지형"
 
 #. Audio.TerrainImpassable
 msgctxt "Audio.TerrainImpassable"
