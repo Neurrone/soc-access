@@ -178,7 +178,7 @@
       "defender": "I punti di schieramento del difensore si distribuiscono nel terzo destro e tre di essi si trovano su {10,0}."
     },
     "Battle_Walls/Walls4": {
-      "terrain": "Terreno pianeggiante su tutto il campo. Il lato destro, dal bordo superiore al bordo inferiore, è occupato da {11,0}, con dirupi al di là.",
+      "terrain": "Terreno pianeggiante su tutto il campo, con {11,0} lungo il lato destro dal bordo superiore al bordo inferiore, e dirupi al di là.",
       "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro.",
       "defender": "I punti di schieramento del difensore corrono dall'alto in basso lungo la parte destra del campo."
     },
@@ -203,7 +203,7 @@
       "defender": "I punti di schieramento del difensore corrono lungo il bordo destro, sei di essi su {10,3}."
     },
     "Battle_Water/Water5": {
-      "terrain": "Terreno aperto con {3,1} in basso a sinistra e {8,4} al centro. Il centro è bloccato da {5,3} e lo si aggira sopra o sotto, con {0,6} nell'angolo in alto a sinistra e {10,0} in basso a destra.",
+      "terrain": "Terreno aperto con {3,1} in basso a sinistra e {8,4} al centro. Il centro è bloccato da {5,3} e si passa sopra o sotto, con {0,6} nell'angolo in alto a sinistra e {10,0} in basso a destra.",
       "attacker": "I punti di schieramento dell'attaccante si distribuiscono nella metà sinistra, tutti su terreno pianeggiante.",
       "defender": "I punti di schieramento del difensore si distribuiscono nella metà destra, tutti su terreno pianeggiante."
     },
@@ -278,7 +278,7 @@
       "defender": "I punti di schieramento del difensore corrono lungo il bordo destro e due di essi si trovano su {9,7}."
     },
     "BattleCampaign/Arleon1GoldMine": {
-      "terrain": "Terreno aperto con {8,1} in basso a destra, {9,6} in alto a destra e {4,7} in alto al centro. Il bordo inferiore è occupato da {4,0}, e nell'angolo in alto a destra si entra solo per {10,5}.",
+      "terrain": "Terreno aperto con {8,1} in basso a destra, {9,6} in alto a destra e {4,7} in alto al centro. Il centro del bordo inferiore è bloccato da {4,0}, e nell'angolo in alto a destra si entra solo per {10,5}.",
       "attacker": "I punti di schieramento dell'attaccante si distribuiscono lungo la parte sinistra del campo, con uno su {4,7}.",
       "defender": "I punti di schieramento del difensore corrono lungo la parte destra del campo, uno su {9,6}, uno su {8,1} e uno su {10,5}."
     },
@@ -293,7 +293,7 @@
       "defender": "I punti di schieramento del difensore corrono lungo il bordo destro, tre di essi su {0,6} e tre su {0,0}."
     },
     "BattleCampaign/Lothfight": {
-      "terrain": "Terreno aperto con {5,3} al centro, {0,6} in alto a sinistra e {10,0} in basso a destra. Il terreno appena sotto il centro è occupato da {5,2}, e le truppe devono passare di lato.",
+      "terrain": "Terreno aperto con {5,3} al centro, {0,6} in alto a sinistra e {10,0} in basso a destra. Il terreno appena sotto il centro è occupato da {5,2}, e le truppe devono passare da un lato o dall'altro.",
       "attacker": "I punti di schieramento dell'attaccante si distribuiscono nel terzo sinistro e uno di essi si trova su {0,6}.",
       "defender": "I punti di schieramento del difensore si distribuiscono nel terzo destro e uno di essi si trova su {10,0}."
     },
