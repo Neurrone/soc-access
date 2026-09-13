@@ -4031,3 +4031,258 @@ msgstr "{0}칸 능선, 높이 {1}"
 msgctxt "Scanner.TerrainSiegeWall_0"
 msgid "wall of {0} cell, height {1}"
 msgstr "{0}칸 벽, 높이 {1}"
+
+#. Battlefield.DescriptionChokePoint
+msgctxt "Battlefield.DescriptionChokePoint"
+msgid "a choke point"
+msgstr "길목"
+
+#. Battlefield.DescriptionCliffs
+msgctxt "Battlefield.DescriptionCliffs"
+msgid "cliffs"
+msgstr "절벽"
+
+#. Battlefield.DescriptionImpassableCell
+msgctxt "Battlefield.DescriptionImpassableCell"
+msgid "an impassable cell"
+msgstr "통행 불가 칸"
+
+#. Battlefield.DescriptionImpassableCells
+msgctxt "Battlefield.DescriptionImpassableCells"
+msgid "impassable cells"
+msgstr "통행 불가 칸들"
+
+#. Battlefield.DescriptionImpassableWall
+msgctxt "Battlefield.DescriptionImpassableWall"
+msgid "a wall of impassable cells"
+msgstr "통행 불가 칸으로 된 벽"
+
+#. Battlefield.DescriptionObstacleWall
+msgctxt "Battlefield.DescriptionObstacleWall"
+msgid "a wall of {0}"
+msgstr "{0} 벽"
+
+#. Battlefield.DescriptionPatch
+msgctxt "Battlefield.DescriptionPatch"
+msgid "a patch (height {0})"
+msgstr "구역 (높이 {0})"
+
+#. Battlefield.DescriptionRidge
+msgctxt "Battlefield.DescriptionRidge"
+msgid "a ridge (height {0})"
+msgstr "능선 (높이 {0})"
+
+#. Battlefield.DescriptionRidgeDiagonal
+msgctxt "Battlefield.DescriptionRidgeDiagonal"
+msgid "a diagonal ridge (height {0})"
+msgstr "대각선 능선 (높이 {0})"
+
+#. Battlefield.DescriptionRidgeVertical
+msgctxt "Battlefield.DescriptionRidgeVertical"
+msgid "a vertical ridge (height {0})"
+msgstr "세로 능선 (높이 {0})"
+
+#. Battlefield.DescriptionSingleCell
+msgctxt "Battlefield.DescriptionSingleCell"
+msgid "a single cell (height {0})"
+msgstr "단일 칸 (높이 {0})"
+
+#. Battlefield.DescriptionStairs
+msgctxt "Battlefield.DescriptionStairs"
+msgid "stairs (height {0})"
+msgstr "계단 (높이 {0})"
+
+#. Battlefield.DescriptionTower
+msgctxt "Battlefield.DescriptionTower"
+msgid "a tower (height {0})"
+msgstr "탑 (높이 {0})"
+
+#. Battlefield.DescriptionWall
+msgctxt "Battlefield.DescriptionWall"
+msgid "a wall (height {0})"
+msgstr "벽 (높이 {0})"
+
+#. Battlefield.ObstacleFire_0
+msgctxt "Battlefield.ObstacleFire_0"
+msgid "fire"
+msgstr "불"
+
+#. Battlefield.ObstacleGrowthArleon_0
+msgctxt "Battlefield.ObstacleGrowthArleon_0"
+msgid "a bush"
+msgstr "덤불"
+
+#. Battlefield.ObstacleGrowthBarya_0
+msgctxt "Battlefield.ObstacleGrowthBarya_0"
+msgid "a desert plant"
+msgstr "사막 식물"
+
+#. Battlefield.ObstacleGrowthLoth_0
+msgctxt "Battlefield.ObstacleGrowthLoth_0"
+msgid "a dark leafy plant"
+msgstr "짙은 잎 식물"
+
+#. Battlefield.ObstacleGrowthRana_0
+msgctxt "Battlefield.ObstacleGrowthRana_0"
+msgid "a pink mushroom"
+msgstr "분홍 버섯"
+
+#. Battlefield.ObstacleGrowthRoots_0
+msgctxt "Battlefield.ObstacleGrowthRoots_0"
+msgid "a teal fungus"
+msgstr "청록색 균류"
+
+#. Battlefield.ObstacleGrowthVanir_0
+msgctxt "Battlefield.ObstacleGrowthVanir_0"
+msgid "purple heather"
+msgstr "보라색 헤더"
+
+#. Battlefield.ObstacleGrowthYulan_0
+msgctxt "Battlefield.ObstacleGrowthYulan_0"
+msgid "a purple flowering shrub"
+msgstr "보라색 꽃이 핀 관목"
+
+#. Battlefield.ObstacleLightArleon_0
+msgctxt "Battlefield.ObstacleLightArleon_0"
+msgid "a torch"
+msgstr "횃불"
+
+#. Battlefield.ObstacleLightBarya_0
+msgctxt "Battlefield.ObstacleLightBarya_0"
+msgid "a golden torch"
+msgstr "황금 횃불"
+
+#. Battlefield.ObstacleLightLoth_0
+msgctxt "Battlefield.ObstacleLightLoth_0"
+msgid "a glowing crystal"
+msgstr "빛나는 수정"
+
+#. Battlefield.ObstacleLightRana_0
+msgctxt "Battlefield.ObstacleLightRana_0"
+msgid "a glowing pool"
+msgstr "빛나는 웅덩이"
+
+#. Battlefield.ObstacleLightRoots_0
+msgctxt "Battlefield.ObstacleLightRoots_0"
+msgid "glowing blue mushrooms"
+msgstr "빛나는 파란 버섯"
+
+#. Battlefield.ObstacleLightVanir_0
+msgctxt "Battlefield.ObstacleLightVanir_0"
+msgid "a torch"
+msgstr "횃불"
+
+#. Battlefield.ObstacleLightYulan_0
+msgctxt "Battlefield.ObstacleLightYulan_0"
+msgid "a paper lantern"
+msgstr "종이 등불"
+
+#. Battlefield.ObstacleManufacturedArleon_0
+msgctxt "Battlefield.ObstacleManufacturedArleon_0"
+msgid "a knight statue"
+msgstr "기사 조각상"
+
+#. Battlefield.ObstacleManufacturedBarya_0
+msgctxt "Battlefield.ObstacleManufacturedBarya_0"
+msgid "an animal statue"
+msgstr "동물 조각상"
+
+#. Battlefield.ObstacleManufacturedLoth_0
+msgctxt "Battlefield.ObstacleManufacturedLoth_0"
+msgid "a gargoyle statue"
+msgstr "가고일 조각상"
+
+#. Battlefield.ObstacleManufacturedRana_0
+msgctxt "Battlefield.ObstacleManufacturedRana_0"
+msgid "a dragon statue"
+msgstr "용 조각상"
+
+#. Battlefield.ObstacleManufacturedRoots_0
+msgctxt "Battlefield.ObstacleManufacturedRoots_0"
+msgid "a giant mushroom"
+msgstr "거대한 버섯"
+
+#. Battlefield.ObstacleManufacturedVanir_0
+msgctxt "Battlefield.ObstacleManufacturedVanir_0"
+msgid "a standing stone"
+msgstr "선돌"
+
+#. Battlefield.ObstacleManufacturedYulan_0
+msgctxt "Battlefield.ObstacleManufacturedYulan_0"
+msgid "a sage statue"
+msgstr "현자 조각상"
+
+#. Battlefield.ObstacleRock_0
+msgctxt "Battlefield.ObstacleRock_0"
+msgid "a boulder"
+msgstr "바위"
+
+#. Battlefield.ObstacleWater_0
+msgctxt "Battlefield.ObstacleWater_0"
+msgid "water"
+msgstr "물"
+
+#. Battlefield.SurroundingDirection
+msgctxt "Battlefield.SurroundingDirection"
+msgid "{0} to the {1}"
+msgstr "{1}에 {0}"
+
+#. Battlefield.SurroundingFarmland
+msgctxt "Battlefield.SurroundingFarmland"
+msgid "farmland"
+msgstr "농지"
+
+#. Battlefield.SurroundingForest
+msgctxt "Battlefield.SurroundingForest"
+msgid "forest"
+msgstr "숲"
+
+#. Battlefield.SurroundingMountains
+msgctxt "Battlefield.SurroundingMountains"
+msgid "mountains"
+msgstr "산"
+
+#. Battlefield.SurroundingOpenLand
+msgctxt "Battlefield.SurroundingOpenLand"
+msgid "open land"
+msgstr "열린 땅"
+
+#. Battlefield.SurroundingWalls
+msgctxt "Battlefield.SurroundingWalls"
+msgid "walls"
+msgstr "벽"
+
+#. Battlefield.SurroundingWater
+msgctxt "Battlefield.SurroundingWater"
+msgid "water"
+msgstr "물"
+
+#. Battlefield.Surroundings
+msgctxt "Battlefield.Surroundings"
+msgid "The battlefield is surrounded by {0}."
+msgstr "전장 주위는 {0}입니다."
+
+#. Scanner.TerrainObstacleCells_0
+msgctxt "Scanner.TerrainObstacleCells_0"
+msgid "{1}, {0} cell, impassable"
+msgstr "{1}, {0}칸, 통행 불가"
+
+#. Scanner.TerrainObstacleWall_0
+msgctxt "Scanner.TerrainObstacleWall_0"
+msgid "wall of {0} {1}, impassable"
+msgstr "{1} {0}칸 벽, 통행 불가"
+
+#. Scanner.TerrainRidgeDiagonal_0
+msgctxt "Scanner.TerrainRidgeDiagonal_0"
+msgid "diagonal ridge of {0} cell, height {1}"
+msgstr "{0}칸 대각선 능선, 높이 {1}"
+
+#. Scanner.TerrainRidgeVertical_0
+msgctxt "Scanner.TerrainRidgeVertical_0"
+msgid "vertical ridge of {0} cell, height {1}"
+msgstr "{0}칸 세로 능선, 높이 {1}"
+
+#. Spatial.ImpassableObstacle
+msgctxt "Spatial.ImpassableObstacle"
+msgid "{0}, impassable"
+msgstr "{0}, 통행 불가"

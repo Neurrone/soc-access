@@ -274,7 +274,8 @@ namespace SongsOfConquestAccess.UI
         /// and the plain words where nothing did.</summary>
         private static string ImpassableDescription(BattlefieldRegion region)
         {
-            if (region.Obstacles.Count == 0)
+            string words = ObstacleWords(region.Obstacles, region.Count);
+            if (string.IsNullOrEmpty(words))
             {
                 if (region.IsRidge)
                 {
@@ -286,7 +287,6 @@ namespace SongsOfConquestAccess.UI
                     : ModStrings.Battlefield.DescriptionImpassableCells);
             }
 
-            string words = ObstacleWords(region.Obstacles, region.Count);
             return region.IsRidge
                 ? ModText.Get(ModStrings.Battlefield.DescriptionObstacleWall, words)
                 : words;
@@ -351,7 +351,10 @@ namespace SongsOfConquestAccess.UI
         /// preview draws every blocked cell the same way).</summary>
         private static string Impassable(BattlefieldRegion region)
         {
-            if (region.Obstacles.Count == 0)
+            // Empty where the fight named nothing, and where it named only obstacles nobody has a
+            // word for: a lone standalone prop is impassable ground and nothing more.
+            string obstacles = ObstacleWords(region.Obstacles, region.Count);
+            if (string.IsNullOrEmpty(obstacles))
             {
                 if (region.Count == 1)
                 {
@@ -377,7 +380,7 @@ namespace SongsOfConquestAccess.UI
                     : ModStrings.Scanner.TerrainObstacleCells,
                 region.Count,
                 region.Count,
-                ObstacleWords(region.Obstacles, region.Count));
+                obstacles);
         }
 
         /// <summary>What the cursor says about a blocked cell in a fight: what stands there and that

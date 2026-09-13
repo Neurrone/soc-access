@@ -4031,3 +4031,258 @@ msgstr "{0} karelik sırt, yükseklik {1}"
 msgctxt "Scanner.TerrainSiegeWall_0"
 msgid "wall of {0} cell, height {1}"
 msgstr "{0} karelik duvar, yükseklik {1}"
+
+#. Battlefield.DescriptionChokePoint
+msgctxt "Battlefield.DescriptionChokePoint"
+msgid "a choke point"
+msgstr "bir dar geçit"
+
+#. Battlefield.DescriptionCliffs
+msgctxt "Battlefield.DescriptionCliffs"
+msgid "cliffs"
+msgstr "uçurumlar"
+
+#. Battlefield.DescriptionImpassableCell
+msgctxt "Battlefield.DescriptionImpassableCell"
+msgid "an impassable cell"
+msgstr "geçilemez bir kare"
+
+#. Battlefield.DescriptionImpassableCells
+msgctxt "Battlefield.DescriptionImpassableCells"
+msgid "impassable cells"
+msgstr "geçilemez kareler"
+
+#. Battlefield.DescriptionImpassableWall
+msgctxt "Battlefield.DescriptionImpassableWall"
+msgid "a wall of impassable cells"
+msgstr "geçilemez karelerden bir duvar"
+
+#. Battlefield.DescriptionObstacleWall
+msgctxt "Battlefield.DescriptionObstacleWall"
+msgid "a wall of {0}"
+msgstr "{0} duvarı"
+
+#. Battlefield.DescriptionPatch
+msgctxt "Battlefield.DescriptionPatch"
+msgid "a patch (height {0})"
+msgstr "bir alan (yükseklik {0})"
+
+#. Battlefield.DescriptionRidge
+msgctxt "Battlefield.DescriptionRidge"
+msgid "a ridge (height {0})"
+msgstr "bir sırt (yükseklik {0})"
+
+#. Battlefield.DescriptionRidgeDiagonal
+msgctxt "Battlefield.DescriptionRidgeDiagonal"
+msgid "a diagonal ridge (height {0})"
+msgstr "çapraz bir sırt (yükseklik {0})"
+
+#. Battlefield.DescriptionRidgeVertical
+msgctxt "Battlefield.DescriptionRidgeVertical"
+msgid "a vertical ridge (height {0})"
+msgstr "dikey bir sırt (yükseklik {0})"
+
+#. Battlefield.DescriptionSingleCell
+msgctxt "Battlefield.DescriptionSingleCell"
+msgid "a single cell (height {0})"
+msgstr "tek bir kare (yükseklik {0})"
+
+#. Battlefield.DescriptionStairs
+msgctxt "Battlefield.DescriptionStairs"
+msgid "stairs (height {0})"
+msgstr "merdiven (yükseklik {0})"
+
+#. Battlefield.DescriptionTower
+msgctxt "Battlefield.DescriptionTower"
+msgid "a tower (height {0})"
+msgstr "bir kule (yükseklik {0})"
+
+#. Battlefield.DescriptionWall
+msgctxt "Battlefield.DescriptionWall"
+msgid "a wall (height {0})"
+msgstr "bir duvar (yükseklik {0})"
+
+#. Battlefield.ObstacleFire_0
+msgctxt "Battlefield.ObstacleFire_0"
+msgid "fire"
+msgstr "ateş"
+
+#. Battlefield.ObstacleGrowthArleon_0
+msgctxt "Battlefield.ObstacleGrowthArleon_0"
+msgid "a bush"
+msgstr "çalı"
+
+#. Battlefield.ObstacleGrowthBarya_0
+msgctxt "Battlefield.ObstacleGrowthBarya_0"
+msgid "a desert plant"
+msgstr "çöl bitkisi"
+
+#. Battlefield.ObstacleGrowthLoth_0
+msgctxt "Battlefield.ObstacleGrowthLoth_0"
+msgid "a dark leafy plant"
+msgstr "koyu yapraklı bitki"
+
+#. Battlefield.ObstacleGrowthRana_0
+msgctxt "Battlefield.ObstacleGrowthRana_0"
+msgid "a pink mushroom"
+msgstr "pembe mantar"
+
+#. Battlefield.ObstacleGrowthRoots_0
+msgctxt "Battlefield.ObstacleGrowthRoots_0"
+msgid "a teal fungus"
+msgstr "camgöbeği mantar"
+
+#. Battlefield.ObstacleGrowthVanir_0
+msgctxt "Battlefield.ObstacleGrowthVanir_0"
+msgid "purple heather"
+msgstr "mor funda"
+
+#. Battlefield.ObstacleGrowthYulan_0
+msgctxt "Battlefield.ObstacleGrowthYulan_0"
+msgid "a purple flowering shrub"
+msgstr "mor çiçekli çalı"
+
+#. Battlefield.ObstacleLightArleon_0
+msgctxt "Battlefield.ObstacleLightArleon_0"
+msgid "a torch"
+msgstr "meşale"
+
+#. Battlefield.ObstacleLightBarya_0
+msgctxt "Battlefield.ObstacleLightBarya_0"
+msgid "a golden torch"
+msgstr "altın meşale"
+
+#. Battlefield.ObstacleLightLoth_0
+msgctxt "Battlefield.ObstacleLightLoth_0"
+msgid "a glowing crystal"
+msgstr "parlayan kristal"
+
+#. Battlefield.ObstacleLightRana_0
+msgctxt "Battlefield.ObstacleLightRana_0"
+msgid "a glowing pool"
+msgstr "parlayan su birikintisi"
+
+#. Battlefield.ObstacleLightRoots_0
+msgctxt "Battlefield.ObstacleLightRoots_0"
+msgid "glowing blue mushrooms"
+msgstr "parlayan mavi mantar"
+
+#. Battlefield.ObstacleLightVanir_0
+msgctxt "Battlefield.ObstacleLightVanir_0"
+msgid "a torch"
+msgstr "meşale"
+
+#. Battlefield.ObstacleLightYulan_0
+msgctxt "Battlefield.ObstacleLightYulan_0"
+msgid "a paper lantern"
+msgstr "kâğıt fener"
+
+#. Battlefield.ObstacleManufacturedArleon_0
+msgctxt "Battlefield.ObstacleManufacturedArleon_0"
+msgid "a knight statue"
+msgstr "şövalye heykeli"
+
+#. Battlefield.ObstacleManufacturedBarya_0
+msgctxt "Battlefield.ObstacleManufacturedBarya_0"
+msgid "an animal statue"
+msgstr "hayvan heykeli"
+
+#. Battlefield.ObstacleManufacturedLoth_0
+msgctxt "Battlefield.ObstacleManufacturedLoth_0"
+msgid "a gargoyle statue"
+msgstr "gargoyl heykeli"
+
+#. Battlefield.ObstacleManufacturedRana_0
+msgctxt "Battlefield.ObstacleManufacturedRana_0"
+msgid "a dragon statue"
+msgstr "ejderha heykeli"
+
+#. Battlefield.ObstacleManufacturedRoots_0
+msgctxt "Battlefield.ObstacleManufacturedRoots_0"
+msgid "a giant mushroom"
+msgstr "dev mantar"
+
+#. Battlefield.ObstacleManufacturedVanir_0
+msgctxt "Battlefield.ObstacleManufacturedVanir_0"
+msgid "a standing stone"
+msgstr "dikili taş"
+
+#. Battlefield.ObstacleManufacturedYulan_0
+msgctxt "Battlefield.ObstacleManufacturedYulan_0"
+msgid "a sage statue"
+msgstr "bilge heykeli"
+
+#. Battlefield.ObstacleRock_0
+msgctxt "Battlefield.ObstacleRock_0"
+msgid "a boulder"
+msgstr "kaya"
+
+#. Battlefield.ObstacleWater_0
+msgctxt "Battlefield.ObstacleWater_0"
+msgid "water"
+msgstr "su"
+
+#. Battlefield.SurroundingDirection
+msgctxt "Battlefield.SurroundingDirection"
+msgid "{0} to the {1}"
+msgstr "{1} yönünde {0}"
+
+#. Battlefield.SurroundingFarmland
+msgctxt "Battlefield.SurroundingFarmland"
+msgid "farmland"
+msgstr "tarım arazisi"
+
+#. Battlefield.SurroundingForest
+msgctxt "Battlefield.SurroundingForest"
+msgid "forest"
+msgstr "orman"
+
+#. Battlefield.SurroundingMountains
+msgctxt "Battlefield.SurroundingMountains"
+msgid "mountains"
+msgstr "dağlar"
+
+#. Battlefield.SurroundingOpenLand
+msgctxt "Battlefield.SurroundingOpenLand"
+msgid "open land"
+msgstr "açık arazi"
+
+#. Battlefield.SurroundingWalls
+msgctxt "Battlefield.SurroundingWalls"
+msgid "walls"
+msgstr "duvarlar"
+
+#. Battlefield.SurroundingWater
+msgctxt "Battlefield.SurroundingWater"
+msgid "water"
+msgstr "su"
+
+#. Battlefield.Surroundings
+msgctxt "Battlefield.Surroundings"
+msgid "The battlefield is surrounded by {0}."
+msgstr "Savaş alanının çevresinde {0} var."
+
+#. Scanner.TerrainObstacleCells_0
+msgctxt "Scanner.TerrainObstacleCells_0"
+msgid "{1}, {0} cell, impassable"
+msgstr "{1}, {0} kare, geçilemez"
+
+#. Scanner.TerrainObstacleWall_0
+msgctxt "Scanner.TerrainObstacleWall_0"
+msgid "wall of {0} {1}, impassable"
+msgstr "{0} karelik {1} duvarı, geçilemez"
+
+#. Scanner.TerrainRidgeDiagonal_0
+msgctxt "Scanner.TerrainRidgeDiagonal_0"
+msgid "diagonal ridge of {0} cell, height {1}"
+msgstr "{0} karelik çapraz sırt, yükseklik {1}"
+
+#. Scanner.TerrainRidgeVertical_0
+msgctxt "Scanner.TerrainRidgeVertical_0"
+msgid "vertical ridge of {0} cell, height {1}"
+msgstr "{0} karelik dikey sırt, yükseklik {1}"
+
+#. Spatial.ImpassableObstacle
+msgctxt "Spatial.ImpassableObstacle"
+msgid "{0}, impassable"
+msgstr "{0}, geçilemez"

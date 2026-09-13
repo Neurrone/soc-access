@@ -50,6 +50,18 @@ namespace SongsOfConquestAccess.Tests
                 ImpassableGroup(ArleonTheme, "......", "GGGGBB", "......"));
         }
 
+        /// <summary>An obstacle nobody has a word for - an unnamed decoration byte, a prop standing
+        /// on its own - is impassable ground and nothing more, even in a fight.</summary>
+        [TestMethod]
+        public void AnObstacleWithNoNameStaysPlainImpassable()
+        {
+            BattlefieldTerrain terrain = Analyse(ArleonTheme, true, ".....", "#####", ".....");
+            Assert.AreEqual(
+                "wall of 5 impassable cells",
+                BattlefieldText.Region(First(terrain, BattlefieldRegionKind.Impassable)));
+            Assert.AreEqual(string.Empty, BattlefieldText.CellImpassable(terrain.GetObstacle(new Vector2Int(0, 1))));
+        }
+
         /// <summary>The placement page has nothing to name: its preview draws every blocked cell as
         /// the same styleless puck, so the words there stay the ones it always said.</summary>
         [TestMethod]

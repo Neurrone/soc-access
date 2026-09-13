@@ -4151,3 +4151,538 @@ msgstr "mur, {0} pola, wysokość {1}"
 msgctxt "Scanner.TerrainSiegeWall_2"
 msgid "wall of {0} cells, height {1}"
 msgstr "mur, {0} pól, wysokość {1}"
+
+#. Battlefield.DescriptionChokePoint
+msgctxt "Battlefield.DescriptionChokePoint"
+msgid "a choke point"
+msgstr "wąskie przejście"
+
+#. Battlefield.DescriptionCliffs
+msgctxt "Battlefield.DescriptionCliffs"
+msgid "cliffs"
+msgstr "urwiska"
+
+#. Battlefield.DescriptionImpassableCell
+msgctxt "Battlefield.DescriptionImpassableCell"
+msgid "an impassable cell"
+msgstr "pole nie do przejścia"
+
+#. Battlefield.DescriptionImpassableCells
+msgctxt "Battlefield.DescriptionImpassableCells"
+msgid "impassable cells"
+msgstr "pola nie do przejścia"
+
+#. Battlefield.DescriptionImpassableWall
+msgctxt "Battlefield.DescriptionImpassableWall"
+msgid "a wall of impassable cells"
+msgstr "mur z pól nie do przejścia"
+
+#. Battlefield.DescriptionObstacleWall
+msgctxt "Battlefield.DescriptionObstacleWall"
+msgid "a wall of {0}"
+msgstr "mur, {0}"
+
+#. Battlefield.DescriptionPatch
+msgctxt "Battlefield.DescriptionPatch"
+msgid "a patch (height {0})"
+msgstr "obszar (wysokość {0})"
+
+#. Battlefield.DescriptionRidge
+msgctxt "Battlefield.DescriptionRidge"
+msgid "a ridge (height {0})"
+msgstr "grzbiet (wysokość {0})"
+
+#. Battlefield.DescriptionRidgeDiagonal
+msgctxt "Battlefield.DescriptionRidgeDiagonal"
+msgid "a diagonal ridge (height {0})"
+msgstr "ukośny grzbiet (wysokość {0})"
+
+#. Battlefield.DescriptionRidgeVertical
+msgctxt "Battlefield.DescriptionRidgeVertical"
+msgid "a vertical ridge (height {0})"
+msgstr "pionowy grzbiet (wysokość {0})"
+
+#. Battlefield.DescriptionSingleCell
+msgctxt "Battlefield.DescriptionSingleCell"
+msgid "a single cell (height {0})"
+msgstr "pojedyncze pole (wysokość {0})"
+
+#. Battlefield.DescriptionStairs
+msgctxt "Battlefield.DescriptionStairs"
+msgid "stairs (height {0})"
+msgstr "schody (wysokość {0})"
+
+#. Battlefield.DescriptionTower
+msgctxt "Battlefield.DescriptionTower"
+msgid "a tower (height {0})"
+msgstr "wieża (wysokość {0})"
+
+#. Battlefield.DescriptionWall
+msgctxt "Battlefield.DescriptionWall"
+msgid "a wall (height {0})"
+msgstr "mur (wysokość {0})"
+
+#. Battlefield.ObstacleFire_0
+msgctxt "Battlefield.ObstacleFire_0"
+msgid "fire"
+msgstr "ogień"
+
+#. Battlefield.ObstacleFire_1
+msgctxt "Battlefield.ObstacleFire_1"
+msgid "fire"
+msgstr "ogień"
+
+#. Battlefield.ObstacleFire_2
+msgctxt "Battlefield.ObstacleFire_2"
+msgid "fire"
+msgstr "ogień"
+
+#. Battlefield.ObstacleGrowthArleon_0
+msgctxt "Battlefield.ObstacleGrowthArleon_0"
+msgid "a bush"
+msgstr "krzew"
+
+#. Battlefield.ObstacleGrowthArleon_1
+msgctxt "Battlefield.ObstacleGrowthArleon_1"
+msgid "bushes"
+msgstr "krzewy"
+
+#. Battlefield.ObstacleGrowthArleon_2
+msgctxt "Battlefield.ObstacleGrowthArleon_2"
+msgid "bushes"
+msgstr "krzewy"
+
+#. Battlefield.ObstacleGrowthBarya_0
+msgctxt "Battlefield.ObstacleGrowthBarya_0"
+msgid "a desert plant"
+msgstr "pustynna roślina"
+
+#. Battlefield.ObstacleGrowthBarya_1
+msgctxt "Battlefield.ObstacleGrowthBarya_1"
+msgid "desert plants"
+msgstr "pustynne rośliny"
+
+#. Battlefield.ObstacleGrowthBarya_2
+msgctxt "Battlefield.ObstacleGrowthBarya_2"
+msgid "desert plants"
+msgstr "pustynne rośliny"
+
+#. Battlefield.ObstacleGrowthLoth_0
+msgctxt "Battlefield.ObstacleGrowthLoth_0"
+msgid "a dark leafy plant"
+msgstr "ciemna liściasta roślina"
+
+#. Battlefield.ObstacleGrowthLoth_1
+msgctxt "Battlefield.ObstacleGrowthLoth_1"
+msgid "dark leafy plants"
+msgstr "ciemne liściaste rośliny"
+
+#. Battlefield.ObstacleGrowthLoth_2
+msgctxt "Battlefield.ObstacleGrowthLoth_2"
+msgid "dark leafy plants"
+msgstr "ciemne liściaste rośliny"
+
+#. Battlefield.ObstacleGrowthRana_0
+msgctxt "Battlefield.ObstacleGrowthRana_0"
+msgid "a pink mushroom"
+msgstr "różowy grzyb"
+
+#. Battlefield.ObstacleGrowthRana_1
+msgctxt "Battlefield.ObstacleGrowthRana_1"
+msgid "pink mushrooms"
+msgstr "różowe grzyby"
+
+#. Battlefield.ObstacleGrowthRana_2
+msgctxt "Battlefield.ObstacleGrowthRana_2"
+msgid "pink mushrooms"
+msgstr "różowe grzyby"
+
+#. Battlefield.ObstacleGrowthRoots_0
+msgctxt "Battlefield.ObstacleGrowthRoots_0"
+msgid "a teal fungus"
+msgstr "turkusowy grzyb"
+
+#. Battlefield.ObstacleGrowthRoots_1
+msgctxt "Battlefield.ObstacleGrowthRoots_1"
+msgid "teal fungi"
+msgstr "turkusowe grzyby"
+
+#. Battlefield.ObstacleGrowthRoots_2
+msgctxt "Battlefield.ObstacleGrowthRoots_2"
+msgid "teal fungi"
+msgstr "turkusowe grzyby"
+
+#. Battlefield.ObstacleGrowthVanir_0
+msgctxt "Battlefield.ObstacleGrowthVanir_0"
+msgid "purple heather"
+msgstr "fioletowy wrzos"
+
+#. Battlefield.ObstacleGrowthVanir_1
+msgctxt "Battlefield.ObstacleGrowthVanir_1"
+msgid "purple heather"
+msgstr "fioletowy wrzos"
+
+#. Battlefield.ObstacleGrowthVanir_2
+msgctxt "Battlefield.ObstacleGrowthVanir_2"
+msgid "purple heather"
+msgstr "fioletowy wrzos"
+
+#. Battlefield.ObstacleGrowthYulan_0
+msgctxt "Battlefield.ObstacleGrowthYulan_0"
+msgid "a purple flowering shrub"
+msgstr "fioletowy kwitnący krzew"
+
+#. Battlefield.ObstacleGrowthYulan_1
+msgctxt "Battlefield.ObstacleGrowthYulan_1"
+msgid "purple flowering shrubs"
+msgstr "fioletowe kwitnące krzewy"
+
+#. Battlefield.ObstacleGrowthYulan_2
+msgctxt "Battlefield.ObstacleGrowthYulan_2"
+msgid "purple flowering shrubs"
+msgstr "fioletowe kwitnące krzewy"
+
+#. Battlefield.ObstacleLightArleon_0
+msgctxt "Battlefield.ObstacleLightArleon_0"
+msgid "a torch"
+msgstr "pochodnia"
+
+#. Battlefield.ObstacleLightArleon_1
+msgctxt "Battlefield.ObstacleLightArleon_1"
+msgid "torches"
+msgstr "pochodnie"
+
+#. Battlefield.ObstacleLightArleon_2
+msgctxt "Battlefield.ObstacleLightArleon_2"
+msgid "torches"
+msgstr "pochodnie"
+
+#. Battlefield.ObstacleLightBarya_0
+msgctxt "Battlefield.ObstacleLightBarya_0"
+msgid "a golden torch"
+msgstr "złota pochodnia"
+
+#. Battlefield.ObstacleLightBarya_1
+msgctxt "Battlefield.ObstacleLightBarya_1"
+msgid "golden torches"
+msgstr "złote pochodnie"
+
+#. Battlefield.ObstacleLightBarya_2
+msgctxt "Battlefield.ObstacleLightBarya_2"
+msgid "golden torches"
+msgstr "złote pochodnie"
+
+#. Battlefield.ObstacleLightLoth_0
+msgctxt "Battlefield.ObstacleLightLoth_0"
+msgid "a glowing crystal"
+msgstr "świecący kryształ"
+
+#. Battlefield.ObstacleLightLoth_1
+msgctxt "Battlefield.ObstacleLightLoth_1"
+msgid "glowing crystals"
+msgstr "świecące kryształy"
+
+#. Battlefield.ObstacleLightLoth_2
+msgctxt "Battlefield.ObstacleLightLoth_2"
+msgid "glowing crystals"
+msgstr "świecące kryształy"
+
+#. Battlefield.ObstacleLightRana_0
+msgctxt "Battlefield.ObstacleLightRana_0"
+msgid "a glowing pool"
+msgstr "świecąca sadzawka"
+
+#. Battlefield.ObstacleLightRana_1
+msgctxt "Battlefield.ObstacleLightRana_1"
+msgid "glowing pools"
+msgstr "świecące sadzawki"
+
+#. Battlefield.ObstacleLightRana_2
+msgctxt "Battlefield.ObstacleLightRana_2"
+msgid "glowing pools"
+msgstr "świecące sadzawki"
+
+#. Battlefield.ObstacleLightRoots_0
+msgctxt "Battlefield.ObstacleLightRoots_0"
+msgid "glowing blue mushrooms"
+msgstr "świecące niebieskie grzyby"
+
+#. Battlefield.ObstacleLightRoots_1
+msgctxt "Battlefield.ObstacleLightRoots_1"
+msgid "glowing blue mushrooms"
+msgstr "świecące niebieskie grzyby"
+
+#. Battlefield.ObstacleLightRoots_2
+msgctxt "Battlefield.ObstacleLightRoots_2"
+msgid "glowing blue mushrooms"
+msgstr "świecące niebieskie grzyby"
+
+#. Battlefield.ObstacleLightVanir_0
+msgctxt "Battlefield.ObstacleLightVanir_0"
+msgid "a torch"
+msgstr "pochodnia"
+
+#. Battlefield.ObstacleLightVanir_1
+msgctxt "Battlefield.ObstacleLightVanir_1"
+msgid "torches"
+msgstr "pochodnie"
+
+#. Battlefield.ObstacleLightVanir_2
+msgctxt "Battlefield.ObstacleLightVanir_2"
+msgid "torches"
+msgstr "pochodnie"
+
+#. Battlefield.ObstacleLightYulan_0
+msgctxt "Battlefield.ObstacleLightYulan_0"
+msgid "a paper lantern"
+msgstr "papierowy lampion"
+
+#. Battlefield.ObstacleLightYulan_1
+msgctxt "Battlefield.ObstacleLightYulan_1"
+msgid "paper lanterns"
+msgstr "papierowe lampiony"
+
+#. Battlefield.ObstacleLightYulan_2
+msgctxt "Battlefield.ObstacleLightYulan_2"
+msgid "paper lanterns"
+msgstr "papierowe lampiony"
+
+#. Battlefield.ObstacleManufacturedArleon_0
+msgctxt "Battlefield.ObstacleManufacturedArleon_0"
+msgid "a knight statue"
+msgstr "posąg rycerza"
+
+#. Battlefield.ObstacleManufacturedArleon_1
+msgctxt "Battlefield.ObstacleManufacturedArleon_1"
+msgid "knight statues"
+msgstr "posągi rycerzy"
+
+#. Battlefield.ObstacleManufacturedArleon_2
+msgctxt "Battlefield.ObstacleManufacturedArleon_2"
+msgid "knight statues"
+msgstr "posągi rycerzy"
+
+#. Battlefield.ObstacleManufacturedBarya_0
+msgctxt "Battlefield.ObstacleManufacturedBarya_0"
+msgid "an animal statue"
+msgstr "posąg zwierzęcia"
+
+#. Battlefield.ObstacleManufacturedBarya_1
+msgctxt "Battlefield.ObstacleManufacturedBarya_1"
+msgid "animal statues"
+msgstr "posągi zwierząt"
+
+#. Battlefield.ObstacleManufacturedBarya_2
+msgctxt "Battlefield.ObstacleManufacturedBarya_2"
+msgid "animal statues"
+msgstr "posągi zwierząt"
+
+#. Battlefield.ObstacleManufacturedLoth_0
+msgctxt "Battlefield.ObstacleManufacturedLoth_0"
+msgid "a gargoyle statue"
+msgstr "posąg gargulca"
+
+#. Battlefield.ObstacleManufacturedLoth_1
+msgctxt "Battlefield.ObstacleManufacturedLoth_1"
+msgid "gargoyle statues"
+msgstr "posągi gargulców"
+
+#. Battlefield.ObstacleManufacturedLoth_2
+msgctxt "Battlefield.ObstacleManufacturedLoth_2"
+msgid "gargoyle statues"
+msgstr "posągi gargulców"
+
+#. Battlefield.ObstacleManufacturedRana_0
+msgctxt "Battlefield.ObstacleManufacturedRana_0"
+msgid "a dragon statue"
+msgstr "posąg smoka"
+
+#. Battlefield.ObstacleManufacturedRana_1
+msgctxt "Battlefield.ObstacleManufacturedRana_1"
+msgid "dragon statues"
+msgstr "posągi smoków"
+
+#. Battlefield.ObstacleManufacturedRana_2
+msgctxt "Battlefield.ObstacleManufacturedRana_2"
+msgid "dragon statues"
+msgstr "posągi smoków"
+
+#. Battlefield.ObstacleManufacturedRoots_0
+msgctxt "Battlefield.ObstacleManufacturedRoots_0"
+msgid "a giant mushroom"
+msgstr "olbrzymi grzyb"
+
+#. Battlefield.ObstacleManufacturedRoots_1
+msgctxt "Battlefield.ObstacleManufacturedRoots_1"
+msgid "giant mushrooms"
+msgstr "olbrzymie grzyby"
+
+#. Battlefield.ObstacleManufacturedRoots_2
+msgctxt "Battlefield.ObstacleManufacturedRoots_2"
+msgid "giant mushrooms"
+msgstr "olbrzymie grzyby"
+
+#. Battlefield.ObstacleManufacturedVanir_0
+msgctxt "Battlefield.ObstacleManufacturedVanir_0"
+msgid "a standing stone"
+msgstr "stojący kamień"
+
+#. Battlefield.ObstacleManufacturedVanir_1
+msgctxt "Battlefield.ObstacleManufacturedVanir_1"
+msgid "standing stones"
+msgstr "stojące kamienie"
+
+#. Battlefield.ObstacleManufacturedVanir_2
+msgctxt "Battlefield.ObstacleManufacturedVanir_2"
+msgid "standing stones"
+msgstr "stojące kamienie"
+
+#. Battlefield.ObstacleManufacturedYulan_0
+msgctxt "Battlefield.ObstacleManufacturedYulan_0"
+msgid "a sage statue"
+msgstr "posąg mędrca"
+
+#. Battlefield.ObstacleManufacturedYulan_1
+msgctxt "Battlefield.ObstacleManufacturedYulan_1"
+msgid "sage statues"
+msgstr "posągi mędrców"
+
+#. Battlefield.ObstacleManufacturedYulan_2
+msgctxt "Battlefield.ObstacleManufacturedYulan_2"
+msgid "sage statues"
+msgstr "posągi mędrców"
+
+#. Battlefield.ObstacleRock_0
+msgctxt "Battlefield.ObstacleRock_0"
+msgid "a boulder"
+msgstr "głaz"
+
+#. Battlefield.ObstacleRock_1
+msgctxt "Battlefield.ObstacleRock_1"
+msgid "boulders"
+msgstr "głazy"
+
+#. Battlefield.ObstacleRock_2
+msgctxt "Battlefield.ObstacleRock_2"
+msgid "boulders"
+msgstr "głazy"
+
+#. Battlefield.ObstacleWater_0
+msgctxt "Battlefield.ObstacleWater_0"
+msgid "water"
+msgstr "woda"
+
+#. Battlefield.ObstacleWater_1
+msgctxt "Battlefield.ObstacleWater_1"
+msgid "water"
+msgstr "woda"
+
+#. Battlefield.ObstacleWater_2
+msgctxt "Battlefield.ObstacleWater_2"
+msgid "water"
+msgstr "woda"
+
+#. Battlefield.SurroundingDirection
+msgctxt "Battlefield.SurroundingDirection"
+msgid "{0} to the {1}"
+msgstr "{0} ({1})"
+
+#. Battlefield.SurroundingFarmland
+msgctxt "Battlefield.SurroundingFarmland"
+msgid "farmland"
+msgstr "pola uprawne"
+
+#. Battlefield.SurroundingForest
+msgctxt "Battlefield.SurroundingForest"
+msgid "forest"
+msgstr "las"
+
+#. Battlefield.SurroundingMountains
+msgctxt "Battlefield.SurroundingMountains"
+msgid "mountains"
+msgstr "góry"
+
+#. Battlefield.SurroundingOpenLand
+msgctxt "Battlefield.SurroundingOpenLand"
+msgid "open land"
+msgstr "otwarty teren"
+
+#. Battlefield.SurroundingWalls
+msgctxt "Battlefield.SurroundingWalls"
+msgid "walls"
+msgstr "mury"
+
+#. Battlefield.SurroundingWater
+msgctxt "Battlefield.SurroundingWater"
+msgid "water"
+msgstr "woda"
+
+#. Battlefield.Surroundings
+msgctxt "Battlefield.Surroundings"
+msgid "The battlefield is surrounded by {0}."
+msgstr "Wokół pola bitwy: {0}."
+
+#. Scanner.TerrainObstacleCells_0
+msgctxt "Scanner.TerrainObstacleCells_0"
+msgid "{1}, {0} cell, impassable"
+msgstr "{1}, {0} pole, nie do przejścia"
+
+#. Scanner.TerrainObstacleCells_1
+msgctxt "Scanner.TerrainObstacleCells_1"
+msgid "{1}, {0} cells, impassable"
+msgstr "{1}, {0} pola, nie do przejścia"
+
+#. Scanner.TerrainObstacleCells_2
+msgctxt "Scanner.TerrainObstacleCells_2"
+msgid "{1}, {0} cells, impassable"
+msgstr "{1}, {0} pól, nie do przejścia"
+
+#. Scanner.TerrainObstacleWall_0
+msgctxt "Scanner.TerrainObstacleWall_0"
+msgid "wall of {0} {1}, impassable"
+msgstr "mur, {0} pole, {1}, nie do przejścia"
+
+#. Scanner.TerrainObstacleWall_1
+msgctxt "Scanner.TerrainObstacleWall_1"
+msgid "wall of {0} {1}, impassable"
+msgstr "mur, {0} pola, {1}, nie do przejścia"
+
+#. Scanner.TerrainObstacleWall_2
+msgctxt "Scanner.TerrainObstacleWall_2"
+msgid "wall of {0} {1}, impassable"
+msgstr "mur, {0} pól, {1}, nie do przejścia"
+
+#. Scanner.TerrainRidgeDiagonal_0
+msgctxt "Scanner.TerrainRidgeDiagonal_0"
+msgid "diagonal ridge of {0} cell, height {1}"
+msgstr "ukośny grzbiet, {0} pole, wysokość {1}"
+
+#. Scanner.TerrainRidgeDiagonal_1
+msgctxt "Scanner.TerrainRidgeDiagonal_1"
+msgid "diagonal ridge of {0} cells, height {1}"
+msgstr "ukośny grzbiet, {0} pola, wysokość {1}"
+
+#. Scanner.TerrainRidgeDiagonal_2
+msgctxt "Scanner.TerrainRidgeDiagonal_2"
+msgid "diagonal ridge of {0} cells, height {1}"
+msgstr "ukośny grzbiet, {0} pól, wysokość {1}"
+
+#. Scanner.TerrainRidgeVertical_0
+msgctxt "Scanner.TerrainRidgeVertical_0"
+msgid "vertical ridge of {0} cell, height {1}"
+msgstr "pionowy grzbiet, {0} pole, wysokość {1}"
+
+#. Scanner.TerrainRidgeVertical_1
+msgctxt "Scanner.TerrainRidgeVertical_1"
+msgid "vertical ridge of {0} cells, height {1}"
+msgstr "pionowy grzbiet, {0} pola, wysokość {1}"
+
+#. Scanner.TerrainRidgeVertical_2
+msgctxt "Scanner.TerrainRidgeVertical_2"
+msgid "vertical ridge of {0} cells, height {1}"
+msgstr "pionowy grzbiet, {0} pól, wysokość {1}"
+
+#. Spatial.ImpassableObstacle
+msgctxt "Spatial.ImpassableObstacle"
+msgid "{0}, impassable"
+msgstr "{0}, nie do przejścia"
