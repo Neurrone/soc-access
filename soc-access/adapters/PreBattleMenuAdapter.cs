@@ -803,6 +803,7 @@ namespace SongsOfConquestAccess.Adapters
             byte[] elevations = map.Contents.ElevationsArray;
             byte[] decorations = map.Contents.DecorationsArray;
             byte[] water = map.Contents.WaterArray;
+            byte[] effects = map.Contents.EffectsArray;
             List<BattlefieldCell> cells = new List<BattlefieldCell>(size.x * size.y);
             for (int y = 0; y < size.y; y++)
             {
@@ -811,12 +812,21 @@ namespace SongsOfConquestAccess.Adapters
                     Vector2Int point = new Vector2Int(x, y);
                     int index = map.PointToIndex(point);
                     byte decoration = decorations != null && index < decorations.Length ? decorations[index] : (byte)0;
+                    bool wet = water != null && index < water.Length && water[index] != 0;
+                    // The bytes that say which family of prop blocks a cell travel even here, where
+                    // the page has no word for any of them: they are what a group of blocked cells
+                    // is split by, so the page's groups are the fight's groups. The theme does not:
+                    // a fight repaints the board from the ground it was joined on, and this page
+                    // cannot know which ground that will be.
                     cells.Add(new BattlefieldCell(
                         point,
                         IsGridTile(map, renderer, point),
                         elevations != null && index < elevations.Length ? elevations[index] : 0,
-                        (water != null && index < water.Length && water[index] != 0) || IsBlocker(decoration),
-                        decoration));
+                        wet || IsBlocker(decoration),
+                        decoration,
+                        effects != null && index < effects.Length ? effects[index] : 0,
+                        wet,
+                        0));
                 }
             }
 
