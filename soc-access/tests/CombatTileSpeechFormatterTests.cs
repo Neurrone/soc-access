@@ -114,6 +114,14 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("impassable, 4, 2", Describe(new CombatTile(new Vector2Int(4, 2)) { IsImpassable = true }));
         }
 
+        /// <summary>A cell nothing can enter says no height: how high a blocked hex stands is no
+        /// use to a player who can never put a troop on it.</summary>
+        [TestMethod]
+        public void TileSaysNoHeightForACellNothingCanEnter()
+        {
+            Assert.AreEqual("impassable, 4, 2", Describe(Blocked(null)));
+        }
+
         /// <summary>Raised ground is named by what it is where the ground itself has a name: a
         /// cliff nothing can climb, and a siege layout's wall, tower and stairs.</summary>
         [TestMethod]
@@ -124,6 +132,19 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("wall, height 2, 4, 2", Describe(Ground(BattlefieldCellKind.Wall, 2)));
             Assert.AreEqual("tower, height 3, 4, 2", Describe(Ground(BattlefieldCellKind.Tower, 3)));
             Assert.AreEqual("stairs, height 1, 4, 2", Describe(Ground(BattlefieldCellKind.Stairs, 1)));
+        }
+
+        /// <summary>A blocked cell raised above the board, which every gatepost of a walled town
+        /// siege is: height 3, and nothing can stand there.</summary>
+        private static CombatTile Blocked(BattlefieldObstacle obstacle)
+        {
+            return new CombatTile(new Vector2Int(4, 2))
+            {
+                IsImpassable = true,
+                Kind = BattlefieldCellKind.Impassable,
+                Elevation = 3,
+                Obstacle = obstacle
+            };
         }
 
         private static CombatTile Ground(BattlefieldCellKind kind, byte elevation)

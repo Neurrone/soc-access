@@ -30,11 +30,16 @@ namespace SongsOfConquestAccess.Scanner
         /// <summary>
         /// How high the ground is decides where the player wants a troop, so the
         /// scanner keeps it. A terrain result already names it as its subject,
-        /// so it does not get it twice.
+        /// so it does not get it twice, and a hex nothing can enter never says a
+        /// height: no troop will ever stand on it.
         /// </summary>
         private static IEnumerable<AnnouncementPart> BuildTileParts(TroopPlacementTile tile, ScannerResult result)
         {
-            if (tile == null || tile.Elevation <= 0 || result == null || result.Kind == ScannerResultKind.TerrainPoint)
+            if (tile == null
+                || tile.Elevation <= 0
+                || tile.IsImpassable
+                || result == null
+                || result.Kind == ScannerResultKind.TerrainPoint)
             {
                 yield break;
             }

@@ -51,14 +51,17 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("spawn point, 1, 0", Describe(null, tile));
         }
 
+        /// <summary>A cell nothing can enter says so before the coordinates and says no height at
+        /// all, however high it stands: no troop will ever be placed on it.</summary>
         [TestMethod]
-        public void DescribeTileReadsImpassableAndElevationBeforeTheCoordinates()
+        public void DescribeTileReadsImpassableWithoutItsHeightBeforeTheCoordinates()
         {
             TroopPlacementTile tile = Tile(1, 0);
             tile.IsImpassable = true;
-            tile.Elevation = 2;
+            tile.Kind = BattlefieldCellKind.Impassable;
+            tile.Elevation = 3;
 
-            Assert.AreEqual("impassable, elevated ground, height 2, 1, 0", Describe(null, tile));
+            Assert.AreEqual("impassable, 1, 0", Describe(null, tile));
         }
 
         /// <summary>Raised ground is named by what it is where the ground itself has a name: a

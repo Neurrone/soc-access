@@ -77,7 +77,12 @@ namespace SongsOfConquestAccess.Scanner
                     ModText.Get(ModStrings.Spatial.Reachable));
             }
 
-            if (tile.Elevation > 0 && result != null && result.Kind != ScannerResultKind.TerrainPoint)
+            // Nothing about the height of a hex nothing can enter: a blocked hex is named by what
+            // stands on it, and how high that stands is no use to a player who cannot go there.
+            if (tile.Elevation > 0
+                && !tile.IsImpassable
+                && result != null
+                && result.Kind != ScannerResultKind.TerrainPoint)
             {
                 yield return new AnnouncementPart(
                     CombatAnnouncementDefinitions.TileKeys.Elevation,

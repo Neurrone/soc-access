@@ -40,7 +40,7 @@ The cursor, the scanner's `Terrain` category and the written battlefield descrip
 | stairs | The steps onto a siege layout's wall | The same, for the stairs decoration | Cursor, scanner, descriptions |
 | spawn point | A hex a side's troops can start on | The layout says so | Cursor, scanner, descriptions |
 
-`blocked` is never spoken on a battlefield. Whether a hex can be reached this turn is not a fact about the ground, and every hex an enemy stands on would be one.
+`blocked` is never spoken on a battlefield. Whether a hex can be reached this turn is not a fact about the ground, and every hex an enemy stands on would be one. An impassable hex never says how high it stands either, on the combat grid or the deployment grid: no troop will ever be on it, so its height is nothing to plan around.
 
 The scanner's `Terrain` category holds one item per group, so a ridge is one stop in the item cycle and `Alt+Page Down` walks its hexes nearest first. A group names itself with its shape, its size and its height, as in `diagonal ridge of 7 cells, height 1`, `cliff of 3 cells`, `unreachable ground, 31 cells` or `wall of 4 impassable cells`.
 
