@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech.Spatial;
 using UnityEngine;
@@ -111,6 +112,23 @@ namespace SongsOfConquestAccess.Tests
         {
             Assert.AreEqual("4, 2", Describe(new CombatTile(new Vector2Int(4, 2)) { IsBlocked = true }));
             Assert.AreEqual("impassable, 4, 2", Describe(new CombatTile(new Vector2Int(4, 2)) { IsImpassable = true }));
+        }
+
+        /// <summary>Raised ground is named by what it is where the ground itself has a name: a
+        /// cliff nothing can climb, and a siege layout's wall, tower and stairs.</summary>
+        [TestMethod]
+        public void TileNamesACliffAndTheSiegeStructuresInsteadOfElevatedGround()
+        {
+            Assert.AreEqual("elevated ground, height 2, 4, 2", Describe(Ground(BattlefieldCellKind.Elevated, 2)));
+            Assert.AreEqual("cliff, height 2, 4, 2", Describe(Ground(BattlefieldCellKind.Cliff, 2)));
+            Assert.AreEqual("wall, height 2, 4, 2", Describe(Ground(BattlefieldCellKind.Wall, 2)));
+            Assert.AreEqual("tower, height 3, 4, 2", Describe(Ground(BattlefieldCellKind.Tower, 3)));
+            Assert.AreEqual("stairs, height 1, 4, 2", Describe(Ground(BattlefieldCellKind.Stairs, 1)));
+        }
+
+        private static CombatTile Ground(BattlefieldCellKind kind, byte elevation)
+        {
+            return new CombatTile(new Vector2Int(4, 2)) { Kind = kind, Elevation = elevation };
         }
 
         private static string Describe(CombatTile tile)

@@ -23,8 +23,11 @@ using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquest.Common.Map;
 using SongsOfConquest.Common.Spells;
+using SongsOfConquest.Server.Adventure.Map.Provider;
 using SongsOfConquest.Server.Battle;
+using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
@@ -222,6 +225,11 @@ namespace SongsOfConquestAccess.Adapters
         // The layout this battle is fought on, composed once: an adapter lives exactly as long as
         // the battle it wraps, and that battle is fought on one map.
         private string _battlefieldKey;
+        // The ground of that map, analysed once and keyed on the level object the game handed over,
+        // so a level replaced under the adapter is read again. Terrain does not change during a
+        // fight; obstacles an ability creates are entities and are not this.
+        private BattlefieldTerrain _terrain;
+        private object _terrainLevel;
         // This frame's answer to "which enemies reach that tile", for the one tile it was asked
         // about. See BuildEnemyInfluenceSources.
         private List<CombatInfluenceSource> _influenceSources;
@@ -563,7 +571,65 @@ namespace SongsOfConquestAccess.Adapters
             tile.IsEntityAttackable = IsAttackable(tile.Entity);
             AddDangerousMapEffects(point, tile);
             tile.DecorativeFeature = GetDecorativeFeatureAt(point, tile.Entity);
+            BattlefieldTerrain terrain = GetTerrain();
+            tile.Kind = terrain != null ? terrain.GetKind(point) : BattlefieldCellKind.OffGrid;
             return tile;
+        }
+
+        /// <summary>The ground this battle is fought on, analysed once per level: terrain does not
+        /// change during a fight, so the answer is kept against the level object the game gave and
+        /// read again only if that object is replaced.</summary>
+        public BattlefieldTerrain GetTerrain()
+        {
+            if (_facade == null || _facade.Level == null)
+            {
+                return null;
+            }
+
+            if (_terrain != null && ReferenceEquals(_terrainLevel, _facade.Level))
+            {
+                return _terrain;
+            }
+
+            try
+            {
+                MapFormat map = _facade.Level.GetMap();
+                _terrainLevel = _facade.Level;
+                _terrain = BattlefieldTerrain.Analyse(
+                    _facade.Level.Size,
+                    ReadTerrainCells(),
+                    map != null && map.Metadata.Type.IsSiege());
+            }
+            catch (Exception exception)
+            {
+                _faults.Report("GetTerrain", exception);
+                _terrainLevel = _facade.Level;
+                _terrain = BattlefieldTerrain.Analyse(new Vector2Int(0, 0), null, false);
+            }
+
+            return _terrain;
+        }
+
+        private List<BattlefieldCell> ReadTerrainCells()
+        {
+            Vector2Int size = _facade.Level.Size;
+            List<BattlefieldCell> cells = new List<BattlefieldCell>(Math.Max(0, size.x * size.y));
+            for (int y = 0; y < size.y; y++)
+            {
+                for (int x = 0; x < size.x; x++)
+                {
+                    Vector2Int point = new Vector2Int(x, y);
+                    bool onGrid = _facade.Level.IsPointWithinMap(point);
+                    cells.Add(new BattlefieldCell(
+                        point,
+                        onGrid,
+                        onGrid ? _facade.Level.GetElevation(point) : 0,
+                        !onGrid || !_facade.Level.IsWalkableStatic(point),
+                        onGrid ? _facade.Level.GetDecoration(point) : 0));
+                }
+            }
+
+            return cells;
         }
 
         /// <summary>Who stands on a tile, as the two facts that change what the tile reads as while

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -18,7 +18,9 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Map;
+using SongsOfConquest.Server.Adventure.Map.Provider;
 using SongsOfConquest.Server.Map;
+using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.UI;
@@ -81,6 +83,11 @@ namespace SongsOfConquestAccess.Adapters
         // The layout this placement page is showing, composed once: an adapter lives exactly as
         // long as the menu instance it wraps, and that instance is built over one map.
         private string _battlefieldKey;
+        // The ground of that map, read once for the same reason: the terrain of a battle is fixed
+        // before the placement page opens and nothing on the page changes it. The miss is kept too,
+        // so a page whose map is not there yet costs one pass and not one per frame.
+        private BattlefieldTerrain _terrain;
+        private bool _terrainProbed;
 
         private enum BattleParticipantSide
         {
@@ -304,45 +311,15 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddTroopPlacementTerrainScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
         {
-            for (int elevation = 1; elevation <= 3; elevation++)
+            BattlefieldTerrain terrain = GetTerrain();
+            if (terrain == null)
             {
-                foreach (TroopPlacementTile tile in placement.Tiles)
-                {
-                    if (tile.Elevation == elevation)
-                    {
-                        ScannerResult result = new ScannerResult(
-                            ScannerTileKeys.For("terrain:elevated:" + elevation, tile.Point),
-                            ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
-                            tile.Point)
-                        {
-                            Kind = ScannerResultKind.TerrainPoint,
-                            ItemKey = ScannerItemKeys.ElevatedGround + elevation
-                        };
-                        snapshot.Add(
-                            ScannerCategoryKeys.Terrain,
-                            ScannerSubcategoryKeys.All,
-                            result);
-                    }
-                }
+                return;
             }
 
-            foreach (TroopPlacementTile tile in placement.Tiles)
+            foreach (BattlefieldRegion region in terrain.Regions)
             {
-                if (tile.IsImpassable)
-                {
-                    ScannerResult result = new ScannerResult(
-                        ScannerTileKeys.For("terrain:impassable", tile.Point),
-                        ModText.Get(ModStrings.Scanner.ImpassableTerrain),
-                        tile.Point)
-                    {
-                        Kind = ScannerResultKind.TerrainPoint,
-                        ItemKey = ScannerItemKeys.ImpassableTerrain
-                    };
-                    snapshot.Add(
-                        ScannerCategoryKeys.Terrain,
-                        ScannerSubcategoryKeys.All,
-                        result);
-                }
+                BattlefieldTerrainResults.Add(snapshot, region);
             }
         }
 
@@ -750,6 +727,7 @@ namespace SongsOfConquestAccess.Adapters
             // One renderer for the whole board: resolving it walks the menu's controller through
             // two reflected fields, and this loop runs over every tile of the map.
             DeploymentRenderer renderer = GetDeploymentRenderer();
+            BattlefieldTerrain terrain = GetTerrain();
             for (int y = 0; y < snapshot.Size.y; y++)
             {
                 for (int x = 0; x < snapshot.Size.x; x++)
@@ -768,8 +746,57 @@ namespace SongsOfConquestAccess.Adapters
                     tile.Elevation = elevations != null && index < elevations.Length ? elevations[index] : (byte)0;
                     tile.IsImpassable = (water != null && index < water.Length && water[index] != 0)
                         || (decorations != null && index < decorations.Length && IsBlocker(decorations[index]));
+                    tile.Kind = terrain != null ? terrain.GetKind(point) : BattlefieldCellKind.OffGrid;
                 }
             }
+        }
+
+        /// <summary>The ground this layout is made of, analysed once for the adapter's lifetime: the
+        /// terrain of a battle is settled before the placement page opens and nothing on the page
+        /// changes it.</summary>
+        private BattlefieldTerrain GetTerrain()
+        {
+            if (_terrain != null || _terrainProbed)
+            {
+                return _terrain;
+            }
+
+            MapFormat map = GetMap();
+            if (map == null)
+            {
+                return null;
+            }
+
+            _terrainProbed = true;
+            _terrain = BattlefieldTerrain.Analyse(map.Metadata.Size, ReadTerrainCells(map), map.Metadata.Type.IsSiege());
+            return _terrain;
+        }
+
+        private List<BattlefieldCell> ReadTerrainCells(MapFormat map)
+        {
+            DeploymentRenderer renderer = GetDeploymentRenderer();
+            Vector2Int size = map.Metadata.Size;
+            byte[] elevations = map.Contents.ElevationsArray;
+            byte[] decorations = map.Contents.DecorationsArray;
+            byte[] water = map.Contents.WaterArray;
+            List<BattlefieldCell> cells = new List<BattlefieldCell>(size.x * size.y);
+            for (int y = 0; y < size.y; y++)
+            {
+                for (int x = 0; x < size.x; x++)
+                {
+                    Vector2Int point = new Vector2Int(x, y);
+                    int index = map.PointToIndex(point);
+                    byte decoration = decorations != null && index < decorations.Length ? decorations[index] : (byte)0;
+                    cells.Add(new BattlefieldCell(
+                        point,
+                        IsGridTile(map, renderer, point),
+                        elevations != null && index < elevations.Length ? elevations[index] : 0,
+                        (water != null && index < water.Length && water[index] != 0) || IsBlocker(decoration),
+                        decoration));
+                }
+            }
+
+            return cells;
         }
 
         private void AddSpawnPoints(TroopPlacementSnapshot snapshot, DeploymentMenu deployment, BattleSide side)
@@ -1338,6 +1365,11 @@ namespace SongsOfConquestAccess.Adapters
         public byte Elevation { get; set; }
 
         public bool IsImpassable { get; set; }
+
+        /// <summary>What the ground of this tile is, as the shared analysis read it: flat, raised,
+        /// a cliff nothing can climb, impassable, or one of a siege layout's structures. The words
+        /// for it belong to the screens.</summary>
+        public BattlefieldCellKind Kind { get; set; }
 
         public BattleSide? SpawnSide { get; set; }
 

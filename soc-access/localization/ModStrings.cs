@@ -182,6 +182,7 @@
             public static readonly ModString AridTrees = new ModString("Spatial.AridTrees", "Arid trees");
             public static readonly ModString Blocked = new ModString("Spatial.Blocked", "blocked");
             public static readonly ModString Bridge = new ModString("Spatial.Bridge", "Bridge");
+            public static readonly ModString CliffHeight = new ModString("Spatial.CliffHeight", "cliff, height {0}");
             public static readonly ModString Commander = new ModString("Spatial.Commander", "Commander");
             public static readonly ModString CommanderPossessive = new ModString("Spatial.CommanderPossessive", "commander's");
             public static readonly ModString CobblestoneRoad = new ModString("Spatial.CobblestoneRoad", "Cobblestone road");
@@ -235,14 +236,20 @@
             public static readonly ModString ShallowWater = new ModString("Spatial.ShallowWater", "Shallow water");
             public static readonly ModPluralString SkippedTileCount = new ModPluralString("Spatial.SkippedTileCount", "Skipped {0} tile", "Skipped {0} tiles");
             public static readonly ModString SpawnPoint = new ModString("Spatial.SpawnPoint", "spawn point");
+            // The siege structures a cell can be. The scanner names a whole tower or flight of
+            // stairs with these same two lines, since one tower is one tower however many cells
+            // it covers.
+            public static readonly ModString StairsHeight = new ModString("Spatial.StairsHeight", "stairs, height {0}");
             public static readonly ModString TemperateTrees = new ModString("Spatial.TemperateTrees", "Temperate trees");
             public static readonly ModString Threatened = new ModString("Spatial.Threatened", "Threatened");
             public static readonly ModString ThisTurnAt = new ModString("Spatial.ThisTurnAt", "This turn: {0}");
+            public static readonly ModString TowerHeight = new ModString("Spatial.TowerHeight", "tower, height {0}");
             public static readonly ModString TurnsIn = new ModString("Spatial.TurnsIn", "in {0} turns");
             public static readonly ModString Unexplored = new ModString("Spatial.Unexplored", "Unexplored");
             public static readonly ModString Unseen = new ModString("Spatial.Unseen", "Unseen");
             public static readonly ModString Visited = new ModString("Spatial.Visited", "visited");
             public static readonly ModString Wall = new ModString("Spatial.Wall", "Wall");
+            public static readonly ModString WallHeight = new ModString("Spatial.WallHeight", "wall, height {0}");
             public static readonly ModString Water = new ModString("Spatial.Water", "Water");
             public static readonly ModString WaterEdge = new ModString("Spatial.WaterEdge", "Water edge");
             public static readonly ModString WithinZoneOfControl = new ModString("Spatial.WithinZoneOfControl", "Within {0} zone of control");
@@ -853,14 +860,12 @@
             public static readonly ModString DirectionStepLong = new ModString("Scanner.DirectionStepLong", "{0} {1}");
             public static readonly ModString East = new ModString("Scanner.East", "east");
             public static readonly ModString EastShort = new ModString("Scanner.EastShort", "e");
-            public static readonly ModString ElevatedGround = new ModString("Scanner.ElevatedGround", "Elevated ground {0}");
             public static readonly ModString Enemy = new ModString("Scanner.Enemy", "Enemy");
             public static readonly ModString EnemyGates = new ModString("Scanner.EnemyGates", "Enemy gates");
             public static readonly ModString Entities = new ModString("Scanner.Entities", "Entities");
             public static readonly ModString Friendly = new ModString("Scanner.Friendly", "Friendly");
             public static readonly ModString FriendlyGates = new ModString("Scanner.FriendlyGates", "Friendly gates");
             public static readonly ModString Exploration = new ModString("Scanner.Exploration", "Exploration");
-            public static readonly ModString ImpassableTerrain = new ModString("Scanner.ImpassableTerrain", "Impassable terrain");
             public static readonly ModString Knowledge = new ModString("Scanner.Knowledge", "Knowledge");
             public static readonly ModString LookAround = new ModString("Scanner.LookAround", "Look around");
             public static readonly ModString LookAroundRadius = new ModString("Scanner.LookAroundRadius", "Look around radius {0}");
@@ -900,6 +905,21 @@
             public static readonly ModString SpecialSites = new ModString("Scanner.SpecialSites", "Special sites");
             public static readonly ModString Teleport = new ModString("Scanner.Teleport", "Teleport");
             public static readonly ModString Terrain = new ModString("Scanner.Terrain", "Terrain");
+            // ONE GROUP OF BATTLEFIELD GROUND, as the Terrain category names it. A group is one
+            // item and its cells are that item's instances, so the count is the group's and the
+            // height is its highest cell. A lone impassable cell borrows Spatial.Impassable, and a
+            // tower or a flight of stairs Spatial.TowerHeight and Spatial.StairsHeight: one tower
+            // is one tower however many cells it covers.
+            public static readonly ModString TerrainChokePoint = new ModString("Scanner.TerrainChokePoint", "choke point");
+            public static readonly ModString TerrainChokePointPair = new ModString("Scanner.TerrainChokePointPair", "choke point, 2 cells");
+            public static readonly ModString TerrainCliff = new ModString("Scanner.TerrainCliff", "cliff");
+            public static readonly ModPluralString TerrainCliffCells = new ModPluralString("Scanner.TerrainCliffCells", "cliff of {0} cell", "cliff of {0} cells");
+            public static readonly ModPluralString TerrainImpassableCells = new ModPluralString("Scanner.TerrainImpassableCells", "impassable, {0} cell", "impassable, {0} cells");
+            public static readonly ModPluralString TerrainImpassableWall = new ModPluralString("Scanner.TerrainImpassableWall", "wall of {0} impassable cell", "wall of {0} impassable cells");
+            public static readonly ModPluralString TerrainPatch = new ModPluralString("Scanner.TerrainPatch", "patch of {0} cell, height {1}", "patch of {0} cells, height {1}");
+            public static readonly ModPluralString TerrainRidge = new ModPluralString("Scanner.TerrainRidge", "ridge of {0} cell, height {1}", "ridge of {0} cells, height {1}");
+            public static readonly ModPluralString TerrainSiegeWall = new ModPluralString("Scanner.TerrainSiegeWall", "wall of {0} cell, height {1}", "wall of {0} cells, height {1}");
+            public static readonly ModString TerrainSingleCell = new ModString("Scanner.TerrainSingleCell", "single cell, height {0}");
             public static readonly ModString TroopSources = new ModString("Scanner.TroopSources", "Troop sources");
             public static readonly ModString Troops = new ModString("Scanner.Troops", "Troops");
             public static readonly ModString Unexplored = new ModString("Scanner.Unexplored", "Unexplored");

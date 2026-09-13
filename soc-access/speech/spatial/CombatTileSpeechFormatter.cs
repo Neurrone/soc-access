@@ -225,9 +225,14 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             if (tile.Elevation > 0)
             {
+                // A cliff, a wall, a tower or a flight of stairs is named by what it is; ordinary
+                // raised ground is named by its height alone.
+                string ground = BattlefieldText.CellGround(tile.Kind, tile.Elevation);
                 yield return new AnnouncementPart(
                     CombatAnnouncementDefinitions.TileKeys.Elevation,
-                    ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation));
+                    string.IsNullOrEmpty(ground)
+                        ? ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation)
+                        : ground);
             }
 
             if (!string.IsNullOrWhiteSpace(tile.DecorativeFeature))

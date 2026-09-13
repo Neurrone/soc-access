@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Speech.Spatial;
 using UnityEngine;
 
@@ -60,6 +61,17 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("impassable, elevated ground, height 2, 1, 0", Describe(null, tile));
         }
 
+        /// <summary>Raised ground is named by what it is where the ground itself has a name: a
+        /// cliff nothing can climb, and a siege layout's wall, tower and stairs.</summary>
+        [TestMethod]
+        public void DescribeTileNamesACliffAndTheSiegeStructuresInsteadOfElevatedGround()
+        {
+            Assert.AreEqual("cliff, height 2, 1, 0", Describe(null, Ground(BattlefieldCellKind.Cliff, 2)));
+            Assert.AreEqual("wall, height 2, 1, 0", Describe(null, Ground(BattlefieldCellKind.Wall, 2)));
+            Assert.AreEqual("tower, height 3, 1, 0", Describe(null, Ground(BattlefieldCellKind.Tower, 3)));
+            Assert.AreEqual("stairs, height 1, 1, 0", Describe(null, Ground(BattlefieldCellKind.Stairs, 1)));
+        }
+
         /// <summary>Ground at the bottom of the board is the normal case and is not worth a word.
         /// </summary>
         [TestMethod]
@@ -90,6 +102,14 @@ namespace SongsOfConquestAccess.Tests
         {
             return new TroopPlacementTileSpeechFormatter(
                 new TroopPlacementSnapshot(new Vector2Int(8, 6), ownSide, null));
+        }
+
+        private static TroopPlacementTile Ground(BattlefieldCellKind kind, byte elevation)
+        {
+            TroopPlacementTile tile = Tile(1, 0);
+            tile.Kind = kind;
+            tile.Elevation = elevation;
+            return tile;
         }
 
         private static TroopPlacementTile Tile(int x, int y)

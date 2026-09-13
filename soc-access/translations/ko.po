@@ -2435,11 +2435,6 @@ msgctxt "Scanner.EastShort"
 msgid "e"
 msgstr "동"
 
-#. Scanner.ElevatedGround
-msgctxt "Scanner.ElevatedGround"
-msgid "Elevated ground {0}"
-msgstr "고지대 {0}"
-
 #. Scanner.Enemy
 msgctxt "Scanner.Enemy"
 msgid "Enemy"
@@ -2464,11 +2459,6 @@ msgstr "아군"
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "아군 관문"
-
-#. Scanner.ImpassableTerrain
-msgctxt "Scanner.ImpassableTerrain"
-msgid "Impassable terrain"
-msgstr "통행 불가 지형"
 
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"
@@ -2745,12 +2735,10 @@ msgctxt "Screens.MoveAllToDefence"
 msgid "Move all to defence"
 msgstr "모두 방어 병력으로 이동"
 
-
 #. Screens.MoveAllToWielder
 msgctxt "Screens.MoveAllToWielder"
 msgid "Move all to wielder"
 msgstr "모두 위더에게 이동"
-
 
 #. Screens.CustomCategories
 msgctxt "Screens.CustomCategories"
@@ -3398,7 +3386,6 @@ msgctxt "Screens.AnnouncementTroop"
 msgid "Troop"
 msgstr "부대"
 
-
 #. Spatial.Visited
 msgctxt "Spatial.Visited"
 msgid "visited"
@@ -3483,7 +3470,6 @@ msgstr "윌더"
 msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr "통제 구역"
-
 
 #. Audio.CategoryCombat
 msgctxt "Audio.CategoryCombat"
@@ -3680,7 +3666,6 @@ msgctxt "Screens.Cursor"
 msgid "Cursor"
 msgstr "커서"
 
-
 #. UI.RoleCheckbox
 msgctxt "UI.RoleCheckbox"
 msgid "checkbox"
@@ -3816,7 +3801,6 @@ msgstr "{0} {1}"
 msgctxt "Spatial.MovementOfMax"
 msgid "{0} / {1}"
 msgstr "{0} / {1}"
-
 
 #. Screens.BuildingNumber
 msgctxt "Screens.BuildingNumber"
@@ -3977,3 +3961,73 @@ msgstr "방어자: {0}"
 msgctxt "Screens.NoBattlefieldDescription"
 msgid "No description for this battlefield"
 msgstr "이 전장에 대한 설명이 없습니다"
+
+#. Spatial.CliffHeight
+msgctxt "Spatial.CliffHeight"
+msgid "cliff, height {0}"
+msgstr "절벽, 높이 {0}"
+
+#. Spatial.StairsHeight
+msgctxt "Spatial.StairsHeight"
+msgid "stairs, height {0}"
+msgstr "계단, 높이 {0}"
+
+#. Spatial.TowerHeight
+msgctxt "Spatial.TowerHeight"
+msgid "tower, height {0}"
+msgstr "탑, 높이 {0}"
+
+#. Spatial.WallHeight
+msgctxt "Spatial.WallHeight"
+msgid "wall, height {0}"
+msgstr "벽, 높이 {0}"
+
+#. Scanner.TerrainChokePoint
+msgctxt "Scanner.TerrainChokePoint"
+msgid "choke point"
+msgstr "길목"
+
+#. Scanner.TerrainChokePointPair
+msgctxt "Scanner.TerrainChokePointPair"
+msgid "choke point, 2 cells"
+msgstr "길목, 2칸"
+
+#. Scanner.TerrainCliff
+msgctxt "Scanner.TerrainCliff"
+msgid "cliff"
+msgstr "절벽"
+
+#. Scanner.TerrainSingleCell
+msgctxt "Scanner.TerrainSingleCell"
+msgid "single cell, height {0}"
+msgstr "단일 칸, 높이 {0}"
+
+#. Scanner.TerrainCliffCells_0
+msgctxt "Scanner.TerrainCliffCells_0"
+msgid "cliff of {0} cell"
+msgstr "{0}칸 절벽"
+
+#. Scanner.TerrainImpassableCells_0
+msgctxt "Scanner.TerrainImpassableCells_0"
+msgid "impassable, {0} cell"
+msgstr "통행 불가, {0}칸"
+
+#. Scanner.TerrainImpassableWall_0
+msgctxt "Scanner.TerrainImpassableWall_0"
+msgid "wall of {0} impassable cell"
+msgstr "통행 불가 {0}칸 벽"
+
+#. Scanner.TerrainPatch_0
+msgctxt "Scanner.TerrainPatch_0"
+msgid "patch of {0} cell, height {1}"
+msgstr "{0}칸 구역, 높이 {1}"
+
+#. Scanner.TerrainRidge_0
+msgctxt "Scanner.TerrainRidge_0"
+msgid "ridge of {0} cell, height {1}"
+msgstr "{0}칸 능선, 높이 {1}"
+
+#. Scanner.TerrainSiegeWall_0
+msgctxt "Scanner.TerrainSiegeWall_0"
+msgid "wall of {0} cell, height {1}"
+msgstr "{0}칸 벽, 높이 {1}"

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Scanner;
 
 namespace SongsOfConquestAccess.Audio
@@ -129,8 +130,10 @@ namespace SongsOfConquestAccess.Audio
             // Only STATICALLY unwalkable ground thuds. A blocked tile is any tile the acting troop
             // cannot walk onto, which is every tile a troop or an attackable thing stands on, and a
             // board of obstacles is a board the cue cannot tell apart; the readout names whoever is
-            // standing there, and the ground under them sounds like ground.
-            if (tile.IsImpassable)
+            // standing there, and the ground under them sounds like ground. A cliff thuds too:
+            // nothing can step onto it, which is the whole of what the thud means. A wall, a tower
+            // and a flight of stairs are walked on and keep their elevation cue.
+            if (tile.IsImpassable || tile.Kind == BattlefieldCellKind.Cliff)
             {
                 AddElevatedGround(cues, elevation);
                 cues.Add(new TileCue(CueLibrary.TerrainImpassable, 0f, followsPrevious: elevation != null));
@@ -159,7 +162,7 @@ namespace SongsOfConquestAccess.Audio
                 return cues;
             }
 
-            if (tile.IsImpassable || tile.EntityId >= 0)
+            if (tile.IsImpassable || tile.EntityId >= 0 || tile.Kind == BattlefieldCellKind.Cliff)
             {
                 AddElevatedGround(cues, elevation);
                 cues.Add(new TileCue(CueLibrary.TerrainImpassable, 0f, followsPrevious: elevation != null));

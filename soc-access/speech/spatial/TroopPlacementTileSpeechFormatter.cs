@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
@@ -57,9 +58,14 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             if (tile.Elevation > 0)
             {
+                // A cliff, a wall, a tower or a flight of stairs is named by what it is; ordinary
+                // raised ground is named by its height alone.
+                string ground = BattlefieldText.CellGround(tile.Kind, tile.Elevation);
                 yield return new AnnouncementPart(
                     TroopDeploymentAnnouncementDefinitions.TileKeys.Elevation,
-                    ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation));
+                    string.IsNullOrEmpty(ground)
+                        ? ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation)
+                        : ground);
             }
 
             yield return new AnnouncementPart(

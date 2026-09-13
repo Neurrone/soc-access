@@ -1,7 +1,8 @@
-﻿using SongsOfConquest.Common;
+using SongsOfConquest.Common;
 using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
+using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.UI;
@@ -11,8 +12,8 @@ namespace SongsOfConquestAccess.Adapters
 {
     // WHAT THE SCANNER FINDS ON THE BATTLEFIELD, moved out of CombatAdapter.cs unchanged: one
     // sweep of the board per category - the stacks on each side, the things that can be attacked and
-    // the gates, the raised and impassable ground - and the check that a result the player is
-    // walking is still a tile of this battle.
+    // the gates, and the ground read as whole regions by the shared analysis - and the check that a
+    // result the player is walking is still a tile of this battle.
 
     public sealed partial class CombatAdapter
     {
@@ -137,59 +138,15 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddCombatTerrainScannerResults(ScannerSnapshot snapshot)
         {
-            for (int elevation = 1; elevation <= 3; elevation++)
+            BattlefieldTerrain terrain = GetTerrain();
+            if (terrain == null)
             {
-                for (int y = 0; y < _facade.Level.Size.y; y++)
-                {
-                    for (int x = 0; x < _facade.Level.Size.x; x++)
-                    {
-                        Vector2Int point = new Vector2Int(x, y);
-                        CombatTile tile = GetTile(point);
-                        if (tile == null)
-                        {
-                            continue;
-                        }
-
-                        if (tile.Elevation == elevation)
-                        {
-                            ScannerResult result = new ScannerResult(
-                                ScannerTileKeys.For("terrain:elevated:" + elevation, point),
-                                ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
-                                point)
-                            {
-                                Kind = ScannerResultKind.TerrainPoint,
-                                ItemKey = ScannerItemKeys.ElevatedGround + elevation
-                            };
-                            snapshot.Add(ScannerCategoryKeys.Terrain, ScannerSubcategoryKeys.All, result);
-                        }
-                    }
-                }
+                return;
             }
 
-            for (int y = 0; y < _facade.Level.Size.y; y++)
+            foreach (BattlefieldRegion region in terrain.Regions)
             {
-                for (int x = 0; x < _facade.Level.Size.x; x++)
-                {
-                    Vector2Int point = new Vector2Int(x, y);
-                    CombatTile tile = GetTile(point);
-                    if (tile == null)
-                    {
-                        continue;
-                    }
-
-                    if (tile.IsImpassable)
-                    {
-                        ScannerResult result = new ScannerResult(
-                            ScannerTileKeys.For("terrain:impassable", point),
-                            ModText.Get(ModStrings.Scanner.ImpassableTerrain),
-                            point)
-                        {
-                            Kind = ScannerResultKind.TerrainPoint,
-                            ItemKey = ScannerItemKeys.ImpassableTerrain
-                        };
-                        snapshot.Add(ScannerCategoryKeys.Terrain, ScannerSubcategoryKeys.All, result);
-                    }
-                }
+                BattlefieldTerrainResults.Add(snapshot, region);
             }
         }
 

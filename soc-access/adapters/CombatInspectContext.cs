@@ -2,6 +2,7 @@
 using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Entities;
+using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Localization;
 using UnityEngine;
 
@@ -26,6 +27,11 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsImpassable { get; set; }
 
         public bool IsBlocked { get; set; }
+
+        /// <summary>What the ground of this tile is, as the shared analysis read it: flat, raised,
+        /// a cliff nothing can climb, impassable, or one of a siege layout's structures. The words
+        /// for it belong to the screens.</summary>
+        public BattlefieldCellKind Kind { get; set; }
 
         public IBattleTroopState Troop { get; set; }
 

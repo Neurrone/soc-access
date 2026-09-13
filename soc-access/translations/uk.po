@@ -2475,11 +2475,6 @@ msgctxt "Scanner.EastShort"
 msgid "e"
 msgstr "сх"
 
-#. Scanner.ElevatedGround
-msgctxt "Scanner.ElevatedGround"
-msgid "Elevated ground {0}"
-msgstr "Підвищена місцевість {0}"
-
 #. Scanner.Enemy
 msgctxt "Scanner.Enemy"
 msgid "Enemy"
@@ -2504,11 +2499,6 @@ msgstr "Дружній"
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "Дружні брами"
-
-#. Scanner.ImpassableTerrain
-msgctxt "Scanner.ImpassableTerrain"
-msgid "Impassable terrain"
-msgstr "Непрохідна місцевість"
 
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"
@@ -2785,12 +2775,10 @@ msgctxt "Screens.MoveAllToDefence"
 msgid "Move all to defence"
 msgstr "Перемістити всіх в оборону"
 
-
 #. Screens.MoveAllToWielder
 msgctxt "Screens.MoveAllToWielder"
 msgid "Move all to wielder"
 msgstr "Перемістити всіх до героя"
-
 
 #. Screens.CustomCategories
 msgctxt "Screens.CustomCategories"
@@ -3448,7 +3436,6 @@ msgctxt "Screens.AnnouncementTroop"
 msgid "Troop"
 msgstr "Загін"
 
-
 #. Spatial.Visited
 msgctxt "Spatial.Visited"
 msgid "visited"
@@ -3533,7 +3520,6 @@ msgstr "Володар"
 msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr "Зона контролю"
-
 
 #. Audio.CategoryCombat
 msgctxt "Audio.CategoryCombat"
@@ -3740,7 +3726,6 @@ msgctxt "Screens.Cursor"
 msgid "Cursor"
 msgstr "Курсор"
 
-
 #. UI.RoleCheckbox
 msgctxt "UI.RoleCheckbox"
 msgid "checkbox"
@@ -3876,7 +3861,6 @@ msgstr "{0} {1}"
 msgctxt "Spatial.MovementOfMax"
 msgid "{0} / {1}"
 msgstr "{0} / {1}"
-
 
 #. Screens.BuildingNumber
 msgctxt "Screens.BuildingNumber"
@@ -4037,3 +4021,133 @@ msgstr "Захисник: {0}"
 msgctxt "Screens.NoBattlefieldDescription"
 msgid "No description for this battlefield"
 msgstr "Для цього поля бою немає опису"
+
+#. Spatial.CliffHeight
+msgctxt "Spatial.CliffHeight"
+msgid "cliff, height {0}"
+msgstr "урвище, висота {0}"
+
+#. Spatial.StairsHeight
+msgctxt "Spatial.StairsHeight"
+msgid "stairs, height {0}"
+msgstr "сходи, висота {0}"
+
+#. Spatial.TowerHeight
+msgctxt "Spatial.TowerHeight"
+msgid "tower, height {0}"
+msgstr "вежа, висота {0}"
+
+#. Spatial.WallHeight
+msgctxt "Spatial.WallHeight"
+msgid "wall, height {0}"
+msgstr "стіна, висота {0}"
+
+#. Scanner.TerrainChokePoint
+msgctxt "Scanner.TerrainChokePoint"
+msgid "choke point"
+msgstr "вузький прохід"
+
+#. Scanner.TerrainChokePointPair
+msgctxt "Scanner.TerrainChokePointPair"
+msgid "choke point, 2 cells"
+msgstr "вузький прохід, 2 клітинки"
+
+#. Scanner.TerrainCliff
+msgctxt "Scanner.TerrainCliff"
+msgid "cliff"
+msgstr "урвище"
+
+#. Scanner.TerrainSingleCell
+msgctxt "Scanner.TerrainSingleCell"
+msgid "single cell, height {0}"
+msgstr "одна клітинка, висота {0}"
+
+#. Scanner.TerrainCliffCells_0
+msgctxt "Scanner.TerrainCliffCells_0"
+msgid "cliff of {0} cell"
+msgstr "урвище, {0} клітинка"
+
+#. Scanner.TerrainCliffCells_1
+msgctxt "Scanner.TerrainCliffCells_1"
+msgid "cliff of {0} cells"
+msgstr "урвище, {0} клітинки"
+
+#. Scanner.TerrainCliffCells_2
+msgctxt "Scanner.TerrainCliffCells_2"
+msgid "cliff of {0} cells"
+msgstr "урвище, {0} клітинок"
+
+#. Scanner.TerrainImpassableCells_0
+msgctxt "Scanner.TerrainImpassableCells_0"
+msgid "impassable, {0} cell"
+msgstr "непрохідно, {0} клітинка"
+
+#. Scanner.TerrainImpassableCells_1
+msgctxt "Scanner.TerrainImpassableCells_1"
+msgid "impassable, {0} cells"
+msgstr "непрохідно, {0} клітинки"
+
+#. Scanner.TerrainImpassableCells_2
+msgctxt "Scanner.TerrainImpassableCells_2"
+msgid "impassable, {0} cells"
+msgstr "непрохідно, {0} клітинок"
+
+#. Scanner.TerrainImpassableWall_0
+msgctxt "Scanner.TerrainImpassableWall_0"
+msgid "wall of {0} impassable cell"
+msgstr "стіна, {0} непрохідна клітинка"
+
+#. Scanner.TerrainImpassableWall_1
+msgctxt "Scanner.TerrainImpassableWall_1"
+msgid "wall of {0} impassable cells"
+msgstr "стіна, {0} непрохідні клітинки"
+
+#. Scanner.TerrainImpassableWall_2
+msgctxt "Scanner.TerrainImpassableWall_2"
+msgid "wall of {0} impassable cells"
+msgstr "стіна, {0} непрохідних клітинок"
+
+#. Scanner.TerrainPatch_0
+msgctxt "Scanner.TerrainPatch_0"
+msgid "patch of {0} cell, height {1}"
+msgstr "ділянка, {0} клітинка, висота {1}"
+
+#. Scanner.TerrainPatch_1
+msgctxt "Scanner.TerrainPatch_1"
+msgid "patch of {0} cells, height {1}"
+msgstr "ділянка, {0} клітинки, висота {1}"
+
+#. Scanner.TerrainPatch_2
+msgctxt "Scanner.TerrainPatch_2"
+msgid "patch of {0} cells, height {1}"
+msgstr "ділянка, {0} клітинок, висота {1}"
+
+#. Scanner.TerrainRidge_0
+msgctxt "Scanner.TerrainRidge_0"
+msgid "ridge of {0} cell, height {1}"
+msgstr "гряда, {0} клітинка, висота {1}"
+
+#. Scanner.TerrainRidge_1
+msgctxt "Scanner.TerrainRidge_1"
+msgid "ridge of {0} cells, height {1}"
+msgstr "гряда, {0} клітинки, висота {1}"
+
+#. Scanner.TerrainRidge_2
+msgctxt "Scanner.TerrainRidge_2"
+msgid "ridge of {0} cells, height {1}"
+msgstr "гряда, {0} клітинок, висота {1}"
+
+#. Scanner.TerrainSiegeWall_0
+msgctxt "Scanner.TerrainSiegeWall_0"
+msgid "wall of {0} cell, height {1}"
+msgstr "стіна, {0} клітинка, висота {1}"
+
+#. Scanner.TerrainSiegeWall_1
+msgctxt "Scanner.TerrainSiegeWall_1"
+msgid "wall of {0} cells, height {1}"
+msgstr "стіна, {0} клітинки, висота {1}"
+
+#. Scanner.TerrainSiegeWall_2
+msgctxt "Scanner.TerrainSiegeWall_2"
+msgid "wall of {0} cells, height {1}"
+msgstr "стіна, {0} клітинок, висота {1}"

@@ -2435,11 +2435,6 @@ msgctxt "Scanner.EastShort"
 msgid "e"
 msgstr "东"
 
-#. Scanner.ElevatedGround
-msgctxt "Scanner.ElevatedGround"
-msgid "Elevated ground {0}"
-msgstr "高地 {0}"
-
 #. Scanner.Enemy
 msgctxt "Scanner.Enemy"
 msgid "Enemy"
@@ -2464,11 +2459,6 @@ msgstr "友方"
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "友方城门"
-
-#. Scanner.ImpassableTerrain
-msgctxt "Scanner.ImpassableTerrain"
-msgid "Impassable terrain"
-msgstr "不可通行地形"
 
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"
@@ -2745,12 +2735,10 @@ msgctxt "Screens.MoveAllToDefence"
 msgid "Move all to defence"
 msgstr "全部移到防守方"
 
-
 #. Screens.MoveAllToWielder
 msgctxt "Screens.MoveAllToWielder"
 msgid "Move all to wielder"
 msgstr "全部移到持有者"
-
 
 #. Screens.CustomCategories
 msgctxt "Screens.CustomCategories"
@@ -3398,7 +3386,6 @@ msgctxt "Screens.AnnouncementTroop"
 msgid "Troop"
 msgstr "部队"
 
-
 #. Spatial.Visited
 msgctxt "Spatial.Visited"
 msgid "visited"
@@ -3483,7 +3470,6 @@ msgstr "行使者"
 msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr "控制区域"
-
 
 #. Audio.CategoryCombat
 msgctxt "Audio.CategoryCombat"
@@ -3680,7 +3666,6 @@ msgctxt "Screens.Cursor"
 msgid "Cursor"
 msgstr "光标"
 
-
 #. UI.RoleCheckbox
 msgctxt "UI.RoleCheckbox"
 msgid "checkbox"
@@ -3816,7 +3801,6 @@ msgstr "{0} {1}"
 msgctxt "Spatial.MovementOfMax"
 msgid "{0} / {1}"
 msgstr "{0} / {1}"
-
 
 #. Screens.BuildingNumber
 msgctxt "Screens.BuildingNumber"
@@ -3977,3 +3961,73 @@ msgstr "防守方：{0}"
 msgctxt "Screens.NoBattlefieldDescription"
 msgid "No description for this battlefield"
 msgstr "此战场没有描述"
+
+#. Spatial.CliffHeight
+msgctxt "Spatial.CliffHeight"
+msgid "cliff, height {0}"
+msgstr "峭壁，高度 {0}"
+
+#. Spatial.StairsHeight
+msgctxt "Spatial.StairsHeight"
+msgid "stairs, height {0}"
+msgstr "阶梯，高度 {0}"
+
+#. Spatial.TowerHeight
+msgctxt "Spatial.TowerHeight"
+msgid "tower, height {0}"
+msgstr "塔，高度 {0}"
+
+#. Spatial.WallHeight
+msgctxt "Spatial.WallHeight"
+msgid "wall, height {0}"
+msgstr "墙，高度 {0}"
+
+#. Scanner.TerrainChokePoint
+msgctxt "Scanner.TerrainChokePoint"
+msgid "choke point"
+msgstr "隘口"
+
+#. Scanner.TerrainChokePointPair
+msgctxt "Scanner.TerrainChokePointPair"
+msgid "choke point, 2 cells"
+msgstr "隘口，2 个格子"
+
+#. Scanner.TerrainCliff
+msgctxt "Scanner.TerrainCliff"
+msgid "cliff"
+msgstr "峭壁"
+
+#. Scanner.TerrainSingleCell
+msgctxt "Scanner.TerrainSingleCell"
+msgid "single cell, height {0}"
+msgstr "单个格子，高度 {0}"
+
+#. Scanner.TerrainCliffCells_0
+msgctxt "Scanner.TerrainCliffCells_0"
+msgid "cliff of {0} cell"
+msgstr "{0} 个格子的峭壁"
+
+#. Scanner.TerrainImpassableCells_0
+msgctxt "Scanner.TerrainImpassableCells_0"
+msgid "impassable, {0} cell"
+msgstr "不可通行，{0} 个格子"
+
+#. Scanner.TerrainImpassableWall_0
+msgctxt "Scanner.TerrainImpassableWall_0"
+msgid "wall of {0} impassable cell"
+msgstr "{0} 个不可通行格子的墙"
+
+#. Scanner.TerrainPatch_0
+msgctxt "Scanner.TerrainPatch_0"
+msgid "patch of {0} cell, height {1}"
+msgstr "{0} 个格子的区块，高度 {1}"
+
+#. Scanner.TerrainRidge_0
+msgctxt "Scanner.TerrainRidge_0"
+msgid "ridge of {0} cell, height {1}"
+msgstr "{0} 个格子的山脊，高度 {1}"
+
+#. Scanner.TerrainSiegeWall_0
+msgctxt "Scanner.TerrainSiegeWall_0"
+msgid "wall of {0} cell, height {1}"
+msgstr "{0} 个格子的墙，高度 {1}"

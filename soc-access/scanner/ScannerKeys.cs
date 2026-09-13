@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
@@ -113,8 +113,5 @@ namespace SongsOfConquestAccess.Scanner
         public const string Blocked = "blocked";
         public const string Unexplored = "unexplored";
         public const string ZoneOfControl = "zone_of_control";
-
-        public const string ElevatedGround = "elevated_ground_";
-        public const string ImpassableTerrain = "impassable_terrain";
     }
 }

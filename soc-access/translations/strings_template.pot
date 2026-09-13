@@ -664,6 +664,11 @@ msgctxt "Spatial.Bridge"
 msgid "Bridge"
 msgstr ""
 
+#. Spatial.CliffHeight
+msgctxt "Spatial.CliffHeight"
+msgid "cliff, height {0}"
+msgstr ""
+
 #. Spatial.Commander
 msgctxt "Spatial.Commander"
 msgid "Commander"
@@ -924,6 +929,11 @@ msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
 msgstr ""
 
+#. Spatial.StairsHeight
+msgctxt "Spatial.StairsHeight"
+msgid "stairs, height {0}"
+msgstr ""
+
 #. Spatial.TemperateTrees
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
@@ -937,6 +947,11 @@ msgstr ""
 #. Spatial.ThisTurnAt
 msgctxt "Spatial.ThisTurnAt"
 msgid "This turn: {0}"
+msgstr ""
+
+#. Spatial.TowerHeight
+msgctxt "Spatial.TowerHeight"
+msgid "tower, height {0}"
 msgstr ""
 
 #. Spatial.TurnsIn
@@ -962,6 +977,11 @@ msgstr ""
 #. Spatial.Wall
 msgctxt "Spatial.Wall"
 msgid "Wall"
+msgstr ""
+
+#. Spatial.WallHeight
+msgctxt "Spatial.WallHeight"
+msgid "wall, height {0}"
 msgstr ""
 
 #. Spatial.Water
@@ -3664,11 +3684,6 @@ msgctxt "Scanner.EastShort"
 msgid "e"
 msgstr ""
 
-#. Scanner.ElevatedGround
-msgctxt "Scanner.ElevatedGround"
-msgid "Elevated ground {0}"
-msgstr ""
-
 #. Scanner.Enemy
 msgctxt "Scanner.Enemy"
 msgid "Enemy"
@@ -3697,11 +3712,6 @@ msgstr ""
 #. Scanner.Exploration
 msgctxt "Scanner.Exploration"
 msgid "Exploration"
-msgstr ""
-
-#. Scanner.ImpassableTerrain
-msgctxt "Scanner.ImpassableTerrain"
-msgid "Impassable terrain"
 msgstr ""
 
 #. Scanner.Knowledge
@@ -3899,6 +3909,26 @@ msgctxt "Scanner.Terrain"
 msgid "Terrain"
 msgstr ""
 
+#. Scanner.TerrainChokePoint
+msgctxt "Scanner.TerrainChokePoint"
+msgid "choke point"
+msgstr ""
+
+#. Scanner.TerrainChokePointPair
+msgctxt "Scanner.TerrainChokePointPair"
+msgid "choke point, 2 cells"
+msgstr ""
+
+#. Scanner.TerrainCliff
+msgctxt "Scanner.TerrainCliff"
+msgid "cliff"
+msgstr ""
+
+#. Scanner.TerrainSingleCell
+msgctxt "Scanner.TerrainSingleCell"
+msgid "single cell, height {0}"
+msgstr ""
+
 #. Scanner.TroopSources
 msgctxt "Scanner.TroopSources"
 msgid "Troop sources"
@@ -4027,5 +4057,95 @@ msgstr ""
 #. Screens.SelectedSubcategoryCount_2
 msgctxt "Screens.SelectedSubcategoryCount_2"
 msgid "{0} selected"
+msgstr ""
+
+#. Scanner.TerrainCliffCells_0
+msgctxt "Scanner.TerrainCliffCells_0"
+msgid "cliff of {0} cell"
+msgstr ""
+
+#. Scanner.TerrainCliffCells_1
+msgctxt "Scanner.TerrainCliffCells_1"
+msgid "cliff of {0} cells"
+msgstr ""
+
+#. Scanner.TerrainCliffCells_2
+msgctxt "Scanner.TerrainCliffCells_2"
+msgid "cliff of {0} cells"
+msgstr ""
+
+#. Scanner.TerrainImpassableCells_0
+msgctxt "Scanner.TerrainImpassableCells_0"
+msgid "impassable, {0} cell"
+msgstr ""
+
+#. Scanner.TerrainImpassableCells_1
+msgctxt "Scanner.TerrainImpassableCells_1"
+msgid "impassable, {0} cells"
+msgstr ""
+
+#. Scanner.TerrainImpassableCells_2
+msgctxt "Scanner.TerrainImpassableCells_2"
+msgid "impassable, {0} cells"
+msgstr ""
+
+#. Scanner.TerrainImpassableWall_0
+msgctxt "Scanner.TerrainImpassableWall_0"
+msgid "wall of {0} impassable cell"
+msgstr ""
+
+#. Scanner.TerrainImpassableWall_1
+msgctxt "Scanner.TerrainImpassableWall_1"
+msgid "wall of {0} impassable cells"
+msgstr ""
+
+#. Scanner.TerrainImpassableWall_2
+msgctxt "Scanner.TerrainImpassableWall_2"
+msgid "wall of {0} impassable cells"
+msgstr ""
+
+#. Scanner.TerrainPatch_0
+msgctxt "Scanner.TerrainPatch_0"
+msgid "patch of {0} cell, height {1}"
+msgstr ""
+
+#. Scanner.TerrainPatch_1
+msgctxt "Scanner.TerrainPatch_1"
+msgid "patch of {0} cells, height {1}"
+msgstr ""
+
+#. Scanner.TerrainPatch_2
+msgctxt "Scanner.TerrainPatch_2"
+msgid "patch of {0} cells, height {1}"
+msgstr ""
+
+#. Scanner.TerrainRidge_0
+msgctxt "Scanner.TerrainRidge_0"
+msgid "ridge of {0} cell, height {1}"
+msgstr ""
+
+#. Scanner.TerrainRidge_1
+msgctxt "Scanner.TerrainRidge_1"
+msgid "ridge of {0} cells, height {1}"
+msgstr ""
+
+#. Scanner.TerrainRidge_2
+msgctxt "Scanner.TerrainRidge_2"
+msgid "ridge of {0} cells, height {1}"
+msgstr ""
+
+#. Scanner.TerrainSiegeWall_0
+msgctxt "Scanner.TerrainSiegeWall_0"
+msgid "wall of {0} cell, height {1}"
+msgstr ""
+
+#. Scanner.TerrainSiegeWall_1
+msgctxt "Scanner.TerrainSiegeWall_1"
+msgid "wall of {0} cells, height {1}"
+msgstr ""
+
+#. Scanner.TerrainSiegeWall_2
+msgctxt "Scanner.TerrainSiegeWall_2"
+msgid "wall of {0} cells, height {1}"
 msgstr ""
 

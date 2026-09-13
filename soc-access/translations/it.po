@@ -2455,11 +2455,6 @@ msgctxt "Scanner.EastShort"
 msgid "e"
 msgstr "e"
 
-#. Scanner.ElevatedGround
-msgctxt "Scanner.ElevatedGround"
-msgid "Elevated ground {0}"
-msgstr "Terreno elevato {0}"
-
 #. Scanner.Enemy
 msgctxt "Scanner.Enemy"
 msgid "Enemy"
@@ -2484,11 +2479,6 @@ msgstr "Alleato"
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "Cancelli alleati"
-
-#. Scanner.ImpassableTerrain
-msgctxt "Scanner.ImpassableTerrain"
-msgid "Impassable terrain"
-msgstr "Terreno impraticabile"
 
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"
@@ -2765,12 +2755,10 @@ msgctxt "Screens.MoveAllToDefence"
 msgid "Move all to defence"
 msgstr "Sposta tutto alla difesa"
 
-
 #. Screens.MoveAllToWielder
 msgctxt "Screens.MoveAllToWielder"
 msgid "Move all to wielder"
 msgstr "Sposta tutto al portatore"
-
 
 #. Screens.CustomCategories
 msgctxt "Screens.CustomCategories"
@@ -3423,7 +3411,6 @@ msgctxt "Screens.AnnouncementTroop"
 msgid "Troop"
 msgstr "Truppa"
 
-
 #. Spatial.Visited
 msgctxt "Spatial.Visited"
 msgid "visited"
@@ -3508,7 +3495,6 @@ msgstr "Possessore"
 msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr "Zona di controllo"
-
 
 #. Audio.CategoryCombat
 msgctxt "Audio.CategoryCombat"
@@ -3710,7 +3696,6 @@ msgctxt "Screens.Cursor"
 msgid "Cursor"
 msgstr "Cursore"
 
-
 #. UI.RoleCheckbox
 msgctxt "UI.RoleCheckbox"
 msgid "checkbox"
@@ -3846,7 +3831,6 @@ msgstr "{0} {1}"
 msgctxt "Spatial.MovementOfMax"
 msgid "{0} / {1}"
 msgstr "{0} / {1}"
-
 
 #. Screens.BuildingNumber
 msgctxt "Screens.BuildingNumber"
@@ -4007,3 +3991,103 @@ msgstr "Difensore: {0}"
 msgctxt "Screens.NoBattlefieldDescription"
 msgid "No description for this battlefield"
 msgstr "Nessuna descrizione per questo campo di battaglia"
+
+#. Spatial.CliffHeight
+msgctxt "Spatial.CliffHeight"
+msgid "cliff, height {0}"
+msgstr "dirupo, altezza {0}"
+
+#. Spatial.StairsHeight
+msgctxt "Spatial.StairsHeight"
+msgid "stairs, height {0}"
+msgstr "scale, altezza {0}"
+
+#. Spatial.TowerHeight
+msgctxt "Spatial.TowerHeight"
+msgid "tower, height {0}"
+msgstr "torre, altezza {0}"
+
+#. Spatial.WallHeight
+msgctxt "Spatial.WallHeight"
+msgid "wall, height {0}"
+msgstr "muro, altezza {0}"
+
+#. Scanner.TerrainChokePoint
+msgctxt "Scanner.TerrainChokePoint"
+msgid "choke point"
+msgstr "passaggio stretto"
+
+#. Scanner.TerrainChokePointPair
+msgctxt "Scanner.TerrainChokePointPair"
+msgid "choke point, 2 cells"
+msgstr "passaggio stretto, 2 caselle"
+
+#. Scanner.TerrainCliff
+msgctxt "Scanner.TerrainCliff"
+msgid "cliff"
+msgstr "dirupo"
+
+#. Scanner.TerrainSingleCell
+msgctxt "Scanner.TerrainSingleCell"
+msgid "single cell, height {0}"
+msgstr "una sola casella, altezza {0}"
+
+#. Scanner.TerrainCliffCells_0
+msgctxt "Scanner.TerrainCliffCells_0"
+msgid "cliff of {0} cell"
+msgstr "dirupo di {0} casella"
+
+#. Scanner.TerrainCliffCells_1
+msgctxt "Scanner.TerrainCliffCells_1"
+msgid "cliff of {0} cells"
+msgstr "dirupo di {0} caselle"
+
+#. Scanner.TerrainImpassableCells_0
+msgctxt "Scanner.TerrainImpassableCells_0"
+msgid "impassable, {0} cell"
+msgstr "impraticabile, {0} casella"
+
+#. Scanner.TerrainImpassableCells_1
+msgctxt "Scanner.TerrainImpassableCells_1"
+msgid "impassable, {0} cells"
+msgstr "impraticabile, {0} caselle"
+
+#. Scanner.TerrainImpassableWall_0
+msgctxt "Scanner.TerrainImpassableWall_0"
+msgid "wall of {0} impassable cell"
+msgstr "muro di {0} casella impraticabile"
+
+#. Scanner.TerrainImpassableWall_1
+msgctxt "Scanner.TerrainImpassableWall_1"
+msgid "wall of {0} impassable cells"
+msgstr "muro di {0} caselle impraticabili"
+
+#. Scanner.TerrainPatch_0
+msgctxt "Scanner.TerrainPatch_0"
+msgid "patch of {0} cell, height {1}"
+msgstr "zona di {0} casella, altezza {1}"
+
+#. Scanner.TerrainPatch_1
+msgctxt "Scanner.TerrainPatch_1"
+msgid "patch of {0} cells, height {1}"
+msgstr "zona di {0} caselle, altezza {1}"
+
+#. Scanner.TerrainRidge_0
+msgctxt "Scanner.TerrainRidge_0"
+msgid "ridge of {0} cell, height {1}"
+msgstr "cresta di {0} casella, altezza {1}"
+
+#. Scanner.TerrainRidge_1
+msgctxt "Scanner.TerrainRidge_1"
+msgid "ridge of {0} cells, height {1}"
+msgstr "cresta di {0} caselle, altezza {1}"
+
+#. Scanner.TerrainSiegeWall_0
+msgctxt "Scanner.TerrainSiegeWall_0"
+msgid "wall of {0} cell, height {1}"
+msgstr "muro di {0} casella, altezza {1}"
+
+#. Scanner.TerrainSiegeWall_1
+msgctxt "Scanner.TerrainSiegeWall_1"
+msgid "wall of {0} cells, height {1}"
+msgstr "muro di {0} caselle, altezza {1}"
