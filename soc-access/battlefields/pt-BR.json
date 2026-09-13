@@ -178,7 +178,7 @@
       "defender": "Os pontos de posicionamento do defensor se espalham pelo terço direito, e três deles ficam em {10,0}."
     },
     "Battle_Walls/Walls4": {
-      "terrain": "Terreno plano por todo o tabuleiro. Há {11,0} descendo da borda superior até a borda inferior pelo lado direito, com penhascos do outro lado.",
+      "terrain": "Terreno plano por todo o tabuleiro, com {11,0} pelo lado direito, da borda superior até a borda inferior, e penhascos do outro lado.",
       "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda.",
       "defender": "Os pontos de posicionamento do defensor descem pela direita do tabuleiro, de cima a baixo."
     },
@@ -258,7 +258,7 @@
       "defender": "Os pontos de posicionamento do defensor descem pelo lado direito, de cima a baixo."
     },
     "Battle_Woods/Woods8": {
-      "terrain": "Terreno aberto com {5,3} no centro do tabuleiro. Há {5,2} à esquerda e abaixo do centro, e {7,3} à direita e acima.",
+      "terrain": "Terreno aberto com {5,3} no centro do tabuleiro. O terreno à esquerda e abaixo do centro é ocupado por {5,2}, e o terreno à direita e acima, por {7,3}.",
       "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda.",
       "defender": "Os pontos de posicionamento do defensor descem pela borda direita."
     },
@@ -278,7 +278,7 @@
       "defender": "Os pontos de posicionamento do defensor descem pela borda direita, e dois deles ficam em {9,7}."
     },
     "BattleCampaign/Arleon1GoldMine": {
-      "terrain": "Terreno aberto com {8,1} na parte inferior direita, {9,6} na parte superior direita e {4,7} na parte superior central. Há {4,0} ao longo da borda inferior, e a única entrada para o canto superior direito é por {10,5}.",
+      "terrain": "Terreno aberto com {8,1} na parte inferior direita, {9,6} na parte superior direita e {4,7} na parte superior central. O meio da borda inferior é bloqueado por {4,0}, e a única entrada para o canto superior direito é por {10,5}.",
       "attacker": "Os pontos de posicionamento do atacante estão espalhados pela esquerda do tabuleiro, com um em {4,7}.",
       "defender": "Os pontos de posicionamento do defensor descem pela direita do tabuleiro, um em {9,6}, um em {8,1} e um em {10,5}."
     },

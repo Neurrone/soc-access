@@ -1,5 +1,5 @@
 {
-  "terrain": "Terreno aberto com {5,3} no centro do tabuleiro. Há {5,2} à esquerda e abaixo do centro, e {7,3} à direita e acima.",
+  "terrain": "Terreno aberto com {5,3} no centro do tabuleiro. O terreno à esquerda e abaixo do centro é ocupado por {5,2}, e o terreno à direita e acima, por {7,3}.",
   "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda.",
   "defender": "Os pontos de posicionamento do defensor descem pela borda direita."
 }
