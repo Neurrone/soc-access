@@ -31,6 +31,7 @@ The cursor, the scanner's `Terrain` category and the written battlefield descrip
 | diagonal ridge | The same running diagonally | The same, with the axis anywhere between | Scanner, descriptions |
 | single cell | One raised hex on its own | A group of one | Scanner, descriptions |
 | cliff | A raised hex nothing can enter | Every step onto it is two heights or more | Cursor, scanner, descriptions |
+| unreachable | Walkable ground no troop can ever stand on: a pocket sealed off behind cliffs or impassable hexes | Nothing reaches it from a spawn point, and it is not a cliff - a troop set down inside the pocket could walk it | Cursor, scanner, descriptions |
 | impassable | A hex nothing can enter at all | The game says it is not walkable, whatever is drawn on it; water is impassable too | Cursor, scanner |
 | wall of impassable cells | A line of impassable hexes that shapes movement | Three or more joined impassable hexes in a ridge shape | Scanner, descriptions |
 | choke point | The one or two hexes everything has to pass through | Removing them would leave the walkable board in two halves of at least five hexes | Scanner, descriptions |
@@ -41,7 +42,7 @@ The cursor, the scanner's `Terrain` category and the written battlefield descrip
 
 `blocked` is never spoken on a battlefield. Whether a hex can be reached this turn is not a fact about the ground, and every hex an enemy stands on would be one.
 
-The scanner's `Terrain` category holds one item per group, so a ridge is one stop in the item cycle and `Alt+Page Down` walks its hexes nearest first. A group names itself with its shape, its size and its height, as in `diagonal ridge of 7 cells, height 1`, `cliff of 3 cells` or `wall of 4 impassable cells`.
+The scanner's `Terrain` category holds one item per group, so a ridge is one stop in the item cycle and `Alt+Page Down` walks its hexes nearest first. A group names itself with its shape, its size and its height, as in `diagonal ridge of 7 cells, height 1`, `cliff of 3 cells`, `unreachable ground, 31 cells` or `wall of 4 impassable cells`.
 
 ### What Blocks a Hex
 

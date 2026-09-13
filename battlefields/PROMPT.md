@@ -46,14 +46,16 @@ What matters, in order:
    knows, so never say what it is good for.
 2. Cliffs: cells nothing can enter because every step onto them is two or more heights. Say
    that there are cliffs and where, nothing more.
-3. Choke points: the one or two cells everything has to pass through, listed in the JSON under
+3. Unreachable ground: flat cells sealed off by cliffs or impassable cells that no troop can
+   ever enter; point at it only when it is large enough to matter.
+4. Choke points: the one or two cells everything has to pass through, listed in the JSON under
    `chokePoints`, and which part of the board they separate. Say nothing when there is none;
    "no choke point" tells the player nothing, and the same goes for every feature in this list.
    A siege lists many, most of them gaps between an inner wall and the board's edge: mention
    the crossing at the gate and any other that everything must pass, and leave the rest.
-4. Impassable cells only when they shape movement. A single impassable cell in open ground is
+5. Impassable cells only when they shape movement. A single impassable cell in open ground is
    not worth a word.
-5. Sieges: which side holds the walls, where the gate is, and where the stairs onto the walls
+6. Sieges: which side holds the walls, where the gate is, and where the stairs onto the walls
    are.
 
 Vocabulary. Use these words and no others for these things:
@@ -81,10 +83,12 @@ a marker with a different shape is a siege engine spawn. The JSON says the same 
 `asciiTerrain` and `asciiSpawns` draw the board with the top row first, `cells` carry each
 cell's elevation and passability with the `kind` the mod reads out for it, and
 `cliffNeighbours` lists the neighbours a cell cannot step to because of a cliff; `regions`
-lists every group of ground the mod names - elevated ground, cliffs, impassable cells and a
-siege layout's walls, towers and stairs - with its `position` in board thirds, its
-`placeholder` and its `points`, and `chokePoints` lists the choke points the same way;
-`spawnPoints` lists each side's spawn points with their elevation. Trust the JSON over the
+lists every group of ground the mod names - elevated ground, cliffs, unreachable ground, which
+is walkable ground sealed off from the rest of the board and which the mod names "unreachable
+ground" and gives a `placeholder` like any other group, impassable cells and a siege layout's
+walls, towers and stairs - with its `position` in board thirds, its `placeholder` and its
+`points`, and `chokePoints` lists the choke points the same way; `spawnPoints` lists each
+side's spawn points with their elevation. Trust the JSON over the
 image when they seem to disagree.
 
 Each group's `label` is what the mod says for it in its scanner, and is there to tell one group
