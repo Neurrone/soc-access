@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno abierto a la izquierda, con {2,1} sobre el centro y la derecha. La parte superior central queda cerrada por {6,5} y el borde inferior por {0,0}, con {5,3} en medio, en el centro.",
+  "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, uno de ellos sobre {2,1}.",
+  "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, todos ellos sobre {2,1}."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "{0,0} cubre todo el tablero, interrumpida por {2,2} en la parte inferior izquierda y {2,5} en la parte central izquierda, que dejan un pasillo a lo largo del borde superior, otro a lo largo del borde inferior y otro por el centro. Los pasillos superior e inferior terminan en el centro y solo el pasillo central sigue hasta la derecha, donde el borde queda dividido en huecos por {11,3} y {11,5}.",
+  "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+  "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, tres de ellos pegados al borde derecho."
+}

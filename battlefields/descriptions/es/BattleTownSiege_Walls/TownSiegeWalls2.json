@@ -1,0 +1,5 @@
+{
+  "terrain": "Un foso va desde la esquina superior izquierda hasta la parte inferior central y solo se cruza por {5,4}, la puerta del centro. Los muros del defensor se alzan a su derecha: uno a lo largo del borde superior, entre una torre en su extremo izquierdo y otra en la parte superior central, un tramo corto flanqueado por dos torres del lado de la ciudad en cada extremo del foso, y otro alrededor de la esquina inferior derecha con dos torres. Hay escaleras que suben a los muros en la parte superior izquierda, la parte superior central, la parte superior derecha, la parte inferior central y la parte inferior derecha.",
+  "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, en terreno abierto fuera del foso.",
+  "defender": "Los puntos de despliegue del defensor se reparten por la ciudad, siete de ellos sobre las torres y los muros."
+}

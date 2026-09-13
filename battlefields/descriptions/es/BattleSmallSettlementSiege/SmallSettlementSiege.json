@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno abierto a la izquierda, con las torres del defensor en la parte superior central y en la parte inferior central, unas escaleras que suben a cada una desde el borde contiguo, y un muro entre ellas en el centro. Detrás del muro, {9,5} queda en la parte central derecha y {8,0} en la parte inferior derecha. Las esquinas superior izquierda y superior derecha quedan cerradas por {0,6} y {12,6}.",
+  "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo, en terreno abierto fuera de las torres.",
+  "defender": "Los puntos de despliegue del defensor ocupan el centro y la derecha, dos de ellos sobre las torres y cuatro sobre el muro."
+}

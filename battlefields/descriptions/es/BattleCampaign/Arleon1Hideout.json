@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno llano en todo el tablero, con {6,6} por la parte superior central y {5,0} en la parte inferior central. {3,3} y {7,3} estrechan el centro y dejan un hueco en medio.",
+  "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, todos en terreno llano.",
+  "defender": "Los puntos de despliegue del defensor recorren el borde derecho, todos en terreno llano."
+}

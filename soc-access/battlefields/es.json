@@ -1,0 +1,351 @@
+{
+  "version": 1,
+  "language": "es",
+  "layouts": {
+    "Battle/Cemetery": {
+      "terrain": "Terreno llano de un extremo a otro. Acantilados a lo largo del borde derecho y alrededor de las esquinas inferior derecha y superior derecha.",
+      "attacker": "Los puntos de despliegue del atacante ocupan el borde izquierdo de abajo arriba.",
+      "defender": "Los puntos de despliegue del defensor se agrupan en la parte central derecha, dentro de los acantilados."
+    },
+    "Battle/Fight1": {
+      "terrain": "Terreno llano en la esquina inferior izquierda, con {6,0} sobre el resto del tablero. El borde superior queda cerrado por {1,4}, con más terreno bloqueado en el centro y {9,2} como único acceso a la derecha.",
+      "attacker": "Los puntos de despliegue del atacante ocupan el terreno llano de la esquina inferior izquierda.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, sobre {6,0}, más allá de {9,2}."
+    },
+    "Battle/Fight2": {
+      "terrain": "Terreno abierto a la izquierda, con {5,0} cubriendo toda la derecha del tablero y extendiéndose hasta la parte superior central y la parte inferior central. {6,2} y {5,5} ocupan buena parte del centro y dejan un paso en medio.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor se reparten por la derecha del tablero, todos ellos sobre {5,0}."
+    },
+    "Battle/Fight3": {
+      "terrain": "El terreno abierto va del borde inferior al superior entre {3,0} a la izquierda y {8,0} a la derecha. El borde izquierdo queda cerrado por {0,0} y el derecho por {12,2}.",
+      "attacker": "Los puntos de despliegue del atacante recorren la parte superior del tablero, siete de ellos sobre {3,0}.",
+      "defender": "Los puntos de despliegue del defensor ocupan la parte inferior derecha, diez de ellos sobre {8,0}."
+    },
+    "Battle/Fight4": {
+      "terrain": "Terreno abierto a lo largo de la parte inferior, con {3,6} subiendo hasta la esquina superior izquierda y {10,6} hasta la superior derecha. La parte superior está ocupada por {6,4}, y el tablero queda dividido en una mitad izquierda y una mitad derecha, unidas solo por {6,2} en la parte inferior central.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, en la mitad izquierda.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, dos de ellos sobre {10,6}."
+    },
+    "Battle/Fight5": {
+      "terrain": "Terreno abierto a la izquierda, con {2,1} sobre el centro y la derecha. La parte superior central queda cerrada por {6,5} y el borde inferior por {0,0}, con {5,3} en medio, en el centro.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, uno de ellos sobre {2,1}.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, todos ellos sobre {2,1}."
+    },
+    "Battle/Fight6": {
+      "terrain": "Terreno abierto en el centro, con {1,1} en la parte inferior izquierda, {9,1} en la parte inferior derecha, {1,6} en la parte superior izquierda y {11,6} en la parte superior derecha. {3,3} y {8,3} se sitúan a la izquierda y a la derecha del centro.",
+      "attacker": "Los puntos de despliegue del atacante se agrupan en el centro del tablero.",
+      "defender": "Los puntos de despliegue del defensor rodean los del atacante, dos en cada esquina y uno en la parte inferior central."
+    },
+    "Battle/Hideout": {
+      "terrain": "Terreno abierto con {5,0} en la parte inferior central, {6,6} en la parte superior central y {12,2} en la parte central derecha. La parte inferior izquierda queda bloqueada por {2,0} y la superior izquierda por {1,6}, con {0,5} como único acceso a la esquina superior izquierda.",
+      "attacker": "Los puntos de despliegue del atacante recorren el centro del tablero.",
+      "defender": "Los puntos de despliegue del defensor rodean los del atacante, dos sobre {5,0}, dos sobre {6,6} y cinco sobre {12,2}."
+    },
+    "Battle/SacredWoods": {
+      "terrain": "Terreno abierto por toda la parte inferior, con {4,0} en la parte inferior izquierda, {4,5} en la parte superior izquierda y {9,2} sobre el lado derecho. Acantilados en la parte inferior central, la parte inferior derecha y la parte central izquierda.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde inferior, todos en terreno llano.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el centro y la parte superior, cuatro de ellos sobre {9,2} y dos sobre {4,5}."
+    },
+    "Battle/TangledBurrow": {
+      "terrain": "Terreno abierto con {2,5} en la parte central izquierda, {5,5} y {8,7} por la parte superior central, y {9,3} en la parte central derecha. {7,1} y {9,1} se sitúan cerca del borde inferior.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo, todos ellos en terreno llano.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el centro y la derecha, uno sobre {5,5}, uno sobre {8,7} y uno sobre {9,3}."
+    },
+    "Battle/TrailerBattle": {
+      "terrain": "Terreno abierto por el centro y la derecha, con {4,4} en el centro y {11,3} en la parte central derecha, y acantilados en la parte superior izquierda y la parte superior central. {0,0} ocupa la parte inferior izquierda y sube por el borde izquierdo, con {5,3} como único acceso, y buena parte del borde superior queda cerrada por {9,6}.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por la izquierda del tablero, uno de ellos sobre {0,0} y otro sobre {4,4}.",
+      "defender": "Los puntos de despliegue del defensor se reparten por la derecha del tablero, todos ellos en terreno abierto."
+    },
+    "Battle/VanirLootPlace": {
+      "terrain": "Terreno abierto con {3,0} en la parte inferior izquierda y {9,4} por el centro y la derecha. La parte superior izquierda queda bloqueada por {3,5}, {3,3} es el único acceso desde el borde izquierdo al resto del tablero, y hay acantilados en la parte superior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, uno de ellos sobre {3,3}.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el centro y la derecha, cuatro de ellos sobre {9,4} y uno sobre {3,0}."
+    },
+    "Battle_Hills/Hills1": {
+      "terrain": "Terreno llano de un extremo a otro. Acantilados en el centro, a lo largo del borde derecho, en la parte superior izquierda y en la parte inferior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, en terreno llano.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, dentro de los acantilados."
+    },
+    "Battle_Hills/Hills10": {
+      "terrain": "Terreno abierto por el centro, con {3,0} en la parte inferior central y {3,6} en la parte superior central. Acantilados en la parte superior izquierda y en el borde derecho, y {10,6} es el único acceso a la esquina superior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, todos ellos en terreno llano.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, dos de ellos en la esquina superior derecha, más allá de {10,6}."
+    },
+    "Battle_Hills/Hills2": {
+      "terrain": "Terreno abierto con {5,2} ocupando el centro, y {0,0} en la parte inferior izquierda, {10,0} en la parte inferior derecha, {0,6} en la parte superior izquierda y {11,6} en la parte superior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, tres de ellos sobre {0,6} y tres sobre {0,0}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, tres de ellos sobre {11,6} y tres sobre {10,0}."
+    },
+    "Battle_Hills/Hills3": {
+      "terrain": "Terreno abierto con {4,3} por el centro, {3,6} en la parte superior izquierda y {7,0} en la parte inferior derecha. Acantilados en la parte inferior izquierda y la parte superior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, y tres de ellos están sobre {3,6}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, y tres de ellos están sobre {7,0}."
+    },
+    "Battle_Hills/Hills4": {
+      "terrain": "El terreno llano ocupa el centro del tablero, con {0,0} alrededor del borde izquierdo y {8,0} alrededor del derecho.",
+      "attacker": "Los puntos de despliegue del atacante recorren la izquierda del tablero, seis de ellos sobre {0,0}.",
+      "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero, seis de ellos sobre {8,0}."
+    },
+    "Battle_Hills/Hills5": {
+      "terrain": "Terreno llano por el centro, con {1,0} ocupando el lado izquierdo y {9,0} el derecho. Acantilados en la parte inferior izquierda.",
+      "attacker": "Los puntos de despliegue del atacante recorren la izquierda, todos menos uno sobre {1,0}.",
+      "defender": "Los puntos de despliegue del defensor recorren la derecha, todos menos uno sobre {9,0}."
+    },
+    "Battle_Hills/Hills6": {
+      "terrain": "Terreno abierto a lo largo de la parte inferior, con {0,0} en la esquina inferior izquierda y {9,0} en la inferior derecha. El centro y la parte superior están ocupados por {5,3}, cuya esquina superior derecha solo es accesible a través de {8,7}.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo, y uno de ellos está sobre {0,0}.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, y uno de ellos está sobre {9,0}."
+    },
+    "Battle_Hills/Hills7": {
+      "terrain": "Terreno abierto por el centro, con {2,5} ocupando la parte superior izquierda, {8,4} la parte superior derecha, {0,0} la parte inferior izquierda, {4,1} la parte inferior central y {11,0} la parte inferior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, tres de ellos sobre {2,5} y uno sobre {0,0}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, cuatro de ellos sobre {8,4} y tres sobre {11,0}."
+    },
+    "Battle_Hills/Hills8": {
+      "terrain": "Terreno abierto con {3,3} por el centro, {4,0} a lo largo del borde inferior y {4,8} a lo largo del borde superior. Acantilados en la parte central izquierda, la parte central derecha y la parte superior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, uno sobre {1,1} y otro sobre {1,7}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, uno sobre {10,1} y otro sobre {10,7}."
+    },
+    "Battle_Hills/Hills9": {
+      "terrain": "Terreno abierto con {3,0} en la parte inferior izquierda, {8,0} en la parte inferior central, {0,5} en la parte superior izquierda, {10,5} en la parte superior derecha y {6,4} en el centro. Acantilados a lo largo de la parte superior central.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, tres de ellos sobre {0,5} y uno sobre {3,0}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, tres de ellos sobre {10,5} y uno sobre {8,0}."
+    },
+    "Battle_Plains/Plains": {
+      "terrain": "Terreno abierto por todo el tablero, con {4,1} y {7,1} cerca del borde inferior y {6,4} en el centro. El terreno de la parte superior central queda interrumpido por {6,6}.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, todos ellos en terreno llano.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, todos ellos en terreno llano."
+    },
+    "Battle_Plains/Plains10": {
+      "terrain": "Terreno llano por todo el tablero, con {6,4} en el centro, {6,3} a su lado y {5,1} en la parte inferior central.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho."
+    },
+    "Battle_Plains/Plains2": {
+      "terrain": "Terreno llano por todo el tablero, con {7,2} en la parte inferior central y {4,6} en la parte superior central.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho."
+    },
+    "Battle_Plains/Plains3": {
+      "terrain": "Terreno llano por todo el tablero, con {5,0} en la parte inferior central y {5,8} en la parte superior central.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, uno sobre {1,1} y otro sobre {1,7}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, uno sobre {10,1} y otro sobre {10,7}."
+    },
+    "Battle_Plains/Plains4": {
+      "terrain": "Terreno abierto con {3,2} en la parte inferior izquierda, {7,2} en la parte inferior central, {5,6} en la parte superior central y {8,5} en la parte central derecha.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo, todos ellos en terreno llano.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, todos ellos en terreno llano."
+    },
+    "Battle_Plains/Plains5": {
+      "terrain": "Terreno llano por todo el tablero, con {5,7} en la parte superior central, {6,4} en el centro y {4,1} en la parte inferior central.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho."
+    },
+    "Battle_Plains/Plains6": {
+      "terrain": "Terreno llano por todo el tablero, con {0,1} en la parte inferior izquierda, {6,3} en el centro y {11,6} en la parte superior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren la izquierda del tablero, uno de ellos sobre {0,1}.",
+      "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero, uno de ellos sobre {11,6}."
+    },
+    "Battle_Plains/Plains7": {
+      "terrain": "Terreno llano por todo el tablero, con {4,1} en la parte inferior izquierda, {3,6} en la parte superior izquierda, {9,2} en la parte inferior derecha y {7,7} en la parte superior central.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, uno de ellos sobre {3,6}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, uno de ellos sobre {9,2}."
+    },
+    "Battle_Plains/Plains8": {
+      "terrain": "Terreno abierto con {5,2} y {7,2} en la parte inferior central, {5,6} y {7,6} en la parte superior central, y {2,4} y {10,4} a cada lado del centro.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo, todos ellos en terreno llano.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, todos ellos en terreno llano."
+    },
+    "Battle_Plains/Plains9": {
+      "terrain": "Terreno llano por todo el tablero, con {1,7} en la parte superior izquierda, {8,6} en la parte superior central, {3,1} en la parte inferior izquierda y {10,0} en la parte inferior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, dos de ellos sobre {1,7}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, dos de ellos sobre {10,0}."
+    },
+    "Battle_Walls/Walls1": {
+      "terrain": "Terreno abierto con {4,4} en la parte central izquierda. Los acantilados van desde la esquina inferior derecha hasta la parte superior central y aíslan {12,0} en la derecha del tablero.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el centro y la parte inferior derecha del tablero."
+    },
+    "Battle_Walls/Walls2": {
+      "terrain": "Terreno llano por todo el tablero. Los acantilados recorren el lado derecho de arriba abajo y sellan el borde derecho.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, bien lejos de los acantilados.",
+      "defender": "Los puntos de despliegue del defensor recorren la parte central derecha, justo delante de los acantilados."
+    },
+    "Battle_Walls/Walls3": {
+      "terrain": "Terreno llano con {0,0} en la esquina inferior izquierda y {10,0} en la inferior derecha. Los acantilados cruzan el tablero de lado a lado por encima del centro y aíslan {3,6} al otro lado.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo, y dos de ellos están sobre {0,0}.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, y tres de ellos están sobre {10,0}."
+    },
+    "Battle_Walls/Walls4": {
+      "terrain": "Terreno llano por todo el tablero. El lado derecho está ocupado por {11,0} del borde superior al borde inferior, con acantilados más allá.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero de arriba abajo."
+    },
+    "Battle_Water/Water1": {
+      "terrain": "Terreno abierto con {5,0} en la parte inferior central y {5,4} en el centro, y {5,2} entre ambas. La parte superior central está recorrida por {7,6}.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero."
+    },
+    "Battle_Water/water2": {
+      "terrain": "Terreno abierto con {3,7} por la parte superior. Por el centro hay {4,2} y, justo encima, {4,5}, con un pasillo entre medias y terreno abierto en los dos extremos.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, a la izquierda de {4,2} y {4,5}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, a la derecha de {4,2} y {4,5}."
+    },
+    "Battle_Water/water3": {
+      "terrain": "Terreno abierto con {3,6} por la parte superior izquierda y {8,6} por la parte superior derecha, y {6,5} como único acceso al terreno que queda en medio. La parte inferior del tablero está interrumpida por {2,0} a la izquierda, {8,0} en el centro y {5,2} entre medias.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho."
+    },
+    "Battle_Water/water4": {
+      "terrain": "Terreno abierto entre {0,1} a la izquierda y {10,3} a la derecha. {6,2} y {4,5} se sitúan en el centro del tablero, con un paso en medio.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, seis de ellos sobre {0,1}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, seis de ellos sobre {10,3}."
+    },
+    "Battle_Water/Water5": {
+      "terrain": "Terreno abierto con {3,1} en la parte inferior izquierda y {8,4} en el centro. El centro está bloqueado por {4,2} y solo se pasa por arriba o por abajo, con {0,6} en la esquina superior izquierda y {10,0} en la inferior derecha.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por la mitad izquierda, todos en terreno llano.",
+      "defender": "Los puntos de despliegue del defensor se reparten por la mitad derecha, todos en terreno llano."
+    },
+    "Battle_Water/Water6": {
+      "terrain": "Terreno abierto con {5,2} por el centro del tablero, con paso por encima y por debajo. En la parte inferior derecha, la esquina queda cerrada por {8,0} y {11,2} es el único acceso.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, dos de ellos en la esquina, más allá de {11,2}."
+    },
+    "Battle_Water/Water7": {
+      "terrain": "Terreno abierto con {4,1} por el centro. La parte superior del tablero está ocupada por {3,5} y la parte inferior central por {7,0}, y {9,4} es el acceso hacia la derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero de arriba abajo."
+    },
+    "Battle_Water/Water8": {
+      "terrain": "Terreno abierto interrumpido por {4,1} en la parte inferior central, {5,4} en el centro y {5,6} en la parte superior central, con pasillos libres por el centro y a lo largo de los bordes superior e inferior. {3,4} y {9,4} se sitúan en la parte central izquierda y en la parte central derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren la izquierda del tablero.",
+      "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero."
+    },
+    "Battle_Woods/Woods1": {
+      "terrain": "Terreno abierto con {8,4} por el centro, {0,3} en la parte central izquierda y {11,4} en la parte central derecha. La parte superior izquierda queda bloqueada por {2,7} y la superior derecha por {9,7}.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, uno de ellos sobre {0,3}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, uno de ellos sobre {11,4}."
+    },
+    "Battle_Woods/Woods2": {
+      "terrain": "Terreno abierto con {5,0} en la parte inferior central, {5,6} en la parte superior central y {0,7} en la esquina superior izquierda, casi cerrada por {1,7}. La parte inferior central queda bloqueada por {9,2}.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, uno de ellos sobre {0,7}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, todos en terreno llano."
+    },
+    "Battle_Woods/Woods3": {
+      "terrain": "Terreno abierto con {3,3} y {3,5} en la parte central izquierda, {8,3} y {8,5} en el centro, y {5,8} y {7,8} en el borde superior.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo de punta a punta.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho de punta a punta."
+    },
+    "Battle_Woods/Woods4": {
+      "terrain": "Terreno abierto con {0,0} en la parte inferior izquierda, {11,0} en la parte inferior derecha, {1,5} en la parte central izquierda y {9,7} en la parte superior derecha. El centro del borde inferior queda bloqueado por {6,0}.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, uno de ellos sobre {1,5} y otro sobre {0,0}.",
+      "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero, dos de ellos sobre {9,7} y uno sobre {11,0}."
+    },
+    "Battle_Woods/Woods5": {
+      "terrain": "Terreno llano por todo el tablero, con {6,4} en el centro.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho."
+    },
+    "Battle_Woods/Woods6": {
+      "terrain": "Terreno abierto con {5,3} en el centro del tablero. {3,7} y {7,7} bloquean la parte superior, con un hueco en medio, en la parte superior central, y terreno abierto por los dos lados.",
+      "attacker": "Los puntos de despliegue del atacante recorren la izquierda del tablero.",
+      "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero."
+    },
+    "Battle_Woods/Woods7": {
+      "terrain": "Terreno llano por todo el tablero, con {5,7} en la parte superior central y {0,4} y {12,4} en los bordes izquierdo y derecho.",
+      "attacker": "Los puntos de despliegue del atacante recorren el lado izquierdo de arriba abajo.",
+      "defender": "Los puntos de despliegue del defensor recorren el lado derecho de arriba abajo."
+    },
+    "Battle_Woods/Woods8": {
+      "terrain": "Terreno abierto con {5,3} en el centro del tablero. A su izquierda y por debajo hay {2,1}, y a su derecha y por encima, {7,3}.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho."
+    },
+    "BattleCampaign/Arleon1Ambush": {
+      "terrain": "Terreno abierto por el centro, con {0,0} a lo largo del borde inferior y {4,5} a lo largo del borde superior. Acantilados en la parte superior central.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, dos de ellos sobre {0,0} y uno sobre {4,5}.",
+      "defender": "Los puntos de despliegue del defensor recorren la parte central derecha, tres de ellos sobre {0,0} y tres sobre {4,5}."
+    },
+    "BattleCampaign/Arleon1Barya": {
+      "terrain": "Terreno abierto con {5,5} en la parte superior central, {2,0} en la parte inferior izquierda y {8,0} en la parte inferior derecha. {0,6} ocupa la esquina superior izquierda y solo se llega a ella a través de {0,5}.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo, y uno de ellos está sobre {2,0}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, y uno de ellos está sobre {8,0}."
+    },
+    "BattleCampaign/Arleon1Faey": {
+      "terrain": "Terreno abierto con {5,2} ocupando el centro, {2,0} en la parte inferior izquierda y {9,7} en la parte superior derecha. El centro del borde inferior queda bloqueado por {5,0} y el centro del borde superior por {5,8}.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo, y uno de ellos está sobre {2,0}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, y dos de ellos están sobre {9,7}."
+    },
+    "BattleCampaign/Arleon1GoldMine": {
+      "terrain": "Terreno abierto con {8,1} en la parte inferior derecha, {9,6} en la parte superior derecha y {4,7} en la parte superior central. A lo largo del borde inferior hay {4,0}, y {10,5} es el único acceso a la esquina superior derecha.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por la izquierda del tablero, con uno sobre {4,7}.",
+      "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero, uno sobre {9,6}, uno sobre {8,1} y uno sobre {10,5}."
+    },
+    "BattleCampaign/Arleon1Hideout": {
+      "terrain": "Terreno llano en todo el tablero, con {6,6} por la parte superior central y {5,0} en la parte inferior central. {3,3} y {7,3} estrechan el centro y dejan un hueco en medio.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, todos en terreno llano.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, todos en terreno llano."
+    },
+    "BattleCampaign/Arleon1Knights": {
+      "terrain": "Terreno llano por el centro, con {0,6} a lo largo del borde superior y {0,0} a lo largo del borde inferior.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, tres de ellos sobre {0,6} y tres sobre {0,0}.",
+      "defender": "Los puntos de despliegue del defensor recorren el borde derecho, tres de ellos sobre {0,6} y tres sobre {0,0}."
+    },
+    "BattleCampaign/Lothfight": {
+      "terrain": "Terreno abierto con {5,3} en el centro, {0,6} en la parte superior izquierda y {10,0} en la parte inferior derecha. El terreno justo debajo del centro está ocupado por {5,2}, y las tropas tienen que pasar por uno de los lados.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo, y uno de ellos está sobre {0,6}.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, y uno de ellos está sobre {10,0}."
+    },
+    "BattleCampaign/Ranafight": {
+      "terrain": "Terreno abierto con {2,2} en la parte central izquierda y {9,4} en la parte central derecha. La parte inferior central está ocupada por {4,0} y la superior central por {4,7}, y entre ambas el centro del tablero queda abierto.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por la izquierda del tablero, dos de ellos sobre {2,2}.",
+      "defender": "Los puntos de despliegue del defensor se reparten por la derecha del tablero, dos de ellos sobre {9,4}."
+    },
+    "BattleCampaign/RiseEternal1Final": {
+      "terrain": "Terreno llano a lo largo del borde izquierdo, y {12,0} cubre el centro y la derecha. Acantilados en la parte superior central, con {10,2} como único acceso a la esquina inferior derecha y {10,5} como único acceso a la superior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, todos en el terreno llano.",
+      "defender": "Los puntos de despliegue del defensor recorren la parte central derecha, todos ellos sobre {12,0}."
+    },
+    "BattleCampaign/RootsHillSiege": {
+      "terrain": "{0,0} cubre todo el tablero, interrumpida por {2,2} en la parte inferior izquierda y {2,5} en la parte central izquierda, que dejan un pasillo a lo largo del borde superior, otro a lo largo del borde inferior y otro por el centro. Los pasillos superior e inferior terminan en el centro y solo el pasillo central sigue hasta la derecha, donde el borde queda dividido en huecos por {11,3} y {11,5}.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, tres de ellos pegados al borde derecho."
+    },
+    "BattleCampaign/Silkspool": {
+      "terrain": "Terreno abierto con {8,6} en la parte superior central y {8,2} en la parte inferior central. Acantilados en la parte superior derecha y la parte inferior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor se reparten por la derecha del tablero, uno de ellos sobre {8,6} y otro sobre {8,2}."
+    },
+    "BattleCampaign/WieshFight": {
+      "terrain": "Terreno abierto con {4,7} y {8,5} en la parte superior central y {8,0} en la parte inferior central. La esquina inferior derecha queda bloqueada por {10,0} y la superior derecha por {10,6}, con acantilados a lo largo del borde derecho más allá de ambas.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero, dos de ellos sobre {8,5} y uno sobre {8,0}."
+    },
+    "BattleLargeSettlementSiege/LargeSettlementSiege": {
+      "terrain": "Terreno abierto con {10,0} en la parte inferior derecha. El defensor ocupa tres tramos cortos de muro: una torre con un muro detrás en la parte inferior central, otra en la parte superior central, y una torre con dos muros en la parte central derecha. Junto a cada torre suben unas escaleras, y los muros están separados, con terreno abierto entre ellos.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, en terreno abierto delante de los muros.",
+      "defender": "Los puntos de despliegue del defensor se reparten por el centro y la derecha, seis de ellos sobre las torres y los muros."
+    },
+    "BattleSmallSettlementSiege/SmallSettlementSiege": {
+      "terrain": "Terreno abierto a la izquierda, con las torres del defensor en la parte superior central y en la parte inferior central, unas escaleras que suben a cada una desde el borde contiguo, y un muro entre ellas en el centro. Detrás del muro, {9,5} queda en la parte central derecha y {8,0} en la parte inferior derecha. Las esquinas superior izquierda y superior derecha quedan cerradas por {0,6} y {12,6}.",
+      "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo, en terreno abierto fuera de las torres.",
+      "defender": "Los puntos de despliegue del defensor ocupan el centro y la derecha, dos de ellos sobre las torres y cuatro sobre el muro."
+    },
+    "BattleTownSiege/TownSiege": {
+      "terrain": "Terreno abierto a la izquierda, y el defensor ocupa la ciudad a la derecha. Una torre se alza en la parte superior central y otra en la parte inferior central, cada una flanqueada por un tramo de foso, con unas escaleras que suben junto a cada una por el lado de la ciudad. Hay muros en la parte central derecha y en la parte inferior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+      "defender": "Los puntos de despliegue del defensor se reparten por la ciudad, uno sobre cada torre y cuatro sobre los muros, dos de ellos para máquinas de asedio."
+    },
+    "BattleTownSiege_Walls/TownSiegeWalls2": {
+      "terrain": "Un foso va desde la esquina superior izquierda hasta la parte inferior central y solo se cruza por {5,4}, la puerta del centro. Los muros del defensor se alzan a su derecha: uno a lo largo del borde superior, entre una torre en su extremo izquierdo y otra en la parte superior central, un tramo corto flanqueado por dos torres del lado de la ciudad en cada extremo del foso, y otro alrededor de la esquina inferior derecha con dos torres. Hay escaleras que suben a los muros en la parte superior izquierda, la parte superior central, la parte superior derecha, la parte inferior central y la parte inferior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, en terreno abierto fuera del foso.",
+      "defender": "Los puntos de despliegue del defensor se reparten por la ciudad, siete de ellos sobre las torres y los muros."
+    },
+    "BattleTownSiege_Walls/TownSiegeWalls2Roots": {
+      "terrain": "Un foso va desde la esquina superior izquierda hasta la parte inferior central y solo se cruza por {5,4}, la puerta del centro. Los muros del defensor se alzan a su derecha: uno a lo largo del borde superior, entre una torre en su extremo izquierdo y otra en la parte superior central, un tramo corto flanqueado por dos torres del lado de la ciudad en cada extremo del foso, y otro alrededor de la esquina inferior derecha con dos torres. Hay escaleras que suben a los muros en la parte superior izquierda, la parte superior central, la parte superior derecha, la parte inferior central y la parte inferior derecha.",
+      "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, en terreno abierto fuera del foso.",
+      "defender": "Los puntos de despliegue del defensor se reparten por la ciudad, siete de ellos sobre las torres y los muros."
+    }
+  }
+}

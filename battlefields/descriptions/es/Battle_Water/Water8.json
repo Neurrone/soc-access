@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno abierto interrumpido por {4,1} en la parte inferior central, {5,4} en el centro y {5,6} en la parte superior central, con pasillos libres por el centro y a lo largo de los bordes superior e inferior. {3,4} y {9,4} se sitúan en la parte central izquierda y en la parte central derecha.",
+  "attacker": "Los puntos de despliegue del atacante recorren la izquierda del tablero.",
+  "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno llano con {0,0} en la esquina inferior izquierda y {10,0} en la inferior derecha. Los acantilados cruzan el tablero de lado a lado por encima del centro y aíslan {3,6} al otro lado.",
+  "attacker": "Los puntos de despliegue del atacante se reparten por el tercio izquierdo, y dos de ellos están sobre {0,0}.",
+  "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, y tres de ellos están sobre {10,0}."
+}

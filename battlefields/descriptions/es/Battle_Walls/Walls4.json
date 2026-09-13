@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno llano por todo el tablero. El lado derecho está ocupado por {11,0} del borde superior al borde inferior, con acantilados más allá.",
+  "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo.",
+  "defender": "Los puntos de despliegue del defensor recorren la derecha del tablero de arriba abajo."
+}

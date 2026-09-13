@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno llano por el centro, con {1,0} ocupando el lado izquierdo y {9,0} el derecho. Acantilados en la parte inferior izquierda.",
+  "attacker": "Los puntos de despliegue del atacante recorren la izquierda, todos menos uno sobre {1,0}.",
+  "defender": "Los puntos de despliegue del defensor recorren la derecha, todos menos uno sobre {9,0}."
+}

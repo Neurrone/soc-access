@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno llano en la esquina inferior izquierda, con {6,0} sobre el resto del tablero. El borde superior queda cerrado por {1,4}, con más terreno bloqueado en el centro y {9,2} como único acceso a la derecha.",
+  "attacker": "Los puntos de despliegue del atacante ocupan el terreno llano de la esquina inferior izquierda.",
+  "defender": "Los puntos de despliegue del defensor se reparten por el tercio derecho, sobre {6,0}, más allá de {9,2}."
+}

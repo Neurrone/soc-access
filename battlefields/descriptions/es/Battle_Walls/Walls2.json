@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno llano por todo el tablero. Los acantilados recorren el lado derecho de arriba abajo y sellan el borde derecho.",
+  "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, bien lejos de los acantilados.",
+  "defender": "Los puntos de despliegue del defensor recorren la parte central derecha, justo delante de los acantilados."
+}

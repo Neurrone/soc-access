@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno llano de un extremo a otro. Acantilados en el centro, a lo largo del borde derecho, en la parte superior izquierda y en la parte inferior derecha.",
+  "attacker": "Los puntos de despliegue del atacante recorren el borde izquierdo, en terreno llano.",
+  "defender": "Los puntos de despliegue del defensor recorren el borde derecho, dentro de los acantilados."
+}
