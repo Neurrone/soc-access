@@ -17,10 +17,12 @@
     <GameManagedDir>$(GameDir)\SongsOfConquest_Data\Managed</GameManagedDir>
     <PluginOutputDir>$(GameDir)\BepInEx\plugins\SongsOfConquestAccess</PluginOutputDir>
     <DeployTranslationsDir>$(GameDir)\BepInEx\config\SongsOfConquestAccess\translations</DeployTranslationsDir>
+    <DeployBattlefieldsDir>$(GameDir)\BepInEx\config\SongsOfConquestAccess\battlefields</DeployBattlefieldsDir>
     <DeployDllPath>$(PluginOutputDir)\$(AssemblyName).dll</DeployDllPath>
     <DeployPdbPath>$(PluginOutputDir)\$(AssemblyName).pdb</DeployPdbPath>
     <ReleaseTemplatePluginsDir>$(MSBuildProjectDirectory)\..\release-template\BepInEx\plugins\SongsOfConquestAccess</ReleaseTemplatePluginsDir>
     <ReleaseTemplateTranslationsDir>$(MSBuildProjectDirectory)\..\release-template\BepInEx\config\SongsOfConquestAccess\translations</ReleaseTemplateTranslationsDir>
+    <ReleaseTemplateBattlefieldsDir>$(MSBuildProjectDirectory)\..\release-template\BepInEx\config\SongsOfConquestAccess\battlefields</ReleaseTemplateBattlefieldsDir>
     <ReleaseTemplatePluginDllPath>$(ReleaseTemplatePluginsDir)\$(AssemblyName).dll</ReleaseTemplatePluginDllPath>
     <ReleaseTemplatePluginPdbPath>$(ReleaseTemplatePluginsDir)\$(AssemblyName).pdb</ReleaseTemplatePluginPdbPath>
     <ReleaseTemplateLoaderDllPath>$(ReleaseTemplatePluginsDir)\SongsOfConquest.Access.Loader.dll</ReleaseTemplateLoaderDllPath>
@@ -41,6 +43,9 @@
 
   <ItemGroup>
     <Content Include="translations\*.po">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="battlefields\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -189,6 +194,15 @@
           DestinationFolder="$(DeployTranslationsDir)"
           SkipUnchangedFiles="false"
           Condition="'@(ModTranslationFiles)' != ''" />
+    <ItemGroup>
+      <ModBattlefieldFiles Include="$(MSBuildProjectDirectory)\battlefields\*.json" />
+    </ItemGroup>
+    <MakeDir Directories="$(DeployBattlefieldsDir)"
+             Condition="'@(ModBattlefieldFiles)' != ''" />
+    <Copy SourceFiles="@(ModBattlefieldFiles)"
+          DestinationFolder="$(DeployBattlefieldsDir)"
+          SkipUnchangedFiles="false"
+          Condition="'@(ModBattlefieldFiles)' != ''" />
   </Target>
 
   <Target Name="CopyReleaseDllToTemplatePlugins"
@@ -198,6 +212,8 @@
     <MakeDir Directories="$(ReleaseTemplatePluginsDir)" />
     <RemoveDir Directories="$(ReleaseTemplatePluginsDir)\translations"
                Condition="Exists('$(ReleaseTemplatePluginsDir)\translations')" />
+    <RemoveDir Directories="$(ReleaseTemplatePluginsDir)\battlefields"
+               Condition="Exists('$(ReleaseTemplatePluginsDir)\battlefields')" />
     <Copy SourceFiles="$(TargetPath)"
           DestinationFiles="$(ReleaseTemplatePluginDllPath)"
           SkipUnchangedFiles="false" />
@@ -221,6 +237,15 @@
           DestinationFolder="$(ReleaseTemplateTranslationsDir)"
           SkipUnchangedFiles="false"
           Condition="'@(ModTranslationFiles)' != ''" />
+    <ItemGroup>
+      <ModBattlefieldFiles Include="$(MSBuildProjectDirectory)\battlefields\*.json" />
+    </ItemGroup>
+    <MakeDir Directories="$(ReleaseTemplateBattlefieldsDir)"
+             Condition="'@(ModBattlefieldFiles)' != ''" />
+    <Copy SourceFiles="@(ModBattlefieldFiles)"
+          DestinationFolder="$(ReleaseTemplateBattlefieldsDir)"
+          SkipUnchangedFiles="false"
+          Condition="'@(ModBattlefieldFiles)' != ''" />
   </Target>
 
 </Project>
