@@ -127,7 +127,8 @@ namespace SongsOfConquestAccess.Battlefields
     ///   from every flat enterable cell, which is where a troop can always stand;
     /// - a siege layout's decoration byte names its structures: 7 a wall, 6 a tower, 8 stairs, the
     ///   same three constants <c>BattleTroopPlacementCalculator</c> reads. They are walked on, so
-    ///   they are enterable, and they are not elevated ground;
+    ///   they are enterable, and they are not elevated ground - unless the game says the cell
+    ///   cannot be entered at all, which wins over every byte;
     /// - a choke point is the one or two cells whose loss would cut the walkable board in two.
     /// </summary>
     public sealed class BattlefieldTerrain
@@ -212,17 +213,19 @@ namespace SongsOfConquestAccess.Battlefields
                         continue;
                     }
 
+                    // Before the structures: a cell nothing can enter is impassable whatever is
+                    // drawn on it, and a tower byte on ground no troop can stand on is not a tower.
+                    if (cell.Impassable)
+                    {
+                        kinds[x, y] = BattlefieldCellKind.Impassable;
+                        continue;
+                    }
+
                     BattlefieldCellKind structure = StructureKind(isSiege, cell.Decoration);
                     if (structure != BattlefieldCellKind.OffGrid)
                     {
                         kinds[x, y] = structure;
                         enterable[x, y] = true;
-                        continue;
-                    }
-
-                    if (cell.Impassable)
-                    {
-                        kinds[x, y] = BattlefieldCellKind.Impassable;
                         continue;
                     }
 

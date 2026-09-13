@@ -165,6 +165,21 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(1, RegionsOf(terrain, BattlefieldRegionKind.Stairs)[0].Height);
         }
 
+        /// <summary>A structure byte on ground nothing can enter is not a structure: a tower nobody
+        /// can walk onto is impassable, whatever the layout drew there.</summary>
+        [TestMethod]
+        public void AnImpassableCellIsImpassableWhateverIsBuiltOnIt()
+        {
+            BattlefieldTerrain terrain = Analyse(
+                new[] { "2#...", "3....", "1...." },
+                new[] { "WT...", "T....", "S...." });
+
+            Assert.AreEqual(BattlefieldCellKind.Impassable, terrain.GetKind(new Vector2Int(1, 2)));
+            Assert.AreEqual(BattlefieldCellKind.Wall, terrain.GetKind(new Vector2Int(0, 2)));
+            Assert.AreEqual(1, RegionsOf(terrain, BattlefieldRegionKind.Impassable).Count);
+            Assert.AreEqual(1, RegionsOf(terrain, BattlefieldRegionKind.Wall)[0].Count);
+        }
+
         /// <summary>An odd row is half a cell to the right and its last column falls off the board.
         /// A cell off the grid is no kind at all and joins no region.</summary>
         [TestMethod]
