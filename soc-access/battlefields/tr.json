@@ -58,7 +58,7 @@
       "defender": "Savunanın çıkış noktaları savaş alanının sağına yayılır, hepsi açık arazidedir."
     },
     "Battle/VanirLootPlace": {
-      "terrain": "Açık arazi; sol altta {3,0}, orta ve sağ boyunca {9,4} var. Sol üstü {3,5} kapatır, sol kenardan savaş alanının geri kalanına yalnızca {3,3} üzerinden geçilir ve sağ üstte uçurumlar var.",
+      "terrain": "Açık arazi; sol altta {3,0}, orta ve sağ boyunca {9,4} var. Sol üst {3,5} ile kapalıdır, sol kenardan savaş alanının geri kalanına yalnızca {3,3} üzerinden geçilir ve sağ üstte uçurumlar var.",
       "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır, biri {3,3} üzerindedir.",
       "defender": "Savunanın çıkış noktaları ortaya ve sağa yayılır; dört tanesi {9,4}, biri de {3,0} üzerindedir."
     },
@@ -113,7 +113,7 @@
       "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır; üç tanesi {10,5}, biri de {8,0} üzerindedir."
     },
     "Battle_Plains/Plains": {
-      "terrain": "Savaş alanı boyunca açık arazi; alt kenara yakın {4,1} ve {7,1}, ortada ise {6,4} var. {5,7} üst ortada zemini böler.",
+      "terrain": "Savaş alanı boyunca açık arazi; alt kenara yakın {4,1} ve {7,1}, ortada ise {6,4} var. Üst ortadaki zemin {5,7} ile bölünür.",
       "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır, hepsi düz arazidedir.",
       "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır, hepsi düz arazidedir."
     },
@@ -178,12 +178,12 @@
       "defender": "Savunanın çıkış noktaları sağ üçte birlik bölüme yayılır ve üç tanesi {10,0} üzerinde durur."
     },
     "Battle_Walls/Walls4": {
-      "terrain": "Savaş alanı boyunca düz arazi. {11,0} sağ tarafta üst kenardan alt kenara uzanır, ötesinde ise uçurumlar var.",
+      "terrain": "Savaş alanı boyunca düz arazi; sağ tarafta üst kenardan alt kenara kadar {11,0}, ötesinde ise uçurumlar var.",
       "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır.",
       "defender": "Savunanın çıkış noktaları savaş alanının sağında yukarıdan aşağıya uzanır."
     },
     "Battle_Water/Water1": {
-      "terrain": "Açık arazi; alt ortada {5,0}, ortada {5,4} ve ikisinin arasında {5,2} var. {7,6} üst orta boyunca uzanır.",
+      "terrain": "Açık arazi; alt ortada {5,0}, ortada {5,4} ve ikisinin arasında {5,2} var. Üst orta boydan boya {7,6} ile kesilir.",
       "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır.",
       "defender": "Savunanın çıkış noktaları savaş alanının sağı boyunca uzanır."
     },
@@ -203,7 +203,7 @@
       "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır, altı tanesi {10,3} üzerindedir."
     },
     "Battle_Water/Water5": {
-      "terrain": "Açık arazi; sol altta {3,1}, ortada {8,4} var. {5,3} ortayı kapatır ve üstünden ya da altından geçilir; sol üst köşede {0,6}, sağ altta {10,0} var.",
+      "terrain": "Açık arazi; sol altta {3,1}, ortada {8,4} var. Orta kısım {5,3} ile kapalıdır ve üstünden ya da altından geçilir; sol üst köşede {0,6}, sağ altta {10,0} var.",
       "attacker": "Saldıranın çıkış noktaları sol yarıya yayılır, hepsi düz arazidedir.",
       "defender": "Savunanın çıkış noktaları sağ yarıya yayılır, hepsi düz arazidedir."
     },
@@ -213,7 +213,7 @@
       "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır, iki tanesi {11,2} ötesindeki köşededir."
     },
     "Battle_Water/Water7": {
-      "terrain": "Açık arazi; ortada boydan boya {4,1} var. {3,5} savaş alanının üstünü, {7,0} alt ortayı doldurur ve sağa yalnızca {9,4} üzerinden geçilir.",
+      "terrain": "Açık arazi; ortada boydan boya {4,1} var. Savaş alanının üstü {3,5} ile, alt orta ise {7,0} ile doludur ve sağa yalnızca {9,4} üzerinden geçilir.",
       "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır.",
       "defender": "Savunanın çıkış noktaları savaş alanının sağında yukarıdan aşağıya uzanır."
     },
@@ -223,12 +223,12 @@
       "defender": "Savunanın çıkış noktaları savaş alanının sağı boyunca uzanır."
     },
     "Battle_Woods/Woods1": {
-      "terrain": "Açık arazi; ortada boydan boya {8,4}, orta solda {0,3} ve orta sağda {11,4} var. Sol üstü {2,8}, sağ üstü {9,7} kapatır.",
+      "terrain": "Açık arazi; ortada boydan boya {8,4}, orta solda {0,3} ve orta sağda {11,4} var. Sol üst {2,8} ile, sağ üst ise {9,7} ile kapalıdır.",
       "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır, biri {0,3} üzerindedir.",
       "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır, biri {11,4} üzerindedir."
     },
     "Battle_Woods/Woods2": {
-      "terrain": "Açık arazi; alt ortada {5,0}, üst ortada {5,6} ve sol üst köşede {0,7} var, {1,8} bu köşeyi neredeyse tamamen kapatır. Alt orta {9,2} ile kapalıdır.",
+      "terrain": "Açık arazi; alt ortada {5,0}, üst ortada {5,6} ve sol üst köşede {0,7} var; bu köşe {1,8} ile neredeyse tamamen kapalıdır. Alt orta {9,2} ile kapalıdır.",
       "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır, biri {0,7} üzerindedir.",
       "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır, hepsi düz arazidedir."
     },
@@ -238,7 +238,7 @@
       "defender": "Savunanın çıkış noktaları sağ kenar boyunca baştan sona uzanır."
     },
     "Battle_Woods/Woods4": {
-      "terrain": "Açık arazi; sol altta {0,0}, sağ altta {11,0}, orta solda {1,5} ve sağ üstte {9,7} var. {6,0} alt kenarın ortasını kapatır.",
+      "terrain": "Açık arazi; sol altta {0,0}, sağ altta {11,0}, orta solda {1,5} ve sağ üstte {9,7} var. Alt kenarın ortası {6,0} ile kapalıdır.",
       "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır; biri {1,5}, biri de {0,0} üzerindedir.",
       "defender": "Savunanın çıkış noktaları savaş alanının sağı boyunca uzanır; iki tanesi {9,7}, biri de {11,0} üzerindedir."
     },
@@ -258,7 +258,7 @@
       "defender": "Savunanın çıkış noktaları sağ tarafta yukarıdan aşağıya uzanır."
     },
     "Battle_Woods/Woods8": {
-      "terrain": "Açık arazi; savaş alanının ortasında {5,3} var. {5,2} onun solunda ve altında, {7,3} ise sağında ve üstünde yer alır.",
+      "terrain": "Açık arazi; savaş alanının ortasında {5,3} var. Onun solundaki ve altındaki zemin {5,2} ile, sağındaki ve üstündeki zemin ise {7,3} ile doludur.",
       "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır.",
       "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır."
     },
@@ -273,12 +273,12 @@
       "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır ve biri {8,0} üzerinde durur."
     },
     "BattleCampaign/Arleon1Faey": {
-      "terrain": "Açık arazi; ortayı {5,2} doldurur, sol altta {2,0} ve sağ üstte {9,7} var. Alt kenarın ortasını {5,0}, üst kenarın ortasını {5,8} kapatır.",
+      "terrain": "Açık arazi; ortayı {5,2} doldurur, sol altta {2,0} ve sağ üstte {9,7} var. Alt kenarın ortası {5,0} ile, üst kenarın ortası ise {5,8} ile kapalıdır.",
       "attacker": "Saldıranın çıkış noktaları sol üçte birlik bölüme yayılır ve biri {2,0} üzerinde durur.",
       "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır ve iki tanesi {9,7} üzerinde durur."
     },
     "BattleCampaign/Arleon1GoldMine": {
-      "terrain": "Açık arazi; sağ altta {8,1}, sağ üstte {9,6} ve üst ortada {4,7} var. {4,0} alt kenar boyunca uzanır ve sağ üst köşeye yalnızca {10,5} üzerinden girilir.",
+      "terrain": "Açık arazi; sağ altta {8,1}, sağ üstte {9,6} ve üst ortada {4,7} var. Alt kenarın ortası {4,0} ile kapalıdır ve sağ üst köşeye yalnızca {10,5} üzerinden girilir.",
       "attacker": "Saldıranın çıkış noktaları savaş alanının solu boyunca dağılır, biri {4,7} üzerindedir.",
       "defender": "Savunanın çıkış noktaları savaş alanının sağı boyunca uzanır; biri {9,6}, biri {8,1}, biri de {10,5} üzerindedir."
     },
@@ -293,12 +293,12 @@
       "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır; üç tanesi {0,6}, üç tanesi de {0,0} üzerindedir."
     },
     "BattleCampaign/Lothfight": {
-      "terrain": "Açık arazi; ortada {5,3}, sol üstte {0,6} ve sağ altta {10,0} var. {5,2} ortanın hemen altındaki zemini doldurur ve birlikler onun bir yanından geçmek zorundadır.",
+      "terrain": "Açık arazi; ortada {5,3}, sol üstte {0,6} ve sağ altta {10,0} var. Ortanın hemen altındaki zemin {5,2} ile doludur ve birlikler bir yandan ya da öbür yandan geçmek zorundadır.",
       "attacker": "Saldıranın çıkış noktaları sol üçte birlik bölüme yayılır ve biri {0,6} üzerinde durur.",
       "defender": "Savunanın çıkış noktaları sağ üçte birlik bölüme yayılır ve biri {10,0} üzerinde durur."
     },
     "BattleCampaign/Ranafight": {
-      "terrain": "Açık arazi; orta solda {2,2}, orta sağda {9,4} var. {4,0} alt ortayı, {4,7} üst ortayı doldurur ve aralarında savaş alanının ortası açık kalır.",
+      "terrain": "Açık arazi; orta solda {2,2}, orta sağda {9,4} var. Alt orta {4,0} ile, üst orta ise {4,7} ile doludur ve aralarında savaş alanının ortası açık kalır.",
       "attacker": "Saldıranın çıkış noktaları savaş alanının soluna dağılır, iki tanesi {2,2} üzerindedir.",
       "defender": "Savunanın çıkış noktaları savaş alanının sağına dağılır, iki tanesi {9,4} üzerindedir."
     },
@@ -318,7 +318,7 @@
       "defender": "Savunanın çıkış noktaları savaş alanının sağına yayılır; biri {8,6}, biri de {8,2} üzerinde durur."
     },
     "BattleCampaign/WieshFight": {
-      "terrain": "Açık arazi; üst ortada {4,7} ve {8,5}, alt ortada {8,0} var. Sağ alt köşeyi {11,0}, sağ üst köşeyi {11,6} kapatır; onların ötesinde, sağ kenar boyunca uçurumlar var.",
+      "terrain": "Açık arazi; üst ortada {4,7} ve {8,5}, alt ortada {8,0} var. Sağ alt köşe {11,0} ile, sağ üst köşe ise {11,6} ile kapalıdır; onların ötesinde, sağ kenar boyunca uçurumlar var.",
       "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır.",
       "defender": "Savunanın çıkış noktaları savaş alanının sağı boyunca uzanır; iki tanesi {8,5}, biri de {8,0} üzerindedir."
     },

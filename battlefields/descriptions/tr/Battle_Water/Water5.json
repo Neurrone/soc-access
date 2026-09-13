@@ -1,5 +1,5 @@
 {
-  "terrain": "Açık arazi; sol altta {3,1}, ortada {8,4} var. {5,3} ortayı kapatır ve üstünden ya da altından geçilir; sol üst köşede {0,6}, sağ altta {10,0} var.",
+  "terrain": "Açık arazi; sol altta {3,1}, ortada {8,4} var. Orta kısım {5,3} ile kapalıdır ve üstünden ya da altından geçilir; sol üst köşede {0,6}, sağ altta {10,0} var.",
   "attacker": "Saldıranın çıkış noktaları sol yarıya yayılır, hepsi düz arazidedir.",
   "defender": "Savunanın çıkış noktaları sağ yarıya yayılır, hepsi düz arazidedir."
 }

@@ -1,5 +1,5 @@
 {
-  "terrain": "Açık arazi; sol altta {3,0}, orta ve sağ boyunca {9,4} var. Sol üstü {3,5} kapatır, sol kenardan savaş alanının geri kalanına yalnızca {3,3} üzerinden geçilir ve sağ üstte uçurumlar var.",
+  "terrain": "Açık arazi; sol altta {3,0}, orta ve sağ boyunca {9,4} var. Sol üst {3,5} ile kapalıdır, sol kenardan savaş alanının geri kalanına yalnızca {3,3} üzerinden geçilir ve sağ üstte uçurumlar var.",
   "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır, biri {3,3} üzerindedir.",
   "defender": "Savunanın çıkış noktaları ortaya ve sağa yayılır; dört tanesi {9,4}, biri de {3,0} üzerindedir."
 }

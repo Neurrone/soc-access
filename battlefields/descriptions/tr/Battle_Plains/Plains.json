@@ -1,5 +1,5 @@
 {
-  "terrain": "Savaş alanı boyunca açık arazi; alt kenara yakın {4,1} ve {7,1}, ortada ise {6,4} var. {5,7} üst ortada zemini böler.",
+  "terrain": "Savaş alanı boyunca açık arazi; alt kenara yakın {4,1} ve {7,1}, ortada ise {6,4} var. Üst ortadaki zemin {5,7} ile bölünür.",
   "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır, hepsi düz arazidedir.",
   "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır, hepsi düz arazidedir."
 }

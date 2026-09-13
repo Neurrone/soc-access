@@ -1,5 +1,5 @@
 {
-  "terrain": "Açık arazi; alt ortada {5,0}, ortada {5,4} ve ikisinin arasında {5,2} var. {7,6} üst orta boyunca uzanır.",
+  "terrain": "Açık arazi; alt ortada {5,0}, ortada {5,4} ve ikisinin arasında {5,2} var. Üst orta boydan boya {7,6} ile kesilir.",
   "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır.",
   "defender": "Savunanın çıkış noktaları savaş alanının sağı boyunca uzanır."
 }
