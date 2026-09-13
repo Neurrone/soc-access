@@ -1,5 +1,5 @@
 {
-  "terrain": "Terreno abierto en el centro, con {1,1} en la parte inferior izquierda, {9,1} en la parte inferior derecha, {1,6} en la parte superior izquierda y {11,6} en la parte superior derecha. {3,3} y {8,3} se sitúan a la izquierda y a la derecha del centro.",
+  "terrain": "Terreno abierto en el centro, con {1,1} en la parte inferior izquierda, {9,1} en la parte inferior derecha, {1,6} en la parte superior izquierda y {11,6} en la parte superior derecha. A la izquierda y a la derecha del centro hay {3,3} y {9,4}.",
   "attacker": "Los puntos de despliegue del atacante se agrupan en el centro del tablero.",
   "defender": "Los puntos de despliegue del defensor rodean los del atacante, dos en cada esquina y uno en la parte inferior central."
 }

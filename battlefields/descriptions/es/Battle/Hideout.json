@@ -1,5 +1,5 @@
 {
-  "terrain": "Terreno abierto con {5,0} en la parte inferior central, {6,6} en la parte superior central y {12,2} en la parte central derecha. La parte inferior izquierda queda bloqueada por {2,0} y la superior izquierda por {1,6}, con {0,5} como único acceso a la esquina superior izquierda.",
+  "terrain": "Terreno abierto con {5,0} en la parte inferior central, {6,6} en la parte superior central y {12,2} en la parte central derecha. La esquina superior izquierda queda cerrada por {3,6} y {3,7}, y {0,5} es el único acceso.",
   "attacker": "Los puntos de despliegue del atacante recorren el centro del tablero.",
   "defender": "Los puntos de despliegue del defensor rodean los del atacante, dos sobre {5,0}, dos sobre {6,6} y cinco sobre {12,2}."
 }

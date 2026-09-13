@@ -1,5 +1,5 @@
 {
-  "terrain": "El terreno abierto va del borde inferior al superior entre {3,0} a la izquierda y {8,0} a la derecha. El borde izquierdo queda cerrado por {0,0} y el derecho por {12,2}.",
+  "terrain": "El terreno abierto va del borde inferior al superior entre {3,0} a la izquierda y {8,0} a la derecha. El borde izquierdo queda cerrado por {1,0} y {0,3}, y el derecho por {12,2}.",
   "attacker": "Los puntos de despliegue del atacante recorren la parte superior del tablero, siete de ellos sobre {3,0}.",
   "defender": "Los puntos de despliegue del defensor ocupan la parte inferior derecha, diez de ellos sobre {8,0}."
 }
