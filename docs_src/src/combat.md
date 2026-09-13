@@ -26,10 +26,12 @@ The cursor, the scanner's `Terrain` category and the written battlefield descrip
 | flat ground | Ground at height 0 | Elevation 0 | Nowhere on the cursor, which says nothing about ordinary ground; descriptions call the rest of a board open ground |
 | elevated ground, height N | A raised hex a troop can reach | Elevation above 0, and something can step onto it | Cursor |
 | patch | A compact group of raised hexes | A connected group that is neither a ridge nor one hex | Scanner, descriptions |
-| ridge | A long thin group of raised hexes | Its longest extent is at least three times its shortest, or it spans more than half the board | Scanner, descriptions |
+| ridge | A long thin group of raised hexes running across the board | Measured along the group's own axis: at least 2.2 times as long as it is wide, three hexes or more, and its axis within 15 degrees of horizontal | Scanner, descriptions |
+| vertical ridge | The same running up the board | The same, with the axis within 15 degrees of vertical | Scanner, descriptions |
+| diagonal ridge | The same running diagonally | The same, with the axis anywhere between | Scanner, descriptions |
 | single cell | One raised hex on its own | A group of one | Scanner, descriptions |
 | cliff | A raised hex nothing can enter | Every step onto it is two heights or more | Cursor, scanner, descriptions |
-| impassable | A hex nothing can enter at all | The game says it is not walkable; water is impassable and nothing more | Cursor, scanner |
+| impassable | A hex nothing can enter at all | The game says it is not walkable, whatever is drawn on it; water is impassable too | Cursor, scanner |
 | wall of impassable cells | A line of impassable hexes that shapes movement | Three or more joined impassable hexes in a ridge shape | Scanner, descriptions |
 | choke point | The one or two hexes everything has to pass through | Removing them would leave the walkable board in two halves of at least five hexes | Scanner, descriptions |
 | wall | A siege layout's wall, which troops walk on | The layout is a siege and the hex carries the wall decoration | Cursor, scanner, descriptions |
@@ -39,7 +41,22 @@ The cursor, the scanner's `Terrain` category and the written battlefield descrip
 
 `blocked` is never spoken on a battlefield. Whether a hex can be reached this turn is not a fact about the ground, and every hex an enemy stands on would be one.
 
-The scanner's `Terrain` category holds one item per group, so a ridge is one stop in the item cycle and `Alt+Page Down` walks its hexes nearest first. A group names itself with its shape, its size and its height, as in `ridge of 7 cells, height 1`, `cliff of 3 cells` or `wall of 4 impassable cells`.
+The scanner's `Terrain` category holds one item per group, so a ridge is one stop in the item cycle and `Alt+Page Down` walks its hexes nearest first. A group names itself with its shape, its size and its height, as in `diagonal ridge of 7 cells, height 1`, `cliff of 3 cells` or `wall of 4 impassable cells`.
+
+### What Blocks a Hex
+
+During a fight the board is repainted with the ground the battle was joined on, so a blocked hex has something on it worth naming, and the cursor and the scanner name it: `boulders, impassable`, `a torch, impassable`, `wall of 5 bushes, impassable`. The words depend on the faction theme the battle inherited:
+
+| What it is | Arleon | Loth | Barya | Rana | Vanir | Roots | Yulan |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Rocks | boulders | boulders | boulders | boulders | boulders | boulders | boulders |
+| Plants | bushes | dark leafy plants | desert plants | pink mushrooms | purple heather | teal fungi | purple flowering shrubs |
+| A monument | a knight statue | a gargoyle statue | an animal statue | a dragon statue | a standing stone | a giant mushroom | a sage statue |
+| A light | a torch | a glowing crystal | a golden torch | a glowing pool | a torch | glowing blue mushrooms | a paper lantern |
+
+A burning hex is `fire` and a water hex is `water` in every theme, and a hex blocked by anything else is `impassable` with no name. A group of hexes holding more than one of these lists them, the commonest first: `wall of 6 bushes and boulders, impassable`.
+
+These words are heard in combat only. The deployment preview draws every blocked hex the same way, so the deployment grid says `impassable` and nothing else.
 
 ### Where Things Are
 
@@ -96,7 +113,7 @@ The following hotkeys work when on the hex grid:
 
 - `\`: performs the secondary action on the focused tile, corresponding to a right-click. Use this to move to a tile or perform an attack
 - `S`: read detailed threat information for the focused tile. Nothing is spoken if the tile is not threatened.
-- `Ctrl+D`: describe the terrain of the battlefield layout. Nothing is said about the spawn points here, since the troops have already been placed.
+- `Ctrl+D`: describe the terrain of the battlefield layout, and then what lies around it - `The battlefield is surrounded by forest to the west and north, mountains to the east.` That sentence is read from the battle itself: when a fight starts the game samples the three adventure tiles west, north and east of the tile it is fought on and builds the scenery from them. Nothing is said about the spawn points here, since the troops have already been placed.
 - `T`: move focus to the timeline
 - Enter: performs the primary action on the focused tile, corresponding to a left-click. Use to select a target for spells
 - `Escape`: cancels spell or ability targeting
