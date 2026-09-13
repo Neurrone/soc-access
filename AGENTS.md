@@ -40,6 +40,8 @@ After adding, removing, or changing a `ModString` or `ModPluralString`, run `dot
 - `dotnet test soc-access\tests\SongsOfConquestAccess.Tests.csproj` to run unit tests
 - `dotnet run --project soc-access\tools\Localization -- update-pot` to regenerate `soc-access\translations\strings_template.pot` from `ModStrings.cs`
 - `dotnet run --project soc-access\tools\Localization -- validate` to check `.po` files for missing, stale, empty, duplicate, changed-source, or placeholder-mismatched translations
+- `.\dump-battlefields.ps1 -Mode Deployment` (from a loaded adventure map) and `-Mode Combat` (from the main menu) to regenerate `battlefields\<LevelType>\<PathName>.json`, the deployment schematic `.jpg` and the editor render `.combat.jpg` for every battlefield layout the game ships; the mod-side code is `soc-access\dev\BattlefieldDump.cs` and `BattlefieldEditor.cs`
+- `.\build-battlefields.ps1` to build the spoken battlefield description tables `soc-access\battlefields\<lang>.json` from the authored files under `battlefields\descriptions\<lang>\`, written from `battlefields\PROMPT.md`; it validates every `{x,y}` placeholder against the dump
 
 Prefer fast text search over manual browsing when tracing the game code.
 

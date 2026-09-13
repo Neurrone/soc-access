@@ -180,6 +180,11 @@ the same three columns.
   `free:true` or with the `obstacle` (entity, commander or impassable terrain) that stops a
   spawned map entity from covering it.
 
+`SongsOfConquestAccess.Dev.BattlefieldDump` and `BattlefieldEditor` are the battlefield dumps
+(`BattlefieldDump.All(dir)` from a loaded adventure map; the editor calls from the main menu),
+driven by `dump-battlefields.ps1` at the repo root, which is the way to rerun them; the
+descriptions built from the dumps come from `build-battlefields.ps1`.
+
 `SongsOfConquestAccess.Dev.DevFixtures` is the same idea for calls that change the game to
 set a test up, kept apart from the probes because a probe never writes:
 
