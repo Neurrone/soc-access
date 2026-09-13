@@ -1,0 +1,5 @@
+{
+  "terrain": "Offenes Gelände, in der Mitte {5,3}, oben links {0,6} und unten rechts {10,0}. Knapp unterhalb der Mitte {5,2}, und Truppen müssen daran links oder rechts vorbei.",
+  "attacker": "Die Aufstellungspunkte des Angreifers verteilen sich über das linke Drittel, und {0,6} trägt einen davon.",
+  "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über das rechte Drittel, und {10,0} trägt einen davon."
+}

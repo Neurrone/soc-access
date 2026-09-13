@@ -1,0 +1,5 @@
+{
+  "terrain": "Flaches Gelände, in der unteren linken Ecke {0,0} und unten rechts {10,0}. Klippen ziehen sich oberhalb der Mitte quer über das ganze Schlachtfeld, und dahinter bleibt {3,6} abgeschnitten.",
+  "attacker": "Die Aufstellungspunkte des Angreifers verteilen sich über das linke Drittel, und {0,0} trägt zwei davon.",
+  "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über das rechte Drittel, und {10,0} trägt drei davon."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Offenes Gelände, unten links {3,0}, unten in der Mitte {8,0}, oben links {0,5}, oben rechts {10,5} und in der Mitte {6,4}. Klippen quer durch die obere Mitte.",
+  "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang; {0,5} trägt drei davon und {3,0} einen.",
+  "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang; {10,5} trägt drei davon und {8,0} einen."
+}

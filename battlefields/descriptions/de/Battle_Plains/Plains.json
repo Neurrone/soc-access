@@ -1,0 +1,5 @@
+{
+  "terrain": "Offenes Gelände über das ganze Schlachtfeld, nahe dem unteren Rand {4,1} und {7,1} und in der Mitte {6,4}. Oben in der Mitte ist der Boden unterbrochen: {6,6}.",
+  "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, alle auf flachem Gelände.",
+  "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang, alle auf flachem Gelände."
+}

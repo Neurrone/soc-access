@@ -1,0 +1,5 @@
+{
+  "terrain": "Flaches Gelände überall, quer durch die obere Mitte {6,6} und unten in der Mitte {5,0}. {3,3} und {7,3} verengen die Mitte, dazwischen bleibt eine Lücke.",
+  "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, alle auf flachem Gelände.",
+  "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang, alle auf flachem Gelände."
+}

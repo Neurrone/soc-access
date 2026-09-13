@@ -1,0 +1,5 @@
+{
+  "terrain": "Flaches Gelände auf der ganzen Breite. Klippen am rechten Rand entlang und um die untere rechte und die obere rechte Ecke herum.",
+  "attacker": "Die Aufstellungspunkte des Angreifers füllen den linken Rand von unten bis oben.",
+  "defender": "Die Aufstellungspunkte des Verteidigers sammeln sich rechts in der Mitte, innerhalb der Klippen."
+}

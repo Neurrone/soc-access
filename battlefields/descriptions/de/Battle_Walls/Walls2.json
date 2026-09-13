@@ -1,0 +1,5 @@
+{
+  "terrain": "Flaches Gelände über das ganze Schlachtfeld. Klippen ziehen sich über die ganze Höhe des Schlachtfelds auf der rechten Seite hinunter und riegeln den rechten Rand ab.",
+  "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, weit weg von den Klippen.",
+  "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich rechts in der Mitte entlang, dicht vor den Klippen."
+}

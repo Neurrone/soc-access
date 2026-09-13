@@ -1,0 +1,5 @@
+{
+  "terrain": "Offenes Gelände, unten rechts {10,0}. Der Verteidiger hält drei kurze Mauerabschnitte: unten in der Mitte einen Turm mit einer Mauer dahinter, oben in der Mitte ebenso und rechts in der Mitte einen Turm mit zwei Mauern. Neben jedem Turm führt eine Treppe hinauf, und die Mauern stehen einzeln, mit offenem Gelände dazwischen.",
+  "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, auf offenem Gelände vor den Mauern.",
+  "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über die Mitte und die rechte Seite, sechs davon auf den Türmen und Mauern."
+}

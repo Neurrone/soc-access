@@ -1,0 +1,5 @@
+{
+  "terrain": "Offenes Gelände, links begrenzt durch {0,1} und rechts durch {10,3}. {6,2} und {4,5} sitzen in der Mitte des Schlachtfelds, dazwischen ein Durchgang.",
+  "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, und {0,1} trägt sechs davon.",
+  "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang, und {10,3} trägt sechs davon."
+}

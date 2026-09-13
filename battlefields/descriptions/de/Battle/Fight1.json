@@ -1,0 +1,5 @@
+{
+  "terrain": "Flaches Gelände in der unteren linken Ecke, über den Rest des Schlachtfelds {6,0}. Am oberen Rand und bis in die Mitte hinunter {1,4}; der einzige Weg nach rechts ist {9,2}.",
+  "attacker": "Die Aufstellungspunkte des Angreifers füllen das flache Gelände in der unteren linken Ecke.",
+  "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über das rechte Drittel, über {9,2} hinaus, wo {6,0} sie trägt."
+}

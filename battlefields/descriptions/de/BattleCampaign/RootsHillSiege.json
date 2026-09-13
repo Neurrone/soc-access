@@ -1,0 +1,5 @@
+{
+  "terrain": "{0,0} bedeckt das ganze Schlachtfeld; unten links {2,2} und links in der Mitte {2,5} durchbrechen sie und lassen je eine Gasse am oberen Rand, am unteren Rand und quer durch die Mitte. Die obere und die untere Gasse enden in der Mitte, und nur die mittlere führt weiter nach rechts, wo {11,3} und {11,5} den Rand in Nischen zerschneiden.",
+  "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang.",
+  "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über das rechte Drittel, drei davon dicht am rechten Rand."
+}

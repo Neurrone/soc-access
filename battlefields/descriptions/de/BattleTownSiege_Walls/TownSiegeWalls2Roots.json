@@ -1,0 +1,5 @@
+{
+  "terrain": "Ein Wassergraben zieht sich von der oberen linken Ecke bis unten in die Mitte, und die einzige Überquerung ist {5,4}, das Tor in der Mitte. Rechts davon stehen die Mauern des Verteidigers: eine am oberen Rand entlang zwischen einem Turm an ihrem linken Ende und einem weiteren oben in der Mitte, ein kurzes Stück an jedem Ende des Wassergrabens, auf der Stadtseite von zwei Türmen flankiert, und eine weitere um die untere rechte Ecke herum mit zwei Türmen. Treppen führen oben links, oben in der Mitte, oben rechts, unten in der Mitte und unten rechts auf die Mauern hinauf.",
+  "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, auf offenem Gelände außerhalb des Wassergrabens.",
+  "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über die Stadt, sieben davon auf den Türmen und Mauern."
+}

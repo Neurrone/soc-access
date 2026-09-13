@@ -1,0 +1,5 @@
+{
+  "terrain": "Flaches Gelände quer durch die Mitte, am oberen Rand entlang {0,6} und am unteren Rand entlang {0,0}.",
+  "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang; {0,6} trägt drei davon und {0,0} drei.",
+  "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang; {0,6} trägt drei davon und {0,0} drei."
+}

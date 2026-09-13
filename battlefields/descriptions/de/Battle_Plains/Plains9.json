@@ -1,0 +1,5 @@
+{
+  "terrain": "Flaches Gelände über das ganze Schlachtfeld, oben links {1,7}, oben in der Mitte {8,6}, unten links {3,1} und unten rechts {10,0}.",
+  "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, und {1,7} trägt zwei davon.",
+  "defender": "Die Aufstellungspunkte des Verteidigers ziehen sich am rechten Rand entlang, und {10,0} trägt zwei davon."
+}
