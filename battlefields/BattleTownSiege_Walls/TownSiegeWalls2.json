@@ -16,6 +16,7 @@
   "context": {
     "whenChosen": "A siege of a walled town: the defender holds walls, towers and a gate.",
     "coordinates": "x runs 0 to width-1 from left to right as the picture shows it; y runs 0 to height-1 from the bottom (nearest the viewer) to the top. Odd rows sit half a cell to the right of even rows, which the mod speaks as x.5 (the 'spoken' fields), so the JSON and the picture agree with what the player hears.",
+    "grid": "This file was written without the preview render, so a cell is on the hex grid when the map holds the point and the point is not the last column of an odd row, which sits half a cell right and hangs off the board - the same answer the renderer gives on every layout it has drawn. The .jpg beside it is the one the last pictured dump wrote and is unchanged.",
     "picture": "The image is the game's own deployment preview: light flat hexes are walkable ground, taller blocks are elevated ground (height = elevation), hatched or dark cells are blocked, missing cells are water. Blue markers are attacker spawn points, red markers are defender spawn points; a different marker shape means a 'Defence' spawn (siege engines).",
     "movement": "Troops step between neighbouring cells only when the elevation differs by at most 1; a bigger step is a cliff (listed per cell under cliffNeighbours as the spoken coordinate of the neighbour that cannot be reached directly). Water and impassable cells cannot be entered. Higher ground gives melee and ranged bonuses.",
     "vocabulary": "A description never names a feature in words: it writes the placeholder of a group in regions or chokePoints - the raw coordinates of one of its cells, also listed under points - and the mod replaces it with what that ground is when it speaks, shape, height and, in a fight, what is standing on it. The label is what the mod's scanner says for the group, to tell one group from another while writing; it is never copied into a description.",
@@ -25,46 +26,61 @@
   "regions": [
     {
       "placeholder": "{0,0}",
-      "label": "impassable, 2 cells",
+      "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Rock",
       "shape": "None",
-      "cells": 2,
+      "cells": 1,
       "height": 0,
       "position": "bottom left",
       "points": [
-        "0,0",
+        "0,0"
+      ],
+      "spoken": [
+        "0, 0"
+      ]
+    },
+    {
+      "placeholder": "{1,0}",
+      "label": "impassable",
+      "kind": "Impassable",
+      "obstacle": "Fire",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "bottom left",
+      "points": [
         "1,0"
       ],
       "spoken": [
-        "0, 0",
         "1, 0"
       ]
     },
     {
       "placeholder": "{6,0}",
-      "label": "impassable, 4 cells",
+      "label": "wall of 3 impassable cells",
       "kind": "Impassable",
-      "shape": "None",
-      "cells": 4,
-      "height": 3,
+      "obstacle": "Water",
+      "shape": "DiagonalRidge",
+      "cells": 3,
+      "height": 0,
       "position": "bottom centre",
       "points": [
         "6,0",
         "5,1",
-        "5,2",
-        "5,3"
+        "5,2"
       ],
       "spoken": [
         "6, 0",
         "5.5, 1",
-        "5, 2",
-        "5.5, 3"
+        "5, 2"
       ]
     },
     {
       "placeholder": "{10,0}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Fire",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -80,6 +96,7 @@
       "placeholder": "{3,1}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Fire",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -95,6 +112,7 @@
       "placeholder": "{7,1}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Light",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -110,6 +128,7 @@
       "placeholder": "{0,2}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Growth",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -125,6 +144,7 @@
       "placeholder": "{2,2}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Growth",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -137,23 +157,68 @@
       ]
     },
     {
-      "placeholder": "{3,5}",
-      "label": "wall of 5 impassable cells",
+      "placeholder": "{5,3}",
+      "label": "impassable",
       "kind": "Impassable",
-      "shape": "DiagonalRidge",
-      "cells": 5,
+      "obstacle": "Gatepost",
+      "shape": "None",
+      "cells": 1,
       "height": 3,
+      "position": "centre",
+      "points": [
+        "5,3"
+      ],
+      "spoken": [
+        "5.5, 3"
+      ]
+    },
+    {
+      "placeholder": "{3,5}",
+      "label": "impassable",
+      "kind": "Impassable",
+      "obstacle": "Fire",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "middle left",
+      "points": [
+        "3,5"
+      ],
+      "spoken": [
+        "3.5, 5"
+      ]
+    },
+    {
+      "placeholder": "{4,5}",
+      "label": "impassable",
+      "kind": "Impassable",
+      "obstacle": "Gatepost",
+      "shape": "None",
+      "cells": 1,
+      "height": 3,
+      "position": "middle left",
+      "points": [
+        "4,5"
+      ],
+      "spoken": [
+        "4.5, 5"
+      ]
+    },
+    {
+      "placeholder": "{3,6}",
+      "label": "wall of 3 impassable cells",
+      "kind": "Impassable",
+      "obstacle": "Water",
+      "shape": "DiagonalRidge",
+      "cells": 3,
+      "height": 0,
       "position": "top left",
       "points": [
-        "3,5",
-        "4,5",
         "3,6",
         "2,7",
         "2,8"
       ],
       "spoken": [
-        "3.5, 5",
-        "4.5, 5",
         "3, 6",
         "2.5, 7",
         "2, 8"
@@ -163,6 +228,7 @@
       "placeholder": "{10,7}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Light",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -178,6 +244,7 @@
       "placeholder": "{0,8}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Growth",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -193,6 +260,7 @@
       "placeholder": "{6,8}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Fire",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -208,6 +276,7 @@
       "placeholder": "{12,0}",
       "label": "wall of 1 cell, height 2",
       "kind": "Wall",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 2,
@@ -223,6 +292,7 @@
       "placeholder": "{6,1}",
       "label": "wall of 1 cell, height 2",
       "kind": "Wall",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 2,
@@ -238,6 +308,7 @@
       "placeholder": "{10,1}",
       "label": "wall of 1 cell, height 2",
       "kind": "Wall",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 2,
@@ -253,6 +324,7 @@
       "placeholder": "{3,7}",
       "label": "wall of 1 cell, height 2",
       "kind": "Wall",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 2,
@@ -268,6 +340,7 @@
       "placeholder": "{7,7}",
       "label": "wall of 6 cells, height 2",
       "kind": "Wall",
+      "obstacle": null,
       "shape": "None",
       "cells": 6,
       "height": 2,
@@ -293,6 +366,7 @@
       "placeholder": "{7,0}",
       "label": "tower, height 3",
       "kind": "Tower",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 3,
@@ -308,6 +382,7 @@
       "placeholder": "{11,0}",
       "label": "tower, height 3",
       "kind": "Tower",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 3,
@@ -323,6 +398,7 @@
       "placeholder": "{6,2}",
       "label": "tower, height 3",
       "kind": "Tower",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 3,
@@ -338,6 +414,7 @@
       "placeholder": "{10,2}",
       "label": "tower, height 3",
       "kind": "Tower",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 3,
@@ -353,6 +430,7 @@
       "placeholder": "{4,6}",
       "label": "tower, height 3",
       "kind": "Tower",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 3,
@@ -368,6 +446,7 @@
       "placeholder": "{8,6}",
       "label": "tower, height 3",
       "kind": "Tower",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 3,
@@ -383,6 +462,7 @@
       "placeholder": "{3,8}",
       "label": "tower, height 3",
       "kind": "Tower",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 3,
@@ -398,6 +478,7 @@
       "placeholder": "{7,8}",
       "label": "tower, height 3",
       "kind": "Tower",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 3,
@@ -413,6 +494,7 @@
       "placeholder": "{11,1}",
       "label": "stairs, height 1",
       "kind": "Stairs",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 1,
@@ -428,6 +510,7 @@
       "placeholder": "{7,2}",
       "label": "stairs, height 1",
       "kind": "Stairs",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 1,
@@ -443,6 +526,7 @@
       "placeholder": "{8,7}",
       "label": "stairs, height 1",
       "kind": "Stairs",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 1,
@@ -458,6 +542,7 @@
       "placeholder": "{11,7}",
       "label": "stairs, height 1",
       "kind": "Stairs",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 1,
@@ -473,6 +558,7 @@
       "placeholder": "{4,8}",
       "label": "stairs, height 1",
       "kind": "Stairs",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 1,
@@ -490,6 +576,7 @@
       "placeholder": "{11,2}",
       "label": "choke point, 4 cells",
       "kind": "ChokePoint",
+      "obstacle": null,
       "shape": "None",
       "cells": 4,
       "height": 0,
@@ -511,6 +598,7 @@
       "placeholder": "{4,3}",
       "label": "choke point, 2 cells",
       "kind": "ChokePoint",
+      "obstacle": null,
       "shape": "None",
       "cells": 2,
       "height": 0,
@@ -528,6 +616,7 @@
       "placeholder": "{5,4}",
       "label": "choke point",
       "kind": "ChokePoint",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -543,6 +632,7 @@
       "placeholder": "{6,4}",
       "label": "choke point, 2 cells",
       "kind": "ChokePoint",
+      "obstacle": null,
       "shape": "None",
       "cells": 2,
       "height": 0,
@@ -560,6 +650,7 @@
       "placeholder": "{5,6}",
       "label": "choke point, 3 cells",
       "kind": "ChokePoint",
+      "obstacle": null,
       "shape": "None",
       "cells": 3,
       "height": 0,

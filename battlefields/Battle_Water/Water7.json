@@ -16,6 +16,7 @@
   "context": {
     "whenChosen": "A field battle beside water: more than 15% of the adventure tiles within two of the defender are water.",
     "coordinates": "x runs 0 to width-1 from left to right as the picture shows it; y runs 0 to height-1 from the bottom (nearest the viewer) to the top. Odd rows sit half a cell to the right of even rows, which the mod speaks as x.5 (the 'spoken' fields), so the JSON and the picture agree with what the player hears.",
+    "grid": "This file was written without the preview render, so a cell is on the hex grid when the map holds the point and the point is not the last column of an odd row, which sits half a cell right and hangs off the board - the same answer the renderer gives on every layout it has drawn. The .jpg beside it is the one the last pictured dump wrote and is unchanged.",
     "picture": "The image is the game's own deployment preview: light flat hexes are walkable ground, taller blocks are elevated ground (height = elevation), hatched or dark cells are blocked, missing cells are water. Blue markers are attacker spawn points, red markers are defender spawn points; a different marker shape means a 'Defence' spawn (siege engines).",
     "movement": "Troops step between neighbouring cells only when the elevation differs by at most 1; a bigger step is a cliff (listed per cell under cliffNeighbours as the spoken coordinate of the neighbour that cannot be reached directly). Water and impassable cells cannot be entered. Higher ground gives melee and ranged bonuses.",
     "vocabulary": "A description never names a feature in words: it writes the placeholder of a group in regions or chokePoints - the raw coordinates of one of its cells, also listed under points - and the mod replaces it with what that ground is when it speaks, shape, height and, in a fight, what is standing on it. The label is what the mod's scanner says for the group, to tell one group from another while writing; it is never copied into a description.",
@@ -27,6 +28,7 @@
       "placeholder": "{4,1}",
       "label": "patch of 14 cells, height 1",
       "kind": "Elevated",
+      "obstacle": null,
       "shape": "Patch",
       "cells": 14,
       "height": 1,
@@ -66,10 +68,11 @@
     },
     {
       "placeholder": "{7,0}",
-      "label": "impassable, 7 cells",
+      "label": "impassable, 5 cells",
       "kind": "Impassable",
+      "obstacle": "Water",
       "shape": "None",
-      "cells": 7,
+      "cells": 5,
       "height": 0,
       "position": "bottom centre",
       "points": [
@@ -77,24 +80,21 @@
         "8,0",
         "9,0",
         "7,1",
-        "8,1",
-        "9,2",
-        "9,3"
+        "8,1"
       ],
       "spoken": [
         "7, 0",
         "8, 0",
         "9, 0",
         "7.5, 1",
-        "8.5, 1",
-        "9, 2",
-        "9.5, 3"
+        "8.5, 1"
       ]
     },
     {
       "placeholder": "{2,2}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Water",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -107,9 +107,42 @@
       ]
     },
     {
+      "placeholder": "{9,2}",
+      "label": "impassable",
+      "kind": "Impassable",
+      "obstacle": "Growth",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "bottom right",
+      "points": [
+        "9,2"
+      ],
+      "spoken": [
+        "9, 2"
+      ]
+    },
+    {
+      "placeholder": "{9,3}",
+      "label": "impassable",
+      "kind": "Impassable",
+      "obstacle": "Water",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "middle right",
+      "points": [
+        "9,3"
+      ],
+      "spoken": [
+        "9.5, 3"
+      ]
+    },
+    {
       "placeholder": "{1,4}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Water",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -125,6 +158,7 @@
       "placeholder": "{11,4}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Water",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -138,10 +172,11 @@
     },
     {
       "placeholder": "{3,5}",
-      "label": "wall of 24 impassable cells",
+      "label": "wall of 21 impassable cells",
       "kind": "Impassable",
+      "obstacle": "Water",
       "shape": "Ridge",
-      "cells": 24,
+      "cells": 21,
       "height": 0,
       "position": "top centre",
       "points": [
@@ -150,12 +185,9 @@
         "3,6",
         "4,6",
         "5,6",
-        "9,6",
         "3,7",
         "4,7",
         "5,7",
-        "7,7",
-        "8,7",
         "0,8",
         "1,8",
         "2,8",
@@ -176,12 +208,9 @@
         "3, 6",
         "4, 6",
         "5, 6",
-        "9, 6",
         "3.5, 7",
         "4.5, 7",
         "5.5, 7",
-        "7.5, 7",
-        "8.5, 7",
         "0, 8",
         "1, 8",
         "2, 8",
@@ -196,6 +225,54 @@
         "11, 8",
         "12, 8"
       ]
+    },
+    {
+      "placeholder": "{9,6}",
+      "label": "impassable",
+      "kind": "Impassable",
+      "obstacle": "Growth",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "top right",
+      "points": [
+        "9,6"
+      ],
+      "spoken": [
+        "9, 6"
+      ]
+    },
+    {
+      "placeholder": "{7,7}",
+      "label": "impassable",
+      "kind": "Impassable",
+      "obstacle": "Growth",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "top centre",
+      "points": [
+        "7,7"
+      ],
+      "spoken": [
+        "7.5, 7"
+      ]
+    },
+    {
+      "placeholder": "{8,7}",
+      "label": "impassable",
+      "kind": "Impassable",
+      "obstacle": "Manufactured",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "top centre",
+      "points": [
+        "8,7"
+      ],
+      "spoken": [
+        "8.5, 7"
+      ]
     }
   ],
   "chokePoints": [
@@ -203,6 +280,7 @@
       "placeholder": "{10,3}",
       "label": "choke point, 2 cells",
       "kind": "ChokePoint",
+      "obstacle": null,
       "shape": "None",
       "cells": 2,
       "height": 0,
@@ -220,6 +298,7 @@
       "placeholder": "{9,4}",
       "label": "choke point, 4 cells",
       "kind": "ChokePoint",
+      "obstacle": null,
       "shape": "None",
       "cells": 4,
       "height": 0,

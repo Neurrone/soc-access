@@ -16,6 +16,7 @@
   "context": {
     "whenChosen": "The generic field battle, used when no terrain-specific type has a layout.",
     "coordinates": "x runs 0 to width-1 from left to right as the picture shows it; y runs 0 to height-1 from the bottom (nearest the viewer) to the top. Odd rows sit half a cell to the right of even rows, which the mod speaks as x.5 (the 'spoken' fields), so the JSON and the picture agree with what the player hears.",
+    "grid": "This file was written without the preview render, so a cell is on the hex grid when the map holds the point and the point is not the last column of an odd row, which sits half a cell right and hangs off the board - the same answer the renderer gives on every layout it has drawn. The .jpg beside it is the one the last pictured dump wrote and is unchanged.",
     "picture": "The image is the game's own deployment preview: light flat hexes are walkable ground, taller blocks are elevated ground (height = elevation), hatched or dark cells are blocked, missing cells are water. Blue markers are attacker spawn points, red markers are defender spawn points; a different marker shape means a 'Defence' spawn (siege engines).",
     "movement": "Troops step between neighbouring cells only when the elevation differs by at most 1; a bigger step is a cliff (listed per cell under cliffNeighbours as the spoken coordinate of the neighbour that cannot be reached directly). Water and impassable cells cannot be entered. Higher ground gives melee and ranged bonuses.",
     "vocabulary": "A description never names a feature in words: it writes the placeholder of a group in regions or chokePoints - the raw coordinates of one of its cells, also listed under points - and the mod replaces it with what that ground is when it speaks, shape, height and, in a fight, what is standing on it. The label is what the mod's scanner says for the group, to tell one group from another while writing; it is never copied into a description.",
@@ -27,6 +28,7 @@
       "placeholder": "{7,0}",
       "label": "cliff of 17 cells",
       "kind": "Cliff",
+      "obstacle": null,
       "shape": "None",
       "cells": 17,
       "height": 2,
@@ -74,6 +76,7 @@
       "placeholder": "{12,0}",
       "label": "unreachable ground",
       "kind": "Unreachable",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -89,6 +92,7 @@
       "placeholder": "{12,8}",
       "label": "unreachable ground",
       "kind": "Unreachable",
+      "obstacle": null,
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -104,6 +108,7 @@
       "placeholder": "{6,0}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Light",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -119,6 +124,7 @@
       "placeholder": "{1,1}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Water",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -134,6 +140,7 @@
       "placeholder": "{7,1}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Rock",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -147,25 +154,25 @@
     },
     {
       "placeholder": "{10,1}",
-      "label": "impassable, 2 cells",
+      "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Growth",
       "shape": "None",
-      "cells": 2,
+      "cells": 1,
       "height": 0,
       "position": "bottom right",
       "points": [
-        "10,1",
-        "11,2"
+        "10,1"
       ],
       "spoken": [
-        "10.5, 1",
-        "11, 2"
+        "10.5, 1"
       ]
     },
     {
       "placeholder": "{5,2}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Manufactured",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -178,9 +185,26 @@
       ]
     },
     {
+      "placeholder": "{11,2}",
+      "label": "impassable",
+      "kind": "Impassable",
+      "obstacle": "Rock",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "bottom right",
+      "points": [
+        "11,2"
+      ],
+      "spoken": [
+        "11, 2"
+      ]
+    },
+    {
       "placeholder": "{6,3}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Manufactured",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -196,6 +220,7 @@
       "placeholder": "{9,4}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Manufactured",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -211,6 +236,7 @@
       "placeholder": "{11,4}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Rock",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -226,6 +252,7 @@
       "placeholder": "{6,5}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Manufactured",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -241,6 +268,7 @@
       "placeholder": "{3,6}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Water",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -256,6 +284,7 @@
       "placeholder": "{5,6}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Manufactured",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -269,27 +298,25 @@
     },
     {
       "placeholder": "{11,6}",
-      "label": "impassable, 3 cells",
+      "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Growth",
       "shape": "None",
-      "cells": 3,
+      "cells": 1,
       "height": 0,
       "position": "top right",
       "points": [
-        "11,6",
-        "9,7",
-        "10,7"
+        "11,6"
       ],
       "spoken": [
-        "11, 6",
-        "9.5, 7",
-        "10.5, 7"
+        "11, 6"
       ]
     },
     {
       "placeholder": "{7,7}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Rock",
       "shape": "None",
       "cells": 1,
       "height": 0,
@@ -302,9 +329,42 @@
       ]
     },
     {
+      "placeholder": "{9,7}",
+      "label": "impassable",
+      "kind": "Impassable",
+      "obstacle": "Manufactured",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "top right",
+      "points": [
+        "9,7"
+      ],
+      "spoken": [
+        "9.5, 7"
+      ]
+    },
+    {
+      "placeholder": "{10,7}",
+      "label": "impassable",
+      "kind": "Impassable",
+      "obstacle": "Rock",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "top right",
+      "points": [
+        "10,7"
+      ],
+      "spoken": [
+        "10.5, 7"
+      ]
+    },
+    {
       "placeholder": "{6,8}",
       "label": "impassable",
       "kind": "Impassable",
+      "obstacle": "Light",
       "shape": "None",
       "cells": 1,
       "height": 0,
