@@ -1,5 +1,5 @@
 {
-  "terrain": "Terreno aperto al centro e a destra, con {4,4} al centro e {11,3} al centro a destra, e dirupi in alto a sinistra e in alto al centro. La parte in basso a sinistra e il bordo sinistro, dove si arriva solo per {5,3}, sono occupati da {0,0}, e gran parte del bordo superiore è chiusa da {9,6}.",
+  "terrain": "Terreno aperto al centro e a destra, con {4,4} al centro e {11,3} al centro a destra, e dirupi in alto a sinistra e in alto al centro. La parte in basso a sinistra e il bordo sinistro, dove si arriva solo per {5,3}, sono occupati da {0,0}, e gran parte del bordo superiore è chiusa da {5,8} e {9,6}.",
   "attacker": "I punti di schieramento dell'attaccante si distribuiscono nella parte sinistra del campo, uno di essi su {0,0} e uno su {4,4}.",
   "defender": "I punti di schieramento del difensore si distribuiscono nella parte destra del campo, tutti su terreno aperto."
 }

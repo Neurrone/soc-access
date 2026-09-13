@@ -8,7 +8,7 @@
       "defender": "I punti di schieramento del difensore si raccolgono al centro a destra, dentro i dirupi."
     },
     "Battle/Fight1": {
-      "terrain": "Terreno pianeggiante nell'angolo in basso a sinistra, con {6,0} sul resto del campo. Il bordo superiore e il centro sono sbarrati da {1,4}, e verso destra si passa solo per {9,2}.",
+      "terrain": "Terreno pianeggiante nell'angolo in basso a sinistra, con {6,0} sul resto del campo. Il bordo superiore è sbarrato da {0,5}, e verso destra si passa solo per {9,2}.",
       "attacker": "I punti di schieramento dell'attaccante riempiono il terreno pianeggiante nell'angolo in basso a sinistra.",
       "defender": "I punti di schieramento del difensore si distribuiscono nel terzo destro, su {6,0} oltre {9,2}."
     },
@@ -18,27 +18,27 @@
       "defender": "I punti di schieramento del difensore si distribuiscono nella parte destra del campo, tutti su {5,0}."
     },
     "Battle/Fight3": {
-      "terrain": "Il terreno aperto corre dal bordo inferiore fino in alto tra {3,0} a sinistra e {8,0} a destra. Il bordo sinistro è chiuso da {0,0} e quello destro da {12,2}.",
+      "terrain": "Il terreno aperto corre dal bordo inferiore fino in alto tra {3,0} a sinistra e {8,0} a destra. Il bordo sinistro è chiuso da {1,0} e {0,3}, e quello destro da {12,2}.",
       "attacker": "I punti di schieramento dell'attaccante corrono lungo la parte alta del campo, sette di essi su {3,0}.",
       "defender": "I punti di schieramento del difensore riempiono la parte in basso a destra, dieci di essi su {8,0}."
     },
     "Battle/Fight4": {
-      "terrain": "Terreno aperto lungo la parte bassa, con {3,6} in salita fino all'angolo in alto a sinistra e {10,6} fino a quello in alto a destra. La parte alta è occupata da {6,4}, e il campo è diviso in una metà sinistra e una metà destra, che si toccano solo a {6,2} in basso al centro.",
+      "terrain": "Terreno aperto lungo la parte bassa, con {3,6} in salita fino all'angolo in alto a sinistra e {10,6} fino a quello in alto a destra. La parte alta è occupata da {4,5}, e la metà sinistra e la metà destra del campo si toccano solo a {5,2} in basso al centro.",
       "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro, nella metà sinistra.",
       "defender": "I punti di schieramento del difensore corrono lungo il bordo destro, due di essi su {10,6}."
     },
     "Battle/Fight5": {
-      "terrain": "Terreno aperto a sinistra, con {2,1} sul centro e sulla destra. La parte in alto al centro è chiusa da {6,5} e il bordo inferiore da {0,0}, con {5,3} tra loro al centro.",
+      "terrain": "Terreno aperto a sinistra, con {2,1} sul centro e sulla destra. La parte in alto al centro è chiusa da {5,7} e il bordo inferiore da {0,0} e {10,0}, con {5,3} tra loro al centro.",
       "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro, uno di essi su {2,1}.",
       "defender": "I punti di schieramento del difensore si distribuiscono nel terzo destro, tutti su {2,1}."
     },
     "Battle/Fight6": {
-      "terrain": "Terreno aperto al centro, con {1,1} in basso a sinistra, {9,1} in basso a destra, {1,6} in alto a sinistra e {11,6} in alto a destra. A sinistra e a destra del centro si trovano {3,3} e {8,3}.",
+      "terrain": "Terreno aperto al centro, con {1,1} in basso a sinistra, {9,1} in basso a destra, {1,6} in alto a sinistra e {11,6} in alto a destra. A sinistra e a destra del centro il terreno è occupato da {3,3} e {9,4}.",
       "attacker": "I punti di schieramento dell'attaccante sono raccolti al centro del campo.",
       "defender": "I punti di schieramento del difensore circondano quelli dell'attaccante, due in ogni angolo e uno in basso al centro."
     },
     "Battle/Hideout": {
-      "terrain": "Terreno aperto con {5,0} in basso al centro, {6,6} in alto al centro e {12,2} al centro a destra. La parte in basso a sinistra è bloccata da {2,0} e quella in alto a sinistra da {1,6}, e nell'angolo in alto a sinistra si entra solo per {0,5}.",
+      "terrain": "Terreno aperto con {5,0} in basso al centro, {6,6} in alto al centro e {12,2} al centro a destra. L'angolo in alto a sinistra è chiuso da {3,6} e {3,7}, e vi si entra solo per {0,5}.",
       "attacker": "I punti di schieramento dell'attaccante corrono attraverso il centro del campo.",
       "defender": "I punti di schieramento del difensore circondano quelli dell'attaccante, due su {5,0}, due su {6,6} e cinque su {12,2}."
     },
@@ -53,7 +53,7 @@
       "defender": "I punti di schieramento del difensore si distribuiscono al centro e a destra, uno su {5,5}, uno su {8,7} e uno su {9,3}."
     },
     "Battle/TrailerBattle": {
-      "terrain": "Terreno aperto al centro e a destra, con {4,4} al centro e {11,3} al centro a destra, e dirupi in alto a sinistra e in alto al centro. La parte in basso a sinistra e il bordo sinistro, dove si arriva solo per {5,3}, sono occupati da {0,0}, e gran parte del bordo superiore è chiusa da {9,6}.",
+      "terrain": "Terreno aperto al centro e a destra, con {4,4} al centro e {11,3} al centro a destra, e dirupi in alto a sinistra e in alto al centro. La parte in basso a sinistra e il bordo sinistro, dove si arriva solo per {5,3}, sono occupati da {0,0}, e gran parte del bordo superiore è chiusa da {5,8} e {9,6}.",
       "attacker": "I punti di schieramento dell'attaccante si distribuiscono nella parte sinistra del campo, uno di essi su {0,0} e uno su {4,4}.",
       "defender": "I punti di schieramento del difensore si distribuiscono nella parte destra del campo, tutti su terreno aperto."
     },
@@ -113,7 +113,7 @@
       "defender": "I punti di schieramento del difensore corrono lungo il bordo destro, tre di essi su {10,5} e uno su {8,0}."
     },
     "Battle_Plains/Plains": {
-      "terrain": "Terreno aperto su tutto il campo, con {4,1} e {7,1} vicino al bordo inferiore e {6,4} al centro. In alto al centro il terreno è interrotto da {6,6}.",
+      "terrain": "Terreno aperto su tutto il campo, con {4,1} e {7,1} vicino al bordo inferiore e {6,4} al centro. In alto al centro il terreno è interrotto da {5,7}.",
       "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro, tutti su terreno pianeggiante.",
       "defender": "I punti di schieramento del difensore corrono lungo il bordo destro, tutti su terreno pianeggiante."
     },
@@ -193,7 +193,7 @@
       "defender": "I punti di schieramento del difensore corrono lungo il bordo destro, a destra di {4,2} e {4,5}."
     },
     "Battle_Water/water3": {
-      "terrain": "Terreno aperto con {3,6} attraverso la parte in alto a sinistra e {8,6} attraverso quella in alto a destra, e nel terreno tra loro si entra solo per {6,5}. La parte bassa del campo è interrotta da {2,0} a sinistra, {8,0} al centro e {5,2} tra loro.",
+      "terrain": "Terreno aperto con {3,6} attraverso la parte in alto a sinistra, {6,6} attraverso quella in alto al centro e {8,6} attraverso quella in alto a destra, e nel terreno tra loro si entra solo per {6,5}. La parte bassa del campo è interrotta da {2,0} a sinistra, {8,0} al centro e {6,2} tra loro.",
       "attacker": "I punti di schieramento dell'attaccante si distribuiscono nel terzo sinistro.",
       "defender": "I punti di schieramento del difensore si distribuiscono nel terzo destro."
     },
@@ -203,7 +203,7 @@
       "defender": "I punti di schieramento del difensore corrono lungo il bordo destro, sei di essi su {10,3}."
     },
     "Battle_Water/Water5": {
-      "terrain": "Terreno aperto con {3,1} in basso a sinistra e {8,4} al centro. Il centro è bloccato da {4,2} e lo si aggira sopra o sotto, con {0,6} nell'angolo in alto a sinistra e {10,0} in basso a destra.",
+      "terrain": "Terreno aperto con {3,1} in basso a sinistra e {8,4} al centro. Il centro è bloccato da {5,3} e lo si aggira sopra o sotto, con {0,6} nell'angolo in alto a sinistra e {10,0} in basso a destra.",
       "attacker": "I punti di schieramento dell'attaccante si distribuiscono nella metà sinistra, tutti su terreno pianeggiante.",
       "defender": "I punti di schieramento del difensore si distribuiscono nella metà destra, tutti su terreno pianeggiante."
     },
@@ -223,12 +223,12 @@
       "defender": "I punti di schieramento del difensore corrono lungo la parte destra del campo."
     },
     "Battle_Woods/Woods1": {
-      "terrain": "Terreno aperto con {8,4} attraverso il centro, {0,3} al centro a sinistra e {11,4} al centro a destra. La parte in alto a sinistra è bloccata da {2,7} e quella in alto a destra da {9,7}.",
+      "terrain": "Terreno aperto con {8,4} attraverso il centro, {0,3} al centro a sinistra e {11,4} al centro a destra. La parte in alto a sinistra è bloccata da {2,8} e quella in alto a destra da {9,7}.",
       "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro, uno di essi su {0,3}.",
       "defender": "I punti di schieramento del difensore corrono lungo il bordo destro, uno di essi su {11,4}."
     },
     "Battle_Woods/Woods2": {
-      "terrain": "Terreno aperto con {5,0} in basso al centro, {5,6} in alto al centro e {0,7} nell'angolo in alto a sinistra, quasi del tutto chiuso da {1,7}. La parte in basso al centro è bloccata da {9,2}.",
+      "terrain": "Terreno aperto con {5,0} in basso al centro, {5,6} in alto al centro e {0,7} nell'angolo in alto a sinistra, quasi del tutto chiuso da {1,8}. La parte in basso al centro è bloccata da {9,2}.",
       "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro, uno di essi su {0,7}.",
       "defender": "I punti di schieramento del difensore corrono lungo il bordo destro, tutti su terreno pianeggiante."
     },
@@ -258,7 +258,7 @@
       "defender": "I punti di schieramento del difensore corrono dall'alto in basso lungo il lato destro."
     },
     "Battle_Woods/Woods8": {
-      "terrain": "Terreno aperto con {5,3} al centro del campo. Ai suoi lati ci sono {2,1}, a sinistra e più in basso, e {7,3}, a destra e più in alto.",
+      "terrain": "Terreno aperto con {5,3} al centro del campo. Il terreno alla sua sinistra e più in basso è occupato da {5,2}, quello alla sua destra e più in alto da {7,3}.",
       "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro.",
       "defender": "I punti di schieramento del difensore corrono lungo il bordo destro."
     },
@@ -318,7 +318,7 @@
       "defender": "I punti di schieramento del difensore si distribuiscono nella parte destra del campo, uno di essi su {8,6} e uno su {8,2}."
     },
     "BattleCampaign/WieshFight": {
-      "terrain": "Terreno aperto con {4,7} e {8,5} in alto al centro e {8,0} in basso al centro. L'angolo in basso a destra è bloccato da {10,0} e quello in alto a destra da {10,6}, e al di là ci sono dirupi lungo il bordo destro.",
+      "terrain": "Terreno aperto con {4,7} e {8,5} in alto al centro e {8,0} in basso al centro. L'angolo in basso a destra è bloccato da {11,0} e quello in alto a destra da {11,6}, e al di là ci sono dirupi lungo il bordo destro.",
       "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro.",
       "defender": "I punti di schieramento del difensore corrono lungo la parte destra del campo, due di essi su {8,5} e uno su {8,0}."
     },
@@ -328,7 +328,7 @@
       "defender": "I punti di schieramento del difensore si distribuiscono al centro e a destra, sei di essi sulle torri e sui muri."
     },
     "BattleSmallSettlementSiege/SmallSettlementSiege": {
-      "terrain": "Terreno aperto a sinistra, con le torri del difensore in alto al centro e in basso al centro, le scale che salgono a ciascuna dal bordo accanto, e un muro tra loro al centro. Dietro il muro ci sono {9,5} al centro a destra e {8,0} in basso a destra. Gli angoli in alto a sinistra e in alto a destra sono chiusi da {0,6} e {12,6}.",
+      "terrain": "Terreno aperto a sinistra, con le torri del difensore in alto al centro e in basso al centro, le scale che salgono a ciascuna dal bordo accanto, e un muro tra loro al centro. Dietro il muro ci sono {9,5} al centro a destra e {8,0} in basso a destra. Gli angoli in alto a sinistra e in alto a destra sono chiusi da {0,8} e {11,8}.",
       "attacker": "I punti di schieramento dell'attaccante si distribuiscono nel terzo sinistro, su terreno aperto fuori dalle torri.",
       "defender": "I punti di schieramento del difensore riempiono il centro e la destra, due di essi sulle torri e quattro sul muro."
     },
