@@ -11,12 +11,14 @@ using SongsOfConquest;
 using SongsOfConquest.Client.Deployment;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Common.Details;
+using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Map;
 using SongsOfConquest.Server.Adventure.Map.Provider;
 using SongsOfConquest.Server.Map;
 using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Loader.Dev;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech.Spatial;
 using SongsOfConquestAccess.UI;
 using Unity.Mathematics;
@@ -284,6 +286,128 @@ namespace SongsOfConquestAccess.Dev
                 json = jsonPath,
                 image = imagePath
             };
+        }
+
+        /// <summary>The game's own names for what a battlefield cell can hold: every theme's
+        /// decorations (with their localization key, travel cost and blocking), the effect brushes,
+        /// and the battle map entity blueprints. Research only: what a decoration vocabulary for the
+        /// cursor and the descriptions could be built from.</summary>
+        public static string Vocabulary()
+        {
+            try
+            {
+                CartographyManifest manifest = CartographyManifestLoader.Instance != null ? CartographyManifestLoader.Instance.BattleManifest : null;
+                if (manifest == null)
+                {
+                    return DevJson.Error("no battle manifest loaded");
+                }
+
+                ICartographyManifest contract = manifest;
+                List<object> decorations = new List<object>();
+                for (int theme = 0; theme < 8; theme++)
+                {
+                    ThemeManifest themeManifest = contract.GetTheme(theme) as ThemeManifest;
+                    if (themeManifest == null)
+                    {
+                        continue;
+                    }
+
+                    for (int decoration = 1; decoration < 16; decoration++)
+                    {
+                        ThemeManifest.DecorationManifest entry = themeManifest.GetDecoration(decoration) as ThemeManifest.DecorationManifest;
+                        if (entry == null)
+                        {
+                            continue;
+                        }
+
+                        List<object> brushes = new List<object>();
+                        // The brush types live in Lavapotion.Cartography, which the mod does not
+                        // reference; an array of them is still an array of UnityEngine.Object.
+                        AddBrushes(brushes, "tile", Brushes(entry, "TileBrushes"));
+                        AddBrushes(brushes, "chunk", Brushes(entry, "ChunkBrushes"));
+                        AddBrushes(brushes, "world", Brushes(entry, "WorldBrushes"));
+                        decorations.Add(new
+                        {
+                            theme,
+                            themeName = themeManifest.Name,
+                            decoration,
+                            brushes,
+                            nameKey = entry.NameKey,
+                            name = GameText.Get(entry.NameKey, string.Empty),
+                            travelCost = float.IsPositiveInfinity(entry.TravelCost) ? (float?)null : entry.TravelCost,
+                            blocking = float.IsPositiveInfinity(entry.TravelCost) || entry.TravelCost > 0f
+                        });
+                    }
+                }
+
+                List<object> effects = new List<object>();
+                for (int effect = 1; effect < 16; effect++)
+                {
+                    try
+                    {
+                        BrushSet brush = manifest.GetEffectBrush(effect);
+                        effects.Add(new { effect, name = brush.name, blocking = brush.isBlocking });
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+
+                IMapEntityManifestRetriever manifests = ProjectContext.Instance.Container.TryResolve<IMapEntityManifestRetriever>();
+                List<object> entities = new List<object>();
+                foreach (BattleMapEntities id in Enum.GetValues(typeof(BattleMapEntities)))
+                {
+                    IMapEntityBlueprint blueprint = null;
+                    try { blueprint = manifests != null ? manifests.GetBattleBlueprint(id) : null; } catch (Exception) { }
+                    entities.Add(new
+                    {
+                        id = (int)id,
+                        enumName = id.ToString(),
+                        nameKey = blueprint != null ? blueprint.NameKey : null,
+                        name = blueprint != null ? GameText.Get(blueprint.NameKey, string.Empty) : null
+                    });
+                }
+
+                return JsonConvert.SerializeObject(new { decorations, effects, entities });
+            }
+            catch (Exception e)
+            {
+                return DevJson.Error(e.ToString());
+            }
+        }
+
+        private static UnityEngine.Object[] Brushes(object entry, string property)
+        {
+            PropertyInfo info = entry.GetType().GetProperty(property, BindingFlags.Public | BindingFlags.Instance);
+            return info != null ? info.GetValue(entry, null) as UnityEngine.Object[] : null;
+        }
+
+        /// <summary>A brush asset's name and its editor description, which is the only record of
+        /// what the brush draws (a battle decoration has no localized name).</summary>
+        private static void AddBrushes(List<object> into, string kind, UnityEngine.Object[] brushes)
+        {
+            if (brushes == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < brushes.Length; i++)
+            {
+                UnityEngine.Object brush = brushes[i];
+                if (brush == null)
+                {
+                    continue;
+                }
+
+                FieldInfo description = brush.GetType().GetField("_description", BindingFlags.NonPublic | BindingFlags.Instance);
+                into.Add(new
+                {
+                    kind,
+                    type = brush.GetType().Name,
+                    name = brush.name,
+                    description = description != null ? description.GetValue(brush) as string : null
+                });
+            }
         }
 
         private sealed class Cell
