@@ -1,0 +1,5 @@
+{
+  "terrain": "Flat ground across the board. {11,0} runs from the top edge to the bottom edge down the right side, with cliffs beyond it.",
+  "attacker": "The attacker's spawn points run down the left edge.",
+  "defender": "The defender's spawn points run from top to bottom down the right of the board."
+}

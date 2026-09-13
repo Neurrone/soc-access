@@ -1,0 +1,5 @@
+{
+  "terrain": "Open ground with {8,1} in the bottom right, {9,6} in the top right, and {4,7} in the top centre. {4,0} lies along the bottom edge, and {10,5} is the only way into the top right corner.",
+  "attacker": "The attacker's spawn points are spread down the left of the board, with one on {4,7}.",
+  "defender": "The defender's spawn points run down the right of the board, one on {9,6}, one on {8,1} and one on {10,5}."
+}

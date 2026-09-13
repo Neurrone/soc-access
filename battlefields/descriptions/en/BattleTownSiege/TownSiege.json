@@ -1,0 +1,5 @@
+{
+  "terrain": "Open ground on the left, and the defender holds the town on the right. A tower stands at the top centre and another at the bottom centre, each flanked by a stretch of moat, with stairs up beside each on the town side. Walls stand in the middle right and the bottom right.",
+  "attacker": "The attacker's spawn points run down the left edge.",
+  "defender": "The defender's spawn points spread through the town, one on each tower and four on the walls, two of them siege engine spawns."
+}

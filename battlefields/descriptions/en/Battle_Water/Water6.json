@@ -1,0 +1,5 @@
+{
+  "terrain": "Open ground with {5,2} across the centre of the board, passable above it and below it. In the bottom right, {8,0} leaves {11,2} as the only way into the corner.",
+  "attacker": "The attacker's spawn points run down the left edge.",
+  "defender": "The defender's spawn points run down the right edge, two of them in the corner beyond {11,2}."
+}

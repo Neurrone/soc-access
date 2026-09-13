@@ -1,0 +1,5 @@
+{
+  "terrain": "Flat ground with {0,0} in the bottom left corner and {10,0} in the bottom right. Cliffs run right across the board above the centre, cutting off {3,6} beyond them.",
+  "attacker": "The attacker's spawn points spread across the left third, and two of them stand on {0,0}.",
+  "defender": "The defender's spawn points spread across the right third, and three of them stand on {10,0}."
+}

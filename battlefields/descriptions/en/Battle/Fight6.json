@@ -1,0 +1,5 @@
+{
+  "terrain": "Open ground in the centre with {1,1} in the bottom left, {9,1} in the bottom right, {1,6} in the top left and {11,6} in the top right. {3,3} and {8,3} stand to the left and right of the centre.",
+  "attacker": "The attacker's spawn points are gathered in the centre of the board.",
+  "defender": "The defender's spawn points surround the attacker's, two in each corner and one in the bottom centre."
+}

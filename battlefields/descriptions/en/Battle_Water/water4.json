@@ -1,0 +1,5 @@
+{
+  "terrain": "Open ground between {0,1} on the left and {10,3} on the right. {6,2} and {4,5} sit in the middle of the board with a way through between them.",
+  "attacker": "The attacker's spawn points run down the left edge, six of them on {0,1}.",
+  "defender": "The defender's spawn points run down the right edge, six of them on {10,3}."
+}

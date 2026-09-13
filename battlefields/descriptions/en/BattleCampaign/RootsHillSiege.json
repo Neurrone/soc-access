@@ -1,0 +1,5 @@
+{
+  "terrain": "{0,0} covers the whole board, broken by {2,2} in the bottom left and {2,5} in the middle left, which leave a lane along the top edge, one along the bottom edge and one across the centre. The top and bottom lanes end in the centre and only the middle lane runs on to the right, where the edge is cut into pockets by {11,3} and {11,5}.",
+  "attacker": "The attacker's spawn points run down the left edge.",
+  "defender": "The defender's spawn points spread across the right third, three of them against the right edge."
+}

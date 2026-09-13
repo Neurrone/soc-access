@@ -1,0 +1,5 @@
+{
+  "terrain": "Open ground across the middle, with {2,5} filling the top left, {8,4} the top right, {0,0} the bottom left, {4,1} the bottom centre and {11,0} the bottom right.",
+  "attacker": "The attacker's spawn points run down the left edge, three of them on {2,5} and one on {0,0}.",
+  "defender": "The defender's spawn points run down the right edge, four of them on {8,4} and three on {11,0}."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Flat ground in the bottom left corner, with {6,0} over the rest of the board. The top edge is sealed by {1,4}, which reaches down through the centre and leaves {9,2} as the only way onto the right.",
+  "attacker": "The attacker's spawn points fill the flat ground in the bottom left corner.",
+  "defender": "The defender's spawn points spread across the right third, on {6,0} beyond {9,2}."
+}

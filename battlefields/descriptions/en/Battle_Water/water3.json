@@ -1,0 +1,5 @@
+{
+  "terrain": "Open ground with {3,6} across the top left and {8,6} across the top right, and {6,5} the only way into the ground between them. The bottom of the board is broken by {2,0} on the left, {8,0} in the centre and {5,2} between them.",
+  "attacker": "The attacker's spawn points spread across the left third.",
+  "defender": "The defender's spawn points spread across the right third."
+}

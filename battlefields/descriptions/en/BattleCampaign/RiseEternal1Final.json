@@ -1,0 +1,5 @@
+{
+  "terrain": "Flat ground down the left edge, and {12,0} covers the centre and the right. Cliffs at the top centre, with {10,2} the only way into the bottom right corner and {10,5} the only way into the top right.",
+  "attacker": "The attacker's spawn points run down the left edge, all on the flat ground.",
+  "defender": "The defender's spawn points run down the middle right, all of them on {12,0}."
+}

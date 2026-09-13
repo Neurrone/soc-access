@@ -1,0 +1,5 @@
+{
+  "terrain": "Flat ground fills the middle of the board, with {0,0} round the left edge and {8,0} round the right.",
+  "attacker": "The attacker's spawn points run down the left of the board, six of them on {0,0}.",
+  "defender": "The defender's spawn points run down the right of the board, six of them on {8,0}."
+}

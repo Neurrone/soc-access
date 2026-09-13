@@ -1,0 +1,5 @@
+{
+  "terrain": "Open ground on the left, with the defender's towers in the top centre and the bottom centre, stairs up to each from the edge beside it, and a wall between them in the centre. Behind the wall, {9,5} lies in the middle right and {8,0} in the bottom right. The top left and top right corners are closed by {0,6} and {12,6}.",
+  "attacker": "The attacker's spawn points spread across the left third, on open ground outside the towers.",
+  "defender": "The defender's spawn points fill the centre and the right, two of them on the towers and four on the wall."
+}

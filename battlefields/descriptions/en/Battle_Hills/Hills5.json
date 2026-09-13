@@ -1,0 +1,5 @@
+{
+  "terrain": "Flat ground down the middle, with {1,0} filling the left side and {9,0} the right. Cliffs at the bottom left.",
+  "attacker": "The attacker's spawn points run down the left, all but one on {1,0}.",
+  "defender": "The defender's spawn points run down the right, all but one on {9,0}."
+}

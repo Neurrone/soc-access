@@ -1,0 +1,5 @@
+{
+  "terrain": "Open ground broken by {4,1} in the bottom centre, {5,4} in the centre and {5,6} in the top centre, with lanes past them across the middle and along the top and bottom edges. {3,4} and {9,4} stand on the middle left and the middle right.",
+  "attacker": "The attacker's spawn points run down the left of the board.",
+  "defender": "The defender's spawn points run down the right of the board."
+}
