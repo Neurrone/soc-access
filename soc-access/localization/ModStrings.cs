@@ -128,6 +128,7 @@
             public static readonly ModString DescriptionSingleCell = new ModString("Battlefield.DescriptionSingleCell", "a single cell (height {0})");
             public static readonly ModString DescriptionStairs = new ModString("Battlefield.DescriptionStairs", "stairs (height {0})");
             public static readonly ModString DescriptionTower = new ModString("Battlefield.DescriptionTower", "a tower (height {0})");
+            public static readonly ModString DescriptionUnreachableGround = new ModString("Battlefield.DescriptionUnreachableGround", "unreachable ground");
             public static readonly ModString DescriptionWall = new ModString("Battlefield.DescriptionWall", "a wall (height {0})");
             // WHAT LIES AROUND THE BATTLEFIELD, from the three adventure tiles the game built the
             // battle's scenery from. One clause per kind of ground, naming the directions it lies
@@ -318,6 +319,9 @@
             public static readonly ModString TowerHeight = new ModString("Spatial.TowerHeight", "tower, height {0}");
             public static readonly ModString TurnsIn = new ModString("Spatial.TurnsIn", "in {0} turns");
             public static readonly ModString Unexplored = new ModString("Spatial.Unexplored", "Unexplored");
+            // Walkable ground no troop can ever be standing on, so there is no height worth
+            // saying: nothing will be there to make use of it.
+            public static readonly ModString Unreachable = new ModString("Spatial.Unreachable", "unreachable");
             public static readonly ModString Unseen = new ModString("Spatial.Unseen", "Unseen");
             public static readonly ModString Visited = new ModString("Spatial.Visited", "visited");
             public static readonly ModString Wall = new ModString("Spatial.Wall", "Wall");
@@ -983,7 +987,7 @@
             // tower or a flight of stairs Spatial.TowerHeight and Spatial.StairsHeight: one tower
             // is one tower however many cells it covers.
             public static readonly ModString TerrainChokePoint = new ModString("Scanner.TerrainChokePoint", "choke point");
-            public static readonly ModString TerrainChokePointPair = new ModString("Scanner.TerrainChokePointPair", "choke point, 2 cells");
+            public static readonly ModPluralString TerrainChokePointCells = new ModPluralString("Scanner.TerrainChokePointCells", "choke point, {0} cell", "choke point, {0} cells");
             public static readonly ModString TerrainCliff = new ModString("Scanner.TerrainCliff", "cliff");
             public static readonly ModPluralString TerrainCliffCells = new ModPluralString("Scanner.TerrainCliffCells", "cliff of {0} cell", "cliff of {0} cells");
             public static readonly ModPluralString TerrainImpassableCells = new ModPluralString("Scanner.TerrainImpassableCells", "impassable, {0} cell", "impassable, {0} cells");
@@ -998,6 +1002,8 @@
             public static readonly ModPluralString TerrainRidgeVertical = new ModPluralString("Scanner.TerrainRidgeVertical", "vertical ridge of {0} cell, height {1}", "vertical ridge of {0} cells, height {1}");
             public static readonly ModPluralString TerrainSiegeWall = new ModPluralString("Scanner.TerrainSiegeWall", "wall of {0} cell, height {1}", "wall of {0} cells, height {1}");
             public static readonly ModString TerrainSingleCell = new ModString("Scanner.TerrainSingleCell", "single cell, height {0}");
+            public static readonly ModString TerrainUnreachable = new ModString("Scanner.TerrainUnreachable", "unreachable ground");
+            public static readonly ModPluralString TerrainUnreachableCells = new ModPluralString("Scanner.TerrainUnreachableCells", "unreachable ground, {0} cell", "unreachable ground, {0} cells");
             public static readonly ModString TroopSources = new ModString("Scanner.TroopSources", "Troop sources");
             public static readonly ModString Troops = new ModString("Scanner.Troops", "Troops");
             public static readonly ModString Unexplored = new ModString("Scanner.Unexplored", "Unexplored");

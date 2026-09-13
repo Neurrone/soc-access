@@ -2335,6 +2335,11 @@ msgctxt "Spatial.Unexplored"
 msgid "Unexplored"
 msgstr "Sin explorar"
 
+#. Spatial.Unreachable
+msgctxt "Spatial.Unreachable"
+msgid "unreachable"
+msgstr "inaccesible"
+
 #. Spatial.Unseen
 msgctxt "Spatial.Unseen"
 msgid "Unseen"
@@ -4017,11 +4022,6 @@ msgctxt "Scanner.TerrainChokePoint"
 msgid "choke point"
 msgstr "paso estrecho"
 
-#. Scanner.TerrainChokePointPair
-msgctxt "Scanner.TerrainChokePointPair"
-msgid "choke point, 2 cells"
-msgstr "paso estrecho, 2 casillas"
-
 #. Scanner.TerrainCliff
 msgctxt "Scanner.TerrainCliff"
 msgid "cliff"
@@ -4031,6 +4031,21 @@ msgstr "acantilado"
 msgctxt "Scanner.TerrainSingleCell"
 msgid "single cell, height {0}"
 msgstr "una sola casilla, altura {0}"
+
+#. Scanner.TerrainUnreachable
+msgctxt "Scanner.TerrainUnreachable"
+msgid "unreachable ground"
+msgstr "terreno inaccesible"
+
+#. Scanner.TerrainChokePointCells_0
+msgctxt "Scanner.TerrainChokePointCells_0"
+msgid "choke point, {0} cell"
+msgstr "paso estrecho, {0} casilla"
+
+#. Scanner.TerrainChokePointCells_1
+msgctxt "Scanner.TerrainChokePointCells_1"
+msgid "choke point, {0} cells"
+msgstr "paso estrecho, {0} casillas"
 
 #. Scanner.TerrainCliffCells_0
 msgctxt "Scanner.TerrainCliffCells_0"
@@ -4156,6 +4171,11 @@ msgstr "escaleras (altura {0})"
 msgctxt "Battlefield.DescriptionTower"
 msgid "a tower (height {0})"
 msgstr "una torre (altura {0})"
+
+#. Battlefield.DescriptionUnreachableGround
+msgctxt "Battlefield.DescriptionUnreachableGround"
+msgid "unreachable ground"
+msgstr "terreno inaccesible"
 
 #. Battlefield.DescriptionWall
 msgctxt "Battlefield.DescriptionWall"
@@ -4486,3 +4506,14 @@ msgstr "cresta vertical de {0} casillas, altura {1}"
 msgctxt "Spatial.ImpassableObstacle"
 msgid "{0}, impassable"
 msgstr "{0}, intransitable"
+
+#. Scanner.TerrainUnreachableCells_0
+msgctxt "Scanner.TerrainUnreachableCells_0"
+msgid "unreachable ground, {0} cell"
+msgstr "terreno inaccesible, {0} casilla"
+
+#. Scanner.TerrainUnreachableCells_1
+msgctxt "Scanner.TerrainUnreachableCells_1"
+msgid "unreachable ground, {0} cells"
+msgstr "terreno inaccesible, {0} casillas"
+

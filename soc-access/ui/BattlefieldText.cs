@@ -238,6 +238,8 @@ namespace SongsOfConquestAccess.UI
                     return ModText.Get(ElevatedDescription(region.Shape), region.Height);
                 case BattlefieldRegionKind.Cliff:
                     return ModText.Get(ModStrings.Battlefield.DescriptionCliffs);
+                case BattlefieldRegionKind.Unreachable:
+                    return ModText.Get(ModStrings.Battlefield.DescriptionUnreachableGround);
                 case BattlefieldRegionKind.ChokePoint:
                     return ModText.Get(ModStrings.Battlefield.DescriptionChokePoint);
                 case BattlefieldRegionKind.Impassable:
@@ -328,12 +330,16 @@ namespace SongsOfConquestAccess.UI
                     return region.Count == 1
                         ? ModText.Get(ModStrings.Scanner.TerrainCliff)
                         : ModText.Plural(ModStrings.Scanner.TerrainCliffCells, region.Count, region.Count);
+                case BattlefieldRegionKind.Unreachable:
+                    return region.Count == 1
+                        ? ModText.Get(ModStrings.Scanner.TerrainUnreachable)
+                        : ModText.Plural(ModStrings.Scanner.TerrainUnreachableCells, region.Count, region.Count);
                 case BattlefieldRegionKind.Impassable:
                     return Impassable(region);
                 case BattlefieldRegionKind.ChokePoint:
                     return region.Count == 1
                         ? ModText.Get(ModStrings.Scanner.TerrainChokePoint)
-                        : ModText.Get(ModStrings.Scanner.TerrainChokePointPair);
+                        : ModText.Plural(ModStrings.Scanner.TerrainChokePointCells, region.Count, region.Count);
                 case BattlefieldRegionKind.Wall:
                     return ModText.Plural(
                         ModStrings.Scanner.TerrainSiegeWall, region.Count, region.Count, region.Height);
@@ -555,14 +561,18 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>What the cursor says about the ground of one cell, where the kind alone answers
-        /// it: a cliff, a wall, a tower, stairs. Ordinary raised ground and flat ground are not
-        /// here - the tile formatters say those from the elevation itself.</summary>
+        /// it: a cliff, unreachable ground, a wall, a tower, stairs. Ordinary raised ground and flat
+        /// ground are not here - the tile formatters say those from the elevation itself. The one
+        /// answer with no height in it is unreachable ground, which no troop will ever be standing
+        /// on, and which is the only one of these a cell at height 0 can be.</summary>
         public static string CellGround(BattlefieldCellKind kind, int elevation)
         {
             switch (kind)
             {
                 case BattlefieldCellKind.Cliff:
                     return ModText.Get(ModStrings.Spatial.CliffHeight, elevation);
+                case BattlefieldCellKind.Unreachable:
+                    return ModText.Get(ModStrings.Spatial.Unreachable);
                 case BattlefieldCellKind.Wall:
                     return ModText.Get(ModStrings.Spatial.WallHeight, elevation);
                 case BattlefieldCellKind.Tower:

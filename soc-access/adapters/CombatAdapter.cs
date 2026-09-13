@@ -621,7 +621,8 @@ namespace SongsOfConquestAccess.Adapters
                     _facade.Level.Size,
                     ReadTerrainCells(),
                     map != null && map.Metadata.Type.IsSiege(),
-                    namesObstacles: true);
+                    namesObstacles: true,
+                    spawnPoints: BattlefieldSpawnCells.For(map));
             }
             catch (Exception exception)
             {

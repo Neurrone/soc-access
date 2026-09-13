@@ -2355,6 +2355,11 @@ msgctxt "Spatial.Unexplored"
 msgid "Unexplored"
 msgstr "Не исследовано"
 
+#. Spatial.Unreachable
+msgctxt "Spatial.Unreachable"
+msgid "unreachable"
+msgstr "недоступно"
+
 #. Spatial.Unseen
 msgctxt "Spatial.Unseen"
 msgid "Unseen"
@@ -4047,11 +4052,6 @@ msgctxt "Scanner.TerrainChokePoint"
 msgid "choke point"
 msgstr "узкий проход"
 
-#. Scanner.TerrainChokePointPair
-msgctxt "Scanner.TerrainChokePointPair"
-msgid "choke point, 2 cells"
-msgstr "узкий проход, 2 клетки"
-
 #. Scanner.TerrainCliff
 msgctxt "Scanner.TerrainCliff"
 msgid "cliff"
@@ -4061,6 +4061,26 @@ msgstr "обрыв"
 msgctxt "Scanner.TerrainSingleCell"
 msgid "single cell, height {0}"
 msgstr "одна клетка, высота {0}"
+
+#. Scanner.TerrainUnreachable
+msgctxt "Scanner.TerrainUnreachable"
+msgid "unreachable ground"
+msgstr "недоступная местность"
+
+#. Scanner.TerrainChokePointCells_0
+msgctxt "Scanner.TerrainChokePointCells_0"
+msgid "choke point, {0} cell"
+msgstr "узкий проход, {0} клетка"
+
+#. Scanner.TerrainChokePointCells_1
+msgctxt "Scanner.TerrainChokePointCells_1"
+msgid "choke point, {0} cells"
+msgstr "узкий проход, {0} клетки"
+
+#. Scanner.TerrainChokePointCells_2
+msgctxt "Scanner.TerrainChokePointCells_2"
+msgid "choke point, {0} cells"
+msgstr "узкий проход, {0} клеток"
 
 #. Scanner.TerrainCliffCells_0
 msgctxt "Scanner.TerrainCliffCells_0"
@@ -4216,6 +4236,11 @@ msgstr "лестница (высота {0})"
 msgctxt "Battlefield.DescriptionTower"
 msgid "a tower (height {0})"
 msgstr "башня (высота {0})"
+
+#. Battlefield.DescriptionUnreachableGround
+msgctxt "Battlefield.DescriptionUnreachableGround"
+msgid "unreachable ground"
+msgstr "недоступная местность"
 
 #. Battlefield.DescriptionWall
 msgctxt "Battlefield.DescriptionWall"
@@ -4686,3 +4711,19 @@ msgstr "вертикальная гряда, {0} клеток, высота {1}"
 msgctxt "Spatial.ImpassableObstacle"
 msgid "{0}, impassable"
 msgstr "{0}, непроходимо"
+
+#. Scanner.TerrainUnreachableCells_0
+msgctxt "Scanner.TerrainUnreachableCells_0"
+msgid "unreachable ground, {0} cell"
+msgstr "недоступная местность, {0} клетка"
+
+#. Scanner.TerrainUnreachableCells_1
+msgctxt "Scanner.TerrainUnreachableCells_1"
+msgid "unreachable ground, {0} cells"
+msgstr "недоступная местность, {0} клетки"
+
+#. Scanner.TerrainUnreachableCells_2
+msgctxt "Scanner.TerrainUnreachableCells_2"
+msgid "unreachable ground, {0} cells"
+msgstr "недоступная местность, {0} клеток"
+

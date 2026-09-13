@@ -12,6 +12,7 @@ namespace SongsOfConquestAccess.Battlefields
         Flat,
         Elevated,
         Cliff,
+        Unreachable,
         Impassable,
         Wall,
         Tower,
@@ -23,6 +24,7 @@ namespace SongsOfConquestAccess.Battlefields
     {
         Elevated,
         Cliff,
+        Unreachable,
         Impassable,
         ChokePoint,
         Wall,
@@ -201,7 +203,13 @@ namespace SongsOfConquestAccess.Battlefields
     /// The rules, all of them the game's own:
     /// - troops step between the six hex neighbours only when the elevation differs by at most one,
     ///   so raised ground that nothing can step onto is a cliff and not a platform. The flood starts
-    ///   from every flat enterable cell, which is where a troop can always stand;
+    ///   from the cells the layout puts its spawn points on, which is the ground a troop is set down
+    ///   on and so the ground it is certain to be standing on; flat ground is not that ground, and a
+    ///   board with none of it - RootsHillSiege, every cell of which is raised - was one cliff of 83
+    ///   cells when the flood started from flat ground instead;
+    /// - ground the flood never reaches is a cliff where every way onto it is two heights or more,
+    ///   and unreachable ground where it is a pocket a troop set down inside it could walk over: a
+    ///   sealed floor, plus whatever a step of one height from that floor reaches;
     /// - a siege layout's decoration byte names its structures: 7 a wall, 6 a tower, 8 stairs, the
     ///   same three constants <c>BattleTroopPlacementCalculator</c> reads. They are walked on, so
     ///   they are enterable, and they are not elevated ground - unless the game says the cell
@@ -282,23 +290,35 @@ namespace SongsOfConquestAccess.Battlefields
 
         public static BattlefieldTerrain Analyse(Vector2Int size, IEnumerable<BattlefieldCell> cells, bool isSiege)
         {
-            return Analyse(size, cells, isSiege, namesObstacles: false);
+            return Analyse(size, cells, isSiege, namesObstacles: false, spawnPoints: null);
+        }
+
+        public static BattlefieldTerrain Analyse(
+            Vector2Int size, IEnumerable<BattlefieldCell> cells, bool isSiege, bool namesObstacles)
+        {
+            return Analyse(size, cells, isSiege, namesObstacles, spawnPoints: null);
         }
 
         /// <summary>The same reading, with or without what blocks each impassable cell.
         /// <paramref name="namesObstacles"/> is the fight: there the board wears the theme of the
         /// ground the battle was joined on and the player sees boulders and bushes. On the
         /// placement page the preview draws a blocked cell as a styleless puck, so nothing there
-        /// has a name to give.</summary>
+        /// has a name to give. <paramref name="spawnPoints"/> is where the layout sets troops
+        /// down, which is where walking from starts; with none given the flood starts from every
+        /// enterable cell at the board's lowest elevation instead, which is the same flat ground
+        /// every board but a fully raised one has.</summary>
         public static BattlefieldTerrain Analyse(
-            Vector2Int size, IEnumerable<BattlefieldCell> cells, bool isSiege, bool namesObstacles)
+            Vector2Int size,
+            IEnumerable<BattlefieldCell> cells,
+            bool isSiege,
+            bool namesObstacles,
+            IEnumerable<Vector2Int> spawnPoints)
         {
             int width = Math.Max(0, size.x);
             int height = Math.Max(0, size.y);
             BattlefieldCellKind[,] kinds = new BattlefieldCellKind[Math.Max(1, width), Math.Max(1, height)];
             int[,] elevations = new int[Math.Max(1, width), Math.Max(1, height)];
             bool[,] enterable = new bool[Math.Max(1, width), Math.Max(1, height)];
-            bool[,] elevated = new bool[Math.Max(1, width), Math.Max(1, height)];
             BattlefieldObstacle[,] obstacles = new BattlefieldObstacle[Math.Max(1, width), Math.Max(1, height)];
 
             if (cells != null)
@@ -341,20 +361,26 @@ namespace SongsOfConquestAccess.Battlefields
                     }
 
                     enterable[x, y] = true;
-                    // Settled below: raised ground the flood never reaches is a cliff.
-                    elevated[x, y] = cell.Elevation > 0;
+                    // Settled below: ground the flood never reaches is a cliff or a sealed pocket.
                     kinds[x, y] = cell.Elevation > 0 ? BattlefieldCellKind.Elevated : BattlefieldCellKind.Flat;
                 }
             }
 
-            bool[,] reached = FloodFromFlatGround(width, height, enterable, elevations);
+            bool[,] reached = FloodFromSpawnPoints(width, height, enterable, elevations, spawnPoints);
+            bool[,] pocket = FloodSealedPockets(width, height, enterable, elevations, reached);
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    if (elevated[x, y] && !reached[x, y])
+                    // Only the ground: a siege's wall, tower and stairs are named by what is built
+                    // on them whether or not anything can get there.
+                    bool ground = kinds[x, y] == BattlefieldCellKind.Flat
+                        || kinds[x, y] == BattlefieldCellKind.Elevated;
+                    if (ground && !reached[x, y])
                     {
-                        kinds[x, y] = BattlefieldCellKind.Cliff;
+                        kinds[x, y] = pocket[x, y]
+                            ? BattlefieldCellKind.Unreachable
+                            : BattlefieldCellKind.Cliff;
                     }
                 }
             }
@@ -362,6 +388,7 @@ namespace SongsOfConquestAccess.Battlefields
             List<BattlefieldRegion> regions = new List<BattlefieldRegion>();
             AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Elevated, BattlefieldRegionKind.Elevated);
             AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Cliff, BattlefieldRegionKind.Cliff);
+            AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Unreachable, BattlefieldRegionKind.Unreachable);
             AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Impassable, BattlefieldRegionKind.Impassable);
             AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Wall, BattlefieldRegionKind.Wall);
             AddRegions(regions, width, height, kinds, elevations, obstacles, BattlefieldCellKind.Tower, BattlefieldRegionKind.Tower);
@@ -476,24 +503,120 @@ namespace SongsOfConquestAccess.Battlefields
             return kind != BattlefieldCellKind.OffGrid && kind != BattlefieldCellKind.Impassable;
         }
 
-        /// <summary>Everywhere a troop starting on flat ground can walk to, one elevation step at a
-        /// time. Raised ground outside it is a cliff.</summary>
-        private static bool[,] FloodFromFlatGround(int width, int height, bool[,] enterable, int[,] elevations)
+        /// <summary>
+        /// EVERYWHERE A TROOP CAN EVER STAND: the flood out of the cells the layout sets troops
+        /// down on, one elevation step at a time. Nothing else is certain ground - a board can be
+        /// raised from edge to edge, and flooding from height 0 there reaches nothing at all.
+        ///
+        /// With no spawn cells given, or none of them on ground a troop could stand on, the flood
+        /// starts from every enterable cell at the board's lowest elevation, which on every board
+        /// but a fully raised one is its flat ground.
+        /// </summary>
+        private static bool[,] FloodFromSpawnPoints(
+            int width, int height, bool[,] enterable, int[,] elevations, IEnumerable<Vector2Int> spawnPoints)
         {
             bool[,] reached = new bool[Math.Max(1, width), Math.Max(1, height)];
+            Queue<Vector2Int> queue = new Queue<Vector2Int>();
+            if (spawnPoints != null)
+            {
+                foreach (Vector2Int spawn in spawnPoints)
+                {
+                    if (Within(spawn, width, height) && enterable[spawn.x, spawn.y] && !reached[spawn.x, spawn.y])
+                    {
+                        reached[spawn.x, spawn.y] = true;
+                        queue.Enqueue(spawn);
+                    }
+                }
+            }
+
+            if (queue.Count == 0)
+            {
+                int lowest = int.MaxValue;
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        if (enterable[x, y])
+                        {
+                            lowest = Math.Min(lowest, elevations[x, y]);
+                        }
+                    }
+                }
+
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        if (enterable[x, y] && elevations[x, y] == lowest)
+                        {
+                            reached[x, y] = true;
+                            queue.Enqueue(new Vector2Int(x, y));
+                        }
+                    }
+                }
+            }
+
+            Spread(queue, reached, width, height, enterable, elevations);
+            return reached;
+        }
+
+        /// <summary>
+        /// THE GROUND THAT IS WALKABLE AND STILL OUT OF REACH: a floor sealed off behind cliffs or
+        /// blocked cells, and everything a step of one height from that floor reaches. A troop set
+        /// down in such a pocket could walk it; no troop is ever set down there, so it is ground
+        /// the board never uses.
+        ///
+        /// The floor is the unreached ground at height 0, which is what tells a pocket from a
+        /// cliff: raised ground is only a cliff while nothing beside it can be stood on either, and
+        /// a raised cell one step above an unreachable floor fails that test - it is unreachable
+        /// ground and not a cliff, because "every step onto it is two heights or more" is untrue of
+        /// it. A pocket whose whole floor is itself raised has no height-0 cell to start from and
+        /// stays a cliff, which is the same answer the board's own shape gives: raised ground with
+        /// no way onto it.
+        /// </summary>
+        private static bool[,] FloodSealedPockets(
+            int width, int height, bool[,] enterable, int[,] elevations, bool[,] reached)
+        {
+            bool[,] pocket = new bool[Math.Max(1, width), Math.Max(1, height)];
             Queue<Vector2Int> queue = new Queue<Vector2Int>();
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    if (enterable[x, y] && elevations[x, y] == 0)
+                    if (enterable[x, y] && !reached[x, y] && elevations[x, y] == 0)
                     {
-                        reached[x, y] = true;
+                        pocket[x, y] = true;
                         queue.Enqueue(new Vector2Int(x, y));
                     }
                 }
             }
 
+            // Through the unreached ground only: a step back onto the board is what the pocket
+            // does not have.
+            while (queue.Count > 0)
+            {
+                Vector2Int point = queue.Dequeue();
+                foreach (Vector2Int neighbour in Neighbours(point, width, height))
+                {
+                    if (!pocket[neighbour.x, neighbour.y]
+                        && !reached[neighbour.x, neighbour.y]
+                        && enterable[neighbour.x, neighbour.y]
+                        && Math.Abs(elevations[neighbour.x, neighbour.y] - elevations[point.x, point.y]) <= 1)
+                    {
+                        pocket[neighbour.x, neighbour.y] = true;
+                        queue.Enqueue(neighbour);
+                    }
+                }
+            }
+
+            return pocket;
+        }
+
+        /// <summary>One flood, out of whatever is already in the queue: the six neighbours, one
+        /// elevation step at a time.</summary>
+        private static void Spread(
+            Queue<Vector2Int> queue, bool[,] reached, int width, int height, bool[,] enterable, int[,] elevations)
+        {
             while (queue.Count > 0)
             {
                 Vector2Int point = queue.Dequeue();
@@ -508,8 +631,6 @@ namespace SongsOfConquestAccess.Battlefields
                     }
                 }
             }
-
-            return reached;
         }
 
         private static void AddRegions(
@@ -759,7 +880,8 @@ namespace SongsOfConquestAccess.Battlefields
         /// <summary>The cells everything has to pass through: one cell, or two next to each other,
         /// whose removal leaves the walkable board in two halves worth calling halves. Only the
         /// smallest such sets are reported, so a pair that owes its split to one of its own cells is
-        /// left out. Brute force over 117 cells, run once per battle.</summary>
+        /// left out, and sets sharing a cell are merged - they are one way through, not several.
+        /// Brute force over 117 cells, run once per battle.</summary>
         private static List<BattlefieldRegion> ChokePoints(int width, int height, bool[,] enterable, int[,] elevations)
         {
             List<BattlefieldRegion> chokePoints = new List<BattlefieldRegion>();
@@ -812,7 +934,75 @@ namespace SongsOfConquestAccess.Battlefields
                 }
             }
 
-            return chokePoints;
+            return MergeSharedCells(chokePoints);
+        }
+
+        /// <summary>
+        /// ONE CROSSING IS ONE GROUP. A cell that splits the board with either of two neighbours
+        /// belongs to two minimal cut sets, and a player told twice about the same gap - once as
+        /// "{9,4} and {9,5}", once as "{9,4} and {10,4}" - learns nothing the second time. Sets
+        /// sharing a cell become one group over the union of their cells, transitively, so a chain
+        /// of overlapping pairs is a single crossing; its first cell, which is the placeholder an
+        /// authored description points at, is then unique again, and every cell an older
+        /// description pointed at is still in the group it was in.
+        /// </summary>
+        private static List<BattlefieldRegion> MergeSharedCells(List<BattlefieldRegion> chokePoints)
+        {
+            List<List<Vector2Int>> groups = new List<List<Vector2Int>>();
+            for (int i = 0; i < chokePoints.Count; i++)
+            {
+                List<Vector2Int> merged = new List<Vector2Int>(chokePoints[i].Cells);
+                bool absorbed = true;
+                while (absorbed)
+                {
+                    absorbed = false;
+                    for (int j = groups.Count - 1; j >= 0; j--)
+                    {
+                        if (!SharesCell(groups[j], merged))
+                        {
+                            continue;
+                        }
+
+                        for (int k = 0; k < groups[j].Count; k++)
+                        {
+                            if (!merged.Contains(groups[j][k]))
+                            {
+                                merged.Add(groups[j][k]);
+                            }
+                        }
+
+                        groups.RemoveAt(j);
+                        absorbed = true;
+                    }
+                }
+
+                groups.Add(merged);
+            }
+
+            List<BattlefieldRegion> regions = new List<BattlefieldRegion>();
+            for (int i = 0; i < groups.Count; i++)
+            {
+                groups[i].Sort(CompareCells);
+                regions.Add(new BattlefieldRegion(
+                    BattlefieldRegionKind.ChokePoint, BattlefieldRegionShape.None, 0, groups[i]));
+            }
+
+            // Board order, so two readings of the same layout list the crossings the same way.
+            regions.Sort((left, right) => CompareCells(left.Cells[0], right.Cells[0]));
+            return regions;
+        }
+
+        private static bool SharesCell(List<Vector2Int> left, List<Vector2Int> right)
+        {
+            for (int i = 0; i < left.Count; i++)
+            {
+                if (right.Contains(left[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool SplitsInTwo(

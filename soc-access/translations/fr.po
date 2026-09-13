@@ -2335,6 +2335,11 @@ msgctxt "Spatial.Unexplored"
 msgid "Unexplored"
 msgstr "Inexploré"
 
+#. Spatial.Unreachable
+msgctxt "Spatial.Unreachable"
+msgid "unreachable"
+msgstr "inaccessible"
+
 #. Spatial.Unseen
 msgctxt "Spatial.Unseen"
 msgid "Unseen"
@@ -4017,11 +4022,6 @@ msgctxt "Scanner.TerrainChokePoint"
 msgid "choke point"
 msgstr "passage étroit"
 
-#. Scanner.TerrainChokePointPair
-msgctxt "Scanner.TerrainChokePointPair"
-msgid "choke point, 2 cells"
-msgstr "passage étroit, 2 cases"
-
 #. Scanner.TerrainCliff
 msgctxt "Scanner.TerrainCliff"
 msgid "cliff"
@@ -4031,6 +4031,21 @@ msgstr "falaise"
 msgctxt "Scanner.TerrainSingleCell"
 msgid "single cell, height {0}"
 msgstr "une seule case, hauteur {0}"
+
+#. Scanner.TerrainUnreachable
+msgctxt "Scanner.TerrainUnreachable"
+msgid "unreachable ground"
+msgstr "terrain inaccessible"
+
+#. Scanner.TerrainChokePointCells_0
+msgctxt "Scanner.TerrainChokePointCells_0"
+msgid "choke point, {0} cell"
+msgstr "passage étroit, {0} case"
+
+#. Scanner.TerrainChokePointCells_1
+msgctxt "Scanner.TerrainChokePointCells_1"
+msgid "choke point, {0} cells"
+msgstr "passage étroit, {0} cases"
 
 #. Scanner.TerrainCliffCells_0
 msgctxt "Scanner.TerrainCliffCells_0"
@@ -4156,6 +4171,11 @@ msgstr "des escaliers (hauteur {0})"
 msgctxt "Battlefield.DescriptionTower"
 msgid "a tower (height {0})"
 msgstr "une tour (hauteur {0})"
+
+#. Battlefield.DescriptionUnreachableGround
+msgctxt "Battlefield.DescriptionUnreachableGround"
+msgid "unreachable ground"
+msgstr "du terrain inaccessible"
 
 #. Battlefield.DescriptionWall
 msgctxt "Battlefield.DescriptionWall"
@@ -4486,3 +4506,14 @@ msgstr "crête verticale de {0} cases, hauteur {1}"
 msgctxt "Spatial.ImpassableObstacle"
 msgid "{0}, impassable"
 msgstr "{0}, infranchissable"
+
+#. Scanner.TerrainUnreachableCells_0
+msgctxt "Scanner.TerrainUnreachableCells_0"
+msgid "unreachable ground, {0} cell"
+msgstr "terrain inaccessible, {0} case"
+
+#. Scanner.TerrainUnreachableCells_1
+msgctxt "Scanner.TerrainUnreachableCells_1"
+msgid "unreachable ground, {0} cells"
+msgstr "terrain inaccessible, {0} cases"
+

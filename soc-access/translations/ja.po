@@ -2315,6 +2315,11 @@ msgctxt "Spatial.Unexplored"
 msgid "Unexplored"
 msgstr "未探索"
 
+#. Spatial.Unreachable
+msgctxt "Spatial.Unreachable"
+msgid "unreachable"
+msgstr "到達不能"
+
 #. Spatial.Unseen
 msgctxt "Spatial.Unseen"
 msgid "Unseen"
@@ -3987,11 +3992,6 @@ msgctxt "Scanner.TerrainChokePoint"
 msgid "choke point"
 msgstr "隘路"
 
-#. Scanner.TerrainChokePointPair
-msgctxt "Scanner.TerrainChokePointPair"
-msgid "choke point, 2 cells"
-msgstr "隘路、2 タイル"
-
 #. Scanner.TerrainCliff
 msgctxt "Scanner.TerrainCliff"
 msgid "cliff"
@@ -4001,6 +4001,16 @@ msgstr "崖"
 msgctxt "Scanner.TerrainSingleCell"
 msgid "single cell, height {0}"
 msgstr "単一タイル、高さ {0}"
+
+#. Scanner.TerrainUnreachable
+msgctxt "Scanner.TerrainUnreachable"
+msgid "unreachable ground"
+msgstr "到達不能地形"
+
+#. Scanner.TerrainChokePointCells_0
+msgctxt "Scanner.TerrainChokePointCells_0"
+msgid "choke point, {0} cell"
+msgstr "隘路、{0} タイル"
 
 #. Scanner.TerrainCliffCells_0
 msgctxt "Scanner.TerrainCliffCells_0"
@@ -4096,6 +4106,11 @@ msgstr "階段（高さ {0}）"
 msgctxt "Battlefield.DescriptionTower"
 msgid "a tower (height {0})"
 msgstr "塔（高さ {0}）"
+
+#. Battlefield.DescriptionUnreachableGround
+msgctxt "Battlefield.DescriptionUnreachableGround"
+msgid "unreachable ground"
+msgstr "到達不能地形"
 
 #. Battlefield.DescriptionWall
 msgctxt "Battlefield.DescriptionWall"
@@ -4286,3 +4301,9 @@ msgstr "{0} タイルの縦の尾根、高さ {1}"
 msgctxt "Spatial.ImpassableObstacle"
 msgid "{0}, impassable"
 msgstr "{0}、通行不可"
+
+#. Scanner.TerrainUnreachableCells_0
+msgctxt "Scanner.TerrainUnreachableCells_0"
+msgid "unreachable ground, {0} cell"
+msgstr "到達不能地形、{0} タイル"
+

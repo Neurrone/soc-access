@@ -16,6 +16,7 @@ using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Map;
 using SongsOfConquest.Server.Adventure.Map.Provider;
 using SongsOfConquest.Server.Map;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Loader.Dev;
 using SongsOfConquestAccess.Localization;
@@ -149,7 +150,11 @@ namespace SongsOfConquestAccess.Dev
 
             // The mod's own reading of the ground, so the JSON says what the scanner says.
             BattlefieldTerrain terrain = BattlefieldTerrain.Analyse(
-                new Vector2Int(width, height), TerrainCells(cells, width, height), type.IsSiege());
+                new Vector2Int(width, height),
+                TerrainCells(cells, width, height),
+                type.IsSiege(),
+                namesObstacles: false,
+                spawnPoints: BattlefieldSpawnCells.For(map));
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)

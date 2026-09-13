@@ -339,6 +339,11 @@ msgctxt "Battlefield.DescriptionTower"
 msgid "a tower (height {0})"
 msgstr ""
 
+#. Battlefield.DescriptionUnreachableGround
+msgctxt "Battlefield.DescriptionUnreachableGround"
+msgid "unreachable ground"
+msgstr ""
+
 #. Battlefield.DescriptionWall
 msgctxt "Battlefield.DescriptionWall"
 msgid "a wall (height {0})"
@@ -1077,6 +1082,11 @@ msgstr ""
 #. Spatial.Unexplored
 msgctxt "Spatial.Unexplored"
 msgid "Unexplored"
+msgstr ""
+
+#. Spatial.Unreachable
+msgctxt "Spatial.Unreachable"
+msgid "unreachable"
 msgstr ""
 
 #. Spatial.Unseen
@@ -4029,11 +4039,6 @@ msgctxt "Scanner.TerrainChokePoint"
 msgid "choke point"
 msgstr ""
 
-#. Scanner.TerrainChokePointPair
-msgctxt "Scanner.TerrainChokePointPair"
-msgid "choke point, 2 cells"
-msgstr ""
-
 #. Scanner.TerrainCliff
 msgctxt "Scanner.TerrainCliff"
 msgid "cliff"
@@ -4042,6 +4047,11 @@ msgstr ""
 #. Scanner.TerrainSingleCell
 msgctxt "Scanner.TerrainSingleCell"
 msgid "single cell, height {0}"
+msgstr ""
+
+#. Scanner.TerrainUnreachable
+msgctxt "Scanner.TerrainUnreachable"
+msgid "unreachable ground"
 msgstr ""
 
 #. Scanner.TroopSources
@@ -4534,6 +4544,21 @@ msgctxt "Screens.SelectedSubcategoryCount_2"
 msgid "{0} selected"
 msgstr ""
 
+#. Scanner.TerrainChokePointCells_0
+msgctxt "Scanner.TerrainChokePointCells_0"
+msgid "choke point, {0} cell"
+msgstr ""
+
+#. Scanner.TerrainChokePointCells_1
+msgctxt "Scanner.TerrainChokePointCells_1"
+msgid "choke point, {0} cells"
+msgstr ""
+
+#. Scanner.TerrainChokePointCells_2
+msgctxt "Scanner.TerrainChokePointCells_2"
+msgid "choke point, {0} cells"
+msgstr ""
+
 #. Scanner.TerrainCliffCells_0
 msgctxt "Scanner.TerrainCliffCells_0"
 msgid "cliff of {0} cell"
@@ -4682,5 +4707,20 @@ msgstr ""
 #. Scanner.TerrainSiegeWall_2
 msgctxt "Scanner.TerrainSiegeWall_2"
 msgid "wall of {0} cells, height {1}"
+msgstr ""
+
+#. Scanner.TerrainUnreachableCells_0
+msgctxt "Scanner.TerrainUnreachableCells_0"
+msgid "unreachable ground, {0} cell"
+msgstr ""
+
+#. Scanner.TerrainUnreachableCells_1
+msgctxt "Scanner.TerrainUnreachableCells_1"
+msgid "unreachable ground, {0} cells"
+msgstr ""
+
+#. Scanner.TerrainUnreachableCells_2
+msgctxt "Scanner.TerrainUnreachableCells_2"
+msgid "unreachable ground, {0} cells"
 msgstr ""
 

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 
@@ -56,10 +57,11 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     ModText.Get(ModStrings.Spatial.Impassable));
             }
 
-            if (tile.Elevation > 0)
+            if (tile.Elevation > 0 || tile.Kind == BattlefieldCellKind.Unreachable)
             {
                 // A cliff, a wall, a tower or a flight of stairs is named by what it is; ordinary
-                // raised ground is named by its height alone.
+                // raised ground is named by its height alone. Unreachable ground is named at any
+                // height, since the pocket it belongs to is mostly at height 0.
                 string ground = BattlefieldText.CellGround(tile.Kind, tile.Elevation);
                 yield return new AnnouncementPart(
                     TroopDeploymentAnnouncementDefinitions.TileKeys.Elevation,

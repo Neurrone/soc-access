@@ -197,16 +197,101 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(new Vector2Int(0, 1), elevated[0].Cells[0]);
         }
 
+        /// <summary>The flood starts where the layout sets troops down, not on flat ground: the
+        /// left column here is raised two above the rest, so nothing can climb it from the flat
+        /// ground beside it, and a spawn point standing on it says a troop is there all the same.
+        /// RootsHillSiege, raised from edge to edge, was one cliff of 83 cells before this.
+        /// </summary>
+        [TestMethod]
+        public void TheFloodStartsFromTheSpawnPointsAndNotFromFlatGround()
+        {
+            string[] rows = { "22...", "22...", "22..." };
+
+            BattlefieldTerrain unseeded = Analyse(rows);
+            Assert.AreEqual(6, RegionsOf(unseeded, BattlefieldRegionKind.Cliff)[0].Count);
+
+            BattlefieldTerrain terrain = Analyse(
+                rows, null, new[] { new Vector2Int(0, 0), new Vector2Int(4, 0) });
+
+            Assert.AreEqual(0, RegionsOf(terrain, BattlefieldRegionKind.Cliff).Count);
+            Assert.AreEqual(0, RegionsOf(terrain, BattlefieldRegionKind.Unreachable).Count);
+            List<BattlefieldRegion> elevated = RegionsOf(terrain, BattlefieldRegionKind.Elevated);
+            Assert.AreEqual(1, elevated.Count);
+            Assert.AreEqual(6, elevated[0].Count);
+        }
+
+        /// <summary>Walkable ground the flood never reaches is unreachable ground, not a cliff: a
+        /// floor sealed behind blocked cells, and the raised cell inside it that a troop standing
+        /// on that floor could step onto - "every step onto it is two heights or more" is untrue of
+        /// it, so the cliff word is not its. A raised cell with nothing beside it to be stood on
+        /// stays a cliff.</summary>
+        [TestMethod]
+        public void ASealedPocketIsUnreachableGroundAndOnlyGroundNothingCanBeStoodBesideIsACliff()
+        {
+            BattlefieldTerrain terrain = Analyse(
+                new[]
+                {
+                    "..1####",
+                    "###....",
+                    ".......",
+                    "...2...",
+                    "......."
+                },
+                null,
+                new[] { new Vector2Int(0, 0) });
+
+            Assert.AreEqual(BattlefieldCellKind.Unreachable, terrain.GetKind(new Vector2Int(0, 4)));
+            Assert.AreEqual(BattlefieldCellKind.Unreachable, terrain.GetKind(new Vector2Int(2, 4)));
+            List<BattlefieldRegion> unreachable = RegionsOf(terrain, BattlefieldRegionKind.Unreachable);
+            Assert.AreEqual(1, unreachable.Count);
+            Assert.AreEqual(3, unreachable[0].Count);
+
+            Assert.AreEqual(BattlefieldCellKind.Cliff, terrain.GetKind(new Vector2Int(3, 1)));
+            List<BattlefieldRegion> cliffs = RegionsOf(terrain, BattlefieldRegionKind.Cliff);
+            Assert.AreEqual(1, cliffs.Count);
+            Assert.AreEqual(1, cliffs[0].Count);
+        }
+
+        /// <summary>Two minimal cut sets sharing a cell are one way through, not two: they become
+        /// one group over the union of their cells, which is also what makes the group's first cell
+        /// - the placeholder an authored description points at - name one group again.</summary>
+        [TestMethod]
+        public void ChokeSetsThatShareACellAreOneGroup()
+        {
+            BattlefieldTerrain terrain = Analyse(
+                "....#....",
+                ".#.......",
+                ".#.......",
+                "#........",
+                ".........",
+                ".........",
+                ".........");
+
+            List<BattlefieldRegion> chokePoints = RegionsOf(terrain, BattlefieldRegionKind.ChokePoint);
+            Assert.AreEqual(1, chokePoints.Count);
+            CollectionAssert.AreEqual(
+                new[] { new Vector2Int(2, 5), new Vector2Int(3, 5), new Vector2Int(3, 6) },
+                chokePoints[0].Cells);
+        }
+
         private static BattlefieldTerrain Analyse(params string[] rows)
         {
-            return Analyse(rows, null);
+            return Analyse(rows, null, null);
+        }
+
+        private static BattlefieldTerrain Analyse(string[] rows, string[] decorationRows)
+        {
+            return Analyse(rows, decorationRows, null);
         }
 
         /// <summary>Terrain rows top first: <c>' '</c> off the grid, <c>'#'</c> impassable,
         /// <c>'.'</c> flat, a digit raised ground of that height. The decoration rows, where a
         /// layout has any, mark <c>'W'</c> a wall, <c>'T'</c> a tower and <c>'S'</c> stairs, which
-        /// only a siege layout has.</summary>
-        private static BattlefieldTerrain Analyse(string[] rows, string[] decorationRows)
+        /// only a siege layout has. The spawn cells are where the layout sets troops down, which is
+        /// where walking from starts; with none given the reading falls back to the board's lowest
+        /// ground, which is what every board with flat ground on it starts from anyway.</summary>
+        private static BattlefieldTerrain Analyse(
+            string[] rows, string[] decorationRows, Vector2Int[] spawnPoints)
         {
             int height = rows.Length;
             int width = rows[0].Length;
@@ -228,7 +313,8 @@ namespace SongsOfConquestAccess.Tests
                 }
             }
 
-            return BattlefieldTerrain.Analyse(new Vector2Int(width, height), cells, decorationRows != null);
+            return BattlefieldTerrain.Analyse(
+                new Vector2Int(width, height), cells, decorationRows != null, false, spawnPoints);
         }
 
         private static int Decoration(char glyph)

@@ -786,7 +786,12 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _terrainProbed = true;
-            _terrain = BattlefieldTerrain.Analyse(map.Metadata.Size, ReadTerrainCells(map), map.Metadata.Type.IsSiege());
+            _terrain = BattlefieldTerrain.Analyse(
+                map.Metadata.Size,
+                ReadTerrainCells(map),
+                map.Metadata.Type.IsSiege(),
+                namesObstacles: false,
+                spawnPoints: BattlefieldSpawnCells.For(map));
             return _terrain;
         }
 
