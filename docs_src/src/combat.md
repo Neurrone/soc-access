@@ -17,6 +17,40 @@ Coordinates are spoken from the bottom-left origin, `0, 0`. The first number `x`
 
 For example, from `0, 0`, moving northeast lands at `0.5, 1`. Moving southeast from there lands at `1, 0`, so one west move returns to `0, 0`.
 
+## Terrain Vocabulary
+
+The cursor, the scanner's `Terrain` category and the written battlefield descriptions all use one set of words for the ground. Every one of them is read off the board itself: troops step between neighbouring hexes only when the elevation differs by at most one, which is what decides most of the table below.
+
+| Term | What it means | How it is judged | Where it is heard |
+| --- | --- | --- | --- |
+| flat ground | Ground at height 0 | Elevation 0 | Nowhere on the cursor, which says nothing about ordinary ground; descriptions call the rest of a board open ground |
+| elevated ground, height N | A raised hex a troop can reach | Elevation above 0, and something can step onto it | Cursor |
+| patch | A compact group of raised hexes | A connected group that is neither a ridge nor one hex | Scanner, descriptions |
+| ridge | A long thin group of raised hexes | Its longest extent is at least three times its shortest, or it spans more than half the board | Scanner, descriptions |
+| single cell | One raised hex on its own | A group of one | Scanner, descriptions |
+| cliff | A raised hex nothing can enter | Every step onto it is two heights or more | Cursor, scanner, descriptions |
+| impassable | A hex nothing can enter at all | The game says it is not walkable; water is impassable and nothing more | Cursor, scanner |
+| wall of impassable cells | A line of impassable hexes that shapes movement | Three or more joined impassable hexes in a ridge shape | Scanner, descriptions |
+| choke point | The one or two hexes everything has to pass through | Removing them would leave the walkable board in two halves of at least five hexes | Scanner, descriptions |
+| wall | A siege layout's wall, which troops walk on | The layout is a siege and the hex carries the wall decoration | Cursor, scanner, descriptions |
+| tower | A siege layout's tower | The same, for the tower decoration | Cursor, scanner, descriptions |
+| stairs | The steps onto a siege layout's wall | The same, for the stairs decoration | Cursor, scanner, descriptions |
+| spawn point | A hex a side's troops can start on | The layout says so | Cursor, scanner, descriptions |
+
+`blocked` is never spoken on a battlefield. Whether a hex can be reached this turn is not a fact about the ground, and every hex an enemy stands on would be one.
+
+The scanner's `Terrain` category holds one item per group, so a ridge is one stop in the item cycle and `Alt+Page Down` walks its hexes nearest first. A group names itself with its shape, its size and its height, as in `ridge of 7 cells, height 1`, `cliff of 3 cells` or `wall of 4 impassable cells`.
+
+### Where Things Are
+
+The written descriptions place a feature by thirds of the board, never by coordinates:
+
+- `left` is columns 0 to 4, `centre` columns 5 to 8, `right` columns 9 to 12.
+- `bottom` is rows 0 to 2, `middle` rows 3 to 5, `top` rows 6 to 8.
+- The nine names combine those: `top left`, `top centre`, `top right`, `middle left`, `centre`, `middle right`, `bottom left`, `bottom centre`, `bottom right`.
+- `left edge`, `right edge`, `top edge` and `bottom edge` are used when a feature hugs one.
+- `across the centre` and `across the board` are used for something that spans the board.
+
 ## Troop Deployment
 
 Before combat, the troop deployment screen allows placement of your troops in spawn points, representing their starting location in combat.
@@ -42,11 +76,11 @@ where each side's spawn points are. It is on a tab stop of its own, called Descr
 which also holds the drag hint, and `Ctrl+D` on the deployment grid speaks the same three
 lines. Not every layout has been described yet; one that has not says so.
 
-The deployment grid also supports the [Scanner](scanner.md) for finding enemy troops, spawn points and terrain features. Scanning from the centre tile is a quick way to understand where troops and terrain features are, since each result is heard in the direction it lies in. See [Audio](audio.md#scanner-results).
+The deployment grid also supports the [Scanner](scanner.md) for finding enemy troops, spawn points and the groups of ground in [Terrain Vocabulary](#terrain-vocabulary) above. Scanning from the centre tile is a quick way to understand where troops and terrain features are, since each result is heard in the direction it lies in. See [Audio](audio.md#scanner-results).
 
 ## Combat
 
-The combat hex grid uses the same keys for navigation and also supports the [Scanner](scanner.md).
+The combat hex grid uses the same keys for navigation and also supports the [Scanner](scanner.md), whose `Terrain` category holds the same groups of ground it does on the deployment grid.
 
 Each hex you land on plays a short sound for what is on it: whether it is empty, raised, obstructed, holds an ally or an enemy, or is threatened by an enemy. See [Audio](audio.md#battlefield-sounds).
 

@@ -22,6 +22,7 @@ Rewrote the UI to modern mod standards to provide the following features:
 - The marketplace screen uses a table to more accurately convey what the game draws
 - In game options, adjusting keybinds is now supported
 - Battlefield layouts now have written descriptions of their terrain and spawn points. The troop placement page has a `Description` tab stop holding the three lines, and `Ctrl+D` speaks them from the deployment grid, or the terrain alone from the combat grid. Not every layout has been described yet
+- The battlefield now reads its ground as whole features instead of loose cells. The cursor names a cliff, and a siege layout's wall, tower and stairs, instead of calling them elevated ground; the scanner's `Terrain` category lists one item per feature - `ridge of 7 cells, height 1`, `patch of 12 cells, height 2`, `cliff of 3 cells`, `wall of 4 impassable cells`, `choke point` - with the feature's cells as its copies, replacing the four items it had for the three elevation levels and impassable terrain. The written layout descriptions use the same words. See [Terrain vocabulary](combat.md#terrain-vocabulary)
 
 ### Controls
 
