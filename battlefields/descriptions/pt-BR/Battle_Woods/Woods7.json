@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno plano por todo o tabuleiro, com {5,7} na parte superior central e {0,4} e {12,4} nas bordas esquerda e direita.",
+  "attacker": "Os pontos de posicionamento do atacante descem pelo lado esquerdo, de cima a baixo.",
+  "defender": "Os pontos de posicionamento do defensor descem pelo lado direito, de cima a baixo."
+}

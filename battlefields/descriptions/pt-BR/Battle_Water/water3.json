@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aberto com {3,6} atravessando a parte superior esquerda e {8,6} atravessando a parte superior direita, e a única entrada para o terreno entre os dois trechos é por {6,5}. A parte de baixo do tabuleiro é interrompida por {2,0} à esquerda, {8,0} no centro e {5,2} no meio do caminho.",
+  "attacker": "Os pontos de posicionamento do atacante se espalham pelo terço esquerdo.",
+  "defender": "Os pontos de posicionamento do defensor se espalham pelo terço direito."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno plano por todo o tabuleiro. Os penhascos descem por toda a altura do tabuleiro pelo lado direito, vedando a borda direita.",
+  "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda, bem longe dos penhascos.",
+  "defender": "Os pontos de posicionamento do defensor descem pela parte central direita, logo à frente dos penhascos."
+}

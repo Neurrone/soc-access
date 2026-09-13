@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno plano no canto inferior esquerdo, com {6,0} pelo resto do tabuleiro. Há {1,4} vedando a borda superior e descendo pelo centro, e a única passagem para a direita é por {9,2}.",
+  "attacker": "Os pontos de posicionamento do atacante preenchem o terreno plano do canto inferior esquerdo.",
+  "defender": "Os pontos de posicionamento do defensor se espalham pelo terço direito, em {6,0}, depois de {9,2}."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aberto à esquerda, com {5,0} cobrindo toda a direita do tabuleiro e contornando até a parte superior central e a parte inferior central. {6,2} e {5,5} ocupam boa parte do centro, deixando uma passagem entre si.",
+  "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda.",
+  "defender": "Os pontos de posicionamento do defensor se espalham pela direita do tabuleiro, todos eles em {5,0}."
+}

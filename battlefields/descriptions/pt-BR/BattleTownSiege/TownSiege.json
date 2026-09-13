@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aberto à esquerda, e o defensor ocupa a cidade à direita. Uma torre fica na parte superior central e outra na parte inferior central, cada uma ladeada por um trecho de fosso, com escadas subindo ao lado de cada uma pelo lado da cidade. Há muros na parte central direita e na parte inferior direita.",
+  "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda.",
+  "defender": "Os pontos de posicionamento do defensor se espalham pela cidade, um em cada torre e quatro nos muros, dois deles para máquinas de cerco."
+}

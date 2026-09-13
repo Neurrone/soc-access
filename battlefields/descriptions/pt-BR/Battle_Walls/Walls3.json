@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno plano com {0,0} no canto inferior esquerdo e {10,0} na parte inferior direita. Os penhascos atravessam o tabuleiro inteiro acima do centro, isolando {3,6} do outro lado.",
+  "attacker": "Os pontos de posicionamento do atacante se espalham pelo terço esquerdo, e dois deles ficam em {0,0}.",
+  "defender": "Os pontos de posicionamento do defensor se espalham pelo terço direito, e três deles ficam em {10,0}."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aberto com {5,2} atravessando o centro do tabuleiro, com passagem por cima e por baixo. Na parte inferior direita há {8,0}, e a única entrada para o canto é por {11,2}.",
+  "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda.",
+  "defender": "Os pontos de posicionamento do defensor descem pela borda direita, dois deles no canto, depois de {11,2}."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aberto com {3,7} atravessando o alto. {4,2} e {4,5} atravessam o meio, um trecho acima do outro, com um corredor entre si e terreno aberto nas duas pontas.",
+  "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda, à esquerda de {4,2} e {4,5}.",
+  "defender": "Os pontos de posicionamento do defensor descem pela borda direita, à direita de {4,2} e {4,5}."
+}

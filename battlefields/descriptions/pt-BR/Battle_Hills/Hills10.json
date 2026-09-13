@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aberto pelo meio, com {3,0} na parte inferior central e {3,6} na parte superior central. Penhascos na parte superior esquerda e na borda direita, e a única entrada para o canto superior direito é por {10,6}.",
+  "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda, todos eles em terreno plano.",
+  "defender": "Os pontos de posicionamento do defensor descem pela borda direita, dois deles no canto superior direito, depois de {10,6}."
+}

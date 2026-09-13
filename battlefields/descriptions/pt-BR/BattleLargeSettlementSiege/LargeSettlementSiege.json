@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aberto com {10,0} na parte inferior direita. O defensor ocupa três trechos curtos de muro: uma torre com um muro atrás dela na parte inferior central, outra na parte superior central e uma torre com dois muros na parte central direita. Há escadas subindo ao lado de cada torre, e os muros ficam separados, com terreno aberto entre eles.",
+  "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda, em terreno aberto diante dos muros.",
+  "defender": "Os pontos de posicionamento do defensor se espalham pelo centro e pela direita, seis deles nas torres e nos muros."
+}

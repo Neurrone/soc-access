@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno plano por toda parte, com {6,6} atravessando a parte superior central e {5,0} na parte inferior central. {3,3} e {7,3} estreitam o meio, deixando uma brecha entre si.",
+  "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda, todos em terreno plano.",
+  "defender": "Os pontos de posicionamento do defensor descem pela borda direita, todos em terreno plano."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "O terreno aberto vai da borda inferior até o alto, entre {3,0} à esquerda e {8,0} à direita. A borda esquerda é fechada por {0,0} e a borda direita, por {12,2}.",
+  "attacker": "Os pontos de posicionamento do atacante atravessam o alto do tabuleiro, sete deles em {3,0}.",
+  "defender": "Os pontos de posicionamento do defensor preenchem a parte inferior direita, dez deles em {8,0}."
+}

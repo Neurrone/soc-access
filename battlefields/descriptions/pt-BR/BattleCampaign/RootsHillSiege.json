@@ -1,0 +1,5 @@
+{
+  "terrain": "O tabuleiro inteiro é coberto por {0,0}, interrompido por {2,2} na parte inferior esquerda e {2,5} na parte central esquerda, o que deixa um corredor ao longo da borda superior, outro ao longo da borda inferior e outro atravessando o centro. Os corredores de cima e de baixo terminam no centro, e só o corredor do meio segue até a direita, onde a borda é recortada em bolsões por {11,3} e {11,5}.",
+  "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda.",
+  "defender": "Os pontos de posicionamento do defensor se espalham pelo terço direito, três deles junto à borda direita."
+}

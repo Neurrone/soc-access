@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno plano de ponta a ponta. Penhascos pela borda direita e contornando os cantos inferior direito e superior direito.",
+  "attacker": "Os pontos de posicionamento do atacante preenchem a borda esquerda de baixo a cima.",
+  "defender": "Os pontos de posicionamento do defensor se reúnem na parte central direita, por dentro dos penhascos."
+}
