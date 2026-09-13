@@ -221,9 +221,10 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>
         /// WHAT ONE GROUP OF GROUND IS CALLED INSIDE A SENTENCE, which is not what the scanner calls
-        /// it: a description is prose, so the height goes in parentheses, the count is left out, and
-        /// impassability is never spoken - the player is being told the shape of the board, and "a
-        /// wall of bushes" already says nothing walks through it.
+        /// it: a description is prose, so the height goes in parentheses, the count is left out,
+        /// obstacles carry their article, and impassability is never spoken - the player is being
+        /// told the shape of the board, and "a wall of bushes" already says nothing walks through
+        /// it.
         /// </summary>
         public static string RegionDescription(BattlefieldRegion region)
         {
@@ -276,7 +277,7 @@ namespace SongsOfConquestAccess.UI
         /// and the plain words where nothing did.</summary>
         private static string ImpassableDescription(BattlefieldRegion region)
         {
-            string words = ObstacleWords(region.Obstacles, region.Count);
+            string words = ObstacleWords(region.Obstacles, region.Count, false);
             if (string.IsNullOrEmpty(words))
             {
                 if (region.IsRidge)
@@ -328,8 +329,9 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>
-        /// WHAT ONE GROUP OF GROUND IS CALLED, the words the scanner's Terrain category speaks and
-        /// the words the authored descriptions are written in. The analysis
+        /// WHAT ONE GROUP OF GROUND IS CALLED, the words the scanner's Terrain category speaks: a
+        /// label, so an obstacle is named by a bare noun rather than the noun phrase
+        /// <see cref="RegionDescription"/> writes into a sentence. The analysis
         /// (<see cref="BattlefieldTerrain"/>) knows kinds, counts and heights and no language at
         /// all; this is the one place they become a phrase, so the dump's JSON and the spoken line
         /// cannot drift apart.
@@ -384,7 +386,7 @@ namespace SongsOfConquestAccess.UI
         {
             // Empty where the fight named nothing, and where it named only obstacles nobody has a
             // word for: a lone standalone prop is impassable ground and nothing more.
-            string obstacles = ObstacleWords(region.Obstacles, region.Count);
+            string obstacles = ObstacleWords(region.Obstacles, region.Count, true);
             if (string.IsNullOrEmpty(obstacles))
             {
                 if (region.Count == 1)
@@ -427,7 +429,8 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>What a whole cell of one obstacle is called: the plural where a cell holds many
         /// of them - boulders, bushes - and the singular where it holds one, a statue, a torch or a
-        /// gatepost.</summary>
+        /// gatepost. The cursor is a label rather than a sentence, so the noun is bare: "gatepost,
+        /// impassable", not "a gatepost, impassable".</summary>
         public static string CellObstacle(BattlefieldObstacle obstacle)
         {
             if (obstacle == null)
@@ -438,13 +441,15 @@ namespace SongsOfConquestAccess.UI
             bool one = obstacle.Kind == BattlefieldObstacleKind.Manufactured
                 || obstacle.Kind == BattlefieldObstacleKind.Light
                 || obstacle.Kind == BattlefieldObstacleKind.Gatepost;
-            return Word(obstacle, one ? 1 : 2);
+            return Word(obstacle, one ? 1 : 2, true);
         }
 
         /// <summary>What a group of blocked cells is standing under, most of it first and joined as
         /// a list. <paramref name="count"/> is the group's size, which is the number spoken beside
-        /// the words and so the number they have to agree with.</summary>
-        public static string ObstacleWords(List<BattlefieldObstacle> obstacles, int count)
+        /// the words and so the number they have to agree with; <paramref name="bare"/> asks for
+        /// the bare nouns the scanner speaks rather than the noun phrases a description reads.
+        /// </summary>
+        public static string ObstacleWords(List<BattlefieldObstacle> obstacles, int count, bool bare)
         {
             if (obstacles == null || obstacles.Count == 0)
             {
@@ -454,7 +459,7 @@ namespace SongsOfConquestAccess.UI
             List<string> words = new List<string>(obstacles.Count);
             for (int i = 0; i < obstacles.Count; i++)
             {
-                string word = Word(obstacles[i], count);
+                string word = Word(obstacles[i], count, bare);
                 if (!string.IsNullOrEmpty(word))
                 {
                     words.Add(word);
@@ -467,23 +472,28 @@ namespace SongsOfConquestAccess.UI
         /// <summary>One obstacle in the form <paramref name="count"/> asks for, in the words of the
         /// theme the board is painted with. Empty for an obstacle nobody named - an unnamed
         /// decoration byte, a standalone prop - which leaves the plain wording to say it.</summary>
-        private static string Word(BattlefieldObstacle obstacle, int count)
+        private static string Word(BattlefieldObstacle obstacle, int count, bool bare)
         {
             ModPluralString words;
-            return obstacle != null && TryWords(obstacle.Kind, obstacle.Theme, out words)
+            return obstacle != null && TryWords(obstacle.Kind, obstacle.Theme, bare, out words)
                 ? ModText.Plural(words, count)
                 : string.Empty;
         }
 
         /// <summary>The owner's word for one family of prop in one theme. Theme 7 is a second
         /// Arleon, and a theme byte nobody knows reads as Arleon too rather than falling silent.
-        /// </summary>
-        private static bool TryWords(BattlefieldObstacleKind kind, int theme, out ModPluralString words)
+        /// <paramref name="bare"/> picks the bare noun the cursor and the scanner speak over the
+        /// noun phrase a description reads; the words English writes without an article have one
+        /// string for both.</summary>
+        private static bool TryWords(
+            BattlefieldObstacleKind kind, int theme, bool bare, out ModPluralString words)
         {
             switch (kind)
             {
                 case BattlefieldObstacleKind.Rock:
-                    words = ModStrings.Battlefield.ObstacleRock;
+                    words = bare
+                        ? ModStrings.Battlefield.ObstacleRockBare
+                        : ModStrings.Battlefield.ObstacleRock;
                     return true;
                 case BattlefieldObstacleKind.Fire:
                     words = ModStrings.Battlefield.ObstacleFire;
@@ -492,17 +502,19 @@ namespace SongsOfConquestAccess.UI
                     words = ModStrings.Battlefield.ObstacleWater;
                     return true;
                 case BattlefieldObstacleKind.Growth:
-                    words = Growth(theme);
+                    words = Growth(theme, bare);
                     return true;
                 case BattlefieldObstacleKind.Manufactured:
-                    words = Manufactured(theme);
+                    words = Manufactured(theme, bare);
                     return true;
                 case BattlefieldObstacleKind.Light:
-                    words = Light(theme);
+                    words = Light(theme, bare);
                     return true;
                 case BattlefieldObstacleKind.Gatepost:
                     // Stonework, and the same stonework whatever theme the battle is painted in.
-                    words = ModStrings.Battlefield.ObstacleGatepost;
+                    words = bare
+                        ? ModStrings.Battlefield.ObstacleGatepostBare
+                        : ModStrings.Battlefield.ObstacleGatepost;
                     return true;
                 default:
                     words = ModStrings.Battlefield.ObstacleRock;
@@ -510,66 +522,106 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        private static ModPluralString Growth(int theme)
+        private static ModPluralString Growth(int theme, bool bare)
         {
             switch (theme)
             {
                 case 1:
-                    return ModStrings.Battlefield.ObstacleGrowthLoth;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleGrowthLothBare
+                        : ModStrings.Battlefield.ObstacleGrowthLoth;
                 case 2:
-                    return ModStrings.Battlefield.ObstacleGrowthBarya;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleGrowthBaryaBare
+                        : ModStrings.Battlefield.ObstacleGrowthBarya;
                 case 3:
-                    return ModStrings.Battlefield.ObstacleGrowthRana;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleGrowthRanaBare
+                        : ModStrings.Battlefield.ObstacleGrowthRana;
                 case 4:
+                    // Purple heather is a mass noun in English: one string for both surfaces.
                     return ModStrings.Battlefield.ObstacleGrowthVanir;
                 case 5:
-                    return ModStrings.Battlefield.ObstacleGrowthRoots;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleGrowthRootsBare
+                        : ModStrings.Battlefield.ObstacleGrowthRoots;
                 case 6:
-                    return ModStrings.Battlefield.ObstacleGrowthYulan;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleGrowthYulanBare
+                        : ModStrings.Battlefield.ObstacleGrowthYulan;
                 default:
-                    return ModStrings.Battlefield.ObstacleGrowthArleon;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleGrowthArleonBare
+                        : ModStrings.Battlefield.ObstacleGrowthArleon;
             }
         }
 
-        private static ModPluralString Manufactured(int theme)
+        private static ModPluralString Manufactured(int theme, bool bare)
         {
             switch (theme)
             {
                 case 1:
-                    return ModStrings.Battlefield.ObstacleManufacturedLoth;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleManufacturedLothBare
+                        : ModStrings.Battlefield.ObstacleManufacturedLoth;
                 case 2:
-                    return ModStrings.Battlefield.ObstacleManufacturedBarya;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleManufacturedBaryaBare
+                        : ModStrings.Battlefield.ObstacleManufacturedBarya;
                 case 3:
-                    return ModStrings.Battlefield.ObstacleManufacturedRana;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleManufacturedRanaBare
+                        : ModStrings.Battlefield.ObstacleManufacturedRana;
                 case 4:
-                    return ModStrings.Battlefield.ObstacleManufacturedVanir;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleManufacturedVanirBare
+                        : ModStrings.Battlefield.ObstacleManufacturedVanir;
                 case 5:
-                    return ModStrings.Battlefield.ObstacleManufacturedRoots;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleManufacturedRootsBare
+                        : ModStrings.Battlefield.ObstacleManufacturedRoots;
                 case 6:
-                    return ModStrings.Battlefield.ObstacleManufacturedYulan;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleManufacturedYulanBare
+                        : ModStrings.Battlefield.ObstacleManufacturedYulan;
                 default:
-                    return ModStrings.Battlefield.ObstacleManufacturedArleon;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleManufacturedArleonBare
+                        : ModStrings.Battlefield.ObstacleManufacturedArleon;
             }
         }
 
-        private static ModPluralString Light(int theme)
+        private static ModPluralString Light(int theme, bool bare)
         {
             switch (theme)
             {
                 case 1:
-                    return ModStrings.Battlefield.ObstacleLightLoth;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleLightLothBare
+                        : ModStrings.Battlefield.ObstacleLightLoth;
                 case 2:
-                    return ModStrings.Battlefield.ObstacleLightBarya;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleLightBaryaBare
+                        : ModStrings.Battlefield.ObstacleLightBarya;
                 case 3:
-                    return ModStrings.Battlefield.ObstacleLightRana;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleLightRanaBare
+                        : ModStrings.Battlefield.ObstacleLightRana;
                 case 4:
-                    return ModStrings.Battlefield.ObstacleLightVanir;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleLightVanirBare
+                        : ModStrings.Battlefield.ObstacleLightVanir;
                 case 5:
+                    // Glowing blue mushrooms are already plural: one string for both surfaces.
                     return ModStrings.Battlefield.ObstacleLightRoots;
                 case 6:
-                    return ModStrings.Battlefield.ObstacleLightYulan;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleLightYulanBare
+                        : ModStrings.Battlefield.ObstacleLightYulan;
                 default:
-                    return ModStrings.Battlefield.ObstacleLightArleon;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleLightArleonBare
+                        : ModStrings.Battlefield.ObstacleLightArleon;
             }
         }
 

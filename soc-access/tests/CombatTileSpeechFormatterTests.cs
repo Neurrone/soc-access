@@ -121,7 +121,7 @@ namespace SongsOfConquestAccess.Tests
         {
             Assert.AreEqual("impassable, 4, 2", Describe(Blocked(null)));
             Assert.AreEqual(
-                "a gatepost, impassable, 4, 2",
+                "gatepost, impassable, 4, 2",
                 Describe(Blocked(new BattlefieldObstacle(BattlefieldObstacleKind.Gatepost, 0, 1))));
         }
 

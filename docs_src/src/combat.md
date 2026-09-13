@@ -46,16 +46,18 @@ The scanner's `Terrain` category holds one item per group, so a ridge is one sto
 
 ### What Blocks a Hex
 
-During a fight the board is repainted with the ground the battle was joined on, so a blocked hex has something on it worth naming, and the cursor and the scanner name it: `boulders, impassable`, `a torch, impassable`, `wall of 5 bushes, impassable`. The words depend on the faction theme the battle inherited:
+During a fight the board is repainted with the ground the battle was joined on, so a blocked hex has something on it worth naming, and the cursor and the scanner name it: `boulders, impassable`, `torch, impassable`, `wall of 5 bushes, impassable`. The words depend on the faction theme the battle inherited:
 
 | What it is | Arleon | Loth | Barya | Rana | Vanir | Roots | Yulan |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Rocks | boulders | boulders | boulders | boulders | boulders | boulders | boulders |
 | Plants | bushes | dark leafy plants | desert plants | pink mushrooms | purple heather | teal fungi | purple flowering shrubs |
-| A monument | a knight statue | a gargoyle statue | an animal statue | a dragon statue | a standing stone | a giant mushroom | a sage statue |
-| A light | a torch | a glowing crystal | a golden torch | a glowing pool | a torch | glowing blue mushrooms | a paper lantern |
+| A monument | knight statue | gargoyle statue | animal statue | dragon statue | standing stone | giant mushroom | sage statue |
+| A light | torch | glowing crystal | golden torch | glowing pool | torch | glowing blue mushrooms | paper lantern |
 
-A burning hex is `fire` and a water hex is `water` in every theme. So is `a gatepost`: the two blocked pieces framing the gate of a walled town siege are the same stonework whatever theme the battle is painted in, and a run of them is never called a wall, since they are the frame of a gate. A hex blocked by anything else is `impassable` with no name. A group of hexes holding more than one of these lists them, the commonest first: `wall of 6 bushes and boulders, impassable`.
+A burning hex is `fire` and a water hex is `water` in every theme. So is `gatepost`: the two blocked pieces framing the gate of a walled town siege are the same stonework whatever theme the battle is painted in, and a run of them is never called a wall, since they are the frame of a gate. A hex blocked by anything else is `impassable` with no name. A group of hexes holding more than one of these lists them, the commonest first: `wall of 6 bushes and boulders, impassable`.
+
+The cursor and the scanner are labels, so the noun is bare. A written layout description is prose, so the same hex is a noun phrase there: `a torch`, `a gatepost`, `a wall of bushes`.
 
 These words are heard in combat only. The deployment preview draws every blocked hex the same way, so the deployment grid says `impassable` and nothing else.
 

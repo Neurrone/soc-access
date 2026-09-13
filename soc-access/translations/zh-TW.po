@@ -4127,9 +4127,19 @@ msgctxt "Battlefield.ObstacleGatepost_0"
 msgid "a gatepost"
 msgstr "門柱"
 
+#. Battlefield.ObstacleGatepostBare_0
+msgctxt "Battlefield.ObstacleGatepostBare_0"
+msgid "gatepost"
+msgstr "門柱"
+
 #. Battlefield.ObstacleGrowthArleon_0
 msgctxt "Battlefield.ObstacleGrowthArleon_0"
 msgid "a bush"
+msgstr "灌木叢"
+
+#. Battlefield.ObstacleGrowthArleonBare_0
+msgctxt "Battlefield.ObstacleGrowthArleonBare_0"
+msgid "bush"
 msgstr "灌木叢"
 
 #. Battlefield.ObstacleGrowthBarya_0
@@ -4137,9 +4147,19 @@ msgctxt "Battlefield.ObstacleGrowthBarya_0"
 msgid "a desert plant"
 msgstr "沙漠植物"
 
+#. Battlefield.ObstacleGrowthBaryaBare_0
+msgctxt "Battlefield.ObstacleGrowthBaryaBare_0"
+msgid "desert plant"
+msgstr "沙漠植物"
+
 #. Battlefield.ObstacleGrowthLoth_0
 msgctxt "Battlefield.ObstacleGrowthLoth_0"
 msgid "a dark leafy plant"
+msgstr "深色闊葉植物"
+
+#. Battlefield.ObstacleGrowthLothBare_0
+msgctxt "Battlefield.ObstacleGrowthLothBare_0"
+msgid "dark leafy plant"
 msgstr "深色闊葉植物"
 
 #. Battlefield.ObstacleGrowthRana_0
@@ -4147,9 +4167,19 @@ msgctxt "Battlefield.ObstacleGrowthRana_0"
 msgid "a pink mushroom"
 msgstr "粉色蘑菇"
 
+#. Battlefield.ObstacleGrowthRanaBare_0
+msgctxt "Battlefield.ObstacleGrowthRanaBare_0"
+msgid "pink mushroom"
+msgstr "粉色蘑菇"
+
 #. Battlefield.ObstacleGrowthRoots_0
 msgctxt "Battlefield.ObstacleGrowthRoots_0"
 msgid "a teal fungus"
+msgstr "青綠色真菌"
+
+#. Battlefield.ObstacleGrowthRootsBare_0
+msgctxt "Battlefield.ObstacleGrowthRootsBare_0"
+msgid "teal fungus"
 msgstr "青綠色真菌"
 
 #. Battlefield.ObstacleGrowthVanir_0
@@ -4162,9 +4192,19 @@ msgctxt "Battlefield.ObstacleGrowthYulan_0"
 msgid "a purple flowering shrub"
 msgstr "紫色開花灌木"
 
+#. Battlefield.ObstacleGrowthYulanBare_0
+msgctxt "Battlefield.ObstacleGrowthYulanBare_0"
+msgid "purple flowering shrub"
+msgstr "紫色開花灌木"
+
 #. Battlefield.ObstacleLightArleon_0
 msgctxt "Battlefield.ObstacleLightArleon_0"
 msgid "a torch"
+msgstr "火把"
+
+#. Battlefield.ObstacleLightArleonBare_0
+msgctxt "Battlefield.ObstacleLightArleonBare_0"
+msgid "torch"
 msgstr "火把"
 
 #. Battlefield.ObstacleLightBarya_0
@@ -4172,14 +4212,29 @@ msgctxt "Battlefield.ObstacleLightBarya_0"
 msgid "a golden torch"
 msgstr "金色火把"
 
+#. Battlefield.ObstacleLightBaryaBare_0
+msgctxt "Battlefield.ObstacleLightBaryaBare_0"
+msgid "golden torch"
+msgstr "金色火把"
+
 #. Battlefield.ObstacleLightLoth_0
 msgctxt "Battlefield.ObstacleLightLoth_0"
 msgid "a glowing crystal"
 msgstr "發光水晶"
 
+#. Battlefield.ObstacleLightLothBare_0
+msgctxt "Battlefield.ObstacleLightLothBare_0"
+msgid "glowing crystal"
+msgstr "發光水晶"
+
 #. Battlefield.ObstacleLightRana_0
 msgctxt "Battlefield.ObstacleLightRana_0"
 msgid "a glowing pool"
+msgstr "發光水池"
+
+#. Battlefield.ObstacleLightRanaBare_0
+msgctxt "Battlefield.ObstacleLightRanaBare_0"
+msgid "glowing pool"
 msgstr "發光水池"
 
 #. Battlefield.ObstacleLightRoots_0
@@ -4192,9 +4247,19 @@ msgctxt "Battlefield.ObstacleLightVanir_0"
 msgid "a torch"
 msgstr "火把"
 
+#. Battlefield.ObstacleLightVanirBare_0
+msgctxt "Battlefield.ObstacleLightVanirBare_0"
+msgid "torch"
+msgstr "火把"
+
 #. Battlefield.ObstacleLightYulan_0
 msgctxt "Battlefield.ObstacleLightYulan_0"
 msgid "a paper lantern"
+msgstr "紙燈籠"
+
+#. Battlefield.ObstacleLightYulanBare_0
+msgctxt "Battlefield.ObstacleLightYulanBare_0"
+msgid "paper lantern"
 msgstr "紙燈籠"
 
 #. Battlefield.ObstacleManufacturedArleon_0
@@ -4202,9 +4267,19 @@ msgctxt "Battlefield.ObstacleManufacturedArleon_0"
 msgid "a knight statue"
 msgstr "騎士雕像"
 
+#. Battlefield.ObstacleManufacturedArleonBare_0
+msgctxt "Battlefield.ObstacleManufacturedArleonBare_0"
+msgid "knight statue"
+msgstr "騎士雕像"
+
 #. Battlefield.ObstacleManufacturedBarya_0
 msgctxt "Battlefield.ObstacleManufacturedBarya_0"
 msgid "an animal statue"
+msgstr "動物雕像"
+
+#. Battlefield.ObstacleManufacturedBaryaBare_0
+msgctxt "Battlefield.ObstacleManufacturedBaryaBare_0"
+msgid "animal statue"
 msgstr "動物雕像"
 
 #. Battlefield.ObstacleManufacturedLoth_0
@@ -4212,9 +4287,19 @@ msgctxt "Battlefield.ObstacleManufacturedLoth_0"
 msgid "a gargoyle statue"
 msgstr "石像鬼雕像"
 
+#. Battlefield.ObstacleManufacturedLothBare_0
+msgctxt "Battlefield.ObstacleManufacturedLothBare_0"
+msgid "gargoyle statue"
+msgstr "石像鬼雕像"
+
 #. Battlefield.ObstacleManufacturedRana_0
 msgctxt "Battlefield.ObstacleManufacturedRana_0"
 msgid "a dragon statue"
+msgstr "巨龍雕像"
+
+#. Battlefield.ObstacleManufacturedRanaBare_0
+msgctxt "Battlefield.ObstacleManufacturedRanaBare_0"
+msgid "dragon statue"
 msgstr "巨龍雕像"
 
 #. Battlefield.ObstacleManufacturedRoots_0
@@ -4222,9 +4307,19 @@ msgctxt "Battlefield.ObstacleManufacturedRoots_0"
 msgid "a giant mushroom"
 msgstr "巨型蘑菇"
 
+#. Battlefield.ObstacleManufacturedRootsBare_0
+msgctxt "Battlefield.ObstacleManufacturedRootsBare_0"
+msgid "giant mushroom"
+msgstr "巨型蘑菇"
+
 #. Battlefield.ObstacleManufacturedVanir_0
 msgctxt "Battlefield.ObstacleManufacturedVanir_0"
 msgid "a standing stone"
+msgstr "立石"
+
+#. Battlefield.ObstacleManufacturedVanirBare_0
+msgctxt "Battlefield.ObstacleManufacturedVanirBare_0"
+msgid "standing stone"
 msgstr "立石"
 
 #. Battlefield.ObstacleManufacturedYulan_0
@@ -4232,9 +4327,19 @@ msgctxt "Battlefield.ObstacleManufacturedYulan_0"
 msgid "a sage statue"
 msgstr "賢者雕像"
 
+#. Battlefield.ObstacleManufacturedYulanBare_0
+msgctxt "Battlefield.ObstacleManufacturedYulanBare_0"
+msgid "sage statue"
+msgstr "賢者雕像"
+
 #. Battlefield.ObstacleRock_0
 msgctxt "Battlefield.ObstacleRock_0"
 msgid "a boulder"
+msgstr "巨石"
+
+#. Battlefield.ObstacleRockBare_0
+msgctxt "Battlefield.ObstacleRockBare_0"
+msgid "boulder"
 msgstr "巨石"
 
 #. Battlefield.ObstacleWater_0

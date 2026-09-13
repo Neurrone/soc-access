@@ -82,6 +82,15 @@
         /// them takes whichever form names the cell: the plural where a cell holds many (boulders,
         /// bushes), the singular where it holds one (a statue, a torch).
         ///
+        /// Each word comes in two forms, because a description is prose and a cursor line is a
+        /// label. The plain name is the DESCRIPTION form and carries an article, so a placeholder
+        /// expands to a noun phrase - "a wall of bushes", "a gatepost"; the Bare name beside it is
+        /// the bare noun the CURSOR AND THE SCANNER speak - "gatepost, impassable". They are two
+        /// strings rather than one with the article cut off at runtime, because the article's form
+        /// follows the noun's gender and its opening sound in most of the thirteen languages. A
+        /// word English writes without an article (water, fire, purple heather, glowing blue
+        /// mushrooms) has the same two forms, so one string serves both surfaces.
+        ///
         /// These are spoken IN COMBAT ONLY. The placement page's preview draws a blocked cell as a
         /// puck with no style, so there it stays plain impassable.
         ///
@@ -92,28 +101,49 @@
         public static class Battlefield
         {
             public static readonly ModPluralString ObstacleRock = new ModPluralString("Battlefield.ObstacleRock", "a boulder", "boulders");
+            public static readonly ModPluralString ObstacleRockBare = new ModPluralString("Battlefield.ObstacleRockBare", "boulder", "boulders");
             public static readonly ModPluralString ObstacleGrowthArleon = new ModPluralString("Battlefield.ObstacleGrowthArleon", "a bush", "bushes");
+            public static readonly ModPluralString ObstacleGrowthArleonBare = new ModPluralString("Battlefield.ObstacleGrowthArleonBare", "bush", "bushes");
             public static readonly ModPluralString ObstacleGrowthLoth = new ModPluralString("Battlefield.ObstacleGrowthLoth", "a dark leafy plant", "dark leafy plants");
+            public static readonly ModPluralString ObstacleGrowthLothBare = new ModPluralString("Battlefield.ObstacleGrowthLothBare", "dark leafy plant", "dark leafy plants");
             public static readonly ModPluralString ObstacleGrowthBarya = new ModPluralString("Battlefield.ObstacleGrowthBarya", "a desert plant", "desert plants");
+            public static readonly ModPluralString ObstacleGrowthBaryaBare = new ModPluralString("Battlefield.ObstacleGrowthBaryaBare", "desert plant", "desert plants");
             public static readonly ModPluralString ObstacleGrowthRana = new ModPluralString("Battlefield.ObstacleGrowthRana", "a pink mushroom", "pink mushrooms");
+            public static readonly ModPluralString ObstacleGrowthRanaBare = new ModPluralString("Battlefield.ObstacleGrowthRanaBare", "pink mushroom", "pink mushrooms");
             public static readonly ModPluralString ObstacleGrowthVanir = new ModPluralString("Battlefield.ObstacleGrowthVanir", "purple heather", "purple heather");
             public static readonly ModPluralString ObstacleGrowthRoots = new ModPluralString("Battlefield.ObstacleGrowthRoots", "a teal fungus", "teal fungi");
+            public static readonly ModPluralString ObstacleGrowthRootsBare = new ModPluralString("Battlefield.ObstacleGrowthRootsBare", "teal fungus", "teal fungi");
             public static readonly ModPluralString ObstacleGrowthYulan = new ModPluralString("Battlefield.ObstacleGrowthYulan", "a purple flowering shrub", "purple flowering shrubs");
+            public static readonly ModPluralString ObstacleGrowthYulanBare = new ModPluralString("Battlefield.ObstacleGrowthYulanBare", "purple flowering shrub", "purple flowering shrubs");
             public static readonly ModPluralString ObstacleManufacturedArleon = new ModPluralString("Battlefield.ObstacleManufacturedArleon", "a knight statue", "knight statues");
+            public static readonly ModPluralString ObstacleManufacturedArleonBare = new ModPluralString("Battlefield.ObstacleManufacturedArleonBare", "knight statue", "knight statues");
             public static readonly ModPluralString ObstacleManufacturedLoth = new ModPluralString("Battlefield.ObstacleManufacturedLoth", "a gargoyle statue", "gargoyle statues");
+            public static readonly ModPluralString ObstacleManufacturedLothBare = new ModPluralString("Battlefield.ObstacleManufacturedLothBare", "gargoyle statue", "gargoyle statues");
             public static readonly ModPluralString ObstacleManufacturedBarya = new ModPluralString("Battlefield.ObstacleManufacturedBarya", "an animal statue", "animal statues");
+            public static readonly ModPluralString ObstacleManufacturedBaryaBare = new ModPluralString("Battlefield.ObstacleManufacturedBaryaBare", "animal statue", "animal statues");
             public static readonly ModPluralString ObstacleManufacturedRana = new ModPluralString("Battlefield.ObstacleManufacturedRana", "a dragon statue", "dragon statues");
+            public static readonly ModPluralString ObstacleManufacturedRanaBare = new ModPluralString("Battlefield.ObstacleManufacturedRanaBare", "dragon statue", "dragon statues");
             public static readonly ModPluralString ObstacleManufacturedVanir = new ModPluralString("Battlefield.ObstacleManufacturedVanir", "a standing stone", "standing stones");
+            public static readonly ModPluralString ObstacleManufacturedVanirBare = new ModPluralString("Battlefield.ObstacleManufacturedVanirBare", "standing stone", "standing stones");
             public static readonly ModPluralString ObstacleManufacturedRoots = new ModPluralString("Battlefield.ObstacleManufacturedRoots", "a giant mushroom", "giant mushrooms");
+            public static readonly ModPluralString ObstacleManufacturedRootsBare = new ModPluralString("Battlefield.ObstacleManufacturedRootsBare", "giant mushroom", "giant mushrooms");
             public static readonly ModPluralString ObstacleManufacturedYulan = new ModPluralString("Battlefield.ObstacleManufacturedYulan", "a sage statue", "sage statues");
+            public static readonly ModPluralString ObstacleManufacturedYulanBare = new ModPluralString("Battlefield.ObstacleManufacturedYulanBare", "sage statue", "sage statues");
             public static readonly ModPluralString ObstacleLightArleon = new ModPluralString("Battlefield.ObstacleLightArleon", "a torch", "torches");
+            public static readonly ModPluralString ObstacleLightArleonBare = new ModPluralString("Battlefield.ObstacleLightArleonBare", "torch", "torches");
             public static readonly ModPluralString ObstacleLightLoth = new ModPluralString("Battlefield.ObstacleLightLoth", "a glowing crystal", "glowing crystals");
+            public static readonly ModPluralString ObstacleLightLothBare = new ModPluralString("Battlefield.ObstacleLightLothBare", "glowing crystal", "glowing crystals");
             public static readonly ModPluralString ObstacleLightBarya = new ModPluralString("Battlefield.ObstacleLightBarya", "a golden torch", "golden torches");
+            public static readonly ModPluralString ObstacleLightBaryaBare = new ModPluralString("Battlefield.ObstacleLightBaryaBare", "golden torch", "golden torches");
             public static readonly ModPluralString ObstacleLightRana = new ModPluralString("Battlefield.ObstacleLightRana", "a glowing pool", "glowing pools");
+            public static readonly ModPluralString ObstacleLightRanaBare = new ModPluralString("Battlefield.ObstacleLightRanaBare", "glowing pool", "glowing pools");
             public static readonly ModPluralString ObstacleLightVanir = new ModPluralString("Battlefield.ObstacleLightVanir", "a torch", "torches");
+            public static readonly ModPluralString ObstacleLightVanirBare = new ModPluralString("Battlefield.ObstacleLightVanirBare", "torch", "torches");
             public static readonly ModPluralString ObstacleLightRoots = new ModPluralString("Battlefield.ObstacleLightRoots", "glowing blue mushrooms", "glowing blue mushrooms");
             public static readonly ModPluralString ObstacleLightYulan = new ModPluralString("Battlefield.ObstacleLightYulan", "a paper lantern", "paper lanterns");
+            public static readonly ModPluralString ObstacleLightYulanBare = new ModPluralString("Battlefield.ObstacleLightYulanBare", "paper lantern", "paper lanterns");
             public static readonly ModPluralString ObstacleGatepost = new ModPluralString("Battlefield.ObstacleGatepost", "a gatepost", "gateposts");
+            public static readonly ModPluralString ObstacleGatepostBare = new ModPluralString("Battlefield.ObstacleGatepostBare", "gatepost", "gateposts");
             public static readonly ModPluralString ObstacleFire = new ModPluralString("Battlefield.ObstacleFire", "fire", "fire");
             public static readonly ModPluralString ObstacleWater = new ModPluralString("Battlefield.ObstacleWater", "water", "water");
             public static readonly ModString DescriptionChokePoint = new ModString("Battlefield.DescriptionChokePoint", "a choke point");

@@ -20,8 +20,8 @@ namespace SongsOfConquestAccess.Tests
         {
             Assert.AreEqual("boulders, impassable", CellAt(ArleonTheme, "..B", 2, 0));
             Assert.AreEqual("bushes, impassable", CellAt(ArleonTheme, "..G", 2, 0));
-            Assert.AreEqual("a torch, impassable", CellAt(ArleonTheme, "..L", 2, 0));
-            Assert.AreEqual("a knight statue, impassable", CellAt(ArleonTheme, "..M", 2, 0));
+            Assert.AreEqual("torch, impassable", CellAt(ArleonTheme, "..L", 2, 0));
+            Assert.AreEqual("knight statue, impassable", CellAt(ArleonTheme, "..M", 2, 0));
             Assert.AreEqual("fire, impassable", CellAt(ArleonTheme, "..F", 2, 0));
             Assert.AreEqual("water, impassable", CellAt(ArleonTheme, "..W", 2, 0));
         }
@@ -32,8 +32,44 @@ namespace SongsOfConquestAccess.Tests
         public void TheWordForAnObstacleFollowsTheThemeTheBoardIsPaintedWith()
         {
             Assert.AreEqual("pink mushrooms, impassable", CellAt(3, "..G", 2, 0));
-            Assert.AreEqual("a standing stone, impassable", CellAt(4, "..M", 2, 0));
+            Assert.AreEqual("standing stone, impassable", CellAt(4, "..M", 2, 0));
             Assert.AreEqual("glowing blue mushrooms, impassable", CellAt(5, "..L", 2, 0));
+        }
+
+        /// <summary>THE ARTICLE IS THE DESCRIPTION'S, not the cursor's. A cursor line is a label, so
+        /// the noun it names an obstacle with is bare.</summary>
+        [TestMethod]
+        public void TheCursorSpeaksAnObstacleAsABareNoun()
+        {
+            Assert.AreEqual("torch, impassable", CellAt(ArleonTheme, "..L", 2, 0));
+        }
+
+        /// <summary>A scanner item is a label too, whether the group under it is one cell or many.
+        /// </summary>
+        [TestMethod]
+        public void TheScannerSpeaksAnObstacleAsABareNoun()
+        {
+            Assert.AreEqual("torch, impassable", ImpassableGroup(ArleonTheme, "L..", "...", "..."));
+        }
+
+        /// <summary>A description is prose, and the same torch is a noun phrase inside it.</summary>
+        [TestMethod]
+        public void ADescriptionNamesTheSameObstacleWithItsArticle()
+        {
+            Assert.AreEqual("a torch", Expand("{0,1}", Analyse(ArleonTheme, true, "...", "L..", "...")));
+        }
+
+        /// <summary>More than one of a thing is the same word on both surfaces - an English plural
+        /// carries no article - and only the wording around it differs.</summary>
+        [TestMethod]
+        public void AGroupOfObstaclesIsThePluralOnBothSurfaces()
+        {
+            Assert.AreEqual(
+                "wall of 5 torches, impassable",
+                ImpassableGroup(ArleonTheme, ".....", "LLLLL", "....."));
+            Assert.AreEqual(
+                "a wall of torches",
+                Expand("{0,1}", Analyse(ArleonTheme, true, ".....", "LLLLL", ".....")));
         }
 
         /// <summary>A group of blocked cells is named by what is on it and how much of it there is,
@@ -76,9 +112,9 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void GatepostsAreOneWordInEveryThemeAndAreNeverAWall()
         {
-            Assert.AreEqual("a gatepost, impassable", CellAt(ArleonTheme, "..P", 2, 0));
-            Assert.AreEqual("a gatepost, impassable", CellAt(4, "..P", 2, 0));
-            Assert.AreEqual("a gatepost, impassable", ImpassableGroup(ArleonTheme, "P..", "...", "..."));
+            Assert.AreEqual("gatepost, impassable", CellAt(ArleonTheme, "..P", 2, 0));
+            Assert.AreEqual("gatepost, impassable", CellAt(4, "..P", 2, 0));
+            Assert.AreEqual("gatepost, impassable", ImpassableGroup(ArleonTheme, "P..", "...", "..."));
             Assert.AreEqual("gateposts, 2 cells, impassable", ImpassableGroup(ArleonTheme, "PP.", "...", "..."));
             Assert.AreEqual(
                 "gateposts, 5 cells, impassable",
