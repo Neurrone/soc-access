@@ -406,6 +406,22 @@ namespace SongsOfConquestAccess.Battlefields
             return Within(point, _width, _height) ? _kinds[point.x, point.y] : BattlefieldCellKind.OffGrid;
         }
 
+        /// <summary>The group a cell belongs to, which is how an authored description points at
+        /// one: the feature comes first and a choke point last, so a cell that is both is named as
+        /// the feature it is. Null for a cell in no group at all.</summary>
+        public BattlefieldRegion RegionAt(Vector2Int point)
+        {
+            for (int i = 0; i < _regions.Count; i++)
+            {
+                if (_regions[i].Cells.Contains(point))
+                {
+                    return _regions[i];
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>What blocks one cell, where the caller asked for obstacles and the cell is
         /// blocked at all; null everywhere else.</summary>
         public BattlefieldObstacle GetObstacle(Vector2Int point)

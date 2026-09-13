@@ -500,7 +500,7 @@ namespace SongsOfConquestAccess.Screens
         {
             BattlefieldDescription description;
             BattlefieldDescriptions.TryGet(Live.BattlefieldKey, out description);
-            return BattlefieldText.Lines(description);
+            return BattlefieldText.Lines(description, Live.GetTerrain(), Live.WarnUnknownRegion);
         }
 
         // ---- keys ----

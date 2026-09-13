@@ -61,7 +61,81 @@ namespace SongsOfConquestAccess.Tests
             Assert.IsNull(terrain.GetObstacle(new Vector2Int(0, 1)));
         }
 
+        /// <summary>A description points at a feature with the coordinates of one of its cells, and
+        /// the words come from the ground as it is now: the shape, and the height in parentheses.
+        /// </summary>
+        [TestMethod]
+        public void APlaceholderBecomesTheFeatureTheGroundHas()
+        {
+            BattlefieldTerrain terrain = Elevated(
+                ".............",
+                ".............",
+                "1............",
+                "......11.....",
+                "..1..111.....",
+                "..1.11.......",
+                "..1..........",
+                "..1..........",
+                "..1..........");
+
+            Assert.AreEqual(
+                "a diagonal ridge (height 1) and a vertical ridge (height 1)",
+                Expand("{4,3} and {2,0}", terrain));
+            Assert.AreEqual("a single cell (height 1)", Expand("{0,6}", terrain));
+        }
+
+        /// <summary>The same placeholder is impassable ground on the placement page and what is
+        /// standing on it in the fight, because the fight is what painted it there.</summary>
+        [TestMethod]
+        public void APlaceholderNamesBlockedGroundByWhatTheFightPaintedOnIt()
+        {
+            Assert.AreEqual("an impassable cell", Expand("{0,0}", Analyse(ArleonTheme, false, "...", "...", "B..")));
+            Assert.AreEqual("a wall of impassable cells", Expand("{0,1}", Analyse(ArleonTheme, false, ".....", "GGGGG", ".....")));
+            Assert.AreEqual("a boulder", Expand("{0,0}", Analyse(ArleonTheme, true, "...", "...", "B..")));
+            Assert.AreEqual("a wall of bushes", Expand("{0,1}", Analyse(ArleonTheme, true, ".....", "GGGGG", ".....")));
+            Assert.AreEqual("boulders and bushes", Expand("{0,1}", Analyse(ArleonTheme, true, "...", "BG.", "...")));
+        }
+
+        /// <summary>A placeholder pointing at no group at all is an authoring mistake: it says
+        /// nothing and is reported once.</summary>
+        [TestMethod]
+        public void APlaceholderThatNamesNoGroupSaysNothingAndIsReported()
+        {
+            BattlefieldTerrain terrain = Elevated("...", "...", "1..");
+            List<string> reported = new List<string>();
+            string text = BattlefieldText.Expand("Open ground with {2,2}.", terrain, reported.Add);
+
+            Assert.AreEqual("Open ground with .", text);
+            CollectionAssert.AreEqual(new[] { "{2,2}" }, reported);
+        }
+
         private const int ArleonTheme = 0;
+
+        private static string Expand(string text, BattlefieldTerrain terrain)
+        {
+            return BattlefieldText.Expand(text, terrain, null);
+        }
+
+        /// <summary>Rows top first, a digit raised ground of that height and <c>'.'</c> flat.
+        /// </summary>
+        private static BattlefieldTerrain Elevated(params string[] rows)
+        {
+            int height = rows.Length;
+            int width = rows[0].Length;
+            List<BattlefieldCell> cells = new List<BattlefieldCell>(width * height);
+            for (int y = 0; y < height; y++)
+            {
+                string row = rows[height - 1 - y];
+                for (int x = 0; x < width; x++)
+                {
+                    char glyph = row[x];
+                    cells.Add(new BattlefieldCell(
+                        new Vector2Int(x, y), true, glyph >= '1' && glyph <= '9' ? glyph - '0' : 0, false, 0));
+                }
+            }
+
+            return BattlefieldTerrain.Analyse(new Vector2Int(width, height), cells, false);
+        }
 
         private static string CellAt(int theme, string row, int x, int y)
         {

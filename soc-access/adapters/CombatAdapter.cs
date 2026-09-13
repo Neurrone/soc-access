@@ -230,6 +230,7 @@ namespace SongsOfConquestAccess.Adapters
         // fight; obstacles an ability creates are entities and are not this.
         private BattlefieldTerrain _terrain;
         private object _terrainLevel;
+        private bool _warnedUnknownRegion;
         // This frame's answer to "which enemies reach that tile", for the one tile it was asked
         // about. See BuildEnemyInfluenceSources.
         private List<CombatInfluenceSource> _influenceSources;
@@ -575,6 +576,22 @@ namespace SongsOfConquestAccess.Adapters
             tile.Kind = terrain != null ? terrain.GetKind(point) : BattlefieldCellKind.OffGrid;
             tile.Obstacle = terrain != null ? terrain.GetObstacle(point) : null;
             return tile;
+        }
+
+        /// <summary>An authored description pointed at a cell no group of ground covers. Said once
+        /// for the life of this adapter - one menu, one battle - because a description is read
+        /// again every time the node is, and an authoring mistake is worth one line in the log and
+        /// not one a frame.</summary>
+        public void WarnUnknownRegion(string placeholder)
+        {
+            if (_warnedUnknownRegion)
+            {
+                return;
+            }
+
+            _warnedUnknownRegion = true;
+            SocAccessMod.Instance?.LogWarning(
+                "The description of " + BattlefieldKey + " points at " + placeholder + ", which is no group of ground");
         }
 
         /// <summary>The ground this battle is fought on, analysed once per level: terrain does not

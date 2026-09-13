@@ -88,6 +88,7 @@ namespace SongsOfConquestAccess.Adapters
         // so a page whose map is not there yet costs one pass and not one per frame.
         private BattlefieldTerrain _terrain;
         private bool _terrainProbed;
+        private bool _warnedUnknownRegion;
 
         private enum BattleParticipantSide
         {
@@ -751,10 +752,27 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+
+        /// <summary>An authored description pointed at a cell no group of ground covers. Said once
+        /// for the life of this adapter - one menu, one battle - because a description is read
+        /// again every time the node is, and an authoring mistake is worth one line in the log and
+        /// not one a frame.</summary>
+        public void WarnUnknownRegion(string placeholder)
+        {
+            if (_warnedUnknownRegion)
+            {
+                return;
+            }
+
+            _warnedUnknownRegion = true;
+            SocAccessMod.Instance?.LogWarning(
+                "The description of " + BattlefieldKey + " points at " + placeholder + ", which is no group of ground");
+        }
+
         /// <summary>The ground this layout is made of, analysed once for the adapter's lifetime: the
         /// terrain of a battle is settled before the placement page opens and nothing on the page
         /// changes it.</summary>
-        private BattlefieldTerrain GetTerrain()
+        public BattlefieldTerrain GetTerrain()
         {
             if (_terrain != null || _terrainProbed)
             {

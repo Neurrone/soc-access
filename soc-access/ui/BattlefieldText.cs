@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Localization;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
 {
@@ -20,9 +24,14 @@ namespace SongsOfConquestAccess.UI
     /// </summary>
     public static class BattlefieldText
     {
+        /// <summary>A reference to a group of ground in an authored description: the raw
+        /// coordinates of any one of its cells, as the dump's <c>regions</c> list them.</summary>
+        private static readonly Regex RegionPlaceholder = new Regex(@"\{\s*(\d+)\s*,\s*(\d+)\s*\}");
+
         /// <summary>The three lines of a description, one per field so the review buffer holds three
         /// and the node speaks them as one body. Empty where the layout has no description.</summary>
-        public static List<string> Lines(BattlefieldDescription description)
+        public static List<string> Lines(
+            BattlefieldDescription description, BattlefieldTerrain terrain, Action<string> onUnknownRegion)
         {
             List<string> lines = new List<string>(3);
             if (description == null)
@@ -30,15 +39,15 @@ namespace SongsOfConquestAccess.UI
                 return lines;
             }
 
-            AddLine(lines, ModStrings.Screens.DescriptionTerrain, description.Terrain);
-            AddLine(lines, ModStrings.Screens.DescriptionAttacker, description.Attacker);
-            AddLine(lines, ModStrings.Screens.DescriptionDefender, description.Defender);
+            AddLine(lines, ModStrings.Screens.DescriptionTerrain, description.Terrain, terrain, onUnknownRegion);
+            AddLine(lines, ModStrings.Screens.DescriptionAttacker, description.Attacker, terrain, onUnknownRegion);
+            AddLine(lines, ModStrings.Screens.DescriptionDefender, description.Defender, terrain, onUnknownRegion);
             return lines;
         }
 
         /// <summary>What the describe-battlefield gesture says on the placement board: the three
         /// labelled lines as one breath, or that nobody has described this layout.</summary>
-        public static string Spoken(string layoutKey)
+        public static string Spoken(string layoutKey, BattlefieldTerrain terrain, Action<string> onUnknownRegion)
         {
             BattlefieldDescription description;
             if (!BattlefieldDescriptions.TryGet(layoutKey, out description))
@@ -46,20 +55,142 @@ namespace SongsOfConquestAccess.UI
                 return ModText.Get(ModStrings.Screens.NoBattlefieldDescription);
             }
 
-            List<string> lines = Lines(description);
+            List<string> lines = Lines(description, terrain, onUnknownRegion);
             return lines.Count == 0
                 ? ModText.Get(ModStrings.Screens.NoBattlefieldDescription)
                 : ModText.JoinList(ModStrings.Common.PhraseSeparator, lines);
         }
 
         /// <summary>What the same gesture says in combat: the terrain alone, unlabelled.</summary>
-        public static string SpokenTerrain(string layoutKey)
+        public static string SpokenTerrain(string layoutKey, BattlefieldTerrain terrain, Action<string> onUnknownRegion)
         {
             BattlefieldDescription description;
             return BattlefieldDescriptions.TryGet(layoutKey, out description)
                 && !string.IsNullOrWhiteSpace(description.Terrain)
-                ? description.Terrain
+                ? Expand(description.Terrain, terrain, onUnknownRegion)
                 : ModText.Get(ModStrings.Screens.NoBattlefieldDescription);
+        }
+
+        /// <summary>
+        /// AN AUTHORED DESCRIPTION AGAINST THE GROUND IT DESCRIBES. A description never names a
+        /// feature in words: it points at one with the coordinates of any of its cells,
+        /// <c>{4,3}</c>, and the words come from the live reading of the board - so the same
+        /// sentence says "a diagonal ridge (height 1)" on the placement page and "a wall of bushes"
+        /// in the fight that painted bushes onto it, and a shape rule that changes changes both.
+        ///
+        /// A placeholder pointing at no group at all is an authoring mistake: it expands to nothing
+        /// and <paramref name="onUnknownRegion"/> is told, which is how it gets said once rather
+        /// than once a frame.
+        /// </summary>
+        public static string Expand(string text, BattlefieldTerrain terrain, Action<string> onUnknownRegion)
+        {
+            if (string.IsNullOrEmpty(text) || text.IndexOf('{') < 0)
+            {
+                return text;
+            }
+
+            return RegionPlaceholder.Replace(text, match =>
+            {
+                int x;
+                int y;
+                if (terrain == null
+                    || !int.TryParse(match.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out x)
+                    || !int.TryParse(match.Groups[2].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out y))
+                {
+                    Unknown(onUnknownRegion, match.Value);
+                    return string.Empty;
+                }
+
+                BattlefieldRegion region = terrain.RegionAt(new Vector2Int(x, y));
+                if (region == null)
+                {
+                    Unknown(onUnknownRegion, match.Value);
+                    return string.Empty;
+                }
+
+                return RegionDescription(region);
+            });
+        }
+
+        /// <summary>
+        /// WHAT ONE GROUP OF GROUND IS CALLED INSIDE A SENTENCE, which is not what the scanner calls
+        /// it: a description is prose, so the height goes in parentheses, the count is left out, and
+        /// impassability is never spoken - the player is being told the shape of the board, and "a
+        /// wall of bushes" already says nothing walks through it.
+        /// </summary>
+        public static string RegionDescription(BattlefieldRegion region)
+        {
+            if (region == null)
+            {
+                return string.Empty;
+            }
+
+            switch (region.Kind)
+            {
+                case BattlefieldRegionKind.Elevated:
+                    return ModText.Get(ElevatedDescription(region.Shape), region.Height);
+                case BattlefieldRegionKind.Cliff:
+                    return ModText.Get(ModStrings.Battlefield.DescriptionCliffs);
+                case BattlefieldRegionKind.ChokePoint:
+                    return ModText.Get(ModStrings.Battlefield.DescriptionChokePoint);
+                case BattlefieldRegionKind.Impassable:
+                    return ImpassableDescription(region);
+                case BattlefieldRegionKind.Wall:
+                    return ModText.Get(ModStrings.Battlefield.DescriptionWall, region.Height);
+                case BattlefieldRegionKind.Tower:
+                    return ModText.Get(ModStrings.Battlefield.DescriptionTower, region.Height);
+                case BattlefieldRegionKind.Stairs:
+                    return ModText.Get(ModStrings.Battlefield.DescriptionStairs, region.Height);
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static ModString ElevatedDescription(BattlefieldRegionShape shape)
+        {
+            switch (shape)
+            {
+                case BattlefieldRegionShape.SingleCell:
+                    return ModStrings.Battlefield.DescriptionSingleCell;
+                case BattlefieldRegionShape.Ridge:
+                    return ModStrings.Battlefield.DescriptionRidge;
+                case BattlefieldRegionShape.VerticalRidge:
+                    return ModStrings.Battlefield.DescriptionRidgeVertical;
+                case BattlefieldRegionShape.DiagonalRidge:
+                    return ModStrings.Battlefield.DescriptionRidgeDiagonal;
+                default:
+                    return ModStrings.Battlefield.DescriptionPatch;
+            }
+        }
+
+        /// <summary>Blocked ground in a sentence: what is standing on it where the fight named it,
+        /// and the plain words where nothing did.</summary>
+        private static string ImpassableDescription(BattlefieldRegion region)
+        {
+            if (region.Obstacles.Count == 0)
+            {
+                if (region.IsRidge)
+                {
+                    return ModText.Get(ModStrings.Battlefield.DescriptionImpassableWall);
+                }
+
+                return ModText.Get(region.Count == 1
+                    ? ModStrings.Battlefield.DescriptionImpassableCell
+                    : ModStrings.Battlefield.DescriptionImpassableCells);
+            }
+
+            string words = ObstacleWords(region.Obstacles, region.Count);
+            return region.IsRidge
+                ? ModText.Get(ModStrings.Battlefield.DescriptionObstacleWall, words)
+                : words;
+        }
+
+        private static void Unknown(Action<string> onUnknownRegion, string placeholder)
+        {
+            if (onUnknownRegion != null)
+            {
+                onUnknownRegion(placeholder);
+            }
         }
 
         /// <summary>
@@ -333,11 +464,16 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        private static void AddLine(List<string> lines, ModString label, string text)
+        private static void AddLine(
+            List<string> lines,
+            ModString label,
+            string text,
+            BattlefieldTerrain terrain,
+            Action<string> onUnknownRegion)
         {
             if (!string.IsNullOrWhiteSpace(text))
             {
-                lines.Add(ModText.Get(label, text));
+                lines.Add(ModText.Get(label, Expand(text, terrain, onUnknownRegion)));
             }
         }
     }

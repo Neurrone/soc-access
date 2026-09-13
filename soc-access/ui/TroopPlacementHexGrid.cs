@@ -144,7 +144,9 @@ namespace SongsOfConquestAccess.UI
         private bool SpeakDescription()
         {
             SpeechPipeline.Output(new SpeechRequest(
-                BattlefieldText.Spoken(_adapter != null ? _adapter.BattlefieldKey : null),
+                _adapter == null
+                    ? BattlefieldText.Spoken(null, null, null)
+                    : BattlefieldText.Spoken(_adapter.BattlefieldKey, _adapter.GetTerrain(), _adapter.WarnUnknownRegion),
                 interrupt: false));
             return true;
         }
