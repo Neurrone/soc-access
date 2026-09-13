@@ -1,0 +1,5 @@
+{
+  "terrain": "Otwarty teren w centrum, {1,1} u dołu po lewej, {9,1} u dołu po prawej, {1,6} u góry po lewej i {11,6} u góry po prawej. {3,3} i {8,3} stoją po lewej i po prawej stronie centrum.",
+  "attacker": "Punkty rozmieszczenia atakującego są skupione w centrum planszy.",
+  "defender": "Punkty rozmieszczenia obrońcy otaczają punkty atakującego, po dwa w każdym rogu i jeden u dołu na środku."
+}

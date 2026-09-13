@@ -1,0 +1,5 @@
+{
+  "terrain": "Otwarty teren, {10,0} u dołu po prawej. Obrońca trzyma trzy krótkie odcinki murów: wieżę z murem za nią u dołu na środku, taką samą parę u góry na środku i wieżę z dwoma murami na środku po prawej. Przy każdej wieży prowadzą w górę schody, a mury stoją osobno, z otwartym terenem między nimi.",
+  "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi, na otwartym terenie przed murami.",
+  "defender": "Punkty rozmieszczenia obrońcy rozciągają się przez centrum i prawą stronę planszy, sześć z nich na wieżach i murach."
+}

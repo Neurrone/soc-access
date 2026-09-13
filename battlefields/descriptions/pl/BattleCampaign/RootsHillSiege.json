@@ -1,0 +1,5 @@
+{
+  "terrain": "Całą planszę pokrywa {0,0}, a {2,2} u dołu po lewej i {2,5} na środku po lewej zostawiają pas wzdłuż górnej krawędzi, pas wzdłuż dolnej i pas przez środek planszy. Pas górny i dolny kończą się w centrum, dalej na prawo prowadzi tylko pas środkowy, a prawą krawędź {11,3} i {11,5} dzielą na wnęki.",
+  "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi.",
+  "defender": "Punkty rozmieszczenia obrońcy rozciągają się w prawej trzeciej części planszy, trzy z nich przy samej prawej krawędzi."
+}

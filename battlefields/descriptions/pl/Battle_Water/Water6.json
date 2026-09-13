@@ -1,0 +1,5 @@
+{
+  "terrain": "Otwarty teren, przez środek planszy {5,2}, a przejść można powyżej i poniżej. U dołu po prawej {8,0}, więc jedyna droga do rogu to {11,2}.",
+  "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi.",
+  "defender": "Punkty rozmieszczenia obrońcy biegną wzdłuż prawej krawędzi, dwa z nich w rogu, do którego prowadzi {11,2}."
+}

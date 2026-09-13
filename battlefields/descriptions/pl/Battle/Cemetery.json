@@ -1,0 +1,5 @@
+{
+  "terrain": "Płaski teren na całej planszy. Urwiska wzdłuż prawej krawędzi oraz wokół prawego dolnego i prawego górnego rogu.",
+  "attacker": "Punkty rozmieszczenia atakującego wypełniają lewą krawędź od dołu do góry.",
+  "defender": "Punkty rozmieszczenia obrońcy skupiają się na środku po prawej, wewnątrz urwisk."
+}

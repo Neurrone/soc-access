@@ -1,0 +1,5 @@
+{
+  "terrain": "Otwarty teren po lewej, a po prawej obrońca trzyma miasto. Wieża stoi u góry na środku, druga u dołu na środku, po obu stronach każdej z nich odcinek fosy, a od strony miasta przy każdej prowadzą w górę schody. Mury stoją na środku po prawej i u dołu po prawej.",
+  "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi.",
+  "defender": "Punkty rozmieszczenia obrońcy rozchodzą się po mieście, po jednym na każdej wieży i cztery na murach, w tym dwa punkty dla machin oblężniczych."
+}

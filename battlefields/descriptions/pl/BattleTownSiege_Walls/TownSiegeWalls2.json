@@ -1,0 +1,5 @@
+{
+  "terrain": "Fosa biegnie od lewego górnego rogu w dół, do dolnej środkowej części planszy, i przekroczyć ją można tylko w jednym miejscu: {5,4}, brama w centrum. Mury obrońcy stoją na prawo od fosy: jeden wzdłuż górnej krawędzi, między wieżą na jego lewym końcu a drugą u góry na środku, krótki odcinek z dwiema wieżami od strony miasta na każdym końcu fosy, a kolejny wokół prawego dolnego rogu z dwiema wieżami. Schody prowadzą na mury u góry po lewej, u góry na środku, u góry po prawej, u dołu na środku i u dołu po prawej.",
+  "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi, na otwartym terenie przed fosą.",
+  "defender": "Punkty rozmieszczenia obrońcy rozchodzą się po mieście, siedem z nich na wieżach i murach."
+}

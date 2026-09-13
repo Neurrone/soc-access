@@ -1,0 +1,5 @@
+{
+  "terrain": "Płaski teren na całej planszy. Po prawej stronie, od górnej krawędzi do dolnej, {11,0}, a dalej urwiska.",
+  "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi.",
+  "defender": "Punkty rozmieszczenia obrońcy biegną z góry na dół po prawej stronie planszy."
+}

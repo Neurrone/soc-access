@@ -1,0 +1,5 @@
+{
+  "terrain": "Płaski teren przez środek planszy, lewą stronę wypełnia {1,0}, a prawą {9,0}. Urwiska u dołu po lewej.",
+  "attacker": "Punkty rozmieszczenia atakującego biegną po lewej stronie, wszystkie oprócz jednego zajmują {1,0}.",
+  "defender": "Punkty rozmieszczenia obrońcy biegną po prawej stronie, wszystkie oprócz jednego zajmują {9,0}."
+}

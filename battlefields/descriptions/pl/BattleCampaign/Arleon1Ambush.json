@@ -1,0 +1,5 @@
+{
+  "terrain": "Otwarty teren przez środek planszy, {0,0} wzdłuż dolnej krawędzi, a {4,5} wzdłuż górnej. Urwiska u góry na środku.",
+  "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi, dwa z nich zajmują {0,0}, a jeden zajmuje {4,5}.",
+  "defender": "Punkty rozmieszczenia obrońcy biegną na środku po prawej, trzy z nich zajmują {0,0}, a trzy {4,5}."
+}

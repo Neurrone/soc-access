@@ -1,0 +1,5 @@
+{
+  "terrain": "Płaski teren, {0,0} w lewym dolnym rogu i {10,0} u dołu po prawej. Urwiska biegną przez całą planszę powyżej centrum, odcinając {3,6} za nimi.",
+  "attacker": "Punkty rozmieszczenia atakującego rozciągają się w lewej trzeciej części planszy, a dwa z nich zajmują {0,0}.",
+  "defender": "Punkty rozmieszczenia obrońcy rozciągają się w prawej trzeciej części planszy, a trzy z nich zajmują {10,0}."
+}

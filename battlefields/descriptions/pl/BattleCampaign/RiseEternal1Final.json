@@ -1,0 +1,5 @@
+{
+  "terrain": "Płaski teren wzdłuż lewej krawędzi, a {12,0} pokrywa centrum i prawą stronę planszy. Urwiska u góry na środku, jedyna droga do prawego dolnego rogu to {10,2}, a do prawego górnego {10,5}.",
+  "attacker": "Punkty rozmieszczenia atakującego biegną wzdłuż lewej krawędzi, wszystkie na płaskim terenie.",
+  "defender": "Punkty rozmieszczenia obrońcy biegną na środku po prawej, wszystkie zajmują {12,0}."
+}

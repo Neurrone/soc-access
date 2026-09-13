@@ -1,0 +1,5 @@
+{
+  "terrain": "Otwarty teren, {3,1} u dołu po lewej i {8,4} w centrum. Środek planszy zamknięty: {4,2}, przejść można powyżej albo poniżej; w lewym górnym rogu {0,6}, a u dołu po prawej {10,0}.",
+  "attacker": "Punkty rozmieszczenia atakującego rozciągają się w lewej połowie planszy, wszystkie na płaskim terenie.",
+  "defender": "Punkty rozmieszczenia obrońcy rozciągają się w prawej połowie planszy, wszystkie na płaskim terenie."
+}

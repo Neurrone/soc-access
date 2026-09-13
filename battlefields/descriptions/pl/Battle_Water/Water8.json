@@ -1,0 +1,5 @@
+{
+  "terrain": "Otwarty teren przerywają {4,1} u dołu na środku, {5,4} w centrum i {5,6} u góry na środku, a obok nich biegną pasy przez środek planszy oraz wzdłuż górnej i dolnej krawędzi. {3,4} i {9,4} stoją na środku po lewej i na środku po prawej.",
+  "attacker": "Punkty rozmieszczenia atakującego biegną po lewej stronie planszy.",
+  "defender": "Punkty rozmieszczenia obrońcy biegną po prawej stronie planszy."
+}

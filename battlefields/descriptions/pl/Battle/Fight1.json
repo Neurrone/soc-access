@@ -1,0 +1,5 @@
+{
+  "terrain": "Płaski teren w lewym dolnym rogu, a na reszcie planszy {6,0}. Górna krawędź zamknięta: wzdłuż niej i w dół przez środek planszy {1,4}, a jedyna droga na prawą stronę to {9,2}.",
+  "attacker": "Punkty rozmieszczenia atakującego wypełniają płaski teren w lewym dolnym rogu.",
+  "defender": "Punkty rozmieszczenia obrońcy rozciągają się w prawej trzeciej części planszy i zajmują {6,0} po drugiej stronie, do której prowadzi {9,2}."
+}
