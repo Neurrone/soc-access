@@ -158,6 +158,7 @@ namespace SongsOfConquestAccess
             });
             _localizationHandler = null;
             Step("translations", ModTranslationLoader.Reset);
+            Step("battlefield descriptions", Battlefields.BattlefieldDescriptions.Reset);
             _screenManager = null;
             Step("story camera", StoryCameraFocusPatches.Reset);
             Step("combat", CombatPatches.Reset);

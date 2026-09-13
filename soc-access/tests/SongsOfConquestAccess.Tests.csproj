@@ -15,6 +15,10 @@
     <PackageReference Include="MSTest.TestAdapter" Version="3.6.4" />
     <PackageReference Include="MSTest.TestFramework" Version="3.6.4" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <!-- The game's own Newtonsoft.Json, which the mod compiles against, is a Unity build whose
+         strong name does not validate under the test host; the published assembly has the same
+         identity and loads, so the battlefield table parses here as it does in the game. -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
