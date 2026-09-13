@@ -31,7 +31,7 @@ Use `ModText.Get(ModStrings...)`, `ModText.Plural(...)`, and `ModText.JoinList(.
 
 English source text lives in `ModStrings.cs`. Non-English `.po` files live in `soc-access/translations/` and are deployed to `BepInEx/config/SongsOfConquestAccess/translations`. The `.po` filenames must match the game's `CurrentLanguage.LanguageCode` values: `de`, `es`, `fr`, `it`, `ja`, `ko`, `pl`, `ru`, `tr`, `uk`, `pt-BR`, `zh-CN`, and `zh-TW`.
 
-After adding, removing, or changing a `ModString` or `ModPluralString`, run `dotnet run --project soc-access\tools\Localization -- update-pot`, update every `.po` file with proper translations of the string in every language (never leave English placeholders), then run `dotnet run --project soc-access\tools\Localization -- validate`. The validator must pass; it catches missing, stale, duplicate, changed-source, empty, and placeholder-mismatched translations.
+After adding, removing, or changing a `ModString` or `ModPluralString`, run `dotnet run --project soc-access\tools\Localization -- update-pot`, update every `.po` file with proper translations of the string in every language (never leave English placeholders), then run `dotnet run --project soc-access\tools\Localization -- validate`. The validator must pass; it catches missing, stale, duplicate, changed-source, empty, and placeholder-mismatched translations. The built battlefield description tables are held to the same rule by `BattlefieldTableLintTests` under `soc-access/tests/Lint/`: every language with a `.po` has a `soc-access/battlefields/<code>.json` holding en.json's layout keys, its three non-empty fields, its `{x,y}` placeholders, and no field left as the English verbatim.
 
 ## Build, Test, and Development Commands
 
