@@ -1,5 +1,5 @@
 {
-  "terrain": "Open ground with {5,2} filling the centre, {2,0} in the bottom left and {9,7} in the top right. {5,0} blocks the middle of the bottom edge and {5,8} the middle of the top edge.",
+  "terrain": "Open ground with {5,2} filling the centre, {2,0} in the bottom left and {9,7} in the top right. The middle of the bottom edge is blocked by {5,0} and the middle of the top edge by {5,8}.",
   "attacker": "The attacker's spawn points spread across the left third, and one of them stands on {2,0}.",
   "defender": "The defender's spawn points run down the right edge, and two of them stand on {9,7}."
 }

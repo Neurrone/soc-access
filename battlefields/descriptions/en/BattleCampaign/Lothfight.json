@@ -1,5 +1,5 @@
 {
-  "terrain": "Open ground with {5,3} in the centre, {0,6} in the top left and {10,0} in the bottom right. {5,2} fills the ground just below the centre, and troops must pass to one side of it.",
+  "terrain": "Open ground with {5,3} in the centre, {0,6} in the top left and {10,0} in the bottom right. The ground just below the centre is filled by {5,2}, and troops must pass to one side or the other.",
   "attacker": "The attacker's spawn points spread across the left third, and one of them stands on {0,6}.",
   "defender": "The defender's spawn points spread across the right third, and one of them stands on {10,0}."
 }

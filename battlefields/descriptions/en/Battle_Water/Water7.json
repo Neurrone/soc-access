@@ -1,5 +1,5 @@
 {
-  "terrain": "Open ground with {4,1} across the centre. {3,5} fills the top of the board and {7,0} the bottom centre, leaving {9,4} as the way through to the right.",
+  "terrain": "Open ground with {4,1} across the centre. The top of the board is filled by {3,5} and the bottom centre by {7,0}, leaving {9,4} as the way through to the right.",
   "attacker": "The attacker's spawn points run down the left edge.",
   "defender": "The defender's spawn points run from top to bottom down the right of the board."
 }

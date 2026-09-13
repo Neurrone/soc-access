@@ -58,7 +58,7 @@
       "defender": "The defender's spawn points spread across the right of the board, all of them on open ground."
     },
     "Battle/VanirLootPlace": {
-      "terrain": "Open ground with {3,0} in the bottom left and {9,4} across the centre and the right. {3,5} blocks the top left, {3,3} is the only way from the left edge onto the rest of the board, and there are cliffs in the top right.",
+      "terrain": "Open ground with {3,0} in the bottom left and {9,4} across the centre and the right. The top left is blocked by {3,5}, {3,3} is the only way from the left edge onto the rest of the board, and there are cliffs in the top right.",
       "attacker": "The attacker's spawn points run down the left edge, one of them on {3,3}.",
       "defender": "The defender's spawn points spread across the centre and the right, four of them on {9,4} and one on {3,0}."
     },
@@ -113,7 +113,7 @@
       "defender": "The defender's spawn points run down the right edge, three of them on {10,5} and one on {8,0}."
     },
     "Battle_Plains/Plains": {
-      "terrain": "Open ground across the board, with {4,1} and {7,1} near the bottom edge and {6,4} in the centre. {5,7} breaks the ground in the top centre.",
+      "terrain": "Open ground across the board, with {4,1} and {7,1} near the bottom edge and {6,4} in the centre. The ground in the top centre is broken by {5,7}.",
       "attacker": "The attacker's spawn points run down the left edge, all of them on flat ground.",
       "defender": "The defender's spawn points run down the right edge, all of them on flat ground."
     },
@@ -178,12 +178,12 @@
       "defender": "The defender's spawn points spread across the right third, and three of them stand on {10,0}."
     },
     "Battle_Walls/Walls4": {
-      "terrain": "Flat ground across the board. {11,0} runs from the top edge to the bottom edge down the right side, with cliffs beyond it.",
+      "terrain": "Flat ground across the board, with {11,0} down the right side from the top edge to the bottom edge, and cliffs beyond.",
       "attacker": "The attacker's spawn points run down the left edge.",
       "defender": "The defender's spawn points run from top to bottom down the right of the board."
     },
     "Battle_Water/Water1": {
-      "terrain": "Open ground with {5,0} in the bottom centre and {5,4} in the centre, and {5,2} between them. {7,6} runs across the top centre.",
+      "terrain": "Open ground with {5,0} in the bottom centre and {5,4} in the centre, and {5,2} between them. The top centre is crossed by {7,6}.",
       "attacker": "The attacker's spawn points run down the left edge.",
       "defender": "The defender's spawn points run down the right of the board."
     },
@@ -203,17 +203,17 @@
       "defender": "The defender's spawn points run down the right edge, six of them on {10,3}."
     },
     "Battle_Water/Water5": {
-      "terrain": "Open ground with {3,1} in the bottom left and {8,4} in the centre. {5,3} blocks the middle and is passed above or below, with {0,6} in the top left corner and {10,0} in the bottom right.",
+      "terrain": "Open ground with {3,1} in the bottom left and {8,4} in the centre. The middle is blocked by {5,3} and is passed above or below, with {0,6} in the top left corner and {10,0} in the bottom right.",
       "attacker": "The attacker's spawn points spread across the left half, all on flat ground.",
       "defender": "The defender's spawn points spread across the right half, all on flat ground."
     },
     "Battle_Water/Water6": {
-      "terrain": "Open ground with {5,2} across the centre of the board, passable above it and below it. In the bottom right, {8,0} leaves {11,2} as the only way into the corner.",
+      "terrain": "Open ground with {5,2} across the centre of the board, passable above and below. In the bottom right, {11,2} is the only way into the corner past {8,0}.",
       "attacker": "The attacker's spawn points run down the left edge.",
       "defender": "The defender's spawn points run down the right edge, two of them in the corner beyond {11,2}."
     },
     "Battle_Water/Water7": {
-      "terrain": "Open ground with {4,1} across the centre. {3,5} fills the top of the board and {7,0} the bottom centre, leaving {9,4} as the way through to the right.",
+      "terrain": "Open ground with {4,1} across the centre. The top of the board is filled by {3,5} and the bottom centre by {7,0}, leaving {9,4} as the way through to the right.",
       "attacker": "The attacker's spawn points run down the left edge.",
       "defender": "The defender's spawn points run from top to bottom down the right of the board."
     },
@@ -223,12 +223,12 @@
       "defender": "The defender's spawn points run down the right of the board."
     },
     "Battle_Woods/Woods1": {
-      "terrain": "Open ground with {8,4} across the centre, {0,3} on the middle left and {11,4} on the middle right. {2,8} blocks the top left and {9,7} the top right.",
+      "terrain": "Open ground with {8,4} across the centre, {0,3} on the middle left and {11,4} on the middle right. The top left is blocked by {2,8} and the top right by {9,7}.",
       "attacker": "The attacker's spawn points run down the left edge, one of them on {0,3}.",
       "defender": "The defender's spawn points run down the right edge, one of them on {11,4}."
     },
     "Battle_Woods/Woods2": {
-      "terrain": "Open ground with {5,0} in the bottom centre, {5,6} in the top centre and {0,7} in the top left corner, which {1,8} all but closes off. The bottom centre is blocked by {9,2}.",
+      "terrain": "Open ground with {5,0} in the bottom centre, {5,6} in the top centre and {0,7} in the top left corner, which is all but closed off by {1,8}. The bottom centre is blocked by {9,2}.",
       "attacker": "The attacker's spawn points run down the left edge, one of them on {0,7}.",
       "defender": "The defender's spawn points run down the right edge, all on flat ground."
     },
@@ -238,7 +238,7 @@
       "defender": "The defender's spawn points run the full length of the right edge."
     },
     "Battle_Woods/Woods4": {
-      "terrain": "Open ground with {0,0} in the bottom left, {11,0} in the bottom right, {1,5} at the middle left and {9,7} in the top right. {6,0} blocks the middle of the bottom edge.",
+      "terrain": "Open ground with {0,0} in the bottom left, {11,0} in the bottom right, {1,5} at the middle left and {9,7} in the top right. The middle of the bottom edge is blocked by {6,0}.",
       "attacker": "The attacker's spawn points run down the left edge, one of them on {1,5} and one on {0,0}.",
       "defender": "The defender's spawn points run down the right of the board, two of them on {9,7} and one on {11,0}."
     },
@@ -258,7 +258,7 @@
       "defender": "The defender's spawn points run from top to bottom down the right side."
     },
     "Battle_Woods/Woods8": {
-      "terrain": "Open ground with {5,3} in the centre of the board. {5,2} lies to the left of it and below, {7,3} to the right and above.",
+      "terrain": "Open ground with {5,3} in the centre of the board. The ground to its left and below is filled by {5,2}, the ground to its right and above by {7,3}.",
       "attacker": "The attacker's spawn points run down the left edge.",
       "defender": "The defender's spawn points run down the right edge."
     },
@@ -273,12 +273,12 @@
       "defender": "The defender's spawn points run down the right edge, and one of them stands on {8,0}."
     },
     "BattleCampaign/Arleon1Faey": {
-      "terrain": "Open ground with {5,2} filling the centre, {2,0} in the bottom left and {9,7} in the top right. {5,0} blocks the middle of the bottom edge and {5,8} the middle of the top edge.",
+      "terrain": "Open ground with {5,2} filling the centre, {2,0} in the bottom left and {9,7} in the top right. The middle of the bottom edge is blocked by {5,0} and the middle of the top edge by {5,8}.",
       "attacker": "The attacker's spawn points spread across the left third, and one of them stands on {2,0}.",
       "defender": "The defender's spawn points run down the right edge, and two of them stand on {9,7}."
     },
     "BattleCampaign/Arleon1GoldMine": {
-      "terrain": "Open ground with {8,1} in the bottom right, {9,6} in the top right, and {4,7} in the top centre. {4,0} lies along the bottom edge, and {10,5} is the only way into the top right corner.",
+      "terrain": "Open ground with {8,1} in the bottom right, {9,6} in the top right, and {4,7} in the top centre. The middle of the bottom edge is blocked by {4,0}, and {10,5} is the only way into the top right corner.",
       "attacker": "The attacker's spawn points are spread down the left of the board, with one on {4,7}.",
       "defender": "The defender's spawn points run down the right of the board, one on {9,6}, one on {8,1} and one on {10,5}."
     },
@@ -293,12 +293,12 @@
       "defender": "The defender's spawn points run down the right edge, three of them on {0,6} and three on {0,0}."
     },
     "BattleCampaign/Lothfight": {
-      "terrain": "Open ground with {5,3} in the centre, {0,6} in the top left and {10,0} in the bottom right. {5,2} fills the ground just below the centre, and troops must pass to one side of it.",
+      "terrain": "Open ground with {5,3} in the centre, {0,6} in the top left and {10,0} in the bottom right. The ground just below the centre is filled by {5,2}, and troops must pass to one side or the other.",
       "attacker": "The attacker's spawn points spread across the left third, and one of them stands on {0,6}.",
       "defender": "The defender's spawn points spread across the right third, and one of them stands on {10,0}."
     },
     "BattleCampaign/Ranafight": {
-      "terrain": "Open ground with {2,2} in the middle left and {9,4} in the middle right. {4,0} fills the bottom centre and {4,7} the top centre, leaving the middle of the board open between them.",
+      "terrain": "Open ground with {2,2} in the middle left and {9,4} in the middle right. The bottom centre is filled by {4,0} and the top centre by {4,7}, leaving the middle of the board open between them.",
       "attacker": "The attacker's spawn points are spread across the left of the board, two of them on {2,2}.",
       "defender": "The defender's spawn points are spread across the right of the board, two of them on {9,4}."
     },
@@ -318,7 +318,7 @@
       "defender": "The defender's spawn points spread across the right of the board, one of them standing on {8,6} and one on {8,2}."
     },
     "BattleCampaign/WieshFight": {
-      "terrain": "Open ground with {4,7} and {8,5} in the top centre and {8,0} in the bottom centre. {11,0} blocks the bottom right corner and {11,6} the top right, with cliffs along the right edge beyond them.",
+      "terrain": "Open ground with {4,7} and {8,5} in the top centre and {8,0} in the bottom centre. The bottom right corner is blocked by {11,0} and the top right by {11,6}, with cliffs along the right edge beyond them.",
       "attacker": "The attacker's spawn points run down the left edge.",
       "defender": "The defender's spawn points run down the right of the board, two of them on {8,5} and one on {8,0}."
     },

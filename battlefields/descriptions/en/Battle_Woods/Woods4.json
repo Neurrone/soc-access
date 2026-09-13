@@ -1,5 +1,5 @@
 {
-  "terrain": "Open ground with {0,0} in the bottom left, {11,0} in the bottom right, {1,5} at the middle left and {9,7} in the top right. {6,0} blocks the middle of the bottom edge.",
+  "terrain": "Open ground with {0,0} in the bottom left, {11,0} in the bottom right, {1,5} at the middle left and {9,7} in the top right. The middle of the bottom edge is blocked by {6,0}.",
   "attacker": "The attacker's spawn points run down the left edge, one of them on {1,5} and one on {0,0}.",
   "defender": "The defender's spawn points run down the right of the board, two of them on {9,7} and one on {11,0}."
 }
