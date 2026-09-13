@@ -12,3 +12,6 @@ release-template/BepInEx/plugins/SongsOfConquestAccess/mcs-NOTICE.txt
 
 # Dump-and-diff captures for the UI graph rewrite
 walks/
+
+# The layout the open placement page shows (BattlefieldDump.Current), a scratch dump
+battlefields/current.*
