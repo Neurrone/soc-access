@@ -20,13 +20,30 @@ Orientation. Left and right are as the image shows them. "Top" is the far edge o
 give coordinates, row or column numbers, or counts of cells. Both armies see the board from the
 same side, so never write "your side"; the two armies are "the attacker" and "the defender".
 
+**A feature is pointed at, never named.** Every group of ground in the JSON's `regions` and
+`chokePoints` carries a `placeholder` such as `{4,3}`. Write that placeholder where the feature
+belongs in your sentence, and the mod fills in what that ground is when it speaks the
+description - the shape, the height, and in a fight what is standing on it. So write
+
+    Open ground with {4,3} across the centre.
+
+and the player hears "Open ground with a diagonal ridge (height 1) across the centre." Never
+write the words yourself: never "ridge", "patch", "single cell", "wall", "tower", "stairs",
+"choke point", "impassable", and never a height. A placeholder always expands to a noun phrase
+with its article ("a patch (height 2)", "a wall of bushes", "a choke point"), so write the
+sentence around one exactly as you would around "a patch". Any cell of a group works, and each
+group's `points` lists them all, but prefer the group's own `placeholder`.
+
+Cliffs are the one exception: a board usually has several and they are all the same thing, so
+name them in words - "Cliffs at the bottom left and top right" - and use no placeholder.
+
 What matters, in order:
 
-1. Elevated ground: where each region is and its highest height. Troops step between
-   neighbouring cells only when the elevation differs by at most one, so a region that is
-   mentioned is climbable by definition; never say what height it rises from. Elevated ground
-   gives troops on it an advantage against troops below, which the player knows, so never say
-   what it is good for.
+1. Elevated ground: where each region is. Troops step between neighbouring cells only when the
+   elevation differs by at most one, so a region that is mentioned is climbable by definition;
+   never say what height it rises from, and never say its height at all - the placeholder says
+   it. Elevated ground gives troops on it an advantage against troops below, which the player
+   knows, so never say what it is good for.
 2. Cliffs: cells nothing can enter because every step onto them is two or more heights. Say
    that there are cliffs and where, nothing more.
 3. Choke points: the one or two cells everything has to pass through, listed in the JSON under
@@ -39,24 +56,18 @@ What matters, in order:
 
 Vocabulary. Use these words and no others for these things:
 
-- Heights: "flat ground" for height 0. An elevated region is named by its shape, its highest
-  height and its position: "a patch, height 2, in the top left", "a ridge, height 1, across the
-  centre". Never crest, shelf, plateau, hill, slope or rising.
-- Shapes: "ridge" for a region at least three times longer than wide or spanning more than
-  half the board, "patch" for any other region, "a single cell" for one cell. "wall of
-  impassable cells" for a barrier, "choke point" for the one or two cells everything must pass
-  through.
+- Ground: "open ground" or "flat ground" for the rest of a board. Never crest, shelf, plateau,
+  hill, slope or rising, and never a word for a feature a placeholder already names.
 - Cliffs: "cliffs at the bottom left and top right". No counts, no cells.
-- Impassable ground: "impassable cells". Water is impassable and nothing more, so it is never
-  named: no water, ponds, boulders, rocks or trees.
 - Positions: the nine names from board thirds: top left, top centre, top right, middle left,
   centre, middle right, bottom left, bottom centre, bottom right. "left edge", "right edge",
   "top edge", "bottom edge" when the feature hugs an edge; "across the centre" or "across the
-  board" for something spanning.
-- Sieges: "wall", "gate", "stairs", "tower", "moat".
+  board" for something spanning. Each group in the JSON carries the `position` it falls in.
+- Sieges: "gate" and "moat" are yours to write; the wall, the towers and the stairs are
+  placeholders.
 - Spawn points: "the attacker's spawn points run down the left edge", "are in the centre",
   "surround the attacker's". Small counts are allowed when they change the placement: "three of
-  them stand on the patch in the top left".
+  them stand on {3,6}".
 
 Inputs. The image is the game's deployment preview: light flat hexes are walkable ground,
 taller blocks are elevated ground, dark cells are impassable and missing cells are water, which
@@ -66,13 +77,14 @@ a marker with a different shape is a siege engine spawn. The JSON says the same 
 cell's elevation and passability with the `kind` the mod reads out for it, and
 `cliffNeighbours` lists the neighbours a cell cannot step to because of a cliff; `regions`
 lists every group of ground the mod names - elevated ground, cliffs, impassable cells and a
-siege layout's walls, towers and stairs - with its position in board thirds, and `chokePoints`
-lists the choke points; `spawnPoints` lists each side's spawn points with their elevation.
-Trust the JSON over the image when they seem to disagree.
+siege layout's walls, towers and stairs - with its `position` in board thirds, its
+`placeholder` and its `points`, and `chokePoints` lists the choke points the same way;
+`spawnPoints` lists each side's spawn points with their elevation. Trust the JSON over the
+image when they seem to disagree.
 
-Every entry in `regions` and `chokePoints` carries a `label`, which is the exact words the mod
-speaks for that group. Name a feature with that label's words: its shape, its height, and the
-count only where the count matters.
+Each group's `label` is what the mod says for it in its scanner, and is there to tell one group
+from another while you write. Never copy its words into a description: the placeholder is how a
+group gets into a sentence.
 
 Answer with exactly this JSON and nothing else:
 
@@ -90,13 +102,18 @@ never add the conclusion ("which suits archers", "so ranged troops can start hig
 Style: plain words, present tense, no flourish, no hedging, no lists. Never mention the JSON,
 the image or the layout's name.
 
-Example, for a layout with a diagonal band of height 1 through the middle, a climbable area in
-each of two corners that reaches height 2, and a few cut-off height 2 cells:
+Example, for a layout whose `regions` hold a band of raised ground through the middle with the
+placeholder `{4,3}`, a climbable area in each of two corners with the placeholders `{3,6}` and
+`{8,1}`, and a few cut-off cells the JSON calls cliffs:
 
 ```json
 {
-  "terrain": "Open ground with a ridge, height 1, across the centre, a patch, height 2, in the top left, and a patch, height 2, in the bottom right. Cliffs at the bottom left and top right.",
-  "attacker": "The attacker's spawn points run down the left edge, and three of them stand on the patch in the top left.",
-  "defender": "The defender's spawn points run down the right edge, and three of them stand on the patch in the bottom right."
+  "terrain": "Open ground with {4,3} across the centre, {3,6} in the top left, and {8,1} in the bottom right. Cliffs at the bottom left and top right.",
+  "attacker": "The attacker's spawn points run down the left edge, and three of them stand on {3,6}.",
+  "defender": "The defender's spawn points run down the right edge, and three of them stand on {8,1}."
 }
 ```
+
+which the player hears as "Open ground with a diagonal ridge (height 1) across the centre, a
+patch (height 2) in the top left, and a patch (height 2) in the bottom right. Cliffs at the
+bottom left and top right."

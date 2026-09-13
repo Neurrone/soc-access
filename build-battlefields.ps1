@@ -18,6 +18,11 @@
     file with a missing or empty field, or a key the English set has and another language does not,
     fails the build rather than shipping a description the player hears half of.
 
+    A description points at a group of ground with a {x,y} placeholder rather than naming it, and
+    the mod replaces it with what that ground is when it speaks. A placeholder whose cell belongs
+    to no group in the dump would be silently dropped at that point, so it fails the build instead,
+    naming the layout and the placeholder.
+
     A layout the player can reach (contentProfile Demo or Releasable) that has no English
     description is only WARNED about: the English set is still being written.
 
@@ -96,10 +101,31 @@ function Read-Language {
             $entry[$field] = $value.Trim()
         }
 
+        Test-Placeholders -Key $key -Relative $relative -Language $Language -Dump "$dump.json" -Entry $entry
         $layouts[$key] = $entry
     }
 
     return $layouts
+}
+
+function Test-Placeholders {
+    param([string]$Key, [string]$Relative, [string]$Language, [string]$Dump, [hashtable]$Entry)
+
+    $layout = Get-Content -Raw -Encoding UTF8 $Dump | ConvertFrom-Json
+    $known = New-Object 'System.Collections.Generic.HashSet[string]'
+    foreach ($group in @($layout.regions) + @($layout.chokePoints)) {
+        if ($null -eq $group) { continue }
+        foreach ($point in @($group.points)) { [void]$known.Add([string]$point) }
+    }
+
+    foreach ($field in $Fields) {
+        foreach ($match in [regex]::Matches($Entry[$field], '\{\s*(\d+)\s*,\s*(\d+)\s*\}')) {
+            $point = "$($match.Groups[1].Value),$($match.Groups[2].Value)"
+            if (-not $known.Contains($point)) {
+                throw "$Language`: '$Relative' ($Key) points at $($match.Value) in $field, which is no group of ground in the dump"
+            }
+        }
+    }
 }
 
 function Write-Table {

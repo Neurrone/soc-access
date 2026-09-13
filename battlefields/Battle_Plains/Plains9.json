@@ -18,18 +18,25 @@
     "coordinates": "x runs 0 to width-1 from left to right as the picture shows it; y runs 0 to height-1 from the bottom (nearest the viewer) to the top. Odd rows sit half a cell to the right of even rows, which the mod speaks as x.5 (the 'spoken' fields), so the JSON and the picture agree with what the player hears.",
     "picture": "The image is the game's own deployment preview: light flat hexes are walkable ground, taller blocks are elevated ground (height = elevation), hatched or dark cells are blocked, missing cells are water. Blue markers are attacker spawn points, red markers are defender spawn points; a different marker shape means a 'Defence' spawn (siege engines).",
     "movement": "Troops step between neighbouring cells only when the elevation differs by at most 1; a bigger step is a cliff (listed per cell under cliffNeighbours as the spoken coordinate of the neighbour that cannot be reached directly). Water and impassable cells cannot be entered. Higher ground gives melee and ranged bonuses.",
-    "vocabulary": "Every entry in regions and chokePoints carries the exact label the mod speaks for it, and cells carry the same kind the cursor reads out. Name a feature with that label's words.",
+    "vocabulary": "A description never names a feature in words: it writes the placeholder of a group in regions or chokePoints - the raw coordinates of one of its cells, also listed under points - and the mod replaces it with what that ground is when it speaks, shape, height and, in a fight, what is standing on it. The label is what the mod's scanner says for the group, to tell one group from another while writing; it is never copied into a description.",
     "sides": "Attacker spawn points are blueprint 2, defender spawn points blueprint 3. The player is the attacker when they started the fight and the defender when attacked. The spawn point numbers the mod speaks follow the game's order: by type (Default, Defence, Fallback), then x ascending, then y descending.",
     "deployment": "Auto-placement puts ranged troops on Default spawns first, siege engines on Defence spawns, and melee troops away from towers, walls and stairs. The player may move a troop to any spawn point of their own side."
   },
   "regions": [
     {
+      "placeholder": "{10,0}",
       "label": "patch of 4 cells, height 2",
       "kind": "Elevated",
       "shape": "Patch",
       "cells": 4,
       "height": 2,
       "position": "bottom right",
+      "points": [
+        "10,0",
+        "11,0",
+        "9,1",
+        "10,1"
+      ],
       "spoken": [
         "10, 0",
         "11, 0",
@@ -38,12 +45,18 @@
       ]
     },
     {
+      "placeholder": "{3,1}",
       "label": "patch of 3 cells, height 1",
       "kind": "Elevated",
       "shape": "Patch",
       "cells": 3,
       "height": 1,
       "position": "bottom left",
+      "points": [
+        "3,1",
+        "3,2",
+        "4,2"
+      ],
       "spoken": [
         "3.5, 1",
         "3, 2",
@@ -51,24 +64,36 @@
       ]
     },
     {
+      "placeholder": "{8,6}",
       "label": "patch of 2 cells, height 1",
       "kind": "Elevated",
       "shape": "Patch",
       "cells": 2,
       "height": 1,
       "position": "top centre",
+      "points": [
+        "8,6",
+        "9,6"
+      ],
       "spoken": [
         "8, 6",
         "9, 6"
       ]
     },
     {
+      "placeholder": "{1,7}",
       "label": "patch of 4 cells, height 2",
       "kind": "Elevated",
       "shape": "Patch",
       "cells": 4,
       "height": 2,
       "position": "top left",
+      "points": [
+        "1,7",
+        "2,7",
+        "1,8",
+        "2,8"
+      ],
       "spoken": [
         "1.5, 7",
         "2.5, 7",
@@ -77,23 +102,32 @@
       ]
     },
     {
+      "placeholder": "{4,1}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "bottom left",
+      "points": [
+        "4,1"
+      ],
       "spoken": [
         "4.5, 1"
       ]
     },
     {
+      "placeholder": "{7,7}",
       "label": "impassable, 2 cells",
       "kind": "Impassable",
       "shape": "None",
       "cells": 2,
       "height": 0,
       "position": "top centre",
+      "points": [
+        "7,7",
+        "8,7"
+      ],
       "spoken": [
         "7.5, 7",
         "8.5, 7"
@@ -292,7 +326,6 @@
     "elevatedCells": 13,
     "maxElevation": 2
   },
-  "entities": [],
   "asciiLegend": "Rows top to bottom are y = height-1 down to 0; odd rows are indented half a cell. '~' water, '#' impassable, ' ' off the hex grid, '.' flat ground, 1-3 elevated ground of that height. In asciiSpawns: A/a attacker spawn (a = Defence type), D/d defender spawn, on top of the terrain glyphs.",
   "asciiTerrain": ". 1 1 . . . . . . . . . .\n . 2 1 . . . . ~ # . . .\n. . . . . . . . 1 1 . . .\n . . . . . . . . . . . .\n. . . . . . . . . . . . .\n . . . . . . . . . . . .\n. . . 1 1 . . . . . . . .\n . . . 1 # . . . . 1 2 .\n. . . . . . . . . . 1 1 .",
   "asciiSpawns": ". A 1 . . . . . . . . D .\n . 2 A . . . . ~ # D . .\n. A . . . . . . 1 1 . D .\n A . . . . . . . . . . D\n. . A . . . . . . . D . .\n A . . . . . . . . . . D\n. A . 1 1 . . . . . . D .\n . . A 1 # . . . . D 2 .\n. A . . . . . . . . 1 D .",

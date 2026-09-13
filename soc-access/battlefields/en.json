@@ -3,7 +3,7 @@
   "language": "en",
   "layouts": {
     "Battle_Hills/Hills3": {
-      "terrain": "Open ground with a ridge, height 1, across the centre, a patch, height 2, in the top left, and a patch, height 2, in the bottom right. Cliffs at the bottom left and top right.",
+      "terrain": "Open ground with {4,3} across the centre, {3,6} in the top left, and {8,1} in the bottom right. Cliffs at the bottom left and top right.",
       "attacker": "The attacker's spawn points run down the left edge, and three of them stand on the patch in the top left.",
       "defender": "The defender's spawn points run down the right edge, and three of them stand on the patch in the bottom right."
     }

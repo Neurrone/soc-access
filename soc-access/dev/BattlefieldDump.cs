@@ -29,9 +29,11 @@ namespace SongsOfConquestAccess.Dev
 {
     /// <summary>
     /// Development only, never spoken: writes every battlefield layout the game ships as one JSON
-    /// file (terrain, passability, spawn points, entities) and one JPEG, the game's own deployment
-    /// preview render with the spawn markers and no troops, so the layouts can be described
-    /// offline and the descriptions checked against the picture. Called from /eval:
+    /// file (terrain, passability, the groups of ground the mod names, spawn points) and one JPEG,
+    /// the game's own deployment preview render with the spawn markers and no troops, so the
+    /// layouts can be described offline and the descriptions checked against the picture. The
+    /// entities a layout carries are deliberately not written: a description never mentions them.
+    /// Called from /eval:
     /// <c>SongsOfConquestAccess.Dev.BattlefieldDump.All(@"C:\...\battlefields")</c>, or
     /// <c>Current(dir)</c> for the layout the open placement page shows.
     /// </summary>
@@ -176,25 +178,6 @@ namespace SongsOfConquestAccess.Dev
             List<object> attackerList = SpawnList(attackers, 0, cells, "A", spawnGlyphs);
             List<object> defenderList = SpawnList(defenders, attackers.Length, cells, "D", spawnGlyphs);
 
-            List<object> entities = new List<object>();
-            for (int i = 0; i < map.Contents.MapEntities.Count; i++)
-            {
-                MapEntityFormat entity = map.Contents.MapEntities[i];
-                if (entity.Id == (ushort)BattleMapEntities.UtilityAttackerSpawnpoint || entity.Id == (ushort)BattleMapEntities.UtilityDefenderSpawnpoint)
-                {
-                    continue;
-                }
-
-                entities.Add(new
-                {
-                    blueprintId = entity.Id,
-                    name = Enum.GetName(typeof(BattleMapEntities), (int)entity.Id) ?? entity.Name,
-                    x = (int)entity.X,
-                    y = (int)entity.Y,
-                    spoken = Spoken(entity.X, entity.Y)
-                });
-            }
-
             List<object> cellList = new List<object>();
             for (int y = 0; y < height; y++)
             {
@@ -244,7 +227,7 @@ namespace SongsOfConquestAccess.Dev
                     coordinates = "x runs 0 to width-1 from left to right as the picture shows it; y runs 0 to height-1 from the bottom (nearest the viewer) to the top. Odd rows sit half a cell to the right of even rows, which the mod speaks as x.5 (the 'spoken' fields), so the JSON and the picture agree with what the player hears.",
                     picture = "The image is the game's own deployment preview: light flat hexes are walkable ground, taller blocks are elevated ground (height = elevation), hatched or dark cells are blocked, missing cells are water. Blue markers are attacker spawn points, red markers are defender spawn points; a different marker shape means a 'Defence' spawn (siege engines).",
                     movement = "Troops step between neighbouring cells only when the elevation differs by at most 1; a bigger step is a cliff (listed per cell under cliffNeighbours as the spoken coordinate of the neighbour that cannot be reached directly). Water and impassable cells cannot be entered. Higher ground gives melee and ranged bonuses.",
-                    vocabulary = "Every entry in regions and chokePoints carries the exact label the mod speaks for it, and cells carry the same kind the cursor reads out. Name a feature with that label's words.",
+                    vocabulary = "A description never names a feature in words: it writes the placeholder of a group in regions or chokePoints - the raw coordinates of one of its cells, also listed under points - and the mod replaces it with what that ground is when it speaks, shape, height and, in a fight, what is standing on it. The label is what the mod's scanner says for the group, to tell one group from another while writing; it is never copied into a description.",
                     sides = "Attacker spawn points are blueprint 2, defender spawn points blueprint 3. The player is the attacker when they started the fight and the defender when attacked. The spawn point numbers the mod speaks follow the game's order: by type (Default, Defence, Fallback), then x ascending, then y descending.",
                     deployment = "Auto-placement puts ranged troops on Default spawns first, siege engines on Defence spawns, and melee troops away from towers, walls and stairs. The player may move a troop to any spawn point of their own side."
                 },
@@ -263,7 +246,6 @@ namespace SongsOfConquestAccess.Dev
                     elevatedCells = cells.Cast<Cell>().Count(c => c.OnGrid && c.Elevation > 0),
                     maxElevation = cells.Cast<Cell>().Max(c => c.Elevation)
                 },
-                entities,
                 asciiLegend = "Rows top to bottom are y = height-1 down to 0; odd rows are indented half a cell. '~' water, '#' impassable, ' ' off the hex grid, '.' flat ground, 1-3 elevated ground of that height. In asciiSpawns: A/a attacker spawn (a = Defence type), D/d defender spawn, on top of the terrain glyphs.",
                 asciiTerrain = Ascii(cells, width, height, null),
                 asciiSpawns = Ascii(cells, width, height, spawnGlyphs),
@@ -509,12 +491,16 @@ namespace SongsOfConquestAccess.Dev
 
             return new
             {
+                // How a description points at this group: the raw coordinates of one of its cells,
+                // which the mod replaces with whatever the ground turns out to be when it speaks.
+                placeholder = "{" + region.Cells[0].x + "," + region.Cells[0].y + "}",
                 label = BattlefieldText.Region(region),
                 kind = region.Kind.ToString(),
                 shape = region.Shape.ToString(),
                 cells = region.Count,
                 height = region.Height,
                 position = Position(x / region.Count, y / region.Count, width, height),
+                points = region.Cells.Select(c => c.x + "," + c.y).ToList(),
                 spoken = Spoken(region.Cells)
             };
         }

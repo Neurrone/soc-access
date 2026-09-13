@@ -18,18 +18,38 @@
     "coordinates": "x runs 0 to width-1 from left to right as the picture shows it; y runs 0 to height-1 from the bottom (nearest the viewer) to the top. Odd rows sit half a cell to the right of even rows, which the mod speaks as x.5 (the 'spoken' fields), so the JSON and the picture agree with what the player hears.",
     "picture": "The image is the game's own deployment preview: light flat hexes are walkable ground, taller blocks are elevated ground (height = elevation), hatched or dark cells are blocked, missing cells are water. Blue markers are attacker spawn points, red markers are defender spawn points; a different marker shape means a 'Defence' spawn (siege engines).",
     "movement": "Troops step between neighbouring cells only when the elevation differs by at most 1; a bigger step is a cliff (listed per cell under cliffNeighbours as the spoken coordinate of the neighbour that cannot be reached directly). Water and impassable cells cannot be entered. Higher ground gives melee and ranged bonuses.",
-    "vocabulary": "Every entry in regions and chokePoints carries the exact label the mod speaks for it, and cells carry the same kind the cursor reads out. Name a feature with that label's words.",
+    "vocabulary": "A description never names a feature in words: it writes the placeholder of a group in regions or chokePoints - the raw coordinates of one of its cells, also listed under points - and the mod replaces it with what that ground is when it speaks, shape, height and, in a fight, what is standing on it. The label is what the mod's scanner says for the group, to tell one group from another while writing; it is never copied into a description.",
     "sides": "Attacker spawn points are blueprint 2, defender spawn points blueprint 3. The player is the attacker when they started the fight and the defender when attacked. The spawn point numbers the mod speaks follow the game's order: by type (Default, Defence, Fallback), then x ascending, then y descending.",
     "deployment": "Auto-placement puts ranged troops on Default spawns first, siege engines on Defence spawns, and melee troops away from towers, walls and stairs. The player may move a troop to any spawn point of their own side."
   },
   "regions": [
     {
+      "placeholder": "{7,0}",
       "label": "cliff of 17 cells",
       "kind": "Cliff",
       "shape": "None",
       "cells": 17,
       "height": 2,
       "position": "middle right",
+      "points": [
+        "7,0",
+        "8,0",
+        "9,0",
+        "10,0",
+        "11,0",
+        "11,1",
+        "12,2",
+        "11,3",
+        "12,4",
+        "11,5",
+        "12,6",
+        "11,7",
+        "7,8",
+        "8,8",
+        "9,8",
+        "10,8",
+        "11,8"
+      ],
       "spoken": [
         "7, 0",
         "8, 0",
@@ -51,134 +71,185 @@
       ]
     },
     {
+      "placeholder": "{6,0}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "bottom centre",
+      "points": [
+        "6,0"
+      ],
       "spoken": [
         "6, 0"
       ]
     },
     {
+      "placeholder": "{1,1}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "bottom left",
+      "points": [
+        "1,1"
+      ],
       "spoken": [
         "1.5, 1"
       ]
     },
     {
+      "placeholder": "{7,1}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "bottom centre",
+      "points": [
+        "7,1"
+      ],
       "spoken": [
         "7.5, 1"
       ]
     },
     {
+      "placeholder": "{10,1}",
       "label": "impassable, 2 cells",
       "kind": "Impassable",
       "shape": "None",
       "cells": 2,
       "height": 0,
       "position": "bottom right",
+      "points": [
+        "10,1",
+        "11,2"
+      ],
       "spoken": [
         "10.5, 1",
         "11, 2"
       ]
     },
     {
+      "placeholder": "{5,2}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "bottom centre",
+      "points": [
+        "5,2"
+      ],
       "spoken": [
         "5, 2"
       ]
     },
     {
+      "placeholder": "{6,3}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "centre",
+      "points": [
+        "6,3"
+      ],
       "spoken": [
         "6.5, 3"
       ]
     },
     {
+      "placeholder": "{9,4}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "middle right",
+      "points": [
+        "9,4"
+      ],
       "spoken": [
         "9, 4"
       ]
     },
     {
+      "placeholder": "{11,4}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "middle right",
+      "points": [
+        "11,4"
+      ],
       "spoken": [
         "11, 4"
       ]
     },
     {
+      "placeholder": "{6,5}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "centre",
+      "points": [
+        "6,5"
+      ],
       "spoken": [
         "6.5, 5"
       ]
     },
     {
+      "placeholder": "{3,6}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "top left",
+      "points": [
+        "3,6"
+      ],
       "spoken": [
         "3, 6"
       ]
     },
     {
+      "placeholder": "{5,6}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "top centre",
+      "points": [
+        "5,6"
+      ],
       "spoken": [
         "5, 6"
       ]
     },
     {
+      "placeholder": "{11,6}",
       "label": "impassable, 3 cells",
       "kind": "Impassable",
       "shape": "None",
       "cells": 3,
       "height": 0,
       "position": "top right",
+      "points": [
+        "11,6",
+        "9,7",
+        "10,7"
+      ],
       "spoken": [
         "11, 6",
         "9.5, 7",
@@ -186,23 +257,31 @@
       ]
     },
     {
+      "placeholder": "{7,7}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "top centre",
+      "points": [
+        "7,7"
+      ],
       "spoken": [
         "7.5, 7"
       ]
     },
     {
+      "placeholder": "{6,8}",
       "label": "impassable",
       "kind": "Impassable",
       "shape": "None",
       "cells": 1,
       "height": 0,
       "position": "top centre",
+      "points": [
+        "6,8"
+      ],
       "spoken": [
         "6, 8"
       ]
@@ -463,7 +542,6 @@
     "elevatedCells": 17,
     "maxElevation": 2
   },
-  "entities": [],
   "asciiLegend": "Rows top to bottom are y = height-1 down to 0; odd rows are indented half a cell. '~' water, '#' impassable, ' ' off the hex grid, '.' flat ground, 1-3 elevated ground of that height. In asciiSpawns: A/a attacker spawn (a = Defence type), D/d defender spawn, on top of the terrain glyphs.",
   "asciiTerrain": ". . . . . . # 2 2 2 2 2 .\n . . . . . . . # . # # 2\n. . . ~ . # . . . . . # 2\n . . . . . . # . . . . 2\n. . . . . . . . . # . # 2\n . . . . . . # . . . . 2\n. . . . . # . . . . . # 2\n . ~ . . . . . # . . # 2\n. . . . . . # 2 2 2 2 2 .",
   "asciiSpawns": "A . . . . . # 2 2 2 2 2 .\n A . . . . . . # . # # 2\nA A . ~ . # . . D . D # 2\n A A . . . . # . D D . 2\nA A A . . . . . D # D # 2\n A A . . . . # . D D . 2\nA A . . . # . . D . D # 2\n A ~ . . . . . # . . # 2\nA . . . . . # 2 2 2 2 2 .",
