@@ -150,27 +150,29 @@ namespace SongsOfConquestAccess.Dev
             }
         }
 
-        /// <summary>Hide or show every canvas of the editor scene, for a frame of the board alone.</summary>
+        /// <summary>Hide or show every canvas in every loaded scene, for a frame of the board alone.
+        /// Every scene, not the editor's alone: the hover tooltip lives in a scene of its own and
+        /// showed up in a frame when the mouse rested on a spawn point.</summary>
         public static string Ui(bool visible)
         {
             try
             {
-                Scene scene = SceneManager.GetSceneByName(SceneType.MapEditor.SceneName);
-                if (!scene.isLoaded)
+                if (!SceneManager.GetSceneByName(SceneType.MapEditor.SceneName).isLoaded)
                 {
                     return DevJson.Error("the editor scene is not loaded");
                 }
 
                 int count = 0;
-                GameObject[] roots = scene.GetRootGameObjects();
-                for (int i = 0; i < roots.Length; i++)
+                Canvas[] canvases = Resources.FindObjectsOfTypeAll<Canvas>();
+                for (int j = 0; j < canvases.Length; j++)
                 {
-                    Canvas[] canvases = roots[i].GetComponentsInChildren<Canvas>(true);
-                    for (int j = 0; j < canvases.Length; j++)
+                    if (canvases[j] == null || !canvases[j].gameObject.scene.isLoaded)
                     {
-                        canvases[j].enabled = visible;
-                        count++;
+                        continue;
                     }
+
+                    canvases[j].enabled = visible;
+                    count++;
                 }
 
                 return JsonConvert.SerializeObject(new { visible, canvases = count });
