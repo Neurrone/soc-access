@@ -49,6 +49,8 @@ What matters, in order:
 3. Choke points: the one or two cells everything has to pass through, listed in the JSON under
    `chokePoints`, and which part of the board they separate. Say nothing when there is none;
    "no choke point" tells the player nothing, and the same goes for every feature in this list.
+   A siege lists many, most of them gaps between an inner wall and the board's edge: mention
+   the crossing at the gate and any other that everything must pass, and leave the rest.
 4. Impassable cells only when they shape movement. A single impassable cell in open ground is
    not worth a word.
 5. Sieges: which side holds the walls, where the gate is, and where the stairs onto the walls
@@ -63,8 +65,11 @@ Vocabulary. Use these words and no others for these things:
   centre, middle right, bottom left, bottom centre, bottom right. "left edge", "right edge",
   "top edge", "bottom edge" when the feature hugs an edge; "across the centre" or "across the
   board" for something spanning. Each group in the JSON carries the `position` it falls in.
-- Sieges: "gate" and "moat" are yours to write; the wall, the towers and the stairs are
-  placeholders.
+- Sieges: "gate", "moat", "wall", "walls", "tower", "towers" and "stairs" are yours to write
+  in prose on a siege layout. Their groups still carry placeholders, but a siege has a dozen
+  or more of them and a sentence built from placeholders repeats the same phrase, so say where
+  the walls run, where the towers stand and where the stairs go up in words. Water is a "moat"
+  only on a siege; elsewhere water is an impassable group with a placeholder.
 - Spawn points: "the attacker's spawn points run down the left edge", "are in the centre",
   "surround the attacker's". Small counts are allowed when they change the placement: "three of
   them stand on {3,6}".
@@ -90,7 +95,7 @@ Answer with exactly this JSON and nothing else:
 
 ```json
 {
-  "terrain": "At most two sentences on the ground alone, nothing about spawn points.",
+  "terrain": "At most two sentences on the ground alone (three on a siege), nothing about spawn points.",
   "attacker": "One sentence: where the attacker's spawn points lie relative to that ground.",
   "defender": "One sentence: the same for the defender."
 }

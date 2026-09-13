@@ -6,6 +6,11 @@
       "terrain": "Open ground with {4,3} across the centre, {3,6} in the top left, and {8,1} in the bottom right. Cliffs at the bottom left and top right.",
       "attacker": "The attacker's spawn points run down the left edge, and three of them stand on the patch in the top left.",
       "defender": "The defender's spawn points run down the right edge, and three of them stand on the patch in the bottom right."
+    },
+    "BattleTownSiege_Walls/TownSiegeWalls2": {
+      "terrain": "A moat runs from the top left corner down to the bottom centre and is crossed only at {5,4}, the gate in the centre. The defender's walls stand to the right of the moat: one along the top edge with a tower at each end, one round the bottom right corner with two towers, and a tower on each bank at both ends of the moat, with stairs onto the walls at the top centre, the top right and the bottom right.",
+      "attacker": "The attacker's spawn points run down the left edge, on open ground outside the moat.",
+      "defender": "The defender's spawn points spread through the town, seven of them on the towers and walls."
     }
   }
 }
