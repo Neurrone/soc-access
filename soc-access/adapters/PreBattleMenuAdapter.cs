@@ -78,6 +78,9 @@ namespace SongsOfConquestAccess.Adapters
         private AdventureBattleMenu.Settings _settings;
         private bool _settingsProbed;
         private readonly FocusedTileOverlay _cursorOverlay = new FocusedTileOverlay("SongsOfConquestAccess_TroopPlacementCursor");
+        // The layout this placement page is showing, composed once: an adapter lives exactly as
+        // long as the menu instance it wraps, and that instance is built over one map.
+        private string _battlefieldKey;
 
         private enum BattleParticipantSide
         {
@@ -93,6 +96,17 @@ namespace SongsOfConquestAccess.Adapters
         public object SourceKey
         {
             get { return _menu; }
+        }
+
+        /// <summary>The layout this battle is fought on, as
+        /// <see cref="Battlefields.BattlefieldDescriptions"/> names it. Null while the menu has no
+        /// map, which <see cref="IsPresent"/> already refuses to be present without.</summary>
+        public string BattlefieldKey
+        {
+            get
+            {
+                return _battlefieldKey ?? (_battlefieldKey = BattlefieldKeys.For(GetMap()));
+            }
         }
 
         /// <summary>The placement page the battle menu holds in its own settings: the one the game

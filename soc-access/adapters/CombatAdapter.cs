@@ -219,6 +219,9 @@ namespace SongsOfConquestAccess.Adapters
         private Action<bool> _endAbilityTargetingHandler;
         private bool _hasBeenPresent;
         private bool _combatEnded;
+        // The layout this battle is fought on, composed once: an adapter lives exactly as long as
+        // the battle it wraps, and that battle is fought on one map.
+        private string _battlefieldKey;
         // This frame's answer to "which enemies reach that tile", for the one tile it was asked
         // about. See BuildEnemyInfluenceSources.
         private List<CombatInfluenceSource> _influenceSources;
@@ -334,6 +337,23 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         public BattleHudAdapter Hud { get; private set; }
+
+        /// <summary>The layout this battle is fought on, as
+        /// <see cref="Battlefields.BattlefieldDescriptions"/> names it. <c>GetMap</c> is on
+        /// <c>IMapProvider</c>, which the level facade implements, so it is a plain call and not a
+        /// reflected one; composed once, since a battle is fought on one map.</summary>
+        public string BattlefieldKey
+        {
+            get
+            {
+                if (_battlefieldKey == null && _facade != null && _facade.Level != null)
+                {
+                    _battlefieldKey = BattlefieldKeys.For(_facade.Level.GetMap());
+                }
+
+                return _battlefieldKey;
+            }
+        }
 
         private static object ResolveByTypeName(DiContainer container, string typeName)
         {
