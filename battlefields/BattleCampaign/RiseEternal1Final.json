@@ -164,6 +164,21 @@
       ]
     },
     {
+      "placeholder": "{7,8}",
+      "label": "unreachable ground",
+      "kind": "Unreachable",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "top centre",
+      "points": [
+        "7,8"
+      ],
+      "spoken": [
+        "7, 8"
+      ]
+    },
+    {
       "placeholder": "{0,0}",
       "label": "impassable, 2 cells",
       "kind": "Impassable",
@@ -409,34 +424,19 @@
     },
     {
       "placeholder": "{10,5}",
-      "label": "choke point, 2 cells",
+      "label": "choke point, 3 cells",
       "kind": "ChokePoint",
       "shape": "None",
-      "cells": 2,
+      "cells": 3,
       "height": 0,
       "position": "middle right",
       "points": [
         "10,5",
-        "10,6"
-      ],
-      "spoken": [
-        "10.5, 5",
-        "10, 6"
-      ]
-    },
-    {
-      "placeholder": "{10,6}",
-      "label": "choke point, 2 cells",
-      "kind": "ChokePoint",
-      "shape": "None",
-      "cells": 2,
-      "height": 0,
-      "position": "top right",
-      "points": [
         "10,6",
         "11,6"
       ],
       "spoken": [
+        "10.5, 5",
         "10, 6",
         "11, 6"
       ]
@@ -2748,7 +2748,7 @@
       "impassable": false,
       "travelCost": 1.0,
       "previewBlocked": false,
-      "kind": "Flat",
+      "kind": "Unreachable",
       "decoration": 0,
       "decorationName": null,
       "terrainType": 3,

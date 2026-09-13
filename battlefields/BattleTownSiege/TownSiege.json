@@ -24,6 +24,21 @@
   },
   "regions": [
     {
+      "placeholder": "{5,0}",
+      "label": "unreachable ground",
+      "kind": "Unreachable",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "bottom centre",
+      "points": [
+        "5,0"
+      ],
+      "spoken": [
+        "5, 0"
+      ]
+    },
+    {
       "placeholder": "{0,0}",
       "label": "impassable, 2 cells",
       "kind": "Impassable",
@@ -757,7 +772,7 @@
       "impassable": false,
       "travelCost": 1.0,
       "previewBlocked": false,
-      "kind": "Flat",
+      "kind": "Unreachable",
       "decoration": 0,
       "decorationName": null,
       "terrainType": 2,

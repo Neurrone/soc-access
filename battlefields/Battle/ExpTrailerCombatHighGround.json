@@ -101,6 +101,21 @@
       ]
     },
     {
+      "placeholder": "{0,6}",
+      "label": "unreachable ground",
+      "kind": "Unreachable",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "top left",
+      "points": [
+        "0,6"
+      ],
+      "spoken": [
+        "0, 6"
+      ]
+    },
+    {
       "placeholder": "{9,0}",
       "label": "wall of 3 impassable cells",
       "kind": "Impassable",
@@ -1891,7 +1906,7 @@
       "impassable": false,
       "travelCost": 1.0,
       "previewBlocked": false,
-      "kind": "Flat",
+      "kind": "Unreachable",
       "decoration": 0,
       "decorationName": null,
       "terrainType": 4,

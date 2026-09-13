@@ -218,52 +218,22 @@
     },
     {
       "placeholder": "{9,4}",
-      "label": "choke point, 2 cells",
+      "label": "choke point, 4 cells",
       "kind": "ChokePoint",
       "shape": "None",
-      "cells": 2,
-      "height": 0,
-      "position": "centre",
-      "points": [
-        "9,4",
-        "8,5"
-      ],
-      "spoken": [
-        "9, 4",
-        "8.5, 5"
-      ]
-    },
-    {
-      "placeholder": "{9,4}",
-      "label": "choke point, 2 cells",
-      "kind": "ChokePoint",
-      "shape": "None",
-      "cells": 2,
+      "cells": 4,
       "height": 0,
       "position": "middle right",
       "points": [
         "9,4",
-        "9,5"
-      ],
-      "spoken": [
-        "9, 4",
-        "9.5, 5"
-      ]
-    },
-    {
-      "placeholder": "{10,4}",
-      "label": "choke point, 2 cells",
-      "kind": "ChokePoint",
-      "shape": "None",
-      "cells": 2,
-      "height": 0,
-      "position": "middle right",
-      "points": [
         "10,4",
+        "8,5",
         "9,5"
       ],
       "spoken": [
+        "9, 4",
         "10, 4",
+        "8.5, 5",
         "9.5, 5"
       ]
     }

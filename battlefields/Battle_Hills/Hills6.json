@@ -288,35 +288,20 @@
   "chokePoints": [
     {
       "placeholder": "{8,7}",
-      "label": "choke point, 2 cells",
+      "label": "choke point, 3 cells",
       "kind": "ChokePoint",
       "shape": "None",
-      "cells": 2,
+      "cells": 3,
       "height": 0,
       "position": "top centre",
       "points": [
         "8,7",
-        "8,8"
-      ],
-      "spoken": [
-        "8.5, 7",
-        "8, 8"
-      ]
-    },
-    {
-      "placeholder": "{8,7}",
-      "label": "choke point, 2 cells",
-      "kind": "ChokePoint",
-      "shape": "None",
-      "cells": 2,
-      "height": 0,
-      "position": "top centre",
-      "points": [
-        "8,7",
+        "8,8",
         "9,8"
       ],
       "spoken": [
         "8.5, 7",
+        "8, 8",
         "9, 8"
       ]
     }

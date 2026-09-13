@@ -165,51 +165,21 @@
   "chokePoints": [
     {
       "placeholder": "{11,2}",
-      "label": "choke point, 2 cells",
+      "label": "choke point, 4 cells",
       "kind": "ChokePoint",
       "shape": "None",
-      "cells": 2,
+      "cells": 4,
       "height": 0,
       "position": "bottom right",
       "points": [
         "11,2",
-        "12,2"
-      ],
-      "spoken": [
-        "11, 2",
-        "12, 2"
-      ]
-    },
-    {
-      "placeholder": "{11,2}",
-      "label": "choke point, 2 cells",
-      "kind": "ChokePoint",
-      "shape": "None",
-      "cells": 2,
-      "height": 0,
-      "position": "bottom right",
-      "points": [
-        "11,2",
-        "11,3"
-      ],
-      "spoken": [
-        "11, 2",
-        "11.5, 3"
-      ]
-    },
-    {
-      "placeholder": "{10,3}",
-      "label": "choke point, 2 cells",
-      "kind": "ChokePoint",
-      "shape": "None",
-      "cells": 2,
-      "height": 0,
-      "position": "middle right",
-      "points": [
+        "12,2",
         "10,3",
         "11,3"
       ],
       "spoken": [
+        "11, 2",
+        "12, 2",
         "10.5, 3",
         "11.5, 3"
       ]

@@ -127,21 +127,6 @@
       ]
     },
     {
-      "placeholder": "{2,8}",
-      "label": "single cell, height 1",
-      "kind": "Elevated",
-      "shape": "SingleCell",
-      "cells": 1,
-      "height": 1,
-      "position": "top left",
-      "points": [
-        "2,8"
-      ],
-      "spoken": [
-        "2, 8"
-      ]
-    },
-    {
       "placeholder": "{6,0}",
       "label": "cliff",
       "kind": "Cliff",
@@ -194,6 +179,59 @@
         "0, 4",
         "1, 4",
         "0.5, 5"
+      ]
+    },
+    {
+      "placeholder": "{12,0}",
+      "label": "unreachable ground",
+      "kind": "Unreachable",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "bottom right",
+      "points": [
+        "12,0"
+      ],
+      "spoken": [
+        "12, 0"
+      ]
+    },
+    {
+      "placeholder": "{12,2}",
+      "label": "unreachable ground",
+      "kind": "Unreachable",
+      "shape": "None",
+      "cells": 1,
+      "height": 0,
+      "position": "bottom right",
+      "points": [
+        "12,2"
+      ],
+      "spoken": [
+        "12, 2"
+      ]
+    },
+    {
+      "placeholder": "{0,6}",
+      "label": "unreachable ground, 5 cells",
+      "kind": "Unreachable",
+      "shape": "None",
+      "cells": 5,
+      "height": 1,
+      "position": "top left",
+      "points": [
+        "0,6",
+        "0,7",
+        "0,8",
+        "1,8",
+        "2,8"
+      ],
+      "spoken": [
+        "0, 6",
+        "0.5, 7",
+        "0, 8",
+        "1, 8",
+        "2, 8"
       ]
     },
     {
@@ -804,7 +842,7 @@
       "impassable": false,
       "travelCost": 1.0,
       "previewBlocked": false,
-      "kind": "Flat",
+      "kind": "Unreachable",
       "decoration": 0,
       "decorationName": null,
       "terrainType": 2,
@@ -1311,7 +1349,7 @@
       "impassable": false,
       "travelCost": 1.0,
       "previewBlocked": false,
-      "kind": "Flat",
+      "kind": "Unreachable",
       "decoration": 0,
       "decorationName": null,
       "terrainType": 2,
@@ -2087,7 +2125,7 @@
       "impassable": false,
       "travelCost": 1.0,
       "previewBlocked": false,
-      "kind": "Flat",
+      "kind": "Unreachable",
       "decoration": 0,
       "decorationName": null,
       "terrainType": 2,
@@ -2336,7 +2374,7 @@
       "impassable": false,
       "travelCost": 1.0,
       "previewBlocked": false,
-      "kind": "Flat",
+      "kind": "Unreachable",
       "decoration": 0,
       "decorationName": null,
       "terrainType": 2,
@@ -2583,7 +2621,7 @@
       "impassable": false,
       "travelCost": 1.0,
       "previewBlocked": false,
-      "kind": "Flat",
+      "kind": "Unreachable",
       "decoration": 0,
       "decorationName": null,
       "terrainType": 2,
@@ -2602,7 +2640,7 @@
       "impassable": false,
       "travelCost": 1.0,
       "previewBlocked": false,
-      "kind": "Flat",
+      "kind": "Unreachable",
       "decoration": 0,
       "decorationName": null,
       "terrainType": 2,
@@ -2621,7 +2659,7 @@
       "impassable": false,
       "travelCost": 1.0,
       "previewBlocked": false,
-      "kind": "Elevated",
+      "kind": "Unreachable",
       "decoration": 0,
       "decorationName": null,
       "terrainType": 2,
