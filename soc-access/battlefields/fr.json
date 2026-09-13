@@ -1,0 +1,351 @@
+{
+  "version": 1,
+  "language": "fr",
+  "layouts": {
+    "Battle/Cemetery": {
+      "terrain": "Terrain plat d'un bout à l'autre. Des falaises le long du bord droit et autour des coins en bas à droite et en haut à droite.",
+      "attacker": "Les points de déploiement de l'attaquant occupent le bord gauche de bas en haut.",
+      "defender": "Les points de déploiement du défenseur se regroupent au milieu à droite, à l'intérieur des falaises."
+    },
+    "Battle/Fight1": {
+      "terrain": "Terrain plat dans le coin en bas à gauche, avec {6,0} sur le reste du champ de bataille. Le bord supérieur et le centre sont fermés par {1,4}, et l'on ne passe à droite que par {9,2}.",
+      "attacker": "Les points de déploiement de l'attaquant occupent le terrain plat du coin en bas à gauche.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit, sur {6,0}, par-delà {9,2}."
+    },
+    "Battle/Fight2": {
+      "terrain": "Terrain dégagé à gauche, avec {5,0} sur toute la droite du champ de bataille et jusqu'en haut au centre et en bas au centre. Une grande partie du centre est occupée par {6,2} et {5,5}, avec un passage entre les deux.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur la droite du champ de bataille, tous sur {5,0}."
+    },
+    "Battle/Fight3": {
+      "terrain": "Du terrain dégagé va du bord inférieur jusqu'en haut, entre {3,0} à gauche et {8,0} à droite. Le bord gauche est fermé par {0,0} et le bord droit par {12,2}.",
+      "attacker": "Les points de déploiement de l'attaquant traversent le haut du champ de bataille, sept d'entre eux sur {3,0}.",
+      "defender": "Les points de déploiement du défenseur occupent le bas à droite, dix d'entre eux sur {8,0}."
+    },
+    "Battle/Fight4": {
+      "terrain": "Terrain dégagé le long du bas, avec une montée vers le coin en haut à gauche par {3,6} et vers le coin en haut à droite par {10,6}. Le haut est occupé par {6,4}, ce qui sépare le champ de bataille en une moitié gauche et une moitié droite, qui ne se rejoignent que par {6,2}, en bas au centre.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, dans la moitié gauche.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, deux d'entre eux sur {10,6}."
+    },
+    "Battle/Fight5": {
+      "terrain": "Terrain dégagé à gauche, avec {2,1} sur le centre et la droite. Le haut au centre est fermé par {6,5} et le bord inférieur par {0,0}, avec {5,3} entre les deux, au centre.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, l'un d'eux sur {2,1}.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit, tous sur {2,1}."
+    },
+    "Battle/Fight6": {
+      "terrain": "Terrain dégagé au centre, avec {1,1} en bas à gauche, {9,1} en bas à droite, {1,6} en haut à gauche et {11,6} en haut à droite. À gauche et à droite du centre se trouvent {3,3} et {8,3}.",
+      "attacker": "Les points de déploiement de l'attaquant sont regroupés au centre du champ de bataille.",
+      "defender": "Les points de déploiement du défenseur entourent ceux de l'attaquant, deux dans chaque coin et un en bas au centre."
+    },
+    "Battle/Hideout": {
+      "terrain": "Terrain dégagé, avec {5,0} en bas au centre, {6,6} en haut au centre et {12,2} au milieu à droite. Le bas à gauche est bloqué par {2,0} et le haut à gauche par {1,6}, si bien que l'on n'entre dans le coin en haut à gauche que par {0,5}.",
+      "attacker": "Les points de déploiement de l'attaquant traversent le centre du champ de bataille.",
+      "defender": "Les points de déploiement du défenseur entourent ceux de l'attaquant, deux sur {5,0}, deux sur {6,6} et cinq sur {12,2}."
+    },
+    "Battle/SacredWoods": {
+      "terrain": "Terrain dégagé en travers du bas, avec {4,0} en bas à gauche, {4,5} en haut à gauche et {9,2} sur tout le côté droit. Des falaises en bas au centre, en bas à droite et au milieu à gauche.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord inférieur, tous sur terrain plat.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le milieu et le haut, quatre d'entre eux sur {9,2} et deux sur {4,5}."
+    },
+    "Battle/TangledBurrow": {
+      "terrain": "Terrain dégagé, avec {2,5} au milieu à gauche, {5,5} et {8,7} en travers du haut au centre, et {9,3} au milieu à droite. {7,1} et {9,1} se trouvent près du bord inférieur.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche, tous sur terrain plat.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le centre et la droite, un sur {5,5}, un sur {8,7} et un sur {9,3}."
+    },
+    "Battle/TrailerBattle": {
+      "terrain": "Terrain dégagé sur le centre et la droite, avec {4,4} au centre et {11,3} au milieu à droite, et des falaises en haut à gauche et en haut au centre. Le bas à gauche et le bord gauche sont occupés par {0,0}, où l'on n'accède que par {5,3}, et la plus grande partie du bord supérieur est fermée par {9,6}.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur la gauche du champ de bataille, l'un d'eux sur {0,0} et un autre sur {4,4}.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur la droite du champ de bataille, tous sur terrain dégagé."
+    },
+    "Battle/VanirLootPlace": {
+      "terrain": "Terrain dégagé, avec {3,0} en bas à gauche et {9,4} en travers du centre et de la droite. Le haut à gauche est bloqué par {3,5}, on ne passe du bord gauche au reste du champ de bataille que par {3,3}, et il y a des falaises en haut à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, l'un d'eux sur {3,3}.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le centre et la droite, quatre d'entre eux sur {9,4} et un sur {3,0}."
+    },
+    "Battle_Hills/Hills1": {
+      "terrain": "Terrain plat d'un bout à l'autre. Des falaises au centre, le long du bord droit, en haut à gauche et en bas à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, sur terrain plat.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, à l'intérieur des falaises."
+    },
+    "Battle_Hills/Hills10": {
+      "terrain": "Terrain dégagé en travers du milieu, avec {3,0} en bas au centre et {3,6} en haut au centre. Des falaises en haut à gauche et sur le bord droit, et l'on n'entre dans le coin en haut à droite que par {10,6}.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, tous sur terrain plat.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, deux d'entre eux dans le coin en haut à droite, par-delà {10,6}."
+    },
+    "Battle_Hills/Hills2": {
+      "terrain": "Terrain dégagé, avec {5,2} sur tout le centre, et {0,0} en bas à gauche, {10,0} en bas à droite, {0,6} en haut à gauche et {11,6} en haut à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, trois d'entre eux sur {0,6} et trois sur {0,0}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, trois d'entre eux sur {11,6} et trois sur {10,0}."
+    },
+    "Battle_Hills/Hills3": {
+      "terrain": "Terrain dégagé, avec {4,3} en travers du centre, {3,6} en haut à gauche et {7,0} en bas à droite. Des falaises en bas à gauche et en haut à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, et trois d'entre eux se trouvent sur {3,6}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, et trois d'entre eux se trouvent sur {7,0}."
+    },
+    "Battle_Hills/Hills4": {
+      "terrain": "Du terrain plat occupe le milieu du champ de bataille, avec {0,0} autour du bord gauche et {8,0} autour du bord droit.",
+      "attacker": "Les points de déploiement de l'attaquant longent la gauche du champ de bataille, six d'entre eux sur {0,0}.",
+      "defender": "Les points de déploiement du défenseur longent la droite du champ de bataille, six d'entre eux sur {8,0}."
+    },
+    "Battle_Hills/Hills5": {
+      "terrain": "Terrain plat au milieu, avec {1,0} sur tout le côté gauche et {9,0} sur tout le côté droit. Des falaises en bas à gauche.",
+      "attacker": "Les points de déploiement de l'attaquant longent la gauche, tous sauf un sur {1,0}.",
+      "defender": "Les points de déploiement du défenseur longent la droite, tous sauf un sur {9,0}."
+    },
+    "Battle_Hills/Hills6": {
+      "terrain": "Terrain dégagé le long du bas, avec {0,0} dans le coin en bas à gauche et {9,0} en bas à droite. Le centre et le haut sont occupés par {5,3}, dont le coin en haut à droite n'est accessible que par {8,7}.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche, et l'un d'eux se trouve sur {0,0}.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit, et l'un d'eux se trouve sur {9,0}."
+    },
+    "Battle_Hills/Hills7": {
+      "terrain": "Terrain dégagé en travers du milieu, avec {2,5} sur tout le haut à gauche, {8,4} sur le haut à droite, {0,0} sur le bas à gauche, {4,1} sur le bas au centre et {11,0} sur le bas à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, trois d'entre eux sur {2,5} et un sur {0,0}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, quatre d'entre eux sur {8,4} et trois sur {11,0}."
+    },
+    "Battle_Hills/Hills8": {
+      "terrain": "Terrain dégagé, avec {3,3} en travers du centre, {4,0} le long du bord inférieur et {4,8} le long du bord supérieur. Des falaises au milieu à gauche, au milieu à droite et en haut à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, un sur {1,1} et un sur {1,7}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, un sur {10,1} et un sur {10,7}."
+    },
+    "Battle_Hills/Hills9": {
+      "terrain": "Terrain dégagé, avec {3,0} en bas à gauche, {8,0} en bas au centre, {0,5} en haut à gauche, {10,5} en haut à droite et {6,4} au centre. Des falaises le long du haut au centre.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, trois d'entre eux sur {0,5} et un sur {3,0}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, trois d'entre eux sur {10,5} et un sur {8,0}."
+    },
+    "Battle_Plains/Plains": {
+      "terrain": "Terrain dégagé sur tout le champ de bataille, avec {4,1} et {7,1} près du bord inférieur et {6,4} au centre. Le terrain en haut au centre est interrompu par {6,6}.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, tous sur terrain plat.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, tous sur terrain plat."
+    },
+    "Battle_Plains/Plains10": {
+      "terrain": "Terrain plat sur tout le champ de bataille, avec {6,4} au centre, {6,3} juste à côté et {5,1} en bas au centre.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit."
+    },
+    "Battle_Plains/Plains2": {
+      "terrain": "Terrain plat sur tout le champ de bataille, avec {7,2} en bas au centre et {4,6} en haut au centre.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit."
+    },
+    "Battle_Plains/Plains3": {
+      "terrain": "Terrain plat sur tout le champ de bataille, avec {5,0} en bas au centre et {5,8} en haut au centre.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, un sur {1,1} et un sur {1,7}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, un sur {10,1} et un sur {10,7}."
+    },
+    "Battle_Plains/Plains4": {
+      "terrain": "Terrain dégagé, avec {3,2} en bas à gauche, {7,2} en bas au centre, {5,6} en haut au centre et {8,5} au milieu à droite.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche, tous sur terrain plat.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit, tous sur terrain plat."
+    },
+    "Battle_Plains/Plains5": {
+      "terrain": "Terrain plat sur tout le champ de bataille, avec {5,7} en haut au centre, {6,4} au centre et {4,1} en bas au centre.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit."
+    },
+    "Battle_Plains/Plains6": {
+      "terrain": "Terrain plat sur tout le champ de bataille, avec {0,1} en bas à gauche, {6,3} au centre et {11,6} en haut à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent la gauche du champ de bataille, l'un d'eux sur {0,1}.",
+      "defender": "Les points de déploiement du défenseur longent la droite du champ de bataille, l'un d'eux sur {11,6}."
+    },
+    "Battle_Plains/Plains7": {
+      "terrain": "Terrain plat sur tout le champ de bataille, avec {4,1} en bas à gauche, {3,6} en haut à gauche, {9,2} en bas à droite et {7,7} en haut au centre.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, l'un d'eux sur {3,6}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, l'un d'eux sur {9,2}."
+    },
+    "Battle_Plains/Plains8": {
+      "terrain": "Terrain dégagé, avec {5,2} et {7,2} en bas au centre, {5,6} et {7,6} en haut au centre, et {2,4} et {10,4} de part et d'autre du milieu.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche, tous sur terrain plat.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit, tous sur terrain plat."
+    },
+    "Battle_Plains/Plains9": {
+      "terrain": "Terrain plat sur tout le champ de bataille, avec {1,7} en haut à gauche, {8,6} en haut au centre, {3,1} en bas à gauche et {10,0} en bas à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, deux d'entre eux sur {1,7}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, deux d'entre eux sur {10,0}."
+    },
+    "Battle_Walls/Walls1": {
+      "terrain": "Terrain dégagé, avec {4,4} au milieu à gauche. Des falaises vont du coin en bas à droite jusqu'en haut au centre et isolent {12,0} sur la droite du champ de bataille.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur se répartissent dans le centre et le bas à droite du champ de bataille."
+    },
+    "Battle_Walls/Walls2": {
+      "terrain": "Terrain plat sur tout le champ de bataille. Des falaises descendent sur toute la hauteur du champ de bataille le long du côté droit et ferment le bord droit.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, bien à l'écart des falaises.",
+      "defender": "Les points de déploiement du défenseur descendent le long du milieu à droite, juste devant les falaises."
+    },
+    "Battle_Walls/Walls3": {
+      "terrain": "Terrain plat, avec {0,0} dans le coin en bas à gauche et {10,0} en bas à droite. Des falaises traversent tout le champ de bataille au-dessus du centre et isolent {3,6} au-delà.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche, et deux d'entre eux se trouvent sur {0,0}.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit, et trois d'entre eux se trouvent sur {10,0}."
+    },
+    "Battle_Walls/Walls4": {
+      "terrain": "Terrain plat sur tout le champ de bataille. Le côté droit est barré du bord supérieur au bord inférieur par {11,0}, avec des falaises au-delà.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur descendent de haut en bas le long de la droite du champ de bataille."
+    },
+    "Battle_Water/Water1": {
+      "terrain": "Terrain dégagé, avec {5,0} en bas au centre et {5,4} au centre, et {5,2} entre les deux. Le haut au centre est traversé par {7,6}.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur longent la droite du champ de bataille."
+    },
+    "Battle_Water/water2": {
+      "terrain": "Terrain dégagé, avec {3,7} en travers du haut. {4,2} et {4,5} se superposent en travers du milieu, avec un couloir entre les deux et du terrain dégagé à chaque extrémité.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, avec {4,2} et {4,5} sur leur droite.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, avec {4,2} et {4,5} sur leur gauche."
+    },
+    "Battle_Water/water3": {
+      "terrain": "Terrain dégagé, avec {3,6} en travers du haut à gauche et {8,6} en travers du haut à droite, et l'on n'entre dans le terrain qui les sépare que par {6,5}. Le bas du champ de bataille est interrompu par {2,0} à gauche, {8,0} au centre et {5,2} entre les deux.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit."
+    },
+    "Battle_Water/water4": {
+      "terrain": "Terrain dégagé entre {0,1} à gauche et {10,3} à droite. {6,2} et {4,5} occupent le milieu du champ de bataille, avec un passage entre les deux.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, six d'entre eux sur {0,1}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, six d'entre eux sur {10,3}."
+    },
+    "Battle_Water/Water5": {
+      "terrain": "Terrain dégagé, avec {3,1} en bas à gauche et {8,4} au centre. Le milieu est bloqué par {4,2}, que l'on contourne par le haut ou par le bas, avec {0,6} dans le coin en haut à gauche et {10,0} en bas à droite.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur la moitié gauche, tous sur terrain plat.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur la moitié droite, tous sur terrain plat."
+    },
+    "Battle_Water/Water6": {
+      "terrain": "Terrain dégagé, avec {5,2} en travers du centre du champ de bataille, que l'on contourne par le haut comme par le bas. En bas à droite, {8,0} ne laisse entrer dans le coin que par {11,2}.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, deux d'entre eux dans le coin, par-delà {11,2}."
+    },
+    "Battle_Water/Water7": {
+      "terrain": "Terrain dégagé, avec {4,1} en travers du centre. Le haut du champ de bataille est occupé par {3,5} et le bas au centre par {7,0}, si bien que l'on ne passe à droite que par {9,4}.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur descendent de haut en bas le long de la droite du champ de bataille."
+    },
+    "Battle_Water/Water8": {
+      "terrain": "Terrain dégagé interrompu par {4,1} en bas au centre, {5,4} au centre et {5,6} en haut au centre, avec des couloirs qui les contournent en travers du milieu et le long des bords supérieur et inférieur. {3,4} et {9,4} se trouvent au milieu à gauche et au milieu à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent la gauche du champ de bataille.",
+      "defender": "Les points de déploiement du défenseur longent la droite du champ de bataille."
+    },
+    "Battle_Woods/Woods1": {
+      "terrain": "Terrain dégagé, avec {8,4} en travers du centre, {0,3} au milieu à gauche et {11,4} au milieu à droite. Le haut à gauche est bloqué par {2,7} et le haut à droite par {9,7}.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, l'un d'eux sur {0,3}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, l'un d'eux sur {11,4}."
+    },
+    "Battle_Woods/Woods2": {
+      "terrain": "Terrain dégagé, avec {5,0} en bas au centre, {5,6} en haut au centre et {0,7} dans le coin en haut à gauche, presque entièrement fermé par {1,7}. Le bas au centre est bloqué par {9,2}.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, l'un d'eux sur {0,7}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, tous sur terrain plat."
+    },
+    "Battle_Woods/Woods3": {
+      "terrain": "Terrain dégagé, avec {3,3} et {3,5} au milieu à gauche, {8,3} et {8,5} au centre, et {5,8} et {7,8} sur le bord supérieur.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche sur toute sa longueur.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit sur toute sa longueur."
+    },
+    "Battle_Woods/Woods4": {
+      "terrain": "Terrain dégagé, avec {0,0} en bas à gauche, {11,0} en bas à droite, {1,5} au milieu à gauche et {9,7} en haut à droite. Le milieu du bord inférieur est bloqué par {6,0}.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, l'un d'eux sur {1,5} et un autre sur {0,0}.",
+      "defender": "Les points de déploiement du défenseur longent la droite du champ de bataille, deux d'entre eux sur {9,7} et un sur {11,0}."
+    },
+    "Battle_Woods/Woods5": {
+      "terrain": "Terrain plat sur tout le champ de bataille, avec {6,4} au centre.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit."
+    },
+    "Battle_Woods/Woods6": {
+      "terrain": "Terrain dégagé, avec {5,3} au centre du champ de bataille. Le haut est bloqué par {3,7} et {7,7}, avec un espace entre les deux en haut au centre et du terrain dégagé de chaque côté.",
+      "attacker": "Les points de déploiement de l'attaquant longent la gauche du champ de bataille.",
+      "defender": "Les points de déploiement du défenseur longent la droite du champ de bataille."
+    },
+    "Battle_Woods/Woods7": {
+      "terrain": "Terrain plat sur tout le champ de bataille, avec {5,7} en haut au centre et {0,4} et {12,4} sur les bords gauche et droit.",
+      "attacker": "Les points de déploiement de l'attaquant descendent de haut en bas le long du côté gauche.",
+      "defender": "Les points de déploiement du défenseur descendent de haut en bas le long du côté droit."
+    },
+    "Battle_Woods/Woods8": {
+      "terrain": "Terrain dégagé, avec {5,3} au centre du champ de bataille. Le centre est bordé par {2,1} à gauche et en dessous, et par {7,3} à droite et au-dessus.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit."
+    },
+    "BattleCampaign/Arleon1Ambush": {
+      "terrain": "Terrain dégagé en travers du milieu, avec {0,0} le long du bord inférieur et {4,5} le long du bord supérieur. Des falaises en haut au centre.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, deux d'entre eux sur {0,0} et un sur {4,5}.",
+      "defender": "Les points de déploiement du défenseur descendent le long du milieu à droite, trois d'entre eux sur {0,0} et trois sur {4,5}."
+    },
+    "BattleCampaign/Arleon1Barya": {
+      "terrain": "Terrain dégagé, avec {5,5} en haut au centre, {2,0} en bas à gauche et {8,0} en bas à droite. Le coin en haut à gauche est occupé par {0,6}, où l'on n'accède que par {0,5}.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche, et l'un d'eux se trouve sur {2,0}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, et l'un d'eux se trouve sur {8,0}."
+    },
+    "BattleCampaign/Arleon1Faey": {
+      "terrain": "Terrain dégagé, avec {5,2} sur tout le centre, {2,0} en bas à gauche et {9,7} en haut à droite. Le milieu du bord inférieur est bloqué par {5,0} et le milieu du bord supérieur par {5,8}.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche, et l'un d'eux se trouve sur {2,0}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, et deux d'entre eux se trouvent sur {9,7}."
+    },
+    "BattleCampaign/Arleon1GoldMine": {
+      "terrain": "Terrain dégagé, avec {8,1} en bas à droite, {9,6} en haut à droite et {4,7} en haut au centre. Le bord inférieur est bordé par {4,0}, et l'on n'entre dans le coin en haut à droite que par {10,5}.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent le long de la gauche du champ de bataille, dont un sur {4,7}.",
+      "defender": "Les points de déploiement du défenseur longent la droite du champ de bataille, un sur {9,6}, un sur {8,1} et un sur {10,5}."
+    },
+    "BattleCampaign/Arleon1Hideout": {
+      "terrain": "Terrain plat partout, avec {6,6} en travers du haut au centre et {5,0} en bas au centre. Le milieu est resserré par {3,3} et {7,3}, avec un espace entre les deux.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, tous sur terrain plat.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, tous sur terrain plat."
+    },
+    "BattleCampaign/Arleon1Knights": {
+      "terrain": "Terrain plat en travers du milieu, avec {0,6} le long du bord supérieur et {0,0} le long du bord inférieur.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, trois d'entre eux sur {0,6} et trois sur {0,0}.",
+      "defender": "Les points de déploiement du défenseur longent le bord droit, trois d'entre eux sur {0,6} et trois sur {0,0}."
+    },
+    "BattleCampaign/Lothfight": {
+      "terrain": "Terrain dégagé, avec {5,3} au centre, {0,6} en haut à gauche et {10,0} en bas à droite. Le terrain juste en dessous du centre est occupé par {5,2}, que les troupes doivent contourner d'un côté ou de l'autre.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche, et l'un d'eux se trouve sur {0,6}.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit, et l'un d'eux se trouve sur {10,0}."
+    },
+    "BattleCampaign/Ranafight": {
+      "terrain": "Terrain dégagé, avec {2,2} au milieu à gauche et {9,4} au milieu à droite. Le bas au centre est occupé par {4,0} et le haut au centre par {4,7}, ce qui laisse le milieu du champ de bataille dégagé entre les deux.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur la gauche du champ de bataille, deux d'entre eux sur {2,2}.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur la droite du champ de bataille, deux d'entre eux sur {9,4}."
+    },
+    "BattleCampaign/RiseEternal1Final": {
+      "terrain": "Terrain plat le long du bord gauche ; le centre et la droite sont couverts par {12,0}. Des falaises en haut au centre, et l'on n'entre dans le coin en bas à droite que par {10,2} et dans le coin en haut à droite que par {10,5}.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, tous sur le terrain plat.",
+      "defender": "Les points de déploiement du défenseur descendent le long du milieu à droite, tous sur {12,0}."
+    },
+    "BattleCampaign/RootsHillSiege": {
+      "terrain": "Tout le champ de bataille est couvert par {0,0}, que {2,2} en bas à gauche et {2,5} au milieu à gauche interrompent, laissant un couloir le long du bord supérieur, un le long du bord inférieur et un en travers du centre. Les couloirs du haut et du bas s'arrêtent au centre, et seul celui du milieu continue vers la droite, où le bord est découpé en poches par {11,3} et {11,5}.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit, trois d'entre eux contre le bord droit."
+    },
+    "BattleCampaign/Silkspool": {
+      "terrain": "Terrain dégagé, avec {8,6} en haut au centre et {8,2} en bas au centre. Des falaises en haut à droite et en bas à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur la droite du champ de bataille, l'un d'eux se trouvant sur {8,6} et un autre sur {8,2}."
+    },
+    "BattleCampaign/WieshFight": {
+      "terrain": "Terrain dégagé, avec {4,7} et {8,5} en haut au centre et {8,0} en bas au centre. Le coin en bas à droite est bloqué par {10,0} et le coin en haut à droite par {10,6}, avec des falaises le long du bord droit au-delà.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur longent la droite du champ de bataille, deux d'entre eux sur {8,5} et un sur {8,0}."
+    },
+    "BattleLargeSettlementSiege/LargeSettlementSiege": {
+      "terrain": "Terrain dégagé, avec {10,0} en bas à droite. Le défenseur tient trois courtes sections de mur : une tour avec un mur derrière elle en bas au centre, une autre en haut au centre, et une tour avec deux murs au milieu à droite. Des escaliers montent à côté de chaque tour, et les murs sont séparés les uns des autres par du terrain dégagé.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, sur le terrain dégagé devant les murs.",
+      "defender": "Les points de déploiement du défenseur se répartissent sur le centre et la droite, six d'entre eux sur les tours et les murs."
+    },
+    "BattleSmallSettlementSiege/SmallSettlementSiege": {
+      "terrain": "Terrain dégagé à gauche, avec les tours du défenseur en haut au centre et en bas au centre, des escaliers montant à chacune depuis le bord voisin, et un mur entre elles au centre. Derrière le mur se trouvent {9,5} au milieu à droite et {8,0} en bas à droite. Les coins en haut à gauche et en haut à droite sont fermés par {0,6} et {12,6}.",
+      "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche, sur le terrain dégagé à l'extérieur des tours.",
+      "defender": "Les points de déploiement du défenseur occupent le centre et la droite, deux d'entre eux sur les tours et quatre sur le mur."
+    },
+    "BattleTownSiege/TownSiege": {
+      "terrain": "Terrain dégagé à gauche, et le défenseur tient la ville à droite. Une tour se dresse en haut au centre et une autre en bas au centre, chacune flanquée d'une section de douves, avec des escaliers qui montent à côté de chacune du côté de la ville. Des murs se dressent au milieu à droite et en bas à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+      "defender": "Les points de déploiement du défenseur se répartissent dans la ville, un sur chaque tour et quatre sur les murs, dont deux pour des engins de siège."
+    },
+    "BattleTownSiege_Walls/TownSiegeWalls2": {
+      "terrain": "Des douves vont du coin en haut à gauche jusqu'en bas au centre, et on ne les franchit qu'à {5,4}, la porte au centre. Les murs du défenseur se dressent à droite des douves : un le long du bord supérieur, entre une tour à son extrémité gauche et une autre en haut au centre ; une courte section flanquée de deux tours du côté de la ville à chaque extrémité des douves ; et une autre autour du coin en bas à droite, avec deux tours. Des escaliers montent sur les murs en haut à gauche, en haut au centre, en haut à droite, en bas au centre et en bas à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, sur le terrain dégagé à l'extérieur des douves.",
+      "defender": "Les points de déploiement du défenseur se répartissent dans la ville, sept d'entre eux sur les tours et les murs."
+    },
+    "BattleTownSiege_Walls/TownSiegeWalls2Roots": {
+      "terrain": "Des douves vont du coin en haut à gauche jusqu'en bas au centre, et on ne les franchit qu'à {5,4}, la porte au centre. Les murs du défenseur se dressent à droite des douves : un le long du bord supérieur, entre une tour à son extrémité gauche et une autre en haut au centre ; une courte section flanquée de deux tours du côté de la ville à chaque extrémité des douves ; et une autre autour du coin en bas à droite, avec deux tours. Des escaliers montent sur les murs en haut à gauche, en haut au centre, en haut à droite, en bas au centre et en bas à droite.",
+      "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, sur le terrain dégagé à l'extérieur des douves.",
+      "defender": "Les points de déploiement du défenseur se répartissent dans la ville, sept d'entre eux sur les tours et les murs."
+    }
+  }
+}

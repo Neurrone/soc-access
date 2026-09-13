@@ -1,0 +1,5 @@
+{
+  "terrain": "Tout le champ de bataille est couvert par {0,0}, que {2,2} en bas à gauche et {2,5} au milieu à gauche interrompent, laissant un couloir le long du bord supérieur, un le long du bord inférieur et un en travers du centre. Les couloirs du haut et du bas s'arrêtent au centre, et seul celui du milieu continue vers la droite, où le bord est découpé en poches par {11,3} et {11,5}.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+  "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit, trois d'entre eux contre le bord droit."
+}

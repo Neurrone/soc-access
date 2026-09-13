@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain dégagé, avec {5,2} en travers du centre du champ de bataille, que l'on contourne par le haut comme par le bas. En bas à droite, {8,0} ne laisse entrer dans le coin que par {11,2}.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+  "defender": "Les points de déploiement du défenseur longent le bord droit, deux d'entre eux dans le coin, par-delà {11,2}."
+}

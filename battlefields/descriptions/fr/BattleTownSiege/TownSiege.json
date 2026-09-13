@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain dégagé à gauche, et le défenseur tient la ville à droite. Une tour se dresse en haut au centre et une autre en bas au centre, chacune flanquée d'une section de douves, avec des escaliers qui montent à côté de chacune du côté de la ville. Des murs se dressent au milieu à droite et en bas à droite.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+  "defender": "Les points de déploiement du défenseur se répartissent dans la ville, un sur chaque tour et quatre sur les murs, dont deux pour des engins de siège."
+}

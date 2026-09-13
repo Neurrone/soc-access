@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain dégagé sur tout le champ de bataille, avec {4,1} et {7,1} près du bord inférieur et {6,4} au centre. Le terrain en haut au centre est interrompu par {6,6}.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, tous sur terrain plat.",
+  "defender": "Les points de déploiement du défenseur longent le bord droit, tous sur terrain plat."
+}

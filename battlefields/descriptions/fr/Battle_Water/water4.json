@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain dégagé entre {0,1} à gauche et {10,3} à droite. {6,2} et {4,5} occupent le milieu du champ de bataille, avec un passage entre les deux.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, six d'entre eux sur {0,1}.",
+  "defender": "Les points de déploiement du défenseur longent le bord droit, six d'entre eux sur {10,3}."
+}

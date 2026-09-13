@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain dégagé, avec {5,2} sur tout le centre, et {0,0} en bas à gauche, {10,0} en bas à droite, {0,6} en haut à gauche et {11,6} en haut à droite.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, trois d'entre eux sur {0,6} et trois sur {0,0}.",
+  "defender": "Les points de déploiement du défenseur longent le bord droit, trois d'entre eux sur {11,6} et trois sur {10,0}."
+}

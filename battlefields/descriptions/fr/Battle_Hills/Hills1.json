@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain plat d'un bout à l'autre. Des falaises au centre, le long du bord droit, en haut à gauche et en bas à droite.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, sur terrain plat.",
+  "defender": "Les points de déploiement du défenseur longent le bord droit, à l'intérieur des falaises."
+}

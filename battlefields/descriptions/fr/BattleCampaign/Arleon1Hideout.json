@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain plat partout, avec {6,6} en travers du haut au centre et {5,0} en bas au centre. Le milieu est resserré par {3,3} et {7,3}, avec un espace entre les deux.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, tous sur terrain plat.",
+  "defender": "Les points de déploiement du défenseur longent le bord droit, tous sur terrain plat."
+}

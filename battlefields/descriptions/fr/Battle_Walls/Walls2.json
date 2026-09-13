@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain plat sur tout le champ de bataille. Des falaises descendent sur toute la hauteur du champ de bataille le long du côté droit et ferment le bord droit.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, bien à l'écart des falaises.",
+  "defender": "Les points de déploiement du défenseur descendent le long du milieu à droite, juste devant les falaises."
+}

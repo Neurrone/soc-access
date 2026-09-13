@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain dégagé interrompu par {4,1} en bas au centre, {5,4} au centre et {5,6} en haut au centre, avec des couloirs qui les contournent en travers du milieu et le long des bords supérieur et inférieur. {3,4} et {9,4} se trouvent au milieu à gauche et au milieu à droite.",
+  "attacker": "Les points de déploiement de l'attaquant longent la gauche du champ de bataille.",
+  "defender": "Les points de déploiement du défenseur longent la droite du champ de bataille."
+}

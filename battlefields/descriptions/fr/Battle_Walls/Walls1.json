@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain dégagé, avec {4,4} au milieu à gauche. Des falaises vont du coin en bas à droite jusqu'en haut au centre et isolent {12,0} sur la droite du champ de bataille.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche.",
+  "defender": "Les points de déploiement du défenseur se répartissent dans le centre et le bas à droite du champ de bataille."
+}

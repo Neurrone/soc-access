@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain dégagé à gauche, avec les tours du défenseur en haut au centre et en bas au centre, des escaliers montant à chacune depuis le bord voisin, et un mur entre elles au centre. Derrière le mur se trouvent {9,5} au milieu à droite et {8,0} en bas à droite. Les coins en haut à gauche et en haut à droite sont fermés par {0,6} et {12,6}.",
+  "attacker": "Les points de déploiement de l'attaquant se répartissent sur le tiers gauche, sur le terrain dégagé à l'extérieur des tours.",
+  "defender": "Les points de déploiement du défenseur occupent le centre et la droite, deux d'entre eux sur les tours et quatre sur le mur."
+}

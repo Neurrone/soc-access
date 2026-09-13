@@ -1,0 +1,5 @@
+{
+  "terrain": "Des douves vont du coin en haut à gauche jusqu'en bas au centre, et on ne les franchit qu'à {5,4}, la porte au centre. Les murs du défenseur se dressent à droite des douves : un le long du bord supérieur, entre une tour à son extrémité gauche et une autre en haut au centre ; une courte section flanquée de deux tours du côté de la ville à chaque extrémité des douves ; et une autre autour du coin en bas à droite, avec deux tours. Des escaliers montent sur les murs en haut à gauche, en haut au centre, en haut à droite, en bas au centre et en bas à droite.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, sur le terrain dégagé à l'extérieur des douves.",
+  "defender": "Les points de déploiement du défenseur se répartissent dans la ville, sept d'entre eux sur les tours et les murs."
+}

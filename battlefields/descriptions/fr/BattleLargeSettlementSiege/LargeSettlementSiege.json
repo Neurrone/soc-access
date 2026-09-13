@@ -1,0 +1,5 @@
+{
+  "terrain": "Terrain dégagé, avec {10,0} en bas à droite. Le défenseur tient trois courtes sections de mur : une tour avec un mur derrière elle en bas au centre, une autre en haut au centre, et une tour avec deux murs au milieu à droite. Des escaliers montent à côté de chaque tour, et les murs sont séparés les uns des autres par du terrain dégagé.",
+  "attacker": "Les points de déploiement de l'attaquant longent le bord gauche, sur le terrain dégagé devant les murs.",
+  "defender": "Les points de déploiement du défenseur se répartissent sur le centre et la droite, six d'entre eux sur les tours et les murs."
+}
