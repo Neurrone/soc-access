@@ -1,5 +1,5 @@
 {
-  "terrain": "Terreno aberto à esquerda, com as torres do defensor na parte superior central e na parte inferior central, escadas subindo até cada uma pela borda ao lado, e um muro entre elas no centro. Atrás do muro, há {9,5} na parte central direita e {8,0} na parte inferior direita. Os cantos superior esquerdo e superior direito são fechados por {0,6} e {12,6}.",
+  "terrain": "Terreno aberto à esquerda, com as torres do defensor na parte superior central e na parte inferior central, escadas subindo até cada uma pela borda ao lado, e um muro entre elas no centro. Atrás do muro, há {9,5} na parte central direita e {8,0} na parte inferior direita. Os cantos superior esquerdo e superior direito são fechados por {0,8} e {11,8}.",
   "attacker": "Os pontos de posicionamento do atacante se espalham pelo terço esquerdo, em terreno aberto fora das torres.",
   "defender": "Os pontos de posicionamento do defensor preenchem o centro e a direita, dois deles nas torres e quatro no muro."
 }

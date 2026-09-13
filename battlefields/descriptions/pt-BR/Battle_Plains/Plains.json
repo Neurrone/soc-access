@@ -1,5 +1,5 @@
 {
-  "terrain": "Terreno aberto por todo o tabuleiro, com {4,1} e {7,1} perto da borda inferior e {6,4} no centro. O terreno da parte superior central é interrompido por {6,6}.",
+  "terrain": "Terreno aberto por todo o tabuleiro, com {4,1} e {7,1} perto da borda inferior e {6,4} no centro. O terreno da parte superior central é interrompido por {5,7}.",
   "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda, todos eles em terreno plano.",
   "defender": "Os pontos de posicionamento do defensor descem pela borda direita, todos eles em terreno plano."
 }

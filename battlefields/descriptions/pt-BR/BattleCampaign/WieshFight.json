@@ -1,5 +1,5 @@
 {
-  "terrain": "Terreno aberto com {4,7} e {8,5} na parte superior central e {8,0} na parte inferior central. O canto inferior direito é bloqueado por {10,0} e a parte superior direita, por {10,6}, com penhascos ao longo da borda direita, do outro lado.",
+  "terrain": "Terreno aberto com {4,7} e {8,5} na parte superior central e {8,0} na parte inferior central. O canto inferior direito é bloqueado por {11,0} e a parte superior direita, por {11,6}, com penhascos ao longo da borda direita, do outro lado.",
   "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda.",
   "defender": "Os pontos de posicionamento do defensor descem pela direita do tabuleiro, dois deles em {8,5} e um em {8,0}."
 }

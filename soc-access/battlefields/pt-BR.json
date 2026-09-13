@@ -8,7 +8,7 @@
       "defender": "Os pontos de posicionamento do defensor se reúnem na parte central direita, por dentro dos penhascos."
     },
     "Battle/Fight1": {
-      "terrain": "Terreno plano no canto inferior esquerdo, com {6,0} pelo resto do tabuleiro. Há {1,4} vedando a borda superior e descendo pelo centro, e a única passagem para a direita é por {9,2}.",
+      "terrain": "Terreno plano no canto inferior esquerdo, com {6,0} pelo resto do tabuleiro. A borda superior é vedada por {0,5}, e o único acesso à direita é por {9,2}.",
       "attacker": "Os pontos de posicionamento do atacante preenchem o terreno plano do canto inferior esquerdo.",
       "defender": "Os pontos de posicionamento do defensor se espalham pelo terço direito, em {6,0}, depois de {9,2}."
     },
@@ -18,27 +18,27 @@
       "defender": "Os pontos de posicionamento do defensor se espalham pela direita do tabuleiro, todos eles em {5,0}."
     },
     "Battle/Fight3": {
-      "terrain": "O terreno aberto vai da borda inferior até o alto, entre {3,0} à esquerda e {8,0} à direita. A borda esquerda é fechada por {0,0} e a borda direita, por {12,2}.",
+      "terrain": "O terreno aberto vai da borda inferior até o alto, entre {3,0} à esquerda e {8,0} à direita. A borda esquerda é fechada por {1,0} e {0,3}, e a borda direita, por {12,2}.",
       "attacker": "Os pontos de posicionamento do atacante atravessam o alto do tabuleiro, sete deles em {3,0}.",
       "defender": "Os pontos de posicionamento do defensor preenchem a parte inferior direita, dez deles em {8,0}."
     },
     "Battle/Fight4": {
-      "terrain": "Terreno aberto ao longo da parte inferior, com {3,6} subindo até o canto superior esquerdo e {10,6} até o canto superior direito. O alto do tabuleiro é ocupado por {6,4}, o que divide o tabuleiro em uma metade esquerda e uma metade direita, ligadas apenas por {6,2} na parte inferior central.",
+      "terrain": "Terreno aberto ao longo da parte inferior, com {3,6} subindo até o canto superior esquerdo e {10,6} até o canto superior direito. O alto do tabuleiro é ocupado por {4,5}, e a metade esquerda e a metade direita do tabuleiro se encontram apenas em {5,2}, na parte inferior central.",
       "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda, na metade esquerda.",
       "defender": "Os pontos de posicionamento do defensor descem pela borda direita, dois deles em {10,6}."
     },
     "Battle/Fight5": {
-      "terrain": "Terreno aberto à esquerda, com {2,1} pelo centro e pela direita. A parte superior central é fechada por {6,5} e a borda inferior, por {0,0}; entre elas, no centro, há {5,3}.",
+      "terrain": "Terreno aberto à esquerda, com {2,1} pelo centro e pela direita. A parte superior central é fechada por {5,7} e a borda inferior, por {0,0} e {10,0}; entre elas, no centro, há {5,3}.",
       "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda, um deles em {2,1}.",
       "defender": "Os pontos de posicionamento do defensor se espalham pelo terço direito, todos eles em {2,1}."
     },
     "Battle/Fight6": {
-      "terrain": "Terreno aberto no centro, com {1,1} na parte inferior esquerda, {9,1} na parte inferior direita, {1,6} na parte superior esquerda e {11,6} na parte superior direita. {3,3} e {8,3} ficam à esquerda e à direita do centro.",
+      "terrain": "Terreno aberto no centro, com {1,1} na parte inferior esquerda, {9,1} na parte inferior direita, {1,6} na parte superior esquerda e {11,6} na parte superior direita. Há {3,3} e {9,4} à esquerda e à direita do centro.",
       "attacker": "Os pontos de posicionamento do atacante estão reunidos no centro do tabuleiro.",
       "defender": "Os pontos de posicionamento do defensor cercam os do atacante, dois em cada canto e um na parte inferior central."
     },
     "Battle/Hideout": {
-      "terrain": "Terreno aberto com {5,0} na parte inferior central, {6,6} na parte superior central e {12,2} na parte central direita. A parte inferior esquerda é bloqueada por {2,0} e a parte superior esquerda, por {1,6}, e a única entrada para o canto superior esquerdo é por {0,5}.",
+      "terrain": "Terreno aberto com {5,0} na parte inferior central, {6,6} na parte superior central e {12,2} na parte central direita. O canto superior esquerdo é fechado por {3,6} e {3,7}, e a única entrada é por {0,5}.",
       "attacker": "Os pontos de posicionamento do atacante atravessam o centro do tabuleiro.",
       "defender": "Os pontos de posicionamento do defensor cercam os do atacante, dois em {5,0}, dois em {6,6} e cinco em {12,2}."
     },
@@ -53,7 +53,7 @@
       "defender": "Os pontos de posicionamento do defensor se espalham pelo centro e pela direita, um em {5,5}, um em {8,7} e um em {9,3}."
     },
     "Battle/TrailerBattle": {
-      "terrain": "Terreno aberto pelo centro e pela direita, com {4,4} no centro e {11,3} na parte central direita, e penhascos na parte superior esquerda e na parte superior central. Há {0,0} ocupando a parte inferior esquerda e subindo pela borda esquerda, com acesso apenas por {5,3}, e boa parte da borda superior é fechada por {9,6}.",
+      "terrain": "Terreno aberto pelo centro e pela direita, com {4,4} no centro e {11,3} na parte central direita, e penhascos na parte superior esquerda e na parte superior central. Há {0,0} ocupando a parte inferior esquerda e subindo pela borda esquerda, com acesso apenas por {5,3}, e boa parte da borda superior é fechada por {5,8} e {9,6}.",
       "attacker": "Os pontos de posicionamento do atacante se espalham pela esquerda do tabuleiro, um deles em {0,0} e um em {4,4}.",
       "defender": "Os pontos de posicionamento do defensor se espalham pela direita do tabuleiro, todos eles em terreno aberto."
     },
@@ -113,7 +113,7 @@
       "defender": "Os pontos de posicionamento do defensor descem pela borda direita, três deles em {10,5} e um em {8,0}."
     },
     "Battle_Plains/Plains": {
-      "terrain": "Terreno aberto por todo o tabuleiro, com {4,1} e {7,1} perto da borda inferior e {6,4} no centro. O terreno da parte superior central é interrompido por {6,6}.",
+      "terrain": "Terreno aberto por todo o tabuleiro, com {4,1} e {7,1} perto da borda inferior e {6,4} no centro. O terreno da parte superior central é interrompido por {5,7}.",
       "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda, todos eles em terreno plano.",
       "defender": "Os pontos de posicionamento do defensor descem pela borda direita, todos eles em terreno plano."
     },
@@ -193,7 +193,7 @@
       "defender": "Os pontos de posicionamento do defensor descem pela borda direita, à direita de {4,2} e {4,5}."
     },
     "Battle_Water/water3": {
-      "terrain": "Terreno aberto com {3,6} atravessando a parte superior esquerda e {8,6} atravessando a parte superior direita, e a única entrada para o terreno entre os dois trechos é por {6,5}. A parte de baixo do tabuleiro é interrompida por {2,0} à esquerda, {8,0} no centro e {5,2} no meio do caminho.",
+      "terrain": "Terreno aberto com {3,6} atravessando a parte superior esquerda, {6,6} atravessando a parte superior central e {8,6} atravessando a parte superior direita, e a única entrada para o terreno entre esses trechos é por {6,5}. A parte de baixo do tabuleiro é interrompida por {2,0} à esquerda, {8,0} no centro e {6,2} no meio do caminho.",
       "attacker": "Os pontos de posicionamento do atacante se espalham pelo terço esquerdo.",
       "defender": "Os pontos de posicionamento do defensor se espalham pelo terço direito."
     },
@@ -203,7 +203,7 @@
       "defender": "Os pontos de posicionamento do defensor descem pela borda direita, seis deles em {10,3}."
     },
     "Battle_Water/Water5": {
-      "terrain": "Terreno aberto com {3,1} na parte inferior esquerda e {8,4} no centro. O meio é bloqueado por {4,2} e se passa por cima ou por baixo, com {0,6} no canto superior esquerdo e {10,0} na parte inferior direita.",
+      "terrain": "Terreno aberto com {3,1} na parte inferior esquerda e {8,4} no centro. O meio é bloqueado por {5,3} e se passa por cima ou por baixo, com {0,6} no canto superior esquerdo e {10,0} na parte inferior direita.",
       "attacker": "Os pontos de posicionamento do atacante se espalham pela metade esquerda, todos em terreno plano.",
       "defender": "Os pontos de posicionamento do defensor se espalham pela metade direita, todos em terreno plano."
     },
@@ -223,12 +223,12 @@
       "defender": "Os pontos de posicionamento do defensor descem pela direita do tabuleiro."
     },
     "Battle_Woods/Woods1": {
-      "terrain": "Terreno aberto com {8,4} atravessando o centro, {0,3} na parte central esquerda e {11,4} na parte central direita. A parte superior esquerda é bloqueada por {2,7} e a parte superior direita, por {9,7}.",
+      "terrain": "Terreno aberto com {8,4} atravessando o centro, {0,3} na parte central esquerda e {11,4} na parte central direita. A parte superior esquerda é bloqueada por {2,8} e a parte superior direita, por {9,7}.",
       "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda, um deles em {0,3}.",
       "defender": "Os pontos de posicionamento do defensor descem pela borda direita, um deles em {11,4}."
     },
     "Battle_Woods/Woods2": {
-      "terrain": "Terreno aberto com {5,0} na parte inferior central, {5,6} na parte superior central e {0,7} no canto superior esquerdo, que fica quase todo fechado por {1,7}. A parte inferior central é bloqueada por {9,2}.",
+      "terrain": "Terreno aberto com {5,0} na parte inferior central, {5,6} na parte superior central e {0,7} no canto superior esquerdo, que fica quase todo fechado por {1,8}. A parte inferior central é bloqueada por {9,2}.",
       "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda, um deles em {0,7}.",
       "defender": "Os pontos de posicionamento do defensor descem pela borda direita, todos em terreno plano."
     },
@@ -258,7 +258,7 @@
       "defender": "Os pontos de posicionamento do defensor descem pelo lado direito, de cima a baixo."
     },
     "Battle_Woods/Woods8": {
-      "terrain": "Terreno aberto com {5,3} no centro do tabuleiro. Há {2,1} à esquerda e abaixo do centro, e {7,3} à direita e acima.",
+      "terrain": "Terreno aberto com {5,3} no centro do tabuleiro. Há {5,2} à esquerda e abaixo do centro, e {7,3} à direita e acima.",
       "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda.",
       "defender": "Os pontos de posicionamento do defensor descem pela borda direita."
     },
@@ -318,7 +318,7 @@
       "defender": "Os pontos de posicionamento do defensor se espalham pela direita do tabuleiro, um deles em {8,6} e outro em {8,2}."
     },
     "BattleCampaign/WieshFight": {
-      "terrain": "Terreno aberto com {4,7} e {8,5} na parte superior central e {8,0} na parte inferior central. O canto inferior direito é bloqueado por {10,0} e a parte superior direita, por {10,6}, com penhascos ao longo da borda direita, do outro lado.",
+      "terrain": "Terreno aberto com {4,7} e {8,5} na parte superior central e {8,0} na parte inferior central. O canto inferior direito é bloqueado por {11,0} e a parte superior direita, por {11,6}, com penhascos ao longo da borda direita, do outro lado.",
       "attacker": "Os pontos de posicionamento do atacante descem pela borda esquerda.",
       "defender": "Os pontos de posicionamento do defensor descem pela direita do tabuleiro, dois deles em {8,5} e um em {8,0}."
     },
@@ -328,7 +328,7 @@
       "defender": "Os pontos de posicionamento do defensor se espalham pelo centro e pela direita, seis deles nas torres e nos muros."
     },
     "BattleSmallSettlementSiege/SmallSettlementSiege": {
-      "terrain": "Terreno aberto à esquerda, com as torres do defensor na parte superior central e na parte inferior central, escadas subindo até cada uma pela borda ao lado, e um muro entre elas no centro. Atrás do muro, há {9,5} na parte central direita e {8,0} na parte inferior direita. Os cantos superior esquerdo e superior direito são fechados por {0,6} e {12,6}.",
+      "terrain": "Terreno aberto à esquerda, com as torres do defensor na parte superior central e na parte inferior central, escadas subindo até cada uma pela borda ao lado, e um muro entre elas no centro. Atrás do muro, há {9,5} na parte central direita e {8,0} na parte inferior direita. Os cantos superior esquerdo e superior direito são fechados por {0,8} e {11,8}.",
       "attacker": "Os pontos de posicionamento do atacante se espalham pelo terço esquerdo, em terreno aberto fora das torres.",
       "defender": "Os pontos de posicionamento do defensor preenchem o centro e a direita, dois deles nas torres e quatro no muro."
     },
