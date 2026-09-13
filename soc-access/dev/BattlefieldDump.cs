@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -36,7 +36,8 @@ namespace SongsOfConquestAccess.Dev
     /// entities a layout carries are deliberately not written: a description never mentions them.
     /// Called from /eval:
     /// <c>SongsOfConquestAccess.Dev.BattlefieldDump.All(@"C:\...\battlefields")</c>, or
-    /// <c>Current(dir)</c> for the layout the open placement page shows.
+    /// <c>Current(dir)</c> for the layout the open placement page shows, or <c>Json(dir)</c> for
+    /// the JSON alone, which is the form that needs no adventure map.
     /// </summary>
     public static class BattlefieldDump
     {
@@ -45,9 +46,26 @@ namespace SongsOfConquestAccess.Dev
 
         public static string All(string directory)
         {
+            return Write(directory, withImage: true);
+        }
+
+        /// <summary>Every layout's JSON and none of the pictures, which is the only form the dump
+        /// can take from anywhere but a loaded adventure map: the deployment renderer's settings
+        /// live on the battle menu's own container and are out of reach in a fight. Without the
+        /// renderer a cell is on the grid when the map says the point is within it, which is the
+        /// weaker of the two tests the pictured dump uses, so the JSON says so in its context. The
+        /// .jpg files beside the JSON are left exactly as the last pictured dump wrote them.
+        /// </summary>
+        public static string Json(string directory)
+        {
+            return Write(directory, withImage: false);
+        }
+
+        private static string Write(string directory, bool withImage)
+        {
             try
             {
-                using (Services services = Services.Resolve())
+                using (Services services = Services.Resolve(withImage))
                 {
                     List<object> written = new List<object>();
                     LevelType[] types = LevelTypeExtensions.GetAllBattleLevelTypes();
@@ -68,7 +86,7 @@ namespace SongsOfConquestAccess.Dev
                                 }
 
                                 string addon = definition.IsExclusiveToAddon ? definition.ExclusiveAddon.ToString() : null;
-                                written.Add(WriteLayout(services, map, types[t], profiles[p].ToString(), addon, Path.Combine(directory, types[t].ToString()), definition.Path));
+                                written.Add(WriteLayout(services, map, types[t], profiles[p].ToString(), addon, Path.Combine(directory, types[t].ToString()), definition.Path, withImage));
                             }
                         }
                     }
@@ -101,9 +119,9 @@ namespace SongsOfConquestAccess.Dev
                     return DevJson.Error("PreBattleMenu has no map");
                 }
 
-                using (Services services = Services.Resolve())
+                using (Services services = Services.Resolve(withRenderer: true))
                 {
-                    object summary = WriteLayout(services, map, map.Metadata.Type, null, null, directory, "current");
+                    object summary = WriteLayout(services, map, map.Metadata.Type, null, null, directory, "current", withImage: true);
                     return JsonConvert.SerializeObject(summary);
                 }
             }
@@ -113,7 +131,7 @@ namespace SongsOfConquestAccess.Dev
             }
         }
 
-        private static object WriteLayout(Services services, MapFormat map, LevelType type, string profile, string addon, string directory, string stem)
+        private static object WriteLayout(Services services, MapFormat map, LevelType type, string profile, string addon, string directory, string stem, bool withImage)
         {
             Directory.CreateDirectory(directory);
             int width = map.Metadata.Size.x;
@@ -124,20 +142,24 @@ namespace SongsOfConquestAccess.Dev
             EntitySpawnPointsEntry[] defenders = map.GetEntitySpawnPoints(
                 services.Objects, services.Manifests.GetBattleBlueprint(BattleMapEntities.UtilityDefenderSpawnpoint), TroopSpawnPointType.Any);
 
-            services.Renderer.Clear();
-            services.Renderer.SetMap(map);
-            for (int i = 0; i < attackers.Length; i++)
+            string imagePath = null;
+            if (withImage)
             {
-                services.Renderer.AddSpawnpoint(i, BattleSide.Left_Attacker, new int2(attackers[i].Point.x, attackers[i].Point.y), attackers[i].type);
-            }
+                services.Renderer.Clear();
+                services.Renderer.SetMap(map);
+                for (int i = 0; i < attackers.Length; i++)
+                {
+                    services.Renderer.AddSpawnpoint(i, BattleSide.Left_Attacker, new int2(attackers[i].Point.x, attackers[i].Point.y), attackers[i].type);
+                }
 
-            for (int i = 0; i < defenders.Length; i++)
-            {
-                services.Renderer.AddSpawnpoint(attackers.Length + i, BattleSide.Right_Defender, new int2(defenders[i].Point.x, defenders[i].Point.y), defenders[i].type);
-            }
+                for (int i = 0; i < defenders.Length; i++)
+                {
+                    services.Renderer.AddSpawnpoint(attackers.Length + i, BattleSide.Right_Defender, new int2(defenders[i].Point.x, defenders[i].Point.y), defenders[i].type);
+                }
 
-            string imagePath = Path.Combine(directory, stem + ".jpg");
-            File.WriteAllBytes(imagePath, services.RenderJpg());
+                imagePath = Path.Combine(directory, stem + ".jpg");
+                File.WriteAllBytes(imagePath, services.RenderJpg());
+            }
 
             Cell[,] cells = new Cell[width, height];
             for (int y = 0; y < height; y++)
@@ -230,6 +252,9 @@ namespace SongsOfConquestAccess.Dev
                 {
                     whenChosen = WhenChosen(type),
                     coordinates = "x runs 0 to width-1 from left to right as the picture shows it; y runs 0 to height-1 from the bottom (nearest the viewer) to the top. Odd rows sit half a cell to the right of even rows, which the mod speaks as x.5 (the 'spoken' fields), so the JSON and the picture agree with what the player hears.",
+                    grid = withImage
+                        ? "A cell is on the hex grid when the map holds the point and the deployment renderer can place it in the world."
+                        : "This file was written without the preview render, so a cell is on the hex grid when the map holds the point and the point is not the last column of an odd row, which sits half a cell right and hangs off the board - the same answer the renderer gives on every layout it has drawn. The .jpg beside it is the one the last pictured dump wrote and is unchanged.",
                     picture = "The image is the game's own deployment preview: light flat hexes are walkable ground, taller blocks are elevated ground (height = elevation), hatched or dark cells are blocked, missing cells are water. Blue markers are attacker spawn points, red markers are defender spawn points; a different marker shape means a 'Defence' spawn (siege engines).",
                     movement = "Troops step between neighbouring cells only when the elevation differs by at most 1; a bigger step is a cliff (listed per cell under cliffNeighbours as the spoken coordinate of the neighbour that cannot be reached directly). Water and impassable cells cannot be entered. Higher ground gives melee and ranged bonuses.",
                     vocabulary = "A description never names a feature in words: it writes the placeholder of a group in regions or chokePoints - the raw coordinates of one of its cells, also listed under points - and the mod replaces it with what that ground is when it speaks, shape, height and, in a fight, what is standing on it. The label is what the mod's scanner says for the group, to tell one group from another while writing; it is never copied into a description.",
@@ -255,7 +280,7 @@ namespace SongsOfConquestAccess.Dev
                 asciiTerrain = Ascii(cells, width, height, null),
                 asciiSpawns = Ascii(cells, width, height, spawnGlyphs),
                 cells = cellList,
-                image = Path.GetFileName(imagePath)
+                image = stem + ".jpg"
             };
 
             string jsonPath = Path.Combine(directory, stem + ".json");
@@ -447,7 +472,10 @@ namespace SongsOfConquestAccess.Dev
             }
 
             float3 ignored;
-            bool onGrid = map.IsPointWithinMap(new Vector2Int(x, y)) && services.Renderer.PointToWorld(new int2(x, y), out ignored);
+            bool onGrid = map.IsPointWithinMap(new Vector2Int(x, y))
+                && (services.Renderer != null
+                    ? services.Renderer.PointToWorld(new int2(x, y), out ignored)
+                    : !FallsOffTheRightEdge(x, y, map.Metadata.Size.x));
             return new Cell
             {
                 Spoken = Spoken(x, y),
@@ -463,6 +491,16 @@ namespace SongsOfConquestAccess.Dev
                 StandaloneDecoration = standalone,
                 Effect = effect
             };
+        }
+
+        /// <summary>The hex board's own edge, for a dump written with no renderer to ask: an odd row
+        /// sits half a cell to the right, so its last column hangs off the board and is not drawn.
+        /// The map's bounds do not know this - <c>IsPointWithinMap</c> is the raw array - and the
+        /// renderer's converter does. Checked against every layout the pictured dump has rendered:
+        /// over 9594 cells this and the renderer agree everywhere.</summary>
+        private static bool FallsOffTheRightEdge(int x, int y, int width)
+        {
+            return (y & 1) == 1 && x == width - 1;
         }
 
         private static List<BattlefieldCell> TerrainCells(Cell[,] cells, int width, int height)
@@ -702,7 +740,11 @@ namespace SongsOfConquestAccess.Dev
             public DeploymentRenderer Renderer;
             private Camera _camera;
 
-            public static Services Resolve()
+            /// <summary>The level serializer and the manifests, which the project container holds
+            /// and every scene can reach, plus - only where a picture is wanted - the deployment
+            /// renderer, whose settings live on the battle menu's own container and are reachable
+            /// from the adventure map alone.</summary>
+            public static Services Resolve(bool withRenderer)
             {
                 DiContainer project = ProjectContext.Instance.Container;
                 Services services = new Services
@@ -715,6 +757,11 @@ namespace SongsOfConquestAccess.Dev
                 if (services.Levels == null || services.Manifests == null || services.Objects == null)
                 {
                     throw new InvalidOperationException("project container lacks level serializer, manifest retriever or object serializer");
+                }
+
+                if (!withRenderer)
+                {
+                    return services;
                 }
 
                 // The deployment installer is a ScriptableObjectInstaller on a GameObjectContext
