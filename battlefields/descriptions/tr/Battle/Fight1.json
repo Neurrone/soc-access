@@ -1,5 +1,5 @@
 {
-  "terrain": "Sol alt köşede düz arazi, savaş alanının geri kalanında {6,0} var. Üst kenarı {1,4} kapatır; ortadan aşağı doğru iner ve sağa yalnızca {9,2} üzerinden geçilir.",
+  "terrain": "Sol alt köşede düz arazi, savaş alanının geri kalanında {6,0} var. Üst kenar {0,5} ile kapalıdır ve sağa yalnızca {9,2} üzerinden geçilir.",
   "attacker": "Saldıranın çıkış noktaları sol alt köşedeki düz araziyi doldurur.",
   "defender": "Savunanın çıkış noktaları sağ üçte birlik bölüme, {9,2} ötesinde kalan {6,0} üzerine yayılır."
 }
