@@ -279,11 +279,15 @@ namespace SongsOfConquestAccess.Screens
                 attacker ? (Func<string>)(() => Live.AttackerThreatText) : () => Live.DefenderThreatText,
                 attacker ? Live.AttackerScoutingTooltip : Live.DefenderScoutingTooltip);
 
-            AddLine(
-                builder,
-                key + "-scouting",
-                attacker ? (Func<string>)(() => Live.AttackerScoutingText) : () => Live.DefenderScoutingText,
-                null);
+            // The scouting information is one line per troop the scout saw; a Text node would put
+            // the whole block in the review buffer as one line.
+            Func<string> scouting = attacker ? (Func<string>)(() => Live.AttackerScoutingText) : () => Live.DefenderScoutingText;
+            if (!string.IsNullOrWhiteSpace(scouting()))
+            {
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(Marker(key + "-scouting"), "pre-battle:" + key + "-scouting"),
+                    GraphNodes.Paragraphs(() => SpokenLines.Of(new[] { scouting() }))));
+            }
 
             return commander;
         }
