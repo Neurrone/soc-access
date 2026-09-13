@@ -128,3 +128,22 @@ placeholder `{4,3}`, a climbable area in each of two corners with the placeholde
 which the player hears as "Open ground with a diagonal ridge (height 1) across the centre, a
 patch (height 2) in the top left, and a patch (height 2) in the bottom right. Cliffs at the
 bottom left and top right."
+
+---
+
+## Translating a description
+
+A translation lives in `battlefields/descriptions/<language code>/`, one file per layout with the
+same three fields, and `build-battlefields.ps1` folds it into `soc-access/battlefields/<code>.json`.
+Every `{x,y}` is copied verbatim. What the mod puts there is a NOMINATIVE noun phrase in the
+player's language, taken from the `.po` file, and the mod never inflects it, so in a case or gender
+language the placeholder must stand where the nominative reads correctly: never after a
+preposition that governs another case, never as the antecedent of an agreeing verb, adjective,
+participle or pronoun unless the group's kind fixes the gender and number. Elevated groups, choke
+points, unreachable ground and the siege structures expand to a fixed phrase, so their gender and
+number are known from the `.po`; an impassable group expands to whatever stands there in that
+fight, "bushes", "water", "a wall of boulders", "impassable cells", so nothing may agree with it.
+The words the cursor and the scanner speak (cliffs, choke point, wall, tower, stairs, unreachable
+ground, spawn point, attacker, defender, open ground, town) are reused from the `.po`, so the
+description agrees with what the player hears beside it, and every other term (moat, gate, flat
+ground, the nine board positions, the four edges) is rendered one way across all the files.
