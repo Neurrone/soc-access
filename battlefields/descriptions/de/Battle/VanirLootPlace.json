@@ -1,5 +1,5 @@
 {
-  "terrain": "Offenes Gelände, unten links {3,0} und quer über die Mitte und die rechte Seite {9,4}. Oben links {3,5}; der einzige Weg vom linken Rand auf den Rest des Schlachtfelds ist {3,3}, und oben rechts liegen Klippen.",
+  "terrain": "Offenes Gelände, unten links {3,0} und quer über die Mitte und die rechte Seite {9,4}. Der obere linke Teil ist versperrt: {3,5}; der einzige Weg vom linken Rand auf den Rest des Schlachtfelds ist {3,3}, und oben rechts liegen Klippen.",
   "attacker": "Die Aufstellungspunkte des Angreifers ziehen sich am linken Rand entlang, und {3,3} trägt einen davon.",
   "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über die Mitte und die rechte Seite; {9,4} trägt vier davon und {3,0} einen."
 }

@@ -1,5 +1,5 @@
 {
-  "terrain": "Offenes Gelände, links in der Mitte {2,2} und rechts in der Mitte {9,4}. {4,0} und {4,7} füllen die untere beziehungsweise die obere Mitte und lassen dazwischen die Mitte des Schlachtfelds frei.",
+  "terrain": "Offenes Gelände, links in der Mitte {2,2} und rechts in der Mitte {9,4}. Die untere Mitte ist ausgefüllt: {4,0}, die obere Mitte: {4,7}; dazwischen bleibt die Mitte des Schlachtfelds frei.",
   "attacker": "Die Aufstellungspunkte des Angreifers verteilen sich über die linke Seite des Schlachtfelds, und {2,2} trägt zwei davon.",
   "defender": "Die Aufstellungspunkte des Verteidigers verteilen sich über die rechte Seite des Schlachtfelds, und {9,4} trägt zwei davon."
 }
