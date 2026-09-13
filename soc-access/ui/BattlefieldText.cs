@@ -85,12 +85,7 @@ namespace SongsOfConquestAccess.UI
                     }
 
                     return ModText.Plural(
-                        region.Shape == BattlefieldRegionShape.Ridge
-                            ? ModStrings.Scanner.TerrainRidge
-                            : ModStrings.Scanner.TerrainPatch,
-                        region.Count,
-                        region.Count,
-                        region.Height);
+                        ElevatedShape(region.Shape), region.Count, region.Count, region.Height);
                 case BattlefieldRegionKind.Cliff:
                     return region.Count == 1
                         ? ModText.Get(ModStrings.Scanner.TerrainCliff)
@@ -102,7 +97,7 @@ namespace SongsOfConquestAccess.UI
                     }
 
                     return ModText.Plural(
-                        region.Shape == BattlefieldRegionShape.Ridge
+                        region.IsRidge
                             ? ModStrings.Scanner.TerrainImpassableWall
                             : ModStrings.Scanner.TerrainImpassableCells,
                         region.Count,
@@ -120,6 +115,23 @@ namespace SongsOfConquestAccess.UI
                     return ModText.Get(ModStrings.Spatial.StairsHeight, region.Height);
                 default:
                     return string.Empty;
+            }
+        }
+
+        /// <summary>How a group of raised ground more than one cell across is named: a ridge by the
+        /// way it runs, and a patch where it is not long enough to be one.</summary>
+        private static ModPluralString ElevatedShape(BattlefieldRegionShape shape)
+        {
+            switch (shape)
+            {
+                case BattlefieldRegionShape.Ridge:
+                    return ModStrings.Scanner.TerrainRidge;
+                case BattlefieldRegionShape.VerticalRidge:
+                    return ModStrings.Scanner.TerrainRidgeVertical;
+                case BattlefieldRegionShape.DiagonalRidge:
+                    return ModStrings.Scanner.TerrainRidgeDiagonal;
+                default:
+                    return ModStrings.Scanner.TerrainPatch;
             }
         }
 

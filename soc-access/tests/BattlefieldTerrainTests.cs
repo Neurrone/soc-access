@@ -10,10 +10,10 @@ namespace SongsOfConquestAccess.Tests
     [TestClass]
     public sealed class BattlefieldTerrainTests
     {
-        /// <summary>A long thin region is a ridge, a compact one a patch, and one cell is one cell.
-        /// </summary>
+        /// <summary>A long thin region is a ridge, named by the way it runs; a compact one is a
+        /// patch, and one cell is one cell.</summary>
         [TestMethod]
-        public void ElevatedRegionsAreNamedRidgePatchAndSingleCellByTheirShape()
+        public void ElevatedRegionsAreNamedByTheirShapeAndTheirAxis()
         {
             BattlefieldTerrain terrain = Analyse(
                 "1111111..",
@@ -29,6 +29,48 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(BattlefieldRegionShape.SingleCell, ShapeOfSize(elevated, 1));
             Assert.AreEqual(BattlefieldRegionShape.Patch, ShapeOfSize(elevated, 4));
             Assert.AreEqual(BattlefieldRegionShape.Ridge, ShapeOfSize(elevated, 7));
+        }
+
+        /// <summary>A column of cells runs up the board, however much the odd rows zigzag it.
+        /// </summary>
+        [TestMethod]
+        public void AColumnOfRaisedCellsIsAVerticalRidge()
+        {
+            BattlefieldTerrain terrain = Analyse(
+                ".........",
+                "..1......",
+                "..1......",
+                "..1......",
+                "..1......",
+                "..1......",
+                ".........");
+
+            List<BattlefieldRegion> elevated = RegionsOf(terrain, BattlefieldRegionKind.Elevated);
+            Assert.AreEqual(1, elevated.Count);
+            Assert.AreEqual(BattlefieldRegionShape.VerticalRidge, elevated[0].Shape);
+        }
+
+        /// <summary>The reference case the shape rule was fixed against: the band across the middle
+        /// of Hills3, which a bounding box calls square and its own axis calls a diagonal ridge.
+        /// </summary>
+        [TestMethod]
+        public void Hills3sCentreBandIsADiagonalRidge()
+        {
+            BattlefieldTerrain terrain = Analyse(
+                ".............",
+                ".............",
+                ".............",
+                "......11.....",
+                ".....111.....",
+                "....11.......",
+                ".............",
+                ".............",
+                ".............");
+
+            List<BattlefieldRegion> elevated = RegionsOf(terrain, BattlefieldRegionKind.Elevated);
+            Assert.AreEqual(1, elevated.Count);
+            Assert.AreEqual(7, elevated[0].Count);
+            Assert.AreEqual(BattlefieldRegionShape.DiagonalRidge, elevated[0].Shape);
         }
 
         /// <summary>Raised ground every step onto which is two heights or more is a cliff: nothing

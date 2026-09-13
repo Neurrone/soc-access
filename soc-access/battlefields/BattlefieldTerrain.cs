@@ -31,13 +31,17 @@ namespace SongsOfConquestAccess.Battlefields
     }
 
     /// <summary>The shape of a region, where its shape is worth a word: a long thin one is a ridge
-    /// (or, in impassable ground, a wall), one cell is a single cell, anything else a patch.</summary>
+    /// (or, in impassable ground, a wall), one cell is a single cell, anything else a patch. A
+    /// ridge also carries which way it runs, since "a ridge across the centre" and "a ridge down
+    /// the left" are different things to a player placing troops.</summary>
     public enum BattlefieldRegionShape
     {
         None,
         SingleCell,
         Patch,
-        Ridge
+        Ridge,
+        VerticalRidge,
+        DiagonalRidge
     }
 
     /// <summary>One cell as the game answers for it. The caller reads these facts from whatever it
@@ -94,6 +98,18 @@ namespace SongsOfConquestAccess.Battlefields
             get { return Cells.Count; }
         }
 
+        /// <summary>Long and thin, whichever way it runs: what impassable ground is a wall for and
+        /// what elevated ground is named a ridge for.</summary>
+        public bool IsRidge
+        {
+            get
+            {
+                return Shape == BattlefieldRegionShape.Ridge
+                    || Shape == BattlefieldRegionShape.VerticalRidge
+                    || Shape == BattlefieldRegionShape.DiagonalRidge;
+            }
+        }
+
         /// <summary>Identity, not words: the kind and the region's lowest cell, which the terrain
         /// of a battle never changes, so a scanner item stays the same item between two scans.
         /// </summary>
@@ -124,6 +140,23 @@ namespace SongsOfConquestAccess.Battlefields
         /// calling a choke point: a pocket smaller than this is a corner, not a half of the board.
         /// </summary>
         private const int ChokePointSplitSize = 5;
+
+        /// <summary>How many times longer than wide a region has to be before it is called a ridge
+        /// rather than a patch, and the fewest cells that can make one. 2.2 rather than a rounder
+        /// number because Hills3's centre band - the reference diagonal ridge - measures 2.23.
+        /// </summary>
+        private const double RidgeRatio = 2.2;
+
+        private const int RidgeMinimumCells = 3;
+
+        /// <summary>How far from flat or from upright a ridge's axis may lie and still be called
+        /// one, in degrees; anything further is diagonal.</summary>
+        private const double RidgeAngleTolerance = 15;
+
+        /// <summary>The distance between two hex rows where a cell is one wide: the height of an
+        /// equilateral triangle, which is what makes a column of cells shorter than it looks.
+        /// </summary>
+        private const double RowHeight = 0.8660254037844386;
 
         private readonly int _width;
         private readonly int _height;
@@ -351,55 +384,155 @@ namespace SongsOfConquestAccess.Battlefields
                     members.Sort(CompareCells);
                     regions.Add(new BattlefieldRegion(
                         regionKind,
-                        ShapeOf(regionKind, members, width, height),
+                        ShapeOf(regionKind, members),
                         MaxElevation(members, elevations),
                         members));
                 }
             }
         }
 
-        /// <summary>A region's shape: one cell, a ridge where it is at least three times as long as
-        /// it is wide or spans more than half the board, and a patch otherwise. Impassable ground
-        /// is only ever a wall (the same ridge test) and only from three cells up; the siege
-        /// structures are named by what they are, so their shape says nothing.</summary>
-        private static BattlefieldRegionShape ShapeOf(BattlefieldRegionKind kind, List<Vector2Int> members, int width, int height)
+        /// <summary>A region's shape: one cell, a ridge where it is long and thin, and a patch
+        /// otherwise. Impassable ground is only ever a wall (the same ridge test) and only from
+        /// three cells up; the siege structures are named by what they are, so their shape says
+        /// nothing.</summary>
+        private static BattlefieldRegionShape ShapeOf(BattlefieldRegionKind kind, List<Vector2Int> members)
         {
             if (kind == BattlefieldRegionKind.Elevated)
             {
-                return members.Count == 1
-                    ? BattlefieldRegionShape.SingleCell
-                    : IsRidge(members, width, height) ? BattlefieldRegionShape.Ridge : BattlefieldRegionShape.Patch;
+                if (members.Count == 1)
+                {
+                    return BattlefieldRegionShape.SingleCell;
+                }
+
+                BattlefieldRegionShape ridge = RidgeShape(members);
+                return ridge == BattlefieldRegionShape.None ? BattlefieldRegionShape.Patch : ridge;
             }
 
-            if (kind == BattlefieldRegionKind.Impassable)
-            {
-                return members.Count >= 3 && IsRidge(members, width, height)
-                    ? BattlefieldRegionShape.Ridge
-                    : BattlefieldRegionShape.None;
-            }
-
-            return BattlefieldRegionShape.None;
+            return kind == BattlefieldRegionKind.Impassable
+                ? RidgeShape(members)
+                : BattlefieldRegionShape.None;
         }
 
-        private static bool IsRidge(List<Vector2Int> members, int width, int height)
+        /// <summary>
+        /// LONG AND THIN ALONG ITS OWN AXIS, not along the board's. The cells are laid out as the
+        /// board draws them - an odd row sits half a cell to the right and a row is
+        /// <see cref="RowHeight"/> apart - and the region's own principal direction is taken from
+        /// them, so a band running diagonally is measured along that diagonal rather than through a
+        /// bounding box that calls it square. The extent is the range of the projections plus one
+        /// cell, so a single cell is one by one and a straight line of three is three by one.
+        ///
+        /// <see cref="BattlefieldRegionShape.None"/> where the region is too short or too thick to
+        /// be a ridge at all; otherwise the word follows the axis: horizontal within
+        /// <see cref="RidgeAngleTolerance"/> degrees of flat, vertical within the same of upright,
+        /// and diagonal in between.
+        /// </summary>
+        private static BattlefieldRegionShape RidgeShape(List<Vector2Int> members)
         {
-            int minX = int.MaxValue;
-            int maxX = int.MinValue;
-            int minY = int.MaxValue;
-            int maxY = int.MinValue;
-            for (int i = 0; i < members.Count; i++)
+            if (members.Count < RidgeMinimumCells)
             {
-                minX = Math.Min(minX, members[i].x);
-                maxX = Math.Max(maxX, members[i].x);
-                minY = Math.Min(minY, members[i].y);
-                maxY = Math.Max(maxY, members[i].y);
+                return BattlefieldRegionShape.None;
             }
 
-            int columns = maxX - minX + 1;
-            int rows = maxY - minY + 1;
-            int longest = Math.Max(columns, rows);
-            int shortest = Math.Min(columns, rows);
-            return longest >= 3 * shortest || columns > width / 2 || rows > height / 2;
+            double centreX = 0;
+            double centreY = 0;
+            for (int i = 0; i < members.Count; i++)
+            {
+                centreX += CentreX(members[i]);
+                centreY += CentreY(members[i]);
+            }
+
+            centreX /= members.Count;
+            centreY /= members.Count;
+
+            double xx = 0;
+            double yy = 0;
+            double xy = 0;
+            for (int i = 0; i < members.Count; i++)
+            {
+                double dx = CentreX(members[i]) - centreX;
+                double dy = CentreY(members[i]) - centreY;
+                xx += dx * dx;
+                yy += dy * dy;
+                xy += dx * dy;
+            }
+
+            // The major axis of the cells' spread: the direction that diagonalises the covariance.
+            double angle = 0.5 * Math.Atan2(2 * xy, xx - yy);
+            double alongMin = double.MaxValue;
+            double alongMax = double.MinValue;
+            double acrossMin = double.MaxValue;
+            double acrossMax = double.MinValue;
+            double cos = Math.Cos(angle);
+            double sin = Math.Sin(angle);
+            for (int i = 0; i < members.Count; i++)
+            {
+                double dx = CentreX(members[i]) - centreX;
+                double dy = CentreY(members[i]) - centreY;
+                double along = (dx * cos) + (dy * sin);
+                double across = (dy * cos) - (dx * sin);
+                alongMin = Math.Min(alongMin, along);
+                alongMax = Math.Max(alongMax, along);
+                acrossMin = Math.Min(acrossMin, across);
+                acrossMax = Math.Max(acrossMax, across);
+            }
+
+            double lengthwise = alongMax - alongMin + 1;
+            double crosswise = acrossMax - acrossMin + 1;
+            if (crosswise > lengthwise)
+            {
+                double swap = lengthwise;
+                lengthwise = crosswise;
+                crosswise = swap;
+                angle += Math.PI / 2;
+            }
+
+            if (lengthwise < RidgeRatio * crosswise)
+            {
+                return BattlefieldRegionShape.None;
+            }
+
+            double degrees = Degrees(angle);
+            if (Math.Abs(degrees) <= RidgeAngleTolerance)
+            {
+                return BattlefieldRegionShape.Ridge;
+            }
+
+            return Math.Abs(degrees) >= 90 - RidgeAngleTolerance
+                ? BattlefieldRegionShape.VerticalRidge
+                : BattlefieldRegionShape.DiagonalRidge;
+        }
+
+        /// <summary>Where a cell's centre sits across the board: an odd row is half a cell to the
+        /// right of an even one.</summary>
+        private static double CentreX(Vector2Int point)
+        {
+            return point.x + ((point.y & 1) == 1 ? 0.5 : 0);
+        }
+
+        /// <summary>Where a cell's centre sits up the board: hex rows are closer together than
+        /// cells in a row are, which is what makes a column of cells steeper than a row is flat.
+        /// </summary>
+        private static double CentreY(Vector2Int point)
+        {
+            return point.y * RowHeight;
+        }
+
+        /// <summary>An axis angle folded onto the half turn it names, in degrees: 0 runs across the
+        /// board and plus or minus 90 up it.</summary>
+        private static double Degrees(double radians)
+        {
+            double degrees = radians * 180 / Math.PI;
+            while (degrees > 90)
+            {
+                degrees -= 180;
+            }
+
+            while (degrees <= -90)
+            {
+                degrees += 180;
+            }
+
+            return degrees;
         }
 
         private static int MaxElevation(List<Vector2Int> members, int[,] elevations)

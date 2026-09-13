@@ -918,6 +918,8 @@
             public static readonly ModPluralString TerrainImpassableWall = new ModPluralString("Scanner.TerrainImpassableWall", "wall of {0} impassable cell", "wall of {0} impassable cells");
             public static readonly ModPluralString TerrainPatch = new ModPluralString("Scanner.TerrainPatch", "patch of {0} cell, height {1}", "patch of {0} cells, height {1}");
             public static readonly ModPluralString TerrainRidge = new ModPluralString("Scanner.TerrainRidge", "ridge of {0} cell, height {1}", "ridge of {0} cells, height {1}");
+            public static readonly ModPluralString TerrainRidgeDiagonal = new ModPluralString("Scanner.TerrainRidgeDiagonal", "diagonal ridge of {0} cell, height {1}", "diagonal ridge of {0} cells, height {1}");
+            public static readonly ModPluralString TerrainRidgeVertical = new ModPluralString("Scanner.TerrainRidgeVertical", "vertical ridge of {0} cell, height {1}", "vertical ridge of {0} cells, height {1}");
             public static readonly ModPluralString TerrainSiegeWall = new ModPluralString("Scanner.TerrainSiegeWall", "wall of {0} cell, height {1}", "wall of {0} cells, height {1}");
             public static readonly ModString TerrainSingleCell = new ModString("Scanner.TerrainSingleCell", "single cell, height {0}");
             public static readonly ModString TroopSources = new ModString("Scanner.TroopSources", "Troop sources");
