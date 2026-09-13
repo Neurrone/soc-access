@@ -374,13 +374,16 @@ Filled in as the loop is used; keep entries to one line each with the date.
   entrance (`GetInteractionPoints(82)`: 74..76,49) boxed the wielder in silently, which
   `DevProbe.TilesAround` showed and the walk did not.
 - 2026-09-08: a battle from the REPL. A hostile army spawns with `DevFixtures.SpawnAt(69, x, y)`
-  (blueprint 69 is `RandomHostile`; 68 `Hostile` is the other current one. Blueprint 37
+  (blueprint 69 is `RandomHostile`; 68 `Hostile` is the other current one; 37
   `ArleonHostileEasy` and every other `Arleon*Hostile`, 37 to 39 and 56 to 64, carry the game's
-  `DeprecatedComponent`: the game's own registration throws a null reference for them and
-  leaves a half-registered server entity the client never sees, which is why 37 once looked as
-  if it "landed" while the next spawn on the tile was refused. `SpawnAt` refuses them up front,
-  2026-09-13, and `DevFixtures.SpawnDiagnose(blueprint, x, y)` walks the creation path one
-  component at a time for any other throw). The map's
+  `DeprecatedComponent` and `SpawnAt` refuses them). A hostile spawn answers
+  `spawnedCommander` with `accepted: true`: the hostile's server component creates its
+  commander inside its own Initialize and destroys its map entity, which nulls the entity's
+  component array, so the game's initialisation loop throws a null reference on its next
+  iteration with the commander already on the map (found 2026-09-13; `SpawnAt` treats that
+  throw as the expected end of a hostile spawn and rethrows any other).
+  `DevFixtures.SpawnDiagnose(blueprint, x, y)` walks the creation path one component at a
+  time when a spawn throws for another reason. The map's
   Enter on the army did nothing here; `game.server.Commands.ProcessServerRequest(new
   SongsOfConquest.Common.Adventure.AttackCommanderCommand.Request(attackerId, defenderId))`
   (`game` from `DevFixtures.ResolveFromScenes<Lavapotion.Networking.IGame>()`, the defender from

@@ -52,11 +52,9 @@ namespace SongsOfConquestAccess.Dev
                         return;
                     }
 
-                    // A deprecated blueprint (every Arleon*Hostile, 37 to 39 and 56 to 64, carries a
-                    // DeprecatedComponent) makes the game's own registration throw a null reference
-                    // inside AbstractMapEntityManager.InitializeEntity and leaves a half-registered
-                    // server entity the client never sees (2026-09-13). Refused up front: 68 Hostile
-                    // and 69 RandomHostile are the current hostile blueprints.
+                    // Every Arleon*Hostile (37 to 39, 56 to 64) carries the game's DeprecatedComponent
+                    // and is not what the game places any more; refused up front, 68 Hostile and 69
+                    // RandomHostile are the current hostile blueprints.
                     string deprecated = DeprecatedBlueprint(blueprintId);
                     if (deprecated != null)
                     {
@@ -102,8 +100,32 @@ namespace SongsOfConquestAccess.Dev
                         return;
                     }
 
-                    bool accepted = game.server.Commands.ProcessServerRequest(
-                        new CreateAdventureMapEntityCommand.Request((ushort)blueprintId, origin));
+                    bool accepted;
+                    try
+                    {
+                        accepted = game.server.Commands.ProcessServerRequest(
+                            new CreateAdventureMapEntityCommand.Request((ushort)blueprintId, origin));
+                    }
+                    catch (NullReferenceException)
+                    {
+                        // A hostile blueprint's server component spawns its commander inside its own
+                        // Initialize and then destroys its map entity, which nulls the entity's
+                        // component array; the game's initialisation loop dereferences it on the next
+                        // iteration (AbstractMapEntityManager.InitializeEntity, 2026-09-13). The
+                        // commander is on the map by then, so that throw is the expected end of a
+                        // hostile spawn, and any other throw is not.
+                        // The commander's client-side state appears a frame later, so the blueprint,
+                        // not the map, says whether this was a hostile.
+                        if (!IsHostileBlueprint(blueprintId))
+                        {
+                            throw;
+                        }
+
+                        accepted = true;
+                        json.WritePropertyName("spawnedCommander");
+                        json.WriteValue(true);
+                    }
+
                     json.WritePropertyName("accepted");
                     json.WriteValue(accepted);
                     json.WriteEndObject();
@@ -199,21 +221,46 @@ namespace SongsOfConquestAccess.Dev
             }
         }
 
-        /// <summary>The refusal for a blueprint carrying the game's DeprecatedComponent, or null.</summary>
-        private static string DeprecatedBlueprint(int blueprintId)
+        /// <summary>Whether the blueprint carries a hostile component, whose Initialize turns the
+        /// map entity into a commander.</summary>
+        private static bool IsHostileBlueprint(int blueprintId)
+        {
+            IMapEntityBlueprint blueprint = AdventureBlueprint(blueprintId);
+            if (blueprint == null || blueprint.AllComponents == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < blueprint.AllComponents.Length; i++)
+            {
+                if (blueprint.AllComponents[i] != null && blueprint.AllComponents[i].GetType().Name.Contains("Hostile"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static IMapEntityBlueprint AdventureBlueprint(int blueprintId)
         {
             IMapEntityManifestRetriever manifests = ProjectContext.Instance == null
                 ? null
                 : ProjectContext.Instance.Container.TryResolve<IMapEntityManifestRetriever>();
-            IMapEntityBlueprint blueprint = null;
             try
             {
-                blueprint = manifests != null ? manifests.GetAdventureBlueprint((AdventureMapEntities)blueprintId) : null;
+                return manifests != null ? manifests.GetAdventureBlueprint((AdventureMapEntities)blueprintId) : null;
             }
             catch (Exception)
             {
+                return null;
             }
+        }
 
+        /// <summary>The refusal for a blueprint carrying the game's DeprecatedComponent, or null.</summary>
+        private static string DeprecatedBlueprint(int blueprintId)
+        {
+            IMapEntityBlueprint blueprint = AdventureBlueprint(blueprintId);
             if (blueprint == null || blueprint.AllComponents == null)
             {
                 return null;
@@ -224,7 +271,7 @@ namespace SongsOfConquestAccess.Dev
                 if (blueprint.AllComponents[i] is DeprecatedComponent)
                 {
                     return "blueprint " + blueprintId + " " + (AdventureMapEntities)blueprintId
-                        + " is deprecated and the game's registration throws for it; use 68 Hostile or 69 RandomHostile";
+                        + " is deprecated; use 68 Hostile or 69 RandomHostile";
                 }
             }
 
