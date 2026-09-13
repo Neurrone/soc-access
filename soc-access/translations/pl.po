@@ -4262,6 +4262,21 @@ msgctxt "Battlefield.ObstacleFire_2"
 msgid "fire"
 msgstr "ogień"
 
+#. Battlefield.ObstacleGatepost_0
+msgctxt "Battlefield.ObstacleGatepost_0"
+msgid "a gatepost"
+msgstr "słup bramy"
+
+#. Battlefield.ObstacleGatepost_1
+msgctxt "Battlefield.ObstacleGatepost_1"
+msgid "gateposts"
+msgstr "słupy bramy"
+
+#. Battlefield.ObstacleGatepost_2
+msgctxt "Battlefield.ObstacleGatepost_2"
+msgid "gateposts"
+msgstr "słupy bramy"
+
 #. Battlefield.ObstacleGrowthArleon_0
 msgctxt "Battlefield.ObstacleGrowthArleon_0"
 msgid "a bush"

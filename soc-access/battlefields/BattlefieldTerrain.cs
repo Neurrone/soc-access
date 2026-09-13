@@ -59,6 +59,7 @@ namespace SongsOfConquestAccess.Battlefields
         Light,
         Fire,
         Water,
+        Gatepost,
         Other
     }
 
@@ -229,6 +230,11 @@ namespace SongsOfConquestAccess.Battlefields
         private const int LightDecoration = 5;
         private const int GrowthDecoration = 9;
         private const int StatueDecoration = 10;
+
+        /// <summary>The game's "Gate Base": the two blocked pieces that frame a walled town siege's
+        /// gate. It is stonework and the same stonework in every theme, so it carries no theme of
+        /// its own.</summary>
+        private const int GatepostDecoration = 11;
         private const int FireEffect = 5;
 
         /// <summary>How big each half of a split has to be before the cells between them are worth
@@ -398,9 +404,10 @@ namespace SongsOfConquestAccess.Battlefields
         }
 
         /// <summary>Which family of prop blocks a cell, from the bytes the caller read: water and
-        /// the fire brush answer for themselves, and the four decoration bytes the owner fixed
-        /// words for are the boulders, the growth, the statues and the lights. Anything else is an
-        /// obstacle with no name of its own, which stays plain impassable.</summary>
+        /// the fire brush answer for themselves, and the decoration bytes the owner fixed words for
+        /// are the boulders, the growth, the statues, the lights and a siege gate's gateposts.
+        /// Anything else is an obstacle with no name of its own, which stays plain impassable.
+        /// </summary>
         private static BattlefieldObstacleKind ObstacleKind(BattlefieldCell cell)
         {
             if (cell.Water)
@@ -423,6 +430,8 @@ namespace SongsOfConquestAccess.Battlefields
                     return BattlefieldObstacleKind.Growth;
                 case StatueDecoration:
                     return BattlefieldObstacleKind.Manufactured;
+                case GatepostDecoration:
+                    return BattlefieldObstacleKind.Gatepost;
                 default:
                     return BattlefieldObstacleKind.Other;
             }

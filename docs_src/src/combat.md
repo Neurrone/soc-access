@@ -55,7 +55,7 @@ During a fight the board is repainted with the ground the battle was joined on, 
 | A monument | a knight statue | a gargoyle statue | an animal statue | a dragon statue | a standing stone | a giant mushroom | a sage statue |
 | A light | a torch | a glowing crystal | a golden torch | a glowing pool | a torch | glowing blue mushrooms | a paper lantern |
 
-A burning hex is `fire` and a water hex is `water` in every theme, and a hex blocked by anything else is `impassable` with no name. A group of hexes holding more than one of these lists them, the commonest first: `wall of 6 bushes and boulders, impassable`.
+A burning hex is `fire` and a water hex is `water` in every theme. So is `a gatepost`: the two blocked pieces framing the gate of a walled town siege are the same stonework whatever theme the battle is painted in, and a run of them is never called a wall, since they are the frame of a gate. A hex blocked by anything else is `impassable` with no name. A group of hexes holding more than one of these lists them, the commonest first: `wall of 6 bushes and boulders, impassable`.
 
 These words are heard in combat only. The deployment preview draws every blocked hex the same way, so the deployment grid says `impassable` and nothing else.
 

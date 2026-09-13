@@ -70,6 +70,24 @@ namespace SongsOfConquestAccess.Tests
                 ImpassableGroup(ArleonTheme, "......", "WWWWBB", "......"));
         }
 
+        /// <summary>The blocked pieces framing a walled town siege's gate are stonework, the same
+        /// stonework in every theme, and they are the frame of a gate rather than a wall of their
+        /// own: a run of them is named by the cells it covers and never as a wall.</summary>
+        [TestMethod]
+        public void GatepostsAreOneWordInEveryThemeAndAreNeverAWall()
+        {
+            Assert.AreEqual("a gatepost, impassable", CellAt(ArleonTheme, "..P", 2, 0));
+            Assert.AreEqual("a gatepost, impassable", CellAt(4, "..P", 2, 0));
+            Assert.AreEqual("a gatepost, impassable", ImpassableGroup(ArleonTheme, "P..", "...", "..."));
+            Assert.AreEqual("gateposts, 2 cells, impassable", ImpassableGroup(ArleonTheme, "PP.", "...", "..."));
+            Assert.AreEqual(
+                "gateposts, 5 cells, impassable",
+                ImpassableGroup(ArleonTheme, ".....", "PPPPP", "....."));
+
+            Assert.AreEqual("a gatepost", Expand("{0,1}", Analyse(ArleonTheme, true, "...", "P..", "...")));
+            Assert.AreEqual("gateposts", Expand("{0,1}", Analyse(ArleonTheme, true, ".....", "PPPPP", ".....")));
+        }
+
         /// <summary>An obstacle nobody has a word for - an unnamed decoration byte, a prop standing
         /// on its own - is impassable ground and nothing more, even in a fight.</summary>
         [TestMethod]
@@ -222,7 +240,7 @@ namespace SongsOfConquestAccess.Tests
         }
 
         /// <summary>Rows top first: <c>'.'</c> flat ground, and a letter a blocked cell holding
-        /// boulders, growth, a monument, a light, fire or water.</summary>
+        /// boulders, growth, a monument, a light, a gatepost, fire or water.</summary>
         private static BattlefieldTerrain Analyse(int theme, bool namesObstacles, params string[] rows)
         {
             int height = rows.Length;
@@ -257,6 +275,7 @@ namespace SongsOfConquestAccess.Tests
                 case 'L': return 5;
                 case 'G': return 9;
                 case 'M': return 10;
+                case 'P': return 11;
                 default: return 0;
             }
         }

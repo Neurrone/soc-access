@@ -4439,6 +4439,21 @@ msgctxt "Battlefield.ObstacleLightYulan_2"
 msgid "paper lanterns"
 msgstr ""
 
+#. Battlefield.ObstacleGatepost_0
+msgctxt "Battlefield.ObstacleGatepost_0"
+msgid "a gatepost"
+msgstr ""
+
+#. Battlefield.ObstacleGatepost_1
+msgctxt "Battlefield.ObstacleGatepost_1"
+msgid "gateposts"
+msgstr ""
+
+#. Battlefield.ObstacleGatepost_2
+msgctxt "Battlefield.ObstacleGatepost_2"
+msgid "gateposts"
+msgstr ""
+
 #. Battlefield.ObstacleFire_0
 msgctxt "Battlefield.ObstacleFire_0"
 msgid "fire"

@@ -114,12 +114,15 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("impassable, 4, 2", Describe(new CombatTile(new Vector2Int(4, 2)) { IsImpassable = true }));
         }
 
-        /// <summary>A cell nothing can enter says no height: how high a blocked hex stands is no
-        /// use to a player who can never put a troop on it.</summary>
+        /// <summary>A cell nothing can enter says no height: how high the gateposts framing a siege
+        /// gate stand is no use to a player who can never put a troop on them.</summary>
         [TestMethod]
         public void TileSaysNoHeightForACellNothingCanEnter()
         {
             Assert.AreEqual("impassable, 4, 2", Describe(Blocked(null)));
+            Assert.AreEqual(
+                "a gatepost, impassable, 4, 2",
+                Describe(Blocked(new BattlefieldObstacle(BattlefieldObstacleKind.Gatepost, 0, 1))));
         }
 
         /// <summary>Raised ground is named by what it is where the ground itself has a name: a

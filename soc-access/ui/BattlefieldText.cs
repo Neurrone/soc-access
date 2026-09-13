@@ -289,17 +289,17 @@ namespace SongsOfConquestAccess.UI
                     : ModStrings.Battlefield.DescriptionImpassableCells);
             }
 
-            return region.IsRidge && !IsUncountable(region.Obstacles)
+            return region.IsRidge && !NeverAWall(region.Obstacles)
                 ? ModText.Get(ModStrings.Battlefield.DescriptionObstacleWall, words)
                 : words;
         }
 
-        /// <summary>Whether a group is nothing but stuff there is no counting and no building
-        /// with: water and fire. "A wall of water" and "wall of 5 water" are not English, so a
-        /// group of them is named by what it is whatever shape it lies in - a moat is water, a
-        /// burning line is fire. A group that mixes them with something countable is a list of
-        /// what is on it, walls and all.</summary>
-        private static bool IsUncountable(List<BattlefieldObstacle> obstacles)
+        /// <summary>Whether a group is nothing but stuff no wall is built out of: water and fire,
+        /// which there is no counting and no building with - "a wall of water" and "wall of 5
+        /// water" are not English, so a moat is water and a burning line is fire whatever shape it
+        /// lies in - and gateposts, which are the frame of a gate and not a wall of their own. A
+        /// group that mixes them with anything else is named as a wall like any other.</summary>
+        private static bool NeverAWall(List<BattlefieldObstacle> obstacles)
         {
             if (obstacles == null || obstacles.Count == 0)
             {
@@ -309,7 +309,8 @@ namespace SongsOfConquestAccess.UI
             for (int i = 0; i < obstacles.Count; i++)
             {
                 if (obstacles[i].Kind != BattlefieldObstacleKind.Water
-                    && obstacles[i].Kind != BattlefieldObstacleKind.Fire)
+                    && obstacles[i].Kind != BattlefieldObstacleKind.Fire
+                    && obstacles[i].Kind != BattlefieldObstacleKind.Gatepost)
                 {
                     return false;
                 }
@@ -405,7 +406,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             return ModText.Plural(
-                region.IsRidge && !IsUncountable(region.Obstacles)
+                region.IsRidge && !NeverAWall(region.Obstacles)
                     ? ModStrings.Scanner.TerrainObstacleWall
                     : ModStrings.Scanner.TerrainObstacleCells,
                 region.Count,
@@ -425,8 +426,8 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>What a whole cell of one obstacle is called: the plural where a cell holds many
-        /// of them - boulders, bushes - and the singular where it holds one, a statue or a torch.
-        /// </summary>
+        /// of them - boulders, bushes - and the singular where it holds one, a statue, a torch or a
+        /// gatepost.</summary>
         public static string CellObstacle(BattlefieldObstacle obstacle)
         {
             if (obstacle == null)
@@ -435,7 +436,8 @@ namespace SongsOfConquestAccess.UI
             }
 
             bool one = obstacle.Kind == BattlefieldObstacleKind.Manufactured
-                || obstacle.Kind == BattlefieldObstacleKind.Light;
+                || obstacle.Kind == BattlefieldObstacleKind.Light
+                || obstacle.Kind == BattlefieldObstacleKind.Gatepost;
             return Word(obstacle, one ? 1 : 2);
         }
 
@@ -497,6 +499,10 @@ namespace SongsOfConquestAccess.UI
                     return true;
                 case BattlefieldObstacleKind.Light:
                     words = Light(theme);
+                    return true;
+                case BattlefieldObstacleKind.Gatepost:
+                    // Stonework, and the same stonework whatever theme the battle is painted in.
+                    words = ModStrings.Battlefield.ObstacleGatepost;
                     return true;
                 default:
                     words = ModStrings.Battlefield.ObstacleRock;

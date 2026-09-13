@@ -113,6 +113,7 @@
             public static readonly ModPluralString ObstacleLightVanir = new ModPluralString("Battlefield.ObstacleLightVanir", "a torch", "torches");
             public static readonly ModPluralString ObstacleLightRoots = new ModPluralString("Battlefield.ObstacleLightRoots", "glowing blue mushrooms", "glowing blue mushrooms");
             public static readonly ModPluralString ObstacleLightYulan = new ModPluralString("Battlefield.ObstacleLightYulan", "a paper lantern", "paper lanterns");
+            public static readonly ModPluralString ObstacleGatepost = new ModPluralString("Battlefield.ObstacleGatepost", "a gatepost", "gateposts");
             public static readonly ModPluralString ObstacleFire = new ModPluralString("Battlefield.ObstacleFire", "fire", "fire");
             public static readonly ModPluralString ObstacleWater = new ModPluralString("Battlefield.ObstacleWater", "water", "water");
             public static readonly ModString DescriptionChokePoint = new ModString("Battlefield.DescriptionChokePoint", "a choke point");
