@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno pianeggiante su tutto il campo. I dirupi corrono per tutta l'altezza del campo lungo il lato destro e sbarrano il bordo destro.",
+  "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro, ben lontani dai dirupi.",
+  "defender": "I punti di schieramento del difensore corrono al centro a destra, appena davanti ai dirupi."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aperto attraverso il centro, con {3,0} in basso al centro e {3,6} in alto al centro. Dirupi in alto a sinistra e sul bordo destro, e nell'angolo in alto a destra si entra solo per {10,6}.",
+  "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro, tutti su terreno pianeggiante.",
+  "defender": "I punti di schieramento del difensore corrono lungo il bordo destro, due di essi nell'angolo in alto a destra oltre {10,6}."
+}

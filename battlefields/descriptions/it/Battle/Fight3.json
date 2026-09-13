@@ -1,0 +1,5 @@
+{
+  "terrain": "Il terreno aperto corre dal bordo inferiore fino in alto tra {3,0} a sinistra e {8,0} a destra. Il bordo sinistro è chiuso da {0,0} e quello destro da {12,2}.",
+  "attacker": "I punti di schieramento dell'attaccante corrono lungo la parte alta del campo, sette di essi su {3,0}.",
+  "defender": "I punti di schieramento del difensore riempiono la parte in basso a destra, dieci di essi su {8,0}."
+}

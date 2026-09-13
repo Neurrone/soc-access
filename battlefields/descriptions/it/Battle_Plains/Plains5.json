@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno pianeggiante su tutto il campo, con {5,7} in alto al centro, {6,4} al centro e {4,1} in basso al centro.",
+  "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro.",
+  "defender": "I punti di schieramento del difensore corrono lungo il bordo destro."
+}

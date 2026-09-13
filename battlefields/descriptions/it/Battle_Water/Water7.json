@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aperto con {4,1} attraverso il centro. La parte alta del campo è occupata da {3,5} e quella in basso al centro da {7,0}, e verso destra si passa per {9,4}.",
+  "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro.",
+  "defender": "I punti di schieramento del difensore corrono dall'alto in basso lungo la parte destra del campo."
+}

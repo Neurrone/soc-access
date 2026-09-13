@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno pianeggiante nell'angolo in basso a sinistra, con {6,0} sul resto del campo. Il bordo superiore e il centro sono sbarrati da {1,4}, e verso destra si passa solo per {9,2}.",
+  "attacker": "I punti di schieramento dell'attaccante riempiono il terreno pianeggiante nell'angolo in basso a sinistra.",
+  "defender": "I punti di schieramento del difensore si distribuiscono nel terzo destro, su {6,0} oltre {9,2}."
+}

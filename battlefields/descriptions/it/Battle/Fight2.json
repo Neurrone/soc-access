@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aperto a sinistra, mentre tutta la parte destra del campo, fin verso l'alto al centro e in basso al centro, è occupata da {5,0}. Buona parte del centro è occupata da {6,2} e {5,5}, con un varco tra loro.",
+  "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro.",
+  "defender": "I punti di schieramento del difensore si distribuiscono nella parte destra del campo, tutti su {5,0}."
+}

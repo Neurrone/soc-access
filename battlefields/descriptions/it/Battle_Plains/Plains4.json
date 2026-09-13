@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aperto con {3,2} in basso a sinistra, {7,2} in basso al centro, {5,6} in alto al centro e {8,5} al centro a destra.",
+  "attacker": "I punti di schieramento dell'attaccante si distribuiscono nel terzo sinistro, tutti su terreno pianeggiante.",
+  "defender": "I punti di schieramento del difensore si distribuiscono nel terzo destro, tutti su terreno pianeggiante."
+}

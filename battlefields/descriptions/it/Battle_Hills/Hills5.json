@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno pianeggiante lungo il centro, con {1,0} a occupare il lato sinistro e {9,0} quello destro. Dirupi in basso a sinistra.",
+  "attacker": "I punti di schieramento dell'attaccante corrono lungo la sinistra, tutti tranne uno su {1,0}.",
+  "defender": "I punti di schieramento del difensore corrono lungo la destra, tutti tranne uno su {9,0}."
+}

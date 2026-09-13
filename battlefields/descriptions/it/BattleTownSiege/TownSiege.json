@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aperto a sinistra, e a destra il difensore tiene la città. Una torre si trova in alto al centro e un'altra in basso al centro, ciascuna affiancata da un tratto di fossato, con le scale che salgono accanto a ciascuna dal lato della città. Ci sono muri al centro a destra e in basso a destra.",
+  "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro.",
+  "defender": "I punti di schieramento del difensore si distribuiscono per la città, uno su ogni torre e quattro sui muri, due dei quali per macchine d'assedio."
+}

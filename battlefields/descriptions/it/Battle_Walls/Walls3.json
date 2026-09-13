@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno pianeggiante con {0,0} nell'angolo in basso a sinistra e {10,0} in basso a destra. I dirupi attraversano tutto il campo sopra il centro e isolano {3,6} al di là di essi.",
+  "attacker": "I punti di schieramento dell'attaccante si distribuiscono nel terzo sinistro e due di essi si trovano su {0,0}.",
+  "defender": "I punti di schieramento del difensore si distribuiscono nel terzo destro e tre di essi si trovano su {10,0}."
+}

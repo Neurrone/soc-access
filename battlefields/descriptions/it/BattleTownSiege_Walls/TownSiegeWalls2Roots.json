@@ -1,0 +1,5 @@
+{
+  "terrain": "Un fossato corre dall'angolo in alto a sinistra fino in basso al centro e lo si attraversa solo a {5,4}, il portone al centro. I muri del difensore stanno alla sua destra: uno lungo il bordo superiore tra una torre alla sua estremità sinistra e un'altra in alto al centro, un breve tratto affiancato da due torri sul lato della città a ciascuna estremità del fossato, e un altro attorno all'angolo in basso a destra con due torri. Le scale salgono sui muri in alto a sinistra, in alto al centro, in alto a destra, in basso al centro e in basso a destra.",
+  "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro, su terreno aperto fuori dal fossato.",
+  "defender": "I punti di schieramento del difensore si distribuiscono per la città, sette di essi sulle torri e sui muri."
+}

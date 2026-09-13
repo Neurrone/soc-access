@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aperto con {5,0} in basso al centro, {6,6} in alto al centro e {12,2} al centro a destra. La parte in basso a sinistra è bloccata da {2,0} e quella in alto a sinistra da {1,6}, e nell'angolo in alto a sinistra si entra solo per {0,5}.",
+  "attacker": "I punti di schieramento dell'attaccante corrono attraverso il centro del campo.",
+  "defender": "I punti di schieramento del difensore circondano quelli dell'attaccante, due su {5,0}, due su {6,6} e cinque su {12,2}."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aperto con {3,6} attraverso la parte in alto a sinistra e {8,6} attraverso quella in alto a destra, e nel terreno tra loro si entra solo per {6,5}. La parte bassa del campo è interrotta da {2,0} a sinistra, {8,0} al centro e {5,2} tra loro.",
+  "attacker": "I punti di schieramento dell'attaccante si distribuiscono nel terzo sinistro.",
+  "defender": "I punti di schieramento del difensore si distribuiscono nel terzo destro."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Tutto il campo è coperto da {0,0}, interrotto da {2,2} in basso a sinistra e {2,5} al centro a sinistra, che lasciano un corridoio lungo il bordo superiore, uno lungo il bordo inferiore e uno attraverso il centro. I corridoi superiore e inferiore finiscono al centro e solo quello centrale prosegue verso destra, dove il bordo è diviso in sacche da {11,3} e {11,5}.",
+  "attacker": "I punti di schieramento dell'attaccante corrono lungo il bordo sinistro.",
+  "defender": "I punti di schieramento del difensore si distribuiscono nel terzo destro, tre di essi contro il bordo destro."
+}

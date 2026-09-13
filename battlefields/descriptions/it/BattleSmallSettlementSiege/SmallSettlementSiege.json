@@ -1,0 +1,5 @@
+{
+  "terrain": "Terreno aperto a sinistra, con le torri del difensore in alto al centro e in basso al centro, le scale che salgono a ciascuna dal bordo accanto, e un muro tra loro al centro. Dietro il muro ci sono {9,5} al centro a destra e {8,0} in basso a destra. Gli angoli in alto a sinistra e in alto a destra sono chiusi da {0,6} e {12,6}.",
+  "attacker": "I punti di schieramento dell'attaccante si distribuiscono nel terzo sinistro, su terreno aperto fuori dalle torri.",
+  "defender": "I punti di schieramento del difensore riempiono il centro e la destra, due di essi sulle torri e quattro sul muro."
+}
