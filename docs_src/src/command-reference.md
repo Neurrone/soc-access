@@ -122,6 +122,7 @@ categories, as one flat list taken nearest first. See
 | `C`                 | Southeast                     |
 | `Shift+A/D/Q/E/Z/C` | Move to next interesting tile |
 | `Ctrl+Space`        | Focuses centre tile           |
+| `Ctrl+D`            | Describe the battlefield layout |
 
 ## Combat
 

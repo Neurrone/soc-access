@@ -31,8 +31,16 @@ Move through the hex grid with:
 - `C`: southeast
 - Use with `shift` to move to the next interesting tile, where interesting means it differs from the current tile
 - `Ctrl+Space`: focus the centre tile
+- `Ctrl+D`: describe the battlefield layout
 
 Use drag and drop to rearrange your troops.
+
+### Battlefield Description
+
+Each battlefield layout the game ships has a written description of its terrain and of
+where each side's spawn points are. It is on a tab stop of its own, called Description,
+which also holds the drag hint, and `Ctrl+D` on the deployment grid speaks the same three
+lines. Not every layout has been described yet; one that has not says so.
 
 The deployment grid also supports the [Scanner](scanner.md) for finding enemy troops, spawn points and terrain features. Scanning from the centre tile is a quick way to understand where troops and terrain features are, since each result is heard in the direction it lies in. See [Audio](audio.md#scanner-results).
 
@@ -54,6 +62,7 @@ The following hotkeys work when on the hex grid:
 
 - `\`: performs the secondary action on the focused tile, corresponding to a right-click. Use this to move to a tile or perform an attack
 - `S`: read detailed threat information for the focused tile. Nothing is spoken if the tile is not threatened.
+- `Ctrl+D`: describe the terrain of the battlefield layout. Nothing is said about the spawn points here, since the troops have already been placed.
 - `T`: move focus to the timeline
 - Enter: performs the primary action on the focused tile, corresponding to a left-click. Use to select a target for spells
 - `Escape`: cancels spell or ability targeting

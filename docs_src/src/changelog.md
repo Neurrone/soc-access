@@ -21,6 +21,7 @@ Rewrote the UI to modern mod standards to provide the following features:
 - Technologies in the research screen are now buttons that when activated, perform the research action
 - The marketplace screen uses a table to more accurately convey what the game draws
 - In game options, adjusting keybinds is now supported
+- Battlefield layouts now have written descriptions of their terrain and spawn points. The troop placement page has a `Description` tab stop holding the three lines, and `Ctrl+D` speaks them from the deployment grid, or the terrain alone from the combat grid. Not every layout has been described yet
 
 ### Controls
 
