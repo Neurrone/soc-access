@@ -1,5 +1,5 @@
 {
-  "terrain": "Terrain plat dans le coin en bas à gauche, avec {6,0} sur le reste du champ de bataille. Le bord supérieur et le centre sont fermés par {1,4}, et l'on ne passe à droite que par {9,2}.",
+  "terrain": "Terrain plat dans le coin en bas à gauche, avec {6,0} sur le reste du champ de bataille. Le bord supérieur est fermé par {0,5}, et l'on ne passe à droite que par {9,2}.",
   "attacker": "Les points de déploiement de l'attaquant occupent le terrain plat du coin en bas à gauche.",
   "defender": "Les points de déploiement du défenseur se répartissent sur le tiers droit, sur {6,0}, par-delà {9,2}."
 }

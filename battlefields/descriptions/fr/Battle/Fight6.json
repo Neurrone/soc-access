@@ -1,5 +1,5 @@
 {
-  "terrain": "Terrain dégagé au centre, avec {1,1} en bas à gauche, {9,1} en bas à droite, {1,6} en haut à gauche et {11,6} en haut à droite. À gauche et à droite du centre se trouvent {3,3} et {8,3}.",
+  "terrain": "Terrain dégagé au centre, avec {1,1} en bas à gauche, {9,1} en bas à droite, {1,6} en haut à gauche et {11,6} en haut à droite. À gauche et à droite du centre se trouvent {3,3} et {9,4}.",
   "attacker": "Les points de déploiement de l'attaquant sont regroupés au centre du champ de bataille.",
   "defender": "Les points de déploiement du défenseur entourent ceux de l'attaquant, deux dans chaque coin et un en bas au centre."
 }

@@ -1,5 +1,5 @@
 {
-  "terrain": "Du terrain dégagé va du bord inférieur jusqu'en haut, entre {3,0} à gauche et {8,0} à droite. Le bord gauche est fermé par {0,0} et le bord droit par {12,2}.",
+  "terrain": "Du terrain dégagé va du bord inférieur jusqu'en haut, entre {3,0} à gauche et {8,0} à droite. Le bord gauche est fermé par {1,0} et {0,3}, et le bord droit par {12,2}.",
   "attacker": "Les points de déploiement de l'attaquant traversent le haut du champ de bataille, sept d'entre eux sur {3,0}.",
   "defender": "Les points de déploiement du défenseur occupent le bas à droite, dix d'entre eux sur {8,0}."
 }

@@ -1,5 +1,5 @@
 {
-  "terrain": "Terrain dégagé sur le centre et la droite, avec {4,4} au centre et {11,3} au milieu à droite, et des falaises en haut à gauche et en haut au centre. Le bas à gauche et le bord gauche sont occupés par {0,0}, où l'on n'accède que par {5,3}, et la plus grande partie du bord supérieur est fermée par {9,6}.",
+  "terrain": "Terrain dégagé sur le centre et la droite, avec {4,4} au centre et {11,3} au milieu à droite, et des falaises en haut à gauche et en haut au centre. Le bas à gauche et le bord gauche sont occupés par {0,0}, où l'on n'accède que par {5,3}, et la plus grande partie du bord supérieur est fermée par {5,8} et {9,6}.",
   "attacker": "Les points de déploiement de l'attaquant se répartissent sur la gauche du champ de bataille, l'un d'eux sur {0,0} et un autre sur {4,4}.",
   "defender": "Les points de déploiement du défenseur se répartissent sur la droite du champ de bataille, tous sur terrain dégagé."
 }

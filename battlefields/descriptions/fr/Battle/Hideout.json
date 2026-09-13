@@ -1,5 +1,5 @@
 {
-  "terrain": "Terrain dégagé, avec {5,0} en bas au centre, {6,6} en haut au centre et {12,2} au milieu à droite. Le bas à gauche est bloqué par {2,0} et le haut à gauche par {1,6}, si bien que l'on n'entre dans le coin en haut à gauche que par {0,5}.",
+  "terrain": "Terrain dégagé, avec {5,0} en bas au centre, {6,6} en haut au centre et {12,2} au milieu à droite. Le coin en haut à gauche est fermé par {3,6} et {3,7}, si bien que l'on n'y entre que par {0,5}.",
   "attacker": "Les points de déploiement de l'attaquant traversent le centre du champ de bataille.",
   "defender": "Les points de déploiement du défenseur entourent ceux de l'attaquant, deux sur {5,0}, deux sur {6,6} et cinq sur {12,2}."
 }
