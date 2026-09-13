@@ -473,8 +473,19 @@ namespace SongsOfConquestAccess.Dev
                 for (int x = 0; x < width; x++)
                 {
                     Cell cell = cells[x, y];
+                    // The theme is left at 0: a fight repaints the board from the adventure ground
+                    // it was joined on, so the layout's own theme is not the one a player will see.
+                    // The rest says which family of prop blocks a cell, which is what the groups of
+                    // blocked ground are split by even where no word is given for them.
                     terrain.Add(new BattlefieldCell(
-                        new Vector2Int(x, y), cell.OnGrid, cell.Elevation, cell.Impassable, cell.Decoration));
+                        new Vector2Int(x, y),
+                        cell.OnGrid,
+                        cell.Elevation,
+                        cell.Impassable,
+                        cell.Decoration,
+                        cell.Effect,
+                        cell.Water,
+                        0));
                 }
             }
 
@@ -501,6 +512,12 @@ namespace SongsOfConquestAccess.Dev
                 placeholder = "{" + region.Cells[0].x + "," + region.Cells[0].y + "}",
                 label = BattlefieldText.Region(region),
                 kind = region.Kind.ToString(),
+                // Which family of prop blocks the group, which is what it is split by; the word a
+                // fight would speak for it is not here, because the theme that chooses the word is
+                // the adventure ground the battle is joined on and no layout knows it in advance.
+                obstacle = region.ObstacleKind == BattlefieldObstacleKind.None
+                    ? null
+                    : region.ObstacleKind.ToString(),
                 shape = region.Shape.ToString(),
                 cells = region.Count,
                 height = region.Height,
