@@ -4197,6 +4197,16 @@ msgctxt "Battlefield.ObstacleFire_1"
 msgid "fire"
 msgstr "fogo"
 
+#. Battlefield.ObstacleFireBare_0
+msgctxt "Battlefield.ObstacleFireBare_0"
+msgid "fire"
+msgstr "fogo"
+
+#. Battlefield.ObstacleFireBare_1
+msgctxt "Battlefield.ObstacleFireBare_1"
+msgid "fire"
+msgstr "fogo"
+
 #. Battlefield.ObstacleGatepost_0
 msgctxt "Battlefield.ObstacleGatepost_0"
 msgid "a gatepost"
@@ -4327,6 +4337,16 @@ msgctxt "Battlefield.ObstacleGrowthVanir_1"
 msgid "purple heather"
 msgstr "urze roxa"
 
+#. Battlefield.ObstacleGrowthVanirBare_0
+msgctxt "Battlefield.ObstacleGrowthVanirBare_0"
+msgid "purple heather"
+msgstr "urze roxa"
+
+#. Battlefield.ObstacleGrowthVanirBare_1
+msgctxt "Battlefield.ObstacleGrowthVanirBare_1"
+msgid "purple heather"
+msgstr "urze roxa"
+
 #. Battlefield.ObstacleGrowthYulan_0
 msgctxt "Battlefield.ObstacleGrowthYulan_0"
 msgid "a purple flowering shrub"
@@ -4434,6 +4454,16 @@ msgstr "cogumelos azuis brilhantes"
 
 #. Battlefield.ObstacleLightRoots_1
 msgctxt "Battlefield.ObstacleLightRoots_1"
+msgid "glowing blue mushrooms"
+msgstr "cogumelos azuis brilhantes"
+
+#. Battlefield.ObstacleLightRootsBare_0
+msgctxt "Battlefield.ObstacleLightRootsBare_0"
+msgid "glowing blue mushrooms"
+msgstr "cogumelos azuis brilhantes"
+
+#. Battlefield.ObstacleLightRootsBare_1
+msgctxt "Battlefield.ObstacleLightRootsBare_1"
 msgid "glowing blue mushrooms"
 msgstr "cogumelos azuis brilhantes"
 
@@ -4644,6 +4674,16 @@ msgstr "água"
 
 #. Battlefield.ObstacleWater_1
 msgctxt "Battlefield.ObstacleWater_1"
+msgid "water"
+msgstr "água"
+
+#. Battlefield.ObstacleWaterBare_0
+msgctxt "Battlefield.ObstacleWaterBare_0"
+msgid "water"
+msgstr "água"
+
+#. Battlefield.ObstacleWaterBare_1
+msgctxt "Battlefield.ObstacleWaterBare_1"
 msgid "water"
 msgstr "água"
 

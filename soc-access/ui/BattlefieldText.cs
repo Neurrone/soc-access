@@ -277,7 +277,12 @@ namespace SongsOfConquestAccess.UI
         /// and the plain words where nothing did.</summary>
         private static string ImpassableDescription(BattlefieldRegion region)
         {
-            string words = ObstacleWords(region.Obstacles, region.Count, false);
+            // "a wall of {0}" carries the article itself, so what goes inside it is the bare noun -
+            // "un mur de rochers", not "un mur de des rochers". Standing on its own the group is the
+            // whole noun phrase and takes the description form, which carries the article a language
+            // needs: "bloqué par des rochers". English spells the two alike and hears no difference.
+            bool wall = region.IsRidge && !NeverAWall(region.Obstacles);
+            string words = ObstacleWords(region.Obstacles, region.Count, wall);
             if (string.IsNullOrEmpty(words))
             {
                 if (region.IsRidge)
@@ -290,7 +295,7 @@ namespace SongsOfConquestAccess.UI
                     : ModStrings.Battlefield.DescriptionImpassableCells);
             }
 
-            return region.IsRidge && !NeverAWall(region.Obstacles)
+            return wall
                 ? ModText.Get(ModStrings.Battlefield.DescriptionObstacleWall, words)
                 : words;
         }
@@ -482,9 +487,10 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>The owner's word for one family of prop in one theme. Theme 7 is a second
         /// Arleon, and a theme byte nobody knows reads as Arleon too rather than falling silent.
-        /// <paramref name="bare"/> picks the bare noun the cursor and the scanner speak over the
-        /// noun phrase a description reads; the words English writes without an article have one
-        /// string for both.</summary>
+        /// <paramref name="bare"/> picks the bare noun the cursor, the scanner and the inside of a
+        /// wall speak over the noun phrase a description reads on its own; the words English writes
+        /// without an article still have both, because French does not write them without one.
+        /// </summary>
         private static bool TryWords(
             BattlefieldObstacleKind kind, int theme, bool bare, out ModPluralString words)
         {
@@ -496,10 +502,14 @@ namespace SongsOfConquestAccess.UI
                         : ModStrings.Battlefield.ObstacleRock;
                     return true;
                 case BattlefieldObstacleKind.Fire:
-                    words = ModStrings.Battlefield.ObstacleFire;
+                    words = bare
+                        ? ModStrings.Battlefield.ObstacleFireBare
+                        : ModStrings.Battlefield.ObstacleFire;
                     return true;
                 case BattlefieldObstacleKind.Water:
-                    words = ModStrings.Battlefield.ObstacleWater;
+                    words = bare
+                        ? ModStrings.Battlefield.ObstacleWaterBare
+                        : ModStrings.Battlefield.ObstacleWater;
                     return true;
                 case BattlefieldObstacleKind.Growth:
                     words = Growth(theme, bare);
@@ -539,8 +549,9 @@ namespace SongsOfConquestAccess.UI
                         ? ModStrings.Battlefield.ObstacleGrowthRanaBare
                         : ModStrings.Battlefield.ObstacleGrowthRana;
                 case 4:
-                    // Purple heather is a mass noun in English: one string for both surfaces.
-                    return ModStrings.Battlefield.ObstacleGrowthVanir;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleGrowthVanirBare
+                        : ModStrings.Battlefield.ObstacleGrowthVanir;
                 case 5:
                     return bare
                         ? ModStrings.Battlefield.ObstacleGrowthRootsBare
@@ -612,8 +623,9 @@ namespace SongsOfConquestAccess.UI
                         ? ModStrings.Battlefield.ObstacleLightVanirBare
                         : ModStrings.Battlefield.ObstacleLightVanir;
                 case 5:
-                    // Glowing blue mushrooms are already plural: one string for both surfaces.
-                    return ModStrings.Battlefield.ObstacleLightRoots;
+                    return bare
+                        ? ModStrings.Battlefield.ObstacleLightRootsBare
+                        : ModStrings.Battlefield.ObstacleLightRoots;
                 case 6:
                     return bare
                         ? ModStrings.Battlefield.ObstacleLightYulanBare

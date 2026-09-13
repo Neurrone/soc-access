@@ -4127,6 +4127,11 @@ msgctxt "Battlefield.ObstacleFire_0"
 msgid "fire"
 msgstr "火焰"
 
+#. Battlefield.ObstacleFireBare_0
+msgctxt "Battlefield.ObstacleFireBare_0"
+msgid "fire"
+msgstr "火焰"
+
 #. Battlefield.ObstacleGatepost_0
 msgctxt "Battlefield.ObstacleGatepost_0"
 msgid "a gatepost"
@@ -4192,6 +4197,11 @@ msgctxt "Battlefield.ObstacleGrowthVanir_0"
 msgid "purple heather"
 msgstr "紫色石南"
 
+#. Battlefield.ObstacleGrowthVanirBare_0
+msgctxt "Battlefield.ObstacleGrowthVanirBare_0"
+msgid "purple heather"
+msgstr "紫色石南"
+
 #. Battlefield.ObstacleGrowthYulan_0
 msgctxt "Battlefield.ObstacleGrowthYulan_0"
 msgid "a purple flowering shrub"
@@ -4244,6 +4254,11 @@ msgstr "發光水池"
 
 #. Battlefield.ObstacleLightRoots_0
 msgctxt "Battlefield.ObstacleLightRoots_0"
+msgid "glowing blue mushrooms"
+msgstr "發光藍蘑菇"
+
+#. Battlefield.ObstacleLightRootsBare_0
+msgctxt "Battlefield.ObstacleLightRootsBare_0"
 msgid "glowing blue mushrooms"
 msgstr "發光藍蘑菇"
 
@@ -4349,6 +4364,11 @@ msgstr "巨石"
 
 #. Battlefield.ObstacleWater_0
 msgctxt "Battlefield.ObstacleWater_0"
+msgid "water"
+msgstr "水"
+
+#. Battlefield.ObstacleWaterBare_0
+msgctxt "Battlefield.ObstacleWaterBare_0"
 msgid "water"
 msgstr "水"
 

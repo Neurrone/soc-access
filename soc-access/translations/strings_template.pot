@@ -4279,6 +4279,21 @@ msgctxt "Battlefield.ObstacleGrowthVanir_2"
 msgid "purple heather"
 msgstr ""
 
+#. Battlefield.ObstacleGrowthVanirBare_0
+msgctxt "Battlefield.ObstacleGrowthVanirBare_0"
+msgid "purple heather"
+msgstr ""
+
+#. Battlefield.ObstacleGrowthVanirBare_1
+msgctxt "Battlefield.ObstacleGrowthVanirBare_1"
+msgid "purple heather"
+msgstr ""
+
+#. Battlefield.ObstacleGrowthVanirBare_2
+msgctxt "Battlefield.ObstacleGrowthVanirBare_2"
+msgid "purple heather"
+msgstr ""
+
 #. Battlefield.ObstacleGrowthRoots_0
 msgctxt "Battlefield.ObstacleGrowthRoots_0"
 msgid "a teal fungus"
@@ -4714,6 +4729,21 @@ msgctxt "Battlefield.ObstacleLightRoots_2"
 msgid "glowing blue mushrooms"
 msgstr ""
 
+#. Battlefield.ObstacleLightRootsBare_0
+msgctxt "Battlefield.ObstacleLightRootsBare_0"
+msgid "glowing blue mushrooms"
+msgstr ""
+
+#. Battlefield.ObstacleLightRootsBare_1
+msgctxt "Battlefield.ObstacleLightRootsBare_1"
+msgid "glowing blue mushrooms"
+msgstr ""
+
+#. Battlefield.ObstacleLightRootsBare_2
+msgctxt "Battlefield.ObstacleLightRootsBare_2"
+msgid "glowing blue mushrooms"
+msgstr ""
+
 #. Battlefield.ObstacleLightYulan_0
 msgctxt "Battlefield.ObstacleLightYulan_0"
 msgid "a paper lantern"
@@ -4789,6 +4819,21 @@ msgctxt "Battlefield.ObstacleFire_2"
 msgid "fire"
 msgstr ""
 
+#. Battlefield.ObstacleFireBare_0
+msgctxt "Battlefield.ObstacleFireBare_0"
+msgid "fire"
+msgstr ""
+
+#. Battlefield.ObstacleFireBare_1
+msgctxt "Battlefield.ObstacleFireBare_1"
+msgid "fire"
+msgstr ""
+
+#. Battlefield.ObstacleFireBare_2
+msgctxt "Battlefield.ObstacleFireBare_2"
+msgid "fire"
+msgstr ""
+
 #. Battlefield.ObstacleWater_0
 msgctxt "Battlefield.ObstacleWater_0"
 msgid "water"
@@ -4801,6 +4846,21 @@ msgstr ""
 
 #. Battlefield.ObstacleWater_2
 msgctxt "Battlefield.ObstacleWater_2"
+msgid "water"
+msgstr ""
+
+#. Battlefield.ObstacleWaterBare_0
+msgctxt "Battlefield.ObstacleWaterBare_0"
+msgid "water"
+msgstr ""
+
+#. Battlefield.ObstacleWaterBare_1
+msgctxt "Battlefield.ObstacleWaterBare_1"
+msgid "water"
+msgstr ""
+
+#. Battlefield.ObstacleWaterBare_2
+msgctxt "Battlefield.ObstacleWaterBare_2"
 msgid "water"
 msgstr ""
 

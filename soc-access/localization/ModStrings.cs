@@ -89,7 +89,8 @@
         /// strings rather than one with the article cut off at runtime, because the article's form
         /// follows the noun's gender and its opening sound in most of the thirteen languages. A
         /// word English writes without an article (water, fire, purple heather, glowing blue
-        /// mushrooms) has the same two forms, so one string serves both surfaces.
+        /// mushrooms) still gets both strings: English fills them alike, and French does not -
+        /// "bloqué par de l'eau" in prose against "eau, infranchissable" on the cursor.
         ///
         /// These are spoken IN COMBAT ONLY. The placement page's preview draws a blocked cell as a
         /// puck with no style, so there it stays plain impassable.
@@ -111,6 +112,7 @@
             public static readonly ModPluralString ObstacleGrowthRana = new ModPluralString("Battlefield.ObstacleGrowthRana", "a pink mushroom", "pink mushrooms");
             public static readonly ModPluralString ObstacleGrowthRanaBare = new ModPluralString("Battlefield.ObstacleGrowthRanaBare", "pink mushroom", "pink mushrooms");
             public static readonly ModPluralString ObstacleGrowthVanir = new ModPluralString("Battlefield.ObstacleGrowthVanir", "purple heather", "purple heather");
+            public static readonly ModPluralString ObstacleGrowthVanirBare = new ModPluralString("Battlefield.ObstacleGrowthVanirBare", "purple heather", "purple heather");
             public static readonly ModPluralString ObstacleGrowthRoots = new ModPluralString("Battlefield.ObstacleGrowthRoots", "a teal fungus", "teal fungi");
             public static readonly ModPluralString ObstacleGrowthRootsBare = new ModPluralString("Battlefield.ObstacleGrowthRootsBare", "teal fungus", "teal fungi");
             public static readonly ModPluralString ObstacleGrowthYulan = new ModPluralString("Battlefield.ObstacleGrowthYulan", "a purple flowering shrub", "purple flowering shrubs");
@@ -140,12 +142,15 @@
             public static readonly ModPluralString ObstacleLightVanir = new ModPluralString("Battlefield.ObstacleLightVanir", "a torch", "torches");
             public static readonly ModPluralString ObstacleLightVanirBare = new ModPluralString("Battlefield.ObstacleLightVanirBare", "torch", "torches");
             public static readonly ModPluralString ObstacleLightRoots = new ModPluralString("Battlefield.ObstacleLightRoots", "glowing blue mushrooms", "glowing blue mushrooms");
+            public static readonly ModPluralString ObstacleLightRootsBare = new ModPluralString("Battlefield.ObstacleLightRootsBare", "glowing blue mushrooms", "glowing blue mushrooms");
             public static readonly ModPluralString ObstacleLightYulan = new ModPluralString("Battlefield.ObstacleLightYulan", "a paper lantern", "paper lanterns");
             public static readonly ModPluralString ObstacleLightYulanBare = new ModPluralString("Battlefield.ObstacleLightYulanBare", "paper lantern", "paper lanterns");
             public static readonly ModPluralString ObstacleGatepost = new ModPluralString("Battlefield.ObstacleGatepost", "a gatepost", "gateposts");
             public static readonly ModPluralString ObstacleGatepostBare = new ModPluralString("Battlefield.ObstacleGatepostBare", "gatepost", "gateposts");
             public static readonly ModPluralString ObstacleFire = new ModPluralString("Battlefield.ObstacleFire", "fire", "fire");
+            public static readonly ModPluralString ObstacleFireBare = new ModPluralString("Battlefield.ObstacleFireBare", "fire", "fire");
             public static readonly ModPluralString ObstacleWater = new ModPluralString("Battlefield.ObstacleWater", "water", "water");
+            public static readonly ModPluralString ObstacleWaterBare = new ModPluralString("Battlefield.ObstacleWaterBare", "water", "water");
             public static readonly ModString DescriptionChokePoint = new ModString("Battlefield.DescriptionChokePoint", "a choke point");
             public static readonly ModString DescriptionCliffs = new ModString("Battlefield.DescriptionCliffs", "cliffs");
             public static readonly ModString DescriptionImpassableCell = new ModString("Battlefield.DescriptionImpassableCell", "an impassable cell");

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Battlefields;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -70,6 +71,28 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(
                 "a wall of torches",
                 Expand("{0,1}", Analyse(ArleonTheme, true, ".....", "LLLLL", ".....")));
+        }
+
+        /// <summary>THE WALL FRAME CARRIES THE ARTICLE, so the words inside it are the bare ones -
+        /// "a wall of bushes" is built from the same plural the scanner speaks, never from the
+        /// description form a group standing on its own reads as. English spells the two alike in
+        /// the plural and only keeps them apart in the singular, so it is French that hears the
+        /// difference: a group on its own is "des buissons" and the same group in a wall is "un mur
+        /// de buissons", which only the bare form gives.</summary>
+        [TestMethod]
+        public void AWallOfObstaclesIsBuiltFromTheBarePlural()
+        {
+            BattlefieldRegion wall = First(
+                Analyse(ArleonTheme, true, ".....", "GGGGG", "....."), BattlefieldRegionKind.Impassable);
+
+            Assert.AreEqual(
+                ModText.Get(
+                    ModStrings.Battlefield.DescriptionObstacleWall,
+                    BattlefieldText.ObstacleWords(wall.Obstacles, wall.Count, true)),
+                BattlefieldText.RegionDescription(wall));
+
+            Assert.AreEqual("a bush", BattlefieldText.ObstacleWords(wall.Obstacles, 1, false));
+            Assert.AreEqual("bush", BattlefieldText.ObstacleWords(wall.Obstacles, 1, true));
         }
 
         /// <summary>A group of blocked cells is named by what is on it and how much of it there is,

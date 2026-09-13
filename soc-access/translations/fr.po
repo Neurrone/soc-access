@@ -4190,10 +4190,20 @@ msgstr "un mur (hauteur {0})"
 #. Battlefield.ObstacleFire_0
 msgctxt "Battlefield.ObstacleFire_0"
 msgid "fire"
-msgstr "feu"
+msgstr "du feu"
 
 #. Battlefield.ObstacleFire_1
 msgctxt "Battlefield.ObstacleFire_1"
+msgid "fire"
+msgstr "du feu"
+
+#. Battlefield.ObstacleFireBare_0
+msgctxt "Battlefield.ObstacleFireBare_0"
+msgid "fire"
+msgstr "feu"
+
+#. Battlefield.ObstacleFireBare_1
+msgctxt "Battlefield.ObstacleFireBare_1"
 msgid "fire"
 msgstr "feu"
 
@@ -4205,7 +4215,7 @@ msgstr "un pilier de portail"
 #. Battlefield.ObstacleGatepost_1
 msgctxt "Battlefield.ObstacleGatepost_1"
 msgid "gateposts"
-msgstr "piliers de portail"
+msgstr "des piliers de portail"
 
 #. Battlefield.ObstacleGatepostBare_0
 msgctxt "Battlefield.ObstacleGatepostBare_0"
@@ -4225,7 +4235,7 @@ msgstr "un buisson"
 #. Battlefield.ObstacleGrowthArleon_1
 msgctxt "Battlefield.ObstacleGrowthArleon_1"
 msgid "bushes"
-msgstr "buissons"
+msgstr "des buissons"
 
 #. Battlefield.ObstacleGrowthArleonBare_0
 msgctxt "Battlefield.ObstacleGrowthArleonBare_0"
@@ -4245,7 +4255,7 @@ msgstr "une plante du désert"
 #. Battlefield.ObstacleGrowthBarya_1
 msgctxt "Battlefield.ObstacleGrowthBarya_1"
 msgid "desert plants"
-msgstr "plantes du désert"
+msgstr "des plantes du désert"
 
 #. Battlefield.ObstacleGrowthBaryaBare_0
 msgctxt "Battlefield.ObstacleGrowthBaryaBare_0"
@@ -4265,7 +4275,7 @@ msgstr "une plante au feuillage sombre"
 #. Battlefield.ObstacleGrowthLoth_1
 msgctxt "Battlefield.ObstacleGrowthLoth_1"
 msgid "dark leafy plants"
-msgstr "plantes au feuillage sombre"
+msgstr "des plantes au feuillage sombre"
 
 #. Battlefield.ObstacleGrowthLothBare_0
 msgctxt "Battlefield.ObstacleGrowthLothBare_0"
@@ -4285,7 +4295,7 @@ msgstr "un champignon rose"
 #. Battlefield.ObstacleGrowthRana_1
 msgctxt "Battlefield.ObstacleGrowthRana_1"
 msgid "pink mushrooms"
-msgstr "champignons roses"
+msgstr "des champignons roses"
 
 #. Battlefield.ObstacleGrowthRanaBare_0
 msgctxt "Battlefield.ObstacleGrowthRanaBare_0"
@@ -4305,7 +4315,7 @@ msgstr "un champignon turquoise"
 #. Battlefield.ObstacleGrowthRoots_1
 msgctxt "Battlefield.ObstacleGrowthRoots_1"
 msgid "teal fungi"
-msgstr "champignons turquoise"
+msgstr "des champignons turquoise"
 
 #. Battlefield.ObstacleGrowthRootsBare_0
 msgctxt "Battlefield.ObstacleGrowthRootsBare_0"
@@ -4320,10 +4330,20 @@ msgstr "champignons turquoise"
 #. Battlefield.ObstacleGrowthVanir_0
 msgctxt "Battlefield.ObstacleGrowthVanir_0"
 msgid "purple heather"
-msgstr "bruyère violette"
+msgstr "de la bruyère violette"
 
 #. Battlefield.ObstacleGrowthVanir_1
 msgctxt "Battlefield.ObstacleGrowthVanir_1"
+msgid "purple heather"
+msgstr "de la bruyère violette"
+
+#. Battlefield.ObstacleGrowthVanirBare_0
+msgctxt "Battlefield.ObstacleGrowthVanirBare_0"
+msgid "purple heather"
+msgstr "bruyère violette"
+
+#. Battlefield.ObstacleGrowthVanirBare_1
+msgctxt "Battlefield.ObstacleGrowthVanirBare_1"
 msgid "purple heather"
 msgstr "bruyère violette"
 
@@ -4335,7 +4355,7 @@ msgstr "un buisson à fleurs violettes"
 #. Battlefield.ObstacleGrowthYulan_1
 msgctxt "Battlefield.ObstacleGrowthYulan_1"
 msgid "purple flowering shrubs"
-msgstr "buissons à fleurs violettes"
+msgstr "des buissons à fleurs violettes"
 
 #. Battlefield.ObstacleGrowthYulanBare_0
 msgctxt "Battlefield.ObstacleGrowthYulanBare_0"
@@ -4355,7 +4375,7 @@ msgstr "une torche"
 #. Battlefield.ObstacleLightArleon_1
 msgctxt "Battlefield.ObstacleLightArleon_1"
 msgid "torches"
-msgstr "torches"
+msgstr "des torches"
 
 #. Battlefield.ObstacleLightArleonBare_0
 msgctxt "Battlefield.ObstacleLightArleonBare_0"
@@ -4375,7 +4395,7 @@ msgstr "une torche dorée"
 #. Battlefield.ObstacleLightBarya_1
 msgctxt "Battlefield.ObstacleLightBarya_1"
 msgid "golden torches"
-msgstr "torches dorées"
+msgstr "des torches dorées"
 
 #. Battlefield.ObstacleLightBaryaBare_0
 msgctxt "Battlefield.ObstacleLightBaryaBare_0"
@@ -4395,7 +4415,7 @@ msgstr "un cristal lumineux"
 #. Battlefield.ObstacleLightLoth_1
 msgctxt "Battlefield.ObstacleLightLoth_1"
 msgid "glowing crystals"
-msgstr "cristaux lumineux"
+msgstr "des cristaux lumineux"
 
 #. Battlefield.ObstacleLightLothBare_0
 msgctxt "Battlefield.ObstacleLightLothBare_0"
@@ -4415,7 +4435,7 @@ msgstr "un bassin lumineux"
 #. Battlefield.ObstacleLightRana_1
 msgctxt "Battlefield.ObstacleLightRana_1"
 msgid "glowing pools"
-msgstr "bassins lumineux"
+msgstr "des bassins lumineux"
 
 #. Battlefield.ObstacleLightRanaBare_0
 msgctxt "Battlefield.ObstacleLightRanaBare_0"
@@ -4430,10 +4450,20 @@ msgstr "bassins lumineux"
 #. Battlefield.ObstacleLightRoots_0
 msgctxt "Battlefield.ObstacleLightRoots_0"
 msgid "glowing blue mushrooms"
-msgstr "champignons bleus lumineux"
+msgstr "des champignons bleus lumineux"
 
 #. Battlefield.ObstacleLightRoots_1
 msgctxt "Battlefield.ObstacleLightRoots_1"
+msgid "glowing blue mushrooms"
+msgstr "des champignons bleus lumineux"
+
+#. Battlefield.ObstacleLightRootsBare_0
+msgctxt "Battlefield.ObstacleLightRootsBare_0"
+msgid "glowing blue mushrooms"
+msgstr "champignons bleus lumineux"
+
+#. Battlefield.ObstacleLightRootsBare_1
+msgctxt "Battlefield.ObstacleLightRootsBare_1"
 msgid "glowing blue mushrooms"
 msgstr "champignons bleus lumineux"
 
@@ -4445,7 +4475,7 @@ msgstr "une torche"
 #. Battlefield.ObstacleLightVanir_1
 msgctxt "Battlefield.ObstacleLightVanir_1"
 msgid "torches"
-msgstr "torches"
+msgstr "des torches"
 
 #. Battlefield.ObstacleLightVanirBare_0
 msgctxt "Battlefield.ObstacleLightVanirBare_0"
@@ -4465,7 +4495,7 @@ msgstr "une lanterne en papier"
 #. Battlefield.ObstacleLightYulan_1
 msgctxt "Battlefield.ObstacleLightYulan_1"
 msgid "paper lanterns"
-msgstr "lanternes en papier"
+msgstr "des lanternes en papier"
 
 #. Battlefield.ObstacleLightYulanBare_0
 msgctxt "Battlefield.ObstacleLightYulanBare_0"
@@ -4485,7 +4515,7 @@ msgstr "une statue de chevalier"
 #. Battlefield.ObstacleManufacturedArleon_1
 msgctxt "Battlefield.ObstacleManufacturedArleon_1"
 msgid "knight statues"
-msgstr "statues de chevaliers"
+msgstr "des statues de chevaliers"
 
 #. Battlefield.ObstacleManufacturedArleonBare_0
 msgctxt "Battlefield.ObstacleManufacturedArleonBare_0"
@@ -4505,7 +4535,7 @@ msgstr "une statue d'animal"
 #. Battlefield.ObstacleManufacturedBarya_1
 msgctxt "Battlefield.ObstacleManufacturedBarya_1"
 msgid "animal statues"
-msgstr "statues d'animaux"
+msgstr "des statues d'animaux"
 
 #. Battlefield.ObstacleManufacturedBaryaBare_0
 msgctxt "Battlefield.ObstacleManufacturedBaryaBare_0"
@@ -4525,7 +4555,7 @@ msgstr "une statue de gargouille"
 #. Battlefield.ObstacleManufacturedLoth_1
 msgctxt "Battlefield.ObstacleManufacturedLoth_1"
 msgid "gargoyle statues"
-msgstr "statues de gargouilles"
+msgstr "des statues de gargouilles"
 
 #. Battlefield.ObstacleManufacturedLothBare_0
 msgctxt "Battlefield.ObstacleManufacturedLothBare_0"
@@ -4545,7 +4575,7 @@ msgstr "une statue de dragon"
 #. Battlefield.ObstacleManufacturedRana_1
 msgctxt "Battlefield.ObstacleManufacturedRana_1"
 msgid "dragon statues"
-msgstr "statues de dragons"
+msgstr "des statues de dragons"
 
 #. Battlefield.ObstacleManufacturedRanaBare_0
 msgctxt "Battlefield.ObstacleManufacturedRanaBare_0"
@@ -4565,7 +4595,7 @@ msgstr "un champignon géant"
 #. Battlefield.ObstacleManufacturedRoots_1
 msgctxt "Battlefield.ObstacleManufacturedRoots_1"
 msgid "giant mushrooms"
-msgstr "champignons géants"
+msgstr "des champignons géants"
 
 #. Battlefield.ObstacleManufacturedRootsBare_0
 msgctxt "Battlefield.ObstacleManufacturedRootsBare_0"
@@ -4585,7 +4615,7 @@ msgstr "un menhir"
 #. Battlefield.ObstacleManufacturedVanir_1
 msgctxt "Battlefield.ObstacleManufacturedVanir_1"
 msgid "standing stones"
-msgstr "menhirs"
+msgstr "des menhirs"
 
 #. Battlefield.ObstacleManufacturedVanirBare_0
 msgctxt "Battlefield.ObstacleManufacturedVanirBare_0"
@@ -4605,7 +4635,7 @@ msgstr "une statue de sage"
 #. Battlefield.ObstacleManufacturedYulan_1
 msgctxt "Battlefield.ObstacleManufacturedYulan_1"
 msgid "sage statues"
-msgstr "statues de sages"
+msgstr "des statues de sages"
 
 #. Battlefield.ObstacleManufacturedYulanBare_0
 msgctxt "Battlefield.ObstacleManufacturedYulanBare_0"
@@ -4625,7 +4655,7 @@ msgstr "un rocher"
 #. Battlefield.ObstacleRock_1
 msgctxt "Battlefield.ObstacleRock_1"
 msgid "boulders"
-msgstr "rochers"
+msgstr "des rochers"
 
 #. Battlefield.ObstacleRockBare_0
 msgctxt "Battlefield.ObstacleRockBare_0"
@@ -4640,10 +4670,20 @@ msgstr "rochers"
 #. Battlefield.ObstacleWater_0
 msgctxt "Battlefield.ObstacleWater_0"
 msgid "water"
-msgstr "eau"
+msgstr "de l'eau"
 
 #. Battlefield.ObstacleWater_1
 msgctxt "Battlefield.ObstacleWater_1"
+msgid "water"
+msgstr "de l'eau"
+
+#. Battlefield.ObstacleWaterBare_0
+msgctxt "Battlefield.ObstacleWaterBare_0"
+msgid "water"
+msgstr "eau"
+
+#. Battlefield.ObstacleWaterBare_1
+msgctxt "Battlefield.ObstacleWaterBare_1"
 msgid "water"
 msgstr "eau"
 
