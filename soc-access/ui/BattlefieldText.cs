@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Localization;
 using UnityEngine;
@@ -69,6 +70,112 @@ namespace SongsOfConquestAccess.UI
                 && !string.IsNullOrWhiteSpace(description.Terrain)
                 ? Expand(description.Terrain, terrain, onUnknownRegion)
                 : ModText.Get(ModStrings.Screens.NoBattlefieldDescription);
+        }
+
+        /// <summary>What the describe-battlefield gesture says in a fight: the terrain, and then
+        /// what lies around the board, which is read from the battle itself rather than authored.
+        /// </summary>
+        public static string SpokenCombat(
+            string layoutKey,
+            BattlefieldTerrain terrain,
+            BattlefieldSurroundings surroundings,
+            Action<string> onUnknownRegion)
+        {
+            return ModText.JoinList(
+                ModStrings.Common.PhraseSeparator,
+                new List<string>
+                {
+                    SpokenTerrain(layoutKey, terrain, onUnknownRegion),
+                    Surroundings(surroundings)
+                });
+        }
+
+        /// <summary>
+        /// WHAT LIES AROUND THE BOARD, in one sentence. The game sampled three adventure tiles when
+        /// it started the battle and drew the scenery from them, so this says what a sighted player
+        /// sees past the edges: one clause per kind of ground, naming the directions it lies in,
+        /// and no directions at all where it lies in all three - "The battlefield is surrounded by
+        /// open land." Empty where the battle carries no surroundings.
+        /// </summary>
+        public static string Surroundings(BattlefieldSurroundings surroundings)
+        {
+            if (surroundings == null)
+            {
+                return string.Empty;
+            }
+
+            List<ModString> words = new List<ModString>(3);
+            List<List<ModString>> directions = new List<List<ModString>>(3);
+            AddSurrounding(words, directions, surroundings.West, ModStrings.Scanner.West);
+            AddSurrounding(words, directions, surroundings.North, ModStrings.Scanner.North);
+            AddSurrounding(words, directions, surroundings.East, ModStrings.Scanner.East);
+
+            List<string> clauses = new List<string>(words.Count);
+            for (int i = 0; i < words.Count; i++)
+            {
+                string word = ModText.Get(words[i]);
+                clauses.Add(directions[i].Count == 3
+                    ? word
+                    : ModText.Get(ModStrings.Battlefield.SurroundingDirection, word, Names(directions[i])));
+            }
+
+            return ModText.Get(ModStrings.Battlefield.Surroundings, ModText.JoinListWithCommas(clauses));
+        }
+
+        /// <summary>One sampled tile onto the clause it belongs to: the same ground in two
+        /// directions is one clause naming both.</summary>
+        private static void AddSurrounding(
+            List<ModString> words, List<List<ModString>> directions, AdventureTerrainKind kind, ModString direction)
+        {
+            ModString word = SurroundingWord(kind);
+            for (int i = 0; i < words.Count; i++)
+            {
+                if (string.Equals(words[i].Key, word.Key, StringComparison.Ordinal))
+                {
+                    directions[i].Add(direction);
+                    return;
+                }
+            }
+
+            words.Add(word);
+            directions.Add(new List<ModString> { direction });
+        }
+
+        private static string Names(List<ModString> directions)
+        {
+            List<string> names = new List<string>(directions.Count);
+            for (int i = 0; i < directions.Count; i++)
+            {
+                names.Add(ModText.Get(directions[i]));
+            }
+
+            return ModText.JoinList(names);
+        }
+
+        /// <summary>What one sampled tile is called from the board: the few kinds of ground worth
+        /// hearing about, and open land for everything else - a player told "open land to the east"
+        /// knows there is nothing there.</summary>
+        private static ModString SurroundingWord(AdventureTerrainKind kind)
+        {
+            switch (kind)
+            {
+                case AdventureTerrainKind.AridTrees:
+                case AdventureTerrainKind.TemperateTrees:
+                    return ModStrings.Battlefield.SurroundingForest;
+                case AdventureTerrainKind.Mountain:
+                    return ModStrings.Battlefield.SurroundingMountains;
+                case AdventureTerrainKind.Water:
+                case AdventureTerrainKind.ShallowWater:
+                case AdventureTerrainKind.DeepWater:
+                case AdventureTerrainKind.WaterEdge:
+                    return ModStrings.Battlefield.SurroundingWater;
+                case AdventureTerrainKind.Wall:
+                    return ModStrings.Battlefield.SurroundingWalls;
+                case AdventureTerrainKind.Farmland:
+                    return ModStrings.Battlefield.SurroundingFarmland;
+                default:
+                    return ModStrings.Battlefield.SurroundingOpenLand;
+            }
         }
 
         /// <summary>

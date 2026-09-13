@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -107,6 +108,32 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual("Open ground with .", text);
             CollectionAssert.AreEqual(new[] { "{2,2}" }, reported);
+        }
+
+        /// <summary>What lies around the board is one sentence: one clause per kind of ground, the
+        /// directions it lies in gathered into it, and no directions at all when it is all around.
+        /// </summary>
+        [TestMethod]
+        public void TheSurroundingsAreOneSentenceGroupedByWhatLiesThere()
+        {
+            Assert.AreEqual(
+                "The battlefield is surrounded by forest to the west and north, mountains to the east.",
+                BattlefieldText.Surroundings(new BattlefieldSurroundings(
+                    AdventureTerrainKind.TemperateTrees,
+                    AdventureTerrainKind.AridTrees,
+                    AdventureTerrainKind.Mountain)));
+            Assert.AreEqual(
+                "The battlefield is surrounded by open land.",
+                BattlefieldText.Surroundings(new BattlefieldSurroundings(
+                    AdventureTerrainKind.Unknown,
+                    AdventureTerrainKind.Deforestation,
+                    AdventureTerrainKind.Obstruction)));
+            Assert.AreEqual(
+                "The battlefield is surrounded by water to the west, open land to the north and east.",
+                BattlefieldText.Surroundings(new BattlefieldSurroundings(
+                    AdventureTerrainKind.DeepWater,
+                    AdventureTerrainKind.Unknown,
+                    AdventureTerrainKind.Unknown)));
         }
 
         private const int ArleonTheme = 0;

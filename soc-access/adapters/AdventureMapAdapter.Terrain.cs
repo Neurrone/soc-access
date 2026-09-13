@@ -158,7 +158,7 @@ namespace SongsOfConquestAccess.Adapters
         /// a kind of ground, so it deliberately falls through to whatever is
         /// underneath it.
         /// </summary>
-        private static AdventureTerrainKind GetDecorationTerrain(byte decoration)
+        public static AdventureTerrainKind GetDecorationTerrain(byte decoration)
         {
             switch (decoration)
             {

@@ -276,13 +276,18 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>The authored description of this layout - the TERRAIN alone, unlabelled: where
-        /// each side started is behind the player once the fight is on.</summary>
+        /// each side started is behind the player once the fight is on - and then what lies around
+        /// the board, which the battle itself answers.</summary>
         private bool SpeakDescription()
         {
             SpeechPipeline.Output(new SpeechRequest(
                 _adapter == null
-                    ? BattlefieldText.SpokenTerrain(null, null, null)
-                    : BattlefieldText.SpokenTerrain(_adapter.BattlefieldKey, _adapter.GetTerrain(), _adapter.WarnUnknownRegion),
+                    ? BattlefieldText.SpokenCombat(null, null, null, null)
+                    : BattlefieldText.SpokenCombat(
+                        _adapter.BattlefieldKey,
+                        _adapter.GetTerrain(),
+                        _adapter.GetSurroundings(),
+                        _adapter.WarnUnknownRegion),
                 interrupt: false));
             return true;
         }

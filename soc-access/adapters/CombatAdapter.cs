@@ -231,6 +231,10 @@ namespace SongsOfConquestAccess.Adapters
         private BattlefieldTerrain _terrain;
         private object _terrainLevel;
         private bool _warnedUnknownRegion;
+        // The three adventure tiles this battle's scenery was built from, read once: a battle is
+        // fought in one place, and the miss is kept too so a battle without them costs one look.
+        private BattlefieldSurroundings _surroundings;
+        private bool _surroundingsProbed;
         // This frame's answer to "which enemies reach that tile", for the one tile it was asked
         // about. See BuildEnemyInfluenceSources.
         private List<CombatInfluenceSource> _influenceSources;
@@ -627,6 +631,51 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return _terrain;
+        }
+
+        /// <summary>What lies around the board: the west, north and east adventure tiles the game
+        /// sampled when it started this battle, as ground the mod has a meaning for. Null where the
+        /// battle carries none - a skirmish built from a seed rather than from a map.</summary>
+        public BattlefieldSurroundings GetSurroundings()
+        {
+            if (_surroundingsProbed)
+            {
+                return _surroundings;
+            }
+
+            _surroundingsProbed = true;
+            try
+            {
+                BattleSurroundings surroundings = _facade != null && _facade.Level != null
+                    ? _facade.Level.Surroundings
+                    : null;
+                if (surroundings != null && surroundings.isValid)
+                {
+                    _surroundings = new BattlefieldSurroundings(
+                        Surrounding(surroundings.west),
+                        Surrounding(surroundings.north),
+                        Surrounding(surroundings.east));
+                }
+            }
+            catch (Exception exception)
+            {
+                _faults.Report("GetSurroundings", exception);
+            }
+
+            return _surroundings;
+        }
+
+        /// <summary>One sampled tile as adventure ground: its decoration where it has one - the
+        /// game keeps only trees and mountains on these - and water otherwise.</summary>
+        private static AdventureTerrainKind Surrounding(BattleSurroundingTile tile)
+        {
+            AdventureTerrainKind decoration = AdventureMapAdapter.GetDecorationTerrain(tile.decoration);
+            if (decoration != AdventureTerrainKind.Unknown)
+            {
+                return decoration;
+            }
+
+            return tile.water > 0 ? AdventureTerrainKind.Water : AdventureTerrainKind.Unknown;
         }
 
         private List<BattlefieldCell> ReadTerrainCells()
