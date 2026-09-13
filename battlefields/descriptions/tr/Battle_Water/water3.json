@@ -1,0 +1,5 @@
+{
+  "terrain": "Açık arazi; sol üst boyunca {3,6}, sağ üst boyunca {8,6} var ve aralarındaki zemine yalnızca {6,5} üzerinden girilir. Savaş alanının altını solda {2,0}, ortada {8,0} ve ikisinin arasında {5,2} böler.",
+  "attacker": "Saldıranın çıkış noktaları sol üçte birlik bölüme yayılır.",
+  "defender": "Savunanın çıkış noktaları sağ üçte birlik bölüme yayılır."
+}

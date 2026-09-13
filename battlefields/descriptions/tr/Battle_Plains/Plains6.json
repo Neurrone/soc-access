@@ -1,0 +1,5 @@
+{
+  "terrain": "Savaş alanının tamamı boyunca düz arazi; sol altta {0,1}, ortada {6,3} ve sağ üstte {11,6} var.",
+  "attacker": "Saldıranın çıkış noktaları savaş alanının solu boyunca uzanır, biri {0,1} üzerindedir.",
+  "defender": "Savunanın çıkış noktaları savaş alanının sağı boyunca uzanır, biri {11,6} üzerindedir."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Solda açık arazi, sağdaki kasabayı ise savunan elinde tutar. Üst ortada bir kule, alt ortada bir kule daha durur; her birinin iki yanında birer hendek kesimi, kasaba tarafında ise yanlarında yukarı çıkan merdivenler vardır. Orta sağda ve sağ altta duvarlar durur.",
+  "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır.",
+  "defender": "Savunanın çıkış noktaları kasabaya yayılır; her kulede bir, duvarlarda dört tane vardır ve bunların ikisi kuşatma makinesi çıkış noktasıdır."
+}

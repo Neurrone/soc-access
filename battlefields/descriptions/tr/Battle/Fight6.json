@@ -1,0 +1,5 @@
+{
+  "terrain": "Ortada açık arazi; sol altta {1,1}, sağ altta {9,1}, sol üstte {1,6} ve sağ üstte {11,6} var. {3,3} ve {8,3} ortanın solunda ve sağında durur.",
+  "attacker": "Saldıranın çıkış noktaları savaş alanının ortasında toplanmıştır.",
+  "defender": "Savunanın çıkış noktaları saldıranınkileri çevreler; her köşede iki tane, alt ortada bir tane vardır."
+}

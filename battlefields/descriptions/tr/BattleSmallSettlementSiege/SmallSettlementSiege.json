@@ -1,0 +1,5 @@
+{
+  "terrain": "Solda açık arazi; savunanın kuleleri üst ortada ve alt ortada durur, her birine yanındaki kenardan merdivenler çıkar ve ortada, ikisinin arasında bir duvar vardır. Duvarın arkasında, orta sağda {9,5}, sağ altta {8,0} bulunur. Sol üst ve sağ üst köşeleri {0,6} ve {12,6} kapatır.",
+  "attacker": "Saldıranın çıkış noktaları sol üçte birlik bölüme, kulelerin dışındaki açık araziye yayılır.",
+  "defender": "Savunanın çıkış noktaları ortayı ve sağı doldurur; iki tanesi kulelerin, dört tanesi duvarın üzerindedir."
+}

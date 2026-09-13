@@ -1,0 +1,5 @@
+{
+  "terrain": "Sol üst köşeden alt ortaya bir hendek uzanır ve yalnızca ortadaki kapıdan, yani {5,4} üzerinden geçilir. Savunanın duvarları hendeğin sağında durur: biri üst kenar boyunca, sol ucundaki bir kule ile üst ortadaki bir başka kule arasında uzanır; kısa bir kesim, hendeğin her iki ucunda kasaba tarafındaki iki kulenin arasında kalır; bir başkası da iki kuleyle birlikte sağ alt köşeyi dolanır. Duvarlara sol üstte, üst ortada, sağ üstte, alt ortada ve sağ altta merdivenler çıkar.",
+  "attacker": "Saldıranın çıkış noktaları sol kenar boyunca, hendeğin dışındaki açık arazide uzanır.",
+  "defender": "Savunanın çıkış noktaları kasabaya yayılır, yedi tanesi kulelerin ve duvarların üzerindedir."
+}

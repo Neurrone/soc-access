@@ -1,0 +1,5 @@
+{
+  "terrain": "{0,0} savaş alanının tamamını kaplar; sol alttaki {2,2} ve orta soldaki {2,5} onu böler ve üst kenar boyunca bir şerit, alt kenar boyunca bir şerit ve ortada boydan boya bir şerit bırakır. Üst ve alt şeritler ortada sona erer, sağa yalnızca ortadaki şerit devam eder; orada kenarı {11,3} ve {11,5} ceplere böler.",
+  "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır.",
+  "defender": "Savunanın çıkış noktaları sağ üçte birlik bölüme yayılır, üç tanesi sağ kenara dayanır."
+}

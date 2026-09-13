@@ -1,0 +1,5 @@
+{
+  "terrain": "Açık arazi; savaş alanının ortasında boydan boya {5,2} var, üstünden ve altından geçilebilir. Sağ altta {8,0} yüzünden köşeye yalnızca {11,2} üzerinden girilir.",
+  "attacker": "Saldıranın çıkış noktaları sol kenar boyunca uzanır.",
+  "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır, iki tanesi {11,2} ötesindeki köşededir."
+}

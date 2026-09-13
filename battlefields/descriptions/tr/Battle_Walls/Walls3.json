@@ -1,0 +1,5 @@
+{
+  "terrain": "Düz arazi; sol alt köşede {0,0}, sağ altta {10,0} var. Uçurumlar ortanın üstünde savaş alanını boydan boya keser ve ötelerinde {3,6} ayrı kalır.",
+  "attacker": "Saldıranın çıkış noktaları sol üçte birlik bölüme yayılır ve iki tanesi {0,0} üzerinde durur.",
+  "defender": "Savunanın çıkış noktaları sağ üçte birlik bölüme yayılır ve üç tanesi {10,0} üzerinde durur."
+}

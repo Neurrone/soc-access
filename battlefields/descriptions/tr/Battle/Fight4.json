@@ -1,0 +1,5 @@
+{
+  "terrain": "Alt kenar boyunca açık arazi; sol üst köşeye {3,6}, sağ üst köşeye {10,6} tırmanır. {6,4} üstü doldurur ve savaş alanını sol ve sağ olmak üzere iki yarıya böler; bu iki yarı yalnızca alt ortada, {6,2} üzerinde birleşir.",
+  "attacker": "Saldıranın çıkış noktaları sol kenar boyunca, sol yarıda uzanır.",
+  "defender": "Savunanın çıkış noktaları sağ kenar boyunca uzanır, iki tanesi {10,6} üzerindedir."
+}

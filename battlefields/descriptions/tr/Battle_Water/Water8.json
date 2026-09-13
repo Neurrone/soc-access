@@ -1,0 +1,5 @@
+{
+  "terrain": "Açık araziyi alt ortada {4,1}, ortada {5,4} ve üst ortada {5,6} böler; yanlarından ortada, üst kenarda ve alt kenarda şeritler geçer. {3,4} ve {9,4} orta solda ve orta sağda durur.",
+  "attacker": "Saldıranın çıkış noktaları savaş alanının solu boyunca uzanır.",
+  "defender": "Savunanın çıkış noktaları savaş alanının sağı boyunca uzanır."
+}

@@ -1,0 +1,5 @@
+{
+  "terrain": "Açık arazi; sağ altta {10,0} var. Savunan üç kısa duvar kesimini elinde tutar: alt ortada arkasında duvar olan bir kule, üst ortada bir tane daha ve orta sağda iki duvarı olan bir kule. Her kulenin yanından merdivenler yukarı çıkar ve duvarlar birbirinden ayrı durur, aralarında açık arazi vardır.",
+  "attacker": "Saldıranın çıkış noktaları sol kenar boyunca, duvarların önündeki açık arazide uzanır.",
+  "defender": "Savunanın çıkış noktaları ortaya ve sağa yayılır, altı tanesi kulelerin ve duvarların üzerindedir."
+}
