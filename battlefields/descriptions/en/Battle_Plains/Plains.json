@@ -1,5 +1,5 @@
 {
-  "terrain": "Open ground across the board, with {4,1} and {7,1} near the bottom edge and {6,4} in the centre. {6,6} breaks the ground in the top centre.",
+  "terrain": "Open ground across the board, with {4,1} and {7,1} near the bottom edge and {6,4} in the centre. {5,7} breaks the ground in the top centre.",
   "attacker": "The attacker's spawn points run down the left edge, all of them on flat ground.",
   "defender": "The defender's spawn points run down the right edge, all of them on flat ground."
 }

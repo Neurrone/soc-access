@@ -1,5 +1,5 @@
 {
-  "terrain": "Open ground runs from the bottom edge to the top between {3,0} on the left and {8,0} on the right. {0,0} closes off the left edge and {12,2} the right.",
+  "terrain": "Open ground runs from the bottom edge to the top between {3,0} on the left and {8,0} on the right. The left edge is closed off by {1,0} and {0,3}, and the right by {12,2}.",
   "attacker": "The attacker's spawn points run across the top of the board, seven of them on {3,0}.",
   "defender": "The defender's spawn points fill the bottom right, ten of them on {8,0}."
 }

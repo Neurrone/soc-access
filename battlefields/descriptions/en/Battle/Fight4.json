@@ -1,5 +1,5 @@
 {
-  "terrain": "Open ground along the bottom, with {3,6} climbing into the top left corner and {10,6} into the top right. {6,4} fills the top and splits the board into a left half and a right half, which meet only at {6,2} in the bottom centre.",
+  "terrain": "Open ground along the bottom, with {3,6} climbing into the top left corner and {10,6} into the top right. The top is filled by {4,5}, and the left half and the right half of the board meet only at {5,2} in the bottom centre.",
   "attacker": "The attacker's spawn points run down the left edge, in the left half.",
   "defender": "The defender's spawn points run down the right edge, two of them on {10,6}."
 }

@@ -34,6 +34,12 @@ with its article ("a patch (height 2)", "a wall of bushes", "a choke point"), so
 sentence around one exactly as you would around "a patch". Any cell of a group works, and each
 group's `points` lists them all, but prefer the group's own `placeholder`.
 
+An impassable group's phrase is decided by the fight, and it may be singular ("a torch", "water")
+or plural ("bushes", "impassable cells"), so never make such a placeholder the subject of a verb
+that has to agree with it: write "The top is filled by {4,5}" or "with {4,5} across the top",
+never "{4,5} fills the top". Elevated groups, choke points and siege structures always expand
+singular and may be subjects.
+
 Cliffs are the one exception: a board usually has several and they are all the same thing, so
 name them in words - "Cliffs at the bottom left and top right" - and use no placeholder.
 

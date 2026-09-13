@@ -1,5 +1,5 @@
 {
-  "terrain": "Open ground across the centre and right, with {4,4} in the centre and {11,3} at the middle right, and cliffs at the top left and the top centre. {0,0} fills the bottom left and runs up the left edge, reached only through {5,3}, and {9,6} closes most of the top edge.",
+  "terrain": "Open ground across the centre and right, with {4,4} in the centre and {11,3} at the middle right, and cliffs at the top left and the top centre. {0,0} fills the bottom left and runs up the left edge, reached only through {5,3}, and {5,8} and {9,6} close most of the top edge.",
   "attacker": "The attacker's spawn points spread across the left of the board, one of them on {0,0} and one on {4,4}.",
   "defender": "The defender's spawn points spread across the right of the board, all of them on open ground."
 }
