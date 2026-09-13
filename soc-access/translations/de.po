@@ -4075,7 +4075,7 @@ msgstr "unpassierbar, {0} Felder"
 #. Scanner.TerrainImpassableWall_0
 msgctxt "Scanner.TerrainImpassableWall_0"
 msgid "wall of {0} impassable cell"
-msgstr "Mauer aus {0} unpassierbaren Feld"
+msgstr "Mauer aus {0} unpassierbarem Feld"
 
 #. Scanner.TerrainImpassableWall_1
 msgctxt "Scanner.TerrainImpassableWall_1"
