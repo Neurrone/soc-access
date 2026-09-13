@@ -50,6 +50,26 @@ namespace SongsOfConquestAccess.Tests
                 ImpassableGroup(ArleonTheme, "......", "GGGGBB", "......"));
         }
 
+        /// <summary>Water and fire are not counted and not built with: a line of either is what it
+        /// is and not a wall of it, in a description and in the scanner alike. A group that mixes
+        /// them with something countable is a wall of the list, as any other mixed group is.
+        /// </summary>
+        [TestMethod]
+        public void WaterAndFireAreNeverAWallOfThemselves()
+        {
+            Assert.AreEqual("water", Expand("{0,1}", Analyse(ArleonTheme, true, ".....", "WWWWW", ".....")));
+            Assert.AreEqual("fire", Expand("{0,1}", Analyse(ArleonTheme, true, ".....", "FFFFF", ".....")));
+            Assert.AreEqual("water, 5 cells, impassable", ImpassableGroup(ArleonTheme, ".....", "WWWWW", "....."));
+            Assert.AreEqual("fire, 5 cells, impassable", ImpassableGroup(ArleonTheme, ".....", "FFFFF", "....."));
+
+            Assert.AreEqual(
+                "a wall of water and boulders",
+                Expand("{0,1}", Analyse(ArleonTheme, true, "......", "WWWWBB", "......")));
+            Assert.AreEqual(
+                "wall of 6 water and boulders, impassable",
+                ImpassableGroup(ArleonTheme, "......", "WWWWBB", "......"));
+        }
+
         /// <summary>An obstacle nobody has a word for - an unnamed decoration byte, a prop standing
         /// on its own - is impassable ground and nothing more, even in a fight.</summary>
         [TestMethod]

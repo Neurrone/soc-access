@@ -43,7 +43,9 @@ What matters, in order:
    elevation differs by at most one, so a region that is mentioned is climbable by definition;
    never say what height it rises from, and never say its height at all - the placeholder says
    it. Elevated ground gives troops on it an advantage against troops below, which the player
-   knows, so never say what it is good for.
+   knows, so never say what it is good for. A board can carry eight or ten single raised cells,
+   each a placeholder that expands to the same phrase; name only the ones near where the
+   fighting starts, not all of them.
 2. Cliffs: cells nothing can enter because every step onto them is two or more heights. Say
    that there are cliffs and where, nothing more.
 3. Unreachable ground: flat cells sealed off by cliffs or impassable cells that no troop can

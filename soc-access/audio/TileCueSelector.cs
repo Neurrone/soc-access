@@ -131,9 +131,10 @@ namespace SongsOfConquestAccess.Audio
             // cannot walk onto, which is every tile a troop or an attackable thing stands on, and a
             // board of obstacles is a board the cue cannot tell apart; the readout names whoever is
             // standing there, and the ground under them sounds like ground. A cliff thuds too:
-            // nothing can step onto it, which is the whole of what the thud means. A wall, a tower
-            // and a flight of stairs are walked on and keep their elevation cue.
-            if (tile.IsImpassable || tile.Kind == BattlefieldCellKind.Cliff)
+            // nothing can step onto it, which is the whole of what the thud means, and unreachable
+            // ground thuds for the same reason - it is walkable and no troop will ever be on it. A
+            // wall, a tower and a flight of stairs are walked on and keep their elevation cue.
+            if (tile.IsImpassable || IsOutOfReach(tile.Kind))
             {
                 AddElevatedGround(cues, elevation);
                 cues.Add(new TileCue(CueLibrary.TerrainImpassable, 0f, followsPrevious: elevation != null));
@@ -162,7 +163,7 @@ namespace SongsOfConquestAccess.Audio
                 return cues;
             }
 
-            if (tile.IsImpassable || tile.EntityId >= 0 || tile.Kind == BattlefieldCellKind.Cliff)
+            if (tile.IsImpassable || tile.EntityId >= 0 || IsOutOfReach(tile.Kind))
             {
                 AddElevatedGround(cues, elevation);
                 cues.Add(new TileCue(CueLibrary.TerrainImpassable, 0f, followsPrevious: elevation != null));
@@ -187,6 +188,14 @@ namespace SongsOfConquestAccess.Audio
                 default:
                     return CueLibrary.HexElevation3;
             }
+        }
+
+        /// <summary>Ground a troop can walk on and can never be standing on: a cliff, which every
+        /// step onto is two heights or more, and a pocket sealed off from the board. Both sound
+        /// like the blocked ground they are, since that is all the thud claims.</summary>
+        private static bool IsOutOfReach(BattlefieldCellKind kind)
+        {
+            return kind == BattlefieldCellKind.Cliff || kind == BattlefieldCellKind.Unreachable;
         }
 
         /// <summary>The warning leads and the rest of the tile serializes behind it, so the danger

@@ -289,9 +289,33 @@ namespace SongsOfConquestAccess.UI
                     : ModStrings.Battlefield.DescriptionImpassableCells);
             }
 
-            return region.IsRidge
+            return region.IsRidge && !IsUncountable(region.Obstacles)
                 ? ModText.Get(ModStrings.Battlefield.DescriptionObstacleWall, words)
                 : words;
+        }
+
+        /// <summary>Whether a group is nothing but stuff there is no counting and no building
+        /// with: water and fire. "A wall of water" and "wall of 5 water" are not English, so a
+        /// group of them is named by what it is whatever shape it lies in - a moat is water, a
+        /// burning line is fire. A group that mixes them with something countable is a list of
+        /// what is on it, walls and all.</summary>
+        private static bool IsUncountable(List<BattlefieldObstacle> obstacles)
+        {
+            if (obstacles == null || obstacles.Count == 0)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < obstacles.Count; i++)
+            {
+                if (obstacles[i].Kind != BattlefieldObstacleKind.Water
+                    && obstacles[i].Kind != BattlefieldObstacleKind.Fire)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static void Unknown(Action<string> onUnknownRegion, string placeholder)
@@ -381,7 +405,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             return ModText.Plural(
-                region.IsRidge
+                region.IsRidge && !IsUncountable(region.Obstacles)
                     ? ModStrings.Scanner.TerrainObstacleWall
                     : ModStrings.Scanner.TerrainObstacleCells,
                 region.Count,
