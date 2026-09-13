@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Lavapotion.Networking;
 using Newtonsoft.Json;
+using SongsOfConquest;
 using SongsOfConquest.Client.Gamestate;
+using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
+using SongsOfConquest.Common.Map;
 using SongsOfConquestAccess.Loader.Dev;
 using UnityEngine;
 using Zenject;
@@ -44,6 +48,20 @@ namespace SongsOfConquestAccess.Dev
                     {
                         json.WritePropertyName("error");
                         json.WriteValue("no adventure scene is up");
+                        json.WriteEndObject();
+                        return;
+                    }
+
+                    // A deprecated blueprint (every Arleon*Hostile, 37 to 39 and 56 to 64, carries a
+                    // DeprecatedComponent) makes the game's own registration throw a null reference
+                    // inside AbstractMapEntityManager.InitializeEntity and leaves a half-registered
+                    // server entity the client never sees (2026-09-13). Refused up front: 68 Hostile
+                    // and 69 RandomHostile are the current hostile blueprints.
+                    string deprecated = DeprecatedBlueprint(blueprintId);
+                    if (deprecated != null)
+                    {
+                        json.WritePropertyName("error");
+                        json.WriteValue(deprecated);
                         json.WriteEndObject();
                         return;
                     }
@@ -93,8 +111,124 @@ namespace SongsOfConquestAccess.Dev
             }
             catch (Exception e)
             {
-                return DevJson.Error(e.Message);
+                // The whole trace, not the message: a throw inside the game's own spawn path (its
+                // component initialisation, 2026-09-13) is only diagnosable from where it came from.
+                return DevJson.Error(e.ToString());
             }
+        }
+
+        /// <summary>The game's own spawn path one call at a time, for a blueprint SpawnAt reports a
+        /// throw for: which server component is null or throws in Initialize or LateInitialize.
+        /// Registers no entity, but a component's Initialize has the game's own side effects: a
+        /// hostile's creates its commander on the tile, so run it on a scratch save.</summary>
+        public static string SpawnDiagnose(int blueprintId, int x, int y)
+        {
+            try
+            {
+                IGame game = ResolveFromScenes<IGame>();
+                if (game == null)
+                {
+                    return DevJson.Error("no game");
+                }
+
+                DiContainer server = game.server.Context.Container;
+                SongsOfConquest.Server.Gamestate.IServerAdventureFacade facade = server.TryResolve<SongsOfConquest.Server.Gamestate.IServerAdventureFacade>();
+                IMapEntityManifestRetriever manifests = server.TryResolve<IMapEntityManifestRetriever>();
+                if (facade == null || manifests == null)
+                {
+                    return DevJson.Error("server container lacks the adventure facade or the manifest retriever");
+                }
+
+                // The manager's own container and manifest, as its Add uses, not the server root.
+                object manager = facade.MapEntities.GetType()
+                    .GetField("_entityManager", BindingFlags.NonPublic | BindingFlags.Instance)
+                    .GetValue(facade.MapEntities);
+                Type managerType = manager != null ? manager.GetType() : null;
+                DiContainer managerContainer = manager != null
+                    ? managerType.GetProperty("Container", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(manager, null) as DiContainer
+                    : null;
+                object categories = manager != null
+                    ? managerType.BaseType.GetField("_entityCategories", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(manager)
+                    : null;
+                IMapEntityBlueprint blueprint = manifests.GetAdventureBlueprint((AdventureMapEntities)blueprintId);
+                IMapEntityState state = facade.MapEntities.CreateState(new MapEntityFormat((byte)x, (byte)y, (ushort)blueprintId, null), -1);
+                IMapEntity entity = blueprint.CreateServerEntity(state, managerContainer ?? server);
+                string categoryKnown = "unknown";
+                if (categories != null)
+                {
+                    System.Collections.IDictionary dictionary = categories as System.Collections.IDictionary;
+                    categoryKnown = dictionary != null ? dictionary.Contains(entity.Category).ToString() : categories.GetType().Name;
+                }
+
+                IAIMapEntity aiEntity = blueprint.CreateAIEntity(state, managerContainer ?? server);
+                List<object> components = new List<object>();
+                for (int i = 0; i < entity.AllComponents.Length; i++)
+                {
+                    IMapEntityComponent component = entity.AllComponents[i];
+                    string initialize = null;
+                    string late = null;
+                    if (component != null)
+                    {
+                        try { component.Initialize(); } catch (Exception e) { initialize = e.ToString(); }
+                        try { component.LateInitialize(); } catch (Exception e) { late = e.ToString(); }
+                    }
+
+                    components.Add(new
+                    {
+                        index = i,
+                        type = component != null ? component.GetType().Name : null,
+                        initializeThrew = initialize,
+                        lateInitializeThrew = late
+                    });
+                }
+
+                return Newtonsoft.Json.JsonConvert.SerializeObject(new
+                {
+                    blueprint = blueprintId,
+                    name = ((AdventureMapEntities)blueprintId).ToString(),
+                    category = entity.Category.ToString(),
+                    categoryKnownToManager = categoryKnown,
+                    managerContainer = managerContainer != null,
+                    aiComponents = aiEntity != null && aiEntity.AllComponents != null ? aiEntity.AllComponents.Length : -1,
+                    components
+                });
+            }
+            catch (Exception e)
+            {
+                return DevJson.Error(e.ToString());
+            }
+        }
+
+        /// <summary>The refusal for a blueprint carrying the game's DeprecatedComponent, or null.</summary>
+        private static string DeprecatedBlueprint(int blueprintId)
+        {
+            IMapEntityManifestRetriever manifests = ProjectContext.Instance == null
+                ? null
+                : ProjectContext.Instance.Container.TryResolve<IMapEntityManifestRetriever>();
+            IMapEntityBlueprint blueprint = null;
+            try
+            {
+                blueprint = manifests != null ? manifests.GetAdventureBlueprint((AdventureMapEntities)blueprintId) : null;
+            }
+            catch (Exception)
+            {
+            }
+
+            if (blueprint == null || blueprint.AllComponents == null)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < blueprint.AllComponents.Length; i++)
+            {
+                if (blueprint.AllComponents[i] is DeprecatedComponent)
+                {
+                    return "blueprint " + blueprintId + " " + (AdventureMapEntities)blueprintId
+                        + " is deprecated and the game's registration throws for it; use 68 Hostile or 69 RandomHostile";
+                }
+            }
+
+            return null;
         }
 
         /// <summary>What stops a map entity from covering a tile, or null when nothing does.</summary>

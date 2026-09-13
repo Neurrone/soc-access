@@ -373,9 +373,14 @@ Filled in as the loop is used; keep entries to one line each with the date.
   at all - a two-tile market spawned on the road between the build sites and Gravekeep's
   entrance (`GetInteractionPoints(82)`: 74..76,49) boxed the wielder in silently, which
   `DevProbe.TilesAround` showed and the walk did not.
-- 2026-09-08: a battle from the REPL. A hostile army spawns with `DevFixtures.SpawnAt(37, x, y)`
-  (blueprint 37 is `MapEntities/Hostile/Arleon/Easy`; the call answers a null-reference error
-  text but the entity lands, and 69 `RandomHostile` reports the tile blocked by it). The map's
+- 2026-09-08: a battle from the REPL. A hostile army spawns with `DevFixtures.SpawnAt(69, x, y)`
+  (blueprint 69 is `RandomHostile`; 68 `Hostile` is the other current one. Blueprint 37
+  `ArleonHostileEasy` and every other `Arleon*Hostile`, 37 to 39 and 56 to 64, carry the game's
+  `DeprecatedComponent`: the game's own registration throws a null reference for them and
+  leaves a half-registered server entity the client never sees, which is why 37 once looked as
+  if it "landed" while the next spawn on the tile was refused. `SpawnAt` refuses them up front,
+  2026-09-13, and `DevFixtures.SpawnDiagnose(blueprint, x, y)` walks the creation path one
+  component at a time for any other throw). The map's
   Enter on the army did nothing here; `game.server.Commands.ProcessServerRequest(new
   SongsOfConquest.Common.Adventure.AttackCommanderCommand.Request(attackerId, defenderId))`
   (`game` from `DevFixtures.ResolveFromScenes<Lavapotion.Networking.IGame>()`, the defender from
