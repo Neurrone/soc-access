@@ -625,9 +625,16 @@ namespace SongsOfConquestAccess.UI.Graph
 
         // One side of a seam indexed by the column each node sits in, or null when the nodes are not a
         // set of columns at all — a bar of ordinary controls, every one of them column 0, where pairing
-        // by column would be pairing everything with the first thing. Both conditions are needed: the
-        // columns must be distinct (a duplicate means the stamp is not a column number here) and at
-        // least one must be non-zero (a lone control, or a run of plain nodes, is column 0 by default).
+        // by column would be pairing everything with the first thing. That is the only disqualifier: at
+        // least one column must be non-zero (a lone control, or a run of plain nodes, is column 0 by
+        // default).
+        //
+        // A column seen twice is NOT a disqualifier, because a cell read as several pieces stamps every
+        // piece with the cell's own column (<see cref="GraphSheet"/>'s EmitCell) so that Up/Down still
+        // pair by column. The FIRST node of a column is the one kept: entering the column from the other
+        // side of the seam should land on the cell's own words, not on the last fragment of it. (A run
+        // that returned null here instead sent every heading's Down edge to the run's first node — so a
+        // table whose first row split a cell into pieces answered every heading with the row's name.)
         private static Dictionary<int, ControlId> ByColumn(List<GraphNode> nodes)
         {
             Dictionary<int, ControlId> map = new Dictionary<int, ControlId>(nodes.Count);
@@ -635,9 +642,8 @@ namespace SongsOfConquestAccess.UI.Graph
             foreach (GraphNode node in nodes)
             {
                 int column = node.Vtable != null ? node.Vtable.Column : 0;
-                if (map.ContainsKey(column)) return null;
                 if (column != 0) columned = true;
-                map.Add(column, node.Id);
+                if (!map.ContainsKey(column)) map.Add(column, node.Id);
             }
 
             return columned ? map : null;

@@ -374,6 +374,28 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("c2", DestKey(Node(r, "h2"), GraphDir.Down));
         }
 
+        /// <summary>A cell read as several pieces stamps every piece with the cell's own column, so a
+        /// column can appear twice on the raw side. The seam still pairs by column, and it lands on the
+        /// first node of the column — the cell's own words, not a fragment of it.</summary>
+        [TestMethod]
+        public void ARepeatedColumnStillPairsAndLandsOnTheCellItself()
+        {
+            GraphBuilder b = new GraphBuilder();
+            b.StartRow(positions: false)
+                .AddItem(new SyntheticNode(Id("h0"), Col("Name", 0)))
+                .AddItem(new SyntheticNode(Id("h1"), Col("Win condition", 1)))
+                .AddItem(new SyntheticNode(Id("h2"), Col("Players", 2)))
+                .EndRow();
+            b.AddNode(new SyntheticNode(Id("c0"), Col("Aftermath", 0)))
+                .AddNode(new SyntheticNode(Id("c1"), Col("Defeat all wielders", 1)))
+                .AddNode(new SyntheticNode(Id("c1b"), Col("Hold the capital", 1)))
+                .AddNode(new SyntheticNode(Id("c2"), Col("4", 2)));
+            GraphRender r = b.Build();
+            Assert.AreEqual("c0", DestKey(Node(r, "h0"), GraphDir.Down));
+            Assert.AreEqual("c1", DestKey(Node(r, "h1"), GraphDir.Down));
+            Assert.AreEqual("c2", DestKey(Node(r, "h2"), GraphDir.Down));
+        }
+
         /// <summary>Sparse rows exist: a column the first row does not draw has no cell to land on, and
         /// that heading falls back to the row's primary rather than dead-ending.</summary>
         [TestMethod]
