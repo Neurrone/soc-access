@@ -60,6 +60,17 @@ Rewrote the UI to modern mod standards to provide the following features:
 - A refused move, such as bumping the map edge or a skip that finds nothing, now plays a falling bonk sound
 - Added an [Audio chapter](audio.md) to the documentation consolidating all sound features in one place
 
+### Combat
+
+- Buffs, debuffs and restrictions (invulnerable, reloading, magic immunity) are now indicated for troops on the combat grid and in scanner results
+- Improve reliability for reading and display of attack previews and troop tooltips
+- Removed confusing "blocked" indicator which was shown on occupied tiles because they had an infinite travel cost. Impassable terrain is still indicated
+- All 69 possible Battlefields in troop deployment and combat now have AI written descriptions grounded by features deterministically computed from the terrain geometry. For example, it recognizes a ridge of elevated terrain. `Ctrl+D` speaks these descriptions
+- Decorations on battlefield tiles are now read, so a tile that previously just read as "impassable" could read as "gatepost, impassable". This helps with orientation and adds to the ambience of the game.
+- An impassable tile no longer speaks a height. This fixes bugs like "Elevated ground, height 3, impassable" which now reads as "Gatepost, impassable"
+- Choke points are now indicated
+- Updated the scanner to take advantage of this new information. The terrain category lists one item per feature - diagonal ridge of 7 cells, height 1, patch of 12 cells, height 2, cliff of 3 cells
+
 ## V0.7.4
 
 - Fixed tiles no longer being announced when returning to them after passing over tiles that announce nothing, which could happen when announcement elements such as coordinates and terrain are disabled
