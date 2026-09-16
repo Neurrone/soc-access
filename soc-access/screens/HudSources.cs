@@ -38,17 +38,15 @@ namespace SongsOfConquestAccess.Screens
             AccessTools.FieldRefAccess<AdventurePlayerMenu, GiftTownPopup>("_giftTownPopup");
         private static readonly AccessTools.FieldRef<AdventureSpellbookOpener, SpellBook> SpellBookRef =
             AccessTools.FieldRefAccess<AdventureSpellbookOpener, SpellBook>("_spellBook");
-        private static readonly AccessTools.FieldRef<TroopHUD, TroopHUDEntryMovable> MovableTroopRef =
-            AccessTools.FieldRefAccess<TroopHUD, TroopHUDEntryMovable>("_movableHudTroop");
 
         /// <summary>The kingdom HUD: the research, troop overview, building overview and player
         /// menus, and the marketplace on its settings.</summary>
         public static readonly ScreenSource<KingdomInformationHUD> Kingdom =
             ScreenSource<KingdomInformationHUD>.FromSubContainer(LoadedScenes.AdventureScene);
 
-        /// <summary>The commander HUD's settings: the wielder sheet, the spellbook's opener and the
-        /// troop HUD whose drag popup this is. The SETTINGS rather than the HUD, because they are
-        /// bound plainly and the HUD holds nothing else the mod reads.</summary>
+        /// <summary>The commander HUD's settings: the wielder sheet and the spellbook's opener. The
+        /// SETTINGS rather than the HUD, because they are bound plainly and the HUD holds nothing
+        /// else the mod reads.</summary>
         public static readonly ScreenSource<CommanderHUD.Settings> Commander =
             ScreenSource<CommanderHUD.Settings>.FromSubContainer(LoadedScenes.AdventureScene);
 
@@ -96,15 +94,6 @@ namespace SongsOfConquestAccess.Screens
         {
             AdventureSpellbookOpener opener = settings.SpellbookOpener;
             return opener == null ? null : SpellBookRef(opener);
-        }
-
-        /// <summary>The commander HUD's own troop drag popup. The game draws several
-        /// <c>TroopHUD</c>s (the settlement's, the trade menu's); this is the one the map's HUD
-        /// owns, and the only one the map's drag opens.</summary>
-        public static TroopHUDEntryMovable MovableTroop(CommanderHUD.Settings settings)
-        {
-            TroopHUD hud = settings.TroopHUD;
-            return hud == null ? null : MovableTroopRef(hud);
         }
     }
 }

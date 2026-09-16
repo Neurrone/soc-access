@@ -38,15 +38,14 @@ namespace SongsOfConquestAccess.Screens
         /// sliders established.</summary>
         private const int CoarseSteps = 10;
 
-        /// <summary>The commander HUD's own troop rows hold the drag popup
-        /// (<see cref="HudSources"/>). Several <c>TroopHUD</c>s exist - the settlement's, the trade
-        /// menu's - and only this one's drag opens from the map.</summary>
-        private readonly ScreenSource<TroopHUDEntryMovable> _source =
-            ScreenSource<TroopHUDEntryMovable>.FromOwner(HudSources.Commander, HudSources.MovableTroop);
-
+        /// <summary>Whichever bar's ghost is deciding, read off the game's input manager every frame
+        /// (<see cref="MoveTroopPopupAdapter.FindDeciding"/>): every troop bar has a ghost of its own
+        /// and the drop opens the popup on the ghost of the bar it landed on, so watching the
+        /// commander HUD's alone missed every drop on a wielder band, the settlement's bar and the
+        /// rest.</summary>
         protected override object ResolveMenu()
         {
-            return _source.Current;
+            return MoveTroopPopupAdapter.FindDeciding();
         }
 
         protected override MoveTroopPopupAdapter Adapt(object menu)

@@ -4,6 +4,7 @@ using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure.UI;
+using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
@@ -31,6 +32,9 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo HandleSliderChangedMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "HandleSliderChanged");
         private static readonly MethodInfo HandleSliderPointerUpMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "HandleSliderPointerUp");
 
+        private static readonly AccessTools.FieldRef<AbstractInputManager, Dictionary<InputLevel, List<IInputEventCallback>>> CallbacksRef =
+            AccessTools.FieldRefAccess<AbstractInputManager, Dictionary<InputLevel, List<IInputEventCallback>>>("_callbacks");
+
         private readonly TroopHUDEntryMovable _movable;
         private readonly ILocalizationHandler _localization;
 
@@ -38,6 +42,38 @@ namespace SongsOfConquestAccess.Adapters
         {
             _movable = movable;
             _localization = Reflect.Get<ILocalizationHandler>(_movable, LocalizationField);
+        }
+
+        /// <summary>
+        /// The drag ghost whose split popup is open, or null. EVERY troop bar the game draws has a
+        /// ghost of its own (<c>TroopHUD._movableHudTroop</c>): the commander HUD's, a wielder band's
+        /// header bar, the settlement's, the trade menu's two, the defence menu's; a drop opens the
+        /// popup on the ghost of the bar it landed on, and a ghost is woken and put back without the
+        /// scene set changing, so no scene-keyed source can answer this. The game's own record is
+        /// read instead: <c>DecideAmount</c> registers the ghost's split hotkey on the input manager
+        /// at <c>InputLevel.PopupInPopup</c> and <c>Reset</c> unregisters it, so the one ghost on that
+        /// list is the one deciding. A short list, walked once per frame.
+        /// </summary>
+        public static TroopHUDEntryMovable FindDeciding()
+        {
+            AbstractInputManager inputManager = InputManagerStaticAccessUnsafe.Current as AbstractInputManager;
+            Dictionary<InputLevel, List<IInputEventCallback>> callbacks = inputManager == null ? null : CallbacksRef(inputManager);
+            List<IInputEventCallback> popup;
+            if (callbacks == null || !callbacks.TryGetValue(InputLevel.PopupInPopup, out popup))
+            {
+                return null;
+            }
+
+            for (int i = 0; i < popup.Count; i++)
+            {
+                TroopHUDEntryMovable movable = popup[i].CallbackTarget as TroopHUDEntryMovable;
+                if (movable != null)
+                {
+                    return movable;
+                }
+            }
+
+            return null;
         }
 
         public object SourceKey
