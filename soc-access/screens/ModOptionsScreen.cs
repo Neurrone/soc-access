@@ -431,9 +431,13 @@ namespace SongsOfConquestAccess.Screens
             // Off a game there is no file to name: the import and the folder are all this page is.
             if (identity != null)
             {
-                _dialog.AddText(hasFile
-                    ? ModText.Get(ModStrings.Screens.BookmarksSavedTo, store.GetPath(identity))
-                    : ModText.Get(ModStrings.Screens.NoBookmarksForThisGame));
+                // A line of its own: where the file is, or that there is none, is not the name of
+                // the buttons under it.
+                _dialog.AddText(
+                    hasFile
+                        ? ModText.Get(ModStrings.Screens.BookmarksSavedTo, store.GetPath(identity))
+                        : ModText.Get(ModStrings.Screens.NoBookmarksForThisGame),
+                    standalone: true);
             }
 
             if (hasFile)
@@ -500,19 +504,33 @@ namespace SongsOfConquestAccess.Screens
                     message = ModText.Get(ModStrings.Screens.BookmarksNotWritten);
                     break;
                 default:
-                    message = ModText.Plural(
-                        result.Identity.SameStorageAs(GameBeingPlayed())
-                            ? ModStrings.Screens.BookmarksImported
-                            : ModStrings.Screens.BookmarksImportedForOtherGame,
-                        result.Count,
-                        result.Count);
+                    // Which game the file belongs to is the store's business; whether that game is
+                    // the one on the screen, and so which of the three answers this is, is the
+                    // tab's.
+                    AdventureBookmarkGameIdentity playing = GameBeingPlayed();
+                    ModPluralString imported;
+                    if (playing == null)
+                    {
+                        imported = ModStrings.Screens.BookmarksImportedForLaterGame;
+                    }
+                    else if (result.Identity.SameStorageAs(playing))
+                    {
+                        imported = ModStrings.Screens.BookmarksImported;
+                    }
+                    else
+                    {
+                        imported = ModStrings.Screens.BookmarksImportedForOtherGame;
+                    }
+
+                    message = ModText.Plural(imported, result.Count, result.Count);
                     break;
             }
 
             ModOptionsDialogs.OpenMessage(
                 "mod-bookmarks-import",
                 ModText.Get(ModStrings.Screens.ImportBookmarksFromClipboard),
-                message);
+                message,
+                standaloneMessage: true);
         }
 
         /// <summary>Hand the folder to the desktop. Verified on Windows, where the file manager opens

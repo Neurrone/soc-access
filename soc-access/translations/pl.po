@@ -3866,6 +3866,21 @@ msgctxt "Screens.BookmarksImportedForOtherGame_2"
 msgid "Imported {0} bookmarks for a different game than the one being played"
 msgstr "Zaimportowano {0} zakładek dla gry innej niż obecnie rozgrywana"
 
+#. Screens.BookmarksImportedForLaterGame_0
+msgctxt "Screens.BookmarksImportedForLaterGame_0"
+msgid "Imported {0} bookmark. It will be used when that game is played."
+msgstr "Zaimportowano {0} zakładkę. Zostanie użyta, gdy ta gra będzie rozgrywana."
+
+#. Screens.BookmarksImportedForLaterGame_1
+msgctxt "Screens.BookmarksImportedForLaterGame_1"
+msgid "Imported {0} bookmarks. They will be used when that game is played."
+msgstr "Zaimportowano {0} zakładki. Zostaną użyte, gdy ta gra będzie rozgrywana."
+
+#. Screens.BookmarksImportedForLaterGame_2
+msgctxt "Screens.BookmarksImportedForLaterGame_2"
+msgid "Imported {0} bookmarks. They will be used when that game is played."
+msgstr "Zaimportowano {0} zakładek. Zostaną użyte, gdy ta gra będzie rozgrywana."
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"

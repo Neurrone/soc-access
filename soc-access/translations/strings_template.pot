@@ -5029,6 +5029,21 @@ msgctxt "Screens.BookmarksImportedForOtherGame_2"
 msgid "Imported {0} bookmarks for a different game than the one being played"
 msgstr ""
 
+#. Screens.BookmarksImportedForLaterGame_0
+msgctxt "Screens.BookmarksImportedForLaterGame_0"
+msgid "Imported {0} bookmark. It will be used when that game is played."
+msgstr ""
+
+#. Screens.BookmarksImportedForLaterGame_1
+msgctxt "Screens.BookmarksImportedForLaterGame_1"
+msgid "Imported {0} bookmarks. They will be used when that game is played."
+msgstr ""
+
+#. Screens.BookmarksImportedForLaterGame_2
+msgctxt "Screens.BookmarksImportedForLaterGame_2"
+msgid "Imported {0} bookmarks. They will be used when that game is played."
+msgstr ""
+
 #. Screens.SelectedSubcategoryCount_0
 msgctxt "Screens.SelectedSubcategoryCount_0"
 msgid "{0} selected"

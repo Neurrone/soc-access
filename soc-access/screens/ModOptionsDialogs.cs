@@ -552,7 +552,10 @@ namespace SongsOfConquestAccess.Screens
         /// and none of them changes anything. A refusal is drawn this way, and so is the answer the
         /// Bookmarks tab's import gives.
         /// </summary>
-        public static void OpenMessage(string key, string title, string message)
+        /// <param name="standaloneMessage">Whether the message is a row of its own, landed on above
+        /// the button, rather than the button's region. The import's answer is read that way: it is
+        /// a sentence about what happened and not a name for OK.</param>
+        public static void OpenMessage(string key, string title, string message, bool standaloneMessage = false)
         {
             ModDialogScreen.Open(
                 key,
@@ -560,7 +563,7 @@ namespace SongsOfConquestAccess.Screens
                 screen =>
                 {
                     ModDialog dialog = screen.Dialog;
-                    dialog.AddText(message);
+                    dialog.AddText(message, standaloneMessage);
                     dialog.AddButton(
                         GameText.Get("Common/Ok", ModText.Get(ModStrings.Screens.Ok)),
                         () => screen.Close());

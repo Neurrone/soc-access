@@ -3866,6 +3866,21 @@ msgctxt "Screens.BookmarksImportedForOtherGame_2"
 msgid "Imported {0} bookmarks for a different game than the one being played"
 msgstr "Импортировано {0} закладок для другой игры, а не для текущей"
 
+#. Screens.BookmarksImportedForLaterGame_0
+msgctxt "Screens.BookmarksImportedForLaterGame_0"
+msgid "Imported {0} bookmark. It will be used when that game is played."
+msgstr "Импортирована {0} закладка. Она будет использована, когда вы будете играть в эту игру."
+
+#. Screens.BookmarksImportedForLaterGame_1
+msgctxt "Screens.BookmarksImportedForLaterGame_1"
+msgid "Imported {0} bookmarks. They will be used when that game is played."
+msgstr "Импортировано {0} закладки. Они будут использованы, когда вы будете играть в эту игру."
+
+#. Screens.BookmarksImportedForLaterGame_2
+msgctxt "Screens.BookmarksImportedForLaterGame_2"
+msgid "Imported {0} bookmarks. They will be used when that game is played."
+msgstr "Импортировано {0} закладок. Они будут использованы, когда вы будете играть в эту игру."
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"

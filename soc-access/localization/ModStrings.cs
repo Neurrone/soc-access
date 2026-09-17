@@ -819,6 +819,9 @@
             public static readonly ModPluralString BookmarksImported = new ModPluralString("Screens.BookmarksImported", "Imported {0} bookmark for this game", "Imported {0} bookmarks for this game");
             /// <summary>And when it belongs to another game, which is allowed and worth saying.</summary>
             public static readonly ModPluralString BookmarksImportedForOtherGame = new ModPluralString("Screens.BookmarksImportedForOtherGame", "Imported {0} bookmark for a different game than the one being played", "Imported {0} bookmarks for a different game than the one being played");
+            /// <summary>And when no game is being played at all, so there is nothing for the file to
+            /// differ from: it waits for the game it was written for.</summary>
+            public static readonly ModPluralString BookmarksImportedForLaterGame = new ModPluralString("Screens.BookmarksImportedForLaterGame", "Imported {0} bookmark. It will be used when that game is played.", "Imported {0} bookmarks. They will be used when that game is played.");
             /// <summary>The Keybinds tab region for the battle hex-grid gestures.</summary>
             public static readonly ModString HexGrid = new ModString("Screens.HexGrid", "Hex grid");
             /// <summary>The Help tab: the three places to read about the mod, ask about it and support it.</summary>

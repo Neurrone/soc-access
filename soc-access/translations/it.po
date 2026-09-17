@@ -3826,6 +3826,16 @@ msgctxt "Screens.BookmarksImportedForOtherGame_1"
 msgid "Imported {0} bookmarks for a different game than the one being played"
 msgstr "Importati {0} segnalibri per una partita diversa da quella in corso"
 
+#. Screens.BookmarksImportedForLaterGame_0
+msgctxt "Screens.BookmarksImportedForLaterGame_0"
+msgid "Imported {0} bookmark. It will be used when that game is played."
+msgstr "Importato {0} segnalibro. Sarà usato quando si giocherà quella partita."
+
+#. Screens.BookmarksImportedForLaterGame_1
+msgctxt "Screens.BookmarksImportedForLaterGame_1"
+msgid "Imported {0} bookmarks. They will be used when that game is played."
+msgstr "Importati {0} segnalibri. Saranno usati quando si giocherà quella partita."
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"

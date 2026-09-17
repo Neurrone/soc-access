@@ -340,9 +340,23 @@ namespace SongsOfConquestAccess.UI
             return _controller.AddTextMeshDropdown(label, options, value, changed);
         }
 
-        public IUITextMesh AddText(string text)
+        /// <summary>
+        /// A line of text. By default it is a CAPTION: a reader that heads regions with captions
+        /// makes it the region of the rows drawn under it, so it is said on the way into them.
+        /// <paramref name="standalone"/> says this text heads nothing and is a line of its own, to
+        /// be landed on and read where it stands - the Bookmarks tab's file path, the answer a
+        /// message dialog gives.
+        /// </summary>
+        public IUITextMesh AddText(string text, bool standalone = false)
         {
-            return _controller.AddSimpleText(text);
+            IUITextMesh mesh = _controller.AddSimpleText(text);
+            Component component = standalone ? mesh as Component : null;
+            if (component != null)
+            {
+                _facts.SetStandaloneText(component.transform);
+            }
+
+            return mesh;
         }
 
         /// <summary>
@@ -949,9 +963,10 @@ namespace SongsOfConquestAccess.UI
         /// WHAT A READER CANNOT READ OFF THE DRAWN FORM.
         ///
         /// Everything else about a row the reader gets from the game - its words, its state, whether
-        /// it is drawn at all. These three are the mod's own decisions, taken as the form was drawn:
+        /// it is drawn at all. These are the mod's own decisions, taken as the form was drawn:
         /// which horizontal layouts are a TABLE's rows and which row each one is, what that table's
-        /// columns are CALLED in speech, and what a control whose drawn words are a glyph is called.
+        /// columns are CALLED in speech, what a control whose drawn words are a glyph is called, and
+        /// which texts are lines of their own rather than captions over the rows under them.
         ///
         /// Facts, not nodes: nothing here knows about node ids, stops or regions. What a table
         /// becomes in the tree is <see cref="MenuFormNodes"/>'s business.
@@ -961,6 +976,7 @@ namespace SongsOfConquestAccess.UI
             private readonly Dictionary<Transform, DrawnRow> _rows = new Dictionary<Transform, DrawnRow>();
             private readonly Dictionary<string, string[]> _columns = new Dictionary<string, string[]>();
             private readonly Dictionary<Transform, string> _spoken = new Dictionary<Transform, string>();
+            private readonly HashSet<Transform> _standalone = new HashSet<Transform>();
 
             /// <summary>One drawn horizontal layout that is a table's row.</summary>
             public sealed class DrawnRow
@@ -1037,11 +1053,27 @@ namespace SongsOfConquestAccess.UI
                 }
             }
 
+            /// <summary>Whether a text is a line of its own rather than a caption over the rows
+            /// under it.</summary>
+            public bool IsStandaloneText(Transform text)
+            {
+                return text != null && _standalone.Contains(text);
+            }
+
+            public void SetStandaloneText(Transform text)
+            {
+                if (text != null)
+                {
+                    _standalone.Add(text);
+                }
+            }
+
             public void Clear()
             {
                 _rows.Clear();
                 _columns.Clear();
                 _spoken.Clear();
+                _standalone.Clear();
             }
         }
 

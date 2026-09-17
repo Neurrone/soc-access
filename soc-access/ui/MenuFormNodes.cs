@@ -23,7 +23,10 @@ namespace SongsOfConquestAccess.UI
     /// out of a copy of the same panel: one description of a form, so the two cannot drift.
     ///
     /// A caption that heads nothing stays a read-only row, and a form that draws no captions at all
-    /// (the lobby's two settings windows) asks for every text to be a row where it stands.
+    /// (the lobby's two settings windows) asks for every text to be a row where it stands. A form
+    /// drawn by the mod can say the same of ONE text (<c>ModDialog.AddText(standalone: true)</c>):
+    /// the Bookmarks tab's file path and a message dialog's answer are lines to land on, not names
+    /// for the buttons under them.
     ///
     /// The Options window's Controls page is the one form that draws rows this reader once could not
     /// see: the rebindable-action rows, drawn by <c>AddKeyBinding</c>. They are now read as a TABLE of
@@ -318,7 +321,10 @@ namespace SongsOfConquestAccess.UI
                 MenuRowText caption = item as MenuRowText;
                 if (caption != null)
                 {
-                    if (!_captionsHeadRegions)
+                    // A text the form drew as a line of its own heads nothing, wherever this form's
+                    // other texts are captions.
+                    if (!_captionsHeadRegions
+                        || (facts != null && facts.IsStandaloneText(control.Transform)))
                     {
                         AddTextRow(builder, control, caption);
                         continue;

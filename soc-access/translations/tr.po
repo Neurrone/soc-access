@@ -3786,6 +3786,11 @@ msgctxt "Screens.BookmarksImportedForOtherGame_0"
 msgid "Imported {0} bookmark for a different game than the one being played"
 msgstr "Oynanan oyundan farklı bir oyun için {0} yer imi içe aktarıldı"
 
+#. Screens.BookmarksImportedForLaterGame_0
+msgctxt "Screens.BookmarksImportedForLaterGame_0"
+msgid "Imported {0} bookmark. It will be used when that game is played."
+msgstr "{0} yer imi içe aktarıldı. Bu oyun oynandığında kullanılacak."
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"
