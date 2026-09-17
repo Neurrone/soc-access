@@ -748,9 +748,9 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             PathNode[] path = GetPathTo(point);
-            SetNativeCursorTile(point, path);
             if (GetTargetingMode() != CombatTargetingMode.None || IsAnySpellCastingStateActive())
             {
+                SetNativeCursorTile(point, path);
                 return;
             }
 
@@ -758,8 +758,12 @@ namespace SongsOfConquestAccess.Adapters
             // physical pointer moves; no inspection is pinning it any more.
             ClearHoverPin();
             TakeHoverOwnership();
-            SetNativeCurrentTroopState();
             _attackPreviewHandler?.Hide();
+            // The hover sync below points the four managers at the tile ONCE and then sets their
+            // states, which is the order the game's own update keeps. Pointing them here first, or
+            // resetting them to the current troop first, re-entered the path manager's state: the
+            // game's state machine has no same-state guard, and re-entering CurrentTroop repeats its
+            // "Blocked" notification for a target the shot cannot reach.
             // The tile and the path travel down with the point: nothing between here and the hover
             // sync changes what either of them answers, and reading them again cost a second
             // whole-board path search per cursor step.
