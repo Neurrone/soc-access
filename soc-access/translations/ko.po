@@ -3726,6 +3726,66 @@ msgctxt "Screens.Bookmarks"
 msgid "Bookmarks"
 msgstr "북마크"
 
+#. Screens.BookmarksSavedTo
+msgctxt "Screens.BookmarksSavedTo"
+msgid "Bookmarks are saved to {0}"
+msgstr "북마크 저장 위치: {0}"
+
+#. Screens.NoBookmarksForThisGame
+msgctxt "Screens.NoBookmarksForThisGame"
+msgid "No bookmarks set for this game"
+msgstr "이 게임에 설정된 북마크가 없습니다"
+
+#. Screens.CopyBookmarksToClipboard
+msgctxt "Screens.CopyBookmarksToClipboard"
+msgid "Copy bookmarks to clipboard"
+msgstr "북마크를 클립보드에 복사"
+
+#. Screens.ImportBookmarksFromClipboard
+msgctxt "Screens.ImportBookmarksFromClipboard"
+msgid "Import bookmarks from clipboard"
+msgstr "클립보드에서 북마크 가져오기"
+
+#. Screens.OpenBookmarksFolder
+msgctxt "Screens.OpenBookmarksFolder"
+msgid "Open bookmarks folder"
+msgstr "북마크 폴더 열기"
+
+#. Screens.BookmarksCopied
+msgctxt "Screens.BookmarksCopied"
+msgid "Bookmarks copied to the clipboard"
+msgstr "북마크를 클립보드에 복사했습니다"
+
+#. Screens.BookmarksNotRead
+msgctxt "Screens.BookmarksNotRead"
+msgid "The bookmarks file could not be read"
+msgstr "북마크 파일을 읽을 수 없습니다"
+
+#. Screens.ClipboardEmpty
+msgctxt "Screens.ClipboardEmpty"
+msgid "The clipboard is empty"
+msgstr "클립보드가 비어 있습니다"
+
+#. Screens.ClipboardNotBookmarks
+msgctxt "Screens.ClipboardNotBookmarks"
+msgid "The clipboard does not hold a bookmarks file"
+msgstr "클립보드에 북마크 파일이 없습니다"
+
+#. Screens.BookmarksNotWritten
+msgctxt "Screens.BookmarksNotWritten"
+msgid "The bookmarks file could not be written"
+msgstr "북마크 파일을 쓸 수 없습니다"
+
+#. Screens.BookmarksImported_0
+msgctxt "Screens.BookmarksImported_0"
+msgid "Imported {0} bookmark for this game"
+msgstr "이 게임에 북마크 {0}개를 가져왔습니다"
+
+#. Screens.BookmarksImportedForOtherGame_0
+msgctxt "Screens.BookmarksImportedForOtherGame_0"
+msgid "Imported {0} bookmark for a different game than the one being played"
+msgstr "플레이 중인 게임이 아닌 다른 게임에 북마크 {0}개를 가져왔습니다"
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"

@@ -3726,6 +3726,66 @@ msgctxt "Screens.Bookmarks"
 msgid "Bookmarks"
 msgstr "书签"
 
+#. Screens.BookmarksSavedTo
+msgctxt "Screens.BookmarksSavedTo"
+msgid "Bookmarks are saved to {0}"
+msgstr "书签保存在 {0}"
+
+#. Screens.NoBookmarksForThisGame
+msgctxt "Screens.NoBookmarksForThisGame"
+msgid "No bookmarks set for this game"
+msgstr "本局游戏尚未设置书签"
+
+#. Screens.CopyBookmarksToClipboard
+msgctxt "Screens.CopyBookmarksToClipboard"
+msgid "Copy bookmarks to clipboard"
+msgstr "将书签复制到剪贴板"
+
+#. Screens.ImportBookmarksFromClipboard
+msgctxt "Screens.ImportBookmarksFromClipboard"
+msgid "Import bookmarks from clipboard"
+msgstr "从剪贴板导入书签"
+
+#. Screens.OpenBookmarksFolder
+msgctxt "Screens.OpenBookmarksFolder"
+msgid "Open bookmarks folder"
+msgstr "打开书签文件夹"
+
+#. Screens.BookmarksCopied
+msgctxt "Screens.BookmarksCopied"
+msgid "Bookmarks copied to the clipboard"
+msgstr "书签已复制到剪贴板"
+
+#. Screens.BookmarksNotRead
+msgctxt "Screens.BookmarksNotRead"
+msgid "The bookmarks file could not be read"
+msgstr "无法读取书签文件"
+
+#. Screens.ClipboardEmpty
+msgctxt "Screens.ClipboardEmpty"
+msgid "The clipboard is empty"
+msgstr "剪贴板为空"
+
+#. Screens.ClipboardNotBookmarks
+msgctxt "Screens.ClipboardNotBookmarks"
+msgid "The clipboard does not hold a bookmarks file"
+msgstr "剪贴板中没有书签文件"
+
+#. Screens.BookmarksNotWritten
+msgctxt "Screens.BookmarksNotWritten"
+msgid "The bookmarks file could not be written"
+msgstr "无法写入书签文件"
+
+#. Screens.BookmarksImported_0
+msgctxt "Screens.BookmarksImported_0"
+msgid "Imported {0} bookmark for this game"
+msgstr "已为本局游戏导入 {0} 个书签"
+
+#. Screens.BookmarksImportedForOtherGame_0
+msgctxt "Screens.BookmarksImportedForOtherGame_0"
+msgid "Imported {0} bookmark for a different game than the one being played"
+msgstr "已为另一局游戏（非当前进行的游戏）导入 {0} 个书签"
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"

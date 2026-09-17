@@ -3726,6 +3726,66 @@ msgctxt "Screens.Bookmarks"
 msgid "Bookmarks"
 msgstr "Yer imleri"
 
+#. Screens.BookmarksSavedTo
+msgctxt "Screens.BookmarksSavedTo"
+msgid "Bookmarks are saved to {0}"
+msgstr "Yer imleri şuraya kaydedilir: {0}"
+
+#. Screens.NoBookmarksForThisGame
+msgctxt "Screens.NoBookmarksForThisGame"
+msgid "No bookmarks set for this game"
+msgstr "Bu oyun için yer imi ayarlanmadı"
+
+#. Screens.CopyBookmarksToClipboard
+msgctxt "Screens.CopyBookmarksToClipboard"
+msgid "Copy bookmarks to clipboard"
+msgstr "Yer imlerini panoya kopyala"
+
+#. Screens.ImportBookmarksFromClipboard
+msgctxt "Screens.ImportBookmarksFromClipboard"
+msgid "Import bookmarks from clipboard"
+msgstr "Yer imlerini panodan içe aktar"
+
+#. Screens.OpenBookmarksFolder
+msgctxt "Screens.OpenBookmarksFolder"
+msgid "Open bookmarks folder"
+msgstr "Yer imi klasörünü aç"
+
+#. Screens.BookmarksCopied
+msgctxt "Screens.BookmarksCopied"
+msgid "Bookmarks copied to the clipboard"
+msgstr "Yer imleri panoya kopyalandı"
+
+#. Screens.BookmarksNotRead
+msgctxt "Screens.BookmarksNotRead"
+msgid "The bookmarks file could not be read"
+msgstr "Yer imi dosyası okunamadı"
+
+#. Screens.ClipboardEmpty
+msgctxt "Screens.ClipboardEmpty"
+msgid "The clipboard is empty"
+msgstr "Pano boş"
+
+#. Screens.ClipboardNotBookmarks
+msgctxt "Screens.ClipboardNotBookmarks"
+msgid "The clipboard does not hold a bookmarks file"
+msgstr "Panoda yer imi dosyası yok"
+
+#. Screens.BookmarksNotWritten
+msgctxt "Screens.BookmarksNotWritten"
+msgid "The bookmarks file could not be written"
+msgstr "Yer imi dosyası yazılamadı"
+
+#. Screens.BookmarksImported_0
+msgctxt "Screens.BookmarksImported_0"
+msgid "Imported {0} bookmark for this game"
+msgstr "Bu oyun için {0} yer imi içe aktarıldı"
+
+#. Screens.BookmarksImportedForOtherGame_0
+msgctxt "Screens.BookmarksImportedForOtherGame_0"
+msgid "Imported {0} bookmark for a different game than the one being played"
+msgstr "Oynanan oyundan farklı bir oyun için {0} yer imi içe aktarıldı"
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"

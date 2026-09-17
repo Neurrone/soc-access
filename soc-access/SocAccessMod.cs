@@ -177,6 +177,7 @@ namespace SongsOfConquestAccess
             Step("speech pipeline", SpeechPipeline.Shutdown);
             Step("speech service", () => _speechService?.Dispose());
             _speechService = null;
+            Step("bookmarks", Bookmarks.AdventureBookmarkStore.Reset);
             Step("settings", ModSettings.Reset);
             if (Instance == this)
             {

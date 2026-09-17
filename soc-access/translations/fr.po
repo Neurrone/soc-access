@@ -3756,6 +3756,76 @@ msgctxt "Screens.Bookmarks"
 msgid "Bookmarks"
 msgstr "Signets"
 
+#. Screens.BookmarksSavedTo
+msgctxt "Screens.BookmarksSavedTo"
+msgid "Bookmarks are saved to {0}"
+msgstr "Les signets sont enregistrés dans {0}"
+
+#. Screens.NoBookmarksForThisGame
+msgctxt "Screens.NoBookmarksForThisGame"
+msgid "No bookmarks set for this game"
+msgstr "Aucun signet enregistré pour cette partie"
+
+#. Screens.CopyBookmarksToClipboard
+msgctxt "Screens.CopyBookmarksToClipboard"
+msgid "Copy bookmarks to clipboard"
+msgstr "Copier les signets dans le presse-papiers"
+
+#. Screens.ImportBookmarksFromClipboard
+msgctxt "Screens.ImportBookmarksFromClipboard"
+msgid "Import bookmarks from clipboard"
+msgstr "Importer les signets depuis le presse-papiers"
+
+#. Screens.OpenBookmarksFolder
+msgctxt "Screens.OpenBookmarksFolder"
+msgid "Open bookmarks folder"
+msgstr "Ouvrir le dossier des signets"
+
+#. Screens.BookmarksCopied
+msgctxt "Screens.BookmarksCopied"
+msgid "Bookmarks copied to the clipboard"
+msgstr "Signets copiés dans le presse-papiers"
+
+#. Screens.BookmarksNotRead
+msgctxt "Screens.BookmarksNotRead"
+msgid "The bookmarks file could not be read"
+msgstr "Le fichier de signets n'a pas pu être lu"
+
+#. Screens.ClipboardEmpty
+msgctxt "Screens.ClipboardEmpty"
+msgid "The clipboard is empty"
+msgstr "Le presse-papiers est vide"
+
+#. Screens.ClipboardNotBookmarks
+msgctxt "Screens.ClipboardNotBookmarks"
+msgid "The clipboard does not hold a bookmarks file"
+msgstr "Le presse-papiers ne contient pas de fichier de signets"
+
+#. Screens.BookmarksNotWritten
+msgctxt "Screens.BookmarksNotWritten"
+msgid "The bookmarks file could not be written"
+msgstr "Le fichier de signets n'a pas pu être écrit"
+
+#. Screens.BookmarksImported_0
+msgctxt "Screens.BookmarksImported_0"
+msgid "Imported {0} bookmark for this game"
+msgstr "{0} signet importé pour cette partie"
+
+#. Screens.BookmarksImported_1
+msgctxt "Screens.BookmarksImported_1"
+msgid "Imported {0} bookmarks for this game"
+msgstr "{0} signets importés pour cette partie"
+
+#. Screens.BookmarksImportedForOtherGame_0
+msgctxt "Screens.BookmarksImportedForOtherGame_0"
+msgid "Imported {0} bookmark for a different game than the one being played"
+msgstr "{0} signet importé pour une partie autre que celle en cours"
+
+#. Screens.BookmarksImportedForOtherGame_1
+msgctxt "Screens.BookmarksImportedForOtherGame_1"
+msgid "Imported {0} bookmarks for a different game than the one being played"
+msgstr "{0} signets importés pour une partie autre que celle en cours"
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"

@@ -3756,6 +3756,76 @@ msgctxt "Screens.Bookmarks"
 msgid "Bookmarks"
 msgstr "Lesezeichen"
 
+#. Screens.BookmarksSavedTo
+msgctxt "Screens.BookmarksSavedTo"
+msgid "Bookmarks are saved to {0}"
+msgstr "Lesezeichen werden in {0} gespeichert"
+
+#. Screens.NoBookmarksForThisGame
+msgctxt "Screens.NoBookmarksForThisGame"
+msgid "No bookmarks set for this game"
+msgstr "Für dieses Spiel sind keine Lesezeichen gesetzt"
+
+#. Screens.CopyBookmarksToClipboard
+msgctxt "Screens.CopyBookmarksToClipboard"
+msgid "Copy bookmarks to clipboard"
+msgstr "Lesezeichen in die Zwischenablage kopieren"
+
+#. Screens.ImportBookmarksFromClipboard
+msgctxt "Screens.ImportBookmarksFromClipboard"
+msgid "Import bookmarks from clipboard"
+msgstr "Lesezeichen aus der Zwischenablage importieren"
+
+#. Screens.OpenBookmarksFolder
+msgctxt "Screens.OpenBookmarksFolder"
+msgid "Open bookmarks folder"
+msgstr "Lesezeichenordner öffnen"
+
+#. Screens.BookmarksCopied
+msgctxt "Screens.BookmarksCopied"
+msgid "Bookmarks copied to the clipboard"
+msgstr "Lesezeichen in die Zwischenablage kopiert"
+
+#. Screens.BookmarksNotRead
+msgctxt "Screens.BookmarksNotRead"
+msgid "The bookmarks file could not be read"
+msgstr "Die Lesezeichendatei konnte nicht gelesen werden"
+
+#. Screens.ClipboardEmpty
+msgctxt "Screens.ClipboardEmpty"
+msgid "The clipboard is empty"
+msgstr "Die Zwischenablage ist leer"
+
+#. Screens.ClipboardNotBookmarks
+msgctxt "Screens.ClipboardNotBookmarks"
+msgid "The clipboard does not hold a bookmarks file"
+msgstr "Die Zwischenablage enthält keine Lesezeichendatei"
+
+#. Screens.BookmarksNotWritten
+msgctxt "Screens.BookmarksNotWritten"
+msgid "The bookmarks file could not be written"
+msgstr "Die Lesezeichendatei konnte nicht geschrieben werden"
+
+#. Screens.BookmarksImported_0
+msgctxt "Screens.BookmarksImported_0"
+msgid "Imported {0} bookmark for this game"
+msgstr "{0} Lesezeichen für dieses Spiel importiert"
+
+#. Screens.BookmarksImported_1
+msgctxt "Screens.BookmarksImported_1"
+msgid "Imported {0} bookmarks for this game"
+msgstr "{0} Lesezeichen für dieses Spiel importiert"
+
+#. Screens.BookmarksImportedForOtherGame_0
+msgctxt "Screens.BookmarksImportedForOtherGame_0"
+msgid "Imported {0} bookmark for a different game than the one being played"
+msgstr "{0} Lesezeichen für ein anderes Spiel als das laufende importiert"
+
+#. Screens.BookmarksImportedForOtherGame_1
+msgctxt "Screens.BookmarksImportedForOtherGame_1"
+msgid "Imported {0} bookmarks for a different game than the one being played"
+msgstr "{0} Lesezeichen für ein anderes Spiel als das laufende importiert"
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"

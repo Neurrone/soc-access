@@ -3756,6 +3756,76 @@ msgctxt "Screens.Bookmarks"
 msgid "Bookmarks"
 msgstr "Segnalibri"
 
+#. Screens.BookmarksSavedTo
+msgctxt "Screens.BookmarksSavedTo"
+msgid "Bookmarks are saved to {0}"
+msgstr "I segnalibri vengono salvati in {0}"
+
+#. Screens.NoBookmarksForThisGame
+msgctxt "Screens.NoBookmarksForThisGame"
+msgid "No bookmarks set for this game"
+msgstr "Nessun segnalibro impostato per questa partita"
+
+#. Screens.CopyBookmarksToClipboard
+msgctxt "Screens.CopyBookmarksToClipboard"
+msgid "Copy bookmarks to clipboard"
+msgstr "Copia i segnalibri negli appunti"
+
+#. Screens.ImportBookmarksFromClipboard
+msgctxt "Screens.ImportBookmarksFromClipboard"
+msgid "Import bookmarks from clipboard"
+msgstr "Importa i segnalibri dagli appunti"
+
+#. Screens.OpenBookmarksFolder
+msgctxt "Screens.OpenBookmarksFolder"
+msgid "Open bookmarks folder"
+msgstr "Apri la cartella dei segnalibri"
+
+#. Screens.BookmarksCopied
+msgctxt "Screens.BookmarksCopied"
+msgid "Bookmarks copied to the clipboard"
+msgstr "Segnalibri copiati negli appunti"
+
+#. Screens.BookmarksNotRead
+msgctxt "Screens.BookmarksNotRead"
+msgid "The bookmarks file could not be read"
+msgstr "Impossibile leggere il file dei segnalibri"
+
+#. Screens.ClipboardEmpty
+msgctxt "Screens.ClipboardEmpty"
+msgid "The clipboard is empty"
+msgstr "Gli appunti sono vuoti"
+
+#. Screens.ClipboardNotBookmarks
+msgctxt "Screens.ClipboardNotBookmarks"
+msgid "The clipboard does not hold a bookmarks file"
+msgstr "Gli appunti non contengono un file dei segnalibri"
+
+#. Screens.BookmarksNotWritten
+msgctxt "Screens.BookmarksNotWritten"
+msgid "The bookmarks file could not be written"
+msgstr "Impossibile scrivere il file dei segnalibri"
+
+#. Screens.BookmarksImported_0
+msgctxt "Screens.BookmarksImported_0"
+msgid "Imported {0} bookmark for this game"
+msgstr "Importato {0} segnalibro per questa partita"
+
+#. Screens.BookmarksImported_1
+msgctxt "Screens.BookmarksImported_1"
+msgid "Imported {0} bookmarks for this game"
+msgstr "Importati {0} segnalibri per questa partita"
+
+#. Screens.BookmarksImportedForOtherGame_0
+msgctxt "Screens.BookmarksImportedForOtherGame_0"
+msgid "Imported {0} bookmark for a different game than the one being played"
+msgstr "Importato {0} segnalibro per una partita diversa da quella in corso"
+
+#. Screens.BookmarksImportedForOtherGame_1
+msgctxt "Screens.BookmarksImportedForOtherGame_1"
+msgid "Imported {0} bookmarks for a different game than the one being played"
+msgstr "Importati {0} segnalibri per una partita diversa da quella in corso"
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"

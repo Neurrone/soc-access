@@ -101,6 +101,8 @@ Saving to an existing slot overwrites it. There is no separate delete command.
 
 Jumping to the bookmark you are already standing on says `here`, since there is no new tile to read.
 
+Bookmarks are saved to a file of their own per game, which the [Bookmarks tab](mod-settings.md#bookmarks) of the mod settings copies to the clipboard, imports from it, or opens in your file manager.
+
 ### Beacons
 
 Beacons are looping sounds that allow bookmarks to serve as spatial audio markers. Use `Ctrl+Shift+number` to toggle the beacon for that bookmark slot. The sound follows the currently focused tile, as described in [Audio](audio.md#bookmark-beacons).

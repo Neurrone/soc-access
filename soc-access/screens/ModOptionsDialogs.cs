@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Audio;
@@ -520,7 +520,7 @@ namespace SongsOfConquestAccess.Screens
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                OpenNameRefused(
+                OpenMessage(
                     "mod-category-name-empty",
                     ModText.Get(ModStrings.Screens.CustomCategoryNameMissingTitle),
                     ModText.Get(ModStrings.Screens.CustomCategoryNameEmpty));
@@ -533,7 +533,7 @@ namespace SongsOfConquestAccess.Screens
                     ModSettings.GetScannerCustomSlots(taxonomy.Key),
                     slot))
             {
-                OpenNameRefused(
+                OpenMessage(
                     "mod-category-name-taken",
                     ModText.Get(ModStrings.Screens.CustomCategoryNameTakenTitle),
                     ModText.Get(ModStrings.Screens.CustomCategoryNameTaken, name));
@@ -545,13 +545,14 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>
-        /// The refusal itself: a title, the message, and the one button that leaves. The message is
-        /// a text row heading the button, so it is the button's region and is read both on arrival
-        /// and on every return to the cursor - "Pickups is already the name of a category, OK,
-        /// button". OK, the window's close button and Escape are all the same way out, and none of
-        /// them changes anything.
+        /// ONE THING SAID AND DISMISSED: a title, the message, and the one button that leaves. The
+        /// message is a text row heading the button, so it is the button's region and is read both
+        /// on arrival and on every return to the cursor - "Pickups is already the name of a
+        /// category, OK, button". OK, the window's close button and Escape are all the same way out,
+        /// and none of them changes anything. A refusal is drawn this way, and so is the answer the
+        /// Bookmarks tab's import gives.
         /// </summary>
-        private static void OpenNameRefused(string key, string title, string message)
+        public static void OpenMessage(string key, string title, string message)
         {
             ModDialogScreen.Open(
                 key,

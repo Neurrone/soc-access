@@ -3786,6 +3786,86 @@ msgctxt "Screens.Bookmarks"
 msgid "Bookmarks"
 msgstr "Закладки"
 
+#. Screens.BookmarksSavedTo
+msgctxt "Screens.BookmarksSavedTo"
+msgid "Bookmarks are saved to {0}"
+msgstr "Закладки зберігаються у {0}"
+
+#. Screens.NoBookmarksForThisGame
+msgctxt "Screens.NoBookmarksForThisGame"
+msgid "No bookmarks set for this game"
+msgstr "Для цієї гри закладок не задано"
+
+#. Screens.CopyBookmarksToClipboard
+msgctxt "Screens.CopyBookmarksToClipboard"
+msgid "Copy bookmarks to clipboard"
+msgstr "Скопіювати закладки до буфера обміну"
+
+#. Screens.ImportBookmarksFromClipboard
+msgctxt "Screens.ImportBookmarksFromClipboard"
+msgid "Import bookmarks from clipboard"
+msgstr "Імпортувати закладки з буфера обміну"
+
+#. Screens.OpenBookmarksFolder
+msgctxt "Screens.OpenBookmarksFolder"
+msgid "Open bookmarks folder"
+msgstr "Відкрити теку закладок"
+
+#. Screens.BookmarksCopied
+msgctxt "Screens.BookmarksCopied"
+msgid "Bookmarks copied to the clipboard"
+msgstr "Закладки скопійовано до буфера обміну"
+
+#. Screens.BookmarksNotRead
+msgctxt "Screens.BookmarksNotRead"
+msgid "The bookmarks file could not be read"
+msgstr "Не вдалося прочитати файл закладок"
+
+#. Screens.ClipboardEmpty
+msgctxt "Screens.ClipboardEmpty"
+msgid "The clipboard is empty"
+msgstr "Буфер обміну порожній"
+
+#. Screens.ClipboardNotBookmarks
+msgctxt "Screens.ClipboardNotBookmarks"
+msgid "The clipboard does not hold a bookmarks file"
+msgstr "У буфері обміну немає файлу закладок"
+
+#. Screens.BookmarksNotWritten
+msgctxt "Screens.BookmarksNotWritten"
+msgid "The bookmarks file could not be written"
+msgstr "Не вдалося записати файл закладок"
+
+#. Screens.BookmarksImported_0
+msgctxt "Screens.BookmarksImported_0"
+msgid "Imported {0} bookmark for this game"
+msgstr "Імпортовано {0} закладку для цієї гри"
+
+#. Screens.BookmarksImported_1
+msgctxt "Screens.BookmarksImported_1"
+msgid "Imported {0} bookmarks for this game"
+msgstr "Імпортовано {0} закладки для цієї гри"
+
+#. Screens.BookmarksImported_2
+msgctxt "Screens.BookmarksImported_2"
+msgid "Imported {0} bookmarks for this game"
+msgstr "Імпортовано {0} закладок для цієї гри"
+
+#. Screens.BookmarksImportedForOtherGame_0
+msgctxt "Screens.BookmarksImportedForOtherGame_0"
+msgid "Imported {0} bookmark for a different game than the one being played"
+msgstr "Імпортовано {0} закладку для іншої гри, ніж поточна"
+
+#. Screens.BookmarksImportedForOtherGame_1
+msgctxt "Screens.BookmarksImportedForOtherGame_1"
+msgid "Imported {0} bookmarks for a different game than the one being played"
+msgstr "Імпортовано {0} закладки для іншої гри, ніж поточна"
+
+#. Screens.BookmarksImportedForOtherGame_2
+msgctxt "Screens.BookmarksImportedForOtherGame_2"
+msgid "Imported {0} bookmarks for a different game than the one being played"
+msgstr "Імпортовано {0} закладок для іншої гри, ніж поточна"
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"

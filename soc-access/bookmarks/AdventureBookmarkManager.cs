@@ -10,6 +10,11 @@ namespace SongsOfConquestAccess.Bookmarks
         private AdventureBookmarkGameIdentity _identity;
         private AdventureBookmarkSet _set = new AdventureBookmarkSet();
 
+        // The store's write counter as of the set now held. Any write the mod makes moves it, so a
+        // file replaced from the Mod options window - a store of its own over the same folder - is
+        // read again on the next bookmark gesture rather than staying as it was loaded.
+        private int _generation = -1;
+
         public AdventureBookmarkManager(AdventureBookmarkStore store)
         {
             _store = store ?? new AdventureBookmarkStore();
@@ -24,12 +29,13 @@ namespace SongsOfConquestAccess.Bookmarks
                 return;
             }
 
-            if (_identity != null && _identity.SameStorageAs(identity))
+            if (_identity != null && _identity.SameStorageAs(identity) && _generation == AdventureBookmarkStore.Generation)
             {
                 return;
             }
 
             _identity = identity;
+            _generation = AdventureBookmarkStore.Generation;
             try
             {
                 _set = _store.Load(identity);
@@ -57,6 +63,9 @@ namespace SongsOfConquestAccess.Bookmarks
             {
                 SocAccessMod.Instance?.LogWarning("Failed to persist adventure bookmarks: " + exception.Message);
             }
+
+            // This write is the mod's own, so it is not a reason to read the file back.
+            _generation = AdventureBookmarkStore.Generation;
 
             return ModText.Get(ModStrings.Bookmarks.BookmarkSaved);
         }

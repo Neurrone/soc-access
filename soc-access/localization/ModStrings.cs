@@ -798,8 +798,27 @@
             public static readonly ModString CaptureNoCancel = new ModString("Screens.CaptureNoCancel", "The next key you press becomes the binding.");
             /// <summary>The Keybinds tab: the mod's own gestures as a rebindable table.</summary>
             public static readonly ModString Keybinds = new ModString("Screens.Keybinds", "Keybinds");
-            /// <summary>The Keybinds tab region for the bookmark gestures.</summary>
+            /// <summary>The Keybinds tab region for the bookmark gestures, and the Bookmarks tab.</summary>
             public static readonly ModString Bookmarks = new ModString("Screens.Bookmarks", "Bookmarks");
+            /// <summary>The Bookmarks tab's caption while a game with a bookmarks file is being
+            /// played: the full path of that file.</summary>
+            public static readonly ModString BookmarksSavedTo = new ModString("Screens.BookmarksSavedTo", "Bookmarks are saved to {0}");
+            /// <summary>The Bookmarks tab's caption in a game that has none yet.</summary>
+            public static readonly ModString NoBookmarksForThisGame = new ModString("Screens.NoBookmarksForThisGame", "No bookmarks set for this game");
+            public static readonly ModString CopyBookmarksToClipboard = new ModString("Screens.CopyBookmarksToClipboard", "Copy bookmarks to clipboard");
+            public static readonly ModString ImportBookmarksFromClipboard = new ModString("Screens.ImportBookmarksFromClipboard", "Import bookmarks from clipboard");
+            public static readonly ModString OpenBookmarksFolder = new ModString("Screens.OpenBookmarksFolder", "Open bookmarks folder");
+            /// <summary>Spoken, queued, once the bookmarks file is on the clipboard.</summary>
+            public static readonly ModString BookmarksCopied = new ModString("Screens.BookmarksCopied", "Bookmarks copied to the clipboard");
+            public static readonly ModString BookmarksNotRead = new ModString("Screens.BookmarksNotRead", "The bookmarks file could not be read");
+            /// <summary>What the import says when there was nothing to paste.</summary>
+            public static readonly ModString ClipboardEmpty = new ModString("Screens.ClipboardEmpty", "The clipboard is empty");
+            public static readonly ModString ClipboardNotBookmarks = new ModString("Screens.ClipboardNotBookmarks", "The clipboard does not hold a bookmarks file");
+            public static readonly ModString BookmarksNotWritten = new ModString("Screens.BookmarksNotWritten", "The bookmarks file could not be written");
+            /// <summary>What the import says when the pasted file belongs to the game being played.</summary>
+            public static readonly ModPluralString BookmarksImported = new ModPluralString("Screens.BookmarksImported", "Imported {0} bookmark for this game", "Imported {0} bookmarks for this game");
+            /// <summary>And when it belongs to another game, which is allowed and worth saying.</summary>
+            public static readonly ModPluralString BookmarksImportedForOtherGame = new ModPluralString("Screens.BookmarksImportedForOtherGame", "Imported {0} bookmark for a different game than the one being played", "Imported {0} bookmarks for a different game than the one being played");
             /// <summary>The Keybinds tab region for the battle hex-grid gestures.</summary>
             public static readonly ModString HexGrid = new ModString("Screens.HexGrid", "Hex grid");
             /// <summary>Spoken, queued, when a mod-gesture capture starts: the next key becomes the

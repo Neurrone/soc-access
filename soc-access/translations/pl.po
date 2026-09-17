@@ -3786,6 +3786,86 @@ msgctxt "Screens.Bookmarks"
 msgid "Bookmarks"
 msgstr "Zakładki"
 
+#. Screens.BookmarksSavedTo
+msgctxt "Screens.BookmarksSavedTo"
+msgid "Bookmarks are saved to {0}"
+msgstr "Zakładki są zapisywane w {0}"
+
+#. Screens.NoBookmarksForThisGame
+msgctxt "Screens.NoBookmarksForThisGame"
+msgid "No bookmarks set for this game"
+msgstr "Brak zakładek dla tej gry"
+
+#. Screens.CopyBookmarksToClipboard
+msgctxt "Screens.CopyBookmarksToClipboard"
+msgid "Copy bookmarks to clipboard"
+msgstr "Kopiuj zakładki do schowka"
+
+#. Screens.ImportBookmarksFromClipboard
+msgctxt "Screens.ImportBookmarksFromClipboard"
+msgid "Import bookmarks from clipboard"
+msgstr "Importuj zakładki ze schowka"
+
+#. Screens.OpenBookmarksFolder
+msgctxt "Screens.OpenBookmarksFolder"
+msgid "Open bookmarks folder"
+msgstr "Otwórz folder zakładek"
+
+#. Screens.BookmarksCopied
+msgctxt "Screens.BookmarksCopied"
+msgid "Bookmarks copied to the clipboard"
+msgstr "Zakładki skopiowano do schowka"
+
+#. Screens.BookmarksNotRead
+msgctxt "Screens.BookmarksNotRead"
+msgid "The bookmarks file could not be read"
+msgstr "Nie można odczytać pliku zakładek"
+
+#. Screens.ClipboardEmpty
+msgctxt "Screens.ClipboardEmpty"
+msgid "The clipboard is empty"
+msgstr "Schowek jest pusty"
+
+#. Screens.ClipboardNotBookmarks
+msgctxt "Screens.ClipboardNotBookmarks"
+msgid "The clipboard does not hold a bookmarks file"
+msgstr "Schowek nie zawiera pliku zakładek"
+
+#. Screens.BookmarksNotWritten
+msgctxt "Screens.BookmarksNotWritten"
+msgid "The bookmarks file could not be written"
+msgstr "Nie można zapisać pliku zakładek"
+
+#. Screens.BookmarksImported_0
+msgctxt "Screens.BookmarksImported_0"
+msgid "Imported {0} bookmark for this game"
+msgstr "Zaimportowano {0} zakładkę dla tej gry"
+
+#. Screens.BookmarksImported_1
+msgctxt "Screens.BookmarksImported_1"
+msgid "Imported {0} bookmarks for this game"
+msgstr "Zaimportowano {0} zakładki dla tej gry"
+
+#. Screens.BookmarksImported_2
+msgctxt "Screens.BookmarksImported_2"
+msgid "Imported {0} bookmarks for this game"
+msgstr "Zaimportowano {0} zakładek dla tej gry"
+
+#. Screens.BookmarksImportedForOtherGame_0
+msgctxt "Screens.BookmarksImportedForOtherGame_0"
+msgid "Imported {0} bookmark for a different game than the one being played"
+msgstr "Zaimportowano {0} zakładkę dla gry innej niż obecnie rozgrywana"
+
+#. Screens.BookmarksImportedForOtherGame_1
+msgctxt "Screens.BookmarksImportedForOtherGame_1"
+msgid "Imported {0} bookmarks for a different game than the one being played"
+msgstr "Zaimportowano {0} zakładki dla gry innej niż obecnie rozgrywana"
+
+#. Screens.BookmarksImportedForOtherGame_2
+msgctxt "Screens.BookmarksImportedForOtherGame_2"
+msgid "Imported {0} bookmarks for a different game than the one being played"
+msgstr "Zaimportowano {0} zakładek dla gry innej niż obecnie rozgrywana"
+
 #. Screens.HexGrid
 msgctxt "Screens.HexGrid"
 msgid "Hex grid"

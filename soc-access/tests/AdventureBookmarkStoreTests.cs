@@ -117,6 +117,45 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(new Vector2Int(3, 4), point);
         }
 
+        [TestMethod]
+        public void ImportOverwritesOnlyTheSlotsItCarries()
+        {
+            AdventureBookmarkGameIdentity identity = Identity(teamId: 1);
+            AdventureBookmarkStore store = new AdventureBookmarkStore(_directory);
+            AdventureBookmarkSet existing = new AdventureBookmarkSet();
+            existing.Set("1", new Vector2Int(1, 1));
+            existing.Set("2", new Vector2Int(2, 2));
+            store.Save(identity, existing);
+            AdventureBookmarkSet imported = new AdventureBookmarkSet();
+            imported.Set("2", new Vector2Int(20, 20));
+            AdventureBookmarkStore source = new AdventureBookmarkStore(Path.Combine(_directory, "clipboard"));
+            source.Save(identity, imported);
+            string text = File.ReadAllText(source.GetPath(identity));
+
+            AdventureBookmarkStore.ImportResult result = store.Import(text);
+
+            Assert.AreEqual(AdventureBookmarkStore.ImportOutcome.Imported, result.Outcome);
+            Assert.AreEqual(1, result.Count);
+            Assert.IsTrue(result.Identity.SameStorageAs(identity));
+            AdventureBookmarkSet merged = store.Load(identity);
+            Vector2Int point;
+            Assert.IsTrue(merged.TryGet("1", out point));
+            Assert.AreEqual(new Vector2Int(1, 1), point);
+            Assert.IsTrue(merged.TryGet("2", out point));
+            Assert.AreEqual(new Vector2Int(20, 20), point);
+        }
+
+        [TestMethod]
+        public void ImportRefusesTextThatIsNotABookmarksFile()
+        {
+            AdventureBookmarkStore store = new AdventureBookmarkStore(_directory);
+
+            Assert.AreEqual(AdventureBookmarkStore.ImportOutcome.Empty, store.Import("   ").Outcome);
+            Assert.AreEqual(AdventureBookmarkStore.ImportOutcome.NotBookmarks, store.Import("not json at all").Outcome);
+            Assert.AreEqual(AdventureBookmarkStore.ImportOutcome.NotBookmarks, store.Import("{\"hello\":\"world\"}").Outcome);
+            Assert.IsFalse(Directory.Exists(_directory));
+        }
+
         private static AdventureBookmarkGameIdentity Identity(int teamId)
         {
             return AdventureBookmarkGameIdentity.Create(

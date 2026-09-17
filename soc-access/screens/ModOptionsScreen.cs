@@ -1,11 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Audio;
+using SongsOfConquestAccess.Bookmarks;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
+using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
@@ -37,6 +39,11 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The index of the Keybinds tab in <see cref="TabLabels"/> - the one page whose rows
         /// are the mod's own gestures rather than game controls.</summary>
         private const int KeybindsTab = 6;
+
+        /// <summary>The index of the Bookmarks tab in <see cref="TabLabels"/> - the one page that
+        /// holds no setting, only what is on disk now and the three things that can be done with it.
+        /// </summary>
+        private const int BookmarksTab = 7;
 
         /// <summary>The window this screen reads, or null when it is not open. Written by
         /// <see cref="Open"/>: the screen is registered once and lives for the whole mod load.
@@ -199,7 +206,8 @@ namespace SongsOfConquestAccess.Screens
             ModStrings.Screens.TroopDeployment,
             ModStrings.Screens.Combat,
             ModStrings.Screens.Audio,
-            ModStrings.Screens.Keybinds
+            ModStrings.Screens.Keybinds,
+            ModStrings.Screens.Bookmarks
         };
 
         /// <summary>Draw one category. Every row is a real game control and every callback writes
@@ -228,6 +236,9 @@ namespace SongsOfConquestAccess.Screens
                     break;
                 case KeybindsTab:
                     DrawKeybinds();
+                    break;
+                case BookmarksTab:
+                    DrawBookmarks();
                     break;
             }
         }
@@ -370,6 +381,126 @@ namespace SongsOfConquestAccess.Screens
                     ModSettings.ClearKeybindOverride(action.Key);
                     ShowBinding(dialog, widget, action);
                 });
+        }
+
+        /// <summary>
+        /// The Bookmarks tab: where this game's bookmarks are kept, and the three things that can be
+        /// done with the file. Nothing on the page is a setting, so it is what the disk and the game
+        /// said when it was drawn - once per tab switch and once per opening of the window, never
+        /// per frame.
+        /// </summary>
+        private void DrawBookmarks()
+        {
+            AdventureBookmarkStore store = new AdventureBookmarkStore();
+            AdventureBookmarkGameIdentity identity = GameBeingPlayed();
+            bool hasFile = store.Exists(identity);
+            // Off a game there is no file to name: the import and the folder are all this page is.
+            if (identity != null)
+            {
+                _dialog.AddText(hasFile
+                    ? ModText.Get(ModStrings.Screens.BookmarksSavedTo, store.GetPath(identity))
+                    : ModText.Get(ModStrings.Screens.NoBookmarksForThisGame));
+            }
+
+            if (hasFile)
+            {
+                _dialog.AddButton(
+                    ModText.Get(ModStrings.Screens.CopyBookmarksToClipboard),
+                    () => CopyBookmarks(store, identity));
+            }
+
+            _dialog.AddButton(
+                ModText.Get(ModStrings.Screens.ImportBookmarksFromClipboard),
+                () => ImportBookmarks(store));
+
+            if (store.FolderHasFiles())
+            {
+                _dialog.AddButton(
+                    ModText.Get(ModStrings.Screens.OpenBookmarksFolder),
+                    () => OpenBookmarksFolder(store));
+            }
+        }
+
+        /// <summary>The game being played, or null on the main menu and anywhere else the adventure
+        /// map is not up. Read from the map screen's own live adapter each time it is asked for; the
+        /// window outlives games, so nothing about one is kept here.</summary>
+        private static AdventureBookmarkGameIdentity GameBeingPlayed()
+        {
+            ScreenManager manager = SocAccessMod.Instance != null ? SocAccessMod.Instance.ScreenManager : null;
+            AdventureMapScreen map = manager == null ? null : manager.Registered<AdventureMapScreen>();
+            return map != null && map.IsActive() ? map.Live.GetBookmarkGameIdentity() : null;
+        }
+
+        /// <summary>The file's own text on the clipboard, unchanged and with nothing added, so that
+        /// what is copied out is exactly what can be pasted back in.</summary>
+        private static void CopyBookmarks(AdventureBookmarkStore store, AdventureBookmarkGameIdentity identity)
+        {
+            string text;
+            bool read = store.TryReadText(identity, out text);
+            if (read)
+            {
+                UnityEngine.GUIUtility.systemCopyBuffer = text;
+            }
+
+            Speak(ModText.Get(read ? ModStrings.Screens.BookmarksCopied : ModStrings.Screens.BookmarksNotRead));
+        }
+
+        /// <summary>Paste a bookmarks file in. The text says which game it belongs to, so this works
+        /// on the main menu and for a game other than the one open, and what it landed on is read in
+        /// a dialog rather than spoken past. A file written for the game being played is picked up by
+        /// the map itself: the store counts its writes and the map's bookmarks reload on the next
+        /// gesture.</summary>
+        private static void ImportBookmarks(AdventureBookmarkStore store)
+        {
+            AdventureBookmarkStore.ImportResult result = store.Import(UnityEngine.GUIUtility.systemCopyBuffer);
+            string message;
+            switch (result.Outcome)
+            {
+                case AdventureBookmarkStore.ImportOutcome.Empty:
+                    message = ModText.Get(ModStrings.Screens.ClipboardEmpty);
+                    break;
+                case AdventureBookmarkStore.ImportOutcome.NotBookmarks:
+                    message = ModText.Get(ModStrings.Screens.ClipboardNotBookmarks);
+                    break;
+                case AdventureBookmarkStore.ImportOutcome.WriteFailed:
+                    message = ModText.Get(ModStrings.Screens.BookmarksNotWritten);
+                    break;
+                default:
+                    message = ModText.Plural(
+                        result.Identity.SameStorageAs(GameBeingPlayed())
+                            ? ModStrings.Screens.BookmarksImported
+                            : ModStrings.Screens.BookmarksImportedForOtherGame,
+                        result.Count,
+                        result.Count);
+                    break;
+            }
+
+            ModOptionsDialogs.OpenMessage(
+                "mod-bookmarks-import",
+                ModText.Get(ModStrings.Screens.ImportBookmarksFromClipboard),
+                message);
+        }
+
+        /// <summary>Hand the folder to the desktop. Verified on Windows, where the file manager opens
+        /// on it; the other platforms the game ships for are unverified.</summary>
+        private static void OpenBookmarksFolder(AdventureBookmarkStore store)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(store.Folder);
+            }
+            catch (Exception exception)
+            {
+                SocAccessMod.Instance?.LogWarning("Failed to open the bookmarks folder: " + exception.Message);
+            }
+        }
+
+        private static void Speak(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
+            }
         }
 
         private void AddAnnouncementOrder(ModString label, AnnouncementGroupDefinition group)
