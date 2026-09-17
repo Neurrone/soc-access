@@ -410,10 +410,10 @@ namespace SongsOfConquestAccess.Input
         }
 
         public static readonly InputAction[] SaveBookmarks =
-            CreateBookmarkActions("save_bookmark", ModStrings.Actions.SaveBookmark, ctrl: true, shift: false, alt: false);
+            CreateBookmarkActions("save_bookmark", ModStrings.Actions.SaveBookmark, ctrl: false, shift: true, alt: false);
 
         public static readonly InputAction[] JumpToBookmarks =
-            CreateBookmarkActions("jump_to_bookmark", ModStrings.Actions.JumpToBookmark, ctrl: false, shift: true, alt: false);
+            CreateBookmarkActions("jump_to_bookmark", ModStrings.Actions.JumpToBookmark, ctrl: true, shift: false, alt: false);
 
         public static readonly InputAction[] SpeakBookmarkDirections =
             CreateBookmarkActions("speak_bookmark_direction", ModStrings.Actions.SpeakBookmarkDirection, ctrl: false, shift: false, alt: true);

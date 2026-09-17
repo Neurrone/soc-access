@@ -72,8 +72,8 @@ This page summarizes the mod hotkeys used across the documentation.
 | `B`                 | Focus objectives                    |
 | `R`                 | Focus resources                     |
 | `T`                 | Focus troops                        |
-| `Ctrl+number`       | Save bookmark                       |
-| `Shift+number`      | Jump to bookmark                    |
+| `Shift+number`      | Save bookmark                       |
+| `Ctrl+number`       | Jump to bookmark                    |
 | `Alt+number`        | Read directions to bookmark         |
 | `Ctrl+Shift+number` | Toggle [bookmark beacon](audio.md#bookmark-beacons) |
 

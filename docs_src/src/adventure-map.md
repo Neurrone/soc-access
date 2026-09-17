@@ -97,8 +97,8 @@ Entities revealed during exploration are announced. They can also be found in a 
 
 Bookmarks let you save adventure map locations and return to them later. There are ten bookmark slots, using the number keys `1` through `9` and `0`.
 
-- `Ctrl+number`: saves the current position to that bookmark slot
-- `Shift+number`: jump to that bookmark slot
+- `Shift+number`: saves the current position to that bookmark slot
+- `Ctrl+number`: jump to that bookmark slot
 - `Alt+number`: read directions from the currently focused tile to the bookmarked position
 
 Saving to an existing slot overwrites it. There is no separate delete command.
