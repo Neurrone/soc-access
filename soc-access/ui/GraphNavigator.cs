@@ -115,6 +115,10 @@ namespace SongsOfConquestAccess.UI
             CarryState.PickUpAction = AccessibilityActions.UiCarry.Key;
             CarryState.DropAction = AccessibilityActions.UiLeftClick.Key;
             CarryState.CancelAction = AccessibilityActions.UiBack.Key;
+
+            // One render per frame: a key press asks for one where it acts and the screen tick asks
+            // for another as it seats the cursor, and nothing the game owns has moved between them.
+            KeyGraph.FrameCounter = () => UnityEngine.Time.frameCount;
         }
 
         public static void ResetWiring()
@@ -356,6 +360,9 @@ namespace SongsOfConquestAccess.UI
         /// </summary>
         public void ReannounceFocused()
         {
+            // "Re-read it now" is asked by a caller that has just changed something by its own
+            // route, which no graph operation invalidated: the next build is always a fresh one.
+            if (_graph != null) _graph.Invalidate();
             _lastSpokenKey = null;
             _bufferKey = null;
             _bufferReadout = null;
@@ -391,6 +398,9 @@ namespace SongsOfConquestAccess.UI
         /// </summary>
         public void FocusNode(ControlId id, bool announce = true)
         {
+            // The caller may have moved the game itself before asking for the cursor to be taken
+            // somewhere, so the build that seats it is never a reused one.
+            if (_graph != null) _graph.Invalidate();
             _pendingFocus = id == null ? null : new FocusRequest(id, announce, _screen);
             _pendingArrival = false;
             _pendingArrivalLabel = null;
@@ -981,6 +991,8 @@ namespace SongsOfConquestAccess.UI
                 CarryOutcome drop = CarryActions.Activate(node == null ? null : node.Vtable, _carry);
                 if (drop.Handled)
                 {
+                    // The drop acted on the game outside the graph.
+                    _graph.Invalidate();
                     Say(drop.Speech, true);
                     return true;
                 }
@@ -1032,6 +1044,8 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
+            // The press changed what is carried, and a carried thing changes what rows say.
+            _graph.Invalidate();
             Say(outcome.Speech, true);
             return true;
         }

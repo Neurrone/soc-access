@@ -1502,5 +1502,96 @@ namespace SongsOfConquestAccess.Tests
             Assert.IsFalse(g.FocusByReference(thing)); // already there: no change
             Assert.IsFalse(g.FocusByReference(new object()));
         }
+
+        // ---- one render per frame ----
+
+        [TestMethod]
+        public void TheRenderIsBuiltOncePerFrameAndAgainAfterAnActivation()
+        {
+            GraphState state = new GraphState();
+            int builds = 0;
+            int frame = 7;
+            List<string> clicked = new List<string>();
+            KeyGraph g = new KeyGraph(() =>
+            {
+                builds++;
+                GraphBuilder b = new GraphBuilder();
+                NodeVtable vt = Vt("A");
+                vt.OnActivate = () => clicked.Add("A");
+                b.AddItem(new SyntheticNode(Id("a"), vt));
+                return b.Build();
+            }, state);
+            KeyGraph.FrameCounter = () => frame;
+            try
+            {
+                Assert.IsTrue(g.Rerender());
+                Assert.IsTrue(g.Rerender());
+                Assert.AreEqual(1, builds); // the operation's render and the seating pass share one build
+
+                frame++;
+                Assert.IsTrue(g.Rerender());
+                Assert.AreEqual(2, builds);
+
+                Assert.IsTrue(g.Activate()); // reuses this frame's build...
+                Assert.AreEqual(2, builds);
+                Assert.AreEqual(1, clicked.Count);
+
+                Assert.IsTrue(g.Rerender()); // ...and what it did is seen by the next render
+                Assert.AreEqual(3, builds);
+            }
+            finally
+            {
+                KeyGraph.Reset();
+            }
+        }
+
+        [TestMethod]
+        public void WithNoFrameClockEveryRerenderBuilds()
+        {
+            GraphState state = new GraphState();
+            int builds = 0;
+            KeyGraph g = new KeyGraph(() =>
+            {
+                builds++;
+                GraphBuilder b = new GraphBuilder();
+                b.AddItem(new SyntheticNode(Id("a"), Vt("A")));
+                return b.Build();
+            }, state);
+
+            Assert.IsTrue(g.Rerender());
+            Assert.IsTrue(g.Rerender());
+            Assert.AreEqual(2, builds);
+        }
+
+        [TestMethod]
+        public void AnEmptyBuildIsNotRemembered()
+        {
+            GraphState state = new GraphState();
+            int builds = 0;
+            bool empty = true;
+            KeyGraph g = new KeyGraph(() =>
+            {
+                builds++;
+                GraphBuilder b = new GraphBuilder();
+                if (!empty) b.AddItem(new SyntheticNode(Id("a"), Vt("A")));
+                return b.Build();
+            }, state);
+            KeyGraph.FrameCounter = () => 3;
+            try
+            {
+                Assert.IsFalse(g.Rerender());
+                Assert.AreEqual(1, builds);
+
+                // The window has content now, on the same frame: the empty answer was not kept.
+                empty = false;
+                Assert.IsTrue(g.Rerender());
+                Assert.AreEqual(2, builds);
+                Assert.AreEqual("a", Focused(g));
+            }
+            finally
+            {
+                KeyGraph.Reset();
+            }
+        }
     }
 }
