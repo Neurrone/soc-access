@@ -748,9 +748,13 @@ namespace SongsOfConquestAccess.Adapters
                     byte[] decorations = map.Contents.DecorationsArray;
                     byte[] water = map.Contents.WaterArray;
                     tile.Elevation = elevations != null && index < elevations.Length ? elevations[index] : (byte)0;
-                    tile.IsImpassable = (water != null && index < water.Length && water[index] != 0)
-                        || (decorations != null && index < decorations.Length && IsBlocker(decorations[index]));
                     tile.Kind = terrain != null ? terrain.GetKind(point) : BattlefieldCellKind.OffGrid;
+                    // The same answer the analysed terrain gives, which is the fight's own cost rule
+                    // (ReadTerrainCells); the water-or-blocker guess is only for a page with no terrain.
+                    tile.IsImpassable = terrain != null
+                        ? tile.Kind == BattlefieldCellKind.Impassable
+                        : (water != null && index < water.Length && water[index] != 0)
+                            || (decorations != null && index < decorations.Length && IsBlocker(decorations[index]));
                     tile.IsChokePoint = terrain != null && terrain.IsChokePoint(point);
                 }
             }
