@@ -399,7 +399,7 @@ internal static class Program
             }
         }
 
-        return builder.ToString();
+        return builder.ToString().Replace("\r\n", "\n");
     }
 
     private static int ValidateTranslations(
