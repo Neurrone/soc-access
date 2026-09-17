@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
+using Lavapotion.Cartography;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Deployment;
 using SongsOfConquest.Client.Gamestate;
@@ -88,6 +89,8 @@ namespace SongsOfConquestAccess.Adapters
         // so a page whose map is not there yet costs one pass and not one per frame.
         private BattlefieldTerrain _terrain;
         private bool _terrainProbed;
+        private CartographyManifest _battleManifest;
+        private bool _battleManifestProbed;
         private bool _warnedUnknownRegion;
 
         private enum BattleParticipantSide
@@ -799,11 +802,17 @@ namespace SongsOfConquestAccess.Adapters
         private List<BattlefieldCell> ReadTerrainCells(MapFormat map)
         {
             DeploymentRenderer renderer = GetDeploymentRenderer();
+            CartographyManifest manifest = GetBattleManifest();
             Vector2Int size = map.Metadata.Size;
             byte[] elevations = map.Contents.ElevationsArray;
             byte[] decorations = map.Contents.DecorationsArray;
             byte[] water = map.Contents.WaterArray;
             byte[] effects = map.Contents.EffectsArray;
+            byte[] themes = map.Contents.ThemesArray;
+            byte[] types = map.Contents.TypesArray;
+            byte[] customTypes = map.Contents.CustomTypesArray;
+            byte[] standalones = map.Contents.StandaloneDecorationsArray;
+            byte[] bridges = map.Contents.BridgesArray;
             List<BattlefieldCell> cells = new List<BattlefieldCell>(size.x * size.y);
             for (int y = 0; y < size.y; y++)
             {
@@ -811,8 +820,22 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     Vector2Int point = new Vector2Int(x, y);
                     int index = map.PointToIndex(point);
-                    byte decoration = decorations != null && index < decorations.Length ? decorations[index] : (byte)0;
-                    bool wet = water != null && index < water.Length && water[index] != 0;
+                    byte decoration = At(decorations, index);
+                    bool wet = At(water, index) != 0;
+                    bool onGrid = IsGridTile(map, renderer, point);
+                    // A cell is impassable when the game prices it infinite, the same sum the fight
+                    // and the dumped layout use, so the page's groups of ground are the fight's.
+                    float cost = BattlefieldCellCosts.StaticTravelCost(
+                        manifest,
+                        At(themes, index),
+                        At(types, index),
+                        At(customTypes, index),
+                        decoration,
+                        At(standalones, index),
+                        At(effects, index),
+                        At(water, index),
+                        At(bridges, index),
+                        IsBlocker(decoration));
                     // The bytes that say which family of prop blocks a cell travel even here, where
                     // the page has no word for any of them: they are what a group of blocked cells
                     // is split by, so the page's groups are the fight's groups. The theme does not:
@@ -820,17 +843,35 @@ namespace SongsOfConquestAccess.Adapters
                     // cannot know which ground that will be.
                     cells.Add(new BattlefieldCell(
                         point,
-                        IsGridTile(map, renderer, point),
-                        elevations != null && index < elevations.Length ? elevations[index] : 0,
-                        wet || IsBlocker(decoration),
+                        onGrid,
+                        At(elevations, index),
+                        float.IsPositiveInfinity(cost) || !onGrid,
                         decoration,
-                        effects != null && index < effects.Length ? effects[index] : 0,
+                        At(effects, index),
                         wet,
                         0));
                 }
             }
 
             return cells;
+        }
+
+        /// <summary>The battle manifest that prices a cell, resolved once for this menu; a miss is
+        /// remembered too, so an unloaded manifest costs one lookup and not one per cell.</summary>
+        private CartographyManifest GetBattleManifest()
+        {
+            if (!_battleManifestProbed)
+            {
+                _battleManifestProbed = true;
+                _battleManifest = BattlefieldCellCosts.BattleManifest();
+            }
+
+            return _battleManifest;
+        }
+
+        private static byte At(byte[] array, int index)
+        {
+            return array != null && index >= 0 && index < array.Length ? array[index] : (byte)0;
         }
 
         private void AddSpawnPoints(TroopPlacementSnapshot snapshot, DeploymentMenu deployment, BattleSide side)

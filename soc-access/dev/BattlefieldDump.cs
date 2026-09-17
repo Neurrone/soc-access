@@ -453,23 +453,11 @@ namespace SongsOfConquestAccess.Dev
             int water = At(contents.WaterArray, index);
             int bridge = At(contents.BridgesArray, index);
 
-            // The game's own cost sum (AbstractStaticMapCache.UpdatePoint, battle branch: no road
-            // factor); infinite cost is what IsWalkableStatic reads as impassable.
-            float cost;
-            if (services.Manifest == null)
-            {
-                cost = water > 0 || IsPreviewBlocker(decoration) ? float.PositiveInfinity : 1f;
-            }
-            else
-            {
-                float typeCost = customType > 0 ? services.Manifest.GetCustomTypeTravelCost(customType) : services.Manifest.GetTypeTravelCost(theme, terrainType);
-                float decorationCost = decoration == 0 ? 0f : services.Manifest.GetDecorationTravelCost(theme, decoration);
-                float effectCost = effect == 0 ? 0f : services.Manifest.GetEffectTravelCost(effect);
-                float bridgeCost = bridge == 0 ? 0f : services.Manifest.GetBridgeTravelCost(bridge);
-                float standaloneCost = standalone == 0 ? 0f : services.Manifest.GetStandaloneDecorationTravelCost(standalone);
-                float waterCost = water > 0 ? float.PositiveInfinity : 0f;
-                cost = typeCost + (standalone > 0 ? standaloneCost : decorationCost + waterCost) + effectCost + bridgeCost;
-            }
+            // The game's own cost sum, shared with the placement page so the two read the same
+            // ground; infinite cost is what IsWalkableStatic reads as impassable.
+            float cost = BattlefieldCellCosts.StaticTravelCost(
+                services.Manifest, theme, terrainType, customType, decoration, standalone, effect, water, bridge,
+                IsPreviewBlocker(decoration));
 
             float3 ignored;
             bool onGrid = map.IsPointWithinMap(new Vector2Int(x, y))

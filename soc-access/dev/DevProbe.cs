@@ -8,6 +8,8 @@ using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
+using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Loader.Dev;
 using SongsOfConquestAccess.Screens;
 using UnityEngine;
@@ -298,6 +300,115 @@ namespace SongsOfConquestAccess.Dev
 
                 json.WriteEndArray();
             });
+        }
+
+        /// <summary>The placement page's ground against the dumped layout's: for every cell of the
+        /// open page, whether the page calls it impassable where
+        /// <c>battlefields/&lt;LevelType&gt;/&lt;PathName&gt;.json</c> does. The two read the same
+        /// bytes through the same cost rule, so any mismatch is a bug in one of them. Also answers
+        /// the page's groups of ground and its choke points, which is what a description points at.
+        /// </summary>
+        public static string PlacementTerrainVersusDump(string dumpPath)
+        {
+            return Guarded(json =>
+            {
+                ScreenManager screens = SocAccessMod.Instance?.ScreenManager;
+                PreBattleMenuScreen screen = screens == null ? null : screens.Registered<PreBattleMenuScreen>();
+                PreBattleMenuAdapter adapter = screen == null ? null : screen.Live;
+                BattlefieldTerrain terrain = adapter == null ? null : adapter.GetTerrain();
+                if (terrain == null)
+                {
+                    json.WritePropertyName("error");
+                    json.WriteValue("no placement page with a battlefield is open");
+                    return;
+                }
+
+                if (!System.IO.File.Exists(dumpPath))
+                {
+                    json.WritePropertyName("error");
+                    json.WriteValue("no dump at " + dumpPath);
+                    return;
+                }
+
+                DumpedLayout dump = JsonConvert.DeserializeObject<DumpedLayout>(System.IO.File.ReadAllText(dumpPath));
+                List<DumpedCell> cells = dump != null && dump.Cells != null ? dump.Cells : new List<DumpedCell>();
+                json.WritePropertyName("battlefield");
+                json.WriteValue(adapter.BattlefieldKey);
+                json.WritePropertyName("size");
+                json.WriteValue(terrain.Size.x + "x" + terrain.Size.y);
+                json.WritePropertyName("dumpedCells");
+                json.WriteValue(cells.Count);
+                json.WritePropertyName("mismatches");
+                json.WriteStartArray();
+                int mismatches = 0;
+                for (int i = 0; i < cells.Count; i++)
+                {
+                    Vector2Int point = new Vector2Int(cells[i].X, cells[i].Y);
+                    BattlefieldCellKind kind = terrain.GetKind(point);
+                    bool page = kind != BattlefieldCellKind.Flat
+                        && kind != BattlefieldCellKind.Elevated
+                        && kind != BattlefieldCellKind.Cliff
+                        && kind != BattlefieldCellKind.Unreachable;
+                    if (page == cells[i].Impassable)
+                    {
+                        continue;
+                    }
+
+                    mismatches++;
+                    json.WriteStartObject();
+                    json.WritePropertyName("cell");
+                    json.WriteValue(point.x + "," + point.y);
+                    json.WritePropertyName("page");
+                    json.WriteValue(kind.ToString());
+                    json.WritePropertyName("dump");
+                    json.WriteValue(cells[i].Impassable ? "impassable" : "walkable");
+                    json.WriteEndObject();
+                }
+
+                json.WriteEndArray();
+                json.WritePropertyName("mismatchCount");
+                json.WriteValue(mismatches);
+                json.WritePropertyName("regions");
+                json.WriteValue(terrain.Regions.Count);
+                json.WritePropertyName("chokePoints");
+                json.WriteStartArray();
+                for (int i = 0; i < terrain.Regions.Count; i++)
+                {
+                    BattlefieldRegion region = terrain.Regions[i];
+                    if (region.Kind != BattlefieldRegionKind.ChokePoint)
+                    {
+                        continue;
+                    }
+
+                    json.WriteStartArray();
+                    for (int c = 0; c < region.Cells.Count; c++)
+                    {
+                        json.WriteValue(region.Cells[c].x + "," + region.Cells[c].y);
+                    }
+
+                    json.WriteEndArray();
+                }
+
+                json.WriteEndArray();
+            });
+        }
+
+        private sealed class DumpedLayout
+        {
+            [JsonProperty("cells")]
+            public List<DumpedCell> Cells { get; set; }
+        }
+
+        private sealed class DumpedCell
+        {
+            [JsonProperty("x")]
+            public int X { get; set; }
+
+            [JsonProperty("y")]
+            public int Y { get; set; }
+
+            [JsonProperty("impassable")]
+            public bool Impassable { get; set; }
         }
 
         private static string Guarded(Action<JsonTextWriter> body)
