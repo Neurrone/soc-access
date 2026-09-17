@@ -346,8 +346,8 @@ namespace SongsOfConquestAccess.Screens
             GraphNodes.Aim(vtable, tooltip);
             vtable.OnActivate = ConfirmTarget;
             vtable.OnContextual = ContextualTile;
-            vtable.OnFocusVisual = () => Grid().ShowOverlay();
-            vtable.OnBlurVisual = () => Grid().HideOverlay();
+            vtable.OnFocusVisual = () => Grid()?.ShowOverlay();
+            vtable.OnBlurVisual = () => Grid()?.HideOverlay();
             TileInstructionHints.Add(vtable, TileTooltip);
             builder.AddItem(new SyntheticNode(BoardNodeId, vtable));
             builder.SetStart(BoardNodeId);
