@@ -239,6 +239,16 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
+        /// <summary>Put new words in the panel's title bar - for a dialog whose title names the very
+        /// thing the dialog can rename.</summary>
+        public void SetTitle(string title)
+        {
+            if (_title != null)
+            {
+                _title.Text = title;
+            }
+        }
+
         /// <summary>Close this dialog and hand the page or the dialog beneath it back.</summary>
         public void Close()
         {
@@ -299,11 +309,17 @@ namespace SongsOfConquestAccess.UI
             return button;
         }
 
-        public IUITextMeshInputField AddInputField(string label, string value, Action<string> changed)
+        /// <summary>
+        /// A text box. <paramref name="changed"/> is the game's own event and fires on every
+        /// keystroke; <paramref name="ended"/> is the END of the edit, which the game does not
+        /// offer - see <see cref="AddEndEditListener"/>.
+        /// </summary>
+        public IUITextMeshInputField AddInputField(string label, string value, Action<string> changed, Action<string> ended = null)
         {
             IUITextMeshInputField field = _controller.AddInputField(label, value ?? string.Empty, changed);
             ClearTooltip(field);
             ClearPlaceholder(field);
+            AddEndEditListener(field, ended);
             return field;
         }
 
@@ -588,17 +604,47 @@ namespace SongsOfConquestAccess.UI
 
         // ---- odds and ends ----
 
+        /// <summary>
+        /// Where a value the mod has to check is committed. The game's box reports a CHANGE per
+        /// keystroke and nothing at all when the player is done, but the TextMeshPro field
+        /// underneath raises <c>onEndEdit</c> on Enter, on Escape - by which time TMP has already
+        /// put the pre-edit text back - and when the focus leaves the box. The listener sits on
+        /// that field, which is destroyed with the column it was drawn into, so a redraw or a
+        /// teardown leaves nothing subscribed.
+        /// </summary>
+        private static void AddEndEditListener(IUITextMeshInputField field, Action<string> ended)
+        {
+            if (ended == null)
+            {
+                return;
+            }
+
+            TMP_InputField input = NativeInputOf(field);
+            if (input != null)
+            {
+                input.onEndEdit.AddListener(text => ended(text));
+            }
+        }
+
         /// <summary>Take the prefab's design-time placeholder ("XXXXXXXXXX") off an empty box, which
         /// is otherwise what an empty keyword field draws.</summary>
         private static void ClearPlaceholder(IUITextMeshInputField field)
         {
-            Component component = field as Component;
-            TMP_InputField input = component != null ? component.GetComponentInChildren<TMP_InputField>(true) : null;
+            TMP_InputField input = NativeInputOf(field);
             TMP_Text placeholder = input != null ? input.placeholder as TMP_Text : null;
             if (placeholder != null)
             {
                 placeholder.text = string.Empty;
             }
+        }
+
+        /// <summary>The TextMeshPro field inside one of the game's text rows: the row is a wrapper
+        /// and the box itself is a child of it. DRAWING, not a build: a row is walked once, as it is
+        /// made, and never again.</summary>
+        private static TMP_InputField NativeInputOf(IUITextMeshInputField field)
+        {
+            Component component = field as Component;
+            return component != null ? component.GetComponentInChildren<TMP_InputField>(true) : null;
         }
 
         private static void ClearTooltip(IUITransform control)

@@ -23,12 +23,13 @@ namespace SongsOfConquestAccess.Screens
     /// says who holds it before it is taken, moving an element redraws the list and leaves the
     /// cursor on the element that moved, and the defaults are a button rather than a special case.
     ///
-    /// The dialogs that EDIT one thing - a cue, a category, a source's subcategories - carry Cancel
-    /// and Confirm, because a change is applied while the dialog is open (a slider replays its cue
-    /// as it moves) and leaving has to be able to mean "not that". Cancel puts back a snapshot taken
-    /// when the dialog opened: <c>ModSettings.SnapshotCue</c> for a cue, and the stored form of the
-    /// whole taxonomy for a category, which already says its name, its key, its subcategories and
-    /// its keywords in one string. The dialogs that only LIST things carry neither.
+    /// A dialog carries Cancel and Confirm only where leaving has to be able to mean "not that":
+    /// a cue, whose sliders replay it as they move, and one source's subcategories. Cancel puts
+    /// back a snapshot taken when the dialog opened - <c>ModSettings.SnapshotCue</c> for a cue, and
+    /// the stored form of the whole taxonomy for the subcategories, which already says every
+    /// category's name, key, subcategories and keywords in one string. Everywhere else, including
+    /// the editor for one category, a change is written and saved as it is made and leaving simply
+    /// leaves, as every toggle and slider in the Mod options window itself does.
     /// </summary>
     public static class ModOptionsDialogs
     {
@@ -311,17 +312,15 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>
         /// The editor for one slot. An empty slot is filled as it is opened, under the name its
         /// number gives it, because a category is a name plus what it asks for and there is nothing
-        /// to tick columns onto until the slot holds one. Cancel puts the whole taxonomy back as it
-        /// was, which empties a slot this opening filled.
+        /// to tick columns onto until the slot holds one. Every change here is written as it is
+        /// made, so leaving keeps it; a slot still untouched when the editor is left is emptied
+        /// again rather than left holding the name the opening gave it.
         /// </summary>
         private static void OpenCustomCategory(ModDialogScreen parent, ScannerTaxonomy taxonomy, int slot)
         {
-            string snapshot = ModSettings.SnapshotScannerCustomCategories(taxonomy.Key);
+            string defaultName = ModText.Get(ModStrings.Screens.CustomCategoryDefaultName, slot + 1);
             ScannerCustomCategory category = ModSettings.GetScannerCustomCategory(taxonomy.Key, slot)
-                ?? ModSettings.AddScannerCustomCategory(
-                    taxonomy.Key,
-                    slot,
-                    ModText.Get(ModStrings.Screens.CustomCategoryDefaultName, slot + 1));
+                ?? ModSettings.AddScannerCustomCategory(taxonomy.Key, slot, defaultName);
             if (category == null)
             {
                 return;
@@ -333,10 +332,22 @@ namespace SongsOfConquestAccess.Screens
                 screen => DrawCustomCategory(screen, parent, taxonomy, slot),
                 () =>
                 {
-                    ModSettings.RestoreScannerCustomCategories(taxonomy.Key, snapshot);
+                    ForgetUntouchedCategory(taxonomy, slot, defaultName);
                     parent.Redraw();
                     return true;
                 });
+        }
+
+        /// <summary>Leaving a slot still exactly as the opening left it empties it again, so looking
+        /// at an empty slot does not put a category with a name and nothing else into the cycle - a
+        /// scope that would answer every key with nothing found.</summary>
+        private static void ForgetUntouchedCategory(ScannerTaxonomy taxonomy, int slot, string defaultName)
+        {
+            ScannerCustomCategory category = ModSettings.GetScannerCustomCategory(taxonomy.Key, slot);
+            if (category != null && category.IsUntouched(defaultName))
+            {
+                ModSettings.ClearScannerCustomCategory(taxonomy.Key, slot);
+            }
         }
 
         private static void DrawCustomCategory(ModDialogScreen screen, ModDialogScreen parent, ScannerTaxonomy taxonomy, int slot)
@@ -349,12 +360,14 @@ namespace SongsOfConquestAccess.Screens
             }
 
             // The box's own change event fires on every keystroke, so the name is not written as it
-            // is typed - it is read off the box when the player confirms, which is also where the
-            // refusal belongs.
-            IUITextMeshInputField nameField = dialog.AddInputField(
+            // is typed - it is committed when the EDIT ENDS, which is Enter, Escape, or the focus
+            // leaving the box, and that is also where the refusal belongs.
+            IUITextMeshInputField nameField = null;
+            nameField = dialog.AddInputField(
                 ModText.Get(ModStrings.Screens.CustomCategoryName),
                 category.Name,
-                null);
+                null,
+                text => CommitName(screen, parent, taxonomy, slot, nameField, text));
 
             IReadOnlyList<ScannerCategoryDefinition> definitions = taxonomy.Categories;
             for (int i = 0; i < definitions.Count; i++)
@@ -412,16 +425,48 @@ namespace SongsOfConquestAccess.Screens
                     parent.Redraw();
                     screen.Close();
                 });
-            AddCancelAndConfirm(screen, () =>
+        }
+
+        /// <summary>
+        /// The name, written when the edit ends. A name left as it was is not a change and passes in
+        /// silence; a refused one leaves the box holding the last accepted name, so the editor never
+        /// shows something the category is not called. The refusal is stacked over the editor from
+        /// inside this callback, and the editor itself is NOT redrawn here - that would destroy the
+        /// very box the callback is running on. The parent is, so the slot list says the new name,
+        /// and so is the title, which carries the name the editor opened with.
+        /// </summary>
+        private static void CommitName(
+            ModDialogScreen screen,
+            ModDialogScreen parent,
+            ScannerTaxonomy taxonomy,
+            int slot,
+            IUITextMeshInputField field,
+            string text)
+        {
+            ScannerCustomCategory category = ModSettings.GetScannerCustomCategory(taxonomy.Key, slot);
+            if (category == null)
             {
-                if (!Rename(taxonomy, slot, Value(nameField)))
+                return;
+            }
+
+            string name = (text ?? string.Empty).Trim();
+            if (name == category.Name)
+            {
+                return;
+            }
+
+            if (!Rename(taxonomy, slot, name))
+            {
+                if (field != null)
                 {
-                    return false;
+                    field.InputFieldValue = category.Name;
                 }
 
-                parent.Redraw();
-                return true;
-            });
+                return;
+            }
+
+            screen.SetTitle(ModText.Get(ModStrings.Screens.CustomCategorySlot, slot + 1, name));
+            parent.Redraw();
         }
 
         private static string Value(IUITextMeshInputField field)
@@ -435,8 +480,7 @@ namespace SongsOfConquestAccess.Screens
         /// which would leave a category the reader speaks as silence. Each refusal is a dialog of
         /// its own stacked over the editor, so it is read on arrival and has to be dismissed rather
         /// than passing by as one spoken line; the editor is left open underneath with what was
-        /// typed still in the box, so a near miss is edited rather than typed out again. A name
-        /// left as it was is not a refusal: Confirm simply closes.
+        /// typed still in the box, so a near miss is edited rather than typed out again.
         /// </summary>
         private static bool Rename(ScannerTaxonomy taxonomy, int slot, string name)
         {

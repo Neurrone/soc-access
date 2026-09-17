@@ -24,7 +24,7 @@ namespace SongsOfConquestAccess.Screens
     public sealed class ModDialogScreen : GraphScreen
     {
         private readonly string _key;
-        private readonly string _title;
+        private string _title;
         private readonly Action<ModDialogScreen> _draw;
         private readonly Func<bool> _cancel;
         private readonly ModDialog _dialog;
@@ -122,6 +122,14 @@ namespace SongsOfConquestAccess.Screens
             {
                 CloseSelf();
             }
+        }
+
+        /// <summary>Rename this dialog: the words in its title bar and the name it is announced
+        /// under are the same words, so they are changed together.</summary>
+        public void SetTitle(string title)
+        {
+            _title = title;
+            _dialog.SetTitle(title);
         }
 
         /// <summary>The window this screen reads, for whatever is drawing into it.</summary>

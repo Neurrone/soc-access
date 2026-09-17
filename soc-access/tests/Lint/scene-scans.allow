@@ -75,5 +75,5 @@ soc-access/patches/AdventureNotificationPatches.cs | 1 | UITextMesh[] textMeshes
 
 soc-access/ui/FrameSweep.cs | 1 | hit = root.GetComponentsInChildren<T>(_inactiveToo);
 
-soc-access/ui/ModDialog.cs | 1 | TMP_InputField input = component != null ? component.GetComponentInChildren<TMP_InputField>(true) : null;
+soc-access/ui/ModDialog.cs | 1 | return component != null ? component.GetComponentInChildren<TMP_InputField>(true) : null;
 soc-access/ui/ModDialog.cs | 1 | UITextMeshLocalization[] bindings = cloned.GetComponentsInChildren<UITextMeshLocalization>(true);

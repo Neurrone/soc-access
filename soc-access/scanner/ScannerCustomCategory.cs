@@ -94,6 +94,20 @@ namespace SongsOfConquestAccess.Scanner
             return true;
         }
 
+        /// <summary>
+        /// Whether nothing has been put in this category yet: still the name
+        /// its slot handed it when the slot was filled, nothing ticked and
+        /// nothing typed. Opening an empty slot fills it, so the editor needs
+        /// this to tell a slot the player only looked at from one they meant to
+        /// keep, and empty the first again on the way out.
+        /// </summary>
+        public bool IsUntouched(string defaultName)
+        {
+            return _selectors.Count == 0
+                && _keywords.Count == 0
+                && string.Equals(_name, (defaultName ?? string.Empty).Trim(), StringComparison.Ordinal);
+        }
+
         public bool HasSelector(string categoryKey, string subcategoryKey)
         {
             return IndexOfSelector(new ScannerCustomCategorySelector(categoryKey, subcategoryKey)) >= 0;

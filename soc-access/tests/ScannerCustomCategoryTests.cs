@@ -58,5 +58,24 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(0, category.Keywords.Count);
         }
 
+        [TestMethod]
+        public void ACategoryIsUntouchedOnlyWhileItIsStillTheEmptyOneTheSlotWasFilledWith()
+        {
+            ScannerCustomCategory category = new ScannerCustomCategory("Custom category 1");
+
+            Assert.IsTrue(category.IsUntouched("Custom category 1"));
+            Assert.IsFalse(category.IsUntouched("Custom category 2"));
+
+            Assert.IsTrue(category.AddKeyword("mine"));
+            Assert.IsFalse(category.IsUntouched("Custom category 1"));
+            Assert.IsTrue(category.RemoveKeyword("mine"));
+
+            category.SetSelector(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.Unvisited, selected: true);
+            Assert.IsFalse(category.IsUntouched("Custom category 1"));
+            category.SetSelector(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.Unvisited, selected: false);
+
+            Assert.IsTrue(category.Rename("My scouting"));
+            Assert.IsFalse(category.IsUntouched("Custom category 1"));
+        }
     }
 }
