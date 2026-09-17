@@ -34,7 +34,7 @@ order, which is how combat covers the map.
 | 7 | `PlatformUserMenuScreen` | a popup over the lobby |
 | 10 | `AdventureMapScreen` | the world, under everything drawn on it |
 | 10 | `CombatScreen` | the battlefield; registered after the map, so it covers it |
-| 12 | `PreBattleMenuScreen` | over the map, under what the battle raises |
+| 12 | `PreBattleMenuScreen` | under what the battle raises; the map is off the stack from the attack until the battle is over |
 | 20 | `MapEntityMiniMenuScreen`, `AdventurePlayerMenuScreen`, `OwnedEntitiesScreen`, `TroopOverviewScreen`, `MarketplaceScreen`, `ArtifactMarketScreen`, `TradingScreen` | an in-game panel over the map |
 | 20 | `SettlementScreen`, `DefenceMenuScreen` | a landing page, under its own sub-pages |
 | 20 | `AdventureLobbyGameSettingsScreen`, `AdventureLobbyPlayerSettingsScreen` | a lobby sub-page, over the lobby |
@@ -73,6 +73,6 @@ Their layers are declared for the dev server's listing only, and are never compa
 ## Keeping the cursor
 
 `KeepStateOnPop` is true on `AdventureMapScreen`, `CombatScreen`, `SettlementScreen` and
-`DefenceMenuScreen`: a dialog COVERS those by layer rather than deactivating them, and the two
-things that do deactivate the map and the battlefield - a story sequence and the loading screen -
-are gaps the player comes back from to where they were.
+`DefenceMenuScreen`: a dialog COVERS those by layer rather than deactivating them, and the three
+things that do deactivate the map and the battlefield - a story sequence, a claimed battle and the
+loading screen - are gaps the player comes back from to where they were.

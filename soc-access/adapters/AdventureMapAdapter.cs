@@ -18,6 +18,7 @@ using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
@@ -68,6 +69,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly ISystemPopups _systemPopups;
         private readonly AdventureMapRevealedRegistry _revealedRegistry;
         private readonly ICommandWaiter _commandWaiter;
+        private readonly IBattleManager _battleManager;
         private readonly ISceneLoader _sceneLoader;
         private readonly MethodInfo _worldToPointMethod;
         private readonly MethodInfo _pointToWorldMethod;
@@ -188,6 +190,7 @@ namespace SongsOfConquestAccess.Adapters
             _systemPopups = systemPopups;
             _revealedRegistry = revealedRegistry;
             _commandWaiter = Reflect.Resolve<ICommandWaiter>(container);
+            _battleManager = Reflect.Resolve<IBattleManager>(container);
             _sceneLoader = ProjectContext.HasInstance && ProjectContext.Instance.Container != null
                 ? ProjectContext.Instance.Container.TryResolve<ISceneLoader>()
                 : null;
@@ -397,6 +400,40 @@ namespace SongsOfConquestAccess.Adapters
             foreach (string identifier in _commandWaiter.WaitDebugIdentifiers)
             {
                 if (identifier == MessageTriggerWait || identifier == DialogueTriggerWait)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>Whether a battle is claimed. The game claims a battlefield on the attack command
+        /// and the server unclaims it when the battle is over or withdrawn from, so this is true
+        /// across the troop placement page, the fight or the quick battle, and the result page.
+        ///
+        /// Read off the game each frame: the claimed set is the battle manager's own dictionary of
+        /// active containers, which it adds to in <c>ClaimBattlefield</c> and removes from in
+        /// <c>UnclaimBattlefield</c>.</summary>
+        public bool IsBattleClaimed()
+        {
+            IEnumerable<BattleContainer> battles = _battleManager == null ? null : _battleManager.AllActiveBattles;
+            if (battles == null)
+            {
+                return false;
+            }
+
+            // The game answers with a dictionary's values, so Count is the whole question and no
+            // enumerator is allocated on a path that runs every frame.
+            ICollection<BattleContainer> claimed = battles as ICollection<BattleContainer>;
+            if (claimed != null)
+            {
+                return claimed.Count > 0;
+            }
+
+            foreach (BattleContainer battle in battles)
+            {
+                if (battle != null)
                 {
                     return true;
                 }

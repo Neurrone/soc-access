@@ -229,11 +229,16 @@ namespace SongsOfConquestAccess.Screens
             get { return false; }
         }
 
-        /// <summary>The adventure view installed and ready, and neither of the two things that take
-        /// the map AWAY: a story sequence running (the camera and the keyboard are the story's) and
-        /// the loading screen. A popup does NOT deactivate the map - it covers it by layer, so the
-        /// HUD stays drawn underneath and the event listener and its audio are not torn down and
-        /// rebuilt for every dialog.</summary>
+        /// <summary>The adventure view installed and ready, and none of the three things that take
+        /// the map AWAY: a story sequence running (the camera and the keyboard are the story's), a
+        /// claimed battle, and the loading screen. A popup does NOT deactivate the map - it covers it
+        /// by layer, so the HUD stays drawn underneath and the event listener and its audio are not
+        /// torn down and rebuilt for every dialog.
+        ///
+        /// The battle gate is what keeps the map quiet from the attack until the battle is over. The
+        /// game hides the troop placement page the moment Quick Battle or Manual Battle is pressed
+        /// and the result page or the combat screen only arrives some frames later; without this the
+        /// map is the top screen in between and is announced.</summary>
         public override bool IsActive()
         {
             if (!base.IsActive())
@@ -241,7 +246,7 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            if (Live.IsStoryTriggerRunning())
+            if (Live.IsStoryTriggerRunning() || Live.IsBattleClaimed())
             {
                 return false;
             }
@@ -254,8 +259,8 @@ namespace SongsOfConquestAccess.Screens
             return loading == null || !loading.IsActive();
         }
 
-        /// <summary>The cursor survives the story gap and the loading screen, which are the only two
-        /// things that take the map off the stack.</summary>
+        /// <summary>The cursor survives the story gap, a battle and the loading screen, which are the
+        /// only three things that take the map off the stack.</summary>
         public override bool KeepStateOnPop
         {
             get { return true; }
