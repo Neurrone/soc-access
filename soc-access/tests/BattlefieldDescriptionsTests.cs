@@ -62,6 +62,21 @@ namespace SongsOfConquestAccess.Tests
             Assert.IsNull(description);
         }
 
+        /// <summary>A map whose authored type disagrees with the folder it was dumped from (the
+        /// campaign battlefields say "Adventure") is still found by its path, which is unique.</summary>
+        [TestMethod]
+        public void ALayoutWhoseTypeDisagreesIsFoundByItsPath()
+        {
+            BattlefieldDescriptionTable table = BattlefieldDescriptions.Parse(Table);
+
+            BattlefieldDescription description;
+            Assert.IsTrue(table.TryGet("Adventure/Hills3", out description));
+            Assert.AreEqual("Open ground with a ridge.", description.Terrain);
+
+            Assert.IsFalse(table.TryGet("Hills3", out description));
+            Assert.IsFalse(table.TryGet("Adventure/Hills4", out description));
+        }
+
         [TestMethod]
         public void ALanguageWithNoTableOfItsOwnReadsTheEnglishOne()
         {

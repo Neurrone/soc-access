@@ -28,17 +28,42 @@ namespace SongsOfConquestAccess.Battlefields
         public string Defender { get; private set; }
     }
 
-    /// <summary>One language's whole table, keyed by "&lt;LevelType&gt;/&lt;PathName&gt;" - the key
-    /// the game's own <c>MapFormat.Metadata</c> answers to, so nothing translates between the
-    /// authoring folder and the runtime.</summary>
+    /// <summary>One language's whole table, keyed by "&lt;LevelType&gt;/&lt;PathName&gt;" - the
+    /// folder the dump loaded the layout from and the path it loaded it by.
+    ///
+    /// The runtime's key is built from <c>MapFormat.Metadata</c>, and its <c>Type</c> is whatever the
+    /// level editor's author set it to - nothing stamps it on load - so a campaign battlefield saved
+    /// as "Adventure" asks for "Adventure/Arleon1GoldMine" while the table holds
+    /// "BattleCampaign/Arleon1GoldMine" (found 2026-09-17 on the first campaign mission's gold mine
+    /// fight, where the page read no description at all). Path names are unique across every
+    /// layout the game ships (82 of 82 in the dump), so a key that misses is matched by its path
+    /// alone.</summary>
     public sealed class BattlefieldDescriptionTable
     {
         private readonly Dictionary<string, BattlefieldDescription> _layouts;
+        private readonly Dictionary<string, BattlefieldDescription> _byPath;
 
         public BattlefieldDescriptionTable(string language, Dictionary<string, BattlefieldDescription> layouts)
         {
             Language = language;
             _layouts = layouts ?? new Dictionary<string, BattlefieldDescription>(StringComparer.Ordinal);
+            _byPath = new Dictionary<string, BattlefieldDescription>(StringComparer.Ordinal);
+            foreach (KeyValuePair<string, BattlefieldDescription> layout in _layouts)
+            {
+                string path = PathOf(layout.Key);
+                if (path != null && !_byPath.ContainsKey(path))
+                {
+                    _byPath.Add(path, layout.Value);
+                }
+            }
+        }
+
+        /// <summary>The path half of a "&lt;LevelType&gt;/&lt;PathName&gt;" key; null for a key with
+        /// no type in front.</summary>
+        private static string PathOf(string key)
+        {
+            int slash = string.IsNullOrEmpty(key) ? -1 : key.LastIndexOf('/');
+            return slash < 0 || slash == key.Length - 1 ? null : key.Substring(slash + 1);
         }
 
         public string Language { get; private set; }
@@ -51,7 +76,18 @@ namespace SongsOfConquestAccess.Battlefields
         public bool TryGet(string key, out BattlefieldDescription description)
         {
             description = null;
-            return !string.IsNullOrEmpty(key) && _layouts.TryGetValue(key, out description);
+            if (string.IsNullOrEmpty(key))
+            {
+                return false;
+            }
+
+            if (_layouts.TryGetValue(key, out description))
+            {
+                return true;
+            }
+
+            string path = PathOf(key);
+            return path != null && _byPath.TryGetValue(path, out description);
         }
     }
 

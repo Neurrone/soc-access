@@ -50,9 +50,10 @@ namespace SongsOfConquestAccess.Screens
     ///
     /// THE DESCRIPTION STOP is what the battlefield IS: the authored description of the layout this
     /// battle is fought on (<see cref="BattlefieldDescriptions"/>, keyed by the map's own
-    /// LevelType/PathName), three lines of one node, followed by the drag hint that was this stop
-    /// before it. The same three lines answer Ctrl+D on the board, which is where a layout nobody
-    /// has described yet says so.
+    /// LevelType/PathName and found by the path alone where the authored type disagrees), three
+    /// lines of one node, followed by the drag hint that was this stop before it. It sits after
+    /// the two sides and before the board (owner ruling 2026-09-17). The same three lines answer
+    /// Ctrl+D on the board, which is where a layout nobody has described yet says so.
     ///
     /// TYPE-AHEAD is on everywhere EXCEPT the board (owner ruling 2026-09-08): the side panels, the
     /// buttons and the hint search normally, while on the board the letters A, D, Q, E, Z and C are
@@ -259,9 +260,11 @@ namespace SongsOfConquestAccess.Screens
             BuildSide(builder, attacker: false);
             builder.PopContext();
 
+            // The description before the board (owner ruling 2026-09-17): what the battlefield is
+            // comes before where the troops stand on it.
+            BuildDescription(builder);
             BuildGrid(builder);
             BuildButtons(builder);
-            BuildDescription(builder);
 
             if (start != null)
             {
