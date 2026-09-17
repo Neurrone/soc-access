@@ -171,19 +171,29 @@ namespace SongsOfConquestAccess.Screens
                 DrawAudioGlossary);
         }
 
+        /// <summary>The glossary's table. It draws no header: three columns of which two are
+        /// buttons that say what they are, so a header would only repeat them.</summary>
+        private const string GlossaryTable = "cues";
+
+        /// <summary>One row per cue: its name, and the two buttons that play it and tune it. The
+        /// columns say nothing on the way in - the name names the row and each button names
+        /// itself.</summary>
         private static void DrawAudioGlossary(ModDialogScreen screen)
         {
             ModDialog dialog = screen.Dialog;
             IReadOnlyList<CueDefinition> cues = CueLibrary.AllCues;
+            dialog.BeginTable(GlossaryTable, new string[3]);
             for (int i = 0; i < cues.Count; i++)
             {
                 CueDefinition cue = cues[i];
+                dialog.StartTableRow(cue.Key);
                 dialog.AddText(ModText.Get(cue.Name));
-                dialog.StartRow();
                 dialog.AddButton(ModText.Get(ModStrings.Screens.Play), () => CueLibrary.PlayCue(cue.Key));
                 dialog.AddButton(ModText.Get(ModStrings.Screens.Configure), () => OpenCue(cue));
                 dialog.EndRow();
             }
+
+            dialog.EndTable();
         }
 
         // ---- one cue ----

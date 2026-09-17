@@ -89,9 +89,9 @@ Open mod settings with the `Mod options` button on the main menu or the pause me
 
 `Play tile sound cues` is the master switch for every cue described on this page. Turning it off silences all of them without losing the individual settings.
 
-`Audio glossary` opens a list of every cue, in three groups: terrain, map contents and battlefield. Press `Enter` on a cue to hear it flat and centred with your current settings, which is the quickest way to learn what each sound means.
+`Audio glossary` opens a table of every cue, in three groups: terrain, map contents and battlefield. One row per cue: its name, a `Play` button and a `Configure` button. `Play` hears the cue flat and centred with your current settings, which is the quickest way to learn what each sound means.
 
-To change a cue, focus it in the list, then activate the `Configure` button below the list, which names the cue it will configure. The configure screen offers:
+To change a cue, move right from its name to `Configure` and press `Enter`. The configure screen offers:
 
 - `Enabled`: whether this cue plays at all.
 - `Volume`: 0 to 100.
