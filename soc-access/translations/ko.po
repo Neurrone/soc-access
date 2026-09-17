@@ -2470,6 +2470,11 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr "봉화"
 
+#. Scanner.BlockedStraightLineFallback
+msgctxt "Scanner.BlockedStraightLineFallback"
+msgid "blocked by {0}, straight line, {1}"
+msgstr "{0}에 막힘, 직선, {1}"
+
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
@@ -2649,6 +2654,11 @@ msgstr "정착지 및 건설 부지"
 msgctxt "Scanner.South"
 msgid "south"
 msgstr "남쪽"
+
+#. Scanner.StraightLineFallback
+msgctxt "Scanner.StraightLineFallback"
+msgid "straight line, {0}"
+msgstr "직선, {0}"
 
 #. Scanner.SouthShort
 msgctxt "Scanner.SouthShort"
@@ -3475,6 +3485,21 @@ msgstr "스캐너"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "스캐너 내용 알림"
+
+#. Screens.ScannerDistance
+msgctxt "Screens.ScannerDistance"
+msgid "Distance"
+msgstr "거리"
+
+#. Screens.ScannerDistanceStraightLine
+msgctxt "Screens.ScannerDistanceStraightLine"
+msgid "Straight line"
+msgstr "직선"
+
+#. Screens.ScannerDistanceWalkablePath
+msgctxt "Screens.ScannerDistanceWalkablePath"
+msgid "Walkable path"
+msgstr "이동 경로"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"

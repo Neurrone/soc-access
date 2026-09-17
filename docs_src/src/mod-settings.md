@@ -12,6 +12,12 @@ Disabling this option shortens the readout for the focus tile to only mention if
 
 The Audio tab holds `Play tile sound cues`, the master switch for the mod's sound cues, and the `Audio glossary` button, where every cue can be played and tuned individually. See [Audio](audio.md#the-audio-glossary-and-tuning).
 
+## Distance
+
+The Scanner tab's first row. `Straight line`, the default, measures a result as the crow flies: the directions read out are the two legs of that line, and the results in a category come nearest-first by it.
+
+`Walkable path` measures it by the route your wielder would actually walk. The directions become the turns of that route, so a result behind a lake reads as the way around it, and a category is ordered by what each result costs to walk to, with anything no route reaches coming last. When there is no route at all, the readout falls back to the straight line and says so: `straight line, 4 north, 5 east`. If an army or something built on the map is what stands in the way, it is named first: `blocked by A stand of Roots troops, straight line, 4 north, 5 east`.
+
 ## Long Directions
 
 Scanner directions are spoken in a short form by default, such as `3ne` for three tiles to the northeast. Enable this option to hear the full wording instead, such as `3 northeast`.

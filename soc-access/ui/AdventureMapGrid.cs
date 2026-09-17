@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Lavapotion.Utilities;
 using SongsOfConquest.Client;
@@ -74,7 +74,8 @@ namespace SongsOfConquestAccess.UI
                     index,
                     count,
                     includeItemName),
-                ScannerDirectionMode.Square);
+                ScannerDirectionMode.Square,
+                _adapter);
         }
 
         public string GetLabel()

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -1418,6 +1418,260 @@ namespace SongsOfConquestAccess.Adapters
                 default:
                     return ModText.Get(ModStrings.Spatial.Neutral);
             }
+        }
+
+        /// <summary>
+        /// The route the wielder would walk from the cursor to a scanner result, as runs of steps,
+        /// or null where the game answers no path. Asked when a result is read, never while a
+        /// snapshot is built, and only while the scanner's Distance setting says the walkable path.
+        /// </summary>
+        public IReadOnlyList<ScannerDirectionStep> TryGetPathDirections(Vector2Int origin, ScannerResult result)
+        {
+            if (_facade == null || _facade.Level == null || !IsWithinMap(origin))
+            {
+                return null;
+            }
+
+            int teamId = GetLocalTeamId();
+            if (teamId < 0)
+            {
+                return null;
+            }
+
+            List<Vector2Int> targets = GetScannerPathTargets(result, teamId);
+            if (targets.Count == 0)
+            {
+                return null;
+            }
+
+            Vector2Int destination;
+            PathNode[] path;
+            if (!_facade.Level.TryGetShortestPathToPoints(
+                    teamId,
+                    origin,
+                    targets,
+                    out destination,
+                    out path,
+                    (PathfinderCacheType)0)
+                || !path.GetIsValid())
+            {
+                return null;
+            }
+
+            List<Vector2Int> points = new List<Vector2Int>(path.Length);
+            for (int i = 0; i < path.Length; i++)
+            {
+                points.Add(new Vector2Int(path[i].point.x, path[i].point.y));
+            }
+
+            return ScannerDirectionUtility.BuildPathDirections(points);
+        }
+
+        /// <summary>
+        /// What stands between the cursor and a result the normal pathfinder could not reach. The
+        /// terrain-only pathfinder is asked for the same journey, and its route is walked for the
+        /// first tile an army's zone of control covers - the army's own tile is one of its zone's
+        /// points - and failing that for the first map entity that blocks movement. A route terrain
+        /// alone refuses has nothing to name and answers null.
+        ///
+        /// One extra path query, only when the normal path failed, only when a result is read.
+        /// </summary>
+        public string TryGetPathBlockerName(Vector2Int origin, ScannerResult result)
+        {
+            if (_facade == null || _facade.Level == null || !IsWithinMap(origin))
+            {
+                return null;
+            }
+
+            int teamId = GetLocalTeamId();
+            if (teamId < 0)
+            {
+                return null;
+            }
+
+            List<Vector2Int> targets = GetScannerPathTargets(result, teamId);
+            if (targets.Count == 0)
+            {
+                return null;
+            }
+
+            Vector2Int destination;
+            PathNode[] route;
+            if (!_facade.Level.TryGetShortestPathToPoints(
+                    teamId,
+                    origin,
+                    targets,
+                    out destination,
+                    out route,
+                    PathfinderCacheType.Static)
+                || !route.GetIsValid())
+            {
+                return null;
+            }
+
+            Dictionary<Vector2Int, List<string>> zones = GetZoneOfControlNames(teamId);
+            string entityName = null;
+            // Neither end of the route is in the way: the cursor is where the player stands and the
+            // last tile is the thing they are asking about, which would otherwise name itself.
+            for (int i = 1; i < route.Length - 1; i++)
+            {
+                Vector2Int point = new Vector2Int(route[i].point.x, route[i].point.y);
+                ICommanderState standing = GetCommanderAtVisiblePoint(point);
+                if (standing != null && !IsHostileZoneOfControlSource(standing, teamId))
+                {
+                    // A partner's army is not in anyone's way; its own tile is the only point the
+                    // team's own dynamic cache files under it.
+                    continue;
+                }
+
+                List<string> names;
+                if (zones.TryGetValue(point, out names) && names.Count > 0)
+                {
+                    return names[0];
+                }
+
+                if (entityName != null)
+                {
+                    continue;
+                }
+
+                AdventureMapTile tile = GetTile(point);
+                if (tile != null
+                    && tile.MapEntity != null
+                    && tile.MapEntity.Category.IsBlocking()
+                    && !string.IsNullOrWhiteSpace(tile.MapEntityName))
+                {
+                    entityName = tile.MapEntityName;
+                }
+                else if (tile != null && tile.Commander != null && !string.IsNullOrWhiteSpace(tile.Commander.Name))
+                {
+                    // An army the zone map does not cover, which is how a hostile army under
+                    // partial fog reads.
+                    return tile.Commander.Name;
+                }
+            }
+
+            return entityName;
+        }
+
+        /// <summary>
+        /// What walking from the cursor to a scanner result costs, out of the one whole-map sweep
+        /// the order asks for every result, or infinity where nothing reaches it.
+        /// </summary>
+        public float GetPathCost(Vector2Int origin, ScannerResult result)
+        {
+            if (_facade == null || _facade.Level == null || !IsWithinMap(origin))
+            {
+                return float.PositiveInfinity;
+            }
+
+            int teamId = GetLocalTeamId();
+            if (teamId < 0)
+            {
+                return float.PositiveInfinity;
+            }
+
+            Dictionary<Vector2Int, float> costs = GetWalkableCostsFrom(origin, teamId);
+            List<Vector2Int> targets = GetScannerPathTargets(result, teamId);
+            float best = float.PositiveInfinity;
+            for (int i = 0; i < targets.Count; i++)
+            {
+                float cost;
+                if (TryGetStandingCost(costs, targets[i], out cost) && cost < best)
+                {
+                    best = cost;
+                }
+            }
+
+            return best;
+        }
+
+        /// <summary>
+        /// What it costs to get to a tile: the tile's own cost where a wielder can stand on it, and
+        /// otherwise the cheapest neighbour, because that is where the wielder stops. Almost every
+        /// entity's interaction point is the entity's own tile and a wielder can never stand there,
+        /// so without this every entity would read as out of reach; the game reports the same
+        /// number, the cost of the node before the destination
+        /// (see <see cref="TryGetReachableMapEntityDistance"/>).
+        /// </summary>
+        private static bool TryGetStandingCost(Dictionary<Vector2Int, float> costs, Vector2Int target, out float cost)
+        {
+            if (costs.TryGetValue(target, out cost))
+            {
+                return true;
+            }
+
+            bool found = false;
+            cost = float.PositiveInfinity;
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    if (x == 0 && y == 0)
+                    {
+                        continue;
+                    }
+
+                    float neighbour;
+                    if (costs.TryGetValue(new Vector2Int(target.x + x, target.y + y), out neighbour)
+                        && neighbour < cost)
+                    {
+                        cost = neighbour;
+                        found = true;
+                    }
+                }
+            }
+
+            return found;
+        }
+
+        /// <summary>
+        /// The tiles a wielder would stop on to reach a result: an entity's interaction points, a
+        /// partnered wielder's own tile and any other wielder's zone of control, and the result's
+        /// own tile for everything else. The spoken route and the order both walk to these, so a
+        /// result is ranked by the same journey the readout describes.
+        /// </summary>
+        private List<Vector2Int> GetScannerPathTargets(ScannerResult result, int teamId)
+        {
+            List<Vector2Int> targets = new List<Vector2Int>();
+            if (result == null)
+            {
+                return targets;
+            }
+
+            if (result.EntityCategory == AdventureEntityCategory.Wielder && result.StableReference is int commanderId)
+            {
+                ICommanderState commander = FindCommanderById(commanderId);
+                if (commander != null)
+                {
+                    if (_facade.Teams != null && _facade.Teams.IsInPartnership(commander.TeamId, teamId))
+                    {
+                        targets.Add(commander.Position);
+                    }
+                    else
+                    {
+                        targets.AddRange(GetZoneOfControlPoints(teamId, commander));
+                    }
+
+                    return targets;
+                }
+            }
+            else if (result.Kind == ScannerResultKind.Point && result.StableReference is int entityId)
+            {
+                IMapEntity entity = TryGetMapEntity(entityId);
+                IInteractableComponent component;
+                if (entity != null
+                    && entity.TryGetComponent<IInteractableComponent>(out component)
+                    && component.CalculatedInteractionPoints != null
+                    && component.CalculatedInteractionPoints.Length > 0)
+                {
+                    targets.AddRange(component.CalculatedInteractionPoints);
+                    return targets;
+                }
+            }
+
+            targets.Add(result.Position);
+            return targets;
         }
     }
 }

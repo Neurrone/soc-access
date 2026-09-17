@@ -27,7 +27,23 @@ namespace SongsOfConquestAccess.Scanner
                 }
             }
 
-            return parts.Count == 0 ? ModText.Get(ModStrings.Spatial.Here) : ModText.JoinListWithCommas(parts);
+            if (parts.Count == 0)
+            {
+                return ModText.Get(ModStrings.Spatial.Here);
+            }
+
+            string text = ModText.JoinListWithCommas(parts);
+            // A player who asked for the walkable path is owed the word when they are hearing the
+            // straight line instead, and the list itself is all either caller passes down.
+            ScannerDirections runs = directions as ScannerDirections;
+            if (runs == null || !runs.IsStraightLineFallback)
+            {
+                return text;
+            }
+
+            return string.IsNullOrWhiteSpace(runs.BlockerName)
+                ? ModText.Get(ModStrings.Scanner.StraightLineFallback, text)
+                : ModText.Get(ModStrings.Scanner.BlockedStraightLineFallback, runs.BlockerName, text);
         }
 
         /// <summary>

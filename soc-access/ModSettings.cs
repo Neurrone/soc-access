@@ -1,4 +1,4 @@
-﻿using BepInEx.Configuration;
+using BepInEx.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +23,18 @@ namespace SongsOfConquestAccess
         public const string Never = "never";
     }
 
+    /// <summary>
+    /// What the scanner's "Distance" setting can say: the straight line between two tiles, or what
+    /// the wielder would pay to walk there. Stored as a string for the same reason the usage-hint
+    /// setting is: a value this list does not name reads as <see cref="StraightLine"/> and is left
+    /// on disk untouched, so a config written by a later build survives a run of this one.
+    /// </summary>
+    public static class ScannerDistanceModes
+    {
+        public const string StraightLine = "StraightLine";
+        public const string WalkablePath = "WalkablePath";
+    }
+
     public static partial class ModSettings
     {
         public const int CueVolumeMinimum = 0;
@@ -42,6 +54,7 @@ namespace SongsOfConquestAccess
         private static ConfigEntry<bool> _readStoryCameraFocusChanges;
         private static ConfigEntry<bool> _tileCuesEnabled;
         private static ConfigEntry<bool> _scannerUsesLongDirections;
+        private static ConfigEntry<string> _scannerDistanceMode;
         private static ConfigEntry<bool> _adventureMapUsesLongRoadDirections;
         private static ConfigEntry<bool> _readLongTooltips;
         private static ConfigEntry<string> _readUsageHints;
@@ -73,6 +86,24 @@ namespace SongsOfConquestAccess
         public static bool ScannerUsesLongDirections
         {
             get { return _scannerUsesLongDirections != null && _scannerUsesLongDirections.Value; }
+        }
+
+        /// <summary>Which distance the scanner reads and orders its results by - one of
+        /// <see cref="ScannerDistanceModes"/>'s values.</summary>
+        public static string ScannerDistanceMode
+        {
+            get
+            {
+                string value = _scannerDistanceMode == null ? null : _scannerDistanceMode.Value;
+                return value == ScannerDistanceModes.WalkablePath
+                    ? ScannerDistanceModes.WalkablePath
+                    : ScannerDistanceModes.StraightLine;
+            }
+        }
+
+        public static bool ScannerUsesWalkablePath
+        {
+            get { return ScannerDistanceMode == ScannerDistanceModes.WalkablePath; }
         }
 
         public static bool AdventureMapUsesLongRoadDirections
@@ -123,6 +154,11 @@ namespace SongsOfConquestAccess
                 "ScannerUsesLongDirections",
                 false,
                 "Whether spoken directions use the long form (\"3 northeast\") instead of the short form (\"3ne\").");
+            _scannerDistanceMode = config.Bind(
+                "Scanner",
+                "DistanceMode",
+                ScannerDistanceModes.StraightLine,
+                "Which distance scanner results are read and ordered by: \"StraightLine\" or \"WalkablePath\".");
             _adventureMapUsesLongRoadDirections = config.Bind(
                 "AdventureMap",
                 "UseLongRoadDirections",
@@ -214,6 +250,17 @@ namespace SongsOfConquestAccess
             _config?.Save();
         }
 
+        public static void SetScannerDistanceMode(string value)
+        {
+            if (_scannerDistanceMode == null)
+            {
+                return;
+            }
+
+            _scannerDistanceMode.Value = value;
+            _config?.Save();
+        }
+
         public static void SetScannerUsesLongDirections(bool value)
         {
             if (_scannerUsesLongDirections == null)
@@ -233,6 +280,7 @@ namespace SongsOfConquestAccess
             _readStoryCameraFocusChanges = null;
             _tileCuesEnabled = null;
             _scannerUsesLongDirections = null;
+            _scannerDistanceMode = null;
             _adventureMapUsesLongRoadDirections = null;
             _readLongTooltips = null;
             _readUsageHints = null;

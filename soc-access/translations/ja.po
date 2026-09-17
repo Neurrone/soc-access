@@ -2470,6 +2470,11 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr "ビーコン"
 
+#. Scanner.BlockedStraightLineFallback
+msgctxt "Scanner.BlockedStraightLineFallback"
+msgid "blocked by {0}, straight line, {1}"
+msgstr "{0}に阻まれています、直線、{1}"
+
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
@@ -2649,6 +2654,11 @@ msgstr "集落と建設地"
 msgctxt "Scanner.South"
 msgid "south"
 msgstr "南"
+
+#. Scanner.StraightLineFallback
+msgctxt "Scanner.StraightLineFallback"
+msgid "straight line, {0}"
+msgstr "直線、{0}"
 
 #. Scanner.SouthShort
 msgctxt "Scanner.SouthShort"
@@ -3475,6 +3485,21 @@ msgstr "スキャナー"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "スキャナー内容の通知"
+
+#. Screens.ScannerDistance
+msgctxt "Screens.ScannerDistance"
+msgid "Distance"
+msgstr "距離"
+
+#. Screens.ScannerDistanceStraightLine
+msgctxt "Screens.ScannerDistanceStraightLine"
+msgid "Straight line"
+msgstr "直線"
+
+#. Screens.ScannerDistanceWalkablePath
+msgctxt "Screens.ScannerDistanceWalkablePath"
+msgid "Walkable path"
+msgstr "移動経路"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"

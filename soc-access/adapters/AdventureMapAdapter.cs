@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +39,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed partial class AdventureMapAdapter : IPresent, IDisposable
+    public sealed partial class AdventureMapAdapter : IPresent, IDisposable, IScannerPathSource
     {
         private const byte ExploredButNotVisibleFogValue = 128;
 
@@ -105,6 +105,13 @@ namespace SongsOfConquestAccess.Adapters
         private int _reachableMovementTeamId;
         private Vector2Int _reachableMovementOrigin;
         private float _reachableMovementMovesLeft;
+
+        // Every tile's cost from one point with no movement limit, for one frame. See
+        // GetWalkableCostsFrom.
+        private Dictionary<Vector2Int, float> _walkableCosts;
+        private int _walkableCostsFrame = -1;
+        private int _walkableCostsTeamId;
+        private Vector2Int _walkableCostsOrigin;
 
         // The zones of control covering each tile for one frame. See GetZoneOfControlNames.
         private Dictionary<Vector2Int, List<string>> _zoneOfControlNames;
@@ -779,37 +786,79 @@ namespace SongsOfConquestAccess.Adapters
                 return _reachableMovementCosts;
             }
 
-            PathNode[] reachable = _facade.Level.PointsWithinReach(
+            Dictionary<Vector2Int, float> costs = ToTravelCostMap(_facade.Level.PointsWithinReach(
                 teamId,
                 origin,
                 movesLeft,
-                (PathfinderCacheType)0);
-            Dictionary<Vector2Int, float> costs = new Dictionary<Vector2Int, float>();
-            if (reachable != null)
-            {
-                for (int i = 0; i < reachable.Length; i++)
-                {
-                    PathNode node = reachable[i];
-                    if (float.IsInfinity(node.travelCost))
-                    {
-                        continue;
-                    }
-
-                    Vector2Int point = new Vector2Int(node.point.x, node.point.y);
-                    if (!costs.ContainsKey(point))
-                    {
-                        // First finite cost for a tile wins, as the linear scan this replaces did.
-                        costs.Add(point, node.travelCost);
-                    }
-                }
-            }
-
+                (PathfinderCacheType)0));
             _reachableMovementCosts = costs;
             _reachableMovementFrame = frame;
             _reachableMovementCommanderId = commanderId;
             _reachableMovementTeamId = teamId;
             _reachableMovementOrigin = origin;
             _reachableMovementMovesLeft = movesLeft;
+            return costs;
+        }
+
+        /// <summary>
+        /// What every tile costs to walk to from a point with no movement limit, as the game's own
+        /// whole-map Dijkstra answers it, indexed by tile. The scanner's walkable-path order needs
+        /// the distance of every result in a snapshot and this is one query for all of them; a tile
+        /// no path reaches is simply absent.
+        ///
+        /// Keyed the way <see cref="GetReachableMovementCosts"/> is keyed and for the same reason:
+        /// the team and the origin are all <c>PointsWithinReach</c> reads here, both are read from
+        /// the game on the call, and <c>Time.frameCount</c> closes the key because within one frame
+        /// nothing the game owns has moved.
+        /// </summary>
+        private Dictionary<Vector2Int, float> GetWalkableCostsFrom(Vector2Int origin, int teamId)
+        {
+            int frame = Time.frameCount;
+            if (_walkableCosts != null
+                && _walkableCostsFrame == frame
+                && _walkableCostsTeamId == teamId
+                && _walkableCostsOrigin == origin)
+            {
+                return _walkableCosts;
+            }
+
+            Dictionary<Vector2Int, float> costs = ToTravelCostMap(_facade.Level.PointsWithinReach(
+                teamId,
+                origin,
+                float.MaxValue,
+                (PathfinderCacheType)0));
+            _walkableCosts = costs;
+            _walkableCostsFrame = frame;
+            _walkableCostsTeamId = teamId;
+            _walkableCostsOrigin = origin;
+            return costs;
+        }
+
+        /// <summary>The finite travel costs of a pathfinder answer, by tile. First finite cost for
+        /// a tile wins, as the linear scan the movement-cost memo replaced did.</summary>
+        private static Dictionary<Vector2Int, float> ToTravelCostMap(PathNode[] nodes)
+        {
+            Dictionary<Vector2Int, float> costs = new Dictionary<Vector2Int, float>();
+            if (nodes == null)
+            {
+                return costs;
+            }
+
+            for (int i = 0; i < nodes.Length; i++)
+            {
+                PathNode node = nodes[i];
+                if (float.IsInfinity(node.travelCost))
+                {
+                    continue;
+                }
+
+                Vector2Int point = new Vector2Int(node.point.x, node.point.y);
+                if (!costs.ContainsKey(point))
+                {
+                    costs.Add(point, node.travelCost);
+                }
+            }
+
             return costs;
         }
 

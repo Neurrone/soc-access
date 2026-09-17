@@ -57,13 +57,38 @@ namespace SongsOfConquestAccess.Tests
             Func<ScannerResult, Vector2Int, ScannerResultRefresh> refreshResult,
             Func<Vector2Int, bool> jumpTo)
         {
+            return Controller(snapshotBuilder, cursorProvider, refreshResult, jumpTo, null);
+        }
+
+        /// <summary>A controller with a pathfinder behind it, which is what the walkable-path
+        /// distance mode asks.</summary>
+        public static ScannerController Controller(
+            Func<Vector2Int, ScannerSnapshot> snapshotBuilder,
+            Func<Vector2Int> cursorProvider,
+            Func<ScannerResult, Vector2Int, ScannerResultRefresh> refreshResult,
+            Func<Vector2Int, bool> jumpTo,
+            IScannerPathSource pathSource)
+        {
             return new ScannerController(
                 snapshotBuilder,
                 cursorProvider,
                 refreshResult,
                 jumpTo,
                 (result, directions, index, count, includeItemName) => null,
-                ScannerDirectionMode.Square);
+                ScannerDirectionMode.Square,
+                pathSource);
+        }
+
+        /// <summary>A controller over a snapshot that never changes, with a pathfinder behind
+        /// it.</summary>
+        public static ScannerController Controller(ScannerSnapshot snapshot, IScannerPathSource pathSource)
+        {
+            return Controller(
+                _ => snapshot,
+                () => Vector2Int.zero,
+                (result, cursorHint) => ScannerResultRefresh.Valid(result.Position),
+                _ => true,
+                pathSource);
         }
 
         /// <summary>A snapshot under categories that group their items, which is the taxonomy's

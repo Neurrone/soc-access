@@ -183,9 +183,25 @@ namespace SongsOfConquestAccess.Scanner
             GetOrAddCategory(categoryKey).GetOrAddSubcategory(subcategoryKey).Add(result);
         }
 
+        /// <summary>The order this snapshot was sorted into, kept so a walk that flattens a
+        /// subcategory back into one list reproduces it rather than measuring its own. Null for a
+        /// snapshot sorted by something other than distance, such as Look Around's compass sweep.
+        /// </summary>
+        public ScannerDistanceOrder SortOrder { get; private set; }
+
         public void SortByDistance(Vector2Int origin)
         {
-            SortBy(origin, (left, right) => CompareByDistance(origin, left, right));
+            SortByDistance(ScannerDistanceOrder.StraightLine(origin));
+        }
+
+        public void SortByDistance(ScannerDistanceOrder order)
+        {
+            if (order == null)
+            {
+                return;
+            }
+
+            SortBy(order, order.Compare);
         }
 
         /// <summary>
@@ -218,6 +234,17 @@ namespace SongsOfConquestAccess.Scanner
             return xCompare != 0 ? xCompare : left.Position.y.CompareTo(right.Position.y);
         }
 
+        public void SortBy(ScannerDistanceOrder order, Comparison<ScannerResult> comparison)
+        {
+            if (order == null)
+            {
+                return;
+            }
+
+            SortBy(order.Origin, comparison);
+            SortOrder = order;
+        }
+
         public void SortBy(Vector2Int origin, Comparison<ScannerResult> comparison)
         {
             if (comparison == null)
@@ -225,6 +252,7 @@ namespace SongsOfConquestAccess.Scanner
                 return;
             }
 
+            SortOrder = null;
             SortOrigin = origin;
             HasSortOrigin = true;
             for (int i = 0; i < _categories.Count; i++)

@@ -2470,6 +2470,11 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr "信标"
 
+#. Scanner.BlockedStraightLineFallback
+msgctxt "Scanner.BlockedStraightLineFallback"
+msgid "blocked by {0}, straight line, {1}"
+msgstr "被{0}阻挡，直线，{1}"
+
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
@@ -2649,6 +2654,11 @@ msgstr "聚落和建筑工地"
 msgctxt "Scanner.South"
 msgid "south"
 msgstr "南"
+
+#. Scanner.StraightLineFallback
+msgctxt "Scanner.StraightLineFallback"
+msgid "straight line, {0}"
+msgstr "直线，{0}"
 
 #. Scanner.SouthShort
 msgctxt "Scanner.SouthShort"
@@ -3475,6 +3485,21 @@ msgstr "扫描器"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "扫描器内容播报"
+
+#. Screens.ScannerDistance
+msgctxt "Screens.ScannerDistance"
+msgid "Distance"
+msgstr "距离"
+
+#. Screens.ScannerDistanceStraightLine
+msgctxt "Screens.ScannerDistanceStraightLine"
+msgid "Straight line"
+msgstr "直线"
+
+#. Screens.ScannerDistanceWalkablePath
+msgctxt "Screens.ScannerDistanceWalkablePath"
+msgid "Walkable path"
+msgstr "可行走路径"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"

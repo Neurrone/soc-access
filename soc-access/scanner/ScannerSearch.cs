@@ -9,12 +9,20 @@ namespace SongsOfConquestAccess.Scanner
         private sealed class MatchInfo
         {
             public int Tier;
-            public int DistanceSquared;
+            public ScannerResult Nearest;
         }
 
         public static ScannerSnapshot Build(ScannerSnapshot source, string query, Vector2Int origin)
         {
-            if (source == null || string.IsNullOrWhiteSpace(query))
+            return Build(source, query, ScannerDistanceOrder.StraightLine(origin));
+        }
+
+        /// <summary>The match tier decides first and the scanner's own distance order decides
+        /// inside a tier, so a search agrees with the walk about which of two equally good matches
+        /// is the nearer one.</summary>
+        public static ScannerSnapshot Build(ScannerSnapshot source, string query, ScannerDistanceOrder order)
+        {
+            if (source == null || order == null || string.IsNullOrWhiteSpace(query))
             {
                 return null;
             }
@@ -44,8 +52,7 @@ namespace SongsOfConquestAccess.Scanner
                     return false;
                 }
 
-                int distance = ScannerSnapshot.DistanceSquared(origin, result.Position);
-                RecordBestMatch(matchInfoByKey, result.Key, tier, distance);
+                RecordBestMatch(matchInfoByKey, result, tier, order);
                 return true;
             });
 
@@ -54,31 +61,39 @@ namespace SongsOfConquestAccess.Scanner
                 return null;
             }
 
-            search.SortBy(origin, (left, right) => CompareMatches(matchInfoByKey, left, right));
+            search.SortBy(order, (left, right) => CompareMatches(matchInfoByKey, order, left, right));
             return search;
         }
 
-        private static void RecordBestMatch(Dictionary<string, MatchInfo> matches, string key, int tier, int distanceSquared)
+        private static void RecordBestMatch(
+            Dictionary<string, MatchInfo> matches,
+            ScannerResult result,
+            int tier,
+            ScannerDistanceOrder order)
         {
             MatchInfo info;
-            if (!matches.TryGetValue(key, out info))
+            if (!matches.TryGetValue(result.Key, out info))
             {
-                matches[key] = new MatchInfo
+                matches[result.Key] = new MatchInfo
                 {
                     Tier = tier,
-                    DistanceSquared = distanceSquared
+                    Nearest = result
                 };
                 return;
             }
 
-            if (tier < info.Tier || (tier == info.Tier && distanceSquared < info.DistanceSquared))
+            if (tier < info.Tier || (tier == info.Tier && order.CompareDistance(result, info.Nearest) < 0))
             {
                 info.Tier = tier;
-                info.DistanceSquared = distanceSquared;
+                info.Nearest = result;
             }
         }
 
-        private static int CompareMatches(Dictionary<string, MatchInfo> matches, ScannerResult left, ScannerResult right)
+        private static int CompareMatches(
+            Dictionary<string, MatchInfo> matches,
+            ScannerDistanceOrder order,
+            ScannerResult left,
+            ScannerResult right)
         {
             MatchInfo leftInfo = matches[left.Key];
             MatchInfo rightInfo = matches[right.Key];
@@ -88,7 +103,7 @@ namespace SongsOfConquestAccess.Scanner
                 return tierCompare;
             }
 
-            int distanceCompare = leftInfo.DistanceSquared.CompareTo(rightInfo.DistanceSquared);
+            int distanceCompare = order.CompareDistance(leftInfo.Nearest, rightInfo.Nearest);
             return distanceCompare != 0 ? distanceCompare : ScannerSnapshot.CompareTieBreak(left, right);
         }
     }

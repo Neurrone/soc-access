@@ -2470,6 +2470,11 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr "İşaretler"
 
+#. Scanner.BlockedStraightLineFallback
+msgctxt "Scanner.BlockedStraightLineFallback"
+msgid "blocked by {0}, straight line, {1}"
+msgstr "{0} tarafından engellendi, düz çizgi, {1}"
+
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
@@ -2649,6 +2654,11 @@ msgstr "Yerleşimler ve inşaat alanları"
 msgctxt "Scanner.South"
 msgid "south"
 msgstr "güney"
+
+#. Scanner.StraightLineFallback
+msgctxt "Scanner.StraightLineFallback"
+msgid "straight line, {0}"
+msgstr "düz çizgi, {0}"
 
 #. Scanner.SouthShort
 msgctxt "Scanner.SouthShort"
@@ -3475,6 +3485,21 @@ msgstr "Tarayıcı"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "Tarayıcı içerik duyuruları"
+
+#. Screens.ScannerDistance
+msgctxt "Screens.ScannerDistance"
+msgid "Distance"
+msgstr "Mesafe"
+
+#. Screens.ScannerDistanceStraightLine
+msgctxt "Screens.ScannerDistanceStraightLine"
+msgid "Straight line"
+msgstr "Düz çizgi"
+
+#. Screens.ScannerDistanceWalkablePath
+msgctxt "Screens.ScannerDistanceWalkablePath"
+msgid "Walkable path"
+msgstr "Yürüme yolu"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"

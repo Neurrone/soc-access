@@ -2510,6 +2510,11 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr "Latarnie"
 
+#. Scanner.BlockedStraightLineFallback
+msgctxt "Scanner.BlockedStraightLineFallback"
+msgid "blocked by {0}, straight line, {1}"
+msgstr "zablokowane przez {0}, linia prosta, {1}"
+
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
@@ -2689,6 +2694,11 @@ msgstr "Osady i place budowy"
 msgctxt "Scanner.South"
 msgid "south"
 msgstr "południe"
+
+#. Scanner.StraightLineFallback
+msgctxt "Scanner.StraightLineFallback"
+msgid "straight line, {0}"
+msgstr "linia prosta, {0}"
 
 #. Scanner.SouthShort
 msgctxt "Scanner.SouthShort"
@@ -3525,6 +3535,21 @@ msgstr "Skaner"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "Komunikaty zawartości skanera"
+
+#. Screens.ScannerDistance
+msgctxt "Screens.ScannerDistance"
+msgid "Distance"
+msgstr "Odległość"
+
+#. Screens.ScannerDistanceStraightLine
+msgctxt "Screens.ScannerDistanceStraightLine"
+msgid "Straight line"
+msgstr "Linia prosta"
+
+#. Screens.ScannerDistanceWalkablePath
+msgctxt "Screens.ScannerDistanceWalkablePath"
+msgid "Walkable path"
+msgstr "Trasa marszu"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"

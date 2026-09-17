@@ -33,6 +33,60 @@ namespace SongsOfConquestAccess.Scanner
         }
 
         /// <summary>
+        /// The tiles of a walked path compressed into runs of identical steps: four tiles north
+        /// then five east read as "4 north, 5 east". The points include the tile walked from, a
+        /// repeated point is not a step and is skipped, and a pair further apart than one tile is
+        /// not a path this can name, which answers null so the caller can say the straight line
+        /// instead. Fewer than two points is a path that goes nowhere and answers no runs.
+        /// </summary>
+        public static IReadOnlyList<ScannerDirectionStep> BuildPathDirections(IReadOnlyList<Vector2Int> points)
+        {
+            List<ScannerDirectionStep> runs = new List<ScannerDirectionStep>();
+            if (points == null)
+            {
+                return null;
+            }
+
+            int runCount = 0;
+            ScannerDirection runDirection = ScannerDirection.North;
+            for (int i = 1; i < points.Count; i++)
+            {
+                Vector2Int offset = points[i] - points[i - 1];
+                if (offset == Vector2Int.zero)
+                {
+                    continue;
+                }
+
+                ScannerDirection direction;
+                if (!TryGetStepDirection(offset, out direction))
+                {
+                    return null;
+                }
+
+                if (runCount > 0 && direction == runDirection)
+                {
+                    runCount++;
+                    continue;
+                }
+
+                if (runCount > 0)
+                {
+                    runs.Add(new ScannerDirectionStep(runCount, runDirection));
+                }
+
+                runDirection = direction;
+                runCount = 1;
+            }
+
+            if (runCount > 0)
+            {
+                runs.Add(new ScannerDirectionStep(runCount, runDirection));
+            }
+
+            return runs;
+        }
+
+        /// <summary>
         /// Names the direction of a single step onto a neighbouring tile. Returns false for a
         /// zero offset, and for anything further than one tile away, which is not a step.
         /// </summary>

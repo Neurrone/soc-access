@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
@@ -277,6 +277,18 @@ namespace SongsOfConquestAccess.Screens
 
         private void DrawScanner()
         {
+            // First in the tab because it changes what every other scanner readout means: the
+            // distance spoken for a result, and the order the results come in.
+            _dialog.AddDropdown(
+                ModText.Get(ModStrings.Screens.ScannerDistance),
+                new List<UITextMeshDropdown.Option>
+                {
+                    new UITextMeshDropdown.Option(ModText.Get(ModStrings.Screens.ScannerDistanceStraightLine)),
+                    new UITextMeshDropdown.Option(ModText.Get(ModStrings.Screens.ScannerDistanceWalkablePath))
+                },
+                ModSettings.ScannerUsesWalkablePath ? 1 : 0,
+                index => ModSettings.SetScannerDistanceMode(
+                    index == 1 ? ScannerDistanceModes.WalkablePath : ScannerDistanceModes.StraightLine));
             _dialog.AddToggle(
                 ModText.Get(ModStrings.Screens.ScannerUsesLongDirections),
                 ModSettings.ScannerUsesLongDirections,

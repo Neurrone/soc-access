@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Scanner;
 using UnityEngine;
@@ -23,6 +24,41 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("Zinc", subcategory.Items[1].Label);
             Assert.AreEqual(new Vector2Int(0, 2), subcategory.Items[2].Instances[0].Position);
             Assert.AreEqual(new Vector2Int(2, 0), subcategory.Items[2].Instances[1].Position);
+        }
+
+        /// <summary>
+        /// Walkable-path order: what costs least to walk to leads, what nothing reaches follows in
+        /// straight-line order, and two results that cost the same fall back to the straight line
+        /// and then to the name.
+        /// </summary>
+        [TestMethod]
+        public void SortByPathCostRanksReachableResultsByCostAndUnreachableByStraightLine()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:zinc", "Zinc", new Vector2Int(0, 3)));
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:apple", "Apple", new Vector2Int(3, 0)));
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:near", "Near", new Vector2Int(1, 0)));
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:island", "Island", new Vector2Int(2, 0)));
+            Dictionary<string, float> costs = new Dictionary<string, float>
+            {
+                { "pickup:zinc", 2f },
+                { "pickup:apple", 2f },
+                { "pickup:near", 9f }
+            };
+
+            snapshot.SortByDistance(ScannerDistanceOrder.WalkablePath(
+                Vector2Int.zero,
+                result =>
+                {
+                    float cost;
+                    return costs.TryGetValue(result.Key, out cost) ? cost : float.PositiveInfinity;
+                }));
+
+            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
+            Assert.AreEqual("Apple", subcategory.Items[0].Label);
+            Assert.AreEqual("Zinc", subcategory.Items[1].Label);
+            Assert.AreEqual("Near", subcategory.Items[2].Label);
+            Assert.AreEqual("Island", subcategory.Items[3].Label);
         }
 
         /// <summary>

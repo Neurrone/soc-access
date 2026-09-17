@@ -45,6 +45,7 @@ Moving to a different item reads its name. Stepping between copies of the same i
 - Category, subcategory, item, and instance navigation all wrap.
 - Readouts describe the thing that was scanned rather than everything else on its tile. The mod setting `Scanner result announcements` controls what each readout includes.
 - Directions are relative to the current accessibility cursor and use a short form such as `3ne` by default. The mod setting `Long directions` reads them as `3 northeast` instead.
+- Directions and result order follow the straight line between the cursor and the result. The mod setting `Distance` on the scanner tab can switch both to the route your wielder would walk instead; see [Mod Settings](mod-settings.md#distance).
 - `Backspace` is not a toggle. The remembered tile is cleared once you return to it, and it is replaced every time you jump again. On the adventure map it also returns you from a bookmark jump.
 - Paging through results also plays the sound of the result you land on, positioned relative to the accessibility cursor. See [Audio](audio.md#scanner-results).
 

@@ -15,6 +15,7 @@ namespace SongsOfConquestAccess.Scanner
         private readonly Func<Vector2Int, bool> _jumpTo;
         private readonly Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, bool, IScannerSpeechContext> _speechContextProvider;
         private readonly ScannerDirectionMode _directionMode;
+        private readonly IScannerPathSource _pathSource;
         private ScannerSnapshot _snapshot;
         private int _categoryIndex;
         private int _subcategoryIndex;
@@ -32,7 +33,8 @@ namespace SongsOfConquestAccess.Scanner
             Func<ScannerResult, Vector2Int, ScannerResultRefresh> refreshResult,
             Func<Vector2Int, bool> jumpTo,
             Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, bool, IScannerSpeechContext> speechContextProvider,
-            ScannerDirectionMode directionMode)
+            ScannerDirectionMode directionMode,
+            IScannerPathSource pathSource = null)
         {
             _snapshotBuilder = snapshotBuilder;
             _cursorProvider = cursorProvider;
@@ -40,6 +42,7 @@ namespace SongsOfConquestAccess.Scanner
             _jumpTo = jumpTo;
             _speechContextProvider = speechContextProvider;
             _directionMode = directionMode;
+            _pathSource = pathSource;
         }
 
         /// <summary>
@@ -59,7 +62,7 @@ namespace SongsOfConquestAccess.Scanner
                 return NoResults();
             }
 
-            _snapshot.SortByDistance(origin);
+            _snapshot.SortByDistance(CreateDistanceOrder(origin));
             LandOnFirstNonEmptyScope();
             return BuildCommandResult(includePath: true);
         }
@@ -74,7 +77,7 @@ namespace SongsOfConquestAccess.Scanner
 
             Vector2Int origin = GetCursor();
             ScannerSnapshot source = BuildSnapshot(origin);
-            ScannerSnapshot search = ScannerSearch.Build(source, query, origin);
+            ScannerSnapshot search = ScannerSearch.Build(source, query, CreateDistanceOrder(origin));
             if (search == null || search.IsEmpty)
             {
                 ClearTemporarySnapshot();
@@ -449,7 +452,7 @@ namespace SongsOfConquestAccess.Scanner
             {
                 // A reused snapshot was already sorted from this same cursor
                 // when the reseat built it.
-                _snapshot.SortByDistance(origin);
+                _snapshot.SortByDistance(CreateDistanceOrder(origin));
             }
 
             int categoryIndex = IndexOfCategory(categoryKey);
@@ -535,7 +538,7 @@ namespace SongsOfConquestAccess.Scanner
                 ResultIndex = position >= 0 ? position + 1 : 1,
                 ResultCount = walk.Count,
                 IncludeItemName = TakeItemNameTurn(category, subcategory, item),
-                Directions = BuildDirections(origin, result.Position),
+                Directions = BuildDirections(origin, result),
                 HasOrigin = true,
                 Origin = origin,
                 IncludePath = false,
@@ -568,8 +571,11 @@ namespace SongsOfConquestAccess.Scanner
 
             if (!subcategory.PreserveResultOrder && _snapshot != null && _snapshot.HasSortOrigin)
             {
+                ScannerDistanceOrder order = _snapshot.SortOrder;
                 Vector2Int origin = _snapshot.SortOrigin;
-                walk.Sort((left, right) => ScannerSnapshot.CompareByDistance(origin, left.Result, right.Result));
+                walk.Sort(order != null
+                    ? (Comparison<FlatWalkEntry>)((left, right) => order.Compare(left.Result, right.Result))
+                    : ((left, right) => ScannerSnapshot.CompareByDistance(origin, left.Result, right.Result)));
             }
 
             return walk;
@@ -746,7 +752,7 @@ namespace SongsOfConquestAccess.Scanner
             ScannerSubcategory subcategory = CurrentSubcategory();
             ScannerItem item = CurrentItem();
             Vector2Int origin = GetSpeechOrigin();
-            IReadOnlyList<ScannerDirectionStep> directions = BuildDirections(origin, result.Position);
+            IReadOnlyList<ScannerDirectionStep> directions = BuildDirections(origin, result);
             int resultIndex;
             int resultCount;
             GetResultPosition(subcategory, item, out resultIndex, out resultCount);
@@ -890,7 +896,7 @@ namespace SongsOfConquestAccess.Scanner
                 return new ReseatResultState(false, hadCurrent, categoryHint, subcategoryHint);
             }
 
-            _snapshot.SortByDistance(origin);
+            _snapshot.SortByDistance(CreateDistanceOrder(origin));
 
             if (!string.IsNullOrWhiteSpace(key)
                 && _snapshot.TryLocateByKey(key, categoryHint, subcategoryHint, allowFallback: false, out ScannerSnapshotLocation location))
@@ -922,7 +928,7 @@ namespace SongsOfConquestAccess.Scanner
                 return;
             }
 
-            _snapshot.SortByDistance(origin);
+            _snapshot.SortByDistance(CreateDistanceOrder(origin));
             RestoreScope(categoryHint, subcategoryHint);
         }
 
@@ -1031,11 +1037,51 @@ namespace SongsOfConquestAccess.Scanner
             public int SubcategoryHint { get; private set; }
         }
 
-        private IReadOnlyList<ScannerDirectionStep> BuildDirections(Vector2Int origin, Vector2Int target)
+        /// <summary>
+        /// The way from the speech origin to a result. In walkable-path mode the game is asked for
+        /// the route the wielder would walk and the runs are the steps of that route; where it
+        /// answers no path the straight line is said instead, marked so the readout names it. The
+        /// path is asked for when a result is read, never while a snapshot is built.
+        /// </summary>
+        private ScannerDirections BuildDirections(Vector2Int origin, ScannerResult result)
+        {
+            if (_pathSource != null && ModSettings.ScannerUsesWalkablePath)
+            {
+                IReadOnlyList<ScannerDirectionStep> path = _pathSource.TryGetPathDirections(origin, result);
+                if (path != null)
+                {
+                    return new ScannerDirections(path, isStraightLineFallback: false);
+                }
+
+                return new ScannerDirections(
+                    BuildStraightLineDirections(origin, result.Position),
+                    isStraightLineFallback: true,
+                    _pathSource.TryGetPathBlockerName(origin, result));
+            }
+
+            return new ScannerDirections(BuildStraightLineDirections(origin, result.Position), isStraightLineFallback: false);
+        }
+
+        private IReadOnlyList<ScannerDirectionStep> BuildStraightLineDirections(Vector2Int origin, Vector2Int target)
         {
             return _directionMode == ScannerDirectionMode.Hex
                 ? BuildHexDirections(origin, target)
                 : ScannerDirectionUtility.BuildSquareDirections(origin, target);
+        }
+
+        /// <summary>
+        /// The order every part of the scanner sorts through, read from the setting each time so
+        /// changing it in mod options lands on the next scan without a reload.
+        /// </summary>
+        private ScannerDistanceOrder CreateDistanceOrder(Vector2Int origin)
+        {
+            if (_pathSource == null || !ModSettings.ScannerUsesWalkablePath)
+            {
+                return ScannerDistanceOrder.StraightLine(origin);
+            }
+
+            IScannerPathSource source = _pathSource;
+            return ScannerDistanceOrder.WalkablePath(origin, result => source.GetPathCost(origin, result));
         }
 
         private static ScannerCommandResult NoResults()
