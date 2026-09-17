@@ -670,6 +670,19 @@
             public static readonly ModString AdventureMap = new ModString("Screens.AdventureMap", "Adventure map");
             public static readonly ModString Add = new ModString("Screens.Add", "Add");
             public static readonly ModString AddKeyword = new ModString("Screens.AddKeyword", "Add keyword");
+            /// <summary>The caption over the wielder's own army on a screen that draws two armies to
+            /// move troops between, spoken on entering it: {0} is the wielder's name in the possessive
+            /// (<c>ModText.FormatPossessiveName</c>). Right from one of its rows crosses to the other
+            /// army, which says the matching "right" caption.</summary>
+            public static readonly ModString ArmyLeft = new ModString("Screens.ArmyLeft", "{0} army, left");
+            /// <summary>The caption over the other wielder's army on the trade screen: {0} is that
+            /// wielder's name in the possessive (<c>ModText.FormatPossessiveName</c>).</summary>
+            public static readonly ModString ArmyRight = new ModString("Screens.ArmyRight", "{0} army, right");
+            /// <summary>The caption over the settlement's own army on the settlement and defence pages:
+            /// {0} is the settlement's name, as the page is named.</summary>
+            public static readonly ModString SettlementArmyRight = new ModString("Screens.SettlementArmyRight", "{0} army, right");
+            /// <summary>The caption over the army offering to join, on the hostile join offer.</summary>
+            public static readonly ModString JoiningArmyRight = new ModString("Screens.JoiningArmyRight", "Joining army, right");
             public static readonly ModString ArtifactDestroyHint = new ModString("Screens.ArtifactDestroyHint", "{0} destroys.");
             public static readonly ModString ArtifactDropHint = new ModString("Screens.ArtifactDropHint", "{0} to drop.");
             public static readonly ModString ArtifactEquipHint = new ModString("Screens.ArtifactEquipHint", "{0} equips.");

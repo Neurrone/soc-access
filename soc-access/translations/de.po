@@ -680,6 +680,26 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "Abenteuerkarte"
 
+#. Screens.ArmyLeft
+msgctxt "Screens.ArmyLeft"
+msgid "{0} army, left"
+msgstr "{0} Armee, links"
+
+#. Screens.ArmyRight
+msgctxt "Screens.ArmyRight"
+msgid "{0} army, right"
+msgstr "{0} Armee, rechts"
+
+#. Screens.SettlementArmyRight
+msgctxt "Screens.SettlementArmyRight"
+msgid "{0} army, right"
+msgstr "Armee von {0}, rechts"
+
+#. Screens.JoiningArmyRight
+msgctxt "Screens.JoiningArmyRight"
+msgid "Joining army, right"
+msgstr "Beitretende Armee, rechts"
+
 #. Screens.ArtifactDestroyHint
 msgctxt "Screens.ArtifactDestroyHint"
 msgid "{0} destroys."

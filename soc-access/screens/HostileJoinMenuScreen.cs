@@ -11,8 +11,12 @@ namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
     /// The offer a hostile army makes when a wielder walks into it. TWO SHAPES over the same window,
-    /// keyed on the game's own stage, both of them two places to be and both named by the title the
+    /// keyed on the game's own stage, both of them three places to be and both named by the title the
     /// menu draws. There is no close cross anywhere on this menu.
+    ///
+    /// THE WIELDER'S BAND IS TWO STOPS in both shapes - the portrait, and then their army - because
+    /// the army being offered is the other half of a troop exchange: Right from a row of the wielder's
+    /// army crosses to the offered rows, Left comes back, each to the row the cursor last had there.
     ///
     /// THE CHOICE STAGE is the attacking wielder's band and then the offer: what the menu says about
     /// it, the army being offered as troop rows, and the two answers. The offered rows read exactly as
@@ -35,6 +39,7 @@ namespace SongsOfConquestAccess.Screens
     public sealed class HostileJoinMenuScreen : LiveScreen<HostileJoinMenuAdapter>
     {
         private const string WielderStop = "hostile-join-wielder";
+        private const string WielderArmyStop = "hostile-join-wielder-army";
         private const string OfferStop = "hostile-join-offer";
         private const string JoinStop = "hostile-join-joining";
         private const string WielderKey = "hostile-join:wielder";
@@ -116,7 +121,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, Live.Wielder);
+            BuildWielder(builder);
 
             if (Live.Stage == HostileJoinMenuStage.Join)
             {
@@ -125,6 +130,7 @@ namespace SongsOfConquestAccess.Screens
                 BuildJoiningTroops(builder, null);
                 BuildMassMove(builder);
                 BuildDone(builder);
+                ConnectArmies(builder);
                 return;
             }
 
@@ -133,6 +139,33 @@ namespace SongsOfConquestAccess.Screens
             BuildJoiningTroops(builder, () => !Live.IsOfferLocked);
             BuildReject(builder);
             BuildAccept(builder);
+            ConnectArmies(builder);
+        }
+
+        /// <summary>The wielder who was offered the deal: their portrait, and then their army as a stop
+        /// of its own, because the offered army is the other half of a troop exchange and the two are
+        /// one Left or Right apart.</summary>
+        private void BuildWielder(GraphBuilder builder)
+        {
+            WielderInteract wielder = Live.Wielder;
+            if (wielder == null || !wielder.IsPresent)
+            {
+                return;
+            }
+
+            TroopHudRows.PortraitStop(builder, WielderStop, WielderKey, wielder);
+            TroopHudRows.ArmyStop(
+                builder,
+                WielderArmyStop,
+                WielderKey,
+                wielder.Troops,
+                TroopHudRows.ArmySide(ModStrings.Screens.ArmyLeft, wielder.WielderName));
+        }
+
+        /// <summary>Left and Right between the wielder's army and the army offering to join.</summary>
+        private void ConnectArmies(GraphBuilder builder)
+        {
+            TroopHudRows.ConnectArmies(builder, Navigator, WielderTroops, WielderKey, JoiningTroops, JoiningKey);
         }
 
         /// <summary>The game's Ctrl+digit quick splits, on whichever band's rows the cursor is on.
@@ -180,25 +213,15 @@ namespace SongsOfConquestAccess.Screens
                 GraphNodes.Paragraphs(() => lines)));
         }
 
-        /// <summary>The army being offered, under the game's own word for an army.</summary>
+        /// <summary>The army being offered, named as the right-hand half of the exchange.</summary>
         private void BuildJoiningTroops(GraphBuilder builder, Func<bool> available)
         {
-            string caption = GameText.Get("Commanders/Tooltip/Troops", string.Empty);
-            bool named = !string.IsNullOrWhiteSpace(caption);
-            if (named)
-            {
-                builder.PushContext(caption);
-                builder.SetRegion(JoiningKey);
-            }
-
-            TroopHudRows.Rows(builder, JoiningTroops, TroopHudRows.RowPrefix(JoiningKey), available);
-
-            if (named)
-            {
-                builder.PopContext();
-            }
-
-            builder.SetRegion(null);
+            TroopHudRows.Army(
+                builder,
+                JoiningTroops,
+                JoiningKey,
+                ModText.Get(ModStrings.Screens.JoiningArmyRight),
+                available);
         }
 
         // ---- the choice stage's two answers ----

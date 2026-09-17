@@ -2529,6 +2529,26 @@ msgctxt "Screens.AddKeyword"
 msgid "Add keyword"
 msgstr ""
 
+#. Screens.ArmyLeft
+msgctxt "Screens.ArmyLeft"
+msgid "{0} army, left"
+msgstr ""
+
+#. Screens.ArmyRight
+msgctxt "Screens.ArmyRight"
+msgid "{0} army, right"
+msgstr ""
+
+#. Screens.SettlementArmyRight
+msgctxt "Screens.SettlementArmyRight"
+msgid "{0} army, right"
+msgstr ""
+
+#. Screens.JoiningArmyRight
+msgctxt "Screens.JoiningArmyRight"
+msgid "Joining army, right"
+msgstr ""
+
 #. Screens.ArtifactDestroyHint
 msgctxt "Screens.ArtifactDestroyHint"
 msgid "{0} destroys."

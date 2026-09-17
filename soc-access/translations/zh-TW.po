@@ -680,6 +680,26 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "冒險地圖"
 
+#. Screens.ArmyLeft
+msgctxt "Screens.ArmyLeft"
+msgid "{0} army, left"
+msgstr "{0}軍隊，左側"
+
+#. Screens.ArmyRight
+msgctxt "Screens.ArmyRight"
+msgid "{0} army, right"
+msgstr "{0}軍隊，右側"
+
+#. Screens.SettlementArmyRight
+msgctxt "Screens.SettlementArmyRight"
+msgid "{0} army, right"
+msgstr "{0}軍隊，右側"
+
+#. Screens.JoiningArmyRight
+msgctxt "Screens.JoiningArmyRight"
+msgid "Joining army, right"
+msgstr "加入的軍隊，右側"
+
 #. Screens.ArtifactDestroyHint
 msgctxt "Screens.ArtifactDestroyHint"
 msgid "{0} destroys."

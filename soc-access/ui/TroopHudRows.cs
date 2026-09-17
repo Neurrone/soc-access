@@ -102,8 +102,90 @@ namespace SongsOfConquestAccess.UI
 
             builder.BeginStop(stopKey);
             AddPortrait(builder, keyPrefix, portrait, wielderName, portraitTooltip, focusPortrait);
+            Army(builder, troops, keyPrefix, TroopsCaption());
+        }
 
-            string caption = TroopsCaption();
+        /// <summary>
+        /// The portrait row as a stop OF ITS OWN, for the screens that draw two armies to move troops
+        /// between (<see cref="ConnectArmies"/>): there the wielder's rows are a stop of their own
+        /// beside it, so that Down from the portrait does not walk into the army.
+        /// </summary>
+        public static void PortraitStop(
+            GraphBuilder builder,
+            object stopKey,
+            string keyPrefix,
+            WielderInteract wielder)
+        {
+            if (builder == null || wielder == null || !wielder.IsPresent)
+            {
+                return;
+            }
+
+            WielderInteract it = wielder;
+            PortraitStop(
+                builder,
+                stopKey,
+                keyPrefix,
+                it.Portrait,
+                () => it.WielderName,
+                it.PortraitTooltip,
+                () => it.FocusPortrait());
+        }
+
+        /// <summary>The same from the PARTS, for a band the game draws without a
+        /// <c>WielderInteractHeader</c> over it.</summary>
+        public static void PortraitStop(
+            GraphBuilder builder,
+            object stopKey,
+            string keyPrefix,
+            Component portrait,
+            Func<string> wielderName,
+            Tooltip portraitTooltip,
+            Action focusPortrait)
+        {
+            if (builder == null)
+            {
+                return;
+            }
+
+            builder.BeginStop(stopKey);
+            AddPortrait(builder, keyPrefix, portrait, wielderName, portraitTooltip, focusPortrait);
+        }
+
+        /// <summary>An army as a stop of its own, under the caption the SCREEN names it with - the
+        /// wielder's band on a screen that draws two armies, where the game's own "Troops" says neither
+        /// whose army it is nor which side of the exchange it is on.</summary>
+        public static void ArmyStop(
+            GraphBuilder builder,
+            object stopKey,
+            string keyPrefix,
+            TroopHudAdapter troops,
+            string caption,
+            Func<bool> available = null)
+        {
+            if (builder == null || troops == null)
+            {
+                return;
+            }
+
+            builder.BeginStop(stopKey);
+            Army(builder, troops, keyPrefix, caption, available);
+        }
+
+        /// <summary>An army's rows under a caption, in whatever stop the caller has already opened, as
+        /// its own region so the region jump still reaches it.</summary>
+        public static void Army(
+            GraphBuilder builder,
+            TroopHudAdapter troops,
+            string keyPrefix,
+            string caption,
+            Func<bool> available = null)
+        {
+            if (builder == null || troops == null)
+            {
+                return;
+            }
+
             bool named = !string.IsNullOrWhiteSpace(caption);
             if (named)
             {
@@ -111,7 +193,7 @@ namespace SongsOfConquestAccess.UI
                 builder.SetRegion(keyPrefix + ":troops");
             }
 
-            Rows(builder, troops, RowPrefix(keyPrefix));
+            Rows(builder, troops, RowPrefix(keyPrefix), available);
 
             if (named)
             {
@@ -119,6 +201,75 @@ namespace SongsOfConquestAccess.UI
             }
 
             builder.SetRegion(null);
+        }
+
+        /// <summary>The caption over one army of a troop exchange: whose army it is and which side of
+        /// the page it is drawn on. <paramref name="side"/> is the screen's own
+        /// <c>ModStrings.Screens.ArmyLeft</c> or <c>ArmyRight</c>.</summary>
+        public static string ArmySide(ModString side, string wielderName)
+        {
+            return ModText.Get(
+                side,
+                ModText.FormatPossessiveName(wielderName, ModStrings.Spatial.CommanderPossessive));
+        }
+
+        /// <summary>
+        /// LEFT AND RIGHT BETWEEN THE TWO ARMIES of a troop-exchange screen, as explicit edges off
+        /// every row of each: Right from the left army lands on the row the cursor last had in the
+        /// right one (<see cref="GraphNavigator.RememberedIndex"/>), or its first row, and Left comes
+        /// back the same way. Explicit edges are applied after the automatic wiring and are followed
+        /// across a stop boundary, which is what carries the cursor from one army's stop into the
+        /// other's.
+        ///
+        /// An army the game is not drawing rows for (a settlement without troop storage) gets no edges,
+        /// and an edge naming a row this build did not declare is dropped where the graph is built, so
+        /// the key does nothing rather than landing somewhere else.
+        /// </summary>
+        public static void ConnectArmies(
+            GraphBuilder builder,
+            GraphNavigator navigator,
+            TroopHudAdapter left,
+            string leftKey,
+            TroopHudAdapter right,
+            string rightKey)
+        {
+            if (builder == null || left == null || right == null)
+            {
+                return;
+            }
+
+            int leftRows = left.GetSlots().Count;
+            int rightRows = right.GetSlots().Count;
+            if (leftRows == 0 || rightRows == 0)
+            {
+                return;
+            }
+
+            ConnectRows(builder, leftKey, leftRows, GraphDir.Right, Landing(navigator, rightKey, rightRows));
+            ConnectRows(builder, rightKey, rightRows, GraphDir.Left, Landing(navigator, leftKey, leftRows));
+        }
+
+        /// <summary>The row the jump into an army lands on: the one the cursor last had there while it
+        /// is still a row, else the first.</summary>
+        private static ControlId Landing(GraphNavigator navigator, string keyPrefix, int rows)
+        {
+            string prefix = RowPrefix(keyPrefix);
+            int index = navigator == null ? -1 : navigator.RememberedIndex(prefix);
+            return ControlId.Structural(prefix + (index < 0 || index >= rows ? 0 : index));
+        }
+
+        private static void ConnectRows(
+            GraphBuilder builder,
+            string keyPrefix,
+            int rows,
+            GraphDir dir,
+            ControlId landing)
+        {
+            string prefix = RowPrefix(keyPrefix);
+            for (int i = 0; i < rows; i++)
+            {
+                builder.Connect(ControlId.Structural(prefix + i), dir, landing);
+            }
         }
 
         /// <summary>The page's name where its wielder band draws the banner naming the place the

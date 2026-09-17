@@ -180,7 +180,40 @@ namespace SongsOfConquestAccess.UI
         /// </summary>
         public int FocusedIndex(string prefix)
         {
-            ControlId key = FocusedKey;
+            return IndexAfter(FocusedKey, prefix);
+        }
+
+        /// <summary>
+        /// The index a Tab-stop REMEMBERS under <paramref name="prefix"/>, or -1 where no stop's
+        /// remembered position is one of those rows - where the cursor would return to in a band it is
+        /// not standing in right now.
+        ///
+        /// A screen that wires a jump INTO somebody else's rows (Left and Right between the two armies
+        /// of a troop exchange) reads the landing here rather than keeping a row number of its own: the
+        /// engine already remembers where the player was in every stop, and a field of the screen's
+        /// would be a second answer to go stale.
+        /// </summary>
+        public int RememberedIndex(string prefix)
+        {
+            if (_state == null || string.IsNullOrEmpty(prefix))
+            {
+                return -1;
+            }
+
+            foreach (KeyValuePair<object, ControlId> memory in _state.StopMemory)
+            {
+                int index = IndexAfter(memory.Value, prefix);
+                if (index >= 0)
+                {
+                    return index;
+                }
+            }
+
+            return -1;
+        }
+
+        private static int IndexAfter(ControlId key, string prefix)
+        {
             string structural = key == null ? null : key.StructuralKey as string;
             if (structural == null || string.IsNullOrEmpty(prefix) || !structural.StartsWith(prefix, StringComparison.Ordinal))
             {

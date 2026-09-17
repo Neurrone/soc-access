@@ -156,6 +156,29 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("b2", Focused(g));
         }
 
+        // What Left and Right between the two armies of a troop exchange rely on (ui/TroopHudRows.cs,
+        // ConnectArmies): an explicit edge is followed even where it leaves the stop the cursor is in,
+        // and the stop it lands in remembers the row it landed on, so Tab back into it returns there.
+        [TestMethod]
+        public void AnExplicitEdgeCrossesAStopAndIsRemembered()
+        {
+            GraphState state = new GraphState();
+            KeyGraph g = new KeyGraph(Renderer(b =>
+            {
+                b.BeginStop("s1").AddItem(new SyntheticNode(Id("a1"), Vt("A1"))).AddItem(new SyntheticNode(Id("a2"), Vt("A2")));
+                b.BeginStop("s2").AddItem(new SyntheticNode(Id("b1"), Vt("B1"))).AddItem(new SyntheticNode(Id("b2"), Vt("B2")));
+                b.Connect(Id("a1"), GraphDir.Right, Id("b2"));
+            }), state);
+            g.Rerender();
+            Assert.IsTrue(g.Move(GraphDir.Right).Moved);
+            Assert.AreEqual("b2", Focused(g));
+            Assert.AreEqual(Id("b2"), state.StopMemory["s2"]);
+            g.MoveStop(-1, false);
+            Assert.AreEqual("a1", Focused(g));
+            g.MoveStop(1, false);
+            Assert.AreEqual("b2", Focused(g));
+        }
+
         [TestMethod]
         public void InitialFocusPrefersTheSelectedMemberOfTheStartStop()
         {

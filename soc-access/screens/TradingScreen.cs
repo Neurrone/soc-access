@@ -12,10 +12,11 @@ using UnityEngine;
 namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
-    /// The trade between two wielders standing next to each other. Seven places to be.
+    /// The trade between two wielders standing next to each other. Eight places to be.
     ///
     /// THE STOP ORDER IS DELIBERATE AND IS NOT THE DRAWN ONE (owner ruling 2026-09-07): left Wielder,
-    /// right Wielder, left Equipment, left Inventory, right Equipment, right Inventory, then Close.
+    /// left Army, right Wielder, left Equipment, left Inventory, right Equipment, right Inventory,
+    /// then Close.
     /// The menu draws each side as one column - portrait, stats, modifiers, artifacts, army - so the
     /// drawn order would put a wielder band between the two backpacks, and every transfer would then
     /// cross it. Putting the two wielder bands first and the four artifact stops together means a
@@ -24,7 +25,11 @@ namespace SongsOfConquestAccess.Screens
     /// A WIELDER STOP HERE IS THE SHEET'S SHAPE, because the menu draws the sheet's own parts, in the
     /// column's own order: the portrait row, the stats band (through <c>ui/CommanderBands.cs</c>,
     /// shared with the sheet), the modifiers, the army rows (<c>ui/TroopHudRows.cs</c>), and then the
-    /// side's Move all button. THE STOP IS NAMED AFTER THE WIELDER (owner ruling 2026-09-08): the
+    /// side's Move all button - except that the LEFT side's army is a stop of its own between the
+    /// modifiers and that button, so the wielder's own rows are one Tab from their portrait. Right
+    /// from one of those rows crosses to the other side's army and Left comes back, each to the row
+    /// the cursor last had there; the caption over each army says whose it is and which side of the
+    /// page it is on. THE STOP IS NAMED AFTER THE WIELDER (owner ruling 2026-09-08): the
     /// name is the stop's context, so Tab into it says who this column belongs to, and the portrait
     /// line under it says the level. The portrait is a region of its own, unnamed, so the region jump
     /// works from it as from anywhere else in the stop. The stop names the portrait as its landing
@@ -56,6 +61,7 @@ namespace SongsOfConquestAccess.Screens
     public sealed class TradingScreen : LiveScreen<TradingMenuAdapter>
     {
         private const string LeftWielderStop = "trade-left-wielder";
+        private const string LeftArmyStop = "trade-left-army";
         private const string RightWielderStop = "trade-right-wielder";
         private const string LeftEquipmentStop = "trade-left-equipment";
         private const string LeftInventoryStop = "trade-left-inventory";
@@ -141,8 +147,8 @@ namespace SongsOfConquestAccess.Screens
 
             ArtifactSlotNodes.RegisterSounds();
 
-            BuildWielder(builder, LeftWielderStop, LeftKey, Live.Left);
-            BuildWielder(builder, RightWielderStop, RightKey, Live.Right);
+            BuildWielder(builder, LeftWielderStop, LeftArmyStop, ModStrings.Screens.ArmyLeft, LeftKey, Live.Left);
+            BuildWielder(builder, RightWielderStop, null, ModStrings.Screens.ArmyRight, RightKey, Live.Right);
 
             builder.BeginStop(LeftEquipmentStop);
             ArtifactSlotNodes.Equipment(builder, Live.Left, LeftKey, AddSlotHints, _leftColumn, Section(Live.Left, Live.Left.EquipmentLabel));
@@ -158,6 +164,9 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(CloseStop);
             BuildClose(builder);
+
+            // Left and Right between the two armies.
+            TroopHudRows.ConnectArmies(builder, Navigator, Troops(Live.Left), LeftKey, Troops(Live.Right), RightKey);
         }
 
         /// <summary>The game's Ctrl+digit quick splits, on whichever side's rows the cursor is on.
@@ -184,14 +193,27 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>One side, in the order the menu draws that side's column: who they are, their
         /// stats, their modifiers, their army, and the button that hands the whole army over.
         /// </summary>
-        private void BuildWielder(GraphBuilder builder, string stop, string keyPrefix, TradingMenuAdapter.Side side)
+        private void BuildWielder(
+            GraphBuilder builder,
+            string stop,
+            object armyStop,
+            ModString armySide,
+            string keyPrefix,
+            TradingMenuAdapter.Side side)
         {
             builder.BeginStop(stop);
             builder.PushContext(side.CommanderName);
             ControlId portrait = BuildPortrait(builder, keyPrefix, side);
             BuildStats(builder, keyPrefix, side);
             BuildModifiers(builder, keyPrefix, side);
-            BuildTroops(builder, keyPrefix, side);
+            BuildTroops(builder, armyStop, armySide, keyPrefix, side);
+            if (armyStop != null)
+            {
+                // The Move all button is the side's own, not the army's: the army stop ends with the
+                // last row, and the button is read back under the side's stop where it is drawn.
+                builder.BeginStop(stop);
+            }
+
             BuildMoveAll(builder, keyPrefix, side);
             builder.PopContext();
 
@@ -276,25 +298,26 @@ namespace SongsOfConquestAccess.Screens
                 Marker);
         }
 
-        /// <summary>The side's army, under the game's own word for it.</summary>
-        private void BuildTroops(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
+        /// <summary>The side's army, named after the wielder whose it is and the side of the page it
+        /// is drawn on, since Left and Right carry a troop straight across between the two. The LEFT
+        /// side's army is a stop of its own, so that the wielder's own rows are one Tab from the
+        /// portrait rather than several arrows down the column; the right side's stays in its side's
+        /// stop, which a carry reaches by the same Left or Right.</summary>
+        private void BuildTroops(
+            GraphBuilder builder,
+            object armyStop,
+            ModString armySide,
+            string keyPrefix,
+            TradingMenuAdapter.Side side)
         {
-            string caption = GameText.Get("Commanders/Tooltip/Troops", string.Empty);
-            bool named = !string.IsNullOrWhiteSpace(caption);
-            if (named)
+            string caption = TroopHudRows.ArmySide(armySide, side.CommanderName);
+            if (armyStop == null)
             {
-                builder.PushContext(caption);
-                builder.SetRegion(keyPrefix + ":troops");
+                TroopHudRows.Army(builder, side.Troops, keyPrefix, caption);
+                return;
             }
 
-            TroopHudRows.Rows(builder, side.Troops, TroopHudRows.RowPrefix(keyPrefix));
-
-            if (named)
-            {
-                builder.PopContext();
-            }
-
-            builder.SetRegion(null);
+            TroopHudRows.ArmyStop(builder, armyStop, keyPrefix, side.Troops, caption);
         }
 
         /// <summary>The button under the army that hands the whole of it over. The game turns it off

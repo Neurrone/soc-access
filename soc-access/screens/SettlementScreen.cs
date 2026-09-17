@@ -8,9 +8,9 @@ using UnityEngine;
 namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
-    /// The landing page of a town or settlement a wielder has walked into. Four places to be, in the
-    /// order the menu draws them: the tutorial button in the corner, the visiting wielder's band
-    /// across the top, the page itself, and the close cross.
+    /// The landing page of a town or settlement a wielder has walked into. Five places to be, in the
+    /// order the menu draws them: the tutorial button in the corner, the visiting wielder's portrait
+    /// and then their army across the top, the page itself, and the close cross.
     ///
     /// THE PAGE is the drawn left column and then the defence panel on the right: the Draft and
     /// Upgrade buttons with the line the menu always writes under each of them read as their value
@@ -21,7 +21,10 @@ namespace SongsOfConquestAccess.Screens
     /// THE TWO ARMIES ARE ONE CARRY: the visiting wielder's rows and the settlement's rows are the
     /// same troop rows (<c>ui/TroopHudRows.cs</c>), so Space picks a troop out of one and Enter drops
     /// it in the other through the game's own drag, which decides what a drop means - the split popup
-    /// onto an empty slot, a swap onto a different troop. The two Move all buttons under the
+    /// onto an empty slot, a swap onto a different troop. Right from a row of the visiting wielder's
+    /// army crosses to the settlement's, Left comes back, each to the row the cursor last had there,
+    /// and the captions over the two armies say which side is which. The wielder stored here keeps its
+    /// own band and is reached by Tab, as it always was. The two Move all buttons under the
     /// settlement's rows are the game's own mass moves; the game gives both the same tooltip ("Move as
     /// many as possible"), so the mod names them by the direction they move in and leaves the tooltip
     /// in the buffer.
@@ -41,6 +44,7 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string TutorialStop = "settlement-tutorial";
         private const string WielderStop = "settlement-wielder";
+        private const string WielderArmyStop = "settlement-wielder-army";
         private const string StoredWielderStop = "settlement-stored-wielder";
         private const string StoredWielderKey = "settlement/stored";
         private const string PageStop = "settlement-page";
@@ -78,6 +82,13 @@ namespace SongsOfConquestAccess.Screens
         /// where it has one of its own.</summary>
         public override string ScreenName
         {
+            get { return PlaceName; }
+        }
+
+        /// <summary>What this place is called - the page's own name, and what the settlement's army is
+        /// named after.</summary>
+        private string PlaceName
+        {
             get
             {
                 if (Live == null)
@@ -105,7 +116,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             BuildTutorial(builder);
-            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, Live.Wielder);
+            BuildVisitingWielder(builder);
             BuildStoredWielder(builder);
 
             builder.BeginStop(PageStop);
@@ -122,6 +133,35 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(CloseStop);
             BuildClose(builder);
+
+            // Left and Right between the visiting wielder's army and the settlement's own.
+            TroopHudRows.ConnectArmies(
+                builder,
+                Navigator,
+                VisitingTroops,
+                WielderKey,
+                SettlementTroops,
+                SettlementArmyKey);
+        }
+
+        /// <summary>The wielder who walked in: their portrait, and then their army as a stop of its
+        /// own, because the settlement's rows are the other half of a troop exchange and the two are
+        /// one Left or Right apart.</summary>
+        private void BuildVisitingWielder(GraphBuilder builder)
+        {
+            WielderInteract wielder = Live.Wielder;
+            if (wielder == null || !wielder.IsPresent)
+            {
+                return;
+            }
+
+            TroopHudRows.PortraitStop(builder, WielderStop, WielderKey, wielder);
+            TroopHudRows.ArmyStop(
+                builder,
+                WielderArmyStop,
+                WielderKey,
+                wielder.Troops,
+                TroopHudRows.ArmySide(ModStrings.Screens.ArmyLeft, wielder.WielderName));
         }
 
         /// <summary>The game's Ctrl+digit quick splits, on whichever army's rows the cursor is on.
@@ -262,7 +302,9 @@ namespace SongsOfConquestAccess.Screens
         private void BuildSettlementTroops(GraphBuilder builder)
         {
             bool rowsDrawn = Live.IsSettlementTroopsVisible();
-            string caption = rowsDrawn ? Live.DefendingTroopsLabel : null;
+            string caption = rowsDrawn
+                ? ModText.Get(ModStrings.Screens.SettlementArmyRight, PlaceName)
+                : null;
             bool named = !string.IsNullOrWhiteSpace(caption);
             if (named)
             {

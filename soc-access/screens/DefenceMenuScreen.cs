@@ -10,13 +10,15 @@ namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
     /// The defence menu of a settlement the player owns, opened without walking a wielder into it.
-    /// Up to four places to be: the tutorial button in the corner, the stored wielder's band where a
-    /// wielder is stored, the menu itself, and the close cross.
+    /// Up to five places to be: the tutorial button in the corner, the stored wielder's portrait and
+    /// their army where a wielder is stored, the menu itself, and the close cross.
     ///
     /// THE BAND HAS NO <c>WielderInteractHeader</c> here - the stored wielder's portrait and army
-    /// hang off <c>DefencePanelWielder</c> instead - so the stop is built from those parts through
+    /// hang off <c>DefencePanelWielder</c> instead - so the stops are built from those parts through
     /// the same contributor the other pages use (<c>ui/TroopHudRows.cs</c>), and there is no
-    /// custom-name banner over it to read.
+    /// custom-name banner over it to read. The stored wielder's ARMY is a stop of its own, and Right
+    /// from one of its rows crosses to the settlement's own army, Left comes back: the two are the
+    /// halves of a troop exchange, and the captions over them say which side is which.
     ///
     /// THE MENU is the two ways to get troops, the defending wielder's band under the header the game
     /// draws over it, the settlement's own troops under the game's own header for them, the towers,
@@ -37,6 +39,7 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string TutorialStop = "defences-tutorial";
         private const string WielderStop = "defences-wielder";
+        private const string WielderArmyStop = "defences-wielder-army";
         private const string PageStop = "defences-page";
         private const string CloseStop = "defences-close";
         private const string KeyPrefix = "defences";
@@ -71,6 +74,13 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The title and the subtitle the menu draws over the page, said once where the game
         /// has written the same text in both.</summary>
         public override string ScreenName
+        {
+            get { return PlaceName; }
+        }
+
+        /// <summary>What this place is called - the page's own name, and what the settlement's army is
+        /// named after.</summary>
+        private string PlaceName
         {
             get
             {
@@ -116,6 +126,15 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(CloseStop);
             BuildClose(builder);
+
+            // Left and Right between the stored wielder's army and the settlement's own.
+            TroopHudRows.ConnectArmies(
+                builder,
+                Navigator,
+                StoredWielderTroops,
+                WielderKey,
+                SettlementTroops,
+                SettlementArmyKey);
         }
 
         /// <summary>The game's Ctrl+digit quick splits, on whichever army's rows the cursor is on.
@@ -179,15 +198,20 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            TroopHudRows.WielderStop(
+            TroopHudRows.PortraitStop(
                 builder,
                 WielderStop,
                 WielderKey,
                 panel.Portrait,
                 () => panel.StoredWielderName,
                 panel.PortraitTooltip,
-                panel.FocusPortrait,
-                panel.Troops);
+                panel.FocusPortrait);
+            TroopHudRows.ArmyStop(
+                builder,
+                WielderArmyStop,
+                WielderKey,
+                panel.Troops,
+                TroopHudRows.ArmySide(ModStrings.Screens.ArmyLeft, panel.StoredWielderName));
         }
 
         // ---- the two ways to get troops ----
@@ -229,7 +253,9 @@ namespace SongsOfConquestAccess.Screens
         private void BuildSettlementTroops(GraphBuilder builder)
         {
             bool rowsDrawn = Live.IsSettlementTroopsVisible();
-            string caption = rowsDrawn ? Live.DefendingTroopsLabel : null;
+            string caption = rowsDrawn
+                ? ModText.Get(ModStrings.Screens.SettlementArmyRight, PlaceName)
+                : null;
             bool named = !string.IsNullOrWhiteSpace(caption);
             if (named)
             {
