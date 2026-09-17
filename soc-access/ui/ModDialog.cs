@@ -447,6 +447,7 @@ namespace SongsOfConquestAccess.UI
             GameObject clone = UnityEngine.Object.Instantiate(panel.gameObject, rootRect);
             clone.name = "Panel";
             container.InjectGameObject(clone);
+            FillCanvas(clone.transform as RectTransform, canvas as RectTransform);
             _root.SetActive(true);
 
             _panelGroup = clone.GetComponent<CanvasGroup>();
@@ -511,6 +512,32 @@ namespace SongsOfConquestAccess.UI
                 "Options",
                 container.Resolve<IAddonManager>());
             return true;
+        }
+
+        /// <summary>
+        /// How much smaller than the canvas the panel is drawn - the frame of page left showing
+        /// around it, in canvas units. The source panel is a fixed 2000 x 1400 on a 3456 x 2160
+        /// canvas, which leaves the mod's own rows a third of the screen to be drawn in and its
+        /// tables no room for their columns.
+        /// </summary>
+        private static readonly Vector2 CanvasMargin = new Vector2(156f, 120f);
+
+        /// <summary>
+        /// Give the copy the whole screen. The panel is centre-anchored, so its size is its
+        /// <c>sizeDelta</c> and its offset from the middle its <c>anchoredPosition</c>; nothing else
+        /// has to move, because the background is a nine-sliced sprite and every part of the panel
+        /// is anchored to an edge or a corner of it - the decorations stay centred, the title and
+        /// the content column stretch, the tabs stay top-left and the close button top-right.
+        /// </summary>
+        private static void FillCanvas(RectTransform panel, RectTransform canvas)
+        {
+            if (panel == null || canvas == null)
+            {
+                return;
+            }
+
+            panel.sizeDelta = canvas.rect.size - CanvasMargin;
+            panel.anchoredPosition = Vector2.zero;
         }
 
         private void AddBlocker(RectTransform parent)
