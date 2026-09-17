@@ -157,7 +157,7 @@ namespace SongsOfConquestAccess.Screens
 
             IReadOnlyList<MenuRow> rows = _dialog.Rows;
             builder.BeginStop(RowsStop);
-            _rows.BuildRows(builder, rows);
+            _rows.BuildRows(builder, rows, _dialog.Facts);
             // The Keybinds tab's gesture rows are the game's own key-binding widget, so they are read
             // as the Options window's Controls page is: a table after the reset-all button.
             _rows.BuildKeyBindingSheet(builder, rows);

@@ -53,6 +53,11 @@ namespace SongsOfConquestAccess.UI
         // takes to open where the control asked for is inside a collapsed one (see FocusRequest).
         private FocusRequest _pendingFocus;
 
+        // Whether the landing asked for is to be READ even where the cursor is already on it, and
+        // what is said in front of it. Cleared with the request that carries them.
+        private bool _pendingArrival;
+        private string _pendingArrivalLabel;
+
         // The live-part watch: the focus it is baselined against, and the last resolved text of each
         // effective announcement part (index-parallel, with nulls where a part is not live).
         private ControlId _liveKey;
@@ -354,6 +359,26 @@ namespace SongsOfConquestAccess.UI
         public void FocusNode(ControlId id, bool announce = true)
         {
             _pendingFocus = id == null ? null : new FocusRequest(id, announce, _screen);
+            _pendingArrival = false;
+            _pendingArrivalLabel = null;
+        }
+
+        /// <summary>
+        /// The same, READ as an arrival even where the cursor was already standing on that control -
+        /// for a screen that redrew its content and moved the thing the cursor is about. The control
+        /// is the same control and so is its id, so nothing about the cursor changed and the ordinary
+        /// rule would say nothing at all; what changed is what the control now means, which is news.
+        ///
+        /// <paramref name="label"/> is said in front of the landing, exactly as the label on the
+        /// arrow that would have walked there is said: the row's name, for a cell in a table's
+        /// metadata column, which is what the player would have heard had they moved onto it
+        /// themselves.
+        /// </summary>
+        public void FocusArrival(ControlId id, string label)
+        {
+            FocusNode(id);
+            _pendingArrival = id != null;
+            _pendingArrivalLabel = label;
         }
 
         private FocusRequest OwnPendingFocus
@@ -524,6 +549,8 @@ namespace SongsOfConquestAccess.UI
             }
 
             FocusRequest pending = OwnPendingFocus;
+            bool arrived = false;
+            string arrivalLabel = null;
             if (_state.CurKey == null && pending == null)
             {
                 // No content yet - a window still animating in. Reconcile will seat the start node
@@ -556,6 +583,8 @@ namespace SongsOfConquestAccess.UI
                     if (outcome == FocusOutcome.Land)
                     {
                         _graph.Focus(pending.Id);
+                        arrived = _pendingArrival;
+                        arrivalLabel = _pendingArrivalLabel;
                         if (!pending.Announce)
                         {
                             _lastSpokenKey = pending.Id;
@@ -566,6 +595,8 @@ namespace SongsOfConquestAccess.UI
                     if (outcome != FocusOutcome.Wait)
                     {
                         _pendingFocus = null;
+                        _pendingArrival = false;
+                        _pendingArrivalLabel = null;
                     }
                 }
             }
@@ -581,7 +612,7 @@ namespace SongsOfConquestAccess.UI
             // A landing of this screen's still in flight: a row the cursor is standing on that nobody
             // asked for is not where the player is going, and is not said.
             bool inFlight = OwnPendingFocus != null;
-            bool moved = _lastSpokenKey == null || !_lastSpokenKey.Equals(node.Id);
+            bool moved = arrived || _lastSpokenKey == null || !_lastSpokenKey.Equals(node.Id);
             if (moved && !inFlight && RecoveredWhileLeaving())
             {
                 // The control the player was on vanished because the page is being switched off (a
@@ -595,8 +626,10 @@ namespace SongsOfConquestAccess.UI
 
             if (moved && !inFlight)
             {
-                // Queued: an arrival follows the screen name rather than cutting it off.
-                Say(GraphAnnouncer.Compose(_lastSpokenNode, node), false);
+                // Queued: an arrival follows the screen name rather than cutting it off. A landing
+                // read AS an arrival comes from nowhere, so the whole of it is said - the row's
+                // position included, which a landing off the same row would have kept quiet about.
+                Say(GraphAnnouncer.Compose(arrived ? null : _lastSpokenNode, node, arrivalLabel), false);
                 _lastSpokenKey = node.Id;
                 _lastSpokenNode = node;
                 _actedKey = null;

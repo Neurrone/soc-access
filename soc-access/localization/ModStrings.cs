@@ -578,6 +578,7 @@
             public static readonly ModString CharacterTab = new ModString("UI.CharacterTab", "tab");
             public static readonly ModString CharacterUnderscore = new ModString("UI.CharacterUnderscore", "underscore");
             public static readonly ModString ColumnDetails = new ModString("UI.ColumnDetails", "Details");
+            public static readonly ModString ColumnElement = new ModString("UI.ColumnElement", "Element");
             public static readonly ModString ColumnFaction = new ModString("UI.ColumnFaction", "Faction");
             public static readonly ModString ColumnGames = new ModString("UI.ColumnGames", "Games");
             public static readonly ModString ColumnKills = new ModString("UI.ColumnKills", "Kills");

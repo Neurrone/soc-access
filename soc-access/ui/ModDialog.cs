@@ -78,6 +78,14 @@ namespace SongsOfConquestAccess.UI
         private Color _blankTabColor;
         private int _selected = -1;
 
+        // What the reader cannot read off the game, rebuilt with the column it describes.
+        private readonly FormFacts _facts = new FormFacts();
+
+        // The table being drawn, and the rows it has so far - the drawing's own bookkeeping, alive
+        // only between BeginTable and EndTable.
+        private readonly List<Transform> _tableRows = new List<Transform>();
+        private string _table;
+
         private ModDialog()
         {
         }
@@ -232,6 +240,10 @@ namespace SongsOfConquestAccess.UI
             // factory made, draw, then let the scroller measure what is there now.
             _controller.Clear();
             _factory.Clear();
+            // Every fact is about a control the clear just destroyed.
+            _facts.Clear();
+            _table = null;
+            _tableRows.Clear();
             DrawContent(_selected);
             if (_autoScroller != null)
             {
@@ -394,10 +406,11 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>
-        /// Start a row of controls drawn side by side. Only ever TWO of them: a toggle is a
-        /// full-width row with its box at the right, and four controls in one layout gave each
-        /// toggle 381 px of a 486 px column and squeezed both buttons to nothing (measured
-        /// 2026-09-07). The game itself only ever puts two buttons in one.
+        /// Start a row of controls drawn side by side. Only ever TWO of them, unless the row is a
+        /// table's (<see cref="StartTableRow"/>, which sizes its cells): a toggle is a full-width
+        /// row with its box at the right, and four controls in one layout gave each toggle 381 px of
+        /// a 486 px column and squeezed both buttons to nothing (measured 2026-09-07). The game
+        /// itself only ever puts two buttons in one.
         ///
         /// The layout is marked as a scroll parent, because <c>AutoScrollToSelected.SearchTransform</c>
         /// walks only the DIRECT children of the content column unless a child carries
@@ -406,18 +419,225 @@ namespace SongsOfConquestAccess.UI
         /// </summary>
         public void StartRow()
         {
-            IUITransform layout = _controller.StartHorizontalLayout();
-            Transform transform = layout != null ? layout.MonoTransform : null;
-            if (transform != null && transform.GetComponent<AutoScrollParent>() == null)
-            {
-                transform.gameObject.AddComponent<AutoScrollParent>();
-            }
+            BeginLayout();
         }
 
         public void EndRow()
         {
             _controller.EndLayout();
         }
+
+        private Transform BeginLayout()
+        {
+            IUITransform layout = _controller.StartHorizontalLayout();
+            Transform transform = layout != null ? layout.MonoTransform : null;
+            if (transform != null && transform.GetComponent<AutoScrollParent>() == null)
+            {
+                transform.gameObject.AddComponent<AutoScrollParent>();
+            }
+
+            return transform;
+        }
+
+        // ---- tables ----
+
+        /// <summary>
+        /// Begin a table: rows drawn as horizontal layouts of one cell per column, laid out so the
+        /// columns line up down the table and read as one.
+        ///
+        /// <paramref name="captions"/> are what the reader SAYS on crossing into each column, the
+        /// primary's first and a null entry for a column crossed in silence. They are not the drawn
+        /// header - a table that wants one draws it with <see cref="StartHeaderRow"/> - because the
+        /// two are separate decisions: the move columns here are captioned by their buttons' own
+        /// spoken labels and draw no header at all.
+        /// </summary>
+        public void BeginTable(string key, string[] captions)
+        {
+            _table = key;
+            _tableRows.Clear();
+            _facts.SetColumns(key, captions);
+        }
+
+        /// <summary>One row of the table being drawn, known across redraws by
+        /// <paramref name="rowRef"/> - so the cursor can be put back on the cell of the very row the
+        /// player moved, wherever the redraw put it.</summary>
+        public void StartTableRow(string rowRef)
+        {
+            Transform row = BeginLayout();
+            if (row != null)
+            {
+                _tableRows.Add(row);
+                _facts.SetRow(row, _table, rowRef);
+            }
+        }
+
+        /// <summary>The table's drawn header band: a row of texts over the columns, which is DRAWN
+        /// and not read - the reader says the captions instead, on crossing.</summary>
+        public void StartHeaderRow()
+        {
+            StartTableRow(null);
+        }
+
+        /// <summary>Finish the table and give every column the width its content needs: each cell is
+        /// as wide as the widest thing in its column and no wider, so the table is compact and left
+        /// aligned with the room it does not need left over at its right.</summary>
+        public void EndTable()
+        {
+            LayOutColumns();
+            _table = null;
+            _tableRows.Clear();
+        }
+
+        /// <summary>A checkbox cell: the game's toggle with the full-width strip and the label it
+        /// draws them for switched off, so what is left is the box. A table cell says what it is
+        /// through its column, not through words of its own beside every box.</summary>
+        public IUIToggle AddToggleCell(bool value, Action<bool> changed)
+        {
+            IUIToggle toggle = _controller.AddToggle(string.Empty, value, changed);
+            Compact(toggle);
+            return toggle;
+        }
+
+        /// <summary>What the reader says for a control whose drawn words are not words at all - an
+        /// arrow glyph on a button. The drawing stays the game's; only the reading is replaced.
+        /// </summary>
+        public void SpeakAs(IUITransform control, string spoken)
+        {
+            Transform transform = control != null ? control.MonoTransform : null;
+            if (transform != null)
+            {
+                _facts.SetSpokenLabel(transform, spoken);
+            }
+        }
+
+        /// <summary>What a reader has to be told about this form that it cannot read off the game:
+        /// which drawn layouts are a table's rows, what that table's spoken column captions are, and
+        /// what a control whose drawn words are a glyph is called.</summary>
+        public FormFacts Facts
+        {
+            get { return _facts; }
+        }
+
+        /// <summary>
+        /// Width by content, column by column: every cell of a column is given the widest of the
+        /// column's own preferred widths, and the layout is told to stop stretching its children, so
+        /// nothing is padded out to fill the panel.
+        ///
+        /// DRAWING: the table is measured once, as it is finished, and never again.
+        /// </summary>
+        private void LayOutColumns()
+        {
+            List<float> widths = new List<float>();
+            for (int i = 0; i < _tableRows.Count; i++)
+            {
+                Transform row = _tableRows[i];
+                for (int c = 0; c < row.childCount; c++)
+                {
+                    float width = FindCellWidth(row.GetChild(c));
+                    if (c < widths.Count)
+                    {
+                        widths[c] = Mathf.Max(widths[c], width);
+                    }
+                    else
+                    {
+                        widths.Add(width);
+                    }
+                }
+            }
+
+            for (int i = 0; i < _tableRows.Count; i++)
+            {
+                Transform row = _tableRows[i];
+                HorizontalLayoutGroup group = row.GetComponent<HorizontalLayoutGroup>();
+                if (group != null)
+                {
+                    // The game's row stretches its children across the whole column; a table's
+                    // columns are as wide as what is in them. The row is already aligned to the
+                    // left (the prefab's alignment is MiddleLeft), so the spare room falls at the
+                    // right where nothing is drawn.
+                    group.childForceExpandWidth = false;
+                }
+
+                for (int c = 0; c < row.childCount && c < widths.Count; c++)
+                {
+                    LayoutElement element = CellElement(row.GetChild(c));
+                    element.minWidth = widths[c];
+                    element.preferredWidth = widths[c];
+                    element.flexibleWidth = 0f;
+                }
+            }
+        }
+
+        /// <summary>How wide one cell has to be: the checkbox where the cell is a bare one, and
+        /// otherwise the widest line of text it draws plus the frame its control draws around it.
+        /// DRAWING: one walk per cell, as the table is laid out.</summary>
+        private static float FindCellWidth(Transform cell)
+        {
+            if (cell.GetComponent<UIToggle>() != null)
+            {
+                return CheckboxSize.x;
+            }
+
+            float text = 0f;
+            TMP_Text[] meshes = cell.GetComponentsInChildren<TMP_Text>(true);
+            for (int i = 0; i < meshes.Length; i++)
+            {
+                text = Mathf.Max(text, meshes[i].GetPreferredValues().x);
+            }
+
+            return text + (cell.GetComponent<UIButton>() != null ? ButtonPadding : 0f);
+        }
+
+        private static LayoutElement CellElement(Transform cell)
+        {
+            LayoutElement element = cell.GetComponent<LayoutElement>();
+            return element != null ? element : cell.gameObject.AddComponent<LayoutElement>();
+        }
+
+        /// <summary>
+        /// Strip the game's toggle down to its box. The widget is a full-width row because of two
+        /// children - <c>Background</c>, the strip the label sits on, and <c>Text</c>, the label -
+        /// and because its <c>Toggle</c> child is a 450-wide band held 558 px in from the left, with
+        /// the box itself at the band's left edge. Switch the two off, pull the band back to the
+        /// left and shrink it to the box, and what is drawn is a checkbox and nothing else.
+        /// </summary>
+        private static void Compact(IUIToggle toggle)
+        {
+            Component component = toggle as Component;
+            Transform root = component != null ? component.transform : null;
+            if (root == null)
+            {
+                return;
+            }
+
+            // The factory answers a label it does not know with the key it was asked for, prefixed:
+            // an empty label came back as "Options/", which is what a reader of the drawn row would
+            // then say. A cell draws no label at all, so it has none to say.
+            toggle.Text = string.Empty;
+            Deactivate(root.Find("Background"));
+            Deactivate(root.Find("Text"));
+            RectTransform box = root.Find("Toggle") as RectTransform;
+            if (box != null)
+            {
+                box.anchoredPosition = new Vector2(0f, box.anchoredPosition.y);
+                box.sizeDelta = CheckboxSize;
+            }
+        }
+
+        private static void Deactivate(Transform child)
+        {
+            if (child != null)
+            {
+                child.gameObject.SetActive(false);
+            }
+        }
+
+        /// <summary>The box of the game's toggle, measured off the prefab's own checkbox art.
+        /// </summary>
+        private static readonly Vector2 CheckboxSize = new Vector2(56f, 57f);
+
+        /// <summary>The frame a button draws around its words, in canvas units.</summary>
+        private const float ButtonPadding = 64f;
 
         // ---- the copy itself ----
 
@@ -723,6 +943,106 @@ namespace SongsOfConquestAccess.UI
         private static void Warn(string message)
         {
             SocAccessMod.Instance?.LogWarning("Mod dialog: " + message);
+        }
+
+        /// <summary>
+        /// WHAT A READER CANNOT READ OFF THE DRAWN FORM.
+        ///
+        /// Everything else about a row the reader gets from the game - its words, its state, whether
+        /// it is drawn at all. These three are the mod's own decisions, taken as the form was drawn:
+        /// which horizontal layouts are a TABLE's rows and which row each one is, what that table's
+        /// columns are CALLED in speech, and what a control whose drawn words are a glyph is called.
+        ///
+        /// Facts, not nodes: nothing here knows about node ids, stops or regions. What a table
+        /// becomes in the tree is <see cref="MenuFormNodes"/>'s business.
+        /// </summary>
+        public sealed class FormFacts
+        {
+            private readonly Dictionary<Transform, DrawnRow> _rows = new Dictionary<Transform, DrawnRow>();
+            private readonly Dictionary<string, string[]> _columns = new Dictionary<string, string[]>();
+            private readonly Dictionary<Transform, string> _spoken = new Dictionary<Transform, string>();
+
+            /// <summary>One drawn horizontal layout that is a table's row.</summary>
+            public sealed class DrawnRow
+            {
+                public DrawnRow(Transform layout, string table, string rowRef)
+                {
+                    Layout = layout;
+                    Table = table;
+                    RowRef = rowRef;
+                }
+
+                /// <summary>The layout the row is drawn as: what its cells are scrolled into view
+                /// by, and the evidence the game is still drawing them.</summary>
+                public Transform Layout { get; private set; }
+
+                /// <summary>Which table it belongs to.</summary>
+                public string Table { get; private set; }
+
+                /// <summary>The row's identity across redraws, or null for the drawn header band,
+                /// which is not a row at all.</summary>
+                public string RowRef { get; private set; }
+            }
+
+            /// <summary>Whether this form drew any table.</summary>
+            public bool HasTables
+            {
+                get { return _rows.Count > 0; }
+            }
+
+            /// <summary>The table row a layout is, or null for a layout that is not one.</summary>
+            public DrawnRow RowOf(Transform layout)
+            {
+                DrawnRow row;
+                return layout != null && _rows.TryGetValue(layout, out row) ? row : null;
+            }
+
+            /// <summary>What a table's columns are called in speech, the primary's first; a null
+            /// entry is a column crossed in silence.</summary>
+            public string[] ColumnsOf(string table)
+            {
+                string[] columns;
+                return table != null && _columns.TryGetValue(table, out columns) ? columns : null;
+            }
+
+            /// <summary>What a control is called, where its drawn words are not what it is called;
+            /// null where they are.</summary>
+            public string SpokenLabelOf(Transform control)
+            {
+                string spoken;
+                return control != null && _spoken.TryGetValue(control, out spoken) ? spoken : null;
+            }
+
+            public void SetRow(Transform layout, string table, string rowRef)
+            {
+                if (layout != null)
+                {
+                    _rows[layout] = new DrawnRow(layout, table, rowRef);
+                }
+            }
+
+            public void SetColumns(string table, string[] columns)
+            {
+                if (table != null)
+                {
+                    _columns[table] = columns;
+                }
+            }
+
+            public void SetSpokenLabel(Transform control, string spoken)
+            {
+                if (control != null)
+                {
+                    _spoken[control] = spoken;
+                }
+            }
+
+            public void Clear()
+            {
+                _rows.Clear();
+                _columns.Clear();
+                _spoken.Clear();
+            }
         }
 
         /// <summary>One of the dialog's category tabs.</summary>

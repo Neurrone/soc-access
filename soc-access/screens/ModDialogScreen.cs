@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
@@ -156,6 +156,21 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        /// <summary>Put the cursor on one cell of a table this dialog drew, named by the row's own
+        /// key and the column's number, and READ the landing: after a redraw that moved the row, the
+        /// cell is the same cell and its id has not changed, so nothing else would say where the row
+        /// now sits. <paramref name="rowName"/> is said in front of it, as the arrow that would have
+        /// walked there says it.</summary>
+        public void FocusCell(string table, string rowRef, int column, string rowName)
+        {
+            GraphNavigator navigator = Navigator;
+            ControlId id = _rows.CellId(table, rowRef, column);
+            if (navigator != null && id != null)
+            {
+                navigator.FocusArrival(id, rowName);
+            }
+        }
+
         /// <summary>Leave without confirming.</summary>
         public bool Cancel()
         {
@@ -191,7 +206,7 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(_key + "-rows");
             IReadOnlyList<MenuRow> rows = _dialog.Rows;
-            _rows.BuildRows(builder, rows);
+            _rows.BuildRows(builder, rows, _dialog.Facts);
 
             builder.BeginStop(_key + "-buttons");
             _rows.AddWindowButton(

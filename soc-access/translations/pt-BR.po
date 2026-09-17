@@ -2946,6 +2946,11 @@ msgctxt "UI.ColumnDetails"
 msgid "Details"
 msgstr "Detalhes"
 
+#. UI.ColumnElement
+msgctxt "UI.ColumnElement"
+msgid "Element"
+msgstr "Elemento"
+
 #. UI.ColumnFaction
 msgctxt "UI.ColumnFaction"
 msgid "Faction"

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.UI;
@@ -85,6 +85,30 @@ namespace SongsOfConquestAccess.Tests
             // leaf alone, as a landing within the same stop reads it, and not the whole arrival.
             Assert.AreEqual("Grass", GraphAnnouncer.Compose(tile, tile));
             Assert.AreEqual("Battlefield, Grass", GraphAnnouncer.ComposeFull(tile));
+        }
+
+        /// <summary>The landing a screen asks to have READ although the cursor is already on it -
+        /// the mod options window's announcement order, whose Move buttons redraw the table under the
+        /// cursor and leave it on the very cell it was on. What the frame then does with the two
+        /// fields is asserted against the composer at the end: a label in front and no node to come
+        /// from is the whole arrival, the row's position included.</summary>
+        [TestMethod]
+        public void FocusArrivalAsksForTheLandingToBeReadWithTheLabelInFrontOfIt()
+        {
+            GraphNavigator navigator = new GraphNavigator();
+            ControlId cell = Id("cell");
+
+            navigator.FocusArrival(cell, "Wielder");
+
+            Assert.IsNotNull(Field(navigator, "_pendingFocus"), "the landing is asked for as any other is");
+            Assert.AreEqual(true, Field(navigator, "_pendingArrival"), "and is read even where the cursor is already on it");
+            Assert.AreEqual("Wielder", Field(navigator, "_pendingArrivalLabel"));
+
+            // An ordinary landing asked for afterwards is an ordinary landing: the two are cleared
+            // with the request that carried them, never left to colour the next one.
+            navigator.FocusNode(cell);
+            Assert.AreEqual(false, Field(navigator, "_pendingArrival"));
+            Assert.IsNull(Field(navigator, "_pendingArrivalLabel"));
         }
     }
 }

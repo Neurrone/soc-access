@@ -100,12 +100,155 @@ namespace SongsOfConquestAccess.UI
             public List<NodeDeclaration> Nodes;
         }
 
+        /// <summary>What a table's node keys begin with, after the form's own prefix.</summary>
+        private const string TableKey = ":table/";
+
+        // Which table row each drawn row belongs to, worked out once per ROW LIST: a row's layout is
+        // settled when the column is drawn and cannot change while the list does not, so a build
+        // reads this array and asks the game nothing.
+        private ModDialog.FormFacts.DrawnRow[] _tablePlan;
+
+        // The table rows' cells, on the same terms as the ordinary rows' nodes: built once per row
+        // list, keyed on the row the form says each layout is.
+        private readonly Dictionary<ModDialog.FormFacts.DrawnRow, TableRowNodes> _tableNodes =
+            new Dictionary<ModDialog.FormFacts.DrawnRow, TableRowNodes>();
+
+        private sealed class TableRowNodes
+        {
+            public NodeVtable Primary;
+            public List<GraphSheet.SheetCell> Cells;
+        }
+
+        /// <summary>Which of this form's rows are a table's, and which row of it each one is. One
+        /// pass over the list, whenever the list is a new one.</summary>
+        private void PlanTables(IReadOnlyList<MenuRow> controls, ModDialog.FormFacts facts)
+        {
+            _tablePlan = null;
+            if (facts == null || !facts.HasTables || controls == null)
+            {
+                return;
+            }
+
+            ModDialog.FormFacts.DrawnRow[] plan = new ModDialog.FormFacts.DrawnRow[controls.Count];
+            for (int i = 0; i < controls.Count; i++)
+            {
+                Transform transform = controls[i] != null ? controls[i].Transform : null;
+                plan[i] = facts.RowOf(transform != null ? transform.parent : null);
+            }
+
+            _tablePlan = plan;
+        }
+
+        /// <summary>One row of a table: the first cell drawn is the row's primary and names it, the
+        /// rest are its columns in drawn order. Built once per row list, because a cell is the same
+        /// vtable every frame; whether the row is DRAWN stays the gate's question, asked of the
+        /// layout the row is drawn as.</summary>
+        private void AddTableRow(
+            GraphSheet sheet,
+            IReadOnlyList<MenuRow> controls,
+            int first,
+            int last,
+            ModDialog.FormFacts.DrawnRow drawn,
+            ModDialog.FormFacts facts)
+        {
+            TableRowNodes nodes;
+            if (!_tableNodes.TryGetValue(drawn, out nodes))
+            {
+                NodeVtable primary = CellVtable(controls[first], facts);
+                if (primary == null)
+                {
+                    return;
+                }
+
+                Func<string> name = primary.Announcements != null && primary.Announcements.Count > 0
+                    ? primary.Announcements[0].Text
+                    : null;
+                List<GraphSheet.SheetCell> cells = new List<GraphSheet.SheetCell>(last - first);
+                for (int i = first + 1; i <= last; i++)
+                {
+                    NodeVtable cell = CellVtable(controls[i], facts);
+                    if (cell == null)
+                    {
+                        continue;
+                    }
+
+                    // Type-ahead over a table matches the ROW's name from any of its columns.
+                    cell.SearchText = name;
+                    cells.Add(new GraphSheet.SheetCell(i - first, 0, cell));
+                }
+
+                nodes = new TableRowNodes { Primary = primary, Cells = cells };
+                _tableNodes[drawn] = nodes;
+            }
+
+            sheet.RowAt(nodes.Primary, drawn.RowRef, nodes.Cells, drawn.Layout);
+        }
+
+        /// <summary>One cell of a table row, as the same kind of node the row would be on its own:
+        /// a checkbox, a button, or the read-only text a row is named by. A control the form says is
+        /// called something other than what it draws - an arrow glyph - is read by that name.
+        /// </summary>
+        private NodeVtable CellVtable(MenuRow control, ModDialog.FormFacts facts)
+        {
+            object item = control != null ? control.Item : null;
+            Transform transform = control != null ? control.Transform : null;
+            string spoken = facts != null ? facts.SpokenLabelOf(transform) : null;
+            Func<string> label = spoken != null ? (Func<string>)(() => spoken) : null;
+
+            MenuRowText text = item as MenuRowText;
+            if (text != null)
+            {
+                return GraphNodes.Text(label ?? text.GetText);
+            }
+
+            MenuRowToggle toggle = item as MenuRowToggle;
+            if (toggle != null)
+            {
+                NodeVtable vtable = GraphNodes.Checkbox(
+                    label ?? toggle.GetLabel,
+                    toggle.IsChecked,
+                    toggle.Toggle,
+                    toggle.IsEnabled,
+                    toggle.GetTooltip());
+                vtable.OnFocusVisual = toggle.Focus;
+                return vtable;
+            }
+
+            MenuRowButton button = item as MenuRowButton;
+            return button != null ? Button(button, label ?? button.GetLabel) : null;
+        }
+
+        /// <summary>The id of one cell of a table this form drew - what a screen names to put the
+        /// cursor back on the very cell the player was working after a redraw moved it. Minted by
+        /// the sheet itself, so the key format stays the sheet's own business.</summary>
+        public ControlId CellId(string table, string rowRef, int column)
+        {
+            if (table == null || rowRef == null)
+            {
+                return null;
+            }
+
+            return ControlId.Structural(
+                new GraphSheet(null, _prefix + TableKey + table + ":").CellKey(rowRef, column));
+        }
+
         public void BuildRows(GraphBuilder builder, IReadOnlyList<MenuRow> controls)
+        {
+            BuildRows(builder, controls, null);
+        }
+
+        /// <param name="facts">What the form says about itself that its rows cannot
+        /// (<see cref="ModDialog.FormFacts"/>): which of its rows are a table's, what that table's
+        /// columns are called, and what a control drawn as a glyph is called. Null for a form that
+        /// draws no table, which is every form the game itself draws.</param>
+        public void BuildRows(GraphBuilder builder, IReadOnlyList<MenuRow> controls, ModDialog.FormFacts facts)
         {
             if (!ReferenceEquals(controls, _rowSource))
             {
                 _rowNodes.Clear();
+                _tableNodes.Clear();
                 _rowSource = controls;
+                PlanTables(controls, facts);
             }
 
             // The rebindable-action rows are a table of their own; stop where they begin so their
@@ -117,10 +260,61 @@ namespace SongsOfConquestAccess.UI
             }
 
             bool inCaption = false;
+            GraphSheet sheet = null;
+            string table = null;
             for (int i = 0; i < end; i++)
             {
                 MenuRow control = controls[i];
                 object item = control != null ? control.Item : null;
+
+                ModDialog.FormFacts.DrawnRow drawn = _tablePlan != null ? _tablePlan[i] : null;
+                if (drawn != null)
+                {
+                    if (inCaption)
+                    {
+                        builder.PopContext();
+                        inCaption = false;
+                    }
+
+                    if (sheet == null || !string.Equals(table, drawn.Table, StringComparison.Ordinal))
+                    {
+                        if (sheet != null)
+                        {
+                            sheet.Finish();
+                        }
+
+                        table = drawn.Table;
+                        sheet = new GraphSheet(builder, _prefix + TableKey + table + ":");
+                        sheet.Region(null, facts.ColumnsOf(table));
+                    }
+
+                    // The cells of one drawn row are consecutive, because the reader hands its rows
+                    // back in drawn order and they share the layout the row is drawn as.
+                    int last = i;
+                    while (last + 1 < end && ReferenceEquals(_tablePlan[last + 1], drawn))
+                    {
+                        last++;
+                    }
+
+                    // A header band is DRAWN and not read: the reader says the column's caption on
+                    // the way into it instead.
+                    if (drawn.RowRef != null)
+                    {
+                        AddTableRow(sheet, controls, i, last, drawn, facts);
+                    }
+
+                    i = last;
+                    continue;
+                }
+
+                if (sheet != null)
+                {
+                    sheet.Finish();
+                    sheet = null;
+                    table = null;
+                    builder.SetRegion(null);
+                }
+
                 MenuRowText caption = item as MenuRowText;
                 if (caption != null)
                 {
@@ -166,7 +360,12 @@ namespace SongsOfConquestAccess.UI
                 builder.PopContext();
             }
 
-            if (_captionsHeadRegions)
+            if (sheet != null)
+            {
+                sheet.Finish();
+            }
+
+            if (_captionsHeadRegions || sheet != null)
             {
                 builder.SetRegion(null);
             }

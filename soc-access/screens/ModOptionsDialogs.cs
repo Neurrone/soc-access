@@ -41,9 +41,10 @@ namespace SongsOfConquestAccess.Screens
         // ---- the order of one announcement group ----
 
         /// <summary>
-        /// One region per element, in the order the announcement is spoken, holding that element's
-        /// two settings and the two buttons that move it. The element's name is a caption, so it
-        /// names the region and is read on the way in rather than repeated on all four controls.
+        /// A table, one row per element in the order the announcement is spoken: the element's name,
+        /// its two settings and the two buttons that move it. The element names the row, so it is
+        /// said on every vertical move rather than repeated on all four controls, and the columns
+        /// name themselves on the way across.
         /// </summary>
         public static void OpenAnnouncementOrder(AnnouncementGroupDefinition group)
         {
@@ -58,10 +59,43 @@ namespace SongsOfConquestAccess.Screens
                 screen => DrawAnnouncementOrder(screen, group));
         }
 
+        /// <summary>The announcement-order table, and which column each of its move cells is.
+        /// </summary>
+        public const string OrderTable = "order";
+        private const int MoveUpColumn = 3;
+        private const int MoveDownColumn = 4;
+
+        /// <summary>What the two move buttons DRAW. They are spoken as "Move up" and "Move down":
+        /// an arrow is what a sighted player reads fastest in a narrow column, and nothing at all in
+        /// speech.</summary>
+        private const string MoveUpGlyph = "\u2191";
+        private const string MoveDownGlyph = "\u2193";
+
         private static void DrawAnnouncementOrder(ModDialogScreen screen, AnnouncementGroupDefinition group)
         {
             ModDialog dialog = screen.Dialog;
             IReadOnlyList<string> order = ModSettings.GetAnnouncementOrder(group);
+            dialog.BeginTable(
+                OrderTable,
+                new[]
+                {
+                    ModText.Get(ModStrings.UI.ColumnElement),
+                    ModText.Get(ModStrings.Screens.Enabled),
+                    ModText.Get(ModStrings.Screens.Suffix),
+                    // The move columns say nothing on the way in: the buttons standing in them are
+                    // already called Move up and Move down.
+                    null,
+                    null,
+                });
+
+            dialog.StartHeaderRow();
+            dialog.AddText(ModText.Get(ModStrings.UI.ColumnElement));
+            dialog.AddText(ModText.Get(ModStrings.Screens.Enabled));
+            dialog.AddText(ModText.Get(ModStrings.Screens.Suffix));
+            dialog.AddText(string.Empty);
+            dialog.AddText(string.Empty);
+            dialog.EndRow();
+
             for (int i = 0; i < order.Count; i++)
             {
                 AnnouncementElementDefinition element = group.GetElement(order[i]);
@@ -71,26 +105,24 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 string key = element.Key;
+                dialog.StartTableRow(key);
                 dialog.AddText(ModText.Get(element.Label));
-                // A toggle is drawn as a full-width row with its box at the right, so two of them
-                // and two buttons side by side do not fit: measured 2026-09-07, four in one
-                // horizontal layout gave each toggle 381 px of a 486 px column and squeezed both
-                // buttons to nothing. The game only ever puts TWO buttons in one, so that is what
-                // this puts in one.
-                dialog.AddToggle(
-                    ModText.Get(ModStrings.Screens.Enabled),
+                dialog.AddToggleCell(
                     ModSettings.GetAnnouncementElementEnabled(group, element),
                     value => ModSettings.SetAnnouncementElementEnabled(group, element, value));
-                dialog.AddToggle(
-                    ModText.Get(ModStrings.Screens.Suffix),
+                dialog.AddToggleCell(
                     ModSettings.GetAnnouncementElementSuffix(group, element),
                     value => ModSettings.SetAnnouncementElementSuffix(group, element, value));
-                dialog.StartRow();
-                dialog.AddButton(ModText.Get(ModStrings.Screens.MoveUp), () => Move(screen, group, key, -1));
-                dialog.AddButton(ModText.Get(ModStrings.Screens.MoveDown), () => Move(screen, group, key, 1));
+                dialog.SpeakAs(
+                    dialog.AddButton(MoveUpGlyph, () => Move(screen, group, key, -1)),
+                    ModText.Get(ModStrings.Screens.MoveUp));
+                dialog.SpeakAs(
+                    dialog.AddButton(MoveDownGlyph, () => Move(screen, group, key, 1)),
+                    ModText.Get(ModStrings.Screens.MoveDown));
                 dialog.EndRow();
             }
 
+            dialog.EndTable();
             dialog.AddButton(
                 ModText.Get(ModStrings.Screens.ResetAllToDefaults),
                 () =>
@@ -105,9 +137,13 @@ namespace SongsOfConquestAccess.Screens
         ///
         /// A move redraws every row, which throws away the control the player was standing on, so
         /// the cursor would otherwise stay at the POSITION and read the element that took the old
-        /// place. The two move buttons of element <c>n</c> are the factory's buttons <c>2n</c> and
-        /// <c>2n+1</c>, so asking for the moved element's own button by that name puts the cursor
-        /// back where the player left it.
+        /// place. The table's rows are keyed on the element, so asking for the moved element's own
+        /// move cell puts the cursor back where the player left it, wherever the redraw put the row.
+        ///
+        /// That cell is the same cell under the same name, so nothing about the cursor changed and
+        /// the landing would pass in silence - while what the player asked for is exactly the thing
+        /// that changed. So it is read as an ARRIVAL: the element, the button, and where the element
+        /// now sits.
         /// </summary>
         private static void Move(ModDialogScreen screen, AnnouncementGroupDefinition group, string key, int delta)
         {
@@ -117,24 +153,12 @@ namespace SongsOfConquestAccess.Screens
             }
 
             screen.Redraw();
-            int index = IndexOf(ModSettings.GetAnnouncementOrder(group), key);
-            if (index >= 0)
-            {
-                screen.FocusRow("options-button-" + (index * 2 + (delta < 0 ? 0 : 1)));
-            }
-        }
-
-        private static int IndexOf(IReadOnlyList<string> order, string key)
-        {
-            for (int i = 0; order != null && i < order.Count; i++)
-            {
-                if (order[i] == key)
-                {
-                    return i;
-                }
-            }
-
-            return -1;
+            AnnouncementElementDefinition moved = group.GetElement(key);
+            screen.FocusCell(
+                OrderTable,
+                key,
+                delta < 0 ? MoveUpColumn : MoveDownColumn,
+                moved != null ? ModText.Get(moved.Label) : null);
         }
 
         // ---- the audio glossary ----

@@ -2921,6 +2921,11 @@ msgctxt "UI.ColumnDetails"
 msgid "Details"
 msgstr "세부 정보"
 
+#. UI.ColumnElement
+msgctxt "UI.ColumnElement"
+msgid "Element"
+msgstr "요소"
+
 #. UI.ColumnFaction
 msgctxt "UI.ColumnFaction"
 msgid "Faction"
