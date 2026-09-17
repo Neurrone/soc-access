@@ -180,12 +180,18 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private void BuildHeadingBand(GraphBuilder builder, IReadOnlyList<string> captions)
         {
+            // One row object shared by the whole band, so Ctrl+Alt+Left/Right walk the headings as
+            // they walk a game's cells. It is left unnumbered (index and count 0) because the band is
+            // one row of its own and "1 of 1" is nothing to say; the vertical corner keys stop at the
+            // first game, the band's region not being the table's.
+            TableRow band = new TableRow { Key = SheetKey + "band" };
             builder.StartRow(positions: false);
             for (int column = 0; column < captions.Count; column++)
             {
                 string caption = captions[column];
                 NodeVtable vtable = GraphNodes.Text(() => caption);
                 vtable.Column = column;
+                vtable.Row = band;
                 // A heading is not a cell of the row below it, so the sheet's one-result-per-row
                 // filter would otherwise drop every heading past the first from type-ahead.
                 vtable.SearchesAsItself = true;
