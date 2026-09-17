@@ -845,11 +845,14 @@ namespace SongsOfConquestAccess.Adapters
                     // is split by, so the page's groups are the fight's groups. The theme does not:
                     // a fight repaints the board from the ground it was joined on, and this page
                     // cannot know which ground that will be.
+                    // A gatepost (byte 11, the "Gate Base" framing a walled siege's gate) is priced
+                    // walkable by the manifest and blocked by the game's own walkability, which the
+                    // page cannot ask; it stays blocked here whatever the manifest says (81a1009).
                     cells.Add(new BattlefieldCell(
                         point,
                         onGrid,
                         At(elevations, index),
-                        float.IsPositiveInfinity(cost) || !onGrid,
+                        float.IsPositiveInfinity(cost) || !onGrid || decoration == GatepostDecoration,
                         decoration,
                         At(effects, index),
                         wet,
@@ -1243,9 +1246,13 @@ namespace SongsOfConquestAccess.Adapters
             return CanResolveTile(renderer, point);
         }
 
+        /// <summary>The decoration byte of the game's "Gate Base", the two pieces framing a walled
+        /// siege's gate; blocked in the fight, priced walkable by the manifest.</summary>
+        private const byte GatepostDecoration = 11;
+
         private static bool IsBlocker(byte value)
         {
-            return value == 4 || value == 9 || value == 10 || value == 11;
+            return value == 4 || value == 9 || value == 10 || value == GatepostDecoration;
         }
 
         private Vector2 GetScreenPoint(Vector2Int tile)
