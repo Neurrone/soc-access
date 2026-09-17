@@ -2140,6 +2140,16 @@ msgctxt "Spatial.Deadly"
 msgid "deadly"
 msgstr "치명적"
 
+#. Spatial.DeadBodies
+msgctxt "Spatial.DeadBodies"
+msgid "Dead bodies"
+msgstr "시체"
+
+#. Spatial.DeadSoldiers
+msgctxt "Spatial.DeadSoldiers"
+msgid "Dead soldiers"
+msgstr "전사한 병사"
+
 #. Spatial.Debris
 msgctxt "Spatial.Debris"
 msgid "debris"
@@ -2160,6 +2170,11 @@ msgctxt "Spatial.Destroys"
 msgid "destroys"
 msgstr "파괴함"
 
+#. Spatial.DragonBones
+msgctxt "Spatial.DragonBones"
+msgid "Dragon bones"
+msgstr "용의 뾼"
+
 #. Spatial.ElevatedGroundHeight
 msgctxt "Spatial.ElevatedGroundHeight"
 msgid "elevated ground, height {0}"
@@ -2175,10 +2190,25 @@ msgctxt "Spatial.Enemy"
 msgid "enemy"
 msgstr "적"
 
+#. Spatial.FaeyForest
+msgctxt "Spatial.FaeyForest"
+msgid "Faey forest"
+msgstr "페이 숲"
+
 #. Spatial.ExtraTargetPrefix
 msgctxt "Spatial.ExtraTargetPrefix"
 msgid "extra target "
 msgstr "추가 대상 "
+
+#. Spatial.FishingSpot
+msgctxt "Spatial.FishingSpot"
+msgid "Fishing spot"
+msgstr "낚시터"
+
+#. Spatial.FortifiedGate
+msgctxt "Spatial.FortifiedGate"
+msgid "Fortified gate"
+msgstr "요사 성문"
 
 #. Spatial.Friendly
 msgctxt "Spatial.Friendly"
@@ -2210,6 +2240,11 @@ msgctxt "Spatial.Here"
 msgid "here"
 msgstr "여기"
 
+#. Spatial.HuntingCamp
+msgctxt "Spatial.HuntingCamp"
+msgid "Hunting camp"
+msgstr "사냥 캐프"
+
 #. Spatial.Impassable
 msgctxt "Spatial.Impassable"
 msgid "impassable"
@@ -2239,6 +2274,16 @@ msgstr "{0} 처치"
 msgctxt "Spatial.MayDestroy"
 msgid "may destroy"
 msgstr "파괴할 수 있음"
+
+#. Spatial.Magnolia
+msgctxt "Spatial.Magnolia"
+msgid "Magnolia trees"
+msgstr "목련나무"
+
+#. Spatial.MidsummerDecorations
+msgctxt "Spatial.MidsummerDecorations"
+msgid "Midsummer decorations"
+msgstr "한여름 축제 장식"
 
 #. Spatial.Movement
 msgctxt "Spatial.Movement"
@@ -2279,6 +2324,11 @@ msgstr "경로 미리보기 없음"
 msgctxt "Spatial.OnRoute"
 msgid "On route"
 msgstr "경로상"
+
+#. Spatial.Palisade
+msgctxt "Spatial.Palisade"
+msgid "Palisade"
+msgstr "목책"
 
 #. Spatial.PositionAndMapSize
 msgctxt "Spatial.PositionAndMapSize"
@@ -2680,10 +2730,35 @@ msgctxt "Spatial.AridTrees"
 msgid "Arid trees"
 msgstr "건조 지대 나무"
 
+#. Spatial.Bamboo
+msgctxt "Spatial.Bamboo"
+msgid "Bamboo"
+msgstr "대나무"
+
+#. Spatial.Barricade
+msgctxt "Spatial.Barricade"
+msgid "Barricade"
+msgstr "바리케이드"
+
+#. Spatial.BirchForest
+msgctxt "Spatial.BirchForest"
+msgid "Birch forest"
+msgstr "자작나무 숲"
+
+#. Spatial.Bones
+msgctxt "Spatial.Bones"
+msgid "Bones"
+msgstr "뾼"
+
 #. Spatial.Bridge
 msgctxt "Spatial.Bridge"
 msgid "Bridge"
 msgstr "다리"
+
+#. Spatial.Campfire
+msgctxt "Spatial.Campfire"
+msgid "Campfire"
+msgstr "모닥불"
 
 #. Spatial.CobblestoneRoad
 msgctxt "Spatial.CobblestoneRoad"
@@ -2705,10 +2780,50 @@ msgctxt "Spatial.DirtRoad"
 msgid "Dirt road"
 msgstr "흙길"
 
+#. Spatial.EffectBurnMarks
+msgctxt "Spatial.EffectBurnMarks"
+msgid "burn marks"
+msgstr "그을린 자국"
+
+#. Spatial.EffectFireflies
+msgctxt "Spatial.EffectFireflies"
+msgid "fireflies"
+msgstr "반딧불이"
+
+#. Spatial.EffectFog
+msgctxt "Spatial.EffectFog"
+msgid "fog"
+msgstr "안개"
+
+#. Spatial.EffectRaysOfLight
+msgctxt "Spatial.EffectRaysOfLight"
+msgid "rays of light"
+msgstr "빛줄기"
+
+#. Spatial.EffectSmoke
+msgctxt "Spatial.EffectSmoke"
+msgid "smoke"
+msgstr "연기"
+
+#. Spatial.EffectSnow
+msgctxt "Spatial.EffectSnow"
+msgid "snow"
+msgstr "눈"
+
+#. Spatial.EffectWildfire
+msgctxt "Spatial.EffectWildfire"
+msgid "wildfire"
+msgstr "들불"
+
 #. Spatial.Farmland
 msgctxt "Spatial.Farmland"
 msgid "Farmland"
 msgstr "농지"
+
+#. Spatial.Excavation
+msgctxt "Spatial.Excavation"
+msgid "Excavation"
+msgstr "발굴지"
 
 #. Spatial.Road
 msgctxt "Spatial.Road"
@@ -2719,6 +2834,11 @@ msgstr "길"
 msgctxt "Spatial.RoadDirectionSeparator"
 msgid "{0} {1}"
 msgstr "{0} {1}"
+
+#. Spatial.Ruins
+msgctxt "Spatial.Ruins"
+msgid "Ruins"
+msgstr "폐허"
 
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
@@ -2925,6 +3045,16 @@ msgstr "모래"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "온대 나무"
+
+#. Spatial.Tombstones
+msgctxt "Spatial.Tombstones"
+msgid "Tombstones"
+msgstr "묘비"
+
+#. Spatial.Torch
+msgctxt "Spatial.Torch"
+msgid "Torch"
+msgstr "훃불"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"
@@ -3420,6 +3550,11 @@ msgstr "부대"
 msgctxt "Spatial.Visited"
 msgid "visited"
 msgstr "방문함"
+
+#. Spatial.WinterDecorations
+msgctxt "Spatial.WinterDecorations"
+msgid "Winter decorations"
+msgstr "겨울 장식"
 
 #. Screens.WielderAnnouncements
 msgctxt "Screens.WielderAnnouncements"
@@ -4086,6 +4221,11 @@ msgstr "절벽, 높이 {0}"
 msgctxt "Spatial.StairsHeight"
 msgid "stairs, height {0}"
 msgstr "계단, 높이 {0}"
+
+#. Spatial.Structures
+msgctxt "Spatial.Structures"
+msgid "Structures"
+msgstr "구조물"
 
 #. Spatial.TowerHeight
 msgctxt "Spatial.TowerHeight"

@@ -286,7 +286,12 @@
             public static readonly ModString Attack = new ModString("Spatial.Attack", "attack");
             public static readonly ModString AttackRange = new ModString("Spatial.AttackRange", "Attack range");
             public static readonly ModString AridTrees = new ModString("Spatial.AridTrees", "Arid trees");
+            public static readonly ModString Bamboo = new ModString("Spatial.Bamboo", "Bamboo");
+            public static readonly ModString Barricade = new ModString("Spatial.Barricade", "Barricade");
+            public static readonly ModString BirchForest = new ModString("Spatial.BirchForest", "Birch forest");
+            public static readonly ModString Bones = new ModString("Spatial.Bones", "Bones");
             public static readonly ModString Bridge = new ModString("Spatial.Bridge", "Bridge");
+            public static readonly ModString Campfire = new ModString("Spatial.Campfire", "Campfire");
             public static readonly ModString CliffHeight = new ModString("Spatial.CliffHeight", "cliff, height {0}");
             public static readonly ModString Commander = new ModString("Spatial.Commander", "Commander");
             public static readonly ModString CommanderPossessive = new ModString("Spatial.CommanderPossessive", "commander's");
@@ -295,19 +300,35 @@
             public static readonly ModString DamagePreview = new ModString("Spatial.DamagePreview", "{0}damage {1}");
             public static readonly ModString DeadlyRange = new ModString("Spatial.DeadlyRange", "Deadly range");
             public static readonly ModString Deadly = new ModString("Spatial.Deadly", "deadly");
+            public static readonly ModString DeadBodies = new ModString("Spatial.DeadBodies", "Dead bodies");
+            public static readonly ModString DeadSoldiers = new ModString("Spatial.DeadSoldiers", "Dead soldiers");
             public static readonly ModString DeepWater = new ModString("Spatial.DeepWater", "Deep water");
             public static readonly ModString Deforestation = new ModString("Spatial.Deforestation", "Deforestation");
             public static readonly ModString Debris = new ModString("Spatial.Debris", "debris");
             public static readonly ModString Destination = new ModString("Spatial.Destination", "Destination");
             public static readonly ModString DestinationAt = new ModString("Spatial.DestinationAt", "Destination: {0}");
             public static readonly ModString Destroys = new ModString("Spatial.Destroys", "destroys");
+            public static readonly ModString DragonBones = new ModString("Spatial.DragonBones", "Dragon bones");
             public static readonly ModString Dirt = new ModString("Spatial.Dirt", "Dirt");
             public static readonly ModString DirtRoad = new ModString("Spatial.DirtRoad", "Dirt road");
+            // The effect layer's words. They follow the terrain in the same sentence, so they are
+            // lower case like "impassable" rather than named the way a terrain is.
+            public static readonly ModString EffectBurnMarks = new ModString("Spatial.EffectBurnMarks", "burn marks");
+            public static readonly ModString EffectFireflies = new ModString("Spatial.EffectFireflies", "fireflies");
+            public static readonly ModString EffectFog = new ModString("Spatial.EffectFog", "fog");
+            public static readonly ModString EffectRaysOfLight = new ModString("Spatial.EffectRaysOfLight", "rays of light");
+            public static readonly ModString EffectSmoke = new ModString("Spatial.EffectSmoke", "smoke");
+            public static readonly ModString EffectSnow = new ModString("Spatial.EffectSnow", "snow");
+            public static readonly ModString EffectWildfire = new ModString("Spatial.EffectWildfire", "wildfire");
             public static readonly ModString ElevatedGroundHeight = new ModString("Spatial.ElevatedGroundHeight", "elevated ground, height {0}");
             public static readonly ModString EnemySpawnPoint = new ModString("Spatial.EnemySpawnPoint", "enemy spawn point");
             public static readonly ModString Enemy = new ModString("Spatial.Enemy", "enemy");
+            public static readonly ModString FaeyForest = new ModString("Spatial.FaeyForest", "Faey forest");
             public static readonly ModString Farmland = new ModString("Spatial.Farmland", "Farmland");
+            public static readonly ModString Excavation = new ModString("Spatial.Excavation", "Excavation");
             public static readonly ModString ExtraTargetPrefix = new ModString("Spatial.ExtraTargetPrefix", "extra target ");
+            public static readonly ModString FishingSpot = new ModString("Spatial.FishingSpot", "Fishing spot");
+            public static readonly ModString FortifiedGate = new ModString("Spatial.FortifiedGate", "Fortified gate");
             public static readonly ModString Friendly = new ModString("Spatial.Friendly", "friendly");
             public static readonly ModString FurthestReachableInTurns = new ModString("Spatial.FurthestReachableInTurns", "furthest reachable in {0} turns");
             public static readonly ModString FurthestReachableNextTurn = new ModString("Spatial.FurthestReachableNextTurn", "furthest reachable next turn");
@@ -315,6 +336,7 @@
             public static readonly ModString Grass = new ModString("Spatial.Grass", "Grass");
             public static readonly ModString Health = new ModString("Spatial.Health", "{0} / {1} health");
             public static readonly ModString Here = new ModString("Spatial.Here", "here");
+            public static readonly ModString HuntingCamp = new ModString("Spatial.HuntingCamp", "Hunting camp");
             public static readonly ModString Impassable = new ModString("Spatial.Impassable", "impassable");
             // The same, with what is standing there: a fight paints the board with the ground the
             // battle was joined on, so a blocked cell has something to be called.
@@ -324,6 +346,8 @@
             public static readonly ModString InteractableNextTurn = new ModString("Spatial.InteractableNextTurn", "interactable next turn");
             public static readonly ModString Kills = new ModString("Spatial.Kills", "kills {0}");
             public static readonly ModString MayDestroy = new ModString("Spatial.MayDestroy", "may destroy");
+            public static readonly ModString Magnolia = new ModString("Spatial.Magnolia", "Magnolia trees");
+            public static readonly ModString MidsummerDecorations = new ModString("Spatial.MidsummerDecorations", "Midsummer decorations");
             public static readonly ModString Movement = new ModString("Spatial.Movement", "Movement");
             public static readonly ModString MovementCost = new ModString("Spatial.MovementCost", "Movement cost: {0}");
             public static readonly ModString MovementRange = new ModString("Spatial.MovementRange", "Movement range");
@@ -333,6 +357,7 @@
             public static readonly ModString NextTurn = new ModString("Spatial.NextTurn", "next turn");
             public static readonly ModString NoRoutePreview = new ModString("Spatial.NoRoutePreview", "no route preview");
             public static readonly ModString OnRoute = new ModString("Spatial.OnRoute", "On route");
+            public static readonly ModString Palisade = new ModString("Spatial.Palisade", "Palisade");
             public static readonly ModString PositionAndMapSize = new ModString("Spatial.PositionAndMapSize", "Position {0}, {1}. Map is {2} by {3}.");
             public static readonly ModString PrimaryPrefix = new ModString("Spatial.PrimaryPrefix", "primary ");
             public static readonly ModString RangeAndMovement = new ModString("Spatial.RangeAndMovement", "{0} and movement range");
@@ -340,6 +365,7 @@
             public static readonly ModString Reloading = new ModString("Spatial.Reloading", "reloading");
             public static readonly ModString Road = new ModString("Spatial.Road", "Road");
             public static readonly ModString RoadDirectionSeparator = new ModString("Spatial.RoadDirectionSeparator", "{0} {1}");
+            public static readonly ModString Ruins = new ModString("Spatial.Ruins", "Ruins");
             public static readonly ModString Sand = new ModString("Spatial.Sand", "Sand");
             public static readonly ModString ShallowWater = new ModString("Spatial.ShallowWater", "Shallow water");
             public static readonly ModPluralString SkippedTileCount = new ModPluralString("Spatial.SkippedTileCount", "Skipped {0} tile", "Skipped {0} tiles");
@@ -348,7 +374,10 @@
             // stairs with these same two lines, since one tower is one tower however many cells
             // it covers.
             public static readonly ModString StairsHeight = new ModString("Spatial.StairsHeight", "stairs, height {0}");
+            public static readonly ModString Structures = new ModString("Spatial.Structures", "Structures");
             public static readonly ModString TemperateTrees = new ModString("Spatial.TemperateTrees", "Temperate trees");
+            public static readonly ModString Tombstones = new ModString("Spatial.Tombstones", "Tombstones");
+            public static readonly ModString Torch = new ModString("Spatial.Torch", "Torch");
             public static readonly ModString Threatened = new ModString("Spatial.Threatened", "Threatened");
             public static readonly ModString ThisTurnAt = new ModString("Spatial.ThisTurnAt", "This turn: {0}");
             public static readonly ModString TowerHeight = new ModString("Spatial.TowerHeight", "tower, height {0}");
@@ -359,6 +388,7 @@
             public static readonly ModString Unreachable = new ModString("Spatial.Unreachable", "unreachable");
             public static readonly ModString Unseen = new ModString("Spatial.Unseen", "Unseen");
             public static readonly ModString Visited = new ModString("Spatial.Visited", "visited");
+            public static readonly ModString WinterDecorations = new ModString("Spatial.WinterDecorations", "Winter decorations");
             public static readonly ModString Wall = new ModString("Spatial.Wall", "Wall");
             public static readonly ModString WallHeight = new ModString("Spatial.WallHeight", "wall, height {0}");
             public static readonly ModString Water = new ModString("Spatial.Water", "Water");

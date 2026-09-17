@@ -121,14 +121,52 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        private byte GetStandaloneDecorationValue(Vector2Int position)
+        {
+            try
+            {
+                return _facade.Level.GetStandaloneDecoration(position);
+            }
+            catch (Exception exception)
+            {
+                LogFailureOnce("reading a tile's standalone decoration", exception);
+                return 0;
+            }
+        }
+
+        private byte GetEffectValue(Vector2Int position)
+        {
+            try
+            {
+                return _facade.Level.GetEffect(position);
+            }
+            catch (Exception exception)
+            {
+                LogFailureOnce("reading a tile's effect", exception);
+                return 0;
+            }
+        }
+
+        public AdventureEffectKind GetEffect(Vector2Int position)
+        {
+            return GetEffectKind(GetEffectValue(position));
+        }
+
         /// <summary>
-        /// Whatever sits on top of the ground: a decoration hides the bridge or road beneath it,
-        /// and a bridge hides the road. Returns Unknown when only ground or water is left.
+        /// Whatever sits on top of the ground: a standalone decoration hides the decoration beneath
+        /// it, a decoration hides the bridge or road beneath it, and a bridge hides the road.
+        /// Returns Unknown when only ground or water is left.
         /// Kept separate from GetTerrain so that asking "is this a road" answers with the same
         /// rule that decides what the tile is called.
         /// </summary>
         private AdventureTerrainKind GetSurfaceTerrain(Vector2Int position)
         {
+            AdventureTerrainKind standaloneTerrain = GetStandaloneDecorationTerrain(GetStandaloneDecorationValue(position));
+            if (standaloneTerrain != AdventureTerrainKind.Unknown)
+            {
+                return standaloneTerrain;
+            }
+
             AdventureTerrainKind decorationTerrain = GetDecorationTerrain(GetDecorationValue(position));
             if (decorationTerrain != AdventureTerrainKind.Unknown)
             {
@@ -153,10 +191,7 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>
-        /// The eight decoration brushes the level editor paints with. Value 5 is
-        /// the lights brush, which is scenery standing on the ground rather than
-        /// a kind of ground, so it deliberately falls through to whatever is
-        /// underneath it.
+        /// The eight decoration brushes the level editor paints with.
         /// </summary>
         public static AdventureTerrainKind GetDecorationTerrain(byte decoration)
         {
@@ -170,6 +205,8 @@ namespace SongsOfConquestAccess.Adapters
                     return AdventureTerrainKind.Mountain;
                 case 4:
                     return AdventureTerrainKind.Obstruction;
+                case 5:
+                    return AdventureTerrainKind.Torch;
                 case 6:
                     return AdventureTerrainKind.Wall;
                 case 7:
@@ -178,6 +215,94 @@ namespace SongsOfConquestAccess.Adapters
                     return AdventureTerrainKind.Farmland;
                 default:
                     return AdventureTerrainKind.Unknown;
+            }
+        }
+
+        /// <summary>
+        /// The standalone decoration brushes, by the brush numbers the cartography manifest gives
+        /// them. Brushes that mean the same thing share a kind: the Yulan tombstones are tombstones.
+        /// A switch rather than a manifest lookup, because this is read for every tile of the
+        /// scanner's whole-map sweep.
+        /// </summary>
+        public static AdventureTerrainKind GetStandaloneDecorationTerrain(byte standaloneDecoration)
+        {
+            switch (standaloneDecoration)
+            {
+                case 1:
+                    return AdventureTerrainKind.FaeyForest;
+                case 2:
+                    return AdventureTerrainKind.DeadBodies;
+                case 3:
+                    return AdventureTerrainKind.Bones;
+                case 4:
+                    return AdventureTerrainKind.Palisade;
+                case 5:
+                    return AdventureTerrainKind.Tombstones;
+                case 6:
+                    return AdventureTerrainKind.Farmland;
+                case 7:
+                    return AdventureTerrainKind.Structures;
+                case 8:
+                    return AdventureTerrainKind.Campfire;
+                case 9:
+                    return AdventureTerrainKind.WinterDecorations;
+                case 10:
+                    return AdventureTerrainKind.DragonBones;
+                case 11:
+                    return AdventureTerrainKind.Excavation;
+                case 12:
+                    return AdventureTerrainKind.HuntingCamp;
+                case 13:
+                    return AdventureTerrainKind.FishingSpot;
+                case 14:
+                    return AdventureTerrainKind.MidsummerDecorations;
+                case 15:
+                    return AdventureTerrainKind.DeadSoldiers;
+                case 16:
+                    return AdventureTerrainKind.Ruins;
+                case 17:
+                    return AdventureTerrainKind.FortifiedGate;
+                case 18:
+                    return AdventureTerrainKind.Barricade;
+                case 19:
+                    return AdventureTerrainKind.BirchForest;
+                case 20:
+                    return AdventureTerrainKind.Magnolia;
+                case 21:
+                    return AdventureTerrainKind.Bamboo;
+                case 22:
+                    return AdventureTerrainKind.Tombstones;
+                default:
+                    return AdventureTerrainKind.Unknown;
+            }
+        }
+
+        /// <summary>
+        /// The effect brushes, by the brush numbers the cartography manifest gives them. The three
+        /// fog brushes are one fog.
+        /// </summary>
+        public static AdventureEffectKind GetEffectKind(byte effect)
+        {
+            switch (effect)
+            {
+                case 1:
+                    return AdventureEffectKind.Fireflies;
+                case 2:
+                    return AdventureEffectKind.BurnMarks;
+                case 3:
+                case 8:
+                case 9:
+                    return AdventureEffectKind.Fog;
+                case 4:
+                    return AdventureEffectKind.Smoke;
+                case 5:
+                    return AdventureEffectKind.Wildfire;
+                case 6:
+                    return AdventureEffectKind.RaysOfLight;
+                case 7:
+                    return AdventureEffectKind.Snow;
+                default:
+                    return AdventureEffectKind.Unknown;
             }
         }
 

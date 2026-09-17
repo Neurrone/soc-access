@@ -2140,6 +2140,16 @@ msgctxt "Spatial.Deadly"
 msgid "deadly"
 msgstr "致命"
 
+#. Spatial.DeadBodies
+msgctxt "Spatial.DeadBodies"
+msgid "Dead bodies"
+msgstr "死体"
+
+#. Spatial.DeadSoldiers
+msgctxt "Spatial.DeadSoldiers"
+msgid "Dead soldiers"
+msgstr "戦死者"
+
 #. Spatial.Debris
 msgctxt "Spatial.Debris"
 msgid "debris"
@@ -2160,6 +2170,11 @@ msgctxt "Spatial.Destroys"
 msgid "destroys"
 msgstr "破壊する"
 
+#. Spatial.DragonBones
+msgctxt "Spatial.DragonBones"
+msgid "Dragon bones"
+msgstr "竜の骨"
+
 #. Spatial.ElevatedGroundHeight
 msgctxt "Spatial.ElevatedGroundHeight"
 msgid "elevated ground, height {0}"
@@ -2175,10 +2190,25 @@ msgctxt "Spatial.Enemy"
 msgid "enemy"
 msgstr "敵"
 
+#. Spatial.FaeyForest
+msgctxt "Spatial.FaeyForest"
+msgid "Faey forest"
+msgstr "フェイの森"
+
 #. Spatial.ExtraTargetPrefix
 msgctxt "Spatial.ExtraTargetPrefix"
 msgid "extra target "
 msgstr "追加対象 "
+
+#. Spatial.FishingSpot
+msgctxt "Spatial.FishingSpot"
+msgid "Fishing spot"
+msgstr "釣り場"
+
+#. Spatial.FortifiedGate
+msgctxt "Spatial.FortifiedGate"
+msgid "Fortified gate"
+msgstr "要塞の門"
 
 #. Spatial.Friendly
 msgctxt "Spatial.Friendly"
@@ -2210,6 +2240,11 @@ msgctxt "Spatial.Here"
 msgid "here"
 msgstr "ここ"
 
+#. Spatial.HuntingCamp
+msgctxt "Spatial.HuntingCamp"
+msgid "Hunting camp"
+msgstr "狩猟キャンプ"
+
 #. Spatial.Impassable
 msgctxt "Spatial.Impassable"
 msgid "impassable"
@@ -2239,6 +2274,16 @@ msgstr "{0}を倒す"
 msgctxt "Spatial.MayDestroy"
 msgid "may destroy"
 msgstr "破壊可能"
+
+#. Spatial.Magnolia
+msgctxt "Spatial.Magnolia"
+msgid "Magnolia trees"
+msgstr "モクレンの木"
+
+#. Spatial.MidsummerDecorations
+msgctxt "Spatial.MidsummerDecorations"
+msgid "Midsummer decorations"
+msgstr "夏至祭の飾り"
 
 #. Spatial.Movement
 msgctxt "Spatial.Movement"
@@ -2279,6 +2324,11 @@ msgstr "経路プレビューなし"
 msgctxt "Spatial.OnRoute"
 msgid "On route"
 msgstr "経路上"
+
+#. Spatial.Palisade
+msgctxt "Spatial.Palisade"
+msgid "Palisade"
+msgstr "柵"
 
 #. Spatial.PositionAndMapSize
 msgctxt "Spatial.PositionAndMapSize"
@@ -2680,10 +2730,35 @@ msgctxt "Spatial.AridTrees"
 msgid "Arid trees"
 msgstr "乾燥地の木々"
 
+#. Spatial.Bamboo
+msgctxt "Spatial.Bamboo"
+msgid "Bamboo"
+msgstr "竹"
+
+#. Spatial.Barricade
+msgctxt "Spatial.Barricade"
+msgid "Barricade"
+msgstr "バリケード"
+
+#. Spatial.BirchForest
+msgctxt "Spatial.BirchForest"
+msgid "Birch forest"
+msgstr "白樺の森"
+
+#. Spatial.Bones
+msgctxt "Spatial.Bones"
+msgid "Bones"
+msgstr "骨"
+
 #. Spatial.Bridge
 msgctxt "Spatial.Bridge"
 msgid "Bridge"
 msgstr "橋"
+
+#. Spatial.Campfire
+msgctxt "Spatial.Campfire"
+msgid "Campfire"
+msgstr "焚き火"
 
 #. Spatial.CobblestoneRoad
 msgctxt "Spatial.CobblestoneRoad"
@@ -2705,10 +2780,50 @@ msgctxt "Spatial.DirtRoad"
 msgid "Dirt road"
 msgstr "土の道"
 
+#. Spatial.EffectBurnMarks
+msgctxt "Spatial.EffectBurnMarks"
+msgid "burn marks"
+msgstr "焼け跡"
+
+#. Spatial.EffectFireflies
+msgctxt "Spatial.EffectFireflies"
+msgid "fireflies"
+msgstr "蜿"
+
+#. Spatial.EffectFog
+msgctxt "Spatial.EffectFog"
+msgid "fog"
+msgstr "霧"
+
+#. Spatial.EffectRaysOfLight
+msgctxt "Spatial.EffectRaysOfLight"
+msgid "rays of light"
+msgstr "光の筋"
+
+#. Spatial.EffectSmoke
+msgctxt "Spatial.EffectSmoke"
+msgid "smoke"
+msgstr "煙"
+
+#. Spatial.EffectSnow
+msgctxt "Spatial.EffectSnow"
+msgid "snow"
+msgstr "雪"
+
+#. Spatial.EffectWildfire
+msgctxt "Spatial.EffectWildfire"
+msgid "wildfire"
+msgstr "野火"
+
 #. Spatial.Farmland
 msgctxt "Spatial.Farmland"
 msgid "Farmland"
 msgstr "農地"
+
+#. Spatial.Excavation
+msgctxt "Spatial.Excavation"
+msgid "Excavation"
+msgstr "発掘場"
 
 #. Spatial.Road
 msgctxt "Spatial.Road"
@@ -2719,6 +2834,11 @@ msgstr "道"
 msgctxt "Spatial.RoadDirectionSeparator"
 msgid "{0} {1}"
 msgstr "{0}、{1}"
+
+#. Spatial.Ruins
+msgctxt "Spatial.Ruins"
+msgid "Ruins"
+msgstr "遺跡"
 
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
@@ -2925,6 +3045,16 @@ msgstr "砂"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "温帯の木々"
+
+#. Spatial.Tombstones
+msgctxt "Spatial.Tombstones"
+msgid "Tombstones"
+msgstr "墓石"
+
+#. Spatial.Torch
+msgctxt "Spatial.Torch"
+msgid "Torch"
+msgstr "松明"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"
@@ -3420,6 +3550,11 @@ msgstr "部隊"
 msgctxt "Spatial.Visited"
 msgid "visited"
 msgstr "訪問済み"
+
+#. Spatial.WinterDecorations
+msgctxt "Spatial.WinterDecorations"
+msgid "Winter decorations"
+msgstr "冬の飾り"
 
 #. Screens.WielderAnnouncements
 msgctxt "Screens.WielderAnnouncements"
@@ -4086,6 +4221,11 @@ msgstr "崖、高さ {0}"
 msgctxt "Spatial.StairsHeight"
 msgid "stairs, height {0}"
 msgstr "階段、高さ {0}"
+
+#. Spatial.Structures
+msgctxt "Spatial.Structures"
+msgid "Structures"
+msgstr "構造物"
 
 #. Spatial.TowerHeight
 msgctxt "Spatial.TowerHeight"

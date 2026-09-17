@@ -14,6 +14,10 @@ Tiles within the movement range of the currently selected wielder are indicated 
 
 Tiles that cannot be entered because of terrain are announced as impassable. A tile next to an enemy or neutral army is announced as within that army's zone of control. Nothing else marks a tile the game refuses: whatever occupies it is already named.
 
+The terrain is the topmost thing painted on the tile, so scenery standing on the ground is named instead of the ground: `Palisade`, `Fortified gate`, `Barricade`, `Tombstones`, `Ruins`, `Torch`, `Faey forest`, `Birch forest`, `Magnolia trees`, `Bamboo`, `Winter decorations` and `Midsummer decorations` block movement, while `Dead bodies`, `Dead soldiers`, `Bones`, `Dragon bones`, `Structures`, `Campfire`, `Excavation`, `Hunting camp`, `Fishing spot` and `Farmland` can be walked over. The scanner lists each of them under `Terrain`, the blocking ones under `Barriers` and the rest under `Open ground`.
+
+Weather and aftermath painted over a tile are read after the terrain as `fireflies`, `burn marks`, `fog`, `smoke`, `wildfire`, `rays of light` or `snow`. They are an `Effects` element in `Tile announcements` on the adventure map tab, on by default, and can be turned off or moved like any other element.
+
 ### Following Roads
 
 A road tile names the neighbouring tiles the road carries on into, straight after the terrain, so a road running east to west reads as `Dirt road, e w` and a fork reads as `Dirt road, n e w`. Every direction named is a neighbour that is road as well, so you can follow a road by stepping in one of the directions it just gave you.

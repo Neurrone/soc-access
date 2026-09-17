@@ -2160,6 +2160,16 @@ msgctxt "Spatial.Deadly"
 msgid "deadly"
 msgstr "mortal"
 
+#. Spatial.DeadBodies
+msgctxt "Spatial.DeadBodies"
+msgid "Dead bodies"
+msgstr "Cadáveres"
+
+#. Spatial.DeadSoldiers
+msgctxt "Spatial.DeadSoldiers"
+msgid "Dead soldiers"
+msgstr "Soldados mortos"
+
 #. Spatial.Debris
 msgctxt "Spatial.Debris"
 msgid "debris"
@@ -2180,6 +2190,11 @@ msgctxt "Spatial.Destroys"
 msgid "destroys"
 msgstr "destrói"
 
+#. Spatial.DragonBones
+msgctxt "Spatial.DragonBones"
+msgid "Dragon bones"
+msgstr "Ossos de dragão"
+
 #. Spatial.ElevatedGroundHeight
 msgctxt "Spatial.ElevatedGroundHeight"
 msgid "elevated ground, height {0}"
@@ -2195,10 +2210,25 @@ msgctxt "Spatial.Enemy"
 msgid "enemy"
 msgstr "hostil"
 
+#. Spatial.FaeyForest
+msgctxt "Spatial.FaeyForest"
+msgid "Faey forest"
+msgstr "Floresta faey"
+
 #. Spatial.ExtraTargetPrefix
 msgctxt "Spatial.ExtraTargetPrefix"
 msgid "extra target "
 msgstr "alvo extra "
+
+#. Spatial.FishingSpot
+msgctxt "Spatial.FishingSpot"
+msgid "Fishing spot"
+msgstr "Ponto de pesca"
+
+#. Spatial.FortifiedGate
+msgctxt "Spatial.FortifiedGate"
+msgid "Fortified gate"
+msgstr "Portão fortificado"
 
 #. Spatial.Friendly
 msgctxt "Spatial.Friendly"
@@ -2230,6 +2260,11 @@ msgctxt "Spatial.Here"
 msgid "here"
 msgstr "aqui"
 
+#. Spatial.HuntingCamp
+msgctxt "Spatial.HuntingCamp"
+msgid "Hunting camp"
+msgstr "Acampamento de caça"
+
 #. Spatial.Impassable
 msgctxt "Spatial.Impassable"
 msgid "impassable"
@@ -2259,6 +2294,16 @@ msgstr "mata {0}"
 msgctxt "Spatial.MayDestroy"
 msgid "may destroy"
 msgstr "pode destruir"
+
+#. Spatial.Magnolia
+msgctxt "Spatial.Magnolia"
+msgid "Magnolia trees"
+msgstr "Magnólias"
+
+#. Spatial.MidsummerDecorations
+msgctxt "Spatial.MidsummerDecorations"
+msgid "Midsummer decorations"
+msgstr "Decorações de solstício de verão"
 
 #. Spatial.Movement
 msgctxt "Spatial.Movement"
@@ -2299,6 +2344,11 @@ msgstr "sem prévia de rota"
 msgctxt "Spatial.OnRoute"
 msgid "On route"
 msgstr "Na rota"
+
+#. Spatial.Palisade
+msgctxt "Spatial.Palisade"
+msgid "Palisade"
+msgstr "Paliçada"
 
 #. Spatial.PositionAndMapSize
 msgctxt "Spatial.PositionAndMapSize"
@@ -2700,10 +2750,35 @@ msgctxt "Spatial.AridTrees"
 msgid "Arid trees"
 msgstr "Árvores áridas"
 
+#. Spatial.Bamboo
+msgctxt "Spatial.Bamboo"
+msgid "Bamboo"
+msgstr "Bambu"
+
+#. Spatial.Barricade
+msgctxt "Spatial.Barricade"
+msgid "Barricade"
+msgstr "Barricada"
+
+#. Spatial.BirchForest
+msgctxt "Spatial.BirchForest"
+msgid "Birch forest"
+msgstr "Bosque de bétulas"
+
+#. Spatial.Bones
+msgctxt "Spatial.Bones"
+msgid "Bones"
+msgstr "Ossos"
+
 #. Spatial.Bridge
 msgctxt "Spatial.Bridge"
 msgid "Bridge"
 msgstr "Ponte"
+
+#. Spatial.Campfire
+msgctxt "Spatial.Campfire"
+msgid "Campfire"
+msgstr "Fogueira"
 
 #. Spatial.CobblestoneRoad
 msgctxt "Spatial.CobblestoneRoad"
@@ -2725,10 +2800,50 @@ msgctxt "Spatial.DirtRoad"
 msgid "Dirt road"
 msgstr "Estrada de terra"
 
+#. Spatial.EffectBurnMarks
+msgctxt "Spatial.EffectBurnMarks"
+msgid "burn marks"
+msgstr "marcas de queimado"
+
+#. Spatial.EffectFireflies
+msgctxt "Spatial.EffectFireflies"
+msgid "fireflies"
+msgstr "vaga-lumes"
+
+#. Spatial.EffectFog
+msgctxt "Spatial.EffectFog"
+msgid "fog"
+msgstr "névoa"
+
+#. Spatial.EffectRaysOfLight
+msgctxt "Spatial.EffectRaysOfLight"
+msgid "rays of light"
+msgstr "raios de luz"
+
+#. Spatial.EffectSmoke
+msgctxt "Spatial.EffectSmoke"
+msgid "smoke"
+msgstr "fumaça"
+
+#. Spatial.EffectSnow
+msgctxt "Spatial.EffectSnow"
+msgid "snow"
+msgstr "neve"
+
+#. Spatial.EffectWildfire
+msgctxt "Spatial.EffectWildfire"
+msgid "wildfire"
+msgstr "incêndio"
+
 #. Spatial.Farmland
 msgctxt "Spatial.Farmland"
 msgid "Farmland"
 msgstr "Terra cultivada"
+
+#. Spatial.Excavation
+msgctxt "Spatial.Excavation"
+msgid "Excavation"
+msgstr "Escavação"
 
 #. Spatial.Road
 msgctxt "Spatial.Road"
@@ -2739,6 +2854,11 @@ msgstr "Estrada"
 msgctxt "Spatial.RoadDirectionSeparator"
 msgid "{0} {1}"
 msgstr "{0} {1}"
+
+#. Spatial.Ruins
+msgctxt "Spatial.Ruins"
+msgid "Ruins"
+msgstr "Ruínas"
 
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
@@ -2945,6 +3065,16 @@ msgstr "Areia"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "Árvores temperadas"
+
+#. Spatial.Tombstones
+msgctxt "Spatial.Tombstones"
+msgid "Tombstones"
+msgstr "Lápides"
+
+#. Spatial.Torch
+msgctxt "Spatial.Torch"
+msgid "Torch"
+msgstr "Tocha"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"
@@ -3445,6 +3575,11 @@ msgstr "Tropa"
 msgctxt "Spatial.Visited"
 msgid "visited"
 msgstr "visitado"
+
+#. Spatial.WinterDecorations
+msgctxt "Spatial.WinterDecorations"
+msgid "Winter decorations"
+msgstr "Decorações de inverno"
 
 #. Screens.WielderAnnouncements
 msgctxt "Screens.WielderAnnouncements"
@@ -4131,6 +4266,11 @@ msgstr "penhasco, altura {0}"
 msgctxt "Spatial.StairsHeight"
 msgid "stairs, height {0}"
 msgstr "escadas, altura {0}"
+
+#. Spatial.Structures
+msgctxt "Spatial.Structures"
+msgid "Structures"
+msgstr "Estruturas"
 
 #. Spatial.TowerHeight
 msgctxt "Spatial.TowerHeight"

@@ -28,7 +28,8 @@ namespace SongsOfConquestAccess.Tests
                 AdventureMapAnnouncementDefinitions.Tile,
                 savedOrder);
 
-            Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, order[order.Count - 3]);
+            Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, order[order.Count - 4]);
+            Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.Effects, order[order.Count - 3]);
             Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.RoadDirections, order[order.Count - 2]);
             Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.MovementCost, order[order.Count - 1]);
         }
@@ -58,7 +59,8 @@ namespace SongsOfConquestAccess.Tests
                 savedOrder);
 
             Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, order[0]);
-            Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.RoadDirections, order[1]);
+            Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.Effects, order[1]);
+            Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.RoadDirections, order[2]);
         }
 
         [TestMethod]

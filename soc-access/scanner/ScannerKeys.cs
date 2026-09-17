@@ -101,6 +101,15 @@ namespace SongsOfConquestAccess.Scanner
         public const string AridTrees = "arid-trees";
         public const string TemperateTrees = "temperate-trees";
         public const string Deforestation = "deforestation";
+        public const string DeadBodies = "dead-bodies";
+        public const string DeadSoldiers = "dead-soldiers";
+        public const string Bones = "bones";
+        public const string DragonBones = "dragon-bones";
+        public const string Structures = "structures";
+        public const string Campfire = "campfire";
+        public const string Excavation = "excavation";
+        public const string HuntingCamp = "hunting-camp";
+        public const string FishingSpot = "fishing-spot";
 
         public const string Mountain = "mountain";
         public const string Wall = "wall";
@@ -109,6 +118,18 @@ namespace SongsOfConquestAccess.Scanner
         public const string ShallowWater = "shallow-water";
         public const string DeepWater = "deep-water";
         public const string WaterEdge = "water-edge";
+        public const string FaeyForest = "faey-forest";
+        public const string BirchForest = "birch-forest";
+        public const string Magnolia = "magnolia";
+        public const string Bamboo = "bamboo";
+        public const string Palisade = "palisade";
+        public const string FortifiedGate = "fortified-gate";
+        public const string Barricade = "barricade";
+        public const string Tombstones = "tombstones";
+        public const string Ruins = "ruins";
+        public const string WinterDecorations = "winter-decorations";
+        public const string MidsummerDecorations = "midsummer-decorations";
+        public const string Torch = "torch";
 
         public const string GuardedGround = "guarded-ground";
         public const string Unexplored = "unexplored";

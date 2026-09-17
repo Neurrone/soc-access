@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Adapters;
@@ -41,6 +42,41 @@ namespace SongsOfConquestAccess.Tests
             string text = CreateFormatter().DescribeTile(tile);
 
             Assert.AreEqual("Grass, 67, 40.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileNamesAStandaloneDecorationAsTheTerrain()
+        {
+            AdventureMapTile tile = TileFixtures.Tile(40, 80, AdventureTerrainKind.Palisade);
+            tile.IsImpassable = true;
+
+            string text = CreateFormatter().DescribeTile(tile);
+
+            Assert.AreEqual("Palisade, impassable, 40, 80.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileReadsTheEffectAfterTheTerrain()
+        {
+            AdventureMapTile tile = TileFixtures.Tile(72, 39, AdventureTerrainKind.Grass);
+            tile.Effect = AdventureEffectKind.Fog;
+
+            string text = CreateFormatter().DescribeTile(tile);
+
+            Assert.AreEqual("Grass, fog, 72, 39.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileLeavesTheEffectOutWhenTheElementIsOff()
+        {
+            AdventureMapTile tile = TileFixtures.Tile(72, 39, AdventureTerrainKind.Grass);
+            tile.Effect = AdventureEffectKind.Fog;
+
+            string text = CreateFormatter(
+                (group, element) => element.Key != AdventureMapAnnouncementDefinitions.TileKeys.Effects
+                    && element.DefaultEnabled).DescribeTile(tile);
+
+            Assert.AreEqual("Grass, 72, 39.", text);
         }
 
         [TestMethod]
@@ -346,11 +382,18 @@ namespace SongsOfConquestAccess.Tests
 
         private static AdventureMapTileSpeechFormatter CreateFormatter(bool enableMovementCost)
         {
-            return new AdventureMapTileSpeechFormatter(
-                GetDefaultOrder,
+            return CreateFormatter(
                 (group, element) => element.Key == AdventureMapAnnouncementDefinitions.TileKeys.MovementCost
                     ? enableMovementCost
-                    : element.DefaultEnabled,
+                    : element.DefaultEnabled);
+        }
+
+        private static AdventureMapTileSpeechFormatter CreateFormatter(
+            Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> isEnabled)
+        {
+            return new AdventureMapTileSpeechFormatter(
+                GetDefaultOrder,
+                isEnabled,
                 (group, element) => element.DefaultSuffix);
         }
 

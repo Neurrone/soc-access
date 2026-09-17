@@ -67,6 +67,15 @@ namespace SongsOfConquestAccess.Adapters
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.AridTrees, ModStrings.Spatial.AridTrees, origin, cell => cell.Terrain == AdventureTerrainKind.AridTrees);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.TemperateTrees, ModStrings.Spatial.TemperateTrees, origin, cell => cell.Terrain == AdventureTerrainKind.TemperateTrees);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.Deforestation, ModStrings.Spatial.Deforestation, origin, cell => cell.Terrain == AdventureTerrainKind.Deforestation);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.DeadBodies, ModStrings.Spatial.DeadBodies, origin, cell => cell.Terrain == AdventureTerrainKind.DeadBodies);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.DeadSoldiers, ModStrings.Spatial.DeadSoldiers, origin, cell => cell.Terrain == AdventureTerrainKind.DeadSoldiers);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.Bones, ModStrings.Spatial.Bones, origin, cell => cell.Terrain == AdventureTerrainKind.Bones);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.DragonBones, ModStrings.Spatial.DragonBones, origin, cell => cell.Terrain == AdventureTerrainKind.DragonBones);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.Structures, ModStrings.Spatial.Structures, origin, cell => cell.Terrain == AdventureTerrainKind.Structures);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.Campfire, ModStrings.Spatial.Campfire, origin, cell => cell.Terrain == AdventureTerrainKind.Campfire);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.Excavation, ModStrings.Spatial.Excavation, origin, cell => cell.Terrain == AdventureTerrainKind.Excavation);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.HuntingCamp, ModStrings.Spatial.HuntingCamp, origin, cell => cell.Terrain == AdventureTerrainKind.HuntingCamp);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.FishingSpot, ModStrings.Spatial.FishingSpot, origin, cell => cell.Terrain == AdventureTerrainKind.FishingSpot);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Mountain, ModStrings.Spatial.Mountain, origin, cell => cell.Terrain == AdventureTerrainKind.Mountain);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Wall, ModStrings.Spatial.Wall, origin, cell => cell.Terrain == AdventureTerrainKind.Wall);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Obstruction, ModStrings.Spatial.Obstruction, origin, cell => cell.Terrain == AdventureTerrainKind.Obstruction);
@@ -74,6 +83,18 @@ namespace SongsOfConquestAccess.Adapters
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.ShallowWater, ModStrings.Spatial.ShallowWater, origin, cell => cell.Terrain == AdventureTerrainKind.ShallowWater);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.DeepWater, ModStrings.Spatial.DeepWater, origin, cell => cell.Terrain == AdventureTerrainKind.DeepWater);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.WaterEdge, ModStrings.Spatial.WaterEdge, origin, cell => cell.Terrain == AdventureTerrainKind.WaterEdge);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.FaeyForest, ModStrings.Spatial.FaeyForest, origin, cell => cell.Terrain == AdventureTerrainKind.FaeyForest);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.BirchForest, ModStrings.Spatial.BirchForest, origin, cell => cell.Terrain == AdventureTerrainKind.BirchForest);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Magnolia, ModStrings.Spatial.Magnolia, origin, cell => cell.Terrain == AdventureTerrainKind.Magnolia);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Bamboo, ModStrings.Spatial.Bamboo, origin, cell => cell.Terrain == AdventureTerrainKind.Bamboo);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Palisade, ModStrings.Spatial.Palisade, origin, cell => cell.Terrain == AdventureTerrainKind.Palisade);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.FortifiedGate, ModStrings.Spatial.FortifiedGate, origin, cell => cell.Terrain == AdventureTerrainKind.FortifiedGate);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Barricade, ModStrings.Spatial.Barricade, origin, cell => cell.Terrain == AdventureTerrainKind.Barricade);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Tombstones, ModStrings.Spatial.Tombstones, origin, cell => cell.Terrain == AdventureTerrainKind.Tombstones);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Ruins, ModStrings.Spatial.Ruins, origin, cell => cell.Terrain == AdventureTerrainKind.Ruins);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.WinterDecorations, ModStrings.Spatial.WinterDecorations, origin, cell => cell.Terrain == AdventureTerrainKind.WinterDecorations);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.MidsummerDecorations, ModStrings.Spatial.MidsummerDecorations, origin, cell => cell.Terrain == AdventureTerrainKind.MidsummerDecorations);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Torch, ModStrings.Spatial.Torch, origin, cell => cell.Terrain == AdventureTerrainKind.Torch);
             // No Impassable item: it is a property of the ground rather than a
             // kind of it, so every tile it would gather is already under its
             // own name in this same subcategory.

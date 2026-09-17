@@ -239,9 +239,21 @@ namespace SongsOfConquestAccess.Audio
                     return CueLibrary.TerrainWater;
                 case AdventureTerrainKind.AridTrees:
                 case AdventureTerrainKind.TemperateTrees:
+                case AdventureTerrainKind.FaeyForest:
+                case AdventureTerrainKind.BirchForest:
+                case AdventureTerrainKind.Magnolia:
+                case AdventureTerrainKind.Bamboo:
                     return CueLibrary.TerrainTrees;
                 case AdventureTerrainKind.Mountain:
                 case AdventureTerrainKind.Wall:
+                case AdventureTerrainKind.Palisade:
+                case AdventureTerrainKind.FortifiedGate:
+                case AdventureTerrainKind.Barricade:
+                case AdventureTerrainKind.Tombstones:
+                case AdventureTerrainKind.Ruins:
+                case AdventureTerrainKind.WinterDecorations:
+                case AdventureTerrainKind.MidsummerDecorations:
+                case AdventureTerrainKind.Torch:
                     return CueLibrary.TerrainImpassable;
                 default:
                     return CueLibrary.TerrainGround;

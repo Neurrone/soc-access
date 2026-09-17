@@ -166,6 +166,12 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, terrain);
             }
 
+            string effects = DescribeEffect(tile.Effect);
+            if (!string.IsNullOrWhiteSpace(effects))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Effects, effects);
+            }
+
             string roadDirections = entityCoversTheGround ? string.Empty : DescribeRoadDirections(tile);
             if (!string.IsNullOrWhiteSpace(roadDirections))
             {
@@ -518,6 +524,71 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     return ModText.Get(ModStrings.Spatial.Deforestation);
                 case AdventureTerrainKind.Farmland:
                     return ModText.Get(ModStrings.Spatial.Farmland);
+                case AdventureTerrainKind.Torch:
+                    return ModText.Get(ModStrings.Spatial.Torch);
+                case AdventureTerrainKind.FaeyForest:
+                    return ModText.Get(ModStrings.Spatial.FaeyForest);
+                case AdventureTerrainKind.BirchForest:
+                    return ModText.Get(ModStrings.Spatial.BirchForest);
+                case AdventureTerrainKind.Magnolia:
+                    return ModText.Get(ModStrings.Spatial.Magnolia);
+                case AdventureTerrainKind.Bamboo:
+                    return ModText.Get(ModStrings.Spatial.Bamboo);
+                case AdventureTerrainKind.Palisade:
+                    return ModText.Get(ModStrings.Spatial.Palisade);
+                case AdventureTerrainKind.FortifiedGate:
+                    return ModText.Get(ModStrings.Spatial.FortifiedGate);
+                case AdventureTerrainKind.Barricade:
+                    return ModText.Get(ModStrings.Spatial.Barricade);
+                case AdventureTerrainKind.Tombstones:
+                    return ModText.Get(ModStrings.Spatial.Tombstones);
+                case AdventureTerrainKind.Ruins:
+                    return ModText.Get(ModStrings.Spatial.Ruins);
+                case AdventureTerrainKind.WinterDecorations:
+                    return ModText.Get(ModStrings.Spatial.WinterDecorations);
+                case AdventureTerrainKind.MidsummerDecorations:
+                    return ModText.Get(ModStrings.Spatial.MidsummerDecorations);
+                case AdventureTerrainKind.DeadBodies:
+                    return ModText.Get(ModStrings.Spatial.DeadBodies);
+                case AdventureTerrainKind.DeadSoldiers:
+                    return ModText.Get(ModStrings.Spatial.DeadSoldiers);
+                case AdventureTerrainKind.Bones:
+                    return ModText.Get(ModStrings.Spatial.Bones);
+                case AdventureTerrainKind.DragonBones:
+                    return ModText.Get(ModStrings.Spatial.DragonBones);
+                case AdventureTerrainKind.Structures:
+                    return ModText.Get(ModStrings.Spatial.Structures);
+                case AdventureTerrainKind.Campfire:
+                    return ModText.Get(ModStrings.Spatial.Campfire);
+                case AdventureTerrainKind.Excavation:
+                    return ModText.Get(ModStrings.Spatial.Excavation);
+                case AdventureTerrainKind.HuntingCamp:
+                    return ModText.Get(ModStrings.Spatial.HuntingCamp);
+                case AdventureTerrainKind.FishingSpot:
+                    return ModText.Get(ModStrings.Spatial.FishingSpot);
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static string DescribeEffect(AdventureEffectKind effect)
+        {
+            switch (effect)
+            {
+                case AdventureEffectKind.Fireflies:
+                    return ModText.Get(ModStrings.Spatial.EffectFireflies);
+                case AdventureEffectKind.BurnMarks:
+                    return ModText.Get(ModStrings.Spatial.EffectBurnMarks);
+                case AdventureEffectKind.Fog:
+                    return ModText.Get(ModStrings.Spatial.EffectFog);
+                case AdventureEffectKind.Smoke:
+                    return ModText.Get(ModStrings.Spatial.EffectSmoke);
+                case AdventureEffectKind.Wildfire:
+                    return ModText.Get(ModStrings.Spatial.EffectWildfire);
+                case AdventureEffectKind.RaysOfLight:
+                    return ModText.Get(ModStrings.Spatial.EffectRaysOfLight);
+                case AdventureEffectKind.Snow:
+                    return ModText.Get(ModStrings.Spatial.EffectSnow);
                 default:
                     return string.Empty;
             }

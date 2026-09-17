@@ -48,10 +48,13 @@ namespace SongsOfConquestAccess.Tests
         {
             AssertTerrainCue(CueLibrary.TerrainRoad, AdventureTerrainKind.Road, AdventureTerrainKind.DirtRoad, AdventureTerrainKind.CobblestoneRoad, AdventureTerrainKind.Bridge);
             AssertTerrainCue(CueLibrary.TerrainGround, AdventureTerrainKind.Grass, AdventureTerrainKind.Dirt, AdventureTerrainKind.Deforestation, AdventureTerrainKind.Farmland, AdventureTerrainKind.Unknown);
+            AssertTerrainCue(CueLibrary.TerrainGround, AdventureTerrainKind.DeadBodies, AdventureTerrainKind.DeadSoldiers, AdventureTerrainKind.Bones, AdventureTerrainKind.DragonBones, AdventureTerrainKind.Structures);
+            AssertTerrainCue(CueLibrary.TerrainGround, AdventureTerrainKind.Campfire, AdventureTerrainKind.Excavation, AdventureTerrainKind.HuntingCamp, AdventureTerrainKind.FishingSpot);
             AssertTerrainCue(CueLibrary.TerrainSand, AdventureTerrainKind.Sand);
             AssertTerrainCue(CueLibrary.TerrainWater, AdventureTerrainKind.Water, AdventureTerrainKind.ShallowWater, AdventureTerrainKind.DeepWater, AdventureTerrainKind.WaterEdge);
-            AssertTerrainCue(CueLibrary.TerrainTrees, AdventureTerrainKind.AridTrees, AdventureTerrainKind.TemperateTrees);
-            AssertTerrainCue(CueLibrary.TerrainImpassable, AdventureTerrainKind.Mountain, AdventureTerrainKind.Wall);
+            AssertTerrainCue(CueLibrary.TerrainTrees, AdventureTerrainKind.AridTrees, AdventureTerrainKind.TemperateTrees, AdventureTerrainKind.FaeyForest, AdventureTerrainKind.BirchForest, AdventureTerrainKind.Magnolia, AdventureTerrainKind.Bamboo);
+            AssertTerrainCue(CueLibrary.TerrainImpassable, AdventureTerrainKind.Mountain, AdventureTerrainKind.Wall, AdventureTerrainKind.Torch, AdventureTerrainKind.Palisade, AdventureTerrainKind.FortifiedGate, AdventureTerrainKind.Barricade);
+            AssertTerrainCue(CueLibrary.TerrainImpassable, AdventureTerrainKind.Tombstones, AdventureTerrainKind.Ruins, AdventureTerrainKind.WinterDecorations, AdventureTerrainKind.MidsummerDecorations);
         }
 
         [TestMethod]

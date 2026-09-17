@@ -2180,6 +2180,16 @@ msgctxt "Spatial.Deadly"
 msgid "deadly"
 msgstr "смертельно"
 
+#. Spatial.DeadBodies
+msgctxt "Spatial.DeadBodies"
+msgid "Dead bodies"
+msgstr "Трупы"
+
+#. Spatial.DeadSoldiers
+msgctxt "Spatial.DeadSoldiers"
+msgid "Dead soldiers"
+msgstr "Павшие солдаты"
+
 #. Spatial.Debris
 msgctxt "Spatial.Debris"
 msgid "debris"
@@ -2200,6 +2210,11 @@ msgctxt "Spatial.Destroys"
 msgid "destroys"
 msgstr "уничтожает"
 
+#. Spatial.DragonBones
+msgctxt "Spatial.DragonBones"
+msgid "Dragon bones"
+msgstr "Кости дракона"
+
 #. Spatial.ElevatedGroundHeight
 msgctxt "Spatial.ElevatedGroundHeight"
 msgid "elevated ground, height {0}"
@@ -2215,10 +2230,25 @@ msgctxt "Spatial.Enemy"
 msgid "enemy"
 msgstr "вражеский"
 
+#. Spatial.FaeyForest
+msgctxt "Spatial.FaeyForest"
+msgid "Faey forest"
+msgstr "Лес фей"
+
 #. Spatial.ExtraTargetPrefix
 msgctxt "Spatial.ExtraTargetPrefix"
 msgid "extra target "
 msgstr "дополнительная цель "
+
+#. Spatial.FishingSpot
+msgctxt "Spatial.FishingSpot"
+msgid "Fishing spot"
+msgstr "Место для рыбалки"
+
+#. Spatial.FortifiedGate
+msgctxt "Spatial.FortifiedGate"
+msgid "Fortified gate"
+msgstr "Укреплённые ворота"
 
 #. Spatial.Friendly
 msgctxt "Spatial.Friendly"
@@ -2250,6 +2280,11 @@ msgctxt "Spatial.Here"
 msgid "here"
 msgstr "здесь"
 
+#. Spatial.HuntingCamp
+msgctxt "Spatial.HuntingCamp"
+msgid "Hunting camp"
+msgstr "Охотничий лагерь"
+
 #. Spatial.Impassable
 msgctxt "Spatial.Impassable"
 msgid "impassable"
@@ -2279,6 +2314,16 @@ msgstr "убивает {0}"
 msgctxt "Spatial.MayDestroy"
 msgid "may destroy"
 msgstr "может уничтожить"
+
+#. Spatial.Magnolia
+msgctxt "Spatial.Magnolia"
+msgid "Magnolia trees"
+msgstr "Магнолии"
+
+#. Spatial.MidsummerDecorations
+msgctxt "Spatial.MidsummerDecorations"
+msgid "Midsummer decorations"
+msgstr "Украшения праздника середины лета"
 
 #. Spatial.Movement
 msgctxt "Spatial.Movement"
@@ -2319,6 +2364,11 @@ msgstr "нет предпросмотра маршрута"
 msgctxt "Spatial.OnRoute"
 msgid "On route"
 msgstr "На маршруте"
+
+#. Spatial.Palisade
+msgctxt "Spatial.Palisade"
+msgid "Palisade"
+msgstr "Частокол"
 
 #. Spatial.PositionAndMapSize
 msgctxt "Spatial.PositionAndMapSize"
@@ -2720,10 +2770,35 @@ msgctxt "Spatial.AridTrees"
 msgid "Arid trees"
 msgstr "Засушливые деревья"
 
+#. Spatial.Bamboo
+msgctxt "Spatial.Bamboo"
+msgid "Bamboo"
+msgstr "Бамбук"
+
+#. Spatial.Barricade
+msgctxt "Spatial.Barricade"
+msgid "Barricade"
+msgstr "Баррикада"
+
+#. Spatial.BirchForest
+msgctxt "Spatial.BirchForest"
+msgid "Birch forest"
+msgstr "Берёзовый лес"
+
+#. Spatial.Bones
+msgctxt "Spatial.Bones"
+msgid "Bones"
+msgstr "Кости"
+
 #. Spatial.Bridge
 msgctxt "Spatial.Bridge"
 msgid "Bridge"
 msgstr "Мост"
+
+#. Spatial.Campfire
+msgctxt "Spatial.Campfire"
+msgid "Campfire"
+msgstr "Костёр"
 
 #. Spatial.CobblestoneRoad
 msgctxt "Spatial.CobblestoneRoad"
@@ -2745,10 +2820,50 @@ msgctxt "Spatial.DirtRoad"
 msgid "Dirt road"
 msgstr "Грунтовая дорога"
 
+#. Spatial.EffectBurnMarks
+msgctxt "Spatial.EffectBurnMarks"
+msgid "burn marks"
+msgstr "следы огня"
+
+#. Spatial.EffectFireflies
+msgctxt "Spatial.EffectFireflies"
+msgid "fireflies"
+msgstr "светлячки"
+
+#. Spatial.EffectFog
+msgctxt "Spatial.EffectFog"
+msgid "fog"
+msgstr "туман"
+
+#. Spatial.EffectRaysOfLight
+msgctxt "Spatial.EffectRaysOfLight"
+msgid "rays of light"
+msgstr "лучи света"
+
+#. Spatial.EffectSmoke
+msgctxt "Spatial.EffectSmoke"
+msgid "smoke"
+msgstr "дым"
+
+#. Spatial.EffectSnow
+msgctxt "Spatial.EffectSnow"
+msgid "snow"
+msgstr "снег"
+
+#. Spatial.EffectWildfire
+msgctxt "Spatial.EffectWildfire"
+msgid "wildfire"
+msgstr "пожар"
+
 #. Spatial.Farmland
 msgctxt "Spatial.Farmland"
 msgid "Farmland"
 msgstr "Пашня"
+
+#. Spatial.Excavation
+msgctxt "Spatial.Excavation"
+msgid "Excavation"
+msgstr "Раскопки"
 
 #. Spatial.Road
 msgctxt "Spatial.Road"
@@ -2759,6 +2874,11 @@ msgstr "Дорога"
 msgctxt "Spatial.RoadDirectionSeparator"
 msgid "{0} {1}"
 msgstr "{0} {1}"
+
+#. Spatial.Ruins
+msgctxt "Spatial.Ruins"
+msgid "Ruins"
+msgstr "Руины"
 
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
@@ -2965,6 +3085,16 @@ msgstr "Песок"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "Деревья умеренного климата"
+
+#. Spatial.Tombstones
+msgctxt "Spatial.Tombstones"
+msgid "Tombstones"
+msgstr "Надгробия"
+
+#. Spatial.Torch
+msgctxt "Spatial.Torch"
+msgid "Torch"
+msgstr "Факел"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"
@@ -3470,6 +3600,11 @@ msgstr "Отряд"
 msgctxt "Spatial.Visited"
 msgid "visited"
 msgstr "посещено"
+
+#. Spatial.WinterDecorations
+msgctxt "Spatial.WinterDecorations"
+msgid "Winter decorations"
+msgstr "Зимние украшения"
 
 #. Screens.WielderAnnouncements
 msgctxt "Screens.WielderAnnouncements"
@@ -4176,6 +4311,11 @@ msgstr "обрыв, высота {0}"
 msgctxt "Spatial.StairsHeight"
 msgid "stairs, height {0}"
 msgstr "лестница, высота {0}"
+
+#. Spatial.Structures
+msgctxt "Spatial.Structures"
+msgid "Structures"
+msgstr "Постройки"
 
 #. Spatial.TowerHeight
 msgctxt "Spatial.TowerHeight"

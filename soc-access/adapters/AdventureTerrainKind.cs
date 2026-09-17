@@ -20,6 +20,27 @@ namespace SongsOfConquestAccess.Adapters
         Mountain,
         Deforestation,
         Farmland,
-        Obstruction
+        Obstruction,
+        Torch,
+        FaeyForest,
+        BirchForest,
+        Magnolia,
+        Bamboo,
+        Palisade,
+        FortifiedGate,
+        Barricade,
+        Tombstones,
+        Ruins,
+        WinterDecorations,
+        MidsummerDecorations,
+        DeadBodies,
+        DeadSoldiers,
+        Bones,
+        DragonBones,
+        Structures,
+        Campfire,
+        Excavation,
+        HuntingCamp,
+        FishingSpot
     }
 }

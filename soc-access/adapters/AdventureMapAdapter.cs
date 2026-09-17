@@ -608,6 +608,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             tile.Terrain = GetTerrain(clamped);
+            tile.Effect = GetEffect(clamped);
             if (IsRoadTerrain(tile.Terrain))
             {
                 // GetTerrain answers with the surface terrain whenever there is one, so a tile

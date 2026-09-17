@@ -97,6 +97,10 @@ namespace SongsOfConquestAccess.Adapters
 
         public AdventureTerrainKind Terrain { get; set; }
 
+        /// <summary>What the effect layer paints over this tile, <see cref="AdventureEffectKind.Unknown"/>
+        /// when it paints nothing.</summary>
+        public AdventureEffectKind Effect { get; set; }
+
         /// <summary>
         /// The neighbouring tiles this road carries on into, empty for anything that is not a
         /// road. Worked out on first read rather than up front, because finding them looks at
