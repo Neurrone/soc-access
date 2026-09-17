@@ -695,7 +695,7 @@ namespace SongsOfConquestAccess.UI.Graph
             get { return Declared == null ? null : Declared.Vtable; }
         }
 
-        public readonly Dictionary<GraphDir, Transition> Transitions = new Dictionary<GraphDir, Transition>();
+        public readonly Dictionary<GraphDir, Transition> Transitions = new Dictionary<GraphDir, Transition>(4);
 
         /// <summary>The node's structural parent within THIS render, or null at screen level. The parent
         /// chain IS the presentation hierarchy: the announcer prefix-diffs old/new chains by identity, so

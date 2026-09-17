@@ -32,11 +32,18 @@ namespace SongsOfConquestAccess.UI.Graph
         /// <summary>The value-equatable structural identity. Never null.</summary>
         public object StructuralKey { get; private set; }
 
+        // The structural key is a string most of the time, and hashing it is what every dictionary
+        // the render keeps costs per lookup: a 430-node table wires 1500 edges, each looked up by both
+        // ends, and rehashing a thirty-character key every time was the largest single cost of a
+        // build (measured on the conquest map list 2026-09-18). Hashed once, here.
+        private readonly int _hash;
+
         private ControlId(object subject, object structuralKey)
         {
             if (structuralKey == null) throw new ArgumentNullException("structuralKey");
             Subject = subject;
             StructuralKey = structuralKey;
+            _hash = structuralKey.GetHashCode();
         }
 
         /// <summary>A control identified only by a structural key (no subject).</summary>
@@ -67,7 +74,7 @@ namespace SongsOfConquestAccess.UI.Graph
 
         public bool Equals(ControlId other)
         {
-            return other != null && Equals(StructuralKey, other.StructuralKey);
+            return other != null && _hash == other._hash && Equals(StructuralKey, other.StructuralKey);
         }
 
         public override bool Equals(object obj)
@@ -77,7 +84,7 @@ namespace SongsOfConquestAccess.UI.Graph
 
         public override int GetHashCode()
         {
-            return StructuralKey.GetHashCode();
+            return _hash;
         }
 
         public override string ToString()

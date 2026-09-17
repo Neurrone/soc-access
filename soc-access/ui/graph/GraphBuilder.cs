@@ -550,9 +550,14 @@ namespace SongsOfConquestAccess.UI.Graph
             foreach (GraphNode node in _declared) AddNodeTo(render, node);
 
             WireMenuEdges(render);
+            // Both ends looked up once each: this loop runs per edge per frame, and a big table is
+            // three or four edges per cell.
             foreach (Edge e in _rawEdges)
-                if (render.Nodes.ContainsKey(e.From) && render.Nodes.ContainsKey(e.To))
-                    render.Nodes[e.From].Transitions[e.Dir] = new Transition(e.To, e.Label);
+            {
+                GraphNode from;
+                if (render.Nodes.TryGetValue(e.From, out from) && render.Nodes.ContainsKey(e.To))
+                    from.Transitions[e.Dir] = new Transition(e.To, e.Label);
+            }
             StitchModeBoundaries();
 
             render.StartKey = _start != null && render.Nodes.ContainsKey(_start)
