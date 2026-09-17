@@ -31,6 +31,83 @@ namespace SongsOfConquestAccess.Tests
             GraphSheet.Reset();
         }
 
+        // ---- a kept block, replayed ----
+
+        /// <summary>A block a sheet recorded declares the same table when it is replayed into a fresh
+        /// builder: the same nodes in the same order, wired the same way and with the same words on
+        /// every crossing, under the same regions.</summary>
+        [TestMethod]
+        public void AReplayedBlockDeclaresTheSameTable()
+        {
+            GraphSheet.Block block = new GraphSheet.Block();
+            GraphBuilder recorded = new GraphBuilder();
+            GraphSheet writing = new GraphSheet(recorded, "t:");
+            writing.Records(block);
+            Rows(writing);
+            writing.Finish();
+            GraphRender first = recorded.Build();
+
+            GraphBuilder replayed = new GraphBuilder();
+            GraphSheet reading = new GraphSheet(replayed, "t:");
+            reading.Replay(block);
+            reading.Finish();
+            GraphRender again = replayed.Build();
+
+            CollectionAssert.AreEqual(Shape(first), Shape(again));
+            Assert.AreEqual(Key(first.NodeAt(first.StartKey)), Key(again.NodeAt(again.StartKey)));
+            Assert.AreEqual(Key(first.NodeAt(block.FirstRow)), Key(again.NodeAt(reading.FirstRow)));
+
+            // The regions came back with the nodes: a replay that lost them would read the second
+            // table's rows under the first one's caption.
+            Assert.AreEqual(
+                "Fleets, table, Alpha",
+                GraphAnnouncer.ComposeFull(again.NodeAt(again.StartKey)));
+        }
+
+        // Every node of a render, in order, with what it says on each of its four edges - the whole of
+        // what a build declared, in one comparable shape.
+        private static string[] Shape(GraphRender render)
+        {
+            string[] lines = new string[render.Order.Count];
+            for (int i = 0; i < render.Order.Count; i++)
+            {
+                GraphNode node = render.Order[i];
+                lines[i] = string.Join(
+                    "|",
+                    new[]
+                    {
+                        Key(node),
+                        GraphAnnouncer.LeafText(node),
+                        Edge(node, GraphDir.Left),
+                        Edge(node, GraphDir.Right),
+                        Edge(node, GraphDir.Up),
+                        Edge(node, GraphDir.Down)
+                    });
+            }
+
+            return lines;
+        }
+
+        private static string Edge(GraphNode node, GraphDir dir)
+        {
+            Transition t;
+            if (!node.Transitions.TryGetValue(dir, out t) || t == null)
+            {
+                return string.Empty;
+            }
+
+            return (string)t.Destination.StructuralKey + ">" + t.Label;
+        }
+
+        private void Rows(GraphSheet sheet)
+        {
+            sheet.Region("Fleets", new[] { "Name", "Ships", "Move" });
+            sheet.Row(Vt("Alpha"), _rowA, null, () => "3", () => "5");
+            sheet.Row(Vt("Beta"), _rowB, null, () => "2", () => "4");
+            sheet.Region("Notes");
+            sheet.Line(Vt("Two systems colonized"));
+        }
+
         private KeyGraph Table(GraphState state, bool raggedSecondRow = false)
         {
             return new KeyGraph(() =>

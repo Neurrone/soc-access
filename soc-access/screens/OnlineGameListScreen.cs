@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using SongsOfConquest.Client.Adventure.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
@@ -47,6 +48,12 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _statusMarker = new object();
         private readonly object _selectedMarker = new object();
         private readonly object[] _bandMarkers = { new object(), new object(), new object() };
+
+        // Mod-owned: what the last build of the list declared, handed back while the keys it was
+        // recorded under still answer the same. Keyed on what the game owns, so a new page answers
+        // with new identities and the block is minted again; there is no reset hook and none is
+        // needed.
+        private readonly SheetSnapshot _table = new SheetSnapshot();
 
         /// <summary>The one game list menu of the online game list scene, shared with the host-game
         /// popup drawn over it (<see cref="MenuSceneSources"/>).</summary>
@@ -150,9 +157,48 @@ namespace SongsOfConquestAccess.Screens
             };
             BuildHeadingBand(builder, captions);
 
-            GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            sheet.Region(Live.Title, captions);
             IReadOnlyList<OnlineGameListAdapter.GameRow> rows = Live.GetRows();
+            GraphSheet sheet = new GraphSheet(builder, SheetKey);
+            // The adapter hands back the same row list while the game is drawing the same entries in
+            // the same order. That alone would not notice an entry the list REBOUND to another game
+            // in place, which renames the row, so the ids - which carry the game's own id - are read
+            // every frame beside it. The captions are the mod's words, so a language change is a new
+            // key, and the title is the page's.
+            object[] keys = { rows, Live.Title, SheetSnapshot.Words(captions), Ids(rows) };
+            if (!_table.TryReplay(sheet, keys))
+            {
+                _table.Record(sheet, keys);
+                sheet.Region(Live.Title, captions);
+                for (int i = 0; i < rows.Count; i++)
+                {
+                    OnlineGameListAdapter.GameRow row = rows[i];
+                    if (row == null || row.Entry == null)
+                    {
+                        continue;
+                    }
+
+                    sheet.RowAt(Primary(row), row.Id, Cells(row, captions), row.Entry);
+                }
+
+                sheet.Finish();
+                _table.Keep();
+            }
+            else
+            {
+                sheet.Finish();
+            }
+
+            if (sheet.FirstRow != null)
+            {
+                builder.LandStopOn(sheet.FirstRow);
+            }
+        }
+
+        /// <summary>Which game each row stands for, as one key: an entry the list rebound to another
+        /// game keeps its object and its place, and only its id says so.</summary>
+        private static string Ids(IReadOnlyList<OnlineGameListAdapter.GameRow> rows)
+        {
+            StringBuilder ids = new StringBuilder();
             for (int i = 0; i < rows.Count; i++)
             {
                 OnlineGameListAdapter.GameRow row = rows[i];
@@ -161,14 +207,10 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                sheet.RowAt(Primary(row), row.Id, Cells(row, captions), row.Entry);
+                ids.Append(row.Id).Append('\u0001');
             }
 
-            sheet.Finish();
-            if (sheet.FirstRow != null)
-            {
-                builder.LandStopOn(sheet.FirstRow);
-            }
+            return ids.ToString();
         }
 
         /// <summary>

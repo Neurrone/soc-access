@@ -67,8 +67,47 @@ namespace SongsOfConquestAccess.UI.Graph
         /// </summary>
         public bool NamedRows = true;
 
+        /// <summary>
+        /// Everything one sheet declared: the node declarations in the order they were emitted, the
+        /// edges that wire them, and where each region was opened along the way. Kept by a caller
+        /// whose rows the game has not rebound, and handed back to <see cref="Replay"/> on the frames
+        /// in between.
+        ///
+        /// It is the STRUCTURE only. Every word a cell says is still a <c>Func&lt;string&gt;</c> asked
+        /// when the cell is read, and every row's existence is still asked of the widget it was
+        /// declared with, so a replayed row says what it says now and disappears when the game stops
+        /// drawing it. What a block cannot notice is a row whose SHAPE changed, or a label some caller
+        /// composed EAGERLY into a vtable - which is the caller's business to key on.
+        ///
+        /// The regions are recorded, where the sheet this was ported from recorded only nodes and
+        /// edges, because a sheet here can carry several of them: the player statistics page builds
+        /// its whole page as one sheet of five regions, and a replay that declared every node under
+        /// whichever region happened to be open would collapse the page into one table.
+        /// </summary>
+        public sealed class Block
+        {
+            public readonly List<NodeDeclaration> Nodes = new List<NodeDeclaration>();
+            public readonly List<GraphBuilder.Edge> Edges = new List<GraphBuilder.Edge>();
+
+            /// <summary>Each region the recording opened, and the node it was opened before.</summary>
+            public readonly List<Cut> Cuts = new List<Cut>();
+
+            /// <summary>The first primary emitted, for <see cref="GraphSheet.FirstRow"/>.</summary>
+            public ControlId FirstRow;
+
+            /// <summary>One <see cref="GraphSheet.Region"/> call, as it was made.</summary>
+            public struct Cut
+            {
+                public int At;
+                public string Label;
+                public string[] Columns;
+                public string Role;
+            }
+        }
+
         private readonly GraphBuilder _b;
         private readonly string _key;
+        private Block _recording;
         private int _regionIndex = -1;
         private bool _contextOpen;
 
@@ -169,6 +208,42 @@ namespace SongsOfConquestAccess.UI.Graph
             return RowKeyFor(rowRef) + "c" + col;
         }
 
+        /// <summary>Keep everything this sheet declares from here on, so that a caller whose rows have
+        /// not been rebound can hand it back to <see cref="Replay"/> instead of reading the game
+        /// again. Set it before the first region; the block's <see cref="Block.FirstRow"/> is filled
+        /// by <see cref="Finish"/>.</summary>
+        public GraphSheet Records(Block block)
+        {
+            _recording = block;
+            return this;
+        }
+
+        /// <summary>Re-declare a kept <see cref="Block"/> into this sheet's builder, opening each
+        /// region where the recording opened it. The sheet's own row state stays empty - a replayed
+        /// sheet emits no further rows - and <see cref="FirstRow"/> answers what the recorded build
+        /// answered. <see cref="Finish"/> closes the last region, as after any build.</summary>
+        public GraphSheet Replay(Block block)
+        {
+            if (block == null) return this;
+            int cut = 0;
+            for (int i = 0; i < block.Nodes.Count; i++)
+            {
+                while (cut < block.Cuts.Count && block.Cuts[cut].At <= i) Reopen(block.Cuts[cut++]);
+                _b.AddNode(block.Nodes[i]);
+            }
+            while (cut < block.Cuts.Count) Reopen(block.Cuts[cut++]);
+            // The edges go in after the nodes, as they do in any build: an edge naming a node the
+            // existence gate withdrew is dropped at Build, exactly as a freshly minted one would be.
+            _b.Replay(null, block.Edges);
+            _first = block.FirstRow;
+            return this;
+        }
+
+        private void Reopen(Block.Cut cut)
+        {
+            Region(cut.Label, cut.Columns, cut.Role);
+        }
+
         /// <summary>
         /// Continue the table below a node that is NOT part of it — a paragraph the screen drew above
         /// the first row, a heading it declared itself. The first row then meets that node exactly as
@@ -198,6 +273,14 @@ namespace SongsOfConquestAccess.UI.Graph
         {
             CloseRegion();
             _regionIndex++;
+            if (_recording != null)
+                _recording.Cuts.Add(new Block.Cut
+                {
+                    At = _recording.Nodes.Count,
+                    Label = label,
+                    Columns = columns,
+                    Role = role
+                });
             _b.SetRegion(_key + "reg:" + _regionIndex);
             if (!string.IsNullOrEmpty(label))
             {
@@ -316,6 +399,22 @@ namespace SongsOfConquestAccess.UI.Graph
         public void Finish()
         {
             CloseRegion();
+            if (_recording != null) _recording.FirstRow = _first;
+        }
+
+        // Every node and every edge the rows emit goes through these two, so that a recording keeps
+        // exactly what the builder was given and a replay can hand back the same objects.
+        private void Declare(NodeDeclaration node)
+        {
+            if (_recording != null) _recording.Nodes.Add(node);
+            _b.AddNode(node);
+        }
+
+        private void Link(ControlId from, GraphDir dir, ControlId to, string label)
+        {
+            GraphBuilder.Edge edge = new GraphBuilder.Edge(from, dir, to, label);
+            if (_recording != null) _recording.Edges.Add(edge);
+            _b.AddEdge(edge);
         }
 
         private void CloseRegion()
@@ -388,7 +487,7 @@ namespace SongsOfConquestAccess.UI.Graph
             // about. Its honesty lives at the walk that enumerated the rows, as every synthetic node's
             // does. Types are constructed directly because this assembly has no engine-side door to
             // come through (<c>UI.Nodes</c>): they are its own.
-            _b.AddNode(
+            Declare(
                 _rowWidget != null
                     ? (NodeDeclaration)new DrawnNode(id, vt, _rowWidget)
                     : new SyntheticNode(id, vt)
@@ -405,8 +504,8 @@ namespace SongsOfConquestAccess.UI.Graph
                 // caption: the caption was said on the way into the column and is said again on
                 // the way out of it.
                 bool crossing = left.Col != col;
-                _b.Connect(id, GraphDir.Left, left.Id, crossing ? Header(left.Col) : null);
-                _b.Connect(left.Id, GraphDir.Right, id, crossing ? Header(col) : null);
+                Link(id, GraphDir.Left, left.Id, crossing ? Header(left.Col) : null);
+                Link(left.Id, GraphDir.Right, id, crossing ? Header(col) : null);
             }
             _rowIds.Add(new CellRef { Col = col, Piece = piece, Id = id });
         }
@@ -422,13 +521,13 @@ namespace SongsOfConquestAccess.UI.Graph
             foreach (CellRef cell in _rowIds)
             {
                 bool matched = HasCol(_prevRowIds, cell.Col);
-                _b.Connect(cell.Id, GraphDir.Up, FindAt(_prevRowIds, cell.Col, cell.Piece),
+                Link(cell.Id, GraphDir.Up, FindAt(_prevRowIds, cell.Col, cell.Piece),
                     matched && cell.Col > 0 && NamedRows ? Text(_prevRowName) : null);
             }
             foreach (CellRef cell in _prevRowIds)
             {
                 bool matched = HasCol(_rowIds, cell.Col);
-                _b.Connect(cell.Id, GraphDir.Down, FindAt(_rowIds, cell.Col, cell.Piece),
+                Link(cell.Id, GraphDir.Down, FindAt(_rowIds, cell.Col, cell.Piece),
                     matched && cell.Col > 0 && NamedRows ? Text(_rowName) : null);
             }
         }

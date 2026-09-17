@@ -65,15 +65,12 @@ namespace SongsOfConquestAccess.Screens
         // cursor on the same node while the selection under it changes.
         private readonly object _detailsMarker = new object();
 
-        // The table's nodes, kept for as long as the adapter hands back the same row list. A row's
-        // primary and its cells are closures over the row adapter and read the game when they are
-        // READ, so rebuilding them every frame bought nothing but the allocation - a vtable, its
-        // announcement list and seven cells per row, 57 rows deep. The adapter already answers with
-        // the same list while the table's membership and drawn order are unchanged (a sort or a
-        // filter is a new list), so its identity is the only key this needs.
-        private object _rowNodesSource;
-
-        private List<RowNodes> _rowNodes;
+        // Mod-owned: what the last build of the table declared, handed back while the keys it was
+        // recorded under still answer the same. 57 maps of seven columns is 415 nodes, a vtable and
+        // an announcement list each, minted and thrown away every frame for a list the game rebinds
+        // when it is filtered or sorted. Keyed on what the game owns, so a new page answers with new
+        // identities and the block is minted again; there is no reset hook and none is needed.
+        private readonly SheetSnapshot _table = new SheetSnapshot();
 
         /// <summary>The lobby navigator's own map select page (<see cref="LobbySources"/>).</summary>
         protected override object ResolveMenu()
@@ -215,81 +212,60 @@ namespace SongsOfConquestAccess.Screens
             IReadOnlyList<string> captions = Live.GetColumnLabels();
             BuildSortBand(builder, captions);
 
+            IReadOnlyList<AdventureLobbyMapSelectRowAdapter> rows = Live.GetVisibleRows();
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            sheet.Region(Live.Title, SheetCaptions(captions));
-            List<RowNodes> rows = RowNodesFor(Live.GetVisibleRows(), captions);
-            object selected = null;
-            for (int i = 0; i < rows.Count; i++)
+            // The adapter hands back the same row list while the entries the game is drawing and the
+            // order it draws them in are unchanged, so nothing can move a row's NAME under a kept
+            // block: the name is the entry's own, and filtering or sorting the table is a new list.
+            // The captions are the adapter's own array, read off the header band once; the title is
+            // the page's, localized once. Both are the adapter's, so a new page is new keys.
+            object[] keys = { rows, captions, Live.Title };
+            if (!_table.TryReplay(sheet, keys))
             {
-                RowNodes row = rows[i];
-                sheet.RowAt(row.Primary, row.Key, row.Cells, row.Widget);
-                if (row.Row.IsSelected)
+                _table.Record(sheet, keys);
+                sheet.Region(Live.Title, SheetCaptions(captions));
+                for (int i = 0; i < rows.Count; i++)
                 {
-                    selected = row.Key;
+                    AdventureLobbyMapSelectRowAdapter row = rows[i];
+                    if (row == null || row.Entry == null)
+                    {
+                        continue;
+                    }
+
+                    sheet.RowAt(Primary(row), row.NativeKey, Cells(row, captions), row.Entry);
                 }
+
+                sheet.Finish();
+                _table.Keep();
+            }
+            else
+            {
+                sheet.Finish();
             }
 
-            sheet.Finish();
             if (sheet.FirstRow != null)
             {
                 // Tab into the table lands on the map the game opened on, else on the first map -
-                // never on the heading band above them.
-                builder.LandStopOn(sheet.RowId(selected) ?? sheet.FirstRow);
+                // never on the heading band above them. Which map that is is read off the rows every
+                // frame: the selection moves without the table being rebuilt.
+                builder.LandStopOn(sheet.RowId(SelectedKey(rows)) ?? sheet.FirstRow);
             }
         }
 
-        /// <summary>One map's nodes, built when the table's rows change and read every frame after.
-        /// The key and the widget are read off the row once here for the same reason the cells are:
-        /// both are fixed for the life of the row.</summary>
-        private struct RowNodes
+        /// <summary>The row the page has selected, or null - walked every frame, because a replayed
+        /// table is still a table whose selection moves.</summary>
+        private static object SelectedKey(IReadOnlyList<AdventureLobbyMapSelectRowAdapter> rows)
         {
-            public readonly AdventureLobbyMapSelectRowAdapter Row;
-
-            public readonly object Key;
-
-            public readonly Component Widget;
-
-            public readonly NodeVtable Primary;
-
-            public readonly List<GraphSheet.SheetCell> Cells;
-
-            public RowNodes(
-                AdventureLobbyMapSelectRowAdapter row,
-                NodeVtable primary,
-                List<GraphSheet.SheetCell> cells)
-            {
-                Row = row;
-                Key = row.NativeKey;
-                Widget = row.Entry;
-                Primary = primary;
-                Cells = cells;
-            }
-        }
-
-        private List<RowNodes> RowNodesFor(
-            IReadOnlyList<AdventureLobbyMapSelectRowAdapter> rows,
-            IReadOnlyList<string> captions)
-        {
-            if (_rowNodes != null && ReferenceEquals(_rowNodesSource, rows))
-            {
-                return _rowNodes;
-            }
-
-            List<RowNodes> built = new List<RowNodes>(rows.Count);
             for (int i = 0; i < rows.Count; i++)
             {
                 AdventureLobbyMapSelectRowAdapter row = rows[i];
-                if (row == null || row.Entry == null)
+                if (row != null && row.Entry != null && row.IsSelected)
                 {
-                    continue;
+                    return row.NativeKey;
                 }
-
-                built.Add(new RowNodes(row, Primary(row), Cells(row, captions)));
             }
 
-            _rowNodesSource = rows;
-            _rowNodes = built;
-            return _rowNodes;
+            return null;
         }
 
         /// <summary>

@@ -94,20 +94,114 @@ namespace SongsOfConquestAccess.Screens
             BuildTabs(builder);
 
             builder.BeginStop(ContentStop);
-            GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            if (Live.IsOverallTabSelected)
-            {
-                BuildOverall(sheet);
-            }
-            else
-            {
-                BuildBattle(sheet);
-            }
-
-            sheet.Finish();
+            BuildContent(builder);
 
             builder.BeginStop(ButtonsStop);
             BuildButtons(builder);
+        }
+
+        // Mod-owned: what the last build of the showing tab declared, handed back while the keys it
+        // was recorded under still answer the same. One snapshot for the whole page, because one
+        // sheet builds all of it: five regions of tables, lists and footnotes. Keyed on what the game
+        // owns, so a new page answers with new identities and the block is minted again; there is no
+        // reset hook and none is needed.
+        private readonly SheetSnapshot _content = new SheetSnapshot();
+
+        /// <summary>The showing tab's panels, as one sheet of regions.</summary>
+        private void BuildContent(GraphBuilder builder)
+        {
+            bool overall = Live.IsOverallTabSelected;
+            GraphSheet sheet = new GraphSheet(builder, SheetKey);
+            object[] keys = overall ? OverallKeys() : BattleKeys();
+            if (!_content.TryReplay(sheet, keys))
+            {
+                _content.Record(sheet, keys);
+                if (overall)
+                {
+                    BuildOverall(sheet);
+                }
+                else
+                {
+                    BuildBattle(sheet);
+                }
+
+                sheet.Finish();
+                _content.Keep();
+            }
+            else
+            {
+                sheet.Finish();
+            }
+        }
+
+        /// <summary>
+        /// What the overall tab's panels were built from: which tab is showing, each table's rows
+        /// (the adapter hands back the same list while the game is drawing the same entries), the
+        /// drawn caption over each panel, and the two kinds of text this page bakes into a node
+        /// rather than reading when the node is read - the general panel's lines and the footnotes
+        /// under the tables.
+        ///
+        /// Those last two are what notices a page whose figures arrive a frame after its entries go
+        /// live: the keys are one set, so a general line that filled in rebuilds every region with
+        /// it, table rows included. A row's own name and figures are read when the row is read; what
+        /// a kept block holds of them is the name baked into a vertical crossing, and on a page of
+        /// finished statistics that name does not move.
+        /// </summary>
+        private object[] OverallKeys()
+        {
+            return new object[]
+            {
+                true,
+                Live.GetFactionRows(),
+                Live.GetMapRows(),
+                Live.GetWielderRows(),
+                Live.GetTroopRows(),
+                SheetSnapshot.Words(new[]
+                {
+                    Live.OverallGeneralLabel,
+                    Live.FactionsLabel,
+                    Live.TopMapsLabel,
+                    Live.TopWieldersLabel,
+                    Live.TopTroopsLabel
+                }),
+                Lines(Live.GetOverallGeneralItems()),
+                SheetSnapshot.Words(new[] { Live.WielderSummary, Live.TroopSummary })
+            };
+        }
+
+        /// <summary>The same for the battle tab (<see cref="OverallKeys"/>).</summary>
+        private object[] BattleKeys()
+        {
+            return new object[]
+            {
+                false,
+                Live.GetSpellRows(),
+                Live.GetEnemyTroopRows(),
+                SheetSnapshot.Words(new[]
+                {
+                    Live.BattleGeneralLabel,
+                    Live.SpellsLabel,
+                    Live.EnemyTroopsLabel
+                }),
+                Lines(Live.GetBattleGeneralItems()),
+                SheetSnapshot.Words(new[] { Live.SpellSummary })
+            };
+        }
+
+        private static string Lines(IReadOnlyList<PlayerStatsAdapter.LabeledItem> items)
+        {
+            if (items == null)
+            {
+                return null;
+            }
+
+            string[] labels = new string[items.Count];
+            for (int i = 0; i < items.Count; i++)
+            {
+                labels[i] = items[i] != null ? items[i].Label : null;
+            }
+
+            return SheetSnapshot.Words(labels);
         }
 
         // ---- the tabs ----

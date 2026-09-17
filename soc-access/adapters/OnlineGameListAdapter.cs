@@ -43,6 +43,10 @@ namespace SongsOfConquestAccess.Adapters
         private TMP_Dropdown _nativeRegionDropdown;
         private bool _nativeRegionDropdownProbed;
 
+        // The rows, kept while the game draws the same entries in the same order (GetRows).
+        private GameRow[] _rows;
+        private int _rowsSignature;
+
         public OnlineGameListAdapter(GameListMenu menu)
         {
             _menu = menu;
@@ -175,16 +179,40 @@ namespace SongsOfConquestAccess.Adapters
         /// <c>OnOnlineGameListChanged</c> pulse, which fired on every list update, selection and region
         /// change, existed only to replace an adapter built over the installer's settings with one
         /// built over the menu, and the source hands the menu itself now.</summary>
+        /// <summary>
+        /// One wrapper per game the list is drawing, in the order it draws them - the same list while
+        /// the game is drawing the same entries in the same order, because the build asks for the
+        /// rows every frame and a screen that keeps what it declared keys on this list
+        /// (AGENTS.md, Performance). The signature is read off the game: which entry objects are live
+        /// and where each sits among its siblings.
+        /// </summary>
         public IReadOnlyList<GameRow> GetRows()
         {
             List<GameListEntry> entries = GetVisibleEntries();
-            List<GameRow> rows = new List<GameRow>();
+            int signature = 17;
             for (int i = 0; i < entries.Count; i++)
             {
-                rows.Add(new GameRow(this, entries[i], i));
+                unchecked
+                {
+                    signature = (signature * 31) + entries[i].GetInstanceID();
+                    signature = (signature * 31) + ((Component)entries[i]).transform.GetSiblingIndex();
+                }
             }
 
-            return rows;
+            if (_rows != null && _rows.Length == entries.Count && _rowsSignature == signature)
+            {
+                return _rows;
+            }
+
+            GameRow[] rows = new GameRow[entries.Count];
+            for (int i = 0; i < entries.Count; i++)
+            {
+                rows[i] = new GameRow(this, entries[i], i);
+            }
+
+            _rows = rows;
+            _rowsSignature = signature;
+            return _rows;
         }
 
         public Tooltip GetButtonTooltip(IMenuButtonAdapter button)

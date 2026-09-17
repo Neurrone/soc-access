@@ -83,6 +83,12 @@ namespace SongsOfConquestAccess.Screens
             get { return Live != null ? Live.BackButton : null; }
         }
 
+        // Mod-owned: what the last build of the table declared, handed back while the keys it was
+        // recorded under still answer the same. Keyed on what the game owns, so a new page answers
+        // with new identities and the block is minted again; there is no reset hook and none is
+        // needed.
+        private readonly SheetSnapshot _table = new SheetSnapshot();
+
         public override void Build(GraphBuilder builder)
         {
             if (!IsActive())
@@ -109,32 +115,58 @@ namespace SongsOfConquestAccess.Screens
                 Live.CompletedColumnLabel
             };
 
-            GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            sheet.Region(Live.Title, captions);
             IReadOnlyList<AdventureLobbyChallengeMapRowAdapter> rows = Live.GetVisibleRows();
-            object selected = null;
-            for (int i = 0; i < rows.Count; i++)
+            GraphSheet sheet = new GraphSheet(builder, SheetKey);
+            // The adapter hands back the same row list while the entries the game is drawing and the
+            // order it draws them in are unchanged, and a challenge map's name is its entry's, so
+            // nothing can move a row's NAME under a kept block. The captions and the title are the
+            // game's own words, so a language change is a new key.
+            object[] keys = { rows, Live.Title, SheetSnapshot.Words(captions) };
+            if (!_table.TryReplay(sheet, keys))
             {
-                AdventureLobbyChallengeMapRowAdapter row = rows[i];
-                if (row == null || row.Entry == null)
+                _table.Record(sheet, keys);
+                sheet.Region(Live.Title, captions);
+                for (int i = 0; i < rows.Count; i++)
                 {
-                    continue;
+                    AdventureLobbyChallengeMapRowAdapter row = rows[i];
+                    if (row == null || row.Entry == null)
+                    {
+                        continue;
+                    }
+
+                    sheet.RowAt(Primary(row), row.NativeKey, Cells(row, captions), row.Entry);
                 }
 
-                sheet.RowAt(Primary(row), row.NativeKey, Cells(row, captions), row.Entry);
-                if (row.IsSelected)
-                {
-                    selected = row.NativeKey;
-                }
+                sheet.Finish();
+                _table.Keep();
+            }
+            else
+            {
+                sheet.Finish();
             }
 
-            sheet.Finish();
             if (sheet.FirstRow != null)
             {
                 // Tab into the table lands on the selected map, else on the first one - never on the
-                // heading band above them.
-                builder.LandStopOn(sheet.RowId(selected) ?? sheet.FirstRow);
+                // heading band above them. Which map that is is read off the rows every frame: the
+                // selection moves without the table being rebuilt.
+                builder.LandStopOn(sheet.RowId(SelectedKey(rows)) ?? sheet.FirstRow);
             }
+        }
+
+        /// <summary>The row the page has selected, or null.</summary>
+        private static object SelectedKey(IReadOnlyList<AdventureLobbyChallengeMapRowAdapter> rows)
+        {
+            for (int i = 0; i < rows.Count; i++)
+            {
+                AdventureLobbyChallengeMapRowAdapter row = rows[i];
+                if (row != null && row.Entry != null && row.IsSelected)
+                {
+                    return row.NativeKey;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>The challenge's own cell: its name, whether it is the one the page has selected,

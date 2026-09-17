@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Economy;
@@ -122,16 +123,86 @@ namespace SongsOfConquestAccess.Screens
                 GraphNodes.Text(() => Live.OwningSummary)));
         }
 
+        // Mod-owned: what the last build of the grid declared, handed back while the keys it was
+        // recorded under still answer the same. Keyed on what the game owns, so a new marketplace
+        // answers with new identities and the block is minted again; there is no reset hook and none
+        // is needed.
+        private readonly SheetSnapshot _table = new SheetSnapshot();
+
         // ---- the trade grid ----
 
         private void BuildTrades(GraphBuilder builder)
         {
             IReadOnlyList<MarketplaceMenuAdapter.TradeColumn> columns = Live.GetTradeColumns();
+            IReadOnlyList<MarketplaceMenuAdapter.ResourceItem> resources = Live.GetResources();
             // No heading band: the sheet names the column on every crossing ("Sell -1, 50 Gold"),
             // so a row of the captions would say them a second time (owner ruling 2026-09-07).
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            sheet.Region(Live.Title, SheetCaptions(columns));
-            IReadOnlyList<MarketplaceMenuAdapter.ResourceItem> resources = Live.GetResources();
+            // The columns are the adapter's grid, rebuilt when the menu replaces its buttons. What a
+            // row NAMES itself is the resource and how much of it the team holds, and that figure is
+            // composed into the primary's label, so it is read every frame and a trade rebuilds the
+            // table. So is which crossings the game is drawing a button at, which is what decides a
+            // row's cells.
+            object[] keys = { columns, Live.Title, Shape(resources, columns) };
+            if (!_table.TryReplay(sheet, keys))
+            {
+                _table.Record(sheet, keys);
+                sheet.Region(Live.Title, SheetCaptions(columns));
+                for (int i = 0; i < resources.Count; i++)
+                {
+                    MarketplaceMenuAdapter.ResourceItem resource = resources[i];
+                    if (resource == null)
+                    {
+                        continue;
+                    }
+
+                    object rowWidget = null;
+                    List<GraphSheet.SheetCell> cells = new List<GraphSheet.SheetCell>();
+                    for (int c = 0; c < columns.Count; c++)
+                    {
+                        MarketplaceMenuAdapter.TradeColumn column = columns[c];
+                        MarketplaceMenuAdapter.TradeButtonItem button =
+                            Live.GetTradeButton(resource.ResourceType, column.IsBuyButton, column.Amount);
+                        if (button == null || !button.IsVisible || button.Component == null)
+                        {
+                            continue;
+                        }
+
+                        if (rowWidget == null)
+                        {
+                            rowWidget = button.Component;
+                        }
+
+                        cells.Add(new GraphSheet.SheetCell(c + 1, 0, TradeCell(button, resource)));
+                    }
+
+                    sheet.RowAt(Primary(resource), RowKey(resource), cells, rowWidget);
+                }
+
+                sheet.Finish();
+                _table.Keep();
+            }
+            else
+            {
+                sheet.Finish();
+            }
+
+            if (sheet.FirstRow != null)
+            {
+                // Tab into the table lands on a RESOURCE, never on the heading band above it.
+                builder.LandStopOn(sheet.FirstRow);
+            }
+        }
+
+        /// <summary>What this frame's grid would build: each resource's name and the amount the team
+        /// holds of it, which the row's own cell says, and which crossings the menu is drawing a
+        /// button at, which is what decides the row's cells. The prices the buttons carry are not in
+        /// it: a trade cell reads its price when it is read.</summary>
+        private string Shape(
+            IReadOnlyList<MarketplaceMenuAdapter.ResourceItem> resources,
+            IReadOnlyList<MarketplaceMenuAdapter.TradeColumn> columns)
+        {
+            StringBuilder shape = new StringBuilder();
             for (int i = 0; i < resources.Count; i++)
             {
                 MarketplaceMenuAdapter.ResourceItem resource = resources[i];
@@ -140,35 +211,19 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                object rowWidget = null;
-                List<GraphSheet.SheetCell> cells = new List<GraphSheet.SheetCell>();
+                shape.Append(resource.ResourceName).Append('\u0001').Append(resource.Amount).Append('\u0001');
                 for (int c = 0; c < columns.Count; c++)
                 {
                     MarketplaceMenuAdapter.TradeColumn column = columns[c];
                     MarketplaceMenuAdapter.TradeButtonItem button =
                         Live.GetTradeButton(resource.ResourceType, column.IsBuyButton, column.Amount);
-                    if (button == null || !button.IsVisible || button.Component == null)
-                    {
-                        continue;
-                    }
-
-                    if (rowWidget == null)
-                    {
-                        rowWidget = button.Component;
-                    }
-
-                    cells.Add(new GraphSheet.SheetCell(c + 1, 0, TradeCell(button, resource)));
+                    shape.Append(button != null && button.IsVisible && button.Component != null ? '1' : '0');
                 }
 
-                sheet.RowAt(Primary(resource), RowKey(resource), cells, rowWidget);
+                shape.Append('\u0002');
             }
 
-            sheet.Finish();
-            if (sheet.FirstRow != null)
-            {
-                // Tab into the table lands on a RESOURCE, never on the heading band above it.
-                builder.LandStopOn(sheet.FirstRow);
-            }
+            return shape.ToString();
         }
 
         /// <summary>The row's own cell: the resource's name and what the team holds of it, which is

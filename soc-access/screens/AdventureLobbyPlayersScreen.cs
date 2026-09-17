@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
@@ -157,17 +158,92 @@ namespace SongsOfConquestAccess.Screens
             BuildHeader(builder);
         }
 
+        // Mod-owned: what the last build of the table declared, handed back while the keys it was
+        // recorded under still answer the same. Keyed on what the game owns, so a new lobby answers
+        // with new identities and the block is minted again; there is no reset hook and none is
+        // needed.
+        private readonly SheetSnapshot _table = new SheetSnapshot();
+
         // ---- the table of slots ----
 
         private void BuildPlayers(GraphBuilder builder)
         {
-            GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            // The columns are all caption-less: the page draws no heading band, and every cell of a
-            // row is a control that says its own name, so a caption crossed into the column would be
-            // the same word twice. The array's LENGTH is what makes the region read as a table.
-            sheet.Region(Live.PlayersLabel, new string[ColumnCount]);
-
             IReadOnlyList<AdventureLobbyPlayersAdapter.PlayerSlotItem> slots = Live.GetPlayerSlots();
+            GraphSheet sheet = new GraphSheet(builder, SheetKey);
+            // The adapter hands back the same slot list while the entries the game is drawing and the
+            // teams they sit in are unchanged - but a slot the game KEEPS can still be joined, left or
+            // handed a new command, which renames the row and changes which cells it has. So the
+            // shape below is read off the slots every frame, and the five settings' captions with it.
+            object[] keys =
+            {
+                slots,
+                Live.PlayersLabel,
+                SheetSnapshot.Words(SettingCaptions()),
+                Shape(slots)
+            };
+            if (!_table.TryReplay(sheet, keys))
+            {
+                _table.Record(sheet, keys);
+                // The columns are all caption-less: the page draws no heading band, and every cell of
+                // a row is a control that says its own name, so a caption crossed into the column
+                // would be the same word twice. The array's LENGTH is what makes the region read as a
+                // table.
+                sheet.Region(Live.PlayersLabel, new string[ColumnCount]);
+                for (int i = 0; i < slots.Count; i++)
+                {
+                    AdventureLobbyPlayersAdapter.PlayerSlotItem slot = slots[i];
+                    if (slot == null || slot.Entry == null)
+                    {
+                        continue;
+                    }
+
+                    sheet.RowAt(Primary(slot), RowKey(i), Cells(slot), slot.Entry);
+                }
+
+                sheet.Finish();
+                _table.Keep();
+            }
+            else
+            {
+                sheet.Finish();
+            }
+
+            if (sheet.FirstRow != null)
+            {
+                // Tab into the table lands on a SLOT; SetStart beside it because this is the first
+                // stop, whose landing the reconciler would otherwise never look at.
+                builder.LandStopOn(sheet.FirstRow);
+                builder.SetStart(sheet.FirstRow);
+            }
+        }
+
+        /// <summary>The game's own names for the five settings a row draws, which the combo boxes
+        /// carry as their captions.</summary>
+        private string[] SettingCaptions()
+        {
+            return new[]
+            {
+                Live.FactionLabel,
+                Live.ColorLabel,
+                Live.StartingWielderLabel,
+                Live.PartnershipLabel,
+                Live.AiDifficultyLabel
+            };
+        }
+
+        /// <summary>
+        /// What this frame's slots would build: each row's drawn name, which a vertical crossing into
+        /// a metadata column says, and which of its eleven buttons the game is drawing, which is what
+        /// decides the row's cells. Read off the game every frame, so a player joining an empty slot
+        /// or a command appearing on a row builds the table again.
+        ///
+        /// What it does not watch is where the commands are DRAWN: their columns are ordered by left
+        /// edge, so a button the game slid sideways without hiding anything keeps the order it was
+        /// recorded in until something else rebuilds the table.
+        /// </summary>
+        private static string Shape(IReadOnlyList<AdventureLobbyPlayersAdapter.PlayerSlotItem> slots)
+        {
+            StringBuilder shape = new StringBuilder();
             for (int i = 0; i < slots.Count; i++)
             {
                 AdventureLobbyPlayersAdapter.PlayerSlotItem slot = slots[i];
@@ -176,17 +252,27 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                sheet.RowAt(Primary(slot), RowKey(i), Cells(slot), slot.Entry);
+                shape.Append(slot.Name).Append('\u0001');
+                Drawn(shape, slot.PlayerActionsButton);
+                Drawn(shape, slot.FactionButton);
+                Drawn(shape, slot.ColorButton);
+                Drawn(shape, slot.StartingWielderButton);
+                Drawn(shape, slot.PartnershipButton);
+                Drawn(shape, slot.AiDifficultyButton);
+                Drawn(shape, slot.JoinButton);
+                Drawn(shape, slot.PlayerSettingsButton);
+                Drawn(shape, slot.LeaveButton);
+                Drawn(shape, slot.KickButton);
+                Drawn(shape, slot.ToggleAiButton);
+                shape.Append('\u0002');
             }
 
-            sheet.Finish();
-            if (sheet.FirstRow != null)
-            {
-                // Tab into the table lands on a SLOT; SetStart beside it because this is the first
-                // stop, whose landing the reconciler would otherwise never look at.
-                builder.LandStopOn(sheet.FirstRow);
-                builder.SetStart(sheet.FirstRow);
-            }
+            return shape.ToString();
+        }
+
+        private static void Drawn(StringBuilder shape, AdventureLobbyPlayersAdapter.LobbyButtonItem button)
+        {
+            shape.Append(button != null && button.IsVisible ? '1' : '0');
         }
 
         /// <summary>The slot's own cell: the name the row draws, its ready state and its DLC

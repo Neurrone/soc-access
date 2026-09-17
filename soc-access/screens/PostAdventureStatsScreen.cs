@@ -202,6 +202,12 @@ namespace SongsOfConquestAccess.Screens
             return drawn;
         }
 
+        // Mod-owned: what the last build of the chart's table declared, handed back while the keys it
+        // was recorded under still answer the same. Keyed on what the game owns, so a new result page
+        // answers with new identities and the block is minted again; there is no reset hook and none
+        // is needed.
+        private readonly SheetSnapshot _table = new SheetSnapshot();
+
         // ---- the chart, as a table ----
 
         private void BuildTable(GraphBuilder builder, IReadOnlyList<PostAdventureStatsAdapter.GraphRoundRow> rows)
@@ -211,19 +217,34 @@ namespace SongsOfConquestAccess.Screens
             // No heading band: the sheet names the column on every crossing ("Neurrone, 1234"), so a
             // row of the captions would say them a second time (owner ruling 2026-09-07).
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            sheet.Region(Live.GraphTitle, columns);
-            for (int i = 0; i < rows.Count; i++)
+            // The adapter hands back the same rounds while the chosen graph, the team count and the
+            // round the adventure is on are unchanged, and a row's NAME is its round number, which
+            // comes from that same list. Which teams are ticked, and what they are called, is read
+            // every frame: it is the columns, and a cell is one per column.
+            object[] keys = { rows, Live.GraphTitle, SheetSnapshot.Words(columns) };
+            if (!_table.TryReplay(sheet, keys))
             {
-                PostAdventureStatsAdapter.GraphRoundRow row = rows[i];
-                if (row == null)
+                _table.Record(sheet, keys);
+                sheet.Region(Live.GraphTitle, columns);
+                for (int i = 0; i < rows.Count; i++)
                 {
-                    continue;
+                    PostAdventureStatsAdapter.GraphRoundRow row = rows[i];
+                    if (row == null)
+                    {
+                        continue;
+                    }
+
+                    sheet.Row(RoundPrimary(row), "round-" + row.Round, null, TeamCells(row, teams));
                 }
 
-                sheet.Row(RoundPrimary(row), "round-" + row.Round, null, TeamCells(row, teams));
+                sheet.Finish();
+                _table.Keep();
+            }
+            else
+            {
+                sheet.Finish();
             }
 
-            sheet.Finish();
             if (sheet.FirstRow != null)
             {
                 // Tab into the table lands on a ROUND.

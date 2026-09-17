@@ -92,12 +92,25 @@ namespace SongsOfConquestAccess.UI.Graph
             public bool Dropped;
         }
 
-        private sealed class RawEdge
+        /// <summary>One declared edge, kept as a value so that a caller which builds the same
+        /// topology every frame can hand back the edges it minted once instead of minting them again
+        /// (<see cref="Replay"/>).</summary>
+        public sealed class Edge
         {
-            public ControlId From;
-            public GraphDir Dir;
-            public ControlId To;
-            public string Label;
+            public readonly ControlId From;
+            public readonly GraphDir Dir;
+            public readonly ControlId To;
+            public readonly string Label;
+
+            public Edge(ControlId from, GraphDir dir, ControlId to, string label)
+            {
+                if (from == null || to == null)
+                    throw new ArgumentNullException(from == null ? "from" : "to");
+                From = from;
+                Dir = dir;
+                To = to;
+                Label = label;
+            }
         }
 
         // Menu mode.
@@ -106,7 +119,7 @@ namespace SongsOfConquestAccess.UI.Graph
 
         // Raw mode.
         private readonly List<GraphNode> _rawNodes = new List<GraphNode>();
-        private readonly List<RawEdge> _rawEdges = new List<RawEdge>();
+        private readonly List<Edge> _rawEdges = new List<Edge>();
 
         // Every node in DECLARATION order regardless of mode — the render's node order (and so the
         // Tab-stop cycle) must interleave menu rows and raw nodes as the screen declared them, not
@@ -454,9 +467,37 @@ namespace SongsOfConquestAccess.UI.Graph
         /// transition line ("lane change"). Edges to/from undeclared nodes are dropped at build.</summary>
         public GraphBuilder Connect(ControlId from, GraphDir dir, ControlId to, string label = null)
         {
-            if (from == null || to == null)
-                throw new ArgumentNullException(from == null ? "from" : "to");
-            _rawEdges.Add(new RawEdge { From = from, Dir = dir, To = to, Label = label });
+            return AddEdge(new Edge(from, dir, to, label));
+        }
+
+        /// <summary>Declare an edge built earlier (<see cref="Edge"/>).</summary>
+        public GraphBuilder AddEdge(Edge edge)
+        {
+            if (edge == null) throw new ArgumentNullException("edge");
+            _rawEdges.Add(edge);
+            return this;
+        }
+
+        /// <summary>
+        /// Declare a block of nodes and edges that some EARLIER build minted - a table whose rows the
+        /// game has not rebound since, handed back whole instead of being read off the widgets again.
+        ///
+        /// Nothing about the build is skipped: every declaration goes through <see cref="AddNode"/>,
+        /// so the existence gate is asked about each one on THIS frame (a row the game has stopped
+        /// drawing is dropped here as it always was), ids are claimed here, and the edges naming a
+        /// dropped node are dropped at <see cref="Build"/> like any other. What is saved is the
+        /// MINTING - the keys, the closures, the vtables and the edge objects - which is the part
+        /// that does not depend on the frame.
+        ///
+        /// Whoever kept the block owns the question of when it stopped being true; this class has no
+        /// opinion about it (<c>SheetSnapshot</c> keys one on what the game owns).
+        /// </summary>
+        public GraphBuilder Replay(IList<NodeDeclaration> nodes, IList<Edge> edges)
+        {
+            if (nodes != null)
+                for (int i = 0; i < nodes.Count; i++) AddNode(nodes[i]);
+            if (edges != null)
+                for (int i = 0; i < edges.Count; i++) AddEdge(edges[i]);
             return this;
         }
 
@@ -509,7 +550,7 @@ namespace SongsOfConquestAccess.UI.Graph
             foreach (GraphNode node in _declared) AddNodeTo(render, node);
 
             WireMenuEdges(render);
-            foreach (RawEdge e in _rawEdges)
+            foreach (Edge e in _rawEdges)
                 if (render.Nodes.ContainsKey(e.From) && render.Nodes.ContainsKey(e.To))
                     render.Nodes[e.From].Transitions[e.Dir] = new Transition(e.To, e.Label);
             StitchModeBoundaries();
