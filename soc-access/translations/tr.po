@@ -3791,6 +3791,26 @@ msgctxt "Screens.HexGrid"
 msgid "Hex grid"
 msgstr "Altıgen ızgara"
 
+#. Screens.Help
+msgctxt "Screens.Help"
+msgid "Help"
+msgstr "Yardım"
+
+#. Screens.ModHomepage
+msgctxt "Screens.ModHomepage"
+msgid "Mod homepage"
+msgstr "Mod ana sayfası"
+
+#. Screens.JoinDiscordServer
+msgctxt "Screens.JoinDiscordServer"
+msgid "Join Discord server"
+msgstr "Discord sunucusuna katıl"
+
+#. Screens.SupportOnPatreon
+msgctxt "Screens.SupportOnPatreon"
+msgid "Support my work on Patreon"
+msgstr "Çalışmama Patreon’dan destek ol"
+
 #. Screens.KeybindPressKey
 msgctxt "Screens.KeybindPressKey"
 msgid "Press a key for {0}"

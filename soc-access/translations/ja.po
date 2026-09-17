@@ -3791,6 +3791,26 @@ msgctxt "Screens.HexGrid"
 msgid "Hex grid"
 msgstr "ヘクスグリッド"
 
+#. Screens.Help
+msgctxt "Screens.Help"
+msgid "Help"
+msgstr "ヘルプ"
+
+#. Screens.ModHomepage
+msgctxt "Screens.ModHomepage"
+msgid "Mod homepage"
+msgstr "Modのホームページ"
+
+#. Screens.JoinDiscordServer
+msgctxt "Screens.JoinDiscordServer"
+msgid "Join Discord server"
+msgstr "Discordサーバーに参加"
+
+#. Screens.SupportOnPatreon
+msgctxt "Screens.SupportOnPatreon"
+msgid "Support my work on Patreon"
+msgstr "Patreonで制作を支援する"
+
 #. Screens.KeybindPressKey
 msgctxt "Screens.KeybindPressKey"
 msgid "Press a key for {0}"

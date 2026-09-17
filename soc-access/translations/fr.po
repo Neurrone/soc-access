@@ -3831,6 +3831,26 @@ msgctxt "Screens.HexGrid"
 msgid "Hex grid"
 msgstr "Grille hexagonale"
 
+#. Screens.Help
+msgctxt "Screens.Help"
+msgid "Help"
+msgstr "Aide"
+
+#. Screens.ModHomepage
+msgctxt "Screens.ModHomepage"
+msgid "Mod homepage"
+msgstr "Site du mod"
+
+#. Screens.JoinDiscordServer
+msgctxt "Screens.JoinDiscordServer"
+msgid "Join Discord server"
+msgstr "Rejoindre le serveur Discord"
+
+#. Screens.SupportOnPatreon
+msgctxt "Screens.SupportOnPatreon"
+msgid "Support my work on Patreon"
+msgstr "Soutenir mon travail sur Patreon"
+
 #. Screens.KeybindPressKey
 msgctxt "Screens.KeybindPressKey"
 msgid "Press a key for {0}"

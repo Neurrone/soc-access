@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
@@ -44,6 +44,14 @@ namespace SongsOfConquestAccess.Screens
         /// holds no setting, only what is on disk now and the three things that can be done with it.
         /// </summary>
         private const int BookmarksTab = 7;
+
+        /// <summary>The index of the Help tab in <see cref="TabLabels"/> - three links out of the
+        /// game, and last for that reason.</summary>
+        private const int HelpTab = 8;
+
+        public const string HomepageUrl = "https://neurrone.github.io/soc-access/intro.html";
+        public const string DiscordUrl = "https://discord.gg/4wgAFFyPCH";
+        public const string PatreonUrl = "https://patreon.com/NeurronesMods";
 
         /// <summary>The window this screen reads, or null when it is not open. Written by
         /// <see cref="Open"/>: the screen is registered once and lives for the whole mod load.
@@ -207,7 +215,8 @@ namespace SongsOfConquestAccess.Screens
             ModStrings.Screens.Combat,
             ModStrings.Screens.Audio,
             ModStrings.Screens.Keybinds,
-            ModStrings.Screens.Bookmarks
+            ModStrings.Screens.Bookmarks,
+            ModStrings.Screens.Help
         };
 
         /// <summary>Draw one category. Every row is a real game control and every callback writes
@@ -239,6 +248,9 @@ namespace SongsOfConquestAccess.Screens
                     break;
                 case BookmarksTab:
                     DrawBookmarks();
+                    break;
+                case HelpTab:
+                    DrawHelp();
                     break;
             }
         }
@@ -381,6 +393,28 @@ namespace SongsOfConquestAccess.Screens
                     ModSettings.ClearKeybindOverride(action.Key);
                     ShowBinding(dialog, widget, action);
                 });
+        }
+
+        /// <summary>The Help tab: where to read about the mod, where to ask about it, and where to
+        /// support it. Each row is an ordinary button, so a mouse works them too, and each hands its
+        /// address to whatever the system opens links with.</summary>
+        private void DrawHelp()
+        {
+            _dialog.AddButton(ModText.Get(ModStrings.Screens.ModHomepage), () => OpenUrl(HomepageUrl));
+            _dialog.AddButton(ModText.Get(ModStrings.Screens.JoinDiscordServer), () => OpenUrl(DiscordUrl));
+            _dialog.AddButton(ModText.Get(ModStrings.Screens.SupportOnPatreon), () => OpenUrl(PatreonUrl));
+        }
+
+        private static void OpenUrl(string url)
+        {
+            try
+            {
+                UnityEngine.Application.OpenURL(url);
+            }
+            catch (Exception exception)
+            {
+                SocAccessMod.Instance?.LogWarning("Failed to open " + url + ": " + exception.Message);
+            }
         }
 
         /// <summary>

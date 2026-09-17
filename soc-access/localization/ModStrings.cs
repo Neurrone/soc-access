@@ -821,6 +821,11 @@
             public static readonly ModPluralString BookmarksImportedForOtherGame = new ModPluralString("Screens.BookmarksImportedForOtherGame", "Imported {0} bookmark for a different game than the one being played", "Imported {0} bookmarks for a different game than the one being played");
             /// <summary>The Keybinds tab region for the battle hex-grid gestures.</summary>
             public static readonly ModString HexGrid = new ModString("Screens.HexGrid", "Hex grid");
+            /// <summary>The Help tab: the three places to read about the mod, ask about it and support it.</summary>
+            public static readonly ModString Help = new ModString("Screens.Help", "Help");
+            public static readonly ModString ModHomepage = new ModString("Screens.ModHomepage", "Mod homepage");
+            public static readonly ModString JoinDiscordServer = new ModString("Screens.JoinDiscordServer", "Join Discord server");
+            public static readonly ModString SupportOnPatreon = new ModString("Screens.SupportOnPatreon", "Support my work on Patreon");
             /// <summary>Spoken, queued, when a mod-gesture capture starts: the next key becomes the
             /// binding.</summary>
             public static readonly ModString KeybindPressKey = new ModString("Screens.KeybindPressKey", "Press a key for {0}");

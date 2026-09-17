@@ -3791,6 +3791,26 @@ msgctxt "Screens.HexGrid"
 msgid "Hex grid"
 msgstr "六边形网格"
 
+#. Screens.Help
+msgctxt "Screens.Help"
+msgid "Help"
+msgstr "帮助"
+
+#. Screens.ModHomepage
+msgctxt "Screens.ModHomepage"
+msgid "Mod homepage"
+msgstr "模组主页"
+
+#. Screens.JoinDiscordServer
+msgctxt "Screens.JoinDiscordServer"
+msgid "Join Discord server"
+msgstr "加入 Discord 服务器"
+
+#. Screens.SupportOnPatreon
+msgctxt "Screens.SupportOnPatreon"
+msgid "Support my work on Patreon"
+msgstr "在 Patreon 上支持我的工作"
+
 #. Screens.KeybindPressKey
 msgctxt "Screens.KeybindPressKey"
 msgid "Press a key for {0}"
