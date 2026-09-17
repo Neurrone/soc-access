@@ -382,7 +382,11 @@ namespace SongsOfConquestAccess.Adapters
             _cursorManager?.SetState(BattleCursorManager.State.InspectTile);
             _gridManager?.SetState(BattleGridManager.State.InspectEntity);
             _highlightManager?.SetState(BattleHighlightManager.State.InspectEntity);
-            _pathManager?.SetState(BattlePathManager.State.CurrentTroop);
+            // InspectEntity, as the game's own entity hover leaves it: the path to the entity was
+            // drawn when the cursor landed on it. CurrentTroop here redrew it and, with the hover
+            // sync's own SetCurrentTile re-entering it, repeated the path manager's "Blocked"
+            // notification twice over.
+            _pathManager?.SetState(BattlePathManager.State.InspectEntity);
             SynchronizeNativeHoverForPreview(entity.Position);
             PinHoverOn(entity.Position);
             TakeHoverOwnership();

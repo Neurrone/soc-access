@@ -117,6 +117,22 @@ namespace SongsOfConquestAccess.UI
         /// inspecting the native focus is left where the inspection pinned it.</summary>
         public void ShowOverlay()
         {
+            // The navigator calls this again on every cursor step, because the tile's tooltip is
+            // what the board node aims at, and it calls HideOverlay first, which lets the hover go.
+            // Where the game's hover already stands on the tile this grid wants it on - the cursor,
+            // or the pinned tile while inspecting - the keyboard only claims it back: the cursor
+            // step has synced the hover once already, and a second native focus re-entered every
+            // manager's state, re-pinned the inspection and re-played the aiming hover sound, none
+            // of which the mouse does for a hover that has not moved.
+            bool targeting = _adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None;
+            Vector2Int wanted = _inspectContext != null ? _inspectContext.PinnedTile : _cursor;
+            if (_adapter != null && !(targeting && _inspectContext != null) && _adapter.IsNativeHoverOn(wanted))
+            {
+                _adapter.TakeHoverOwnership();
+                _adapter.SetFocusedTileOverlay(_cursor);
+                return;
+            }
+
             FocusCurrentTile(updateNativeFocus: _inspectContext == null);
         }
 

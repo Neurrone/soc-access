@@ -58,10 +58,17 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The keyboard has just put the game's hover where its cursor is: hold it there
         /// until the pointer moves. The pointer is baselined here, so the position it already had
         /// is not read as a move.</summary>
-        private void TakeHoverOwnership()
+        public void TakeHoverOwnership()
         {
             _hoverOwner = this;
             _pointerRead = TryReadPointerPosition(out _pointerPosition);
+        }
+
+        /// <summary>Whether the game's hover already stands on this tile, as the controller reads it,
+        /// whichever of the keyboard and the mouse put it there.</summary>
+        public bool IsNativeHoverOn(Vector2Int point)
+        {
+            return _humanBattleController != null && _humanBattleController.CurrentHoverTile == point;
         }
 
         /// <summary>Give the hover back: the game's own <c>UpdateCurrentTile</c> runs untouched from
