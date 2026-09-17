@@ -207,13 +207,9 @@ namespace SongsOfConquestAccess.Screens
             BuildStats(builder, keyPrefix, side);
             BuildModifiers(builder, keyPrefix, side);
             BuildTroops(builder, armyStop, armySide, keyPrefix, side);
-            if (armyStop != null)
-            {
-                // The Move all button is the side's own, not the army's: the army stop ends with the
-                // last row, and the button is read back under the side's stop where it is drawn.
-                builder.BeginStop(stop);
-            }
-
+            // Move all stays with the troops it moves (owner ruling 2026-09-17): declared into the
+            // army's own stop after its last row where the army is a stop of its own, and after the
+            // rows in the side's stop otherwise.
             BuildMoveAll(builder, keyPrefix, side);
             builder.PopContext();
 
