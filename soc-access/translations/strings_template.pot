@@ -3491,7 +3491,7 @@ msgstr ""
 
 #. Screens.ScannerResultOrderWalkablePath
 msgctxt "Screens.ScannerResultOrderWalkablePath"
-msgid "Walkable path"
+msgid "Walkable path cost"
 msgstr ""
 
 #. Screens.ScannerUsesLongDirections

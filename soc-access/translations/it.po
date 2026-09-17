@@ -3523,8 +3523,8 @@ msgstr "Distanza in linea retta"
 
 #. Screens.ScannerResultOrderWalkablePath
 msgctxt "Screens.ScannerResultOrderWalkablePath"
-msgid "Walkable path"
-msgstr "Percorso percorribile"
+msgid "Walkable path cost"
+msgstr "Costo del percorso percorribile"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"

@@ -911,7 +911,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ScannerContentAnnouncements = new ModString("Screens.ScannerContentAnnouncements", "Scanner content announcements");
             public static readonly ModString ScannerResultOrder = new ModString("Screens.ScannerResultOrder", "Sort scanner results by");
             public static readonly ModString ScannerResultOrderStraightLine = new ModString("Screens.ScannerResultOrderStraightLine", "Straight line distance");
-            public static readonly ModString ScannerResultOrderWalkablePath = new ModString("Screens.ScannerResultOrderWalkablePath", "Walkable path");
+            public static readonly ModString ScannerResultOrderWalkablePath = new ModString("Screens.ScannerResultOrderWalkablePath", "Walkable path cost");
             public static readonly ModString ScannerUsesLongDirections = new ModString("Screens.ScannerUsesLongDirections", "Long directions");
             public static readonly ModString AdventureMapUsesLongRoadDirections = new ModString("Screens.AdventureMapUsesLongRoadDirections", "Long road directions");
             public static readonly ModString ScannerResultAnnouncements = new ModString("Screens.ScannerResultAnnouncements", "Scanner result announcements");

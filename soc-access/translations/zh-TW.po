@@ -3498,8 +3498,8 @@ msgstr "直線距離"
 
 #. Screens.ScannerResultOrderWalkablePath
 msgctxt "Screens.ScannerResultOrderWalkablePath"
-msgid "Walkable path"
-msgstr "可行走路徑"
+msgid "Walkable path cost"
+msgstr "可行走路徑消耗"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"

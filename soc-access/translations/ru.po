@@ -3548,8 +3548,8 @@ msgstr "Расстояние по прямой"
 
 #. Screens.ScannerResultOrderWalkablePath
 msgctxt "Screens.ScannerResultOrderWalkablePath"
-msgid "Walkable path"
-msgstr "Путь пешком"
+msgid "Walkable path cost"
+msgstr "Стоимость пути пешком"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"

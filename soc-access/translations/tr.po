@@ -3498,8 +3498,8 @@ msgstr "Düz çizgi mesafesi"
 
 #. Screens.ScannerResultOrderWalkablePath
 msgctxt "Screens.ScannerResultOrderWalkablePath"
-msgid "Walkable path"
-msgstr "Yürüme yolu"
+msgid "Walkable path cost"
+msgstr "Yürüme yolu maliyeti"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"

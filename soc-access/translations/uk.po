@@ -3548,8 +3548,8 @@ msgstr "Відстань по прямій"
 
 #. Screens.ScannerResultOrderWalkablePath
 msgctxt "Screens.ScannerResultOrderWalkablePath"
-msgid "Walkable path"
-msgstr "Шлях пішки"
+msgid "Walkable path cost"
+msgstr "Вартість шляху пішки"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"

@@ -3523,8 +3523,8 @@ msgstr "Luftlinie"
 
 #. Screens.ScannerResultOrderWalkablePath
 msgctxt "Screens.ScannerResultOrderWalkablePath"
-msgid "Walkable path"
-msgstr "Laufweg"
+msgid "Walkable path cost"
+msgstr "Laufwegkosten"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"

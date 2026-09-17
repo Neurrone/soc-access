@@ -16,7 +16,7 @@ The Audio tab holds `Play tile sound cues`, the master switch for the mod's soun
 
 The Adventure map tab's first row, and the order the scanner reads a category's results in. `Straight line distance`, the default, puts them nearest-first as the crow flies.
 
-`Walkable path` puts them in the order of the walk instead: each result is ranked by what your wielder would pay to walk there, so a result just across a lake comes after the one the road reaches first. A result an army or something built on the map blocks is ranked by what the walk to it would cost with nothing in the way, so it keeps its place in the list, and only somewhere no walk reaches at all, such as another island, comes last.
+`Walkable path cost` puts them in the order of the walk instead: each result is ranked by what your wielder would pay to walk there, so a result just across a lake comes after the one the road reaches first. A result an army or something built on the map blocks is ranked by what the walk to it would cost with nothing in the way, so it keeps its place in the list, and only somewhere no walk reaches at all, such as another island, comes last.
 
 Either way the directions read out are the straight line to the result, such as `4 north, 5 east`. A result nothing can reach today is read as `blocked, 4 north, 5 east`, and names the army in the way when there is one you can see: `blocked by A stand of Roots troops, 4 north, 5 east`. Nothing built on the map is ever named, because what a wielder would actually walk around cannot be told from where the route over bare terrain runs.
 

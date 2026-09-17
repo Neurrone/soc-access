@@ -3523,8 +3523,8 @@ msgstr "Distance à vol d'oiseau"
 
 #. Screens.ScannerResultOrderWalkablePath
 msgctxt "Screens.ScannerResultOrderWalkablePath"
-msgid "Walkable path"
-msgstr "Chemin praticable"
+msgid "Walkable path cost"
+msgstr "Coût du chemin praticable"
 
 #. Screens.ScannerUsesLongDirections
 msgctxt "Screens.ScannerUsesLongDirections"
