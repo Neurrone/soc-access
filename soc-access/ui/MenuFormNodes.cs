@@ -288,7 +288,9 @@ namespace SongsOfConquestAccess.UI
 
                         table = drawn.Table;
                         sheet = new GraphSheet(builder, _prefix + TableKey + table + ":");
-                        sheet.Region(null, facts.ColumnsOf(table));
+                        // Named where the dialog named it, so the way in says "<name>, table"; a
+                        // sheet entered under no name says neither.
+                        sheet.Region(facts.LabelOf(table), facts.ColumnsOf(table));
                     }
 
                     // The cells of one drawn row are consecutive, because the reader hands its rows

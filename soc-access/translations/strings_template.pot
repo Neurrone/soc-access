@@ -2754,6 +2754,11 @@ msgctxt "Screens.AudioGlossary"
 msgid "Audio glossary"
 msgstr ""
 
+#. Screens.Cues
+msgctxt "Screens.Cues"
+msgid "Cues"
+msgstr ""
+
 #. Screens.Available
 msgctxt "Screens.Available"
 msgid "Available"

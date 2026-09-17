@@ -465,11 +465,11 @@ namespace SongsOfConquestAccess.UI
         /// two are separate decisions: the move columns here are captioned by their buttons' own
         /// spoken labels and draw no header at all.
         /// </summary>
-        public void BeginTable(string key, string[] captions)
+        public void BeginTable(string key, string[] captions, string label = null)
         {
             _table = key;
             _tableRows.Clear();
-            _facts.SetColumns(key, captions);
+            _facts.SetColumns(key, captions, label);
         }
 
         /// <summary>One row of the table being drawn, known across redraws by
@@ -975,6 +975,7 @@ namespace SongsOfConquestAccess.UI
         {
             private readonly Dictionary<Transform, DrawnRow> _rows = new Dictionary<Transform, DrawnRow>();
             private readonly Dictionary<string, string[]> _columns = new Dictionary<string, string[]>();
+            private readonly Dictionary<string, string> _labels = new Dictionary<string, string>();
             private readonly Dictionary<Transform, string> _spoken = new Dictionary<Transform, string>();
             private readonly HashSet<Transform> _standalone = new HashSet<Transform>();
 
@@ -1037,11 +1038,21 @@ namespace SongsOfConquestAccess.UI
                 }
             }
 
-            public void SetColumns(string table, string[] columns)
+            /// <summary>What a table is called on the way into it ("Map entity announcements,
+            /// table"); null for a table that enters unnamed and therefore without its role word.
+            /// </summary>
+            public string LabelOf(string table)
+            {
+                string label;
+                return table != null && _labels.TryGetValue(table, out label) ? label : null;
+            }
+
+            public void SetColumns(string table, string[] columns, string label = null)
             {
                 if (table != null)
                 {
                     _columns[table] = columns;
+                    _labels[table] = label;
                 }
             }
 

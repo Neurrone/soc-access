@@ -726,6 +726,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AttackerPortrait = new ModString("Screens.AttackerPortrait", "Attacker portrait");
             public static readonly ModString Audio = new ModString("Screens.Audio", "Audio");
             public static readonly ModString AudioGlossary = new ModString("Screens.AudioGlossary", "Audio glossary");
+            /// <summary>What the audio glossary's table is called on the way into it.</summary>
+            public static readonly ModString Cues = new ModString("Screens.Cues", "Cues");
             public static readonly ModString Available = new ModString("Screens.Available", "Available");
             public static readonly ModString Back = new ModString("Screens.Back", "Back");
             public static readonly ModString Ballista = new ModString("Screens.Ballista", "Ballista");

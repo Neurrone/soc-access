@@ -86,7 +86,9 @@ namespace SongsOfConquestAccess.Screens
                     // already called Move up and Move down.
                     null,
                     null,
-                });
+                },
+                // The group's own name, so the way in says "Map entity announcements, table".
+                ModText.Get(group.Label));
 
             dialog.StartHeaderRow();
             dialog.AddText(ModText.Get(ModStrings.UI.ColumnElement));
@@ -182,7 +184,7 @@ namespace SongsOfConquestAccess.Screens
         {
             ModDialog dialog = screen.Dialog;
             IReadOnlyList<CueDefinition> cues = CueLibrary.AllCues;
-            dialog.BeginTable(GlossaryTable, new string[3]);
+            dialog.BeginTable(GlossaryTable, new string[3], ModText.Get(ModStrings.Screens.Cues));
             for (int i = 0; i < cues.Count; i++)
             {
                 CueDefinition cue = cues[i];

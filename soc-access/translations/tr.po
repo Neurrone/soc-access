@@ -3781,6 +3781,11 @@ msgctxt "Screens.AudioGlossary"
 msgid "Audio glossary"
 msgstr "Ses sözlüğü"
 
+#. Screens.Cues
+msgctxt "Screens.Cues"
+msgid "Cues"
+msgstr "Ses ipuçları"
+
 #. Screens.Duration
 msgctxt "Screens.Duration"
 msgid "Duration"
