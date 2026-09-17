@@ -57,7 +57,7 @@ The combat hex grid and the troop deployment grid play a cue for each hex you la
 - Troops use the same `Ally` and `Enemy` sounds as the adventure map, so affiliation is one sound language everywhere.
 - `Battlefield: acting troop`: two high blips after the occupant's sound, marking the stack whose turn it is.
 - Obstacles and impassable hexes use `Impassable tile`, the same low thud as impassable terrain. A cliff thuds too, since nothing can step onto one; walls, towers and stairs are walked on and keep their elevation cue.
-- `Battlefield: threatened hex`: a falling two-note warning, the one jarring interval in the set. It leads the hex's sounds, and the rest of the hex is heard just after it. It plays only on unoccupied hexes, and fires exactly when speech would call the hex threatened.
+- `Battlefield: threatened hex`: a falling two-note warning, the one jarring interval in the set. It leads the hex's sounds, and the rest of the hex is heard just after it. It plays only on hexes a troop could step onto: an occupied or impassable hex never warns, even where speech would call it threatened.
 
 ## Hearing Things at a Distance
 

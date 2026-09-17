@@ -136,14 +136,13 @@ namespace SongsOfConquestAccess.Audio
             // wall, a tower and a flight of stairs are walked on and keep their elevation cue.
             if (tile.IsImpassable || IsOutOfReach(tile.Kind))
             {
+                // Nothing will ever stand here, so the threat over it is moot: the thud alone.
                 AddElevatedGround(cues, elevation);
                 cues.Add(new TileCue(CueLibrary.TerrainImpassable, 0f, followsPrevious: elevation != null));
-            }
-            else
-            {
-                AddElevatedGround(cues, elevation);
+                return cues;
             }
 
+            AddElevatedGround(cues, elevation);
             return isThreatened ? WithDangerWarning(cues) : cues;
         }
 

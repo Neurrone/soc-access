@@ -393,7 +393,7 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ThreatenedElevatedAndObstacleHexesKeepTheirOwnSerialization()
+        public void ThreatenedElevatedHexWarnsFirstAndThreatenedObstacleOnlyThuds()
         {
             CombatTile elevated = new CombatTile(new Vector2Int(4, 5)) { Elevation = 2 };
             CombatTile obstacle = new CombatTile(new Vector2Int(4, 6)) { IsImpassable = true, Elevation = 1 };
@@ -412,10 +412,10 @@ namespace SongsOfConquestAccess.Tests
                 isActingTroop: false,
                 isThreatened: true);
             CollectionAssert.AreEqual(
-                new[] { CueLibrary.HexDanger, CueLibrary.HexElevation1, CueLibrary.TerrainImpassable },
-                ToArray(obstacleCues));
-            Assert.IsTrue(obstacleCues[1].FollowsPrevious, "elevation waits for the warning");
-            Assert.IsTrue(obstacleCues[2].FollowsPrevious, "the obstacle still waits for the elevation tick");
+                new[] { CueLibrary.HexElevation1, CueLibrary.TerrainImpassable },
+                ToArray(obstacleCues),
+                "nothing can stand on an obstacle, so the threat over it is not warned");
+            Assert.IsTrue(obstacleCues[1].FollowsPrevious, "the obstacle still waits for the elevation tick");
         }
 
         [TestMethod]
