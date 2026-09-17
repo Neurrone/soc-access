@@ -12,7 +12,7 @@ The mod keeps the focused tile in view and reads the tile as you move. Each tile
 
 Tiles within the movement range of the currently selected wielder are indicated as reachable.
 
-Tiles that cannot be entered because of terrain are announced as impassable. Tiles that are otherwise blocked by game state, such as an occupying unit or blocking map entity, are announced as blocked.
+Tiles that cannot be entered because of terrain are announced as impassable. A tile next to an enemy or neutral army is announced as within that army's zone of control. Nothing else marks a tile the game refuses: whatever occupies it is already named.
 
 ### Following Roads
 

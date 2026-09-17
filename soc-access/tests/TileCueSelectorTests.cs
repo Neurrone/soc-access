@@ -74,12 +74,12 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void BlockedFlagReplacesTerrainCue()
+        public void BlockedFlagKeepsTheTerrainCue()
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Sand);
             tile.IsBlocked = true;
 
-            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForAdventureTile(tile)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainSand }, ToArray(TileCueSelector.ForAdventureTile(tile)));
         }
 
         [TestMethod]

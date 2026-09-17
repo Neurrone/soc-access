@@ -82,11 +82,11 @@ namespace SongsOfConquestAccess.Adapters
                 ScannerCategoryKeys.Obstacles,
                 ScannerSubcategoryKeys.All,
                 terrain,
-                ScannerItemKeys.Blocked,
-                ModStrings.Scanner.Blocked,
+                ScannerItemKeys.GuardedGround,
+                ModStrings.Scanner.GuardedGround,
                 origin,
                 ScannerResultKind.AreaGroup,
-                cell => cell.Blocked);
+                cell => cell.Guarded);
         }
 
         private void AddUnexploredScannerResults(ScannerSnapshot snapshot, Vector2Int origin)
@@ -146,6 +146,10 @@ namespace SongsOfConquestAccess.Adapters
             int width = _facade.Level.Width;
             int height = _facade.Level.Height;
             byte[] exploration = localTeamId >= 0 ? _facade.Level.GetExplorationForTeam(localTeamId) : null;
+            // The guarded ground is the zone of control the tile readout speaks, read from the
+            // same per-frame map, so a tile the scan calls guarded is a tile the cursor says is
+            // within someone's zone of control.
+            Dictionary<Vector2Int, List<string>> zonesOfControl = localTeamId >= 0 ? GetZoneOfControlNames(localTeamId) : null;
             TerrainScanCell[,] terrain = new TerrainScanCell[width, height];
             for (int y = 0; y < height; y++)
             {
@@ -167,7 +171,7 @@ namespace SongsOfConquestAccess.Adapters
                         Explored = eligible,
                         Terrain = eligible ? GetTerrain(point) : AdventureTerrainKind.Unknown,
                         Impassable = impassable,
-                        Blocked = eligible && !impassable && IsBlockedTerrain(localTeamId, point)
+                        Guarded = eligible && !impassable && zonesOfControl != null && zonesOfControl.ContainsKey(point)
                     };
                 }
             }
@@ -313,24 +317,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool IsBlockedTerrain(int localTeamId, Vector2Int point)
-        {
-            if (localTeamId < 0)
-            {
-                return false;
-            }
-
-            try
-            {
-                return !_facade.Level.IsValidMoveDestination(localTeamId, point);
-            }
-            catch (Exception exception)
-            {
-                LogFailureOnce("reading whether a point can be moved to", exception);
-                return false;
-            }
-        }
-
         private void AddTerrainGroups(
             ScannerSnapshot snapshot,
             TerrainScanCell[,] terrain,
@@ -425,7 +411,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool Impassable;
 
-            public bool Blocked;
+            public bool Guarded;
         }
 
         private void EnqueueTerrainNeighbors(Queue<Vector2Int> queue, bool[,] visited, Vector2Int point)

@@ -309,10 +309,6 @@ namespace SongsOfConquestAccess.Speech.Spatial
             {
                 details.Add(ModText.Get(ModStrings.Spatial.Impassable));
             }
-            else if (tile.IsBlocked)
-            {
-                details.Add(ModText.Get(ModStrings.Spatial.Blocked));
-            }
 
             return details;
         }

@@ -286,7 +286,6 @@
             public static readonly ModString Attack = new ModString("Spatial.Attack", "attack");
             public static readonly ModString AttackRange = new ModString("Spatial.AttackRange", "Attack range");
             public static readonly ModString AridTrees = new ModString("Spatial.AridTrees", "Arid trees");
-            public static readonly ModString Blocked = new ModString("Spatial.Blocked", "blocked");
             public static readonly ModString Bridge = new ModString("Spatial.Bridge", "Bridge");
             public static readonly ModString CliffHeight = new ModString("Spatial.CliffHeight", "cliff, height {0}");
             public static readonly ModString Commander = new ModString("Spatial.Commander", "Commander");
@@ -1006,7 +1005,6 @@
             public static readonly ModString Attackable = new ModString("Scanner.Attackable", "Attackable");
             public static readonly ModString Barriers = new ModString("Scanner.Barriers", "Barriers");
             public static readonly ModString Beacons = new ModString("Scanner.Beacons", "Beacons");
-            public static readonly ModString Blocked = new ModString("Scanner.Blocked", "Blocked");
             public static readonly ModString Buildings = new ModString("Scanner.Buildings", "Buildings");
             public static readonly ModString CustomCategoryEmpty = new ModString("Scanner.CustomCategoryEmpty", "Custom category {0} is empty");
             public static readonly ModString Dangerous = new ModString("Scanner.Dangerous", "Dangerous");
@@ -1019,6 +1017,7 @@
             public static readonly ModString Entities = new ModString("Scanner.Entities", "Entities");
             public static readonly ModString Friendly = new ModString("Scanner.Friendly", "Friendly");
             public static readonly ModString FriendlyGates = new ModString("Scanner.FriendlyGates", "Friendly gates");
+            public static readonly ModString GuardedGround = new ModString("Scanner.GuardedGround", "Guarded ground");
             public static readonly ModString Exploration = new ModString("Scanner.Exploration", "Exploration");
             public static readonly ModString Knowledge = new ModString("Scanner.Knowledge", "Knowledge");
             public static readonly ModString LookAround = new ModString("Scanner.LookAround", "Look around");

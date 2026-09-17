@@ -2110,11 +2110,6 @@ msgctxt "Spatial.AttackRange"
 msgid "Attack range"
 msgstr "Saldırı menzili"
 
-#. Spatial.Blocked
-msgctxt "Spatial.Blocked"
-msgid "blocked"
-msgstr "engelli"
-
 #. Spatial.Commander
 msgctxt "Spatial.Commander"
 msgid "Commander"
@@ -2425,11 +2420,6 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr "İşaretler"
 
-#. Scanner.Blocked
-msgctxt "Scanner.Blocked"
-msgid "Blocked"
-msgstr "Engelli"
-
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
@@ -2484,6 +2474,11 @@ msgstr "Dost"
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "Dost kapıları"
+
+#. Scanner.GuardedGround
+msgctxt "Scanner.GuardedGround"
+msgid "Guarded ground"
+msgstr "Korunan arazi"
 
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"

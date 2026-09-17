@@ -2110,11 +2110,6 @@ msgctxt "Spatial.AttackRange"
 msgid "Attack range"
 msgstr "공격 범위"
 
-#. Spatial.Blocked
-msgctxt "Spatial.Blocked"
-msgid "blocked"
-msgstr "막힘"
-
 #. Spatial.Commander
 msgctxt "Spatial.Commander"
 msgid "Commander"
@@ -2425,11 +2420,6 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr "봉화"
 
-#. Scanner.Blocked
-msgctxt "Scanner.Blocked"
-msgid "Blocked"
-msgstr "막힘"
-
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
@@ -2484,6 +2474,11 @@ msgstr "아군"
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "아군 관문"
+
+#. Scanner.GuardedGround
+msgctxt "Scanner.GuardedGround"
+msgid "Guarded ground"
+msgstr "경계 지역"
 
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"

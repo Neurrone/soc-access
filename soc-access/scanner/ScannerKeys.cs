@@ -110,7 +110,7 @@ namespace SongsOfConquestAccess.Scanner
         public const string DeepWater = "deep-water";
         public const string WaterEdge = "water-edge";
 
-        public const string Blocked = "blocked";
+        public const string GuardedGround = "guarded-ground";
         public const string Unexplored = "unexplored";
         public const string ZoneOfControl = "zone_of_control";
     }

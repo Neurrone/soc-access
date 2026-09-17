@@ -2150,11 +2150,6 @@ msgctxt "Spatial.AttackRange"
 msgid "Attack range"
 msgstr "Дальность атаки"
 
-#. Spatial.Blocked
-msgctxt "Spatial.Blocked"
-msgid "blocked"
-msgstr "заблокировано"
-
 #. Spatial.Commander
 msgctxt "Spatial.Commander"
 msgid "Commander"
@@ -2465,11 +2460,6 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr "Маяки"
 
-#. Scanner.Blocked
-msgctxt "Scanner.Blocked"
-msgid "Blocked"
-msgstr "Заблокировано"
-
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
@@ -2524,6 +2514,11 @@ msgstr "Дружественный"
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "Дружественные ворота"
+
+#. Scanner.GuardedGround
+msgctxt "Scanner.GuardedGround"
+msgid "Guarded ground"
+msgstr "Охраняемая территория"
 
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"

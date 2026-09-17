@@ -33,6 +33,17 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void DescribeTileSaysNothingAboutATileTheGameOnlyRefusesBecauseOfWhatIsOnIt()
+        {
+            AdventureMapTile tile = TileFixtures.Tile(67, 40, AdventureTerrainKind.Grass);
+            tile.IsBlocked = true;
+
+            string text = CreateFormatter().DescribeTile(tile);
+
+            Assert.AreEqual("Grass, 67, 40.", text);
+        }
+
+        [TestMethod]
         public void DescribeTileReadsGroundTerrainWithoutEnvironmentLayer()
         {
             AdventureMapTile tile = TileFixtures.Tile(7, 4, AdventureTerrainKind.Grass);

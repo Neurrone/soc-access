@@ -251,7 +251,6 @@ namespace SongsOfConquestAccess.Audio
         private static bool IsAdventureTileImpassable(AdventureMapTile tile)
         {
             return tile.IsImpassable
-                || tile.IsBlocked
                 || tile.Terrain == AdventureTerrainKind.Mountain
                 || tile.Terrain == AdventureTerrainKind.Wall;
         }
