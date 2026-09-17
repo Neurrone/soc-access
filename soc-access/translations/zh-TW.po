@@ -1060,6 +1060,11 @@ msgctxt "Screens.SpellbookDropToRemove"
 msgid "Drop here to remove"
 msgstr "拖到此處以移除"
 
+#. Screens.Tables
+msgctxt "Screens.Tables"
+msgid "Tables"
+msgstr "表格"
+
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"
 msgid "Team {0}"
@@ -1515,10 +1520,30 @@ msgctxt "Actions.UiEnd"
 msgid "Last Item"
 msgstr "最後一個項目"
 
+#. Actions.UiFirstColumn
+msgctxt "Actions.UiFirstColumn"
+msgid "Move To First Column Of Row"
+msgstr "移到本列第一欄"
+
+#. Actions.UiFirstRow
+msgctxt "Actions.UiFirstRow"
+msgid "Move To First Row Of Table"
+msgstr "移到表格第一列"
+
 #. Actions.UiHome
 msgctxt "Actions.UiHome"
 msgid "First Item"
 msgstr "第一個項目"
+
+#. Actions.UiLastColumn
+msgctxt "Actions.UiLastColumn"
+msgid "Move To Last Column Of Row"
+msgstr "移到本列最後一欄"
+
+#. Actions.UiLastRow
+msgctxt "Actions.UiLastRow"
+msgid "Move To Last Row Of Table"
+msgstr "移到表格最後一列"
 
 #. Actions.UiLeft
 msgctxt "Actions.UiLeft"

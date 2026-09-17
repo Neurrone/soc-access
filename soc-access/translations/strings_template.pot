@@ -1669,9 +1669,29 @@ msgctxt "Actions.UiEnd"
 msgid "Last Item"
 msgstr ""
 
+#. Actions.UiFirstColumn
+msgctxt "Actions.UiFirstColumn"
+msgid "Move To First Column Of Row"
+msgstr ""
+
+#. Actions.UiFirstRow
+msgctxt "Actions.UiFirstRow"
+msgid "Move To First Row Of Table"
+msgstr ""
+
 #. Actions.UiHome
 msgctxt "Actions.UiHome"
 msgid "First Item"
+msgstr ""
+
+#. Actions.UiLastColumn
+msgctxt "Actions.UiLastColumn"
+msgid "Move To Last Column Of Row"
+msgstr ""
+
+#. Actions.UiLastRow
+msgctxt "Actions.UiLastRow"
+msgid "Move To Last Row Of Table"
 msgstr ""
 
 #. Actions.UiLeft
@@ -3532,6 +3552,11 @@ msgstr ""
 #. Screens.Suffix
 msgctxt "Screens.Suffix"
 msgid "Include suffix punctuation"
+msgstr ""
+
+#. Screens.Tables
+msgctxt "Screens.Tables"
+msgid "Tables"
 msgstr ""
 
 #. Screens.TeamValue

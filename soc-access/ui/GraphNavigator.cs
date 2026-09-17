@@ -466,6 +466,11 @@ namespace SongsOfConquestAccess.UI
                 case "ui_region_prev":
                 case "ui_region_next":
                     return InRegion();
+                case "ui_first_column":
+                case "ui_last_column":
+                case "ui_first_row":
+                case "ui_last_row":
+                    return InTable();
                 case "ui_coarse_increase":
                 case "ui_coarse_decrease":
                     return HasAdjust();
@@ -532,6 +537,14 @@ namespace SongsOfConquestAccess.UI
                     return InRegion() && Region(-1);
                 case "ui_region_next":
                     return InRegion() && Region(1);
+                case "ui_first_column":
+                    return TableEdge(GraphDir.Left);
+                case "ui_last_column":
+                    return TableEdge(GraphDir.Right);
+                case "ui_first_row":
+                    return TableEdge(GraphDir.Up);
+                case "ui_last_row":
+                    return TableEdge(GraphDir.Down);
                 case "ui_coarse_increase":
                     return Adjust(1, true);
                 case "ui_coarse_decrease":
@@ -888,6 +901,39 @@ namespace SongsOfConquestAccess.UI
         {
             GraphNode node = _graph == null ? null : _graph.CurrentNode;
             return node != null && node.RegionKey != null;
+        }
+
+        /// <summary>Whether the cursor is standing on a table cell - the only place the four corner
+        /// keys have anything to be about.</summary>
+        private bool InTable()
+        {
+            GraphNode node = _graph == null ? null : _graph.CurrentNode;
+            return node != null && node.Vtable != null && node.Vtable.Row != null;
+        }
+
+        /// <summary>
+        /// A corner of the table the cursor is standing in: the row's first or last column, the
+        /// table's first or last row.
+        ///
+        /// Not claimed at all outside a table - unlike Home and End, which always mean something on a
+        /// panel, these four have nothing to be about there, and a key that does nothing is better
+        /// given back to the game than swallowed. Inside a table the press is consumed even when the
+        /// cursor is already in the corner asked for, the same silence as Home on the first control.
+        /// </summary>
+        private bool TableEdge(GraphDir dir)
+        {
+            if (!InTable())
+            {
+                return false;
+            }
+
+            MoveResult move = _graph.MoveToTableEdge(dir);
+            if (move.Moved)
+            {
+                AnnounceMove(move);
+            }
+
+            return true;
         }
 
         private bool HasAdjust()

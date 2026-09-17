@@ -36,6 +36,17 @@ This page summarizes the mod hotkeys used across the documentation.
 | `Ctrl+Home`  | First line      |
 | `Ctrl+End`   | Last line       |
 
+## Tables
+
+These four keys never leave the table the cursor is in, and do nothing outside one.
+
+| Key              | Action                |
+| ---------------- | --------------------- |
+| `Ctrl+Alt+Left`  | First column of row   |
+| `Ctrl+Alt+Right` | Last column of row    |
+| `Ctrl+Alt+Up`    | First row of table    |
+| `Ctrl+Alt+Down`  | Last row of table     |
+
 ## Grids
 
 | Key      | Action                      |

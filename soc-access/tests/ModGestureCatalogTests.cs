@@ -47,16 +47,19 @@ namespace SongsOfConquestAccess.Tests
         {
             IReadOnlyList<ModGestureCatalog.Group> groups = ModGestureCatalog.Groups;
             Assert.AreEqual(ModStrings.Screens.ReviewBuffer, groups[1].Caption);
-            Assert.AreEqual(ModStrings.Screens.AdventureMap, groups[2].Caption);
-            Assert.AreEqual(ModStrings.Screens.Scanner, groups[3].Caption);
+            Assert.AreEqual(ModStrings.Screens.Tables, groups[2].Caption);
+            Assert.AreEqual(ModStrings.Screens.AdventureMap, groups[3].Caption);
+            Assert.AreEqual(ModStrings.Screens.Scanner, groups[4].Caption);
             Assert.AreEqual(ModStrings.Screens.Bookmarks, groups[groups.Count - 1].Caption);
-            CollectionAssert.Contains((System.Collections.ICollection)groups[2].Actions, AccessibilityActions.SummarizeResources);
-            CollectionAssert.Contains((System.Collections.ICollection)groups[2].Actions, AccessibilityActions.ScannerLookAround);
-            CollectionAssert.Contains((System.Collections.ICollection)groups[2].Actions, AccessibilityActions.ScannerIncreaseLookAroundRadius);
-            CollectionAssert.DoesNotContain((System.Collections.ICollection)groups[3].Actions, AccessibilityActions.ScannerLookAround);
-            Assert.AreEqual(ModStrings.Screens.HexGrid, groups[4].Caption);
-            Assert.AreEqual(ModStrings.Screens.Combat, groups[5].Caption);
-            CollectionAssert.Contains((System.Collections.ICollection)groups[5].Actions, AccessibilityActions.SummarizeEnemyResources);
+            CollectionAssert.Contains((System.Collections.ICollection)groups[2].Actions, AccessibilityActions.UiFirstColumn);
+            CollectionAssert.Contains((System.Collections.ICollection)groups[2].Actions, AccessibilityActions.UiLastRow);
+            CollectionAssert.Contains((System.Collections.ICollection)groups[3].Actions, AccessibilityActions.SummarizeResources);
+            CollectionAssert.Contains((System.Collections.ICollection)groups[3].Actions, AccessibilityActions.ScannerLookAround);
+            CollectionAssert.Contains((System.Collections.ICollection)groups[3].Actions, AccessibilityActions.ScannerIncreaseLookAroundRadius);
+            CollectionAssert.DoesNotContain((System.Collections.ICollection)groups[4].Actions, AccessibilityActions.ScannerLookAround);
+            Assert.AreEqual(ModStrings.Screens.HexGrid, groups[5].Caption);
+            Assert.AreEqual(ModStrings.Screens.Combat, groups[6].Caption);
+            CollectionAssert.Contains((System.Collections.ICollection)groups[6].Actions, AccessibilityActions.SummarizeEnemyResources);
         }
 
         [TestMethod]

@@ -483,7 +483,11 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString UiCoarseIncrease = new ModString("Actions.UiCoarseIncrease", "Increase slider by 10%");
             public static readonly ModString UiDown = new ModString("Actions.UiDown", "Move Down");
             public static readonly ModString UiEnd = new ModString("Actions.UiEnd", "Last Item");
+            public static readonly ModString UiFirstColumn = new ModString("Actions.UiFirstColumn", "Move To First Column Of Row");
+            public static readonly ModString UiFirstRow = new ModString("Actions.UiFirstRow", "Move To First Row Of Table");
             public static readonly ModString UiHome = new ModString("Actions.UiHome", "First Item");
+            public static readonly ModString UiLastColumn = new ModString("Actions.UiLastColumn", "Move To Last Column Of Row");
+            public static readonly ModString UiLastRow = new ModString("Actions.UiLastRow", "Move To Last Row Of Table");
             public static readonly ModString UiLeft = new ModString("Actions.UiLeft", "Move Left");
             public static readonly ModString UiLeftClick = new ModString("Actions.UiLeftClick", "Left click or complete drag");
             public static readonly ModString UiNext = new ModString("Actions.UiNext", "Next Stop");
@@ -922,6 +926,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString SpellbookDropToRemove = new ModString("Screens.SpellbookDropToRemove", "Drop here to remove");
             public static readonly ModString Sell = new ModString("Screens.Sell", "Sell");
             public static readonly ModString Suffix = new ModString("Screens.Suffix", "Include suffix punctuation");
+            /// <summary>The Keybinds tab region for the four keys that reach a table's corners.</summary>
+            public static readonly ModString Tables = new ModString("Screens.Tables", "Tables");
             public static readonly ModString TeamValue = new ModString("Screens.TeamValue", "Team {0}");
             public static readonly ModString TileAnnouncements = new ModString("Screens.TileAnnouncements", "Tile announcements");
             public static readonly ModString TileAttackHint = new ModString("Screens.TileAttackHint", "{0} attacks");

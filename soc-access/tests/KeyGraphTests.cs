@@ -1381,6 +1381,109 @@ namespace SongsOfConquestAccess.Tests
             Assert.IsFalse(g.TryAdjust(1, false));
         }
 
+        // ---- the four corners of a table ----
+
+        private static readonly object RowA = new object();
+        private static readonly object RowB = new object();
+        private static readonly object RowC = new object();
+
+        /// <summary>A heading band, then a two-row table, then a second table of one row - the three
+        /// things a bounded walk has to tell apart, wired by the builder exactly as a screen wires
+        /// them.</summary>
+        private static KeyGraph Tables(GraphState state, out GraphSheet built)
+        {
+            GraphSheet sheet = null;
+            KeyGraph g = new KeyGraph(() =>
+            {
+                GraphBuilder b = new GraphBuilder();
+                b.StartRow()
+                    .AddItem(new SyntheticNode(Id("hName"), Vt("Sort by name")))
+                    .AddItem(new SyntheticNode(Id("hTroops"), Vt("Sort by troops")))
+                    .AddItem(new SyntheticNode(Id("hMove"), Vt("Sort by move")))
+                    .EndRow();
+                GraphSheet s = new GraphSheet(b, "t:");
+                s.Region("Wielders", new[] { "Name", "Troops", "Move" });
+                s.Row(Vt("Alpha"), RowA, null, () => "3", () => "5");
+                s.Row(Vt("Beta"), RowB, null, () => "2", () => "4");
+                s.Region("Towns", new[] { "Name", "Troops", "Move" });
+                s.Row(Vt("Gamma"), RowC, null, () => "1", () => "9");
+                s.Finish();
+                sheet = s;
+                return b.Build();
+            }, state);
+            g.Rerender();
+            built = sheet;
+            return g;
+        }
+
+        [TestMethod]
+        public void AColumnJumpStopsAtTheEndOfItsOwnRow()
+        {
+            GraphState state = new GraphState();
+            GraphSheet sheet;
+            KeyGraph g = Tables(state, out sheet);
+            g.Move(GraphDir.Down); // Alpha
+            g.Move(GraphDir.Down); // Beta
+            g.Move(GraphDir.Right); // Beta's troops
+
+            MeasuredMove(g, GraphDir.Right, sheet.CellKey(RowB, 2), "4");
+            MeasuredMove(g, GraphDir.Left, sheet.CellKey(RowB, 0), "Beta");
+        }
+
+        [TestMethod]
+        public void AColumnJumpNamesTheColumnItLandsIn()
+        {
+            GraphState state = new GraphState();
+            GraphSheet sheet;
+            KeyGraph g = Tables(state, out sheet);
+            g.Move(GraphDir.Down); // Alpha
+
+            Assert.AreEqual("Move", g.MoveToTableEdge(GraphDir.Right).TransitionLabel);
+            Assert.AreEqual("Name", g.MoveToTableEdge(GraphDir.Left).TransitionLabel);
+        }
+
+        /// <summary>The bound the unbounded <see cref="KeyGraph.MoveToEdge"/> has not got: the heading
+        /// band above the first row and the next section's rows below the last one are both one
+        /// ordinary edge away, and neither is part of this table.</summary>
+        [TestMethod]
+        public void ARowJumpStopsAtTheHeadingBandAndAtTheNextTable()
+        {
+            GraphState state = new GraphState();
+            GraphSheet sheet;
+            KeyGraph g = Tables(state, out sheet);
+            g.Move(GraphDir.Down); // Alpha
+            g.Move(GraphDir.Down); // Beta
+
+            MeasuredMove(g, GraphDir.Up, sheet.CellKey(RowA, 0), "Alpha");
+            MeasuredMove(g, GraphDir.Down, sheet.CellKey(RowB, 0), "Beta");
+        }
+
+        [TestMethod]
+        public void TheCornersOfATableDoNothingOutsideOne()
+        {
+            GraphState state = new GraphState();
+            GraphSheet sheet;
+            KeyGraph g = Tables(state, out sheet);
+
+            Assert.AreEqual("hName", Focused(g)); // a heading: no row of its own
+            Assert.IsFalse(g.MoveToTableEdge(GraphDir.Right).Moved);
+            Assert.IsFalse(g.MoveToTableEdge(GraphDir.Down).Moved);
+            Assert.AreEqual("hName", Focused(g));
+        }
+
+        private static void MeasuredMove(KeyGraph g, GraphDir dir, string key, string label)
+        {
+            MoveResult move = g.MoveToTableEdge(dir);
+            Assert.IsTrue(move.Moved);
+            Assert.AreEqual(key, Focused(g));
+            Assert.AreEqual(label, NodeLabel(move.To));
+        }
+
+        private static string NodeLabel(GraphNode node)
+        {
+            return node.Vtable.Announcements[0].Text();
+        }
+
         [TestMethod]
         public void FocusByReferenceSyncsFromTheGameSide()
         {

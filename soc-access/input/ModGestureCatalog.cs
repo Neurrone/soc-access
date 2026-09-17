@@ -16,7 +16,8 @@ namespace SongsOfConquestAccess.Input
     /// first they can see and change. Only the Ctrl+digit quick-split chords are held out, since
     /// their multi-key semantics a single-key capture cannot express. Everything a group lists is
     /// captured as one <see cref="KeyboardBinding"/>. The order is the owner's (2026-09-11): cursor,
-    /// review buffer, adventure map, scanner, hex grid, combat, and the forty bookmark rows last.
+    /// review buffer, tables, adventure map, scanner, hex grid, combat, and the forty bookmark rows
+    /// last.
     /// </summary>
     public static class ModGestureCatalog
     {
@@ -111,6 +112,14 @@ namespace SongsOfConquestAccess.Input
                 AccessibilityActions.NextBufferLine,
                 AccessibilityActions.FirstBufferLine,
                 AccessibilityActions.LastBufferLine,
+            }));
+
+            groups.Add(new Group(ModStrings.Screens.Tables, new[]
+            {
+                AccessibilityActions.UiFirstColumn,
+                AccessibilityActions.UiLastColumn,
+                AccessibilityActions.UiFirstRow,
+                AccessibilityActions.UiLastRow,
             }));
 
             groups.Add(new Group(ModStrings.Screens.AdventureMap, new[]

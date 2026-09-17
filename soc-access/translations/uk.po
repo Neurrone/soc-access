@@ -1080,6 +1080,11 @@ msgctxt "Screens.SpellbookDropToRemove"
 msgid "Drop here to remove"
 msgstr "Перетягніть сюди, щоб прибрати"
 
+#. Screens.Tables
+msgctxt "Screens.Tables"
+msgid "Tables"
+msgstr "Таблиці"
+
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"
 msgid "Team {0}"
@@ -1545,10 +1550,30 @@ msgctxt "Actions.UiEnd"
 msgid "Last Item"
 msgstr "Останній елемент"
 
+#. Actions.UiFirstColumn
+msgctxt "Actions.UiFirstColumn"
+msgid "Move To First Column Of Row"
+msgstr "До першого стовпця рядка"
+
+#. Actions.UiFirstRow
+msgctxt "Actions.UiFirstRow"
+msgid "Move To First Row Of Table"
+msgstr "До першого рядка таблиці"
+
 #. Actions.UiHome
 msgctxt "Actions.UiHome"
 msgid "First Item"
 msgstr "Перший елемент"
+
+#. Actions.UiLastColumn
+msgctxt "Actions.UiLastColumn"
+msgid "Move To Last Column Of Row"
+msgstr "До останнього стовпця рядка"
+
+#. Actions.UiLastRow
+msgctxt "Actions.UiLastRow"
+msgid "Move To Last Row Of Table"
+msgstr "До останнього рядка таблиці"
 
 #. Actions.UiLeft
 msgctxt "Actions.UiLeft"

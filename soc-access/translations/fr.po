@@ -1060,6 +1060,11 @@ msgctxt "Screens.SpellbookDropToRemove"
 msgid "Drop here to remove"
 msgstr "Déposer ici pour retirer"
 
+#. Screens.Tables
+msgctxt "Screens.Tables"
+msgid "Tables"
+msgstr "Tableaux"
+
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"
 msgid "Team {0}"
@@ -1530,10 +1535,30 @@ msgctxt "Actions.UiEnd"
 msgid "Last Item"
 msgstr "Dernier élément"
 
+#. Actions.UiFirstColumn
+msgctxt "Actions.UiFirstColumn"
+msgid "Move To First Column Of Row"
+msgstr "Aller à la première colonne de la ligne"
+
+#. Actions.UiFirstRow
+msgctxt "Actions.UiFirstRow"
+msgid "Move To First Row Of Table"
+msgstr "Aller à la première ligne du tableau"
+
 #. Actions.UiHome
 msgctxt "Actions.UiHome"
 msgid "First Item"
 msgstr "Premier élément"
+
+#. Actions.UiLastColumn
+msgctxt "Actions.UiLastColumn"
+msgid "Move To Last Column Of Row"
+msgstr "Aller à la dernière colonne de la ligne"
+
+#. Actions.UiLastRow
+msgctxt "Actions.UiLastRow"
+msgid "Move To Last Row Of Table"
+msgstr "Aller à la dernière ligne du tableau"
 
 #. Actions.UiLeft
 msgctxt "Actions.UiLeft"

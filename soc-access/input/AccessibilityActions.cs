@@ -250,6 +250,23 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction UiRegionNext = OneShot("ui_region_next", ModStrings.Actions.UiRegionNext, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.DownArrow, alt: true));
 
+        // The corners of a table, on the arrows with both modifiers on them. Home and End stay what
+        // they were - the ends of the PANEL - because a table is not the only thing a panel holds, and
+        // the player who wants the top of the list still asks for it the same way. Binding matching is
+        // exact on all three modifiers, which is what keeps these four off the plain arrows, off the
+        // Ctrl ones the review buffers use and off the Alt ones the region jump uses.
+        public static readonly InputAction UiFirstColumn = OneShot("ui_first_column", ModStrings.Actions.UiFirstColumn, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.LeftArrow, ctrl: true, alt: true));
+
+        public static readonly InputAction UiLastColumn = OneShot("ui_last_column", ModStrings.Actions.UiLastColumn, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.RightArrow, ctrl: true, alt: true));
+
+        public static readonly InputAction UiFirstRow = OneShot("ui_first_row", ModStrings.Actions.UiFirstRow, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.UpArrow, ctrl: true, alt: true));
+
+        public static readonly InputAction UiLastRow = OneShot("ui_last_row", ModStrings.Actions.UiLastRow, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.DownArrow, ctrl: true, alt: true));
+
         /// <summary>
         /// The left click, on every key that delivers one. The two Ctrl chords are bindings of the
         /// SAME action on purpose: the game's own click handlers read the physical Ctrl
@@ -585,6 +602,10 @@ namespace SongsOfConquestAccess.Input
                 UiEnd,
                 UiRegionPrev,
                 UiRegionNext,
+                UiFirstColumn,
+                UiLastColumn,
+                UiFirstRow,
+                UiLastRow,
                 UiLeftClick,
                 UiClearSearch,
                 UiRightClick,

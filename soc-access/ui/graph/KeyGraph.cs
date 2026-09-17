@@ -338,6 +338,64 @@ namespace SongsOfConquestAccess.UI.Graph
             return result;
         }
 
+        /// <summary>
+        /// As far as possible in <paramref name="dir"/> WITHOUT leaving the table the cursor is
+        /// standing in: sideways, the first or last column of THIS row; vertically, the first or last
+        /// row of THIS table.
+        ///
+        /// Bounded where <see cref="MoveToEdge"/> is not, and the bound is the whole point. A sheet
+        /// wires its first row up to the heading band above it and chains its last row down into the
+        /// next section's first, so an unbounded walk ends on a heading or in another table - two
+        /// places the player asked for neither. The fence is what the sheet already stamps on every
+        /// cell: a cell is in a table when it carries a <see cref="NodeVtable.Row"/>, two cells are in
+        /// the same ROW when they carry the same one, and two rows are in the same TABLE when their
+        /// region keys agree (one region is one table).
+        ///
+        /// The label reported is the LAST edge crossed, so a column jump names its landing column
+        /// exactly as the single sideways step onto that column would have.
+        /// </summary>
+        public MoveResult MoveToTableEdge(GraphDir dir)
+        {
+            MoveResult result = default(MoveResult);
+            if (!Rerender()) return result;
+
+            GraphNode node = CurrentNode;
+            result.From = node;
+            result.To = node;
+            if (node == null || node.Vtable == null || node.Vtable.Row == null) return result;
+
+            bool sideways = dir == GraphDir.Left || dir == GraphDir.Right;
+            GraphNode cur = node;
+            string label = null;
+            while (true)
+            {
+                Transition t;
+                if (!cur.Transitions.TryGetValue(dir, out t) || t == null) break;
+                GraphNode next = _current.NodeAt(t.Destination);
+                if (next == null || next == cur) break;
+                if (!SameTable(node, next, sideways)) break;
+                cur = next;
+                label = t.Label;
+            }
+
+            if (cur == node) return result;
+
+            SetCurrent(cur);
+            result.To = cur;
+            result.Moved = true;
+            result.TransitionLabel = label;
+            return result;
+        }
+
+        /// <summary>Whether <paramref name="to"/> is still inside the table <paramref name="from"/> is
+        /// in — the same row for a sideways walk, the same table for a vertical one.</summary>
+        private static bool SameTable(GraphNode from, GraphNode to, bool sideways)
+        {
+            NodeVtable vt = to.Vtable;
+            if (vt == null || vt.Row == null) return false;
+            return sideways ? vt.Row == from.Vtable.Row : Equals(to.RegionKey, from.RegionKey);
+        }
+
         /// <summary>Cycle to the next/previous Tab-stop (declaration order), landing on the stop's
         /// remembered position (else its first node). <paramref name="wrap"/> continues past the ends;
         /// without it, at the last/first stop the result is not-moved (the caller may blur instead).</summary>

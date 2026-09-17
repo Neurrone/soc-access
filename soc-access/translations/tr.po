@@ -1060,6 +1060,11 @@ msgctxt "Screens.SpellbookDropToRemove"
 msgid "Drop here to remove"
 msgstr "Kaldırmak için buraya bırakın"
 
+#. Screens.Tables
+msgctxt "Screens.Tables"
+msgid "Tables"
+msgstr "Tablolar"
+
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"
 msgid "Team {0}"
@@ -1515,10 +1520,30 @@ msgctxt "Actions.UiEnd"
 msgid "Last Item"
 msgstr "Son öğe"
 
+#. Actions.UiFirstColumn
+msgctxt "Actions.UiFirstColumn"
+msgid "Move To First Column Of Row"
+msgstr "Satırın ilk sütununa git"
+
+#. Actions.UiFirstRow
+msgctxt "Actions.UiFirstRow"
+msgid "Move To First Row Of Table"
+msgstr "Tablonun ilk satırına git"
+
 #. Actions.UiHome
 msgctxt "Actions.UiHome"
 msgid "First Item"
 msgstr "İlk öğe"
+
+#. Actions.UiLastColumn
+msgctxt "Actions.UiLastColumn"
+msgid "Move To Last Column Of Row"
+msgstr "Satırın son sütununa git"
+
+#. Actions.UiLastRow
+msgctxt "Actions.UiLastRow"
+msgid "Move To Last Row Of Table"
+msgstr "Tablonun son satırına git"
 
 #. Actions.UiLeft
 msgctxt "Actions.UiLeft"
