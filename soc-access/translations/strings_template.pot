@@ -4019,6 +4019,11 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr ""
 
+#. Scanner.Blocked
+msgctxt "Scanner.Blocked"
+msgid "blocked, {0}"
+msgstr ""
+
 #. Scanner.BlockedBy
 msgctxt "Scanner.BlockedBy"
 msgid "blocked by {0}, {1}"

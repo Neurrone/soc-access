@@ -1038,6 +1038,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Attackable = new ModString("Scanner.Attackable", "Attackable");
             public static readonly ModString Barriers = new ModString("Scanner.Barriers", "Barriers");
             public static readonly ModString Beacons = new ModString("Scanner.Beacons", "Beacons");
+            public static readonly ModString Blocked = new ModString("Scanner.Blocked", "blocked, {0}");
             public static readonly ModString BlockedBy = new ModString("Scanner.BlockedBy", "blocked by {0}, {1}");
             public static readonly ModString Buildings = new ModString("Scanner.Buildings", "Buildings");
             public static readonly ModString CustomCategoryEmpty = new ModString("Scanner.CustomCategoryEmpty", "Custom category {0} is empty");

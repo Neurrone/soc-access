@@ -9,11 +9,12 @@ namespace SongsOfConquestAccess.Scanner
     /// </summary>
     public interface IScannerPathSource
     {
-        /// <summary>What stops the walk to a result no route reaches: the name of the army whose
-        /// zone of control the route runs into, or of the map entity standing in it. Null where
-        /// terrain alone is the answer and there is nothing to name. Asked when a result whose
-        /// <see cref="GetPathCost"/> is infinite is read, in either order mode.</summary>
-        string TryGetPathBlockerName(Vector2Int origin, ScannerResult result);
+        /// <summary>Whether something other than the ground stops the walk to a result no route
+        /// reaches, with <paramref name="armyName"/> the army whose zone of control the walk runs
+        /// into where the player can see one. False where terrain alone is the answer, which the
+        /// readout says nothing about. Asked when a result whose <see cref="GetPathCost"/> is
+        /// infinite is read, in either order mode.</summary>
+        bool TryGetPathBlocker(Vector2Int origin, ScannerResult result, out string armyName);
 
         /// <summary>What walking from <paramref name="origin"/> to the result costs the wielder
         /// today, or <see cref="float.PositiveInfinity"/> where an army or something built on the

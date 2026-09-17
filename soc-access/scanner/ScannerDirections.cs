@@ -14,19 +14,25 @@ namespace SongsOfConquestAccess.Scanner
         private readonly IReadOnlyList<ScannerDirectionStep> _steps;
 
         public ScannerDirections(IReadOnlyList<ScannerDirectionStep> steps)
-            : this(steps, null)
+            : this(steps, false, null)
         {
         }
 
-        public ScannerDirections(IReadOnlyList<ScannerDirectionStep> steps, string blockerName)
+        public ScannerDirections(IReadOnlyList<ScannerDirectionStep> steps, bool blocked, string blockerName)
         {
             _steps = steps ?? new List<ScannerDirectionStep>();
+            Blocked = blocked;
             BlockerName = blockerName;
         }
 
-        /// <summary>What the game says is standing in the way of a result no route reaches, where
-        /// it names something: an army or a map entity. Null where a route does reach the result,
-        /// and where terrain alone stops it and there is nothing to name.</summary>
+        /// <summary>Whether something other than the ground stands between the cursor and the
+        /// result. False where a route reaches it, and where the ground itself is the answer and
+        /// the player has nothing to act on.</summary>
+        public bool Blocked { get; private set; }
+
+        /// <summary>The army standing in the way of a blocked result, where the player can see
+        /// one. Null where the result is not blocked, and where no visible army is in the way,
+        /// which is said without a name.</summary>
         public string BlockerName { get; private set; }
 
         public int Count

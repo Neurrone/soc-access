@@ -52,9 +52,24 @@ namespace SongsOfConquestAccess.Tests
             };
 
             Assert.AreEqual("blocked by A stand of Roots troops, 2n", ScannerSpeechUtility.FormatDirections(
-                new ScannerDirections(steps, "A stand of Roots troops"), useLongForm: false));
+                new ScannerDirections(steps, blocked: true, blockerName: "A stand of Roots troops"),
+                useLongForm: false));
             Assert.AreEqual("2n", ScannerSpeechUtility.FormatDirections(
                 new ScannerDirections(steps), useLongForm: false));
+        }
+
+        /// <summary>A blocked result with no visible army in the way is said to be blocked without
+        /// naming anything: the mod never names a cause the player cannot perceive.</summary>
+        [TestMethod]
+        public void ABlockedResultWithNoArmyInTheWayIsSaidWithoutAName()
+        {
+            List<ScannerDirectionStep> steps = new List<ScannerDirectionStep>
+            {
+                new ScannerDirectionStep(2, ScannerDirection.North)
+            };
+
+            Assert.AreEqual("blocked, 2n", ScannerSpeechUtility.FormatDirections(
+                new ScannerDirections(steps, blocked: true, blockerName: null), useLongForm: false));
         }
 
         [TestMethod]

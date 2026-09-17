@@ -1039,9 +1039,10 @@ namespace SongsOfConquestAccess.Scanner
 
         /// <summary>
         /// The way from the speech origin to a result: the runs of the straight line, whichever
-        /// order the results are in. A result no route reaches also carries what stands in the way,
-        /// in both order modes; that costs one lookup in the whole-map sweep and at most one path
-        /// query, asked when a result is read and never while a snapshot is built.
+        /// order the results are in. A result no route reaches also carries that it is blocked and
+        /// the army in the way where there is a visible one, in both order modes; that costs one
+        /// lookup in the whole-map sweep and at most one path query, asked when a result is read
+        /// and never while a snapshot is built.
         /// </summary>
         private ScannerDirections BuildDirections(Vector2Int origin, ScannerResult result)
         {
@@ -1051,7 +1052,9 @@ namespace SongsOfConquestAccess.Scanner
                 return new ScannerDirections(steps);
             }
 
-            return new ScannerDirections(steps, _pathSource.TryGetPathBlockerName(origin, result));
+            string armyName;
+            bool blocked = _pathSource.TryGetPathBlocker(origin, result, out armyName);
+            return new ScannerDirections(steps, blocked, armyName);
         }
 
         private IReadOnlyList<ScannerDirectionStep> BuildStraightLineDirections(Vector2Int origin, Vector2Int target)

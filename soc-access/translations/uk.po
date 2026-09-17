@@ -2510,6 +2510,11 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr "Маяки"
 
+#. Scanner.Blocked
+msgctxt "Scanner.Blocked"
+msgid "blocked, {0}"
+msgstr "шлях перекрито, {0}"
+
 #. Scanner.BlockedBy
 msgctxt "Scanner.BlockedBy"
 msgid "blocked by {0}, {1}"

@@ -100,36 +100,6 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(new Vector2Int(9, 0), position);
         }
 
-        /// <summary>An army anywhere on the route is what stops the player, even where something
-        /// built on the map comes first, and only a route with no army on it names an entity.
-        /// </summary>
-        [TestMethod]
-        public void AnArmyOnTheRouteIsNamedBeforeAnEntityOnIt()
-        {
-            AdventureMapAdapter.RouteBlocker[] route =
-            {
-                new AdventureMapAdapter.RouteBlocker(null, null),
-                new AdventureMapAdapter.RouteBlocker(null, "Pile of Wood"),
-                new AdventureMapAdapter.RouteBlocker("A stand of Roots troops", null)
-            };
-
-            Assert.AreEqual("A stand of Roots troops", AdventureMapAdapter.ChooseRouteBlockerName(route));
-        }
-
-        [TestMethod]
-        public void AnEntityIsNamedWhenNoArmyLiesAnywhereOnTheRoute()
-        {
-            AdventureMapAdapter.RouteBlocker[] route =
-            {
-                new AdventureMapAdapter.RouteBlocker(null, null),
-                new AdventureMapAdapter.RouteBlocker(null, "Pile of Wood"),
-                new AdventureMapAdapter.RouteBlocker(null, "Burnt Building")
-            };
-
-            Assert.AreEqual("Pile of Wood", AdventureMapAdapter.ChooseRouteBlockerName(route));
-            Assert.IsNull(AdventureMapAdapter.ChooseRouteBlockerName(new AdventureMapAdapter.RouteBlocker[0]));
-        }
-
         private static ScannerResult Group(params Vector2Int[] points)
         {
             ScannerResult result = new ScannerResult("unexplored:1", "Unexplored", points[0])

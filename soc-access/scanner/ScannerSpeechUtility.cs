@@ -33,15 +33,18 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             string text = ModText.JoinListWithCommas(parts);
-            // What stands in the way of a result no route reaches is said before the directions,
-            // and the list itself is all either caller passes down.
+            // That a result no route reaches is blocked is said before the directions, with the
+            // army in the way where the player can see one, and the list itself is all either
+            // caller passes down.
             ScannerDirections runs = directions as ScannerDirections;
-            if (runs == null || string.IsNullOrWhiteSpace(runs.BlockerName))
+            if (runs == null || !runs.Blocked)
             {
                 return text;
             }
 
-            return ModText.Get(ModStrings.Scanner.BlockedBy, runs.BlockerName, text);
+            return string.IsNullOrWhiteSpace(runs.BlockerName)
+                ? ModText.Get(ModStrings.Scanner.Blocked, text)
+                : ModText.Get(ModStrings.Scanner.BlockedBy, runs.BlockerName, text);
         }
 
         /// <summary>

@@ -1421,33 +1421,35 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>
-        /// What stands between the cursor and a result the normal pathfinder could not reach. The
-        /// terrain-only pathfinder is asked for the same journey, and its whole route is walked
-        /// for a tile an enemy or neutral army's zone of control covers - the army's own tile is
-        /// one of its zone's points. An army anywhere on the route is what stops the player, so it
-        /// is named ahead of any map entity on the route, and a blocking entity is named only where
-        /// no army's zone lies anywhere on it. A route terrain alone refuses has nothing to name
-        /// and answers null.
+        /// Whether a result the normal pathfinder could not reach is blocked by something other
+        /// than the ground, and the army to name for it. The terrain-only pathfinder is asked for
+        /// the same journey: where it finds no route either, the ground itself is the answer, there
+        /// is nothing to report and this answers false. Where it does find one, the result is
+        /// blocked, and the route is walked for a tile a visible enemy or neutral army's zone of
+        /// control covers - the army's own tile is one of its zone's points - which is the only
+        /// thing named. Nothing built on the map is named: the terrain-only route runs through
+        /// pickups and buildings a real route would walk around, so naming one is a guess.
         ///
         /// One extra path query, only for a result no route reaches, only when it is read.
         /// </summary>
-        public string TryGetPathBlockerName(Vector2Int origin, ScannerResult result)
+        public bool TryGetPathBlocker(Vector2Int origin, ScannerResult result, out string armyName)
         {
+            armyName = null;
             if (_facade == null || _facade.Level == null || !IsWithinMap(origin))
             {
-                return null;
+                return false;
             }
 
             int teamId = GetLocalTeamId();
             if (teamId < 0)
             {
-                return null;
+                return false;
             }
 
             List<Vector2Int> targets = GetScannerPathTargets(result, teamId);
             if (targets.Count == 0)
             {
-                return null;
+                return false;
             }
 
             Vector2Int destination;
@@ -1461,13 +1463,23 @@ namespace SongsOfConquestAccess.Adapters
                     PathfinderCacheType.Static)
                 || !route.GetIsValid())
             {
-                return null;
+                return false;
             }
 
+            armyName = FindRouteArmyName(route, teamId);
+            return true;
+        }
+
+        /// <summary>
+        /// The first army on a route that stands in the player's way: an enemy or neutral army
+        /// whose zone of control covers one of the route's tiles. Neither end of the route is a
+        /// candidate - the cursor is where the player stands and the last tile is the thing they
+        /// are asking about, which would otherwise name itself. Null where no visible army lies
+        /// anywhere on the route.
+        /// </summary>
+        private string FindRouteArmyName(PathNode[] route, int teamId)
+        {
             Dictionary<Vector2Int, List<string>> zones = GetZoneOfControlNames(teamId);
-            // Neither end of the route is in the way: the cursor is where the player stands and the
-            // last tile is the thing they are asking about, which would otherwise name itself.
-            List<RouteBlocker> candidates = new List<RouteBlocker>(Math.Max(0, route.Length - 2));
             for (int i = 1; i < route.Length - 1; i++)
             {
                 Vector2Int point = new Vector2Int(route[i].point.x, route[i].point.y);
@@ -1480,65 +1492,21 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 List<string> names;
-                string armyName = zones.TryGetValue(point, out names) && names.Count > 0 ? names[0] : null;
+                if (zones.TryGetValue(point, out names) && names.Count > 0)
+                {
+                    return names[0];
+                }
+
                 AdventureMapTile tile = GetTile(point);
-                if (string.IsNullOrWhiteSpace(armyName) && tile != null && tile.Commander != null)
+                if (tile != null && tile.Commander != null)
                 {
                     // An army the zone map does not cover, which is how a hostile army under
                     // partial fog reads.
-                    armyName = tile.Commander.Name;
-                }
-
-                string entityName = tile != null && tile.MapEntity != null && tile.MapEntity.Category.IsBlocking()
-                    ? tile.MapEntityName
-                    : null;
-                candidates.Add(new RouteBlocker(armyName, entityName));
-            }
-
-            return ChooseRouteBlockerName(candidates);
-        }
-
-        /// <summary>What one tile of a route holds that could be what blocks the route.</summary>
-        public struct RouteBlocker
-        {
-            public RouteBlocker(string armyName, string entityName)
-            {
-                ArmyName = armyName;
-                EntityName = entityName;
-            }
-
-            /// <summary>The enemy or neutral army whose zone of control covers this tile, or that
-            /// stands on it. Null where none does.</summary>
-            public string ArmyName { get; private set; }
-
-            /// <summary>The map entity on this tile that movement cannot cross. Null where there is
-            /// none.</summary>
-            public string EntityName { get; private set; }
-        }
-
-        /// <summary>
-        /// Which of a route's tiles names what blocks it: the first army on the route, and only
-        /// where the whole route holds none, the first blocking map entity on it. An army is the
-        /// answer wherever it lies, because a player cannot walk past one; a building can be walked
-        /// around and is the answer only when nothing else is.
-        /// </summary>
-        public static string ChooseRouteBlockerName(IReadOnlyList<RouteBlocker> tiles)
-        {
-            string entityName = null;
-            for (int i = 0; i < tiles.Count; i++)
-            {
-                if (!string.IsNullOrWhiteSpace(tiles[i].ArmyName))
-                {
-                    return tiles[i].ArmyName;
-                }
-
-                if (entityName == null && !string.IsNullOrWhiteSpace(tiles[i].EntityName))
-                {
-                    entityName = tiles[i].EntityName;
+                    return tile.Commander.Name;
                 }
             }
 
-            return entityName;
+            return null;
         }
 
         /// <summary>

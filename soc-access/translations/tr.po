@@ -2470,6 +2470,11 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr "İşaretler"
 
+#. Scanner.Blocked
+msgctxt "Scanner.Blocked"
+msgid "blocked, {0}"
+msgstr "engellendi, {0}"
+
 #. Scanner.BlockedBy
 msgctxt "Scanner.BlockedBy"
 msgid "blocked by {0}, {1}"

@@ -48,13 +48,25 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void AResultNoRouteReachesNamesWhatStandsInTheWayInBothOrders()
+        public void AResultAnArmyBlocksNamesTheArmyInBothOrders()
         {
             StubPathSource paths = new StubPathSource();
-            paths.SetBlocker("pickup:gold", "A stand of Roots troops");
+            paths.SetBlockedBy("pickup:gold", "A stand of Roots troops");
 
             Assert.AreEqual("blocked by A stand of Roots troops, 3e", Read(paths, ScannerResultOrders.StraightLine));
             Assert.AreEqual("blocked by A stand of Roots troops, 3e", Read(paths, ScannerResultOrders.WalkablePath));
+        }
+
+        /// <summary>A result blocked by something the player cannot see is said to be blocked and
+        /// nothing is named for it, in both orders.</summary>
+        [TestMethod]
+        public void AResultBlockedByNoVisibleArmyIsSaidWithoutANameInBothOrders()
+        {
+            StubPathSource paths = new StubPathSource();
+            paths.SetBlocked("pickup:gold");
+
+            Assert.AreEqual("blocked, 3e", Read(paths, ScannerResultOrders.StraightLine));
+            Assert.AreEqual("blocked, 3e", Read(paths, ScannerResultOrders.WalkablePath));
         }
 
         /// <summary>Terrain alone has nothing to name, so the readout is the plain directions.
@@ -74,7 +86,7 @@ namespace SongsOfConquestAccess.Tests
             StubPathSource paths = new StubPathSource();
             paths.SetCost("pickup:far", 9f);
             paths.SetTerrainCost("pickup:blocked", 2f);
-            paths.SetBlocker("pickup:blocked", "A stand of Roots troops");
+            paths.SetBlockedBy("pickup:blocked", "A stand of Roots troops");
             ModSettings.SetScannerResultOrder(ScannerResultOrders.WalkablePath);
             ScannerController controller = Controller(
                 Snapshot(
@@ -115,13 +127,13 @@ namespace SongsOfConquestAccess.Tests
         }
 
         /// <summary>A pathfinder that answers only what a test told it: a result it was given no
-        /// cost for is one nothing reaches today, and a result it was given no terrain cost for is
-        /// one no walk crosses at all.</summary>
+        /// cost for is one nothing reaches today, a result it was given no terrain cost for is one
+        /// no walk crosses at all, and a result is blocked only where a test said so.</summary>
         private sealed class StubPathSource : IScannerPathSource
         {
             private readonly Dictionary<string, float> _costs = new Dictionary<string, float>();
             private readonly Dictionary<string, float> _terrainCosts = new Dictionary<string, float>();
-            private readonly Dictionary<string, string> _blockers = new Dictionary<string, string>();
+            private readonly Dictionary<string, string> _blocked = new Dictionary<string, string>();
 
             public void SetCost(string key, float cost)
             {
@@ -133,15 +145,19 @@ namespace SongsOfConquestAccess.Tests
                 _terrainCosts[key] = cost;
             }
 
-            public void SetBlocker(string key, string name)
+            public void SetBlockedBy(string key, string armyName)
             {
-                _blockers[key] = name;
+                _blocked[key] = armyName;
             }
 
-            public string TryGetPathBlockerName(Vector2Int origin, ScannerResult result)
+            public void SetBlocked(string key)
             {
-                string blocker;
-                return _blockers.TryGetValue(result.Key, out blocker) ? blocker : null;
+                _blocked[key] = null;
+            }
+
+            public bool TryGetPathBlocker(Vector2Int origin, ScannerResult result, out string armyName)
+            {
+                return _blocked.TryGetValue(result.Key, out armyName);
             }
 
             public float GetPathCost(Vector2Int origin, ScannerResult result)
