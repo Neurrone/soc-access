@@ -297,7 +297,7 @@ namespace SongsOfConquestAccess.Audio
                 TerrainRoad,
                 CueCategory.Terrain,
                 ModStrings.Audio.TerrainRoad,
-                Spec(TerrainRoad, Tone(CueWaveform.Triangle, 660f, 0f, 45f, 4f, 18f))));
+                Spec(TerrainRoad, Tone(CueWaveform.Triangle, 330f, 0f, 45f, 4f, 18f))));
             cues.Add(new CueDefinition(
                 TerrainGround,
                 CueCategory.Terrain,
@@ -314,8 +314,8 @@ namespace SongsOfConquestAccess.Audio
                 ModStrings.Audio.TerrainWater,
                 Spec(
                     TerrainWater,
-                    Tone(CueWaveform.Sine, 520f, 0f, 35f, 4f, 12f),
-                    Tone(CueWaveform.Sine, 620f, 40f, 35f, 4f, 12f))));
+                    Tone(CueWaveform.Sine, 260f, 0f, 35f, 4f, 12f),
+                    Tone(CueWaveform.Sine, 310f, 40f, 35f, 4f, 12f))));
             cues.Add(new CueDefinition(
                 TerrainTrees,
                 CueCategory.Terrain,
@@ -341,26 +341,28 @@ namespace SongsOfConquestAccess.Audio
                 EntityFriendly,
                 CueCategory.Overworld,
                 ModStrings.Audio.EntityFriendly,
-                Spec(EntityFriendly, Tone(CueWaveform.Sine, 784f, 0f, 45f, 4f, 18f))));
+                Spec(EntityFriendly, Tone(CueWaveform.Sine, 392f, 0f, 45f, 4f, 18f))));
             cues.Add(new CueDefinition(
                 EntityEnemy,
                 CueCategory.Overworld,
                 ModStrings.Audio.EntityEnemy,
                 Spec(
                     EntityEnemy,
-                    Tone(CueWaveform.Triangle, 587f, 0f, 30f, 4f, 12f),
-                    Tone(CueWaveform.Triangle, 587f, 40f, 30f, 4f, 12f))));
+                    Tone(CueWaveform.Triangle, 294f, 0f, 30f, 4f, 12f),
+                    Tone(CueWaveform.Triangle, 294f, 40f, 30f, 4f, 12f))));
             // Sonar sweep voices. Each names a category and is immediately followed at the same
             // pan by an entity_* affiliation marker, so all four avoid the affiliation timbres:
-            // a low rising triangle horn, a static sine fifth, and two very high sine blips.
+            // a low rising triangle horn, a static sine fifth, and two bright sine blips.
+            // Every cue an octave below where it began (2026-09-17): the old set sat at 784 Hz
+            // and above and grated in long sessions.
             cues.Add(new CueDefinition(
                 SweepWielder,
                 CueCategory.Overworld,
                 ModStrings.Audio.SweepWielder,
                 Spec(
                     SweepWielder,
-                    Tone(CueWaveform.Triangle, 392f, 0f, 30f, 4f, 10f),
-                    Tone(CueWaveform.Triangle, 523f, 30f, 35f, 4f, 14f))));
+                    Tone(CueWaveform.Triangle, 262f, 0f, 30f, 4f, 10f),
+                    Tone(CueWaveform.Triangle, 349f, 30f, 35f, 4f, 14f))));
             cues.Add(new CueDefinition(
                 SweepSettlement,
                 CueCategory.Overworld,
@@ -375,13 +377,13 @@ namespace SongsOfConquestAccess.Audio
                 ModStrings.Audio.SweepResource,
                 Spec(
                     SweepResource,
-                    Tone(CueWaveform.Sine, 1319f, 0f, 18f, 4f, 6f),
-                    Tone(CueWaveform.Sine, 1319f, 26f, 18f, 4f, 8f))));
+                    Tone(CueWaveform.Sine, 659f, 0f, 18f, 4f, 6f),
+                    Tone(CueWaveform.Sine, 659f, 26f, 18f, 4f, 8f))));
             cues.Add(new CueDefinition(
                 SweepPickup,
                 CueCategory.Overworld,
                 ModStrings.Audio.SweepPickup,
-                Spec(SweepPickup, Tone(CueWaveform.Sine, 1568f, 0f, 40f, 4f, 16f))));
+                Spec(SweepPickup, Tone(CueWaveform.Sine, 784f, 0f, 40f, 4f, 16f))));
 
             cues.Add(new CueDefinition(
                 MoveDenied,
@@ -413,23 +415,26 @@ namespace SongsOfConquestAccess.Audio
                 ModStrings.Audio.HexElevation3,
                 ElevatedHexSpec(HexElevation3, 12f)));
             // A falling tritone: the one dissonant interval in the set, so danger never reads
-            // as a variant of another cue.
+            // as a variant of another cue. Dropped a tritone rather than an octave: at 200 Hz a
+            // 30 ms note is six cycles and clicks.
             cues.Add(new CueDefinition(
                 HexDanger,
                 CueCategory.Combat,
                 ModStrings.Audio.HexDanger,
                 Spec(
                     HexDanger,
-                    Tone(CueWaveform.Triangle, 566f, 0f, 30f, 4f, 12f),
-                    Tone(CueWaveform.Triangle, 400f, 35f, 30f, 4f, 12f))));
+                    Tone(CueWaveform.Triangle, 400f, 0f, 35f, 4f, 12f),
+                    Tone(CueWaveform.Triangle, 283f, 40f, 35f, 4f, 12f))));
+            // B4: a major third over the ally and a major sixth over the enemy, so the acting
+            // troop's stack fuses instead of beating (A4 over G4 beat at 48 Hz).
             cues.Add(new CueDefinition(
                 HexActive,
                 CueCategory.Combat,
                 ModStrings.Audio.HexActive,
                 Spec(
                     HexActive,
-                    Tone(CueWaveform.Sine, 880f, 0f, 30f, 4f, 12f),
-                    Tone(CueWaveform.Sine, 880f, 40f, 30f, 4f, 12f))));
+                    Tone(CueWaveform.Sine, 494f, 0f, 30f, 4f, 12f),
+                    Tone(CueWaveform.Sine, 494f, 40f, 30f, 4f, 12f))));
 
             return cues;
         }
