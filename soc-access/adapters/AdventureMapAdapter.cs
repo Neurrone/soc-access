@@ -15,6 +15,7 @@ using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Client.Grid;
 using SongsOfConquest.Client.InputManagement;
+using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
@@ -71,6 +72,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly ICommandWaiter _commandWaiter;
         private readonly IBattleManager _battleManager;
         private readonly ISceneLoader _sceneLoader;
+        private readonly Image _projectUiBlockerImage;
         private readonly MethodInfo _worldToPointMethod;
         private readonly MethodInfo _pointToWorldMethod;
         private readonly MethodInfo _getTooltipForTilePositionMethod;
@@ -200,6 +202,7 @@ namespace SongsOfConquestAccess.Adapters
             _sceneLoader = ProjectContext.HasInstance && ProjectContext.Instance.Container != null
                 ? ProjectContext.Instance.Container.TryResolve<ISceneLoader>()
                 : null;
+            _projectUiBlockerImage = ResolveProjectUiBlockerImage();
             _worldToPointMethod = cartographyConverter != null
                 ? AccessTools.Method(cartographyConverter.GetType(), "WorldToPoint", new[] { typeof(float3) })
                 : null;
@@ -421,6 +424,41 @@ namespace SongsOfConquestAccess.Adapters
         /// Read off the game each frame: the claimed set is the battle manager's own dictionary of
         /// active containers, which it adds to in <c>ClaimBattlefield</c> and removes from in
         /// <c>UnclaimBattlefield</c>.</summary>
+        /// <summary>
+        /// The image the game fades in over everything while it abandons a session - Quit to Main
+        /// Menu, Quit to Map Editor, Quit to Desktop - resolved once from the project container
+        /// (<c>MenuProjectInstaller</c> binds the blocker there). The pause menu has already closed
+        /// when that fade starts and the scene loader only goes busy when it ends, 0.2 s later, so
+        /// this image being active is the one fact that says "the map is on its way out" during
+        /// that gap. Null when the blocker cannot be reached; the gate then never fires.
+        /// </summary>
+        private Image ResolveProjectUiBlockerImage()
+        {
+            try
+            {
+                IProjectUIBlocker blocker = ProjectContext.HasInstance && ProjectContext.Instance.Container != null
+                    ? ProjectContext.Instance.Container.TryResolve<IProjectUIBlocker>()
+                    : null;
+                FieldInfo settingsField = blocker == null ? null : AccessTools.Field(blocker.GetType(), "_settings");
+                ProjectUIBlocker.Settings settings = settingsField == null
+                    ? null
+                    : settingsField.GetValue(blocker) as ProjectUIBlocker.Settings;
+                return settings == null ? null : settings.BlockerImage;
+            }
+            catch (Exception exception)
+            {
+                LogFailureOnce("resolving the project UI blocker", exception);
+                return null;
+            }
+        }
+
+        /// <summary>Whether the game's project-wide UI blocker is showing, which it is from the
+        /// moment the player confirms leaving the session until the next scene is up.</summary>
+        public bool IsProjectUiBlockerShowing()
+        {
+            return _projectUiBlockerImage != null && _projectUiBlockerImage.gameObject.activeSelf;
+        }
+
         public bool IsBattleClaimed()
         {
             IEnumerable<BattleContainer> battles = _battleManager == null ? null : _battleManager.AllActiveBattles;

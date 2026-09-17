@@ -73,6 +73,7 @@ Their layers are declared for the dev server's listing only, and are never compa
 ## Keeping the cursor
 
 `KeepStateOnPop` is true on `AdventureMapScreen`, `CombatScreen`, `SettlementScreen` and
-`DefenceMenuScreen`: a dialog COVERS those by layer rather than deactivating them, and the three
-things that do deactivate the map and the battlefield - a story sequence, a claimed battle and the
-loading screen - are gaps the player comes back from to where they were.
+`DefenceMenuScreen`: a dialog COVERS those by layer rather than deactivating them, and the four
+things that do deactivate the map and the battlefield - a story sequence, a claimed battle, the
+game's UI blocker fading in over a session being abandoned, and the loading screen - are gaps the
+player comes back from to where they were.
