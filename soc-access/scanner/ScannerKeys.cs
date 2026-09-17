@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
@@ -131,7 +131,6 @@ namespace SongsOfConquestAccess.Scanner
         public const string MidsummerDecorations = "midsummer-decorations";
         public const string Torch = "torch";
 
-        public const string GuardedGround = "guarded-ground";
         public const string Unexplored = "unexplored";
         public const string ZoneOfControl = "zone_of_control";
     }

@@ -98,16 +98,6 @@ namespace SongsOfConquestAccess.Adapters
             // No Impassable item: it is a property of the ground rather than a
             // kind of it, so every tile it would gather is already under its
             // own name in this same subcategory.
-            AddScannerGroups(
-                snapshot,
-                ScannerCategoryKeys.Obstacles,
-                ScannerSubcategoryKeys.All,
-                terrain,
-                ScannerItemKeys.GuardedGround,
-                ModStrings.Scanner.GuardedGround,
-                origin,
-                ScannerResultKind.AreaGroup,
-                cell => cell.Guarded);
         }
 
         private void AddUnexploredScannerResults(ScannerSnapshot snapshot, Vector2Int origin)
@@ -167,10 +157,6 @@ namespace SongsOfConquestAccess.Adapters
             int width = _facade.Level.Width;
             int height = _facade.Level.Height;
             byte[] exploration = localTeamId >= 0 ? _facade.Level.GetExplorationForTeam(localTeamId) : null;
-            // The guarded ground is the zone of control the tile readout speaks, read from the
-            // same per-frame map, so a tile the scan calls guarded is a tile the cursor says is
-            // within someone's zone of control.
-            Dictionary<Vector2Int, List<string>> zonesOfControl = localTeamId >= 0 ? GetZoneOfControlNames(localTeamId) : null;
             TerrainScanCell[,] terrain = new TerrainScanCell[width, height];
             for (int y = 0; y < height; y++)
             {
@@ -186,13 +172,10 @@ namespace SongsOfConquestAccess.Adapters
                     }
 
                     bool eligible = explored || visible;
-                    bool impassable = eligible && IsImpassableTerrain(localTeamId, point);
                     terrain[x, y] = new TerrainScanCell
                     {
                         Explored = eligible,
-                        Terrain = eligible ? GetTerrain(point) : AdventureTerrainKind.Unknown,
-                        Impassable = impassable,
-                        Guarded = eligible && !impassable && zonesOfControl != null && zonesOfControl.ContainsKey(point)
+                        Terrain = eligible ? GetTerrain(point) : AdventureTerrainKind.Unknown
                     };
                 }
             }
@@ -320,24 +303,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool IsImpassableTerrain(int localTeamId, Vector2Int point)
-        {
-            if (localTeamId < 0)
-            {
-                return false;
-            }
-
-            try
-            {
-                return float.IsPositiveInfinity(_facade.Level.GetStaticTravelCost(localTeamId, point));
-            }
-            catch (Exception exception)
-            {
-                LogFailureOnce("reading a point's static travel cost", exception);
-                return false;
-            }
-        }
-
         private void AddTerrainGroups(
             ScannerSnapshot snapshot,
             TerrainScanCell[,] terrain,
@@ -429,10 +394,6 @@ namespace SongsOfConquestAccess.Adapters
             public bool Explored;
 
             public AdventureTerrainKind Terrain;
-
-            public bool Impassable;
-
-            public bool Guarded;
         }
 
         private void EnqueueTerrainNeighbors(Queue<Vector2Int> queue, bool[,] visited, Vector2Int point)

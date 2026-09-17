@@ -4064,11 +4064,6 @@ msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr ""
 
-#. Scanner.GuardedGround
-msgctxt "Scanner.GuardedGround"
-msgid "Guarded ground"
-msgstr ""
-
 #. Scanner.Exploration
 msgctxt "Scanner.Exploration"
 msgid "Exploration"

@@ -2565,11 +2565,6 @@ msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "Przyjazne bramy"
 
-#. Scanner.GuardedGround
-msgctxt "Scanner.GuardedGround"
-msgid "Guarded ground"
-msgstr "Strzeżony teren"
-
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"
 msgid "Knowledge"

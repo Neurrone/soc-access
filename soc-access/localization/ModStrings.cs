@@ -1047,7 +1047,6 @@
             public static readonly ModString Entities = new ModString("Scanner.Entities", "Entities");
             public static readonly ModString Friendly = new ModString("Scanner.Friendly", "Friendly");
             public static readonly ModString FriendlyGates = new ModString("Scanner.FriendlyGates", "Friendly gates");
-            public static readonly ModString GuardedGround = new ModString("Scanner.GuardedGround", "Guarded ground");
             public static readonly ModString Exploration = new ModString("Scanner.Exploration", "Exploration");
             public static readonly ModString Knowledge = new ModString("Scanner.Knowledge", "Knowledge");
             public static readonly ModString LookAround = new ModString("Scanner.LookAround", "Look around");
