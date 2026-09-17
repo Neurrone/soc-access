@@ -3731,11 +3731,6 @@ msgctxt "Audio.HexElevation3"
 msgid "Battlefield: hex, elevation 3"
 msgstr "Champ de bataille : hexagone, altitude 3"
 
-#. Audio.HexEmpty
-msgctxt "Audio.HexEmpty"
-msgid "Battlefield: empty hex"
-msgstr "Champ de bataille : hexagone vide"
-
 #. Audio.MoveDenied
 msgctxt "Audio.MoveDenied"
 msgid "Map edge"

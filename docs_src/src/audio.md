@@ -52,8 +52,8 @@ Notes on how the gesture behaves:
 
 The combat hex grid and the troop deployment grid play a cue for each hex you land on.
 
-- `Battlefield: empty hex`: a soft tick for an empty, passable hex at ground level.
-- `Battlefield: hex, elevation 1`, `Battlefield: hex, elevation 2`, `Battlefield: hex, elevation 3`: the same tick raised one step higher for each level of elevation. An empty raised hex plays only its elevation cue. On an occupied or obstructed hex, the elevation cue plays first and the rest of the hex follows just behind it, so the raised ground stays audible.
+- An empty, passable hex at ground level is silent: most hexes are, and a tick on every one was noise.
+- `Battlefield: hex, elevation 1`, `Battlefield: hex, elevation 2`, `Battlefield: hex, elevation 3`: a soft tick, raised one step higher for each level of elevation. An empty raised hex plays only its elevation cue. On an occupied or obstructed hex, the elevation cue plays first and the rest of the hex follows just behind it, so the raised ground stays audible.
 - Troops use the same `Ally` and `Enemy` sounds as the adventure map, so affiliation is one sound language everywhere.
 - `Battlefield: acting troop`: two high blips after the occupant's sound, marking the stack whose turn it is.
 - Obstacles and impassable hexes use `Impassable tile`, the same low thud as impassable terrain. A cliff thuds too, since nothing can step onto one; walls, towers and stairs are walked on and keep their elevation cue.

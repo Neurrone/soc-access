@@ -52,7 +52,6 @@ namespace SongsOfConquestAccess.Audio
         public const string SweepSettlement = "sweep_settlement";
         public const string SweepResource = "sweep_resource";
         public const string SweepPickup = "sweep_pickup";
-        public const string HexEmpty = "hex_empty";
         public const string HexElevation1 = "hex_elevation_1";
         public const string HexElevation2 = "hex_elevation_2";
         public const string HexElevation3 = "hex_elevation_3";
@@ -395,11 +394,6 @@ namespace SongsOfConquestAccess.Audio
                     Tone(CueWaveform.Sine, 120f, 35f, 35f, 4f, 20f))));
 
             cues.Add(new CueDefinition(
-                HexEmpty,
-                CueCategory.Combat,
-                ModStrings.Audio.HexEmpty,
-                Spec(HexEmpty, Tone(CueWaveform.Sine, 520f, 0f, 35f, 4f, 14f))));
-            cues.Add(new CueDefinition(
                 HexElevation1,
                 CueCategory.Combat,
                 ModStrings.Audio.HexElevation1,
@@ -479,8 +473,9 @@ namespace SongsOfConquestAccess.Audio
             return segment;
         }
 
-        /// <summary>The empty-hex tick played as varispeed, so raised ground keeps the shortened
-        /// duration a runtime pitch offset used to give it.</summary>
+        /// <summary>A ground tick played as varispeed, so raised ground keeps the shortened
+        /// duration a runtime pitch offset used to give it. Ground level itself is silent: most
+        /// hexes are empty, and a tick on every one was noise.</summary>
         private static CueSpec ElevatedHexSpec(string key, float rateSemitones)
         {
             CueSegment segment = Tone(CueWaveform.Sine, 520f, 0f, 35f, 4f, 14f);

@@ -104,7 +104,7 @@ The deployment grid also supports the [Scanner](scanner.md) for finding enemy tr
 
 The combat hex grid uses the same keys for navigation and also supports the [Scanner](scanner.md), whose `Terrain` category holds the same groups of ground it does on the deployment grid.
 
-Each hex you land on plays a short sound for what is on it: whether it is empty, raised, obstructed, holds an ally or an enemy, or is threatened by an enemy. See [Audio](audio.md#battlefield-sounds).
+Each hex you land on plays a short sound for what is on it: whether it is raised, obstructed, holds an ally or an enemy, or is threatened by an enemy. See [Audio](audio.md#battlefield-sounds).
 
 Every troop stack has a tooltip which can be reviewed with the UI buffer.
 

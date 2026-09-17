@@ -58,7 +58,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString HexElevation1 = new ModString("Audio.HexElevation1", "Battlefield: hex, elevation 1");
             public static readonly ModString HexElevation2 = new ModString("Audio.HexElevation2", "Battlefield: hex, elevation 2");
             public static readonly ModString HexElevation3 = new ModString("Audio.HexElevation3", "Battlefield: hex, elevation 3");
-            public static readonly ModString HexEmpty = new ModString("Audio.HexEmpty", "Battlefield: empty hex");
             public static readonly ModString MoveDenied = new ModString("Audio.MoveDenied", "Map edge");
             public static readonly ModString SweepPickup = new ModString("Audio.SweepPickup", "Pickup");
             public static readonly ModString SweepResource = new ModString("Audio.SweepResource", "Resource deposit");

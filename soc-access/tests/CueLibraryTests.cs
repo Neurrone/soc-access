@@ -24,7 +24,6 @@ namespace SongsOfConquestAccess.Tests
             CueLibrary.SweepResource,
             CueLibrary.SweepPickup,
             CueLibrary.MoveDenied,
-            CueLibrary.HexEmpty,
             CueLibrary.HexElevation1,
             CueLibrary.HexElevation2,
             CueLibrary.HexElevation3,
@@ -91,17 +90,17 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ElevationCuesAreTheEmptyHexTickAtBakedVarispeed()
+        public void ElevationCuesAreOneGroundTickAtBakedVarispeed()
         {
-            CueSegment flat = CueLibrary.GetCue(CueLibrary.HexEmpty).DefaultSpec.Segments[0];
+            CueSegment flat = CueLibrary.GetCue(CueLibrary.HexElevation1).DefaultSpec.Segments[0];
             string[] elevationKeys = { CueLibrary.HexElevation1, CueLibrary.HexElevation2, CueLibrary.HexElevation3 };
             float[] expectedSemitones = { 4f, 8f, 12f };
 
-            int emptyIndex = IndexOf(CueLibrary.HexEmpty);
+            int firstIndex = IndexOf(CueLibrary.HexElevation1);
             for (int i = 0; i < elevationKeys.Length; i++)
             {
                 CueDefinition cue = CueLibrary.GetCue(elevationKeys[i]);
-                Assert.AreEqual(emptyIndex + 1 + i, IndexOf(elevationKeys[i]), elevationKeys[i]);
+                Assert.AreEqual(firstIndex + i, IndexOf(elevationKeys[i]), elevationKeys[i]);
                 Assert.AreEqual(CueCategory.Combat, cue.Category, elevationKeys[i]);
                 Assert.AreEqual(1, cue.DefaultSpec.Segments.Count, elevationKeys[i]);
 

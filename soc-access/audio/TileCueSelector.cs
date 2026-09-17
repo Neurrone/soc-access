@@ -141,7 +141,7 @@ namespace SongsOfConquestAccess.Audio
             }
             else
             {
-                cues.Add(new TileCue(elevation ?? CueLibrary.HexEmpty, 0f));
+                AddElevatedGround(cues, elevation);
             }
 
             return isThreatened ? WithDangerWarning(cues) : cues;
@@ -170,7 +170,7 @@ namespace SongsOfConquestAccess.Audio
                 return cues;
             }
 
-            cues.Add(new TileCue(elevation ?? CueLibrary.HexEmpty, 0f));
+            AddElevatedGround(cues, elevation);
             return cues;
         }
 

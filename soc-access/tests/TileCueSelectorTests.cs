@@ -315,18 +315,18 @@ namespace SongsOfConquestAccess.Tests
             CombatTile withEntity = new CombatTile(new Vector2Int(1, 3)) { EntityId = 5 };
 
             CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForCombatTile(impassable, false, false, false)));
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexEmpty }, ToArray(TileCueSelector.ForCombatTile(blocked, false, false, false)));
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexEmpty }, ToArray(TileCueSelector.ForCombatTile(withEntity, false, false, false)));
+            Assert.AreEqual(0, TileCueSelector.ForCombatTile(blocked, false, false, false).Count);
+            Assert.AreEqual(0, TileCueSelector.ForCombatTile(withEntity, false, false, false).Count);
         }
 
         [TestMethod]
-        public void EmptyCombatTilePlaysTheEmptyCue()
+        public void EmptyCombatTileAtGroundLevelIsSilent()
         {
             CombatTile tile = new CombatTile(new Vector2Int(2, 2));
 
-            CollectionAssert.AreEqual(
-                new[] { CueLibrary.HexEmpty },
-                ToArray(TileCueSelector.ForCombatTile(tile, isEnemyTroop: false, isActingTroop: false, isThreatened: false)));
+            Assert.AreEqual(
+                0,
+                TileCueSelector.ForCombatTile(tile, isEnemyTroop: false, isActingTroop: false, isThreatened: false).Count);
         }
 
         [TestMethod]
@@ -378,7 +378,7 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ThreatenedEmptyHexWarnsBeforeTheTileCue()
+        public void ThreatenedEmptyHexPlaysOnlyTheWarning()
         {
             CombatTile tile = new CombatTile(new Vector2Int(4, 4));
 
@@ -388,9 +388,8 @@ namespace SongsOfConquestAccess.Tests
                 isActingTroop: false,
                 isThreatened: true);
 
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexDanger, CueLibrary.HexEmpty }, ToArray(cues));
+            CollectionAssert.AreEqual(new[] { CueLibrary.HexDanger }, ToArray(cues));
             Assert.IsFalse(cues[0].FollowsPrevious);
-            Assert.IsTrue(cues[1].FollowsPrevious, "the tile cue must wait for the warning");
         }
 
         [TestMethod]
@@ -510,7 +509,7 @@ namespace SongsOfConquestAccess.Tests
 
             CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForTroopPlacementTile(impassable, false)));
             CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForTroopPlacementTile(withEntity, false)));
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexEmpty }, ToArray(TileCueSelector.ForTroopPlacementTile(empty, false)));
+            Assert.AreEqual(0, TileCueSelector.ForTroopPlacementTile(empty, false).Count);
         }
 
         /// <summary>A null expected cue means the affiliation is not marked at all.</summary>

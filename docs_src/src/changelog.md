@@ -74,7 +74,7 @@ Other changes:
 
 ### Sounds
 
-- Added a procedural sound system: moving the cursor now plays a short cue for every tile, on the adventure map (roads, open ground, sand, water, trees, impassable and unexplored tiles) and on the battlefield and troop deployment grids (empty hexes, elevation levels 1 to 3, obstacles, troops and threatened tiles)
+- Added a procedural sound system: moving the cursor now plays a short cue for every tile, on the adventure map (roads, open ground, sand, water, trees, impassable and unexplored tiles) and on the battlefield and troop deployment grids (elevation levels 1 to 3, obstacles, troops and threatened tiles)
 - Things on the map play a two-part chord instead of their terrain sound: a category sound for wielders, settlements, resource deposits, and pickups, followed by an `Ally` or `Enemy` marker. Neutral things only play the category sound
 - Added a sonar sweep on `P`: every entity the scanner can see within the look around radius plays its gesture from west to east, positioned by direction and quieter with distance, giving the shape of your surroundings in a few seconds
 - Moving through scanner results now plays each result's sound positioned relative to the cursor. This replaces the "Scanner plays directional beep" setting and its sound file
