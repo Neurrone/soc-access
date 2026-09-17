@@ -411,3 +411,9 @@ Filled in as the loop is used; keep entries to one line each with the date.
   `ResetAndDisableAllDevices` and the keyboard is disabled, so queued events go nowhere. Set
   `InputSystem.settings.backgroundBehavior = IgnoreFocus` and `EnableDevice(Keyboard.current)`
   for the test and put the setting back after. `/input` bypasses the device and needs none of it.
+- 2026-09-17: a manual battle can be ended from the REPL in the player's favour with
+  `game.server.Commands.ProcessServerRequest(new SongsOfConquest.Common.Battle.SurrenderBattleCommand.Request("<attackerId>v<defenderId>", <enemyTeamId>))`,
+  the identifier and the team ids read from
+  `game.server.Context.Container.TryResolve<IBattleManager>().GetLocalContainer().BattleFacade`,
+  because `DevFixtures.ResolveFromScenes<IBattleManager>()` answers null once the adventure scene
+  is unloaded.

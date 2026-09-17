@@ -1421,60 +1421,15 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>
-        /// The route the wielder would walk from the cursor to a scanner result, as runs of steps,
-        /// or null where the game answers no path. Asked when a result is read, never while a
-        /// snapshot is built, and only while the scanner's Distance setting says the walkable path.
-        /// </summary>
-        public IReadOnlyList<ScannerDirectionStep> TryGetPathDirections(Vector2Int origin, ScannerResult result)
-        {
-            if (_facade == null || _facade.Level == null || !IsWithinMap(origin))
-            {
-                return null;
-            }
-
-            int teamId = GetLocalTeamId();
-            if (teamId < 0)
-            {
-                return null;
-            }
-
-            List<Vector2Int> targets = GetScannerPathTargets(result, teamId);
-            if (targets.Count == 0)
-            {
-                return null;
-            }
-
-            Vector2Int destination;
-            PathNode[] path;
-            if (!_facade.Level.TryGetShortestPathToPoints(
-                    teamId,
-                    origin,
-                    targets,
-                    out destination,
-                    out path,
-                    (PathfinderCacheType)0)
-                || !path.GetIsValid())
-            {
-                return null;
-            }
-
-            List<Vector2Int> points = new List<Vector2Int>(path.Length);
-            for (int i = 0; i < path.Length; i++)
-            {
-                points.Add(new Vector2Int(path[i].point.x, path[i].point.y));
-            }
-
-            return ScannerDirectionUtility.BuildPathDirections(points);
-        }
-
-        /// <summary>
         /// What stands between the cursor and a result the normal pathfinder could not reach. The
-        /// terrain-only pathfinder is asked for the same journey, and its route is walked for the
-        /// first tile an army's zone of control covers - the army's own tile is one of its zone's
-        /// points - and failing that for the first map entity that blocks movement. A route terrain
-        /// alone refuses has nothing to name and answers null.
+        /// terrain-only pathfinder is asked for the same journey, and its whole route is walked
+        /// for a tile an enemy or neutral army's zone of control covers - the army's own tile is
+        /// one of its zone's points. An army anywhere on the route is what stops the player, so it
+        /// is named ahead of any map entity on the route, and a blocking entity is named only where
+        /// no army's zone lies anywhere on it. A route terrain alone refuses has nothing to name
+        /// and answers null.
         ///
-        /// One extra path query, only when the normal path failed, only when a result is read.
+        /// One extra path query, only for a result no route reaches, only when it is read.
         /// </summary>
         public string TryGetPathBlockerName(Vector2Int origin, ScannerResult result)
         {
@@ -1510,9 +1465,9 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             Dictionary<Vector2Int, List<string>> zones = GetZoneOfControlNames(teamId);
-            string entityName = null;
             // Neither end of the route is in the way: the cursor is where the player stands and the
             // last tile is the thing they are asking about, which would otherwise name itself.
+            List<RouteBlocker> candidates = new List<RouteBlocker>(Math.Max(0, route.Length - 2));
             for (int i = 1; i < route.Length - 1; i++)
             {
                 Vector2Int point = new Vector2Int(route[i].point.x, route[i].point.y);
@@ -1525,29 +1480,61 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 List<string> names;
-                if (zones.TryGetValue(point, out names) && names.Count > 0)
-                {
-                    return names[0];
-                }
-
-                if (entityName != null)
-                {
-                    continue;
-                }
-
+                string armyName = zones.TryGetValue(point, out names) && names.Count > 0 ? names[0] : null;
                 AdventureMapTile tile = GetTile(point);
-                if (tile != null
-                    && tile.MapEntity != null
-                    && tile.MapEntity.Category.IsBlocking()
-                    && !string.IsNullOrWhiteSpace(tile.MapEntityName))
-                {
-                    entityName = tile.MapEntityName;
-                }
-                else if (tile != null && tile.Commander != null && !string.IsNullOrWhiteSpace(tile.Commander.Name))
+                if (string.IsNullOrWhiteSpace(armyName) && tile != null && tile.Commander != null)
                 {
                     // An army the zone map does not cover, which is how a hostile army under
                     // partial fog reads.
-                    return tile.Commander.Name;
+                    armyName = tile.Commander.Name;
+                }
+
+                string entityName = tile != null && tile.MapEntity != null && tile.MapEntity.Category.IsBlocking()
+                    ? tile.MapEntityName
+                    : null;
+                candidates.Add(new RouteBlocker(armyName, entityName));
+            }
+
+            return ChooseRouteBlockerName(candidates);
+        }
+
+        /// <summary>What one tile of a route holds that could be what blocks the route.</summary>
+        public struct RouteBlocker
+        {
+            public RouteBlocker(string armyName, string entityName)
+            {
+                ArmyName = armyName;
+                EntityName = entityName;
+            }
+
+            /// <summary>The enemy or neutral army whose zone of control covers this tile, or that
+            /// stands on it. Null where none does.</summary>
+            public string ArmyName { get; private set; }
+
+            /// <summary>The map entity on this tile that movement cannot cross. Null where there is
+            /// none.</summary>
+            public string EntityName { get; private set; }
+        }
+
+        /// <summary>
+        /// Which of a route's tiles names what blocks it: the first army on the route, and only
+        /// where the whole route holds none, the first blocking map entity on it. An army is the
+        /// answer wherever it lies, because a player cannot walk past one; a building can be walked
+        /// around and is the answer only when nothing else is.
+        /// </summary>
+        public static string ChooseRouteBlockerName(IReadOnlyList<RouteBlocker> tiles)
+        {
+            string entityName = null;
+            for (int i = 0; i < tiles.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(tiles[i].ArmyName))
+                {
+                    return tiles[i].ArmyName;
+                }
+
+                if (entityName == null && !string.IsNullOrWhiteSpace(tiles[i].EntityName))
+                {
+                    entityName = tiles[i].EntityName;
                 }
             }
 
@@ -1560,6 +1547,21 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public float GetPathCost(Vector2Int origin, ScannerResult result)
         {
+            return GetSweptCost(origin, result, terrainOnly: false);
+        }
+
+        /// <summary>
+        /// What the same walk would cost over the terrain alone, out of a second whole-map sweep,
+        /// or infinity where the ground itself refuses it. This is what a result an army or a
+        /// building blocks is ordered by, so it sits where the length of the walk puts it.
+        /// </summary>
+        public float GetTerrainPathCost(Vector2Int origin, ScannerResult result)
+        {
+            return GetSweptCost(origin, result, terrainOnly: true);
+        }
+
+        private float GetSweptCost(Vector2Int origin, ScannerResult result, bool terrainOnly)
+        {
             if (_facade == null || _facade.Level == null || !IsWithinMap(origin))
             {
                 return float.PositiveInfinity;
@@ -1571,7 +1573,9 @@ namespace SongsOfConquestAccess.Adapters
                 return float.PositiveInfinity;
             }
 
-            Dictionary<Vector2Int, float> costs = GetWalkableCostsFrom(origin, teamId);
+            Dictionary<Vector2Int, float> costs = terrainOnly
+                ? GetTerrainCostsFrom(origin, teamId)
+                : GetWalkableCostsFrom(origin, teamId);
             List<Vector2Int> targets = GetScannerPathTargets(result, teamId);
             float best = float.PositiveInfinity;
             for (int i = 0; i < targets.Count; i++)

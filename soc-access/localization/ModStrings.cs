@@ -909,9 +909,9 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Round = new ModString("Screens.Round", "Round {0}");
             public static readonly ModString Scanner = new ModString("Screens.Scanner", "Scanner");
             public static readonly ModString ScannerContentAnnouncements = new ModString("Screens.ScannerContentAnnouncements", "Scanner content announcements");
-            public static readonly ModString ScannerDistance = new ModString("Screens.ScannerDistance", "Distance");
-            public static readonly ModString ScannerDistanceStraightLine = new ModString("Screens.ScannerDistanceStraightLine", "Straight line");
-            public static readonly ModString ScannerDistanceWalkablePath = new ModString("Screens.ScannerDistanceWalkablePath", "Walkable path");
+            public static readonly ModString ScannerResultOrder = new ModString("Screens.ScannerResultOrder", "Sort scanner results by");
+            public static readonly ModString ScannerResultOrderStraightLine = new ModString("Screens.ScannerResultOrderStraightLine", "Straight line distance");
+            public static readonly ModString ScannerResultOrderWalkablePath = new ModString("Screens.ScannerResultOrderWalkablePath", "Walkable path");
             public static readonly ModString ScannerUsesLongDirections = new ModString("Screens.ScannerUsesLongDirections", "Long directions");
             public static readonly ModString AdventureMapUsesLongRoadDirections = new ModString("Screens.AdventureMapUsesLongRoadDirections", "Long road directions");
             public static readonly ModString ScannerResultAnnouncements = new ModString("Screens.ScannerResultAnnouncements", "Scanner result announcements");
@@ -1038,7 +1038,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Attackable = new ModString("Scanner.Attackable", "Attackable");
             public static readonly ModString Barriers = new ModString("Scanner.Barriers", "Barriers");
             public static readonly ModString Beacons = new ModString("Scanner.Beacons", "Beacons");
-            public static readonly ModString BlockedStraightLineFallback = new ModString("Scanner.BlockedStraightLineFallback", "blocked by {0}, straight line, {1}");
+            public static readonly ModString BlockedBy = new ModString("Scanner.BlockedBy", "blocked by {0}, {1}");
             public static readonly ModString Buildings = new ModString("Scanner.Buildings", "Buildings");
             public static readonly ModString CustomCategoryEmpty = new ModString("Scanner.CustomCategoryEmpty", "Custom category {0} is empty");
             public static readonly ModString Dangerous = new ModString("Scanner.Dangerous", "Dangerous");
@@ -1081,7 +1081,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString SearchResults = new ModString("Scanner.SearchResults", "Search Results");
             public static readonly ModString SettlementsAndBuildSites = new ModString("Scanner.SettlementsAndBuildSites", "Settlements and Build sites");
             public static readonly ModString South = new ModString("Scanner.South", "south");
-            public static readonly ModString StraightLineFallback = new ModString("Scanner.StraightLineFallback", "straight line, {0}");
             public static readonly ModString SouthShort = new ModString("Scanner.SouthShort", "s");
             public static readonly ModString Southeast = new ModString("Scanner.Southeast", "southeast");
             public static readonly ModString SoutheastShort = new ModString("Scanner.SoutheastShort", "se");

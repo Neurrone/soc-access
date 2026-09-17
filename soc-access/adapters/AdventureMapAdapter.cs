@@ -115,6 +115,12 @@ namespace SongsOfConquestAccess.Adapters
         private int _walkableCostsTeamId;
         private Vector2Int _walkableCostsOrigin;
 
+        // The same over the terrain alone, for one frame. See GetTerrainCostsFrom.
+        private Dictionary<Vector2Int, float> _terrainCosts;
+        private int _terrainCostsFrame = -1;
+        private int _terrainCostsTeamId;
+        private Vector2Int _terrainCostsOrigin;
+
         // The zones of control covering each tile for one frame. See GetZoneOfControlNames.
         private Dictionary<Vector2Int, List<string>> _zoneOfControlNames;
         private int _zoneOfControlFrame = -1;
@@ -868,6 +874,38 @@ namespace SongsOfConquestAccess.Adapters
             _walkableCostsFrame = frame;
             _walkableCostsTeamId = teamId;
             _walkableCostsOrigin = origin;
+            return costs;
+        }
+
+        /// <summary>
+        /// The same sweep over the terrain alone: what every tile would cost to walk to if no army
+        /// and nothing built on the map stood in the way. The scanner's walkable-path order ranks a
+        /// result nothing can reach today by this, so a result behind an army sits at the distance
+        /// of the walk to it rather than at the back of the list.
+        ///
+        /// Keyed and memoised exactly as <see cref="GetWalkableCostsFrom"/> is, and for the same
+        /// reason; the two sweeps are separate because a caller usually wants only one of them.
+        /// </summary>
+        private Dictionary<Vector2Int, float> GetTerrainCostsFrom(Vector2Int origin, int teamId)
+        {
+            int frame = Time.frameCount;
+            if (_terrainCosts != null
+                && _terrainCostsFrame == frame
+                && _terrainCostsTeamId == teamId
+                && _terrainCostsOrigin == origin)
+            {
+                return _terrainCosts;
+            }
+
+            Dictionary<Vector2Int, float> costs = ToTravelCostMap(_facade.Level.PointsWithinReach(
+                teamId,
+                origin,
+                float.MaxValue,
+                PathfinderCacheType.Static));
+            _terrainCosts = costs;
+            _terrainCostsFrame = frame;
+            _terrainCostsTeamId = teamId;
+            _terrainCostsOrigin = origin;
             return costs;
         }
 

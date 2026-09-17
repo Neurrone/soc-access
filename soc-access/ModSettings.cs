@@ -24,12 +24,13 @@ namespace SongsOfConquestAccess
     }
 
     /// <summary>
-    /// What the scanner's "Distance" setting can say: the straight line between two tiles, or what
-    /// the wielder would pay to walk there. Stored as a string for the same reason the usage-hint
-    /// setting is: a value this list does not name reads as <see cref="StraightLine"/> and is left
-    /// on disk untouched, so a config written by a later build survives a run of this one.
+    /// What the "Sort scanner results by" setting can say: the straight line between two tiles, or
+    /// what the wielder would pay to walk there. Stored as a string for the same reason the
+    /// usage-hint setting is: a value this list does not name reads as <see cref="StraightLine"/>
+    /// and is left on disk untouched, so a config written by a later build survives a run of this
+    /// one.
     /// </summary>
-    public static class ScannerDistanceModes
+    public static class ScannerResultOrders
     {
         public const string StraightLine = "StraightLine";
         public const string WalkablePath = "WalkablePath";
@@ -54,7 +55,7 @@ namespace SongsOfConquestAccess
         private static ConfigEntry<bool> _readStoryCameraFocusChanges;
         private static ConfigEntry<bool> _tileCuesEnabled;
         private static ConfigEntry<bool> _scannerUsesLongDirections;
-        private static ConfigEntry<string> _scannerDistanceMode;
+        private static ConfigEntry<string> _scannerResultOrder;
         private static ConfigEntry<bool> _adventureMapUsesLongRoadDirections;
         private static ConfigEntry<bool> _readLongTooltips;
         private static ConfigEntry<string> _readUsageHints;
@@ -88,22 +89,23 @@ namespace SongsOfConquestAccess
             get { return _scannerUsesLongDirections != null && _scannerUsesLongDirections.Value; }
         }
 
-        /// <summary>Which distance the scanner reads and orders its results by - one of
-        /// <see cref="ScannerDistanceModes"/>'s values.</summary>
-        public static string ScannerDistanceMode
+        /// <summary>Which distance the scanner orders its results by - one of
+        /// <see cref="ScannerResultOrders"/>'s values. The directions spoken for a result are the
+        /// straight line either way.</summary>
+        public static string ScannerResultOrder
         {
             get
             {
-                string value = _scannerDistanceMode == null ? null : _scannerDistanceMode.Value;
-                return value == ScannerDistanceModes.WalkablePath
-                    ? ScannerDistanceModes.WalkablePath
-                    : ScannerDistanceModes.StraightLine;
+                string value = _scannerResultOrder == null ? null : _scannerResultOrder.Value;
+                return value == ScannerResultOrders.WalkablePath
+                    ? ScannerResultOrders.WalkablePath
+                    : ScannerResultOrders.StraightLine;
             }
         }
 
-        public static bool ScannerUsesWalkablePath
+        public static bool ScannerSortsByWalkablePath
         {
-            get { return ScannerDistanceMode == ScannerDistanceModes.WalkablePath; }
+            get { return ScannerResultOrder == ScannerResultOrders.WalkablePath; }
         }
 
         public static bool AdventureMapUsesLongRoadDirections
@@ -154,11 +156,11 @@ namespace SongsOfConquestAccess
                 "ScannerUsesLongDirections",
                 false,
                 "Whether spoken directions use the long form (\"3 northeast\") instead of the short form (\"3ne\").");
-            _scannerDistanceMode = config.Bind(
-                "Scanner",
-                "DistanceMode",
-                ScannerDistanceModes.StraightLine,
-                "Which distance scanner results are read and ordered by: \"StraightLine\" or \"WalkablePath\".");
+            _scannerResultOrder = config.Bind(
+                "AdventureMap",
+                "ScannerResultOrder",
+                ScannerResultOrders.StraightLine,
+                "Which distance scanner results are ordered by: \"StraightLine\" or \"WalkablePath\".");
             _adventureMapUsesLongRoadDirections = config.Bind(
                 "AdventureMap",
                 "UseLongRoadDirections",
@@ -250,14 +252,14 @@ namespace SongsOfConquestAccess
             _config?.Save();
         }
 
-        public static void SetScannerDistanceMode(string value)
+        public static void SetScannerResultOrder(string value)
         {
-            if (_scannerDistanceMode == null)
+            if (_scannerResultOrder == null)
             {
                 return;
             }
 
-            _scannerDistanceMode.Value = value;
+            _scannerResultOrder.Value = value;
             _config?.Save();
         }
 
@@ -280,7 +282,7 @@ namespace SongsOfConquestAccess
             _readStoryCameraFocusChanges = null;
             _tileCuesEnabled = null;
             _scannerUsesLongDirections = null;
-            _scannerDistanceMode = null;
+            _scannerResultOrder = null;
             _adventureMapUsesLongRoadDirections = null;
             _readLongTooltips = null;
             _readUsageHints = null;

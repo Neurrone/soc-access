@@ -44,65 +44,17 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void PathDirectionsCompressEachRunAndTurnOfTheWalk()
-        {
-            IReadOnlyList<ScannerDirectionStep> steps = ScannerDirectionUtility.BuildPathDirections(
-                new[]
-                {
-                    new Vector2Int(2, 2),
-                    new Vector2Int(2, 3),
-                    new Vector2Int(2, 4),
-                    new Vector2Int(3, 4),
-                    new Vector2Int(4, 4)
-                });
-
-            Assert.AreEqual(2, steps.Count);
-            Assert.AreEqual(ScannerDirection.North, steps[0].Direction);
-            Assert.AreEqual(2, steps[0].Count);
-            Assert.AreEqual(ScannerDirection.East, steps[1].Direction);
-            Assert.AreEqual(2, steps[1].Count);
-        }
-
-        [TestMethod]
-        public void PathDirectionsNameADiagonalStep()
-        {
-            IReadOnlyList<ScannerDirectionStep> steps = ScannerDirectionUtility.BuildPathDirections(
-                new[] { new Vector2Int(0, 0), new Vector2Int(1, 1), new Vector2Int(2, 2) });
-
-            Assert.AreEqual(1, steps.Count);
-            Assert.AreEqual(ScannerDirection.Northeast, steps[0].Direction);
-            Assert.AreEqual(2, steps[0].Count);
-        }
-
-        [TestMethod]
-        public void PathDirectionsAreEmptyForAPathThatGoesNowhere()
-        {
-            Assert.AreEqual(0, ScannerDirectionUtility.BuildPathDirections(new Vector2Int[0]).Count);
-            Assert.AreEqual(0, ScannerDirectionUtility.BuildPathDirections(new[] { new Vector2Int(4, 4) }).Count);
-            Assert.IsNull(ScannerDirectionUtility.BuildPathDirections(null));
-        }
-
-        /// <summary>A pair of tiles further apart than one step is not a walk this can name, and
-        /// answering null is what makes the readout say the straight line instead.</summary>
-        [TestMethod]
-        public void PathDirectionsRefuseAJumpThatIsNotAStep()
-        {
-            Assert.IsNull(ScannerDirectionUtility.BuildPathDirections(
-                new[] { new Vector2Int(0, 0), new Vector2Int(0, 4) }));
-        }
-
-        [TestMethod]
-        public void TheStraightLineFallbackIsNamedWhenItStandsInForAPath()
+        public void TheBlockerIsSaidBeforeTheDirectionsWhenTheGameNamesOne()
         {
             List<ScannerDirectionStep> steps = new List<ScannerDirectionStep>
             {
                 new ScannerDirectionStep(2, ScannerDirection.North)
             };
 
-            Assert.AreEqual("straight line, 2n", ScannerSpeechUtility.FormatDirections(
-                new ScannerDirections(steps, isStraightLineFallback: true), useLongForm: false));
+            Assert.AreEqual("blocked by A stand of Roots troops, 2n", ScannerSpeechUtility.FormatDirections(
+                new ScannerDirections(steps, "A stand of Roots troops"), useLongForm: false));
             Assert.AreEqual("2n", ScannerSpeechUtility.FormatDirections(
-                new ScannerDirections(steps, isStraightLineFallback: false), useLongForm: false));
+                new ScannerDirections(steps), useLongForm: false));
         }
 
         [TestMethod]

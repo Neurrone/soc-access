@@ -33,17 +33,15 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             string text = ModText.JoinListWithCommas(parts);
-            // A player who asked for the walkable path is owed the word when they are hearing the
-            // straight line instead, and the list itself is all either caller passes down.
+            // What stands in the way of a result no route reaches is said before the directions,
+            // and the list itself is all either caller passes down.
             ScannerDirections runs = directions as ScannerDirections;
-            if (runs == null || !runs.IsStraightLineFallback)
+            if (runs == null || string.IsNullOrWhiteSpace(runs.BlockerName))
             {
                 return text;
             }
 
-            return string.IsNullOrWhiteSpace(runs.BlockerName)
-                ? ModText.Get(ModStrings.Scanner.StraightLineFallback, text)
-                : ModText.Get(ModStrings.Scanner.BlockedStraightLineFallback, runs.BlockerName, text);
+            return ModText.Get(ModStrings.Scanner.BlockedBy, runs.BlockerName, text);
         }
 
         /// <summary>

@@ -277,18 +277,6 @@ namespace SongsOfConquestAccess.Screens
 
         private void DrawScanner()
         {
-            // First in the tab because it changes what every other scanner readout means: the
-            // distance spoken for a result, and the order the results come in.
-            _dialog.AddDropdown(
-                ModText.Get(ModStrings.Screens.ScannerDistance),
-                new List<UITextMeshDropdown.Option>
-                {
-                    new UITextMeshDropdown.Option(ModText.Get(ModStrings.Screens.ScannerDistanceStraightLine)),
-                    new UITextMeshDropdown.Option(ModText.Get(ModStrings.Screens.ScannerDistanceWalkablePath))
-                },
-                ModSettings.ScannerUsesWalkablePath ? 1 : 0,
-                index => ModSettings.SetScannerDistanceMode(
-                    index == 1 ? ScannerDistanceModes.WalkablePath : ScannerDistanceModes.StraightLine));
             _dialog.AddToggle(
                 ModText.Get(ModStrings.Screens.ScannerUsesLongDirections),
                 ModSettings.ScannerUsesLongDirections,
@@ -300,6 +288,19 @@ namespace SongsOfConquestAccess.Screens
 
         private void DrawAdventureMap()
         {
+            // First in the tab because it changes the order every scanner readout on the map comes
+            // in. It is a map row and not a scanner one because the walk it measures is the
+            // adventure map's; the battle scanner has no pathfinder behind it.
+            _dialog.AddDropdown(
+                ModText.Get(ModStrings.Screens.ScannerResultOrder),
+                new List<UITextMeshDropdown.Option>
+                {
+                    new UITextMeshDropdown.Option(ModText.Get(ModStrings.Screens.ScannerResultOrderStraightLine)),
+                    new UITextMeshDropdown.Option(ModText.Get(ModStrings.Screens.ScannerResultOrderWalkablePath))
+                },
+                ModSettings.ScannerSortsByWalkablePath ? 1 : 0,
+                index => ModSettings.SetScannerResultOrder(
+                    index == 1 ? ScannerResultOrders.WalkablePath : ScannerResultOrders.StraightLine));
             // Turning the road-directions element off leaves nothing for the long form to lengthen,
             // so this row goes with it rather than sitting there doing nothing.
             _dialog.AddToggle(

@@ -2470,10 +2470,10 @@ msgctxt "Scanner.Beacons"
 msgid "Beacons"
 msgstr "信標"
 
-#. Scanner.BlockedStraightLineFallback
-msgctxt "Scanner.BlockedStraightLineFallback"
-msgid "blocked by {0}, straight line, {1}"
-msgstr "被{0}阻擋，直線，{1}"
+#. Scanner.BlockedBy
+msgctxt "Scanner.BlockedBy"
+msgid "blocked by {0}, {1}"
+msgstr "被{0}阻擋，{1}"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
@@ -2654,11 +2654,6 @@ msgstr "聚落和建築工地"
 msgctxt "Scanner.South"
 msgid "south"
 msgstr "南"
-
-#. Scanner.StraightLineFallback
-msgctxt "Scanner.StraightLineFallback"
-msgid "straight line, {0}"
-msgstr "直線，{0}"
 
 #. Scanner.SouthShort
 msgctxt "Scanner.SouthShort"
@@ -3486,18 +3481,18 @@ msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "掃描器內容播報"
 
-#. Screens.ScannerDistance
-msgctxt "Screens.ScannerDistance"
-msgid "Distance"
-msgstr "距離"
+#. Screens.ScannerResultOrder
+msgctxt "Screens.ScannerResultOrder"
+msgid "Sort scanner results by"
+msgstr "掃描器結果排序方式"
 
-#. Screens.ScannerDistanceStraightLine
-msgctxt "Screens.ScannerDistanceStraightLine"
-msgid "Straight line"
-msgstr "直線"
+#. Screens.ScannerResultOrderStraightLine
+msgctxt "Screens.ScannerResultOrderStraightLine"
+msgid "Straight line distance"
+msgstr "直線距離"
 
-#. Screens.ScannerDistanceWalkablePath
-msgctxt "Screens.ScannerDistanceWalkablePath"
+#. Screens.ScannerResultOrderWalkablePath
+msgctxt "Screens.ScannerResultOrderWalkablePath"
 msgid "Walkable path"
 msgstr "可行走路徑"
 

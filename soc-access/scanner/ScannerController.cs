@@ -1038,28 +1038,20 @@ namespace SongsOfConquestAccess.Scanner
         }
 
         /// <summary>
-        /// The way from the speech origin to a result. In walkable-path mode the game is asked for
-        /// the route the wielder would walk and the runs are the steps of that route; where it
-        /// answers no path the straight line is said instead, marked so the readout names it. The
-        /// path is asked for when a result is read, never while a snapshot is built.
+        /// The way from the speech origin to a result: the runs of the straight line, whichever
+        /// order the results are in. A result no route reaches also carries what stands in the way,
+        /// in both order modes; that costs one lookup in the whole-map sweep and at most one path
+        /// query, asked when a result is read and never while a snapshot is built.
         /// </summary>
         private ScannerDirections BuildDirections(Vector2Int origin, ScannerResult result)
         {
-            if (_pathSource != null && ModSettings.ScannerUsesWalkablePath)
+            IReadOnlyList<ScannerDirectionStep> steps = BuildStraightLineDirections(origin, result.Position);
+            if (_pathSource == null || !float.IsPositiveInfinity(_pathSource.GetPathCost(origin, result)))
             {
-                IReadOnlyList<ScannerDirectionStep> path = _pathSource.TryGetPathDirections(origin, result);
-                if (path != null)
-                {
-                    return new ScannerDirections(path, isStraightLineFallback: false);
-                }
-
-                return new ScannerDirections(
-                    BuildStraightLineDirections(origin, result.Position),
-                    isStraightLineFallback: true,
-                    _pathSource.TryGetPathBlockerName(origin, result));
+                return new ScannerDirections(steps);
             }
 
-            return new ScannerDirections(BuildStraightLineDirections(origin, result.Position), isStraightLineFallback: false);
+            return new ScannerDirections(steps, _pathSource.TryGetPathBlockerName(origin, result));
         }
 
         private IReadOnlyList<ScannerDirectionStep> BuildStraightLineDirections(Vector2Int origin, Vector2Int target)
@@ -1075,13 +1067,25 @@ namespace SongsOfConquestAccess.Scanner
         /// </summary>
         private ScannerDistanceOrder CreateDistanceOrder(Vector2Int origin)
         {
-            if (_pathSource == null || !ModSettings.ScannerUsesWalkablePath)
+            if (_pathSource == null || !ModSettings.ScannerSortsByWalkablePath)
             {
                 return ScannerDistanceOrder.StraightLine(origin);
             }
 
             IScannerPathSource source = _pathSource;
-            return ScannerDistanceOrder.WalkablePath(origin, result => source.GetPathCost(origin, result));
+            return ScannerDistanceOrder.WalkablePath(origin, result => WalkCost(source, origin, result));
+        }
+
+        /// <summary>
+        /// What a result costs the order: what the wielder pays to walk there, and where something
+        /// stands in the way, what the same walk would cost over the terrain alone, so a blocked
+        /// result sits where the length of the walk puts it instead of at the back.
+        /// Only ground no walk crosses at all is infinite, and the order puts those last.
+        /// </summary>
+        private static float WalkCost(IScannerPathSource source, Vector2Int origin, ScannerResult result)
+        {
+            float cost = source.GetPathCost(origin, result);
+            return float.IsPositiveInfinity(cost) ? source.GetTerrainPathCost(origin, result) : cost;
         }
 
         private static ScannerCommandResult NoResults()

@@ -4,37 +4,29 @@ using System.Collections.Generic;
 namespace SongsOfConquestAccess.Scanner
 {
     /// <summary>
-    /// The way to a result: the runs of steps, and whether they are the straight line said because
-    /// the game answered no walkable path. The flag travels with the steps rather than beside them
-    /// because both places that speak a result's directions - the result readout and the bearing
-    /// key - are handed the list alone and neither knows which mode built it.
+    /// The way to a result: the runs of the straight line to it, and what the game says stands in
+    /// the way of walking there. The name travels with the steps rather than beside them because
+    /// both places that speak a result's directions - the result readout and the bearing key - are
+    /// handed the list alone.
     /// </summary>
     public sealed class ScannerDirections : IReadOnlyList<ScannerDirectionStep>
     {
         private readonly IReadOnlyList<ScannerDirectionStep> _steps;
 
-        public ScannerDirections(IReadOnlyList<ScannerDirectionStep> steps, bool isStraightLineFallback)
-            : this(steps, isStraightLineFallback, null)
+        public ScannerDirections(IReadOnlyList<ScannerDirectionStep> steps)
+            : this(steps, null)
         {
         }
 
-        public ScannerDirections(
-            IReadOnlyList<ScannerDirectionStep> steps,
-            bool isStraightLineFallback,
-            string blockerName)
+        public ScannerDirections(IReadOnlyList<ScannerDirectionStep> steps, string blockerName)
         {
             _steps = steps ?? new List<ScannerDirectionStep>();
-            IsStraightLineFallback = isStraightLineFallback;
             BlockerName = blockerName;
         }
 
-        /// <summary>Whether the player asked for the walkable path and got the straight line
-        /// instead, which is the one case the spoken form names.</summary>
-        public bool IsStraightLineFallback { get; private set; }
-
-        /// <summary>What the game says is standing in the way, where it names something: an army
-        /// or a map entity. Null when terrain alone stops the route, or when these are the
-        /// directions the player asked for.</summary>
+        /// <summary>What the game says is standing in the way of a result no route reaches, where
+        /// it names something: an army or a map entity. Null where a route does reach the result,
+        /// and where terrain alone stops it and there is nothing to name.</summary>
         public string BlockerName { get; private set; }
 
         public int Count

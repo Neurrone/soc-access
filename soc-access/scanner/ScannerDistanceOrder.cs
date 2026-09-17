@@ -6,10 +6,11 @@ namespace SongsOfConquestAccess.Scanner
 {
     /// <summary>
     /// The order the scanner reads results in, and the one place that knows which of the two
-    /// distances the player asked for. Straight-line mode ranks by squared tile distance from the
-    /// scan origin. Walkable-path mode ranks by what the wielder pays to walk there, putting every
-    /// result no path reaches after all the reachable ones and ordering those by straight line
-    /// among themselves; the straight line is also the tie-break between equal costs.
+    /// orders the player asked for. Straight-line mode ranks by squared tile distance from the
+    /// scan origin. Walkable-path mode ranks by the cost its caller gives each result - what the
+    /// walk there costs - putting every result with no cost at all after the rest and ordering
+    /// those by straight line among themselves; the straight line is also the tie-break between
+    /// equal costs.
     ///
     /// The landing, the reseat, the flat walk and the search all sort through one of these, which
     /// is how they agree on an order. A cost is asked for once per result and kept: a sort asks
