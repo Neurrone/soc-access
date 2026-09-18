@@ -44,7 +44,6 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly Home _home;
         private ListItem _selectedItem;
-        private ListItem _lastScrolledItem;
         private int _selectedRowIndex = -1;
         // mod.io's own words for its controls, read once rather than once per row per frame. The
         // browser is instantiated once for the session and only hidden when it closes, so this
@@ -785,21 +784,15 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            ListItem item = source.GetComponent<ListItem>();
-            if (item != null && ReferenceEquals(item, _lastScrolledItem))
-            {
-                return;
-            }
-
+            // No dedupe on the item: mod.io moves the scroll between two focuses of the same pooled
+            // row - ResetScrollRect puts it back at the top whenever the browser reopens a panel -
+            // so a row remembered as already revealed would be left off-screen. ScrollView.Reveal is
+            // its own guard: it measures the row against the viewport and returns without moving
+            // anything when it is already in view.
             ScrollRect scrollRect = HomeScrollRectField != null ? HomeScrollRectField.GetValue(_home) as ScrollRect : null;
             if (scrollRect == null)
             {
                 return;
-            }
-
-            if (item != null)
-            {
-                _lastScrolledItem = item;
             }
 
             ScrollView.Reveal(scrollRect, source);
