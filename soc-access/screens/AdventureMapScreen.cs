@@ -144,7 +144,8 @@ namespace SongsOfConquestAccess.Screens
                 menu => new TeleportMenuAdapter(menu));
 
         // Whether the mod has already said the mode was entered, so arrival and departure are each
-        // announced once. The mode itself is read off the menu above, never remembered.
+        // announced once. The mode itself is read off the menu above, never remembered, and a new
+        // adventure takes this back to not-said in Grid().
         private bool _inTeleportMode;
 
         // The tile tooltip is expensive to compose (the game's whole details capture) and the graph
@@ -205,6 +206,11 @@ namespace SongsOfConquestAccess.Screens
 
             _gridAdapter = Live;
             _grid = Live == null ? null : new AdventureMapGrid(Live, ReadMapTile);
+            // A new adventure has said nothing yet, teleport mode included. Quitting with the
+            // teleport menu up leaves the flag standing, and the next adventure's first update read
+            // that as the menu having just closed: the cursor was moved to the selected wielder and
+            // the focus forced onto the map.
+            _inTeleportMode = false;
             InvalidateTile();
             return _grid;
         }
