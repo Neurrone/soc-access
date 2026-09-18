@@ -99,6 +99,15 @@ namespace SongsOfConquestAccess.Adapters
 
         /// <summary>The stable KEY a row of this form is known by: "options-toggle-3",
         /// "game-settings-text-0". The node id a screen builds from it is the screen's to spell.
+        ///
+        /// <para>The index is the row's place among the controls of its kind that are STILL DRAWN,
+        /// not its place in the collection's list. <c>MenuFactoryController.Clear</c> destroys the
+        /// content column's children and leaves the collection holding them
+        /// (<c>MenuFactoryCollection.Clear</c> runs only from <c>Dispose</c>), so a form that redraws
+        /// itself - the lobby's game settings do it from the "Turn timers" toggle's own callback -
+        /// appends its new controls after the dead ones. Counting the survivors is what gives the
+        /// same control the same key across a redraw, and so keeps the cursor on the row the player
+        /// was working.</para>
         /// </summary>
         private static string RowKey(MenuRowSettings settings, string kind, int index)
         {
@@ -109,6 +118,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<IUITextMesh> texts = new List<IUITextMesh>();
             factory.GetCreatedTextMeshes(texts);
+            int index = 0;
             for (int i = 0; i < texts.Count; i++)
             {
                 IUITextMesh text = texts[i];
@@ -121,7 +131,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowText(
-                        RowKey(settings, "text", i),
+                        RowKey(settings, "text", index++),
                         () => SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text)),
                         () => GameObjects.IsLive(component))));
             }
@@ -131,6 +141,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<IUITextMeshInputField> fields = new List<IUITextMeshInputField>();
             factory.GetCreatedTextMeshInputFields(fields);
+            int index = 0;
             for (int i = 0; i < fields.Count; i++)
             {
                 IUITextMeshInputField field = fields[i];
@@ -143,7 +154,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowInput(
-                        RowKey(settings, "input", i),
+                        RowKey(settings, "input", index++),
                         () => InputLabel(field),
                         () => field,
                         () => field.Active && field.Interactable,
@@ -164,6 +175,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<IUITimeInputField> fields = new List<IUITimeInputField>();
             factory.GetCreatedTimeInputFields(fields);
+            int index = 0;
             for (int i = 0; i < fields.Count; i++)
             {
                 IUITimeInputField field = fields[i];
@@ -176,7 +188,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowTimeInput(
-                        RowKey(settings, "time-input", i),
+                        RowKey(settings, "time-input", index++),
                         () => TimeInputLabel(field),
                         () => TimeInputChildField(field, TimeInputMinutesField),
                         () => TimeInputChildField(field, TimeInputSecondsField),
@@ -217,6 +229,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<IUITextMeshDropdown> dropdowns = new List<IUITextMeshDropdown>();
             factory.GetCreatedTextMeshDropdowns(dropdowns);
+            int index = 0;
             for (int i = 0; i < dropdowns.Count; i++)
             {
                 IUITextMeshDropdown dropdown = dropdowns[i];
@@ -229,7 +242,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowDropdown(
-                        RowKey(settings, "dropdown", i),
+                        RowKey(settings, "dropdown", index++),
                         () => DropdownLabel(dropdown),
                         () => DropdownOptions(dropdown),
                         () => DropdownValue(dropdown),
@@ -253,6 +266,7 @@ namespace SongsOfConquestAccess.Adapters
             factory.GetCreatedTinyToggles(tinyToggles);
             toggles.AddRange(tinyToggles);
 
+            int index = 0;
             for (int i = 0; i < toggles.Count; i++)
             {
                 IUIToggle toggle = toggles[i];
@@ -265,7 +279,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowToggle(
-                        RowKey(settings, "toggle", i),
+                        RowKey(settings, "toggle", index++),
                         () => ToggleLabel(toggle),
                         () => toggle.ToggleValue = !toggle.ToggleValue,
                         () => toggle.ToggleValue,
@@ -280,6 +294,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<IUISlider> sliders = new List<IUISlider>();
             factory.GetCreatedSliders(sliders);
+            int index = 0;
             for (int i = 0; i < sliders.Count; i++)
             {
                 IUISlider slider = sliders[i];
@@ -292,7 +307,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowSlider(
-                        RowKey(settings, "slider", i),
+                        RowKey(settings, "slider", index++),
                         () => SliderLabel(slider),
                         () => ValueText(slider),
                         () => slider.SliderValue,
@@ -313,6 +328,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<IUIButton> buttons = new List<IUIButton>();
             factory.GetCreatedButtons(buttons);
+            int index = 0;
             for (int i = 0; i < buttons.Count; i++)
             {
                 IUIButton button = buttons[i];
@@ -325,7 +341,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new MenuRow(
                     component.transform,
                     new MenuRowButton(
-                        RowKey(settings, settings.ButtonKeyKind, i),
+                        RowKey(settings, settings.ButtonKeyKind, index++),
                         () => Label(button),
                         () => NativeSelectionUtility.Click(button),
                         () => NativeSelectionUtility.Select(component),
@@ -351,6 +367,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<IUIKeyBinding> bindings = new List<IUIKeyBinding>();
             factory.GetCreatedKeyBindings(bindings);
+            int index = 0;
             for (int i = 0; i < bindings.Count; i++)
             {
                 IUIKeyBinding widget = bindings[i];
@@ -362,7 +379,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 items.Add(new MenuRow(
                     component.transform,
-                    MakeKeyBinding(RowKey(settings, "keybind", i), widget, settings.KeyBindings)));
+                    MakeKeyBinding(RowKey(settings, "keybind", index++), widget, settings.KeyBindings)));
             }
         }
 
