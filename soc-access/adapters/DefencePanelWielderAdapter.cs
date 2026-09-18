@@ -114,7 +114,8 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>What the game writes where no wielder is stored ("Place wielder inside building to
-        /// strengthen the defences").</summary>
+        /// strengthen the defences"). The game draws the Store button inside the same container, so
+        /// the button's own caption is left out: it is the button's to say, not the prompt's.</summary>
         public string NoStoredWielderText
         {
             get
@@ -126,7 +127,7 @@ namespace SongsOfConquestAccess.Adapters
                     _noStoredWielderRoot = root;
                     _noStoredWielderMeshes = root == null
                         ? new UITextMesh[0]
-                        : root.GetComponentsInChildren<UITextMesh>(includeInactive: true);
+                        : OutsideOf(root.GetComponentsInChildren<UITextMesh>(includeInactive: true), GetStoreButton() as Component);
                 }
 
                 return JoinVisibleText(_noStoredWielderMeshes);
@@ -310,6 +311,26 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return SpokenText.Get(_localization, localizationKey, fallback);
+        }
+
+        private static UITextMesh[] OutsideOf(UITextMesh[] textMeshes, Component button)
+        {
+            if (button == null)
+            {
+                return textMeshes;
+            }
+
+            List<UITextMesh> kept = new List<UITextMesh>();
+            for (int i = 0; i < textMeshes.Length; i++)
+            {
+                Component mesh = textMeshes[i] as Component;
+                if (mesh == null || !mesh.transform.IsChildOf(button.transform))
+                {
+                    kept.Add(textMeshes[i]);
+                }
+            }
+
+            return kept.ToArray();
         }
 
         private static string JoinVisibleText(UITextMesh[] textMeshes)
