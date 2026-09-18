@@ -1341,9 +1341,20 @@ namespace SongsOfConquestAccess.Adapters
                 NativeSelectionUtility.PointerEnter(button);
             }
 
+            /// <summary>The pointer leaves the entry THIS ITEM WAS BUILT OVER, and only if that entry
+            /// is still the one: the blur runs on a later frame than the focus it undoes, and the
+            /// queue's entries come from a pool the game recycles as turns pass, so the item held by
+            /// the closure can be pointing at an entry now drawn for another troop or returned to the
+            /// pool. The entry is asked who it is drawing, the same question
+            /// <see cref="FindNativeQueueEntry"/> asks when the item is built.</summary>
             public void Unfocus()
             {
-                if (IsRoundMarker || _entry == null)
+                if (IsRoundMarker || _entry == null || !GameObjects.IsLive(_entry.Container))
+                {
+                    return;
+                }
+
+                if (_entry.Troop.Id != _queuedTroop.Id || _entry.Troop.Round != _queuedTroop.Round)
                 {
                     return;
                 }
