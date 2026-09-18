@@ -133,8 +133,13 @@ namespace SongsOfConquestAccess.Adapters
                     return null;
                 }
 
-                // Once per caption field, kept in _captionTexts with the root it was found under;
-                // a mesh that has gone blank sends the search over that header again.
+                // Once per caption field, kept in _captionTexts with the root it was found under,
+                // and kept even where the header has no mesh at all: _allyHeader and _enemyHeader
+                // are serialized GameObjects whose children are fixed, and the menu only toggles
+                // them and reorders them among their siblings (decompiled
+                // .../Adventure/AdventurePlayerMenu.cs:37-41,102-117), so the search cannot answer
+                // differently later. The TEXT is still read live off the mesh below, which is what
+                // a caption that has gone blank changes.
                 text = header.GetComponentInChildren<UITextMesh>(includeInactive: true);
                 root = header.transform;
                 _captionTexts[field] = text;
