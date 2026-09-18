@@ -124,6 +124,19 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        /// <summary>The chain that owns this dialog is going away: the page under the window it is
+        /// stacked over went inactive and took its children with it. Nothing else would take the
+        /// dialog down - it is the mod's own object on the DontDestroyOnLoad overlay canvas, with a
+        /// full-screen raycast blocker under it - so it goes with the screen, without running the
+        /// cancel: the player did not leave it, the page did. <c>Close</c>'s own <c>CloseSelf</c> is
+        /// a no-op here, because <see cref="Screen.RemoveChild"/> clears <c>ActiveChild</c> before
+        /// it runs this.</summary>
+        public override void OnPop()
+        {
+            base.OnPop();
+            Close();
+        }
+
         /// <summary>Rename this dialog: the words in its title bar and the name it is announced
         /// under are the same words, so they are changed together.</summary>
         public void SetTitle(string title)

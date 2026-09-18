@@ -130,11 +130,19 @@ namespace SongsOfConquestAccess.Screens
         /// closing, a scene taking the canvas with it - disarms a capture armed on the Keybinds tab.
         /// The player has no cancel, so the window going is the only way out of an armed-but-unwanted
         /// capture, and a capture left armed has the router eat the next key pressed anywhere.
-        /// </summary>
+        ///
+        /// The window itself goes with the screen, because nothing else would take it down. When the
+        /// page it was drawn over goes inactive underneath (an online turn timer, a host
+        /// disconnecting, a scene change), <see cref="Screen.RemoveChild"/> runs this and nothing
+        /// else, and the panel and its full-screen raycast blocker would be left on the
+        /// DontDestroyOnLoad overlay canvas, owned by no screen and swallowing every click.
+        /// <c>Close</c>'s own <c>CloseSelf</c> is a no-op here: <c>RemoveChild</c> clears
+        /// <c>ActiveChild</c> before it runs this.</summary>
         public override void OnPop()
         {
             ModKeyCapture.Cancel();
             base.OnPop();
+            Close();
         }
 
         public bool Close()
