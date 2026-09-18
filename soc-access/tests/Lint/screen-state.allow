@@ -9,6 +9,8 @@
 soc-access/screens/AdventureMapScreen.cs | 1 | private AdventureMapAdapter _gridAdapter; | cursor
 soc-access/screens/AdventureMapScreen.cs | 1 | private AdventureMapGrid _grid; | cursor
 soc-access/screens/AdventureMapScreen.cs | 1 | private AdventureMapTile _tile; | cursor
+soc-access/screens/AdventureMapScreen.cs | 1 | private ILanguageDefinition _tileLanguage; | cursor
+soc-access/screens/AdventureMapScreen.cs | 1 | private ILanguageDefinition _tooltipLanguage; | cursor
 soc-access/screens/AdventureMapScreen.cs | 1 | private Tooltip _tooltip; | cursor
 soc-access/screens/AdventureMapScreen.cs | 1 | private Vector2Int _tileTile; | cursor
 soc-access/screens/AdventureMapScreen.cs | 1 | private Vector2Int _tooltipTile; | cursor

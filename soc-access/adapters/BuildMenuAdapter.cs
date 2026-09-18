@@ -104,6 +104,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly HashSet<string> _reportedGameConfigFailures = new HashSet<string>();
         private readonly Dictionary<BuildSiteSize, string> _buildTimeBySize =
             new Dictionary<BuildSiteSize, string>();
+        private ILanguageDefinition _buildTimeLanguage;
         private Type _validateResearchArgType;
         private MethodInfo _validateResearchMethod;
         private Type _researchDetailsArgType;
@@ -1142,9 +1143,17 @@ namespace SongsOfConquestAccess.Adapters
 
         /// <summary>How long a size takes to build, in the game's own counted words. Fixed for the
         /// life of the menu, and asked for once per size tab on every build, so it is read once per
-        /// size.</summary>
+        /// size - and once more per size if the options menu changes the language under it, which it
+        /// can do without closing the town.</summary>
         private string BuildTimeForSize(BuildSiteSize size)
         {
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
+            if (!ReferenceEquals(language, _buildTimeLanguage))
+            {
+                _buildTimeLanguage = language;
+                _buildTimeBySize.Clear();
+            }
+
             string cached;
             if (_buildTimeBySize.TryGetValue(size, out cached))
             {

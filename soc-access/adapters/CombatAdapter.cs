@@ -184,6 +184,7 @@ namespace SongsOfConquestAccess.Adapters
         // Every recovery below says so the first time it happens; see FaultLog.
         private readonly FaultLog _faults = new FaultLog("CombatAdapter");
         private Dictionary<string, TileInstruction> _combatInstructionKinds;
+        private ILanguageDefinition _combatInstructionKindsLanguage;
         private bool _combatInstructionKindsProbed;
         private readonly ICameraLookup _cameraLookup;
         private readonly object _cartographyConverter;

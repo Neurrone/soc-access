@@ -12,6 +12,7 @@ using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech.Spatial;
 using SongsOfConquestAccess.UI;
@@ -265,7 +266,7 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>The kind a row's text names, matched against the game's own battle instruction
-        /// strings, which are resolved once per adapter. A wording the table does not hold is logged
+        /// strings, which are resolved once per language. A wording the table does not hold is logged
         /// once so a new game kind shows up in the log rather than vanishing.</summary>
         private TileInstruction ClassifyCombatInstruction(string text)
         {
@@ -286,14 +287,22 @@ namespace SongsOfConquestAccess.Adapters
             return TileInstruction.None;
         }
 
+        /// <summary>The table maps the game's LOCALIZED instruction rows onto kinds, and the game
+        /// changes language live - the options menu is reachable from a battle - so it is keyed on
+        /// the language object the handler is holding, as <see cref="UI.TroopHudRows"/>'s caption is.
+        /// One property read per classification, and a classification happens when a tooltip is
+        /// composed.</summary>
         private void EnsureCombatInstructionKinds()
         {
-            if (_combatInstructionKindsProbed)
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
+            if (_combatInstructionKindsProbed && ReferenceEquals(language, _combatInstructionKindsLanguage))
             {
                 return;
             }
 
             _combatInstructionKindsProbed = true;
+            _combatInstructionKindsLanguage = language;
+            _combatInstructionKinds = null;
             if (_localization == null)
             {
                 return;

@@ -114,6 +114,7 @@ namespace SongsOfConquestAccess.Adapters
         private string[] _columnLabelList;
         private string _title;
         private List<MapSelectFilterAdapter> _filters;
+        private ILanguageDefinition _labelLanguage;
         private IMenuButtonAdapter _clearFiltersButton;
         private bool _clearFiltersProbed;
 
@@ -177,7 +178,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return _title ?? (_title = GetLocalizedText("Lobby/MapSelect/Title", string.Empty)); }
+            get
+            {
+                SyncLabelLanguage();
+                return _title ?? (_title = GetLocalizedText("Lobby/MapSelect/Title", string.Empty));
+            }
         }
 
         /// <summary>The map name the preview panel draws beside the table, which the game sets from
@@ -299,6 +304,7 @@ namespace SongsOfConquestAccess.Adapters
                 return new MapSelectFilterAdapter[0];
             }
 
+            SyncLabelLanguage();
             if (_filters != null)
             {
                 return _filters;
@@ -337,6 +343,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<string> GetColumnLabels()
         {
+            SyncLabelLanguage();
             return _columnLabelList ?? (_columnLabelList = new[]
             {
                 GetColumnLabel(0),
@@ -353,6 +360,7 @@ namespace SongsOfConquestAccess.Adapters
         /// label is a subtree walk, and the band is set up before the page is navigable.</summary>
         private string GetColumnLabel(int columnIndex)
         {
+            SyncLabelLanguage();
             if (columnIndex < 0 || columnIndex >= _columnLabels.Length)
             {
                 return ResolveColumnLabel(columnIndex);
@@ -365,6 +373,27 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return _columnLabels[columnIndex];
+        }
+
+        /// <summary>Everything read once above is localized, and the lobby's own options button
+        /// changes the language without this page closing, so all of it is dropped when the handler
+        /// hands back a different language.</summary>
+        private void SyncLabelLanguage()
+        {
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
+            if (ReferenceEquals(language, _labelLanguage))
+            {
+                return;
+            }
+
+            _labelLanguage = language;
+            _columnLabelList = null;
+            _title = null;
+            _filters = null;
+            for (int i = 0; i < _columnLabelResolved.Length; i++)
+            {
+                _columnLabelResolved[i] = false;
+            }
         }
 
         private string ResolveColumnLabel(int columnIndex)
@@ -658,6 +687,10 @@ namespace SongsOfConquestAccess.Adapters
         // Everything the row reads off the map's own metadata and off the game's tooltip data is fixed
         // for the life of the row, and a tooltip's existence can only be answered by capturing it, so
         // each is read once and kept. The live parts - the selection, the preview text - are not here.
+        // The kept strings that came out of the localization tables are dropped when the lobby's
+        // options button changes the language under the row (SyncLabelLanguage); the tooltips are
+        // not, because what they hold is a function that reads the game when it is asked.
+        private ILanguageDefinition _labelLanguage;
         private string _name;
         private string _nativeKey;
         private string _typeLabel;
@@ -769,17 +802,45 @@ namespace SongsOfConquestAccess.Adapters
 
         public string TypeLabel
         {
-            get { return _typeLabel ?? (_typeLabel = GetTypeLabel()); }
+            get
+            {
+                SyncLabelLanguage();
+                return _typeLabel ?? (_typeLabel = GetTypeLabel());
+            }
         }
 
         public IReadOnlyList<string> TagLabels
         {
-            get { return _tagLabels ?? (_tagLabels = GetTagLabels()); }
+            get
+            {
+                SyncLabelLanguage();
+                return _tagLabels ?? (_tagLabels = GetTagLabels());
+            }
         }
 
         public IReadOnlyList<string> WinConditionLabels
         {
-            get { return _winConditionLabels ?? (_winConditionLabels = GetWinConditionLabels()); }
+            get
+            {
+                SyncLabelLanguage();
+                return _winConditionLabels ?? (_winConditionLabels = GetWinConditionLabels());
+            }
+        }
+
+        private void SyncLabelLanguage()
+        {
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
+            if (ReferenceEquals(language, _labelLanguage))
+            {
+                return;
+            }
+
+            _labelLanguage = language;
+            _typeLabel = null;
+            _tagLabels = null;
+            _winConditionLabels = null;
+            _completedLabel = null;
+            _notCompletedLabel = null;
         }
 
         /// <summary>One tooltip per drawn win-condition icon, in the order of
@@ -816,12 +877,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public string CompletedLabel
         {
-            get { return _completedLabel ?? (_completedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", string.Empty)); }
+            get
+            {
+                SyncLabelLanguage();
+                return _completedLabel ?? (_completedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", string.Empty));
+            }
         }
 
         public string NotCompletedLabel
         {
-            get { return _notCompletedLabel ?? (_notCompletedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", string.Empty)); }
+            get
+            {
+                SyncLabelLanguage();
+                return _notCompletedLabel ?? (_notCompletedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", string.Empty));
+            }
         }
 
         public string Description

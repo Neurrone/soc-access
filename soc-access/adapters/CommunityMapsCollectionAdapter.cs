@@ -5,6 +5,7 @@ using HarmonyLib;
 using ModIO;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.UI;
 using TMPro;
@@ -35,17 +36,28 @@ namespace SongsOfConquestAccess.Adapters
             new FrameSweep<ListItem>("community maps collection list", inactiveToo: false);
 
         private readonly Collection _collection;
-        private readonly string _browseLabel;
-        private readonly string _collectionLabel;
-        private readonly string _searchFilterLabel;
-        private readonly string _downloadsLabel;
-        private readonly string _moreOptionsLabel;
-        private readonly string _unsubscribeLabel;
+
+        // mod.io's own words for its controls, read once rather than once per row per frame. The
+        // browser is instantiated once for the session and only hidden when it closes, so this
+        // adapter outlives an options visit; mod.io re-translates its own UI when the language
+        // changes under an open browser, so these are read again when it does (SyncLabelLanguage).
+        private ILanguageDefinition _labelLanguage;
+        private string _browseLabel;
+        private string _collectionLabel;
+        private string _searchFilterLabel;
+        private string _downloadsLabel;
+        private string _moreOptionsLabel;
+        private string _unsubscribeLabel;
         private CollectionItem _selectedItem;
 
         public CommunityMapsCollectionAdapter(Collection collection)
         {
             _collection = collection;
+            SyncLabelLanguage();
+        }
+
+        private void ReadLabels()
+        {
             _browseLabel = CommunityMapsText.Translate("Browse");
             _collectionLabel = CommunityMapsText.Translate("Collection");
             _searchFilterLabel = CommunityMapsText.FindTopBar("Search & filter");
@@ -54,8 +66,25 @@ namespace SongsOfConquestAccess.Adapters
             _unsubscribeLabel = CommunityMapsText.Translate("Unsubscribe");
         }
 
+        /// <summary>Read the words above again where the game has changed language since. Asked from
+        /// <see cref="IsPresent"/>, which the screen asks every frame before it reads anything.
+        /// </summary>
+        private void SyncLabelLanguage()
+        {
+            ILocalizationHandler localization = GlobalLocalizationVariables.LocalizationHandler;
+            ILanguageDefinition language = localization != null ? localization.CurrentLanguage : null;
+            if (ReferenceEquals(language, _labelLanguage))
+            {
+                return;
+            }
+
+            _labelLanguage = language;
+            ReadLabels();
+        }
+
         public bool IsPresent()
         {
+            SyncLabelLanguage();
             return Browser.IsOpen
                 && _collection != null
                 && _collection.CollectionPanel != null

@@ -153,6 +153,7 @@ namespace SongsOfConquestAccess.Screens
         private Vector2Int _tooltipTile;
         private Tooltip _tooltip;
         private bool _tooltipRead;
+        private ILanguageDefinition _tooltipLanguage;
 
         // The tile itself is the same story: reading one still runs the game's shortest-path query
         // for an interactable entity standing on it, on top of everything the adapter reads about
@@ -162,6 +163,7 @@ namespace SongsOfConquestAccess.Screens
         private Vector2Int _tileTile;
         private AdventureMapTile _tile;
         private bool _tileRead;
+        private ILanguageDefinition _tileLanguage;
 
         // THE ADVENTURE FINDS ITSELF: the view installer is a component on the adventure scene's
         // SceneContext object, and its container is where everything the map reads is bound, so the
@@ -397,16 +399,20 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>The tile under the cursor, read once and kept until the cursor moves or the map
-        /// changes, the same shape as <see cref="TileTooltip"/> below.</summary>
+        /// changes, the same shape as <see cref="TileTooltip"/> below. Both hold localized text the
+        /// pause menu's options page can change under a still cursor - no map event fires for it -
+        /// so both are keyed on the language as well.</summary>
         private AdventureMapTile CursorTile()
         {
             Vector2Int tile = Grid().CursorTile;
-            if (_tileRead && tile == _tileTile)
+            ILanguageDefinition language = MapLanguage();
+            if (_tileRead && tile == _tileTile && ReferenceEquals(language, _tileLanguage))
             {
                 return _tile;
             }
 
             _tileTile = tile;
+            _tileLanguage = language;
             _tileRead = true;
             _tile = Live.GetTile(tile);
             return _tile;
@@ -427,15 +433,24 @@ namespace SongsOfConquestAccess.Screens
         private Tooltip TileTooltip()
         {
             Vector2Int tile = Grid().CursorTile;
-            if (_tooltipRead && tile == _tooltipTile)
+            ILanguageDefinition language = MapLanguage();
+            if (_tooltipRead && tile == _tooltipTile && ReferenceEquals(language, _tooltipLanguage))
             {
                 return _tooltip;
             }
 
             _tooltipTile = tile;
+            _tooltipLanguage = language;
             _tooltipRead = true;
             _tooltip = Live.GetTooltip(tile);
             return _tooltip;
+        }
+
+        /// <summary>The language the map's text is being read in, off the adapter's own handler.</summary>
+        private ILanguageDefinition MapLanguage()
+        {
+            ILocalizationHandler localization = Live != null ? Live.LocalizationHandler : null;
+            return localization != null ? localization.CurrentLanguage : null;
         }
 
         /// <summary>Enter on the map. While the teleport menu is up it confirms the destination and

@@ -165,7 +165,8 @@ namespace SongsOfConquestAccess.Adapters
         /// section pool is drawing - how many sections, which the first and last are, and how many
         /// buttons they draw between them - read from the game on every call (AGENTS.md,
         /// Performance). Which article is SELECTED is not part of it: each item answers that from
-        /// the event system when it is asked.</summary>
+        /// the event system when it is asked. The language is, because the options menu re-localizes
+        /// every drawn mesh where it stands and the pool is left alone.</summary>
         public IReadOnlyList<ArticleGroupItem> GetArticleGroups()
         {
             IList sections = GetActivePoolEntries(CategorySectionPoolField);
@@ -195,11 +196,13 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
             if (_articleGroups != null
                 && drawnSections == _articleSectionCount
                 && drawnButtons == _articleButtonCount
                 && ReferenceEquals(first, _firstArticleSection)
-                && ReferenceEquals(last, _lastArticleSection))
+                && ReferenceEquals(last, _lastArticleSection)
+                && ReferenceEquals(language, _articleLanguage))
             {
                 return _articleGroups;
             }
@@ -208,6 +211,7 @@ namespace SongsOfConquestAccess.Adapters
             _articleButtonCount = drawnButtons;
             _firstArticleSection = first;
             _lastArticleSection = last;
+            _articleLanguage = language;
             _articleGroups = ReadArticleGroups(sections);
             return _articleGroups;
         }
@@ -268,6 +272,7 @@ namespace SongsOfConquestAccess.Adapters
         private int _articleButtonCount = -1;
         private object _firstArticleSection;
         private object _lastArticleSection;
+        private ILanguageDefinition _articleLanguage;
 
         public bool FocusArticle(ArticleItem item)
         {

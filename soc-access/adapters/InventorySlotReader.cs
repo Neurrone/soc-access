@@ -91,8 +91,11 @@ namespace SongsOfConquestAccess.Adapters
         private readonly bool _answersLeftClick;
 
         // The rows the game writes for a mouse. They are the same for every slot and for the menu's
-        // whole life, so they are looked up once instead of nine times a slot a frame.
+        // whole life, so they are looked up once instead of nine times a slot a frame - once per
+        // language, because the options menu can change it without the menu closing, and lines in
+        // the old language would strip nothing.
         private List<string> _mouseInstructionLines;
+        private ILanguageDefinition _mouseInstructionLanguage;
 
         public InventorySlotReader(
             Func<InventoryHUD> inventory,
@@ -561,11 +564,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private List<string> GetMouseInstructionLines()
         {
-            if (_mouseInstructionLines != null)
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
+            if (_mouseInstructionLines != null && ReferenceEquals(language, _mouseInstructionLanguage))
             {
                 return _mouseInstructionLines;
             }
 
+            _mouseInstructionLanguage = language;
             List<string> lines = new List<string>();
             for (int i = 0; i < _instructionKeys.Length; i++)
             {

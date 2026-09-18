@@ -85,11 +85,15 @@ namespace SongsOfConquestAccess.Adapters
         private List<PlayerSlotItem> _playerSlots;
         private int _playerSlotsSignature;
 
+        // The five row-button names, read once each. The lobby has its own options button, which
+        // changes the language without the page closing, so the language they were read under is
+        // held beside them and they are dropped when the handler hands back a different one.
         private string _factionLabel;
         private string _colorLabel;
         private string _startingWielderLabel;
         private string _partnershipLabel;
         private string _aiDifficultyLabel;
+        private ILanguageDefinition _labelLanguage;
 
         public AdventureLobbyPlayersAdapter(
             LobbyMenu menu,
@@ -178,27 +182,63 @@ namespace SongsOfConquestAccess.Adapters
         /// from the same localization keys <c>LobbyPlayerEntry</c> writes their tooltips with.</summary>
         public string FactionLabel
         {
-            get { return _factionLabel ?? (_factionLabel = SpokenText.Get(_localization, "Adventure/TeamQueueHUD/Faction", string.Empty)); }
+            get
+            {
+                SyncLabelLanguage();
+                return _factionLabel ?? (_factionLabel = SpokenText.Get(_localization, "Adventure/TeamQueueHUD/Faction", string.Empty));
+            }
         }
 
         public string ColorLabel
         {
-            get { return _colorLabel ?? (_colorLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/SetColor", string.Empty)); }
+            get
+            {
+                SyncLabelLanguage();
+                return _colorLabel ?? (_colorLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/SetColor", string.Empty));
+            }
         }
 
         public string StartingWielderLabel
         {
-            get { return _startingWielderLabel ?? (_startingWielderLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/SetStartingWielder", string.Empty)); }
+            get
+            {
+                SyncLabelLanguage();
+                return _startingWielderLabel ?? (_startingWielderLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/SetStartingWielder", string.Empty));
+            }
         }
 
         public string PartnershipLabel
         {
-            get { return _partnershipLabel ?? (_partnershipLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/Coop", string.Empty)); }
+            get
+            {
+                SyncLabelLanguage();
+                return _partnershipLabel ?? (_partnershipLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/Coop", string.Empty));
+            }
         }
 
         public string AiDifficultyLabel
         {
-            get { return _aiDifficultyLabel ?? (_aiDifficultyLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/SetAiDifficulty", string.Empty)); }
+            get
+            {
+                SyncLabelLanguage();
+                return _aiDifficultyLabel ?? (_aiDifficultyLabel = SpokenText.Get(_localization, "Lobby/LobbyPlayerMenu/SetAiDifficulty", string.Empty));
+            }
+        }
+
+        private void SyncLabelLanguage()
+        {
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
+            if (ReferenceEquals(language, _labelLanguage))
+            {
+                return;
+            }
+
+            _labelLanguage = language;
+            _factionLabel = null;
+            _colorLabel = null;
+            _startingWielderLabel = null;
+            _partnershipLabel = null;
+            _aiDifficultyLabel = null;
         }
 
         /// <summary>The rows the lobby is drawing, in team order. They are read off the player menu's

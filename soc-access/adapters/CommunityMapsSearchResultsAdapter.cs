@@ -4,6 +4,7 @@ using System.Reflection;
 using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.Localization;
@@ -59,6 +60,7 @@ namespace SongsOfConquestAccess.Adapters
         // which is exactly what the deleted SearchResults.Open hook used to be for.
         private bool _panelWasDrawn;
         private bool _labelsRead;
+        private ILanguageDefinition _labelLanguage;
 
         private bool _snapshotTaken;
         private int _stampRowCount;
@@ -174,10 +176,31 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPresent()
         {
+            SyncLabelLanguage();
             return Browser.IsOpen
                 && _results != null
                 && _results.SearchResultsPanel != null
                 && _results.SearchResultsPanel.activeInHierarchy;
+        }
+
+        /// <summary>Let go of everything read off the panel's texts where the game has changed
+        /// language since: mod.io re-translates its own UI in place, so the panel is drawn in the new
+        /// language while nothing the three memos above key on has moved. Asked from
+        /// <see cref="IsPresent"/>, which the screen asks every frame before it reads anything.
+        /// </summary>
+        private void SyncLabelLanguage()
+        {
+            ILocalizationHandler localization = GlobalLocalizationVariables.LocalizationHandler;
+            ILanguageDefinition language = localization != null ? localization.CurrentLanguage : null;
+            if (ReferenceEquals(language, _labelLanguage))
+            {
+                return;
+            }
+
+            _labelLanguage = language;
+            _labelsRead = false;
+            _snapshotTaken = false;
+            _overlayRead = false;
         }
 
         public string Title

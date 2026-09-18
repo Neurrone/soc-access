@@ -4,6 +4,7 @@ using System.Reflection;
 using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.UI;
 using TMPro;
@@ -45,15 +46,27 @@ namespace SongsOfConquestAccess.Adapters
         private readonly Dictionary<TMP_Text, string> _nearbyLabels = new Dictionary<TMP_Text, string>();
 
         private readonly Details _details;
-        private readonly string _voteUpLabel;
-        private readonly string _voteDownLabel;
-        private readonly string _reportLabel;
-        private readonly string _backLabel;
-        private readonly string _downloadsLabel;
+
+        // mod.io's own words for its controls, read once rather than once per row per frame. The
+        // browser is instantiated once for the session and only hidden when it closes, so this
+        // adapter outlives an options visit; mod.io re-translates its own UI when the language
+        // changes under an open browser, so these and the stat labels above are read again when it
+        // does (SyncLabelLanguage).
+        private ILanguageDefinition _labelLanguage;
+        private string _voteUpLabel;
+        private string _voteDownLabel;
+        private string _reportLabel;
+        private string _backLabel;
+        private string _downloadsLabel;
 
         public CommunityMapsDetailsAdapter(Details details)
         {
             _details = details;
+            SyncLabelLanguage();
+        }
+
+        private void ReadLabels()
+        {
             _voteUpLabel = CommunityMapsText.Translate("Vote up");
             _voteDownLabel = CommunityMapsText.Translate("Vote down");
             _reportLabel = CommunityMapsText.Translate("Report");
@@ -65,8 +78,26 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>Read the words above again where the game has changed language since. Asked from
+        /// <see cref="IsPresent"/>, which the screen asks every frame before it reads anything.
+        /// </summary>
+        private void SyncLabelLanguage()
+        {
+            ILocalizationHandler localization = GlobalLocalizationVariables.LocalizationHandler;
+            ILanguageDefinition language = localization != null ? localization.CurrentLanguage : null;
+            if (ReferenceEquals(language, _labelLanguage))
+            {
+                return;
+            }
+
+            _labelLanguage = language;
+            _nearbyLabels.Clear();
+            ReadLabels();
+        }
+
         public bool IsPresent()
         {
+            SyncLabelLanguage();
             return Browser.IsOpen
                 && _details != null
                 && _details.ModDetailsPanel != null

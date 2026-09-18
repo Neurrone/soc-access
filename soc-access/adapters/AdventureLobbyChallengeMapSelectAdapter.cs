@@ -321,6 +321,11 @@ namespace SongsOfConquestAccess.Adapters
         // Everything the row reads off the map's own metadata and off the game's tooltip data is fixed
         // for the life of the row, and a tooltip's existence can only be answered by capturing it, so
         // each is read once and kept. The live parts - the selection, the preview text - are not here.
+        // What came out of the localization tables is dropped when the lobby's options button changes
+        // the language under the row (SyncLabelLanguage); the tooltips are not, because what they
+        // hold is a function that reads the game when it is asked, and neither is the map's name,
+        // which the game itself froze when it set the row up.
+        private ILanguageDefinition _labelLanguage;
         private string _name;
         private string _nativeKey;
         private string _completedLabel;
@@ -363,7 +368,25 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<string> WinConditionLabels
         {
-            get { return _winConditionLabels ?? (_winConditionLabels = GetWinConditionLabels()); }
+            get
+            {
+                SyncLabelLanguage();
+                return _winConditionLabels ?? (_winConditionLabels = GetWinConditionLabels());
+            }
+        }
+
+        private void SyncLabelLanguage()
+        {
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
+            if (ReferenceEquals(language, _labelLanguage))
+            {
+                return;
+            }
+
+            _labelLanguage = language;
+            _winConditionLabels = null;
+            _completedLabel = null;
+            _notCompletedLabel = null;
         }
 
         /// <summary>One tooltip per drawn win-condition icon, in the order of
@@ -405,12 +428,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public string CompletedLabel
         {
-            get { return _completedLabel ?? (_completedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", string.Empty)); }
+            get
+            {
+                SyncLabelLanguage();
+                return _completedLabel ?? (_completedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", string.Empty));
+            }
         }
 
         public string NotCompletedLabel
         {
-            get { return _notCompletedLabel ?? (_notCompletedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", string.Empty)); }
+            get
+            {
+                SyncLabelLanguage();
+                return _notCompletedLabel ?? (_notCompletedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", string.Empty));
+            }
         }
 
         public string Description

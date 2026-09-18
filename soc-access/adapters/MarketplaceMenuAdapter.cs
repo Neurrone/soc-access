@@ -122,14 +122,20 @@ namespace SongsOfConquestAccess.Adapters
         ///
         /// A grid whose column captions are not all drawn yet is not kept: the menu spawns its
         /// buttons before it turns its headers on, and a snapshot taken in between would name the
-        /// columns nothing for the life of the menu.</summary>
+        /// columns nothing for the life of the menu.
+        ///
+        /// The captions are localized, and the options menu the pause menu opens changes the
+        /// language without closing anything, so the language they were read under is part of the
+        /// key.</summary>
         private GridSnapshot Grid()
         {
             List<MarketplaceButton> buttons = Reflect.Get<List<MarketplaceButton>>(_menu, ButtonsField);
             int count = buttons != null ? buttons.Count : 0;
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
             if (_grid != null
                 && ReferenceEquals(_grid.Source, buttons)
                 && _grid.Count == count
+                && ReferenceEquals(_grid.Language, language)
                 && _grid.IsCaptioned)
             {
                 return _grid;
@@ -138,6 +144,7 @@ namespace SongsOfConquestAccess.Adapters
             GridSnapshot grid = new GridSnapshot();
             grid.Source = buttons;
             grid.Count = count;
+            grid.Language = language;
             grid.Columns = BuildTradeColumns();
             grid.ByCell = new Dictionary<long, MarketplaceButton>();
             for (int i = 0; buttons != null && i < buttons.Count; i++)
@@ -268,6 +275,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             public List<MarketplaceButton> Source;
             public int Count;
+            public ILanguageDefinition Language;
             public List<TradeColumn> Columns;
             public Dictionary<long, MarketplaceButton> ByCell;
 

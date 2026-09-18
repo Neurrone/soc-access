@@ -6,6 +6,7 @@ using HarmonyLib;
 using ModIO;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.Localization;
@@ -45,16 +46,21 @@ namespace SongsOfConquestAccess.Adapters
         private ListItem _selectedItem;
         private ListItem _lastScrolledItem;
         private int _selectedRowIndex = -1;
-        private readonly string _browseLabel;
-        private readonly string _collectionLabel;
-        private readonly string _featuredLabel;
-        private readonly string _searchFilterLabel;
-        private readonly string _moreOptionsLabel;
-        private readonly string _subscribeLabel;
-        private readonly string _unsubscribeLabel;
-        private readonly string _loadingLabel;
-        private readonly string _errorLabel;
-        private readonly string _downloadsLabel;
+        // mod.io's own words for its controls, read once rather than once per row per frame. The
+        // browser is instantiated once for the session and only hidden when it closes, so this
+        // adapter outlives an options visit; mod.io re-translates its own UI when the language
+        // changes under an open browser, so these are read again when it does (SyncLabelLanguage).
+        private ILanguageDefinition _labelLanguage;
+        private string _browseLabel;
+        private string _collectionLabel;
+        private string _featuredLabel;
+        private string _searchFilterLabel;
+        private string _moreOptionsLabel;
+        private string _subscribeLabel;
+        private string _unsubscribeLabel;
+        private string _loadingLabel;
+        private string _errorLabel;
+        private string _downloadsLabel;
 
         // mod.io's own subscription check, and the collection object it is asked on: both were looked
         // up afresh for every mod whose Subscribe label was read.
@@ -69,6 +75,11 @@ namespace SongsOfConquestAccess.Adapters
         public CommunityMapsHomeAdapter(Home home)
         {
             _home = home;
+            SyncLabelLanguage();
+        }
+
+        private void ReadLabels()
+        {
             _browseLabel = CommunityMapsText.Translate("Browse");
             _collectionLabel = CommunityMapsText.Translate("Collection");
             _featuredLabel = CommunityMapsText.Translate("Featured maps & mods");
@@ -81,8 +92,25 @@ namespace SongsOfConquestAccess.Adapters
             _downloadsLabel = CommunityMapsText.Translate("Downloads");
         }
 
+        /// <summary>Read the words above again where the game has changed language since. Asked from
+        /// <see cref="IsPresent"/>, which the screen asks every frame before it reads anything.
+        /// </summary>
+        private void SyncLabelLanguage()
+        {
+            ILocalizationHandler localization = GlobalLocalizationVariables.LocalizationHandler;
+            ILanguageDefinition language = localization != null ? localization.CurrentLanguage : null;
+            if (ReferenceEquals(language, _labelLanguage))
+            {
+                return;
+            }
+
+            _labelLanguage = language;
+            ReadLabels();
+        }
+
         public bool IsPresent()
         {
+            SyncLabelLanguage();
             return Browser.IsOpen
                 && _home != null
                 && _home.BrowserPanel != null

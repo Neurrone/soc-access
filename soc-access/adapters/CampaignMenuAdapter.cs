@@ -85,7 +85,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (_customCampaignButton == null)
                 {
                     _customCampaignButton = CreateOptionalButton(
-                        ModText.Get(ModStrings.Screens.CustomCampaigns),
+                        () => ModText.Get(ModStrings.Screens.CustomCampaigns),
                         _campaignMenu != null ? CustomCampaignButtonRef(_campaignMenu) : null,
                         includeAllVisibleText: false);
                 }
@@ -103,7 +103,7 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     UIButton talesButton = _campaignMenu != null ? TalesButtonRef(_campaignMenu) : null;
                     _talesButton = CreateOptionalButton(
-                        ModText.Get(ModStrings.Screens.Tales),
+                        () => ModText.Get(ModStrings.Screens.Tales),
                         talesButton != null ? ((Component)talesButton).gameObject : null,
                         includeAllVisibleText: true);
                 }
@@ -148,7 +148,7 @@ namespace SongsOfConquestAccess.Adapters
             _headerFound = true;
             _backButton = new OptionalMenuButtonAdapter(
                 settings.BackButton,
-                ModText.Get(ModStrings.Screens.Back),
+                () => ModText.Get(ModStrings.Screens.Back),
                 () => settings.BackButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.BackButton),
                 null,
                 includeAllVisibleText: false);
@@ -233,7 +233,7 @@ namespace SongsOfConquestAccess.Adapters
             return _campaignMenu != null ? CampaignButtonContainerRef(_campaignMenu) : null;
         }
 
-        private static IMenuButtonAdapter CreateOptionalButton(string fallbackLabel, GameObject root, bool includeAllVisibleText)
+        private static IMenuButtonAdapter CreateOptionalButton(System.Func<string> fallbackLabel, GameObject root, bool includeAllVisibleText)
         {
             if (!IsGameObjectActive(root))
             {
@@ -279,18 +279,22 @@ namespace SongsOfConquestAccess.Adapters
 
         private sealed class OptionalMenuButtonAdapter : MenuButtonAdapterBase
         {
-            private readonly string _fallbackLabel;
+            // The fallback is asked for when the label is read, not when the wrapper is made: the
+            // menu's own options page changes the language with this page still up and the wrapper
+            // is kept for the page's life, so a word taken at construction would be the one the
+            // player had when they arrived.
+            private readonly System.Func<string> _fallbackLabel;
             private readonly bool _includeAllVisibleText;
 
             public OptionalMenuButtonAdapter(
                 UIButton button,
-                string fallbackLabel,
+                System.Func<string> fallbackLabel,
                 System.Func<bool> isVisible,
                 System.Func<bool> activate,
                 bool includeAllVisibleText)
                 : base(button, isVisible, activate)
             {
-                _fallbackLabel = fallbackLabel ?? string.Empty;
+                _fallbackLabel = fallbackLabel;
                 _includeAllVisibleText = includeAllVisibleText;
             }
 
@@ -299,7 +303,12 @@ namespace SongsOfConquestAccess.Adapters
                 string label = _includeAllVisibleText
                     ? MenuButtonTextUtility.GetAllVisibleText(Button)
                     : MenuButtonTextUtility.GetStandardButtonLabel(Button);
-                return string.IsNullOrWhiteSpace(label) ? _fallbackLabel : label;
+                if (!string.IsNullOrWhiteSpace(label))
+                {
+                    return label;
+                }
+
+                return _fallbackLabel != null ? _fallbackLabel() : string.Empty;
             }
         }
     }

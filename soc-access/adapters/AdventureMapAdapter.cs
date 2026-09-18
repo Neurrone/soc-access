@@ -98,6 +98,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly HashSet<string> _unknownMapInstructions = new HashSet<string>(StringComparer.Ordinal);
         private Dictionary<string, TileInstruction> _mapInstructionKinds;
         private bool _mapInstructionKindsProbed;
+        private ILanguageDefinition _mapInstructionKindsLanguage;
         private readonly FocusedTileOverlay _cursorOverlay = new FocusedTileOverlay("SongsOfConquestAccess_AdventureMapCursor");
         private Vector2Int? _focusedOverlayTile;
 
@@ -1162,12 +1163,18 @@ namespace SongsOfConquestAccess.Adapters
 
         private void EnsureMapInstructionKinds()
         {
-            if (_mapInstructionKindsProbed)
+            // The table matches localized wordings, and the pause menu's options page changes the
+            // language without the map going anywhere, so the language it was read under is part of
+            // what "already probed" means.
+            ILanguageDefinition language = _localizationHandler != null ? _localizationHandler.CurrentLanguage : null;
+            if (_mapInstructionKindsProbed && ReferenceEquals(language, _mapInstructionKindsLanguage))
             {
                 return;
             }
 
             _mapInstructionKindsProbed = true;
+            _mapInstructionKindsLanguage = language;
+            _mapInstructionKinds = null;
             if (_localizationHandler == null)
             {
                 return;
