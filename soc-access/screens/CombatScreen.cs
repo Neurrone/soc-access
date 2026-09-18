@@ -290,6 +290,10 @@ namespace SongsOfConquestAccess.Screens
             _localActingTroopCycle.Reset();
             _enemyActingTroopCycle.Reset();
             _instruction = null;
+            // KeepStateOnPop keeps the navigator's cursor for the story gap INSIDE one battle, and
+            // the navigator keys what it keeps on this screen object, which every battle shares: a
+            // different battle starts from the top, not on the stop the last one ended on.
+            Navigator?.ScreenClosed(this);
         }
 
         public override void OnUpdate()
