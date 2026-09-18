@@ -50,3 +50,7 @@ soc-access/screens/PreBattleMenuScreen.cs | 1 | private bool _tooltipRead; | cur
 soc-access/screens/PreBattleMenuScreen.cs | 1 | private string _instruction; | baseline
 
 soc-access/screens/SpellbookScreen.cs | 1 | private bool _nativeDragRan; | baseline
+
+soc-access/screens/TutorialSimpleScreen.cs | 1 | private ITutorialEntry _lastTutorial; | baseline
+
+soc-access/screens/TutorialSlideshowScreen.cs | 1 | private ITutorialEntry _lastTutorial; | baseline

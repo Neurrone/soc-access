@@ -25,6 +25,8 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<TutorialSimplePopup, UIButton>("_okButton");
         private static readonly AccessTools.FieldRef<TutorialSimplePopup, UIToggle> ToggleRef =
             AccessTools.FieldRefAccess<TutorialSimplePopup, UIToggle>("_uiToggle");
+        private static readonly AccessTools.FieldRef<TutorialMenu, ITutorialEntry> CurrentTutorialRef =
+            AccessTools.FieldRefAccess<TutorialMenu, ITutorialEntry>("_currentTutorial");
 
         private readonly TutorialMenu _menu;
 
@@ -131,6 +133,15 @@ namespace SongsOfConquestAccess.Adapters
             {
                 toggle.ToggleValue = !toggle.ToggleValue;
             }
+        }
+
+        /// <summary>The tutorial the popup is showing. Its identity is how a tutorial REPLACED IN
+        /// PLACE is told from the one before it: <c>TutorialManager.ShowTutorialInternal</c> closes
+        /// and re-opens the menu in one call, so neither the menu object nor the popup ever
+        /// changes.</summary>
+        public ITutorialEntry CurrentTutorial
+        {
+            get { return _menu != null ? CurrentTutorialRef(_menu) : null; }
         }
 
         private TutorialSimplePopup SimplePopup

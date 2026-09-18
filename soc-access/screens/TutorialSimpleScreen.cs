@@ -33,6 +33,11 @@ namespace SongsOfConquestAccess.Screens
         /// menu has actually drawn - so the two screens never both stand up over one menu.</summary>
         private readonly ScreenSource<ITutorialMenu> _source = ScreenSource<ITutorialMenu>.FromProject();
 
+        // The tutorial the popup was last showing. Mod-owned and outliving the menu on purpose: the
+        // menu is the one object the project container holds for the whole game, so the adapter is
+        // never replaced and there is nothing per-menu to hang this on.
+        private ITutorialEntry _lastTutorial;
+
         protected override object ResolveMenu()
         {
             return _source.Current;
@@ -61,6 +66,53 @@ namespace SongsOfConquestAccess.Screens
             {
                 string header = Live != null ? Live.Header : null;
                 return string.IsNullOrWhiteSpace(header) ? null : header;
+            }
+        }
+
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+            WatchTutorial();
+        }
+
+        /// <summary>
+        /// One popup REPLACED BY ANOTHER, with no frame between them:
+        /// <c>TutorialManager.ShowTutorialInternal</c> closes and re-opens the menu in a single call,
+        /// so the popup never goes inactive, the project container's menu object never changes and
+        /// neither the manager's arrival announcement nor the adapter slot's own ever runs. The
+        /// heading and body nodes are keyed on subjects of the screen's own, so the second popup is
+        /// silent outright.
+        ///
+        /// The entry the menu is showing is what tells the two apart: a new one says the new title
+        /// and gives up the cursor, which the next <c>EnsureFocus</c> seats on the body - now the
+        /// new tutorial's - and reads.
+        /// </summary>
+        private void WatchTutorial()
+        {
+            if (!IsActive())
+            {
+                _lastTutorial = null;
+                return;
+            }
+
+            ITutorialEntry tutorial = Live.CurrentTutorial;
+            if (ReferenceEquals(tutorial, _lastTutorial))
+            {
+                return;
+            }
+
+            bool replaced = _lastTutorial != null;
+            _lastTutorial = tutorial;
+            if (!replaced)
+            {
+                return;
+            }
+
+            SayNameIfChanged();
+            GraphNavigator navigator = Navigator;
+            if (navigator != null && ReferenceEquals(navigator.Screen, this))
+            {
+                navigator.Blur();
             }
         }
 

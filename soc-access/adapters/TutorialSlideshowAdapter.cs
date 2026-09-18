@@ -183,7 +183,11 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private ITutorialEntry CurrentTutorial
+        /// <summary>The tutorial the menu is showing. Its identity is how a tutorial REPLACED IN
+        /// PLACE is told from the one before it: <c>TutorialManager.ShowTutorialInternal</c> closes
+        /// and re-opens the menu in one call, so neither the menu object nor the panel ever
+        /// changes.</summary>
+        public ITutorialEntry CurrentTutorial
         {
             get { return _menu != null ? CurrentTutorialRef(_menu) : null; }
         }
