@@ -71,10 +71,23 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPresent()
         {
             OptionsMenu.Settings settings = Settings;
-            return _menu != null
+            bool present = _menu != null
                 && settings != null
                 && settings.parent != null
                 && settings.parent.Active;
+            if (!present)
+            {
+                // The window is a project-container singleton, so this adapter lives for the
+                // process and one opening's capture must not be read back in the next. The window
+                // being down is what ends an opening, and this is where the game is asked: every
+                // registered screen is polled through IsActive every frame (ScreenManager.Resolve),
+                // this window included while it is closed.
+                _captureStage = 0;
+                _keyBindings.LastRebindWidget = null;
+                _keyBindings.LastRebindAction = null;
+            }
+
+            return present;
         }
 
         /// <summary>The window's tab row, built at most once a frame: each tab is an object and three
