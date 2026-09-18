@@ -250,22 +250,26 @@ namespace SongsOfConquestAccess.Adapters
             _spellTargetInstructionText = null;
         }
 
-        public string TargetingInstructionText
+        /// <summary>What the game is asking the player to aim at. Both instructions arrive as signals
+        /// and the ability's end signal is not the only way an ability aim ENDS - the controller
+        /// leaves its ChoosingAbilityTarget state on a new turn, on a menu opening and on a spell
+        /// beginning without any of the three invokes that raise it - so the captured ability line
+        /// would otherwise outlive its aim and name itself over the next spell. The mode the game is
+        /// in decides which capture is the live one; neither capture is trusted to say so itself.
+        /// </summary>
+        public string GetTargetingInstructionText(CombatTargetingMode mode)
         {
-            get
+            if (mode == CombatTargetingMode.Ability)
             {
-                if (!string.IsNullOrWhiteSpace(_abilityTargetInstructionText))
-                {
-                    return _abilityTargetInstructionText;
-                }
-
-                if (!string.IsNullOrWhiteSpace(_spellTargetInstructionText))
-                {
-                    return _spellTargetInstructionText;
-                }
-
-                return GetVisibleSpellInstructionText();
+                return _abilityTargetInstructionText;
             }
+
+            if (!string.IsNullOrWhiteSpace(_spellTargetInstructionText))
+            {
+                return _spellTargetInstructionText;
+            }
+
+            return GetVisibleSpellInstructionText();
         }
 
         public bool IsCancelSpellButtonVisible()

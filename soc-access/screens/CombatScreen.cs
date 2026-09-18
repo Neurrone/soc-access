@@ -995,7 +995,12 @@ namespace SongsOfConquestAccess.Screens
 
         private string InstructionText
         {
-            get { return Live != null && Live.Hud != null ? Live.Hud.TargetingInstructionText : null; }
+            get
+            {
+                return Live != null && Live.Hud != null
+                    ? Live.Hud.GetTargetingInstructionText(Live.GetTargetingMode())
+                    : null;
+            }
         }
 
         // ---- the cursor, driven from elsewhere ----
