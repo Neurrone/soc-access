@@ -119,7 +119,9 @@ namespace SongsOfConquestAccess.Screens
         private CombatTargetingMode _tooltipTargeting;
         private int _tooltipTroopId = -1;
         private int _tooltipTroopHealthLost;
+        private int _tooltipTroopStatusCount;
         private int _tooltipTurn;
+        private Vector2Int _tooltipCurrentTroopTile;
         private Tooltip _tooltip;
         private bool _tooltipRead;
 
@@ -391,8 +393,11 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>The cached tooltip, kept while everything it was composed from still reads the
         /// same: where the cursor stands, whether it is inspecting, what is being aimed, who stands on
-        /// the tile and with how much health lost, and the battle's own turn counter - the generation
-        /// under which reach and the moves left were true.</summary>
+        /// the tile with how much health lost and how many statuses - a wielder's spell changes the
+        /// dossier's bacterias and restrictions without taking any health - the battle's own turn
+        /// counter, and where the acting troop stands, which is what the dossier's reach, its travel
+        /// cost and its "click to attack" row are measured from and which a troop with movement left
+        /// changes without the turn moving on.</summary>
         private Tooltip TileTooltip()
         {
             Vector2Int tile = Grid().CursorTile;
@@ -400,15 +405,19 @@ namespace SongsOfConquestAccess.Screens
             CombatTargetingMode targeting = Live.GetTargetingMode();
             int troopId;
             int troopHealthLost;
-            Live.GetTileTroopState(tile, out troopId, out troopHealthLost);
+            int troopStatusCount;
+            Live.GetTileTroopState(tile, out troopId, out troopHealthLost, out troopStatusCount);
             int turn = Live.GetCurrentTurn();
+            Vector2Int currentTroopTile = Live.GetCurrentTroopPosition();
             if (_tooltipRead
                 && tile == _tooltipTile
                 && inspecting == _tooltipInspecting
                 && targeting == _tooltipTargeting
                 && troopId == _tooltipTroopId
                 && troopHealthLost == _tooltipTroopHealthLost
-                && turn == _tooltipTurn)
+                && troopStatusCount == _tooltipTroopStatusCount
+                && turn == _tooltipTurn
+                && currentTroopTile == _tooltipCurrentTroopTile)
             {
                 return _tooltip;
             }
@@ -418,7 +427,9 @@ namespace SongsOfConquestAccess.Screens
             _tooltipTargeting = targeting;
             _tooltipTroopId = troopId;
             _tooltipTroopHealthLost = troopHealthLost;
+            _tooltipTroopStatusCount = troopStatusCount;
             _tooltipTurn = turn;
+            _tooltipCurrentTroopTile = currentTroopTile;
             _tooltipRead = true;
             _tooltip = Grid().GetTooltip();
             return _tooltip;

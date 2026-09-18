@@ -38,12 +38,12 @@ namespace SongsOfConquestAccess.Adapters
 
             if (tile.Troop != null)
             {
-                return BeginStackInspect(tile.Troop);
+                return StampInspectState(BeginStackInspect(tile.Troop));
             }
 
             if (tile.Entity != null)
             {
-                return BeginEntityInspect(tile.Entity);
+                return StampInspectState(BeginEntityInspect(tile.Entity));
             }
 
             if (!IsReachable(point))
@@ -52,7 +52,49 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            return BeginPathInspect(point);
+            return StampInspectState(BeginPathInspect(point));
+        }
+
+        /// <summary>Write into an inspection the board state it was taken under, so
+        /// <see cref="IsInspectStateCurrent"/> can tell later whether it still describes the board.
+        /// </summary>
+        private CombatInspectContext StampInspectState(CombatInspectContext context)
+        {
+            if (context == null)
+            {
+                return null;
+            }
+
+            int troopId;
+            int healthLost;
+            int statusCount;
+            GetTileTroopState(context.PinnedTile, out troopId, out healthLost, out statusCount);
+            context.CaptureState(GetCurrentTurn(), troopId, healthLost, statusCount, GetCurrentTroopPosition());
+            return context;
+        }
+
+        /// <summary>Whether an inspection still describes the board. Everything it holds - the reach
+        /// tiles it lets the cursor walk, the path it drew and the dossier the pinned tile reads - was
+        /// worked out once, from the troop standing on the pinned tile, from the acting troop and from
+        /// whose turn it was; all three are read back from the game each time the inspection is used,
+        /// which is two field reads and the game's own point lookup.</summary>
+        public bool IsInspectStateCurrent(CombatInspectContext context)
+        {
+            if (context == null)
+            {
+                return false;
+            }
+
+            int troopId;
+            int healthLost;
+            int statusCount;
+            GetTileTroopState(context.PinnedTile, out troopId, out healthLost, out statusCount);
+            return context.MatchesState(
+                GetCurrentTurn(),
+                troopId,
+                healthLost,
+                statusCount,
+                GetCurrentTroopPosition());
         }
 
         public void HandleSecondaryAction(Vector2Int point)

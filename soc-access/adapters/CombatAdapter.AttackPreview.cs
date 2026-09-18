@@ -67,9 +67,13 @@ namespace SongsOfConquestAccess.Adapters
         // The captured lines, and everything they were true of. Read time is what triggers the
         // capture, so without this the hover sync and the game's own preview pass would run once per
         // frame under a still cursor: the tile and whether an inspection pinned it come from the
-        // caller, and who stands there, how hurt they are, what is being aimed, the turn and whether
-        // the game is waiting on a command are read from the game. The waiting is in the key because
-        // the game's own preview refuses to draw through it (BattleAttackPreview.Show).
+        // caller, and who stands there, how hurt they are, how many statuses they carry, what is
+        // being aimed, the turn, where the acting troop stands and whether the game is waiting on a
+        // command are read from the game. The waiting is in the key because the game's own preview
+        // refuses to draw through it (BattleAttackPreview.Show); the statuses are because a wielder's
+        // spell changes the damage without taking any health, and the acting troop's position is
+        // because the preview is worked out FROM it - its range and its high ground - and a troop with
+        // movement left repositions without the turn moving on.
         private IList<string> _previewLines;
         private bool _previewRead;
         private Vector2Int _previewPoint;
@@ -77,7 +81,9 @@ namespace SongsOfConquestAccess.Adapters
         private CombatTargetingMode _previewTargeting;
         private int _previewTroopId = -1;
         private int _previewHealthLost;
+        private int _previewStatusCount;
         private int _previewTurn;
+        private Vector2Int _previewCurrentTroopPoint;
         private bool _previewWaiting;
         private ICommandWaiter _commandWaiter;
         private bool _commandWaiterProbed;
@@ -106,8 +112,10 @@ namespace SongsOfConquestAccess.Adapters
             CombatTargetingMode targeting = GetTargetingMode();
             int troopId;
             int healthLost;
-            GetTileTroopState(point, out troopId, out healthLost);
+            int statusCount;
+            GetTileTroopState(point, out troopId, out healthLost, out statusCount);
             int turn = GetCurrentTurn();
+            Vector2Int currentTroopPoint = GetCurrentTroopPosition();
             bool waiting = IsCommandWaiting();
             if (_previewRead
                 && point == _previewPoint
@@ -115,7 +123,9 @@ namespace SongsOfConquestAccess.Adapters
                 && targeting == _previewTargeting
                 && troopId == _previewTroopId
                 && healthLost == _previewHealthLost
+                && statusCount == _previewStatusCount
                 && turn == _previewTurn
+                && currentTroopPoint == _previewCurrentTroopPoint
                 && waiting == _previewWaiting)
             {
                 return _previewLines;
@@ -126,7 +136,9 @@ namespace SongsOfConquestAccess.Adapters
             _previewTargeting = targeting;
             _previewTroopId = troopId;
             _previewHealthLost = healthLost;
+            _previewStatusCount = statusCount;
             _previewTurn = turn;
+            _previewCurrentTroopPoint = currentTroopPoint;
             _previewWaiting = waiting;
             _previewRead = true;
             // Split where the game drew a line: an additional sentence it wrote over two lines is

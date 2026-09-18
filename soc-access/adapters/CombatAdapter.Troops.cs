@@ -334,6 +334,18 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>Where the troop whose turn it is stands. A troop with movement left does not end
+        /// its turn by walking (<c>AutoEndBattleTurnCommand</c> only ends it once nothing is left to
+        /// do), so the turn counter alone does not notice a reposition - and everything measured FROM
+        /// the acting troop moves with it: what a path costs, whether a shot is in range, and the
+        /// numbers the damage preview shows. One property read off the facade's current troop.
+        /// </summary>
+        public Vector2Int GetCurrentTroopPosition()
+        {
+            IBattleTroopState current = GetCurrentTroop();
+            return current != null ? current.Position : new Vector2Int(-1, -1);
+        }
+
         public int GetCurrentRound()
         {
             return BattleFacadeState.CurrentRound(_facade);

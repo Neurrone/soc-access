@@ -730,16 +730,23 @@ namespace SongsOfConquestAccess.Adapters
             return cells;
         }
 
-        /// <summary>Who stands on a tile, as the two facts that change what the tile reads as while
+        /// <summary>Who stands on a tile, as the three facts that change what the tile reads as while
         /// the cursor stands still: the id of the troop there - -1 for an empty tile, and for a dead
-        /// one, which the game's point lookup already answers null for - and the health its stack has
-        /// lost. The game's own point cache answers it, so this is the cheap read a per-frame cache
-        /// keys on; <see cref="GetTile"/> composes the whole tile and is not that.</summary>
-        public void GetTileTroopState(Vector2Int point, out int troopId, out int healthLost)
+        /// one, which the game's point lookup already answers null for - the health its stack has
+        /// lost, and how many bacterias and restrictions it carries, which is what a wielder's spell
+        /// changes on a stack that takes no damage (the game's own dossier reads both lists,
+        /// ClientBattleTroopFacade.GetDetails). The game's own point cache answers it and the two
+        /// counts are list reads, so this is the cheap read a per-frame cache keys on;
+        /// <see cref="GetTile"/> composes the whole tile and is not that.</summary>
+        public void GetTileTroopState(Vector2Int point, out int troopId, out int healthLost, out int statusCount)
         {
             IBattleTroopState troop = GetTroopAt(point);
             troopId = troop != null ? troop.Id : -1;
             healthLost = troop != null ? troop.HealthLost : 0;
+            statusCount = troop != null
+                ? (troop.Bacterias != null ? troop.Bacterias.Count : 0)
+                    + (troop.Restrictions != null ? troop.Restrictions.Count : 0)
+                : 0;
         }
 
         public bool IsValidTile(Vector2Int point)

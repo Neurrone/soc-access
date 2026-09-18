@@ -26,12 +26,14 @@ soc-access/screens/CombatScreen.cs | 1 | private CombatAdapter _gridAdapter; | c
 soc-access/screens/CombatScreen.cs | 1 | private CombatHexGrid _grid; | cursor
 soc-access/screens/CombatScreen.cs | 1 | private CombatTargetingMode _tooltipTargeting; | cursor
 soc-access/screens/CombatScreen.cs | 1 | private Tooltip _tooltip; | cursor
+soc-access/screens/CombatScreen.cs | 1 | private Vector2Int _tooltipCurrentTroopTile; | cursor
 soc-access/screens/CombatScreen.cs | 1 | private Vector2Int _tooltipTile; | cursor
 soc-access/screens/CombatScreen.cs | 1 | private bool _tooltipInspecting; | cursor
 soc-access/screens/CombatScreen.cs | 1 | private bool _tooltipRead; | cursor
 soc-access/screens/CombatScreen.cs | 1 | private int _lastCycleCurrentTroopId = -1; | cursor
 soc-access/screens/CombatScreen.cs | 1 | private int _tooltipTroopHealthLost; | cursor
 soc-access/screens/CombatScreen.cs | 1 | private int _tooltipTroopId = -1; | cursor
+soc-access/screens/CombatScreen.cs | 1 | private int _tooltipTroopStatusCount; | cursor
 soc-access/screens/CombatScreen.cs | 1 | private int _tooltipTurn; | cursor
 soc-access/screens/CombatScreen.cs | 1 | private string _instruction; | baseline
 

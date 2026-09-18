@@ -75,6 +75,11 @@ namespace SongsOfConquestAccess.Adapters
         private readonly Dictionary<Vector2Int, HashSet<CombatRangeIndicator>> _indicators =
             new Dictionary<Vector2Int, HashSet<CombatRangeIndicator>>();
         private readonly HashSet<Vector2Int> _reviewSet = new HashSet<Vector2Int>();
+        private int _turn;
+        private int _troopId = -1;
+        private int _healthLost;
+        private int _statusCount;
+        private Vector2Int _actingTile;
 
         private CombatInspectContext(CombatInspectMode mode, Vector2Int pinnedTile)
         {
@@ -90,6 +95,30 @@ namespace SongsOfConquestAccess.Adapters
         public List<Vector2Int> OrderedTiles { get; private set; }
 
         public IDetails TooltipDetails { get; set; }
+
+        /// <summary>What the board looked like when this inspection was taken: the battle's turn
+        /// counter, who stood on the pinned tile with how much health lost and how many statuses, and
+        /// where the acting troop stood - the path and the zone of control below were measured from
+        /// it, and it walks without the turn moving on. The reach tiles and the dossier above are a
+        /// SNAPSHOT of that moment, so these are what the game has to still answer for them to
+        /// describe the board - see <see cref="CombatAdapter.IsInspectStateCurrent"/>.</summary>
+        public void CaptureState(int turn, int troopId, int healthLost, int statusCount, Vector2Int actingTile)
+        {
+            _turn = turn;
+            _troopId = troopId;
+            _healthLost = healthLost;
+            _statusCount = statusCount;
+            _actingTile = actingTile;
+        }
+
+        public bool MatchesState(int turn, int troopId, int healthLost, int statusCount, Vector2Int actingTile)
+        {
+            return turn == _turn
+                && troopId == _troopId
+                && healthLost == _healthLost
+                && statusCount == _statusCount
+                && actingTile == _actingTile;
+        }
 
         public static CombatInspectContext ForStack(Vector2Int pinnedTile)
         {

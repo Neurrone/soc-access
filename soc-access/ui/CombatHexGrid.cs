@@ -69,34 +69,55 @@ namespace SongsOfConquestAccess.UI
                 PlayTileCuesFor);
         }
 
+        /// <summary>The inspection, if the board it was taken from has not moved under it. What it
+        /// holds - the inspected stack's reach tiles and its dossier - is a SNAPSHOT, so the state it
+        /// was taken under is read back from the game (<see cref="CombatAdapter.IsInspectStateCurrent"/>)
+        /// every time it is used, and an inspection the game has left behind is GIVEN UP rather than
+        /// retaken: retaking would silently re-pin the game's hover and search the whole board's reach
+        /// again behind the player, while giving it up says "exited inspect mode" and leaves the
+        /// cursor on the tile that was pinned - which is what the player already gets from Escape.
+        /// </summary>
+        private CombatInspectContext InspectContext()
+        {
+            if (_inspectContext != null && _adapter != null && !_adapter.IsInspectStateCurrent(_inspectContext))
+            {
+                ExitInspect();
+            }
+
+            return _inspectContext;
+        }
+
         public string GetLabel()
         {
+            // The context first: giving up an inspection the board has left behind puts the cursor
+            // back on the tile that was pinned, and the tile read below is meant to be that one.
+            CombatInspectContext context = GetEffectiveInspectContext();
             CombatTile tile = GetFocusedTile();
             bool selectedForSpellcast = _adapter != null
                 && _adapter.GetTargetingMode() == CombatTargetingMode.Spell
                 && _adapter.IsSpellTargetSelected(_cursor);
             return _adapter != null
-                ? _adapter.DescribeTile(tile, GetEffectiveInspectContext(), selectedForSpellcast)
+                ? _adapter.DescribeTile(tile, context, selectedForSpellcast)
                 : ModText.Get(ModStrings.UI.Battlefield);
         }
 
         public Tooltip GetTooltip()
         {
-            return _adapter != null ? _adapter.GetInspectTooltip(_inspectContext, _cursor) : null;
+            return _adapter != null ? _adapter.GetInspectTooltip(InspectContext(), _cursor) : null;
         }
 
         /// <summary>What the game says an attack on this tile would do, read when the node is read.
         /// </summary>
         public IList<string> GetAttackPreviewLines()
         {
-            return _adapter != null ? _adapter.ReadAttackPreviewLines(_inspectContext, _cursor) : null;
+            return _adapter != null ? _adapter.ReadAttackPreviewLines(InspectContext(), _cursor) : null;
         }
 
         /// <summary>What the game's buff and nerf indicators over the stack on this tile say, read
         /// when the node is read.</summary>
         public IList<string> GetTroopEffectDetailLines()
         {
-            return _adapter != null ? _adapter.ReadTroopEffectDetailLines(_inspectContext, _cursor) : null;
+            return _adapter != null ? _adapter.ReadTroopEffectDetailLines(InspectContext(), _cursor) : null;
         }
 
         /// <summary>Where the cursor stands - the tile the node's clicks act on.</summary>
@@ -109,7 +130,7 @@ namespace SongsOfConquestAccess.UI
         /// screen takes Escape away from the game.</summary>
         public bool IsInspecting
         {
-            get { return _inspectContext != null; }
+            get { return InspectContext() != null; }
         }
 
         /// <summary>Draw the game's own highlight on the tile the cursor stands on and give the tile
@@ -125,15 +146,16 @@ namespace SongsOfConquestAccess.UI
             // manager's state, re-pinned the inspection and re-played the aiming hover sound, none
             // of which the mouse does for a hover that has not moved.
             bool targeting = _adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None;
-            Vector2Int wanted = _inspectContext != null ? _inspectContext.PinnedTile : _cursor;
-            if (_adapter != null && !(targeting && _inspectContext != null) && _adapter.IsNativeHoverOn(wanted))
+            CombatInspectContext context = InspectContext();
+            Vector2Int wanted = context != null ? context.PinnedTile : _cursor;
+            if (_adapter != null && !(targeting && context != null) && _adapter.IsNativeHoverOn(wanted))
             {
                 _adapter.TakeHoverOwnership();
                 _adapter.SetFocusedTileOverlay(_cursor);
                 return;
             }
 
-            FocusCurrentTile(updateNativeFocus: _inspectContext == null);
+            FocusCurrentTile(updateNativeFocus: context == null);
         }
 
         /// <summary>Take the highlight off again: the cursor has gone to a HUD stop or off the
@@ -415,6 +437,9 @@ namespace SongsOfConquestAccess.UI
 
         private bool SkipMove(Func<Vector2Int, Vector2Int> step)
         {
+            // Once for the whole walk rather than once per tile: the predicate below reads the
+            // inspection the board is in NOW, and a skip crosses many tiles in one frame.
+            InspectContext();
             TileSkipResult result = TileSkipNavigator.FindTarget(
                 _cursor,
                 step,
@@ -461,7 +486,7 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
-            if (_inspectContext != null)
+            if (InspectContext() != null)
             {
                 return true;
             }
@@ -512,9 +537,10 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
-            if (_inspectContext != null
+            CombatInspectContext context = InspectContext();
+            if (context != null
                 && (_adapter == null || _adapter.GetTargetingMode() == CombatTargetingMode.None)
-                && !_inspectContext.Contains(point))
+                && !context.Contains(point))
             {
                 CueLibrary.PlayCue(CueLibrary.MoveDenied);
                 return true;
@@ -526,7 +552,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             _cursor = point;
-            FocusCurrentTile(updateNativeFocus: _inspectContext == null);
+            FocusCurrentTile(updateNativeFocus: context == null);
             ReadTile();
             PlayTileCues();
             return true;
@@ -621,7 +647,7 @@ namespace SongsOfConquestAccess.UI
 
         private CombatInspectContext GetEffectiveInspectContext()
         {
-            return _adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None ? null : _inspectContext;
+            return _adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None ? null : InspectContext();
         }
     }
 }
