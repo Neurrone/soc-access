@@ -107,6 +107,16 @@ namespace SongsOfConquestAccess.Adapters
                 answersLeftClick: true);
         }
 
+        /// <summary>Drop what is kept for the current frame only. Called wherever the mod drives the
+        /// menu's own click, because the game recycles the offer grid and redraws the bands in the
+        /// same frame the build has already read them in.</summary>
+        public void InvalidateFrameSnapshots()
+        {
+            _categoryToggles.Invalidate();
+            _marketEntries.Invalidate();
+            _bandTexts.Invalidate();
+        }
+
         public ArtifactMarketMenu Source
         {
             get { return _menu; }
@@ -283,6 +293,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             group.SetActiveToggle(categoryIndex);
+            InvalidateFrameSnapshots();
             return true;
         }
 
@@ -541,7 +552,9 @@ namespace SongsOfConquestAccess.Adapters
         public bool BuySelectedMarketArtifact()
         {
             PurchaseButton buyButton = Reflect.Get<PurchaseButton>(_menu, BuyButtonField);
-            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(buyButton, PurchaseButtonButtonField));
+            bool clicked = NativeSelectionUtility.Click(Reflect.Get<UIButton>(buyButton, PurchaseButtonButtonField));
+            InvalidateFrameSnapshots();
+            return clicked;
         }
 
         /// <summary>Whether the band is showing the artifact the player has picked out to sell.
@@ -613,7 +626,9 @@ namespace SongsOfConquestAccess.Adapters
         public bool SellSelectedArtifact()
         {
             PurchaseButton sellButton = Reflect.Get<PurchaseButton>(_menu, SellButtonField);
-            return NativeSelectionUtility.Click(Reflect.Get<UIButton>(sellButton, PurchaseButtonButtonField));
+            bool clicked = NativeSelectionUtility.Click(Reflect.Get<UIButton>(sellButton, PurchaseButtonButtonField));
+            InvalidateFrameSnapshots();
+            return clicked;
         }
 
         /// <summary>The one text a selection band draws that is neither the artifact's name nor a
