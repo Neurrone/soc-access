@@ -139,6 +139,29 @@ namespace SongsOfConquestAccess.Audio
         }
 
         /// <summary>
+        /// Plays the cue for the audio glossary: the user's volume, pitch and duration applied, but
+        /// neither the cue's own enabled flag nor the master switch consulted. A player listening to
+        /// a cue in the glossary is deciding whether to turn it on, so a silenced cue still has to be
+        /// audible there.
+        /// </summary>
+        public static void PreviewCue(string key)
+        {
+            CueSpec spec = GetEffectiveSpec(key);
+            if (spec == null)
+            {
+                return;
+            }
+
+            SynthCuePlayer.Play(
+                key,
+                spec,
+                0f,
+                ModSettings.GetCueVolume(key) / 100f,
+                ModSettings.GetCuePitchSemitones(key),
+                0f);
+        }
+
+        /// <summary>
         /// Plays a tile-cue stack; a cue marked FollowsPrevious is serialized after the cue
         /// before it (same-timbre cues fired together fuse into one sound), and later
         /// unmarked cues keep that accumulated delay so they stay aligned with it.

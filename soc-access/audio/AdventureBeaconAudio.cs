@@ -13,7 +13,13 @@ namespace SongsOfConquestAccess.Audio
         private const int PitchMaxSemitones = 12;
         private const float AudibleDistanceTiles = 30f;
 
+        /// <summary>The voice slot the glossary's preview sounds on, which no bookmark can claim:
+        /// a bookmark slot is a number.</summary>
+        private const string PreviewSlot = "preview";
+
         private static readonly List<AdventureBeaconAudio> LiveInstances = new List<AdventureBeaconAudio>();
+
+        private static AdventureBeaconAudio _preview;
 
         private readonly Dictionary<string, BeaconVoice> _voices = new Dictionary<string, BeaconVoice>();
         private AudioClip _clip;
@@ -136,6 +142,11 @@ namespace SongsOfConquestAccess.Audio
 
             _disposed = true;
             LiveInstances.Remove(this);
+            if (ReferenceEquals(_preview, this))
+            {
+                _preview = null;
+            }
+
             foreach (BeaconVoice voice in _voices.Values)
             {
                 if (voice.GameObject != null)
@@ -152,6 +163,22 @@ namespace SongsOfConquestAccess.Audio
             }
         }
 
+        /// <summary>
+        /// The audio glossary's Play for the beacon: the file once, not looped, flat and centred, at
+        /// the volume the beacon setting says. The source and the clip it needs belong to an instance
+        /// of this class like any other, so <see cref="DisposeAll"/> destroys them with the rest and
+        /// a reload leaves nothing behind.
+        /// </summary>
+        public static void PlayPreview()
+        {
+            if (_preview == null)
+            {
+                _preview = new AdventureBeaconAudio();
+            }
+
+            _preview.PlayOnce();
+        }
+
         public static void DisposeAll()
         {
             AdventureBeaconAudio[] instances = LiveInstances.ToArray();
@@ -161,6 +188,22 @@ namespace SongsOfConquestAccess.Audio
             }
 
             LiveInstances.Clear();
+        }
+
+        private void PlayOnce()
+        {
+            BeaconVoice voice = GetOrCreateVoice(PreviewSlot);
+            if (voice == null || voice.Source == null)
+            {
+                return;
+            }
+
+            // The voice is built looping and positioned, as a bookmark's is; the preview is neither.
+            voice.Source.loop = false;
+            voice.Source.panStereo = 0f;
+            voice.Source.pitch = 1f;
+            voice.Source.volume = ModSettings.GetBeaconVolume() / 100f;
+            voice.Source.Play();
         }
 
         private void StopAllSources()
@@ -242,7 +285,8 @@ namespace SongsOfConquestAccess.Audio
             int semitones = Math.Max(-PitchMaxSemitones, Math.Min(PitchMaxSemitones, dy));
             float pitch = Mathf.Pow(2f, semitones / 12f);
             float distance = Mathf.Sqrt(dx * dx + dy * dy);
-            float volume = Mathf.Clamp(1f - distance / AudibleDistanceTiles, 0f, 1f);
+            float volume = Mathf.Clamp(1f - distance / AudibleDistanceTiles, 0f, 1f)
+                * (ModSettings.GetBeaconVolume() / 100f);
 
             voice.Source.panStereo = pan;
             voice.Source.pitch = pitch;

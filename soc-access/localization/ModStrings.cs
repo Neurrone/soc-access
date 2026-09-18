@@ -48,6 +48,9 @@ namespace SongsOfConquestAccess.Localization
 
         public static class Audio
         {
+            /// <summary>The glossary's row for the bookmark beacon's sound file, which is not a cue.
+            /// </summary>
+            public static readonly ModString Beacon = new ModString("Audio.Beacon", "Audio beacon");
             public static readonly ModString CategoryCombat = new ModString("Audio.CategoryCombat", "Battlefield");
             public static readonly ModString CategoryOverworld = new ModString("Audio.CategoryOverworld", "Map contents");
             public static readonly ModString CategoryTerrain = new ModString("Audio.CategoryTerrain", "Terrain");

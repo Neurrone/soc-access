@@ -41,6 +41,8 @@ namespace SongsOfConquestAccess
         public const int CueVolumeMinimum = 0;
         public const int CueVolumeMaximum = 100;
         public const int CueVolumeDefault = 30;
+        /// <summary>Full: the loudness a beacon had before it had a volume setting.</summary>
+        public const int BeaconVolumeDefault = 100;
         public const int CuePitchSemitonesMinimum = -12;
         public const int CuePitchSemitonesMaximum = 12;
         public const int CuePitchSemitonesDefault = 0;
@@ -54,6 +56,7 @@ namespace SongsOfConquestAccess
         private static ConfigEntry<bool> _readEnemyInfluence;
         private static ConfigEntry<bool> _readStoryCameraFocusChanges;
         private static ConfigEntry<bool> _tileCuesEnabled;
+        private static ConfigEntry<int> _beaconVolume;
         private static ConfigEntry<bool> _scannerUsesLongDirections;
         private static ConfigEntry<string> _scannerResultOrder;
         private static ConfigEntry<bool> _adventureMapUsesLongRoadDirections;
@@ -151,6 +154,11 @@ namespace SongsOfConquestAccess
                 "TileCuesEnabled",
                 true,
                 "Whether cursor movement plays synthesised tile sound cues.");
+            _beaconVolume = config.Bind(
+                AudioSection,
+                "BeaconVolume",
+                BeaconVolumeDefault,
+                "Playback volume of the bookmark beacon, from 0 to 100.");
             _scannerUsesLongDirections = config.Bind(
                 "Scanner",
                 "ScannerUsesLongDirections",
@@ -281,6 +289,7 @@ namespace SongsOfConquestAccess
             _readEnemyInfluence = null;
             _readStoryCameraFocusChanges = null;
             _tileCuesEnabled = null;
+            _beaconVolume = null;
             _scannerUsesLongDirections = null;
             _scannerResultOrder = null;
             _adventureMapUsesLongRoadDirections = null;

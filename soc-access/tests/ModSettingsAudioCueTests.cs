@@ -50,7 +50,8 @@ namespace SongsOfConquestAccess.Tests
         }
 
         /// <summary>The cue dialog writes every change as the player listens, so Cancel has to be
-        /// able to put the whole tuning back.</summary>
+        /// able to put the whole tuning back. The enabled flag is not the dialog's: it is ticked in
+        /// the glossary's table and a cancelled dialog leaves it where it stands.</summary>
         [TestMethod]
         public void SnapshotAndRestorePutTheWholeTuningBack()
         {
@@ -64,14 +65,16 @@ namespace SongsOfConquestAccess.Tests
             ModSettings.SetCueDurationScale(CueLibrary.TerrainRoad, 200);
             ModSettings.RestoreCue(CueLibrary.TerrainRoad, snapshot);
 
-            Assert.IsTrue(ModSettings.GetCueEnabled(CueLibrary.TerrainRoad));
+            Assert.IsFalse(ModSettings.GetCueEnabled(CueLibrary.TerrainRoad));
             Assert.AreEqual(45, ModSettings.GetCueVolume(CueLibrary.TerrainRoad));
             Assert.AreEqual(3, ModSettings.GetCuePitchSemitones(CueLibrary.TerrainRoad));
             Assert.AreEqual(ModSettings.CueDurationScaleDefault, ModSettings.GetCueDurationScale(CueLibrary.TerrainRoad));
         }
 
+        /// <summary>Reset restores the cue's SOUND. Whether it plays at all is the glossary table's
+        /// checkbox, and a player who silenced a cue did not ask for it back.</summary>
         [TestMethod]
-        public void ResetCueRestoresDefaults()
+        public void ResetCueRestoresDefaultsAndLeavesEnabledAlone()
         {
             ModSettings.SetCueEnabled(CueLibrary.HexActive, false);
             ModSettings.SetCueVolume(CueLibrary.HexActive, 10);
@@ -80,10 +83,30 @@ namespace SongsOfConquestAccess.Tests
 
             ModSettings.ResetCue(CueLibrary.HexActive);
 
-            Assert.IsTrue(ModSettings.GetCueEnabled(CueLibrary.HexActive));
+            Assert.IsFalse(ModSettings.GetCueEnabled(CueLibrary.HexActive));
             Assert.AreEqual(ModSettings.CueVolumeDefault, ModSettings.GetCueVolume(CueLibrary.HexActive));
             Assert.AreEqual(ModSettings.CuePitchSemitonesDefault, ModSettings.GetCuePitchSemitones(CueLibrary.HexActive));
             Assert.AreEqual(ModSettings.CueDurationScaleDefault, ModSettings.GetCueDurationScale(CueLibrary.HexActive));
+        }
+
+        /// <summary>The beacon is not a cue and has one setting: a volume on the cue scale, which the
+        /// glossary's beacon dialog moves and resets.</summary>
+        [TestMethod]
+        public void BeaconVolumeStartsFullAndClamps()
+        {
+            Assert.AreEqual(ModSettings.BeaconVolumeDefault, ModSettings.GetBeaconVolume());
+
+            ModSettings.SetBeaconVolume(70);
+            Assert.AreEqual(70, ModSettings.GetBeaconVolume());
+
+            ModSettings.SetBeaconVolume(400);
+            Assert.AreEqual(ModSettings.CueVolumeMaximum, ModSettings.GetBeaconVolume());
+
+            ModSettings.SetBeaconVolume(-10);
+            Assert.AreEqual(ModSettings.CueVolumeMinimum, ModSettings.GetBeaconVolume());
+
+            ModSettings.SetBeaconVolume(ModSettings.BeaconVolumeDefault);
+            Assert.AreEqual(ModSettings.BeaconVolumeDefault, ModSettings.GetBeaconVolume());
         }
 
         [TestMethod]

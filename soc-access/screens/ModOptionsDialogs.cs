@@ -15,8 +15,8 @@ namespace SongsOfConquestAccess.Screens
     ///
     /// The Mod options window's buttons open dialogs stacked over it, each a
     /// <see cref="ModDialogScreen"/> and each nothing but rows. This is the content of every one:
-    /// the announcement order of a group, the audio glossary, one cue's tuning, a taxonomy's custom
-    /// categories, one category, and one source's subcategories.
+    /// the announcement order of a group, the audio glossary, one cue's tuning, the beacon's volume,
+    /// a taxonomy's custom categories, one category, and one source's subcategories.
     ///
     /// Every rule the mod-owned menus these replace enforced is enforced here: a name already spoken
     /// for is refused and said so, a keyword already present is refused and said so, a quick key
@@ -24,7 +24,8 @@ namespace SongsOfConquestAccess.Screens
     /// cursor on the element that moved, and the defaults are a button rather than a special case.
     ///
     /// A dialog carries Cancel and Confirm only where leaving has to be able to mean "not that":
-    /// a cue, whose sliders replay it as they move, and one source's subcategories. Cancel puts
+    /// a cue and the beacon, whose sliders replay the sound as they move, and one source's
+    /// subcategories. Cancel puts
     /// back a snapshot taken when the dialog opened - <c>ModSettings.SnapshotCue</c> for a cue, and
     /// the stored form of the whole taxonomy for the subcategories, which already says every
     /// category's name, key, subcategories and keywords in one string. Everywhere else, including
@@ -173,29 +174,117 @@ namespace SongsOfConquestAccess.Screens
                 DrawAudioGlossary);
         }
 
-        /// <summary>The glossary's table. It draws no header: three columns of which two are
-        /// buttons that say what they are, so a header would only repeat them.</summary>
+        /// <summary>The glossary's table, and the row the beacon is drawn under.</summary>
         private const string GlossaryTable = "cues";
+        private const string BeaconRow = "beacon";
 
-        /// <summary>One row per cue: its name, and the two buttons that play it and tune it. The
-        /// columns say nothing on the way in - the name names the row and each button names
-        /// itself.</summary>
+        /// <summary>
+        /// One row per cue: its name, the button that plays it, the checkbox that turns it on and
+        /// off, and the button that tunes it. Only the checkbox column is captioned - the name names
+        /// the row and each button names itself - and only it draws a header, because a bare box is
+        /// the one cell a sighted player cannot read.
+        ///
+        /// Play sounds the cue whatever the checkbox and the master switch say: the player is
+        /// listening in order to decide.
+        /// </summary>
         private static void DrawAudioGlossary(ModDialogScreen screen)
         {
             ModDialog dialog = screen.Dialog;
             IReadOnlyList<CueDefinition> cues = CueLibrary.AllCues;
-            dialog.BeginTable(GlossaryTable, new string[3], ModText.Get(ModStrings.Screens.Cues));
+            dialog.BeginTable(
+                GlossaryTable,
+                new string[] { null, null, ModText.Get(ModStrings.Screens.Enabled), null },
+                ModText.Get(ModStrings.Screens.Cues));
+
+            dialog.StartHeaderRow();
+            dialog.AddText(string.Empty);
+            dialog.AddText(string.Empty);
+            dialog.AddText(ModText.Get(ModStrings.Screens.Enabled));
+            dialog.AddText(string.Empty);
+            dialog.EndRow();
+
             for (int i = 0; i < cues.Count; i++)
             {
                 CueDefinition cue = cues[i];
                 dialog.StartTableRow(cue.Key);
                 dialog.AddText(ModText.Get(cue.Name));
-                dialog.AddButton(ModText.Get(ModStrings.Screens.Play), () => CueLibrary.PlayCue(cue.Key));
+                dialog.AddButton(ModText.Get(ModStrings.Screens.Play), () => CueLibrary.PreviewCue(cue.Key));
+                dialog.AddToggleCell(
+                    ModSettings.GetCueEnabled(cue.Key),
+                    value => ModSettings.SetCueEnabled(cue.Key, value));
                 dialog.AddButton(ModText.Get(ModStrings.Screens.Configure), () => OpenCue(cue));
                 dialog.EndRow();
+
+                if (cue.Category == CueCategory.Overworld
+                    && (i + 1 >= cues.Count || cues[i + 1].Category != CueCategory.Overworld))
+                {
+                    DrawBeaconRow(dialog);
+                }
             }
 
             dialog.EndTable();
+        }
+
+        /// <summary>The beacon's row, under the map contents it marks. Its Enabled cell is empty: a
+        /// beacon sounds because the player switched one on for a bookmark, so there is no flag here
+        /// to tick.</summary>
+        private static void DrawBeaconRow(ModDialog dialog)
+        {
+            dialog.StartTableRow(BeaconRow);
+            dialog.AddText(ModText.Get(ModStrings.Audio.Beacon));
+            dialog.AddButton(ModText.Get(ModStrings.Screens.Play), AdventureBeaconAudio.PlayPreview);
+            dialog.AddEmptyCell();
+            dialog.AddButton(ModText.Get(ModStrings.Screens.Configure), OpenBeacon);
+            dialog.EndRow();
+        }
+
+        // ---- the beacon ----
+
+        /// <summary>The beacon has one setting, and it is not a cue: its pitch carries north and
+        /// south and its file loops, so neither the pitch nor the duration slider a cue has means
+        /// anything here.</summary>
+        public static void OpenBeacon()
+        {
+            int snapshot = ModSettings.GetBeaconVolume();
+            ModDialogScreen.Open(
+                "mod-beacon",
+                ModText.Get(
+                    ModStrings.Screens.ConfigureAnnouncementElement,
+                    ModText.Get(ModStrings.Audio.Beacon)),
+                DrawBeacon,
+                () =>
+                {
+                    ModSettings.SetBeaconVolume(snapshot);
+                    return true;
+                });
+        }
+
+        private static void DrawBeacon(ModDialogScreen screen)
+        {
+            ModDialog dialog = screen.Dialog;
+            Percent(
+                dialog.AddSlider(
+                    ModText.Get(ModStrings.Screens.Volume),
+                    ModSettings.GetBeaconVolume() / 100f,
+                    ModSettings.CueVolumeMinimum / 100f,
+                    ModSettings.CueVolumeMaximum / 100f,
+                    value =>
+                    {
+                        ModSettings.SetBeaconVolume(Whole(value));
+                        AdventureBeaconAudio.PlayPreview();
+                    }),
+                VolumeStep);
+
+            dialog.AddButton(ModText.Get(ModStrings.Screens.Play), AdventureBeaconAudio.PlayPreview);
+            dialog.AddButton(
+                ModText.Get(ModStrings.Screens.ResetToDefaults),
+                () =>
+                {
+                    ModSettings.SetBeaconVolume(ModSettings.BeaconVolumeDefault);
+                    screen.Redraw();
+                    AdventureBeaconAudio.PlayPreview();
+                });
+            AddCancelAndConfirm(screen);
         }
 
         // ---- one cue ----
@@ -223,14 +312,6 @@ namespace SongsOfConquestAccess.Screens
         private static void DrawCue(ModDialogScreen screen, string key)
         {
             ModDialog dialog = screen.Dialog;
-            dialog.AddToggle(
-                ModText.Get(ModStrings.Screens.Enabled),
-                ModSettings.GetCueEnabled(key),
-                value =>
-                {
-                    ModSettings.SetCueEnabled(key, value);
-                    CueLibrary.PlayCue(key);
-                });
 
             // Percentages are drawn as percentages by the game's own slider, which speaks
             // value * 100 with a per cent sign, so the value is handed over as a fraction and the
@@ -244,7 +325,7 @@ namespace SongsOfConquestAccess.Screens
                     value =>
                     {
                         ModSettings.SetCueVolume(key, Whole(value));
-                        CueLibrary.PlayCue(key);
+                        CueLibrary.PreviewCue(key);
                     }),
                 VolumeStep);
 
@@ -256,7 +337,7 @@ namespace SongsOfConquestAccess.Screens
                 value =>
                 {
                     ModSettings.SetCuePitchSemitones(key, (int)Math.Round(value));
-                    CueLibrary.PlayCue(key);
+                    CueLibrary.PreviewCue(key);
                 });
             if (pitch != null)
             {
@@ -275,18 +356,18 @@ namespace SongsOfConquestAccess.Screens
                     value =>
                     {
                         ModSettings.SetCueDurationScale(key, Whole(value));
-                        CueLibrary.PlayCue(key);
+                        CueLibrary.PreviewCue(key);
                     }),
                 DurationStep);
 
-            dialog.AddButton(ModText.Get(ModStrings.Screens.Play), () => CueLibrary.PlayCue(key));
+            dialog.AddButton(ModText.Get(ModStrings.Screens.Play), () => CueLibrary.PreviewCue(key));
             dialog.AddButton(
                 ModText.Get(ModStrings.Screens.ResetToDefaults),
                 () =>
                 {
                     ModSettings.ResetCue(key);
                     screen.Redraw();
-                    CueLibrary.PlayCue(key);
+                    CueLibrary.PreviewCue(key);
                 });
             AddCancelAndConfirm(screen);
         }

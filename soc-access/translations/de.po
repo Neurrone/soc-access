@@ -3711,6 +3711,11 @@ msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr "Kontrollzone"
 
+#. Audio.Beacon
+msgctxt "Audio.Beacon"
+msgid "Audio beacon"
+msgstr "Audio-Beacon"
+
 #. Audio.CategoryCombat
 msgctxt "Audio.CategoryCombat"
 msgid "Battlefield"

@@ -89,18 +89,21 @@ Open mod settings with the `Mod options` button on the main menu or the pause me
 
 `Play tile sound cues` is the master switch for every cue described on this page. Turning it off silences all of them without losing the individual settings.
 
-`Audio glossary` opens a table of every cue, in three groups: terrain, map contents and battlefield. One row per cue: its name, a `Play` button and a `Configure` button. `Play` hears the cue flat and centred with your current settings, which is the quickest way to learn what each sound means.
+`Audio glossary` opens a table of every cue, in three groups: terrain, map contents and battlefield. One row per cue: its name, a `Play` button, an `Enabled` checkbox and a `Configure` button. `Play` hears the cue flat and centred with your current settings, which is the quickest way to learn what each sound means. It sounds the cue whether or not the checkbox is ticked and whether or not `Play tile sound cues` is on, so you can hear what you are about to switch on.
 
-To change a cue, move right from its name to `Configure` and press `Enter`. The configure screen offers:
+`Enabled` is where a cue is silenced or brought back. Unticking it stops that one cue everywhere without touching its volume, pitch or duration.
 
-- `Enabled`: whether this cue plays at all.
+To change how a cue sounds, move right from its name to `Configure` and press `Enter`. The configure screen offers:
+
 - `Volume`: 0 to 100.
 - `Pitch`: -12 to +12 semitones.
 - `Duration`: 50% to 200% of the cue's default length.
 - `Play`: hear the cue again.
-- `Reset to defaults`: restore this cue's original sound.
+- `Reset to defaults`: restore this cue's original sound. It leaves the `Enabled` checkbox alone.
 
 Every change replays the cue immediately, so you can hold left or right on a slider and listen for the setting you want.
+
+The table also has an `Audio beacon` row, after the map contents and before the battlefield sounds. It is the [bookmark beacon](#bookmark-beacons) sound file rather than a cue: `Play` sounds it once, flat and centred, and its `Enabled` cell is empty, because a beacon sounds when you switch one on for a bookmark. `Configure` offers a `Volume` slider, `Play` and `Reset to defaults`. There is no pitch or duration here: a beacon's pitch carries north and south, and the file loops for as long as the beacon is on.
 
 ## Bookmark Beacons
 
@@ -108,7 +111,9 @@ Beacons are looping sounds that turn [bookmarks](adventure-map.md#bookmarks) int
 
 A beacon's sound changes relative to the currently focused tile, using the same mapping as the cues above: stereo position for east and west, pitch for north and south, and volume for distance.
 
-Beacons are separate from the tile cues, so the master switch and the glossary do not affect them. They play a sound file, `beacon.wav`, in the `BepInEx\config\SongsOfConquestAccess\sounds` folder of your game installation. Replace that file to use a beacon sound of your own.
+Beacons are separate from the tile cues, so `Play tile sound cues` never silences them. They play a sound file, `beacon.wav`, in the `BepInEx\config\SongsOfConquestAccess\sounds` folder of your game installation. Replace that file to use a beacon sound of your own.
+
+Their volume is the `Audio beacon` row of the [audio glossary](#the-audio-glossary-and-tuning). It scales the volume distance already sets, so a beacon turned down is quieter everywhere rather than audible over a shorter range. A beacon already running picks up a change when you return to the map.
 
 ## Game Sounds
 

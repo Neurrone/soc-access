@@ -512,6 +512,20 @@ namespace SongsOfConquestAccess.UI
             return toggle;
         }
 
+        /// <summary>A cell with nothing in it, which keeps the column aligned under the cells above
+        /// and below it and is not a control: the reader skips it rather than landing on a cell it
+        /// has nothing to say about. The glossary's beacon row has no enabled flag to tick.
+        /// </summary>
+        public void AddEmptyCell()
+        {
+            IUITextMesh mesh = _controller.AddSimpleText(string.Empty);
+            Component component = mesh as Component;
+            if (component != null)
+            {
+                _facts.SetBlankCell(component.transform);
+            }
+        }
+
         /// <summary>What the reader says for a control whose drawn words are not words at all - an
         /// arrow glyph on a button. The drawing stays the game's; only the reading is replaced.
         /// </summary>
@@ -978,6 +992,7 @@ namespace SongsOfConquestAccess.UI
             private readonly Dictionary<string, string> _labels = new Dictionary<string, string>();
             private readonly Dictionary<Transform, string> _spoken = new Dictionary<Transform, string>();
             private readonly HashSet<Transform> _standalone = new HashSet<Transform>();
+            private readonly HashSet<Transform> _blank = new HashSet<Transform>();
 
             /// <summary>One drawn horizontal layout that is a table's row.</summary>
             public sealed class DrawnRow
@@ -1079,12 +1094,30 @@ namespace SongsOfConquestAccess.UI
                 }
             }
 
+            /// <summary>Whether a cell was drawn with nothing in it, so that the reader passes over
+            /// it. An empty text cannot be recognised by what it says: the factory's text keeps the
+            /// prefab's placeholder in its own Text property after the mod writes an empty string
+            /// into it, so what the mod drew is a fact only the drawing knows.</summary>
+            public bool IsBlankCell(Transform cell)
+            {
+                return cell != null && _blank.Contains(cell);
+            }
+
+            public void SetBlankCell(Transform cell)
+            {
+                if (cell != null)
+                {
+                    _blank.Add(cell);
+                }
+            }
+
             public void Clear()
             {
                 _rows.Clear();
                 _columns.Clear();
                 _spoken.Clear();
                 _standalone.Clear();
+                _blank.Clear();
             }
         }
 

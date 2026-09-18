@@ -195,6 +195,13 @@ namespace SongsOfConquestAccess.UI
         {
             object item = control != null ? control.Item : null;
             Transform transform = control != null ? control.Transform : null;
+            if (facts != null && facts.IsBlankCell(transform))
+            {
+                // A cell drawn with nothing in it keeps the column aligned and is not a control;
+                // the row is built without it, so the columns around it keep their numbers.
+                return null;
+            }
+
             string spoken = facts != null ? facts.SpokenLabelOf(transform) : null;
             Func<string> label = spoken != null ? (Func<string>)(() => spoken) : null;
 

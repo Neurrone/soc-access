@@ -89,11 +89,11 @@ namespace SongsOfConquestAccess
         }
 
         /// <summary>Everything the cue dialog can change about one cue, taken as a value so leaving
-        /// the dialog without confirming can put it back.</summary>
+        /// the dialog without confirming can put it back. The enabled flag is not in it: it is ticked
+        /// in the glossary's table, not in the dialog.</summary>
         public static CueTuning SnapshotCue(string cueKey)
         {
             return new CueTuning(
-                GetCueEnabled(cueKey),
                 GetCueVolume(cueKey),
                 GetCuePitchSemitones(cueKey),
                 GetCueDurationScale(cueKey));
@@ -101,23 +101,20 @@ namespace SongsOfConquestAccess
 
         public static void RestoreCue(string cueKey, CueTuning tuning)
         {
-            SetCueEnabled(cueKey, tuning.Enabled);
             SetCueVolume(cueKey, tuning.Volume);
             SetCuePitchSemitones(cueKey, tuning.PitchSemitones);
             SetCueDurationScale(cueKey, tuning.DurationScale);
         }
 
+        /// <summary>The cue's sound back to its default. Whether the cue plays at all is left alone:
+        /// that is the glossary table's checkbox and not one of the defaults this button restores.
+        /// </summary>
         public static void ResetCue(string cueKey)
         {
             AudioCueConfig config = GetAudioCueConfig(cueKey);
             if (config == null)
             {
                 return;
-            }
-
-            if (config.Enabled != null)
-            {
-                config.Enabled.Value = true;
             }
 
             if (config.Volume != null)
@@ -136,6 +133,25 @@ namespace SongsOfConquestAccess
             }
 
             SaveAndInvalidateCue(cueKey);
+        }
+
+        /// <summary>The bookmark beacon's volume, on the same scale as a cue's and defaulting to
+        /// full. It multiplies the distance volume a beacon voice already carries; the tile-cue
+        /// master switch never touches beacons.</summary>
+        public static int GetBeaconVolume()
+        {
+            return _beaconVolume != null ? _beaconVolume.Value : BeaconVolumeDefault;
+        }
+
+        public static void SetBeaconVolume(int value)
+        {
+            if (_beaconVolume == null)
+            {
+                return;
+            }
+
+            _beaconVolume.Value = Clamp(value, CueVolumeMinimum, CueVolumeMaximum);
+            _config?.Save();
         }
 
         private static void BindAudioCues(ConfigFile config)
