@@ -595,7 +595,9 @@ namespace SongsOfConquestAccess.UI
         /// all" and then drop - and the game's drag moves whatever the SOURCE SLOT holds now, which
         /// by then is another troop or nothing at all, while the announcement would name the troop
         /// that was picked up. The slot's occupant as it was at pick-up is what the carry's own name
-        /// records, so the name the slot answers with now is the comparison.</summary>
+        /// records, so the name the slot answers with now is the comparison. The source slot is read
+        /// off its own entry, never looked up in <paramref name="troops"/>: that is the TARGET's bar,
+        /// and a troop carried from a wielder to a settlement was never on it.</summary>
         private static DropResult Drop(
             TroopHudAdapter troops,
             CarryItem held,
@@ -607,7 +609,7 @@ namespace SongsOfConquestAccess.UI
                 return DropResult.Refused();
             }
 
-            if (!string.Equals(Label(SlotOf(troops, source)), held.Name, StringComparison.Ordinal))
+            if (!string.Equals(Label(new TroopHudAdapter.SlotItem(troops, source)), held.Name, StringComparison.Ordinal))
             {
                 return DropResult.Done(ModText.Get(ModStrings.Graph.DragCancelled));
             }
@@ -621,23 +623,6 @@ namespace SongsOfConquestAccess.UI
         private static TroopHUDEntry Cargo(CarryItem held)
         {
             return held == null ? null : held.Cargo as TroopHUDEntry;
-        }
-
-        /// <summary>The slot the bar draws for this entry now, or null where it draws it no longer.
-        /// The adapter's own list - the one the rows were built from, so asking for it costs the memo
-        /// nothing - walked for the one entry.</summary>
-        private static TroopHudAdapter.SlotItem SlotOf(TroopHudAdapter troops, TroopHUDEntry entry)
-        {
-            IReadOnlyList<TroopHudAdapter.SlotItem> slots = troops.GetSlots();
-            for (int i = 0; i < slots.Count; i++)
-            {
-                if (ReferenceEquals(slots[i].Entry, entry))
-                {
-                    return slots[i];
-                }
-            }
-
-            return null;
         }
 
         /// <summary>Whether a troop is being carried right now - the gate on the hint for the gesture
