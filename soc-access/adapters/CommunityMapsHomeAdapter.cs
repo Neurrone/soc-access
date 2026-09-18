@@ -69,8 +69,14 @@ namespace SongsOfConquestAccess.Adapters
         private Collection _collection;
 
         // Which mesh each band's caption was found on. The search for it is up to three walks of the
-        // band and of its neighbours; the words are still read off the mesh live.
+        // band and of its neighbours; the words are still read off the mesh live. Only a HIT is kept:
+        // the walks see switched-on meshes only, so a band looked at while it was not drawn has no
+        // caption to find, and keeping that answer left the band nameless for as long as the browser
+        // lived. A miss is stamped with whether the band was drawn when it was looked at and looked
+        // for again when that changes - one bool read per nameless band per frame, and no walk
+        // (AGENTS.md, Performance).
         private readonly Dictionary<ModListRow, TMP_Text> _rowLabelTexts = new Dictionary<ModListRow, TMP_Text>();
+        private readonly Dictionary<ModListRow, bool> _rowLabelMisses = new Dictionary<ModListRow, bool>();
 
         public CommunityMapsHomeAdapter(Home home)
         {
@@ -616,19 +622,34 @@ namespace SongsOfConquestAccess.Adapters
 
         private string FindRowLabel(ModListRow row)
         {
-            TMP_Text kept;
-            if (row != null && _rowLabelTexts.TryGetValue(row, out kept))
+            if (row == null)
             {
-                return kept != null ? CommunityMapsText.Of(kept) : string.Empty;
+                return string.Empty;
+            }
+
+            TMP_Text kept;
+            if (_rowLabelTexts.TryGetValue(row, out kept) && kept != null)
+            {
+                return CommunityMapsText.Of(kept);
+            }
+
+            bool drawn = row.gameObject.activeInHierarchy;
+            bool missDrawn;
+            if (_rowLabelMisses.TryGetValue(row, out missDrawn) && missDrawn == drawn)
+            {
+                return string.Empty;
             }
 
             TMP_Text found = FindRowLabelText(row);
-            if (row != null)
+            if (found == null)
             {
-                _rowLabelTexts[row] = found;
+                _rowLabelMisses[row] = drawn;
+                return string.Empty;
             }
 
-            return found != null ? CommunityMapsText.Of(found) : string.Empty;
+            _rowLabelTexts[row] = found;
+            _rowLabelMisses.Remove(row);
+            return CommunityMapsText.Of(found);
         }
 
         private static TMP_Text FindRowLabelText(ModListRow row)

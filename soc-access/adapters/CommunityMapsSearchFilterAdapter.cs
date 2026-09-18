@@ -5,6 +5,7 @@ using System.Reflection;
 using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
@@ -28,16 +29,39 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo TagParentField = AccessTools.Field(SearchPanelType, "SearchPanelTagParent");
 
         private readonly object _searchPanel;
-        private readonly string _title;
+
+        // mod.io's own word for this panel, read once rather than per frame. The browser is
+        // instantiated once for the session and only hidden when it closes, so this adapter outlives
+        // an options visit; mod.io re-translates its own UI when the language changes under an open
+        // browser, so the title is read again when it does (SyncLabelLanguage).
+        private ILanguageDefinition _labelLanguage;
+        private string _title;
 
         public CommunityMapsSearchFilterAdapter(object searchPanel)
         {
             _searchPanel = searchPanel;
+            SyncLabelLanguage();
+        }
+
+        /// <summary>Read the title above again where the game has changed language since. Asked from
+        /// <see cref="IsPresent"/>, which the screen asks every frame before it reads anything.
+        /// </summary>
+        private void SyncLabelLanguage()
+        {
+            ILocalizationHandler localization = GlobalLocalizationVariables.LocalizationHandler;
+            ILanguageDefinition language = localization != null ? localization.CurrentLanguage : null;
+            if (ReferenceEquals(language, _labelLanguage))
+            {
+                return;
+            }
+
+            _labelLanguage = language;
             _title = CommunityMapsText.FindTopBar("Search & filter");
         }
 
         public bool IsPresent()
         {
+            SyncLabelLanguage();
             GameObject panel = Panel;
             return Browser.IsOpen && panel != null && panel.activeInHierarchy;
         }
