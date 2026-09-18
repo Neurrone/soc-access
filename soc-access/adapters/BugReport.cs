@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
+using SongsOfConquest;
 using SongsOfConquest.Client.Menu.BugReporting;
 using SongsOfConquest.Client.Menu.BugReporting.Windows;
 using SongsOfConquest.Client.UI;
@@ -168,6 +169,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo LoadingField = AccessTools.Field(typeof(BugReporterController), "_loadingWindow");
         private static readonly FieldInfo FeedbackField = AccessTools.Field(typeof(BugReporterController), "_feedbackWindow");
         private static readonly FieldInfo SliderTextMeshField = AccessTools.Field(typeof(UISlider), "_textMesh");
+        private static readonly FieldInfo EntryPoolField = AccessTools.Field(typeof(BugReporterListSearchResultWindow), "_entryPool");
+        private static readonly FieldInfo EntryIssueField = AccessTools.Field(typeof(BugReporterSearchResultEntry), "_issue");
 
         private readonly UITransform _menuContainer;
         private readonly UITextMesh _headerText;
@@ -226,9 +229,16 @@ namespace SongsOfConquestAccess.Adapters
         private readonly UITextMesh _fbDiscordDescription;
 
         // The search-result rows are spawned once per result set and do not change afterwards, so the
-        // snapshot is rebuilt only when the container's child count moves - a game-owned count read
-        // per frame, never a subtree walk per frame.
+        // snapshot is rebuilt only when what the window has spawned moves - two game-owned reads per
+        // frame, never a subtree walk per frame. The container's childCount will not do it: the
+        // window's pool only switches a row OFF to retire it (SimpleGameObjectPool.Despawn), so the
+        // count is a high-water mark and a second search returning as many results as the first would
+        // keep the first set's rows. What the pool holds active answers instead - how many rows are
+        // spawned now, and which issue the first of them was given. The pool itself is read through
+        // its handle every frame rather than kept: the window builds it in its own Awake, which has
+        // not necessarily run when this adapter is made.
         private int _entrySnapshotCount = -1;
+        private object _entrySnapshotFirstIssue;
         private List<BugReportIssue> _issues = new List<BugReportIssue>();
 
         public BugReportAdapter(BugReporterController controller)
@@ -437,10 +447,17 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                int count = _lsEntryContainer != null ? _lsEntryContainer.childCount : 0;
-                if (count != _entrySnapshotCount)
+                SimpleGameObjectPool<BugReporterSearchResultEntry> pool =
+                    Read<SimpleGameObjectPool<BugReporterSearchResultEntry>>(EntryPoolField, _listSearch);
+                List<BugReporterSearchResultEntry> spawned = pool != null ? pool.ActiveEntries : null;
+                int count = spawned != null ? spawned.Count : 0;
+                object firstIssue = count > 0 && EntryIssueField != null && spawned[0] != null
+                    ? EntryIssueField.GetValue(spawned[0])
+                    : null;
+                if (count != _entrySnapshotCount || !ReferenceEquals(firstIssue, _entrySnapshotFirstIssue))
                 {
                     _entrySnapshotCount = count;
+                    _entrySnapshotFirstIssue = firstIssue;
                     _issues = ScanIssues();
                 }
 
@@ -504,7 +521,7 @@ namespace SongsOfConquestAccess.Adapters
                 return issues;
             }
 
-            // Walked only when the child count moved (a new result set), never every frame.
+            // Walked only when the window's spawned rows moved (a new result set), never every frame.
             BugReporterSearchResultEntry[] entries = _lsEntryContainer.GetComponentsInChildren<BugReporterSearchResultEntry>(false);
             for (int i = 0; i < entries.Length; i++)
             {
