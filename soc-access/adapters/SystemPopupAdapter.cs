@@ -22,6 +22,8 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<SystemPopup, UIButton>("_confirmButton");
         private static readonly AccessTools.FieldRef<SystemPopup, UIButton> CancelButtonRef =
             AccessTools.FieldRefAccess<SystemPopup, UIButton>("_cancelButton");
+        private static readonly AccessTools.FieldRef<SystemPopup, UISelectionLayer> SelectionLayerRef =
+            AccessTools.FieldRefAccess<SystemPopup, UISelectionLayer>("_selectionLayer");
 
         private readonly SystemPopup _popup;
         private Action<IUITextMeshInputField, string> _attachedSubmit;
@@ -111,6 +113,12 @@ namespace SongsOfConquestAccess.Adapters
         public bool GameHandlesEscape
         {
             get { return false; }
+        }
+
+        /// <summary>Pushed by <c>Show</c> and popped by <c>Hide</c>.</summary>
+        public IUISelectionLayer SelectionLayer
+        {
+            get { return _popup != null ? SelectionLayerRef(_popup) : null; }
         }
 
         public Component ButtonOf(DialogAction action)

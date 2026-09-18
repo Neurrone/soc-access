@@ -124,6 +124,16 @@ namespace SongsOfConquestAccess.Adapters
             get { return false; }
         }
 
+        /// <summary>Pushed by <c>Show</c> and popped by <c>Hide</c> and by <c>Dispose</c>.</summary>
+        public IUISelectionLayer SelectionLayer
+        {
+            get
+            {
+                CustomMessageMenu.Settings settings = GetSettings();
+                return settings != null ? settings.SelectionLayer : null;
+            }
+        }
+
         public Component ButtonOf(DialogAction action)
         {
             CustomMessageMenu.Settings settings = GetSettings();

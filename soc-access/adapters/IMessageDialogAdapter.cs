@@ -41,6 +41,12 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         bool GameHandlesEscape { get; }
 
+        /// <summary>The layer this source pushes onto the game's own selection-layer stack while it
+        /// is showing, or null where it pushes none. The stack is a LIFO the whole game shares
+        /// (<c>UISelectionLayerStack</c>, one instance off the project container), so its top is the
+        /// dialog raised LAST, which is the one drawn over the others - and the one whose buttons a
+        /// press must reach. The random-event menu pushes nothing and answers null.</summary>
+        IUISelectionLayer SelectionLayer { get; }
 
         /// <summary>The component the game draws this action's button with, or null where the source
         /// has no such button. Where a button IS on the screen is a game fact; what the reading order

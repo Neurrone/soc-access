@@ -111,6 +111,13 @@ namespace SongsOfConquestAccess.Adapters
             get { return true; }
         }
 
+        /// <summary>None: the random-event menu is the one source that pushes no selection layer -
+        /// it relies on its own UI blocker and on the input level instead.</summary>
+        public IUISelectionLayer SelectionLayer
+        {
+            get { return null; }
+        }
+
         public Component ButtonOf(DialogAction action)
         {
             return action == DialogAction.Positive ? GetConfirmButton() : null;

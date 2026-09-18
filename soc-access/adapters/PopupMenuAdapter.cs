@@ -141,6 +141,13 @@ namespace SongsOfConquestAccess.Adapters
             get { return true; }
         }
 
+        /// <summary>Popped and pushed again by every one of the popup's show methods, so it is on
+        /// top for as long as this popup is the last one raised.</summary>
+        public IUISelectionLayer SelectionLayer
+        {
+            get { return _settings != null ? _settings.SelectionLayer : null; }
+        }
+
         public Component ButtonOf(DialogAction action)
         {
             switch (action)

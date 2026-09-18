@@ -116,17 +116,68 @@ namespace SongsOfConquestAccess.Screens
                     manager => SystemPopupRef((SystemPopupManager)manager)),
                 popup => new SystemPopupAdapter((SystemPopup)popup));
 
+        /// <summary>The game's own modal stack, one instance off the project container
+        /// (<c>MenuProjectInstaller</c> binds <c>UISelectionLayerStack</c> as a single): a LIFO of
+        /// the selection layers every dialog pushes while it is showing, so its top is the one
+        /// raised last.</summary>
+        private readonly ScreenSource<IUISelectionLayerStack> _layerStack =
+            ScreenSource<IUISelectionLayerStack>.FromProject();
+
         /// <summary>The adapter itself is what the slot holds here: six unrelated objects draw the
         /// one page, so the "menu" a source answers with IS the adapter over it, built once per
-        /// object.</summary>
+        /// object.
+        ///
+        /// MORE THAN ONE CAN BE SHOWING: a system popup raised over a map message or a popup menu
+        /// leaves the covered one Active - <c>PopupMenu.Active</c> is its container's Active and
+        /// the caller alone turns it off - so a fixed order would read the covered dialog and press
+        /// its buttons. Which is on top is asked of the game: five of the six push a selection layer
+        /// while they show (<c>Push</c> on Show, <c>Pop</c> on Hide, and the popup menu pops and
+        /// pushes again on every show), and the stack's top is therefore the last one raised. The
+        /// fixed order stays as the answer where the top layer is none of theirs, which is every
+        /// ordinary single-dialog frame and the random-event menu, the one source that pushes
+        /// nothing.</summary>
         protected override object ResolveMenu()
         {
-            return Drawing(_mapMessage.Current)
-                ?? Drawing(_randomEvent.Current)
-                ?? Drawing(_customMessage.Current)
-                ?? Drawing(_popupMenu.Current)
-                ?? Drawing(_confirmPopup.Current)
-                ?? Drawing(_systemPopup.Current);
+            IUISelectionLayerStack stack = _layerStack.Current;
+            IUISelectionLayer top = stack != null ? stack.GetCurrentLayer() : null;
+            IMessageDialogAdapter first = null;
+            for (int i = 0; i < SourceCount; i++)
+            {
+                IMessageDialogAdapter adapter = Drawing(SourceAt(i));
+                if (adapter == null)
+                {
+                    continue;
+                }
+
+                if (top != null && ReferenceEquals(adapter.SelectionLayer, top))
+                {
+                    return adapter;
+                }
+
+                if (first == null)
+                {
+                    first = adapter;
+                }
+            }
+
+            return first;
+        }
+
+        private const int SourceCount = 6;
+
+        /// <summary>The six sources in the order they are tried, which is the order the detector's
+        /// own handlers used to be tried in.</summary>
+        private IMessageDialogAdapter SourceAt(int index)
+        {
+            switch (index)
+            {
+                case 0: return _mapMessage.Current;
+                case 1: return _randomEvent.Current;
+                case 2: return _customMessage.Current;
+                case 3: return _popupMenu.Current;
+                case 4: return _confirmPopup.Current;
+                default: return _systemPopup.Current;
+            }
         }
 
         /// <summary>The source that has just been written into the slot may have a text field of its

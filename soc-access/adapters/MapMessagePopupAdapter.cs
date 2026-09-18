@@ -21,6 +21,8 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<MapMessagePopup, UITextMesh>("_titleText");
         private static readonly AccessTools.FieldRef<MapMessagePopup, UIButton> OkButtonRef =
             AccessTools.FieldRefAccess<MapMessagePopup, UIButton>("_okButton");
+        private static readonly AccessTools.FieldRef<MapMessagePopup, UISelectionLayer> SelectionLayerRef =
+            AccessTools.FieldRefAccess<MapMessagePopup, UISelectionLayer>("_selectionLayer");
 
         private readonly MapMessagePopup _popup;
 
@@ -95,6 +97,12 @@ namespace SongsOfConquestAccess.Adapters
         public bool GameHandlesEscape
         {
             get { return true; }
+        }
+
+        /// <summary>Pushed by <c>Show</c> and popped by <c>Hide</c>.</summary>
+        public IUISelectionLayer SelectionLayer
+        {
+            get { return _popup != null ? SelectionLayerRef(_popup) : null; }
         }
 
         public Component ButtonOf(DialogAction action)

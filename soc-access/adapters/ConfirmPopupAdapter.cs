@@ -28,6 +28,8 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<ConfirmPopup, UITransform>("_mainContainer");
         private static readonly AccessTools.FieldRef<ConfirmPopup, ILocalizationHandler> LocalizationHandlerRef =
             AccessTools.FieldRefAccess<ConfirmPopup, ILocalizationHandler>("_localizationHandler");
+        private static readonly AccessTools.FieldRef<ConfirmPopup, UISelectionLayer> SelectionLayerRef =
+            AccessTools.FieldRefAccess<ConfirmPopup, UISelectionLayer>("_selectionLayer");
 
         private readonly ConfirmPopup _popup;
 
@@ -103,6 +105,12 @@ namespace SongsOfConquestAccess.Adapters
         public bool GameHandlesEscape
         {
             get { return true; }
+        }
+
+        /// <summary>Pushed by <c>Show</c> and popped by <c>Close</c>.</summary>
+        public IUISelectionLayer SelectionLayer
+        {
+            get { return _popup != null ? SelectionLayerRef(_popup) : null; }
         }
 
         public Component ButtonOf(DialogAction action)
