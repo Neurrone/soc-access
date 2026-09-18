@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SongsOfConquest.Common.Localization;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -16,6 +17,14 @@ namespace SongsOfConquestAccess.Adapters
     /// wielder sheet's composed bands and the artifact market's offers are the same bargain over
     /// other rows. It lives on the adapter, which lives exactly as long as the menu instance it
     /// wraps.
+    ///
+    /// Every one of those frozen strings is localized, and the game changes language in place - the
+    /// options menu the pause menu, the lobby and a battle all open calls SetCurrentLanguage and the
+    /// drawn text re-localizes where it stands, with no number in any key moving. So the language
+    /// the list was built under is part of the key here rather than at each site: it is read off the
+    /// game every frame like the rest of the key (the handler's own CurrentLanguage) and compared by
+    /// reference. Where there is no handler at all, as in a test, the answer never changes and the
+    /// key is the caller's numbers alone.
     /// </summary>
     public sealed class SlotSnapshot<T>
     {
@@ -23,13 +32,20 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly List<int> _read = new List<int>();
 
+        private ILanguageDefinition _keyLanguage;
+
+        private ILanguageDefinition _readLanguage;
+
         private IReadOnlyList<T> _items;
 
         /// <summary>The list this frame's key is written into, emptied for the caller. Kept across
-        /// frames so a key that has not changed costs no allocation at all.</summary>
+        /// frames so a key that has not changed costs no allocation at all. The language is read
+        /// here too, so it is read once per key and not once per number.</summary>
         public List<int> BeginKey()
         {
             _read.Clear();
+            ILocalizationHandler localization = GlobalLocalizationVariables.LocalizationHandler;
+            _readLanguage = localization != null ? localization.CurrentLanguage : null;
             return _read;
         }
 
@@ -37,7 +53,9 @@ namespace SongsOfConquestAccess.Adapters
         /// including the first read, which has built nothing yet.</summary>
         public IReadOnlyList<T> Unchanged()
         {
-            if (_items == null || _key.Count != _read.Count)
+            if (_items == null
+                || !ReferenceEquals(_keyLanguage, _readLanguage)
+                || _key.Count != _read.Count)
             {
                 return null;
             }
@@ -58,6 +76,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             _key.Clear();
             _key.AddRange(_read);
+            _keyLanguage = _readLanguage;
             _items = items;
             return items;
         }
