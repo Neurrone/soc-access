@@ -67,6 +67,7 @@ namespace SongsOfConquestAccess.UI
             _bookmarks = new AdventureBookmarkManager(new AdventureBookmarkStore());
             _beacons = new AdventureBeaconAudio();
             HydrateBookmarks();
+            RearmBeacons();
             _scanner = new ScannerController(
                 origin => ScannerCustomCategorySynthesizer.ApplyFromSettings(
                     _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null),
@@ -650,6 +651,7 @@ namespace SongsOfConquestAccess.UI
                 }
 
                 bool activated = _beacons.Toggle(slot, point, _cursorTile);
+                AdventureBeaconArming.Remember(BookmarkIdentity(), slot, activated);
                 ModString message = activated
                     ? ModStrings.Bookmarks.BeaconActivated
                     : ModStrings.Bookmarks.BeaconDeactivated;
@@ -703,7 +705,53 @@ namespace SongsOfConquestAccess.UI
         private void HydrateBookmarks()
         {
             SyncBeaconTeam();
-            _bookmarks.EnsureLoaded(_adapter != null ? _adapter.GetBookmarkGameIdentity() : null);
+            _bookmarks.EnsureLoaded(BookmarkIdentity());
+        }
+
+        /// <summary>Which bookmark storage this map's bookmarks - and the beacons armed over them -
+        /// belong to: the game, and the team within it.</summary>
+        private AdventureBookmarkGameIdentity BookmarkIdentity()
+        {
+            return _adapter != null ? _adapter.GetBookmarkGameIdentity() : null;
+        }
+
+        /// <summary>
+        /// Sound again every beacon the player has armed for the bookmarks now loaded
+        /// (<see cref="AdventureBeaconArming"/>). The arming outlives this grid - a manual battle
+        /// reloads the adventure scene and builds a new one - so a beacon the player never switched
+        /// off comes back with the map rather than being silently forgotten.
+        ///
+        /// A slot whose bookmark has gone (a file replaced from the Mod options window) is disarmed
+        /// here rather than left pointing at nothing. Nothing is played directly: <c>Start</c> honours
+        /// the audible state the screen last set, so a map re-armed while the focus is elsewhere
+        /// stays silent until the screen says otherwise.
+        /// </summary>
+        private void RearmBeacons()
+        {
+            AdventureBookmarkGameIdentity identity = BookmarkIdentity();
+            if (identity == null || _adapter == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < AdventureBookmarkSlots.All.Length; i++)
+            {
+                string slot = AdventureBookmarkSlots.All[i];
+                if (!AdventureBeaconArming.IsArmed(identity, slot))
+                {
+                    continue;
+                }
+
+                Vector2Int point;
+                if (_bookmarks.TryGet(slot, out point) && _adapter.IsValidMapTile(point))
+                {
+                    _beacons.Start(slot, point, _cursorTile);
+                }
+                else
+                {
+                    AdventureBeaconArming.Remember(identity, slot, false);
+                }
+            }
         }
 
         /// <summary>
@@ -713,9 +761,10 @@ namespace SongsOfConquestAccess.UI
         /// the facade, so the screen's update asks every frame and a hand-over is silent at the
         /// moment it happens rather than at the next bookmark gesture.
         ///
-        /// Handing control BACK leaves the beacons off: a bookmark is a position and nothing else,
-        /// so the file records no beacon of its own to restore, and re-starting them would be the
-        /// mod deciding what the player last wanted rather than reading it.
+        /// Handing control BACK sounds again whatever the incoming player had armed
+        /// (<see cref="AdventureBeaconArming"/>), which is read rather than decided: their bookmarks
+        /// are a file of their own and the beacons over them are remembered against that same
+        /// storage, so the switch restores each player's map as they left it.
         /// </summary>
         public void SyncBeaconTeam()
         {
@@ -727,6 +776,10 @@ namespace SongsOfConquestAccess.UI
 
             _beaconTeamId = teamId;
             _beacons.StopAll();
+            // The team is half of the bookmark file's name, so the incoming player's bookmarks are
+            // loaded before their beacons can be put back over them.
+            _bookmarks.EnsureLoaded(BookmarkIdentity());
+            RearmBeacons();
         }
 
         private static void SpeakNoBookmark()

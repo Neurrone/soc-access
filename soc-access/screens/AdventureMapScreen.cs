@@ -207,6 +207,11 @@ namespace SongsOfConquestAccess.Screens
 
             _gridAdapter = Live;
             _grid = Live == null ? null : new AdventureMapGrid(Live, ReadMapTile);
+            // A grid puts back the beacons the player had armed over this game's bookmarks, and the
+            // one built for the map returning from a battle is built before the map is the screen
+            // being read. What the beacons may be heard at is the screen's answer, so it is given
+            // here rather than waited for.
+            _grid?.SetBeaconAudible(_isTopScreen);
             // A new adventure has said nothing yet, teleport mode included. Quitting with the
             // teleport menu up leaves the flag standing, and the next adventure's first update read
             // that as the menu having just closed: the cursor was moved to the selected wielder and

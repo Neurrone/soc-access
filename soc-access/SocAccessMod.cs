@@ -178,6 +178,7 @@ namespace SongsOfConquestAccess
             Step("speech service", () => _speechService?.Dispose());
             _speechService = null;
             Step("bookmarks", Bookmarks.AdventureBookmarkStore.Reset);
+            Step("beacon arming", Bookmarks.AdventureBeaconArming.Reset);
             Step("settings", ModSettings.Reset);
             if (Instance == this)
             {
