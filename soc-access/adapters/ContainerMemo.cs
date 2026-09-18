@@ -26,6 +26,7 @@ namespace SongsOfConquestAccess.Adapters
     {
         private T _value;
         private Transform _container;
+        private object _subject;
         private int _childCount = -1;
         private Transform _first;
         private Transform _last;
@@ -36,6 +37,16 @@ namespace SongsOfConquestAccess.Adapters
         /// language under them.</summary>
         public T Get(Transform container, Func<T> read)
         {
+            return Get(container, null, read);
+        }
+
+        /// <summary>The same, for a container the game redraws for one SUBJECT at a time. Unity
+        /// destroys at the end of the frame, so the redraw leaves the old children in place for the
+        /// rest of it, and a block the new subject draws nothing into keeps its count and both its
+        /// ends - the key would hit and hand back the previous subject's answer. What the block is
+        /// drawn for is part of the key for that reason.</summary>
+        public T Get(Transform container, object subject, Func<T> read)
+        {
             int count = container != null ? container.childCount : 0;
             Transform first = count > 0 ? container.GetChild(0) : null;
             Transform last = count > 0 ? container.GetChild(count - 1) : null;
@@ -43,6 +54,7 @@ namespace SongsOfConquestAccess.Adapters
             ILanguageDefinition language = localization != null ? localization.CurrentLanguage : null;
             if (_value != null
                 && ReferenceEquals(container, _container)
+                && ReferenceEquals(subject, _subject)
                 && count == _childCount
                 && ReferenceEquals(first, _first)
                 && ReferenceEquals(last, _last)
@@ -52,6 +64,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _container = container;
+            _subject = subject;
             _childCount = count;
             _first = first;
             _last = last;

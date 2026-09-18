@@ -273,9 +273,20 @@ namespace SongsOfConquestAccess.Adapters
 
         // The rows the block last drew. SetDetails clears the entry container and instantiates new
         // rows into it and Clear destroys them, so the memo's key is what that container holds - read
-        // from the game each build, not a generation a hook feeds (AGENTS.md, Screen Resolution).
+        // from the game each build, not a generation a hook feeds (AGENTS.md, Screen Resolution) -
+        // TOGETHER WITH THE ENTITY the menu is drawn for. Clear destroys through Object.Destroy,
+        // which Unity defers to the end of the frame, and Show redraws for the next entity without
+        // hiding first, so on that frame the block holds the previous entity's rows as well: a new
+        // entity that draws none of its own would keep the count and both ends and the key would
+        // hit.
         private readonly ContainerMemo<IReadOnlyList<DescriptionRow>> _descriptionRows =
             new ContainerMemo<IReadOnlyList<DescriptionRow>>();
+
+        // The entity the rows were last read for, and the entries that read kept. On the frame the
+        // entity moves, the rows awaiting that deferred destroy are still walked, and they are the
+        // ones named here, so they are skipped by identity rather than spoken under the new name.
+        private IMapEntity _rowsEntity;
+        private Component[] _rowsEntries = new Component[0];
 
         public IReadOnlyList<DescriptionRow> GetDescriptionRows()
         {
@@ -285,22 +296,25 @@ namespace SongsOfConquestAccess.Adapters
                 return new List<DescriptionRow>();
             }
 
+            IMapEntity entity = Entity;
             return _descriptionRows.Get(
                 GetDescriptionEntryContainer(description),
-                () => ReadDescriptionRows(description));
+                entity,
+                () => ReadDescriptionRows(description, entity));
         }
 
-        private IReadOnlyList<DescriptionRow> ReadDescriptionRows(MiniMenuDescription description)
+        private IReadOnlyList<DescriptionRow> ReadDescriptionRows(MiniMenuDescription description, IMapEntity entity)
         {
             List<DescriptionRow> rows = new List<DescriptionRow>();
 
             // Reached only when the key above says the block has been rewritten, so a still menu
             // costs no walk.
+            Component[] pendingDestroy = ReferenceEquals(entity, _rowsEntity) ? null : _rowsEntries;
             MapEntityHUDDescriptionEntry[] entries = description.GetComponentsInChildren<MapEntityHUDDescriptionEntry>(false);
             for (int i = 0; i < entries.Length; i++)
             {
                 MapEntityHUDDescriptionEntry entry = entries[i];
-                if (!GameObjects.IsLive(entry))
+                if (!GameObjects.IsLive(entry) || WasRead(pendingDestroy, entry))
                 {
                     continue;
                 }
@@ -313,14 +327,36 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
+                // Counted off the rows KEPT, so a row has the same index on the frame the previous
+                // entity's are still there as it has once they are gone, and the node keeps its id.
                 rows.Add(new DescriptionRow(
-                    i,
+                    rows.Count,
                     entry,
                     label,
                     () => FirstTooltipWithLines(icon, text)));
             }
 
+            _rowsEntity = entity;
+            _rowsEntries = new Component[rows.Count];
+            for (int i = 0; i < rows.Count; i++)
+            {
+                _rowsEntries[i] = rows[i].Component;
+            }
+
             return rows;
+        }
+
+        private static bool WasRead(Component[] previous, Component entry)
+        {
+            for (int i = 0; previous != null && i < previous.Length; i++)
+            {
+                if (ReferenceEquals(previous[i], entry))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>The transform the block instantiates its rows into, which is what a rewrite
