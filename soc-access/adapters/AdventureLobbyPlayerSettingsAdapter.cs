@@ -5,6 +5,7 @@ using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquest.Common.Lobby;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -29,6 +30,8 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(LobbyPlayerSettingsMenu), "_confirmButton");
         private static readonly FieldInfo LocalizationField =
             AccessTools.Field(typeof(LobbyPlayerSettingsMenu), "_localizationHandler");
+        private static readonly FieldInfo TeamStateField =
+            AccessTools.Field(typeof(LobbyPlayerSettingsMenu), "_lobbyTeamState");
 
         private readonly LobbyPlayerSettingsMenu _menu;
         private readonly ILocalizationHandler _localization;
@@ -62,6 +65,21 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return SpokenLines.Clean(
                     GameText.Get(_localization, "Lobby/PlayerSettingsMenu/Header", string.Empty));
+            }
+        }
+
+        /// <summary>The name of the player whose settings the popup is showing, empty where it is
+        /// showing nobody's. One <c>LobbyPlayerSettingsMenu</c> serves every row and <c>Show</c>
+        /// keeps the team it was opened for (decompiled <c>LobbyPlayerSettingsMenu.cs</c> ~:136-139),
+        /// so the team's own stored name is what the popup is about - the game's own word for the
+        /// player, and what <c>PlatformNameManager.GetName</c> builds the row's drawn name from.
+        /// </summary>
+        public string PlayerName
+        {
+            get
+            {
+                ILobbyTeamState team = Reflect.Get<ILobbyTeamState>(_menu, TeamStateField);
+                return SpokenLines.Clean(team != null ? team.StoredName : null);
             }
         }
 

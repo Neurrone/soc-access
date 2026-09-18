@@ -1,5 +1,6 @@
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 
@@ -55,10 +56,24 @@ namespace SongsOfConquestAccess.Screens
             get { return 20; }
         }
 
-        /// <summary>The popup's own drawn title ("Player settings").</summary>
+        /// <summary>The popup's own drawn title ("Player settings"), and after it the player it is
+        /// about: one popup serves every row and its title says so for none of them, so arrival
+        /// would otherwise never say whose settings these are.</summary>
         public override string ScreenName
         {
-            get { return Live != null ? Live.Title : null; }
+            get
+            {
+                if (Live == null)
+                {
+                    return null;
+                }
+
+                string title = Live.Title;
+                string player = Live.PlayerName;
+                return string.IsNullOrWhiteSpace(player) || string.IsNullOrWhiteSpace(title)
+                    ? title
+                    : ModText.Get(ModStrings.Common.ListSeparator, title, player);
+            }
         }
 
         public override object InitialFocusStop
