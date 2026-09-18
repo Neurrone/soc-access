@@ -45,7 +45,11 @@ namespace SongsOfConquestAccess.Screens
         // MOD-OWNED CURSOR INTENT, which outlives the menu (AGENTS.md, "Screen Resolution"): taking
         // a difficulty makes the game redraw the page, and a redraw the screen did not survive
         // starts with no cursor memory. This carries the one thing worth keeping across that - that
-        // the player was at the difficulty - and is read once, by the seating that follows.
+        // the player was at the difficulty - and is read once, by the seating that follows. It is
+        // about THIS page, so leaving the page drops it: the game redraws in place
+        // (CampaignMapSelectMenu.HandleDifficultyChanged re-clicks the selected button and the
+        // information view never clears _map), the screen therefore never goes inactive, and an
+        // intent nobody consumed would be waiting for the next campaign map opened.
         private bool _focusDifficultyAfterNextRebuild;
 
         // A subject of its own for the details line, kept across rebuilds so the reconciler seats the
@@ -105,6 +109,16 @@ namespace SongsOfConquestAccess.Screens
         public override IMenuButtonAdapter BackButton
         {
             get { return Live != null ? Live.BackButton : null; }
+        }
+
+        /// <summary>The page has gone, so the intent about it goes too: it is read only when a
+        /// seating finds no cursor, which on this page never happens, so an unconsumed one would be
+        /// waiting for the next campaign map opened and put the player on "Difficulty, combo box"
+        /// instead of on the missions.</summary>
+        public override void OnPop()
+        {
+            base.OnPop();
+            _focusDifficultyAfterNextRebuild = false;
         }
 
         public override void Build(GraphBuilder builder)
