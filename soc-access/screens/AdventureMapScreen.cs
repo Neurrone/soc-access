@@ -323,7 +323,11 @@ namespace SongsOfConquestAccess.Screens
             AccessibilityEventBus.Unsubscribe(HandleAccessibilityEvent);
             Live?.DetachEvents();
             _isTopScreen = false;
-            Grid()?.DisposeAudio();
+            // SILENCED, not destroyed: three of the four things that pop the map - a story sequence,
+            // a claimed quick battle, the loading prompt - leave the same adapter and so the same
+            // grid in place, and a grid whose voices have been destroyed can never sound again.
+            // Destroying them belongs to the adapter swap in Grid() and to the mod's Stop path.
+            Grid()?.SetBeaconAudible(false);
             Grid()?.HideOverlay();
             base.OnPop();
         }
