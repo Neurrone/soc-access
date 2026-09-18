@@ -287,10 +287,17 @@ namespace SongsOfConquestAccess.Screens
         /// here, where the loading screen is gone and the map is filled in, so the listener's discovery
         /// baseline is the loaded map and not the empty one the adapter was built over; detached in
         /// <see cref="OnPop"/>. The listener itself lives on the adapter, which releases it in its
-        /// Dispose when the slot moves to another adventure.</summary>
+        /// Dispose when the slot moves to another adventure.
+        ///
+        /// The kept tile and tooltip are dropped here because nothing reported what the game changed
+        /// while the map was off the stack: a quick battle removes the defender with the listener
+        /// detached, and a cursor left standing on that tile would otherwise still read the defeated
+        /// stack and its attack instruction. A manual battle unloads the scene and gets a new adapter,
+        /// which drops them in <see cref="Grid"/>; a quick battle does not.</summary>
         public override void OnPush()
         {
             Live?.AttachEvents(InvalidateTile);
+            InvalidateTile();
             AccessibilityEventBus.Subscribe(HandleAccessibilityEvent);
         }
 
