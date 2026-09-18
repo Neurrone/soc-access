@@ -302,6 +302,9 @@ namespace SongsOfConquestAccess
         private void Update()
         {
             AttachLocalizationHandler();
+            // The game's input manager is built by its first scene, long after the mod is loaded, so
+            // the keybind warning asks for it here until it has one.
+            ModKeybindConflicts.Tick();
             Adapters.ModOptionsEntries.Tick();
             ClearAdventureStateOnMainMenuArrival();
             // Who the player is on, then the keys: every screen resolves its own menu from the game

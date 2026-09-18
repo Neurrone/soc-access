@@ -18,8 +18,11 @@ namespace SongsOfConquestAccess.Input
     /// Direction (b), a mod rebind landing on a game key, is checked at capture apply
     /// (<see cref="WarnIfModShadowsGame"/>) against the game's own overrideable actions. Direction
     /// (a), a game rebind landing on a mod key, rides <see cref="IInputManager.OnBindingChanged"/>,
-    /// subscribed at mod init and dropped in a Stop step. Only the mod &lt;-&gt; game boundary; no
-    /// mod-vs-mod, no game-vs-game.
+    /// attached from the mod's update (<see cref="Tick"/>) rather than once at init and dropped in a
+    /// Stop step. The mod starts from the loader's Awake, while BepInEx is still chainloading and
+    /// before the game's first scene has built an input manager, so a cold boot has nothing to attach
+    /// to at init and only a hot reload ever did. Only the mod &lt;-&gt; game boundary; no mod-vs-mod,
+    /// no game-vs-game.
     ///
     /// Matching is by a canonical (ctrl, shift, alt, key-token) tuple. A mod
     /// <see cref="KeyboardBinding"/> is normalised straight from its fields; the game's binding is
@@ -34,8 +37,8 @@ namespace SongsOfConquestAccess.Input
         private static Action<ActionReference> _handler;
 
         /// <summary>Hook the game's binding-changed callback so a game rebind onto a mod key warns.
-        /// Best-effort: on a cold boot before the input manager exists there is nothing to hook, and
-        /// direction (a) is silently unavailable until the next mod load. Idempotent.</summary>
+        /// Best-effort: where the input manager does not exist yet there is nothing to hook and
+        /// <see cref="Tick"/> asks again. Idempotent.</summary>
         public static void Start()
         {
             Stop();
@@ -48,6 +51,20 @@ namespace SongsOfConquestAccess.Input
             _subscribed = manager;
             _handler = OnGameBindingChanged;
             manager.OnBindingChanged += _handler;
+        }
+
+        /// <summary>Attach to the game's input manager as soon as there is one, and to the next one
+        /// if the manager is rebuilt with the scene that installs it. One static field read a frame
+        /// while it is already attached, which is what the mod's update can afford.</summary>
+        public static void Tick()
+        {
+            IInputManager manager = InputManagerStaticAccessUnsafe.Current;
+            if (manager == null || ReferenceEquals(manager, _subscribed))
+            {
+                return;
+            }
+
+            Start();
         }
 
         /// <summary>Drop the subscription from the exact manager it was placed on. A Stop step.</summary>
