@@ -8,14 +8,11 @@ Use `Up`, `Down`, `Home`, and `End` to move through slots.
 
 ## Army Exchange
 
-The army exchange widget is used when moving troops between two armies or when an army is offering to join yours. The exchange is represented as a two-column grid, one column for each army.
+Troops may also be moved from the current wielder to another wielder, a settlement or another army may want to join you.
 
-- `Up`: previous slot in the current army
-- `Down`: next slot in the current army
-- `Left`: move to the other army column
-- `Right`: move to the other army column
-- `Home`: first slot in the current army
-- `End`: last slot in the current army
+Both armies are separate tab stops that you can drag and drop troops between.
+
+The current wielder's army is designated the left army, and the other army involved is right. Press `Left` or `Right` to switch sides. This is a convenience hotkey since these armies are in the tab order.
 
 ## Moving Troops
 
@@ -31,8 +28,4 @@ To move a troop:
 
 If the game needs an amount specified before completing the move, the move amount popup opens.
 
-The slots of each army is visually rendered from left to right. The second army is positioned to the right of your wielder's army. Hence, when the game uses terminology to "move left" or "move right", it refers to the path the mouse moves when performing a drag and drop in the normal way.
-
-## Disbanding
-
-There is a disband [tooltip Action ](actions-menu.md) for troops that can be disbanded.
+The slots of each army are visually rendered from left to right. The second army is positioned to the right of your wielder's army. Hence, when the game uses terminology to "move left" or "move right", it refers to the path the mouse moves when performing a drag and drop in the normal way.

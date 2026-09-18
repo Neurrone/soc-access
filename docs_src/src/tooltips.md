@@ -1,11 +1,7 @@
 # Tooltips
 
-Almost every UI element has an associated tooltip. For example:
+Virtually every element has a tooltip.
 
-- Troop stacks
-- Tiles within an enemy's zone of control
-- Tiles with resources or buildings
-- Research
-- Buildings
+Short text-only tooltips are always automatically read. In [mod settings](mod-settings.md), you can disable the reading of longer tooltips.
 
-See the next section on [Buffers](buffers.md) to read these tooltips.
+Tooltips can be read line by line in the [UI Buffer](buffers.md)

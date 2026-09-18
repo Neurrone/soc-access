@@ -4,19 +4,21 @@ Songs of Conquest Access is a screen reader accessibility mod for Songs of Conqu
 
 ## Features
 
-- Full narration of menus, text, tooltips and other game UI elements
+- Full narration of menus, text, tooltips and other game UI elements through any screen reader supported by Prism
 - Support for the Windows version of the game with a keyboard
 - Keyboard-based drag-and-drop, which is used extensively throughout the game
 - Buffer system for review of tooltips, lengthy text elements and event notifications
 - Scanner system, bookmarks and audio beacons for overworld navigation
-- Sound cues for terrain, map contents and battlefield hexes, plus a sonar sweep of your surroundings, all tunable from an [audio glossary](audio.md)
+- Sound cues for terrain and battlefield awareness
+- AI written descriptions with information about important terrain features, choke points and spawn points for all 69 possible battlefield layouts
 - Narration of all combat events with summaries to condense similar events for less verbosity
-- In combat, readouts for threat information for tiles: attack, deadly and movement range as well as zone of control
+- In combat, readouts of threat information for tiles: attack, deadly and movement range as well as zone of control
+- Support for remapping of all mod commands
 - AI written translations for all other languages that the game supports: French, Italian, German, Spanish, Polish, Russian, Portuguese - Brazil, Simplified Chinese, Korean, Traditional Chinese, Ukrainian, Turkish and Japanese
 
 ## Status
 
-The mod provides full screen reader accessibility for the Windows version of the game. It was tested by completing a playthrough of the Arleon faction campaign, The Song of Stoutheart.
+The mod provides full screen reader accessibility for the Windows version of the game.
 
 All official campaigns, maps and DLCs are supported. Multiplayer, community maps and campaigns are experimental due to the need for more testing.
 

@@ -4,7 +4,7 @@
 
 Download and run [SongsOfConquestAccessInstaller.exe](https://github.com/Neurrone/soc-access/releases/latest/download/SongsOfConquestAccessInstaller.exe).
 
-The installer will try to find your Steam or GOG installation automatically. If it cannot find the game, use the Browse button and select the folder that contains `SongsOfConquest.exe`.
+The installer detects your Steam or GOG installation automatically. If it cannot find the game, use the Browse button and select the folder that contains `SongsOfConquest.exe`.
 
 Close Songs of Conquest before installing or updating the mod.
 

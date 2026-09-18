@@ -1,47 +1,53 @@
 # Getting Started
 
-## Moving Between Widgets
+## Screens
 
-Use Tab to move to the next major widget on the current screen. Use Shift+Tab to move to the previous widget. Navigation wraps for convenience, with a sound being played to indicate when this happened. The mod uses sound in a number of other places too, described in [Audio](audio.md).
+Every screen is divided into tab stops
 
-A widget is a UI element like a menu, button, the adventure map grid or the combat hex grid.
+A stop is one panel of the game. Use the arrow keys to explore the contents of a panel. Panels may be subdivided into regions for easier navigation. For instance, a region could be a list, table or a row of buttons.
 
-## Menus
+- `Tab`: next stop
+- `Shift+Tab`: previous stop
+- `Up` / `Down` / `Left` / `Right`: navigates items in a stop, `Left` and `Right` also collapses and expands grouped content or adjusts sliders
+- `Shift+Left` / `Shift+Right`: a larger adjustment on an adjustable slider
+- `Home` / `End`: first or last item of the stop or region
+- `Alt+Up` / `Alt+Down`: previous and next region of a stop
 
-- Down: next item
-- Up: previous item
-- Home: first item
-- End: last item
-- Enter: activate the focused item if applicable
-- Escape: closes the current screen
+## Acting on things
 
-Note that menus are used to expose lists of information as well, so pressing enter on menu items does nothing.
+`Enter` corresponds to a left click and activates buttons. `Escape` cancels the current context or screen. `\` performs a right-click.
 
-## Buttons
+The mod speaks usage hints when there are additional commands available for the focused element. These hints are also written to the bottom of the buffer.
 
-Buttons are activated with Enter.
+## Type-ahead search
 
-## Grids
+Start typing to find something in the current tab stop. This is especially useful in long lists like the research or recruitment screens.
 
-- Up and Down: move by row
-- Left and Right: move by column
-- Home: first row in the current column
-- End: last row in the current column
+- keep typing to narrow the search
+- `Up` / `Down`: previous and next match
+- `Home` / `End`: first and last match
+- `Escape` or `Backspace`: ends the search
+- any other command ends the search
 
-## Drag and Drop
+Note that typeahead search is disabled in the adventure map and combat screens as well as the troop deployment grid because they conflict with other commands.
 
-Some widgets support drag and drop. The mod announces draggable items as draggable.
+## Drag and drop
 
-To drag an item:
+The mod announces draggable items as "draggable". To drag an item:
 
-1. Focus the item.
-2. Press Space to start dragging.
-3. Move to the destination.
-4. Press Enter to drop.
-5. Press Escape to cancel the drag.
+1. Press `Space` to start dragging.
+2. Move to the destination.
+3. Press `Enter` to drop.
+4. Press `Escape` to cancel the drag.
 
-## Editing Text
+## Tables
 
-Text fields are announced as edit controls.
+- Use the arrow keys to navigate
+- `Ctrl+Alt+Left`: move to first column of current row
+- `Ctrl+Alt+Right`: move to last column of current row
+- `Ctrl+Alt+Up`: move to first row of current column, `Home` also works
+- `Ctrl+Alt+Down`: move to lastt row of current column, `End` also works
 
-Type text normally like you would in a form. The text field receives characters when focused.
+## Editing text
+
+Press `Enter` to start editing, `Enter` to commit and `Escape` to cancel editing which restores the previous contents of the edit field.

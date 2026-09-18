@@ -8,31 +8,21 @@ The adventure map has an accessibility cursor. The mod speaks the tile under the
 
 Use the arrow keys to move the map cursor. Use the shift+arrow keys to move to the next interesting tile, where interesting means it differs from the current tile.
 
-The mod keeps the focused tile in view and reads the tile as you move. Each tile you land on also plays a short sound describing its terrain, or what is standing on it. See [Audio](audio.md).
+The mod keeps the focused tile in view and reads the tile as you move. Each tile plays a short sound describing its terrain or its contents. See [the audio chapter](audio.md).
 
 Tiles within the movement range of the currently selected wielder are indicated as reachable.
 
-Tiles that cannot be entered because of terrain are announced as impassable. A tile next to an enemy or neutral army is announced as within that army's zone of control. Nothing else marks a tile the game refuses: whatever occupies it is already named.
-
-The terrain is the topmost thing painted on the tile, so scenery standing on the ground is named instead of the ground: `Palisade`, `Fortified gate`, `Barricade`, `Tombstones`, `Ruins`, `Torch`, `Faey forest`, `Birch forest`, `Magnolia trees`, `Bamboo`, `Winter decorations` and `Midsummer decorations` block movement, while `Dead bodies`, `Dead soldiers`, `Bones`, `Dragon bones`, `Structures`, `Campfire`, `Excavation`, `Hunting camp`, `Fishing spot` and `Farmland` can be walked over. The scanner lists each of them under `Terrain`, the blocking ones under `Barriers` and the rest under `Open ground`.
-
-Weather and aftermath painted over a tile are read after the terrain as `fireflies`, `burn marks`, `fog`, `smoke`, `wildfire`, `rays of light` or `snow`. They are an `Effects` element in `Tile announcements` on the adventure map tab, on by default, and can be turned off or moved like any other element.
+Tiles that cannot be entered because of terrain are announced as impassable. A tile next to an enemy or neutral army is announced as within that army's zone of control; entering such tiles will cause you to be attacked.
 
 ### Following Roads
 
-A road tile names the neighbouring tiles the road carries on into, straight after the terrain, so a road running east to west reads as `Dirt road, e w` and a fork reads as `Dirt road, n e w`. Every direction named is a neighbour that is road as well, so you can follow a road by stepping in one of the directions it just gave you.
-
-The number of directions tells you the shape without spending a word on it: one direction means the road ends where you are standing, two means it passes through, and three or more means it forks.
-
-Roads are not always one tile wide. On a road that has been painted wider, a tile borders road on several sides and names all of them, so expect more directions there than the road has ways to go.
+A road tile names the neighbouring tiles the road continues into, so a road running east to west reads as `Dirt road, e w` and a fork reads as `Dirt road, n e w`. Reading road directions is enabled by default.
 
 Bridges count as road, so a route does not appear to stop dead at a water crossing. A road running into unexplored ground contributes no direction, so it reads as though it ended until you explore further.
 
-The directions are a `Road directions` element in `Tile announcements` on the adventure map tab, on by default. Turn it off, move it elsewhere in the tile announcement, or change whether it takes a suffix, the same as any other element.
+While road directions are on, the shift+arrow keys also stop on a fork to make it following stretches of road convenient.
 
-`Long road directions`, a checkbox on the adventure map tab, reads them as `east west` instead of `e w`. It is separate from the scanner's own `Long directions` setting, so the map and the scanner can differ.
-
-While road directions are on, the shift+arrow keys also stop on a fork, so you can run along a road and be put down where it branches instead of sailing past. Turn the element off and they run past forks as before.
+### Visibility
 
 A tile can be in one of three visibility states:
 
@@ -52,20 +42,6 @@ The mod mentions if a tile is unexplored or currently unseen.
 - `W`: select the next wielder
 - `S`: select the next settlement
 - `Space`: move focus to the selected wielder's tile
-
-### Setting a Destination
-
-When a destination is set, the mod reads what it will cost and the route the wielder will walk, for example `Cost: 5 this turn, 12 next turn. Aurelia will move 2n, ne, 2e.`
-
-The cost is broken over the turns it is spent on. Each number is the movement used during that turn, so the first is capped by what the wielder has left right now and the rest by its full movement. A turn that costs nothing is left out, so a wielder that has already run out this turn starts at `next turn`. When the destination is something the wielder interacts with, what that interaction costs is counted too, on the turn the wielder can afford to spend it.
-
-The route is then named as a run of steps at a time, with the number of tiles in front of the direction they are walked. A run of a single tile is named on its own, so a route that goes north twice, then northeast, then east twice reads as `2n, ne, 2e`. These follow the scanner's `Long directions` setting, so the same route reads as `2 north, northeast, 2 east` when that setting is on.
-
-When the destination is something the wielder acts on rather than somewhere it stands, the action is named after the last step, for example `Cost: 5.5 this turn. Aurelia will move 2n, ne and Claim Gold Mine.` If the wielder is already standing next to it there is nothing to walk, so the action is all that is read, for example `Cost: 0.5 this turn. Aurelia will Claim Gold Mine.` An action that costs no movement drops the cost, reading as `Aurelia will Visit Watermill.`
-
-The action and the name of the thing acted on are the game's own, the same wording its tooltip uses, and like the tooltip it is only named for something the wielder has not visited yet, so a wielder sent to a mine its side already holds is read as a walk. Another wielder is named the same way, as `Attack` for a hostile one and `Trade` for your own or a partner's, and neither is named while that side is in a battle, since the game does not allow it then.
-
-If the route cannot be worked out, this falls back to naming the destination tile instead.
 
 ### Route Previews
 
@@ -87,7 +63,7 @@ After setting a destination, the game draws a route preview. When focus is on a 
 
 ### Sonar Sweep
 
-Press `P` to hear every entity within the look around radius as a short sound, one after another from west to east, positioned relative to the cursor. See [Audio](audio.md#sonar-sweep).
+Press `P` to hear every entity within the look around radius as a short sound, one after another from west to east, positioned relative to the cursor. See [the audio chapter](audio.md#sonar-sweep).
 
 ### Revealed Entity Announcements
 
@@ -103,26 +79,24 @@ Bookmarks let you save adventure map locations and return to them later. There a
 
 Saving to an existing slot overwrites it. There is no separate delete command.
 
-Jumping to the bookmark you are already standing on says `here`, since there is no new tile to read.
-
-Bookmarks are saved to a file of their own per game, which the [Bookmarks tab](mod-settings.md#bookmarks) of the mod settings copies to the clipboard, imports from it, or opens in your file manager.
+Bookmarks are saved to a separate file per game. Use the bookmarks tab in the mod settings screen to import or export bookmarks.
 
 ### Beacons
 
-Beacons are looping sounds that allow bookmarks to serve as spatial audio markers. Use `Ctrl+Shift+number` to toggle the beacon for that bookmark slot. The sound follows the currently focused tile, as described in [Audio](audio.md#bookmark-beacons).
+Beacons are looping sounds that allow bookmarks to serve as spatial audio markers. Use `Ctrl+Shift+number` to toggle the beacon for that bookmark slot. The sound follows the currently focused tile, as described in [the audio chapter](audio.md#bookmark-beacons).
 
 ## HUD
 
 The HUD provides various controls for the currently selected wielder such as the wielder portrait, resources and objectives. Visibility is toggled with `h`. These controls are visible by default, and I recommend leaving it that way.
 
-Press tab from the map grid to cycle through HUD controls. When on the adventure map, press the following keys to move focus to the following HUD controls:
+Press `Tab` from the map grid to cycle through HUD controls. When on the adventure map, press the following keys to move focus to the following HUD controls:
 
 - `N`: notifications
 - `B`: objectives
 - `R`: resources
 - `T`: troops
 
-When focus is in the HUD controls, pressing escape moves focus back to the grid.
+When focus is in the HUD controls, pressing `Escape` moves focus back to the grid.
 
 Additionally, the game provides the following hotkeys that work anywhere on the adventure map screen:
 

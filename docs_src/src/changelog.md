@@ -10,17 +10,19 @@ Rewrote the UI to modern mod standards to provide the following features:
 - Some elements are now groups and can be expanded with `Right` to show child controls. This should make recruitment and upgrade of troops more intuitive
 - Where possible, all screens support typeahead to move focus to the next thing in the tab stop that matches the typed search term. This is disabled in the battlefield deployment grid, adventure map and combat screens due to conflicts with game or other mod keys
 - The tooltip actions menu has been replaced with usage hints that read what hotkey performs the corresponding action. These hints are also available at the bottom of the buffer. Reading of usage hints can be disabled in mod settings
-- Tooltips are now automatically read. Added a new mod setting to control automatic reading of long tooltips such as troop and wielder information; enabled by default
-- The inventory, equipment, trade and army exchange widgets have been simplified by using multiple tab stops. Drag and drop still works in the same way. As a convenience for existing players, `Left` and `Right` in contexts where troops can be moved between armies will still work like it did before
+- Tooltips are now automatically read. A new mod setting controls automatic reading of long tooltips such as troop and wielder information
+- The inventory, equipment, trade and army exchange widgets have been simplified by using multiple tab stops. Drag and drop still works in the same way. As a convenience for existing players, `Left` and `Right` moveds between armies like it did before
+- Tables now support `Ctrl+Alt` with the arrow keys to move to the first or last column of the current row, or to the first or last row in the current column
 - The mod's own options dialog is now a real visible game window accessed from the main or pause menus. The `Ctrl+m` hotkey that previously opened an invisible mod options dialog has been removed
 
 ### Game Screens
 
-- As part of the UI rewrite, the mod now uses an immediate instead of a retained tree. This means the presence or absence of screens is no longer determined by method hooking which was fragile and caused bugs like being stuck on the post-combat screen when attacked while your wielder was defending a settlement
+- Fix being stuck on the post-combat screen when attacked while your wielder was defending a settlement
 - The loading screen now reads Tips and progress information
 - Technologies in the research screen are now buttons that when activated, perform the research action
-- The marketplace screen uses a table to more accurately convey what the game draws
+- The marketplace screen was rewritten to use a table which more accurately matches what the game draws
 - In game options, adjusting keybinds is now supported
+- Fixed the adventure map speaking the current tile when transitioning between the troop placement and combat screens or quitting a game
 
 ### Controls
 
@@ -43,10 +45,12 @@ Other changes:
 - Tiles no longer say "blocked". This was confusing and didn't provide meaningful information
 - The mod now considers decorative terrain such as ruins, Tombstones or Birch Forest as the tile's terrain. This helps with orientation and ambience
 - Additional decorative effects on tiles like fog, burn marks or fireflies are now read after terrain. This can be disabled in mod settings
+- Changed the default binding of the describe map command from `D` to `Ctrl+D` so that the same hotkey works across the adventure map and combat screens
 
 ### Bookmarks
 
 - Added bookmarks tab to the mod settings screen to manage, import or export bookmarks
+- Swapped commands for setting and jumping to bookmarks: `Ctrl+1` through `0` now goes to a bookmark, `Shift+1` through `0` sets a bookmark
 
 ### Scanner
 
@@ -87,12 +91,12 @@ Other changes:
 - Buffs, debuffs and restrictions (invulnerable, reloading, magic immunity) are now indicated for troops on the combat grid and in scanner results
 - Improve reliability for reading and display of attack previews and troop tooltips
 - Removed confusing "blocked" indicator which was shown on occupied tiles because they had an infinite travel cost. Impassable terrain is still indicated
-- All 69 possible Battlefields in troop deployment and combat now have AI written descriptions grounded by features deterministically computed from terrain geometry. For example, it recognizes a ridge of elevated terrain. `Ctrl+D` speaks these descriptions
+- All 69 possible Battlefields in troop deployment and combat now have AI written descriptions with information about important terrain features, choke points and spawn points. These descriptions are available in the troop deployment screen and can be read with `Ctrl+D`
 - Decorations on battlefield tiles are now read, so a tile that previously just read as "impassable" could read as "gatepost, impassable". This helps with orientation and adds to the ambience of the game.
 - An impassable tile no longer speaks a height. This fixes bugs like "Elevated ground, height 3, impassable" which now reads as "Gatepost, impassable"
 - Choke points are now indicated and can be found in the scanner
 - Updated the scanner to take advantage of this new information. The terrain category lists one item per feature - diagonal ridge of 7 cells, height 1, patch of 12 cells, height 2, cliff of 3 cells
-- Fixed the adventure map speaking the current tile when transitioning between the troop placement and combat screens or quitting a game
+- Fixed "blocked" being spoken 6 times when a ranged unit's attack is obstructed by elevated terrain
 
 ## V0.7.4
 
