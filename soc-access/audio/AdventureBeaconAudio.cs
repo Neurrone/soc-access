@@ -222,7 +222,16 @@ namespace SongsOfConquestAccess.Audio
             BeaconVoice voice;
             if (_voices.TryGetValue(slot, out voice))
             {
-                return voice;
+                // A voice's object is a plain GameObject, so it is destroyed with the scene it was
+                // made in - a manual battle unloads the adventure, and the glossary's preview
+                // instance is static and outlives every scene. A Unity-null object is not a voice
+                // any more: kept, it would answer every later Play with a silent early return.
+                if (voice.GameObject != null && voice.Source != null)
+                {
+                    return voice;
+                }
+
+                _voices.Remove(slot);
             }
 
             AudioClip clip = EnsureClip();
