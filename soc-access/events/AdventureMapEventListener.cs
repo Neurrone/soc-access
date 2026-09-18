@@ -760,7 +760,7 @@ namespace SongsOfConquestAccess.Events
             else
             {
                 RemovePendingDiscovery(discoveryKey);
-                _revealedRegistry?.Remove(discoveryKey);
+                _revealedRegistry?.Remove(GetLocalTeamId(), discoveryKey);
                 if (announcedVisible)
                 {
                     return AddPendingHiddenWielder(discoveryKey, GetCommanderName(commander));
@@ -808,7 +808,7 @@ namespace SongsOfConquestAccess.Events
             _announcedVisibleNonLocalCommanders.Remove(commanderId);
             RemovePendingDiscovery(discoveryKey);
             RemovePendingHiddenWielder(discoveryKey);
-            _revealedRegistry?.Remove(discoveryKey);
+            _revealedRegistry?.Remove(GetLocalTeamId(), discoveryKey);
         }
 
         private bool AddPendingDiscovery(
@@ -935,6 +935,9 @@ namespace SongsOfConquestAccess.Events
                 return;
             }
 
+            // The finds belong to the team that made them, which in hot seat is whoever holds the
+            // map now and not whoever the listener was built under.
+            int teamId = GetLocalTeamId();
             IReadOnlyList<string> keys = _pendingDiscoveries.KeyOrder;
             for (int i = 0; i < keys.Count; i++)
             {
@@ -945,6 +948,7 @@ namespace SongsOfConquestAccess.Events
                 }
 
                 _revealedRegistry.AddOrUpdate(
+                    teamId,
                     entry.Key,
                     entry.Label,
                     entry.Position,

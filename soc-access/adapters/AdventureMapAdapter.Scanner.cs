@@ -67,7 +67,7 @@ namespace SongsOfConquestAccess.Adapters
             ScannerContribution.Run(ScannerSubcategoryKeys.Teleport, () => AddTeleportScannerResults(snapshot, tileCache));
             ScannerContribution.Run(ScannerCategoryKeys.Terrain, () => AddAdventureTerrainScannerResults(snapshot, origin, tileCache));
             ScannerContribution.Run(ScannerSubcategoryKeys.Unexplored, () => AddUnexploredScannerResults(snapshot, origin));
-            ScannerContribution.Run(ScannerSubcategoryKeys.Revealed, () => AddRevealedScannerResults(snapshot));
+            ScannerContribution.Run(ScannerSubcategoryKeys.Revealed, () => AddRevealedScannerResults(snapshot, localTeamId));
             return snapshot;
         }
 
@@ -494,7 +494,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            _revealedRegistry.Remove(result.Key);
+            _revealedRegistry.Remove(GetLocalTeamId(), result.Key);
         }
 
         private void AddWielderScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
@@ -752,14 +752,15 @@ namespace SongsOfConquestAccess.Adapters
             });
         }
 
-        private void AddRevealedScannerResults(ScannerSnapshot snapshot)
+        private void AddRevealedScannerResults(ScannerSnapshot snapshot, int localTeamId)
         {
             if (_revealedRegistry == null || snapshot == null)
             {
                 return;
             }
 
-            IReadOnlyList<AdventureMapRevealedEntry> entries = _revealedRegistry.Entries;
+            // The finds of the team holding the map now, which in hot seat is not the whole game's.
+            IReadOnlyList<AdventureMapRevealedEntry> entries = _revealedRegistry.Entries(localTeamId);
             if (entries == null || entries.Count == 0)
             {
                 return;
@@ -782,13 +783,13 @@ namespace SongsOfConquestAccess.Adapters
                     IMapEntity entity = TryGetMapEntity(entry.StableReference);
                     if (entity == null)
                     {
-                        RemoveStaleRevealedMapEntityEntry(entry);
+                        RemoveStaleRevealedMapEntityEntry(localTeamId, entry);
                         continue;
                     }
 
                     if (!TryGetMapEntityIdentityTile(entity, null, out tile))
                     {
-                        RemoveStaleRevealedMapEntityEntry(entry);
+                        RemoveStaleRevealedMapEntityEntry(localTeamId, entry);
                         continue;
                     }
 
@@ -1257,11 +1258,11 @@ namespace SongsOfConquestAccess.Adapters
                     || entity.HasComponent<IUnlockWithArtifactComponent>());
         }
 
-        private void RemoveStaleRevealedMapEntityEntry(AdventureMapRevealedEntry entry)
+        private void RemoveStaleRevealedMapEntityEntry(int localTeamId, AdventureMapRevealedEntry entry)
         {
             if (entry != null && _revealedRegistry != null)
             {
-                _revealedRegistry.Remove(entry.Key);
+                _revealedRegistry.Remove(localTeamId, entry.Key);
             }
         }
 

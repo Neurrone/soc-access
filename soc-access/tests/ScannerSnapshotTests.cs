@@ -268,30 +268,49 @@ namespace SongsOfConquestAccess.Tests
         {
             AdventureMapRevealedRegistry registry = new AdventureMapRevealedRegistry();
 
-            registry.AddOrUpdate("entity:1", "Old Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
-            registry.AddOrUpdate("commander:2", "Wielder", new Vector2Int(2, 0), 2, AdventureMapRevealedKind.Wielder);
-            registry.AddOrUpdate("entity:1", "Gold", new Vector2Int(3, 0), 1, AdventureMapRevealedKind.MapEntity);
+            registry.AddOrUpdate(1, "entity:1", "Old Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
+            registry.AddOrUpdate(1, "commander:2", "Wielder", new Vector2Int(2, 0), 2, AdventureMapRevealedKind.Wielder);
+            registry.AddOrUpdate(1, "entity:1", "Gold", new Vector2Int(3, 0), 1, AdventureMapRevealedKind.MapEntity);
 
-            Assert.AreEqual(2, registry.Entries.Count);
-            Assert.AreEqual("entity:1", registry.Entries[0].Key);
-            Assert.AreEqual("Gold", registry.Entries[0].Label);
-            Assert.AreEqual(new Vector2Int(3, 0), registry.Entries[0].Position);
-            Assert.AreEqual(0, registry.Entries[0].Sequence);
-            Assert.AreEqual("commander:2", registry.Entries[1].Key);
-            Assert.AreEqual(1, registry.Entries[1].Sequence);
+            Assert.AreEqual(2, registry.Entries(1).Count);
+            Assert.AreEqual("entity:1", registry.Entries(1)[0].Key);
+            Assert.AreEqual("Gold", registry.Entries(1)[0].Label);
+            Assert.AreEqual(new Vector2Int(3, 0), registry.Entries(1)[0].Position);
+            Assert.AreEqual(0, registry.Entries(1)[0].Sequence);
+            Assert.AreEqual("commander:2", registry.Entries(1)[1].Key);
+            Assert.AreEqual(1, registry.Entries(1)[1].Sequence);
         }
 
         [TestMethod]
         public void AdventureMapRevealedRegistryRemovesEntries()
         {
             AdventureMapRevealedRegistry registry = new AdventureMapRevealedRegistry();
-            registry.AddOrUpdate("entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
-            registry.AddOrUpdate("commander:2", "Wielder", new Vector2Int(2, 0), 2, AdventureMapRevealedKind.Wielder);
+            registry.AddOrUpdate(1, "entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
+            registry.AddOrUpdate(1, "commander:2", "Wielder", new Vector2Int(2, 0), 2, AdventureMapRevealedKind.Wielder);
 
-            Assert.IsTrue(registry.Remove("entity:1"));
+            Assert.IsTrue(registry.Remove(1, "entity:1"));
 
-            Assert.AreEqual(1, registry.Entries.Count);
-            Assert.AreEqual("commander:2", registry.Entries[0].Key);
+            Assert.AreEqual(1, registry.Entries(1).Count);
+            Assert.AreEqual("commander:2", registry.Entries(1)[0].Key);
+        }
+
+        /// <summary>Hot seat: the map changes hands inside one game, and each player's Revealed list
+        /// is their own - the other player's finds are neither read out nor removed by theirs.</summary>
+        [TestMethod]
+        public void AdventureMapRevealedRegistryKeepsEachTeamsFindsApart()
+        {
+            AdventureMapRevealedRegistry registry = new AdventureMapRevealedRegistry();
+            registry.AddOrUpdate(1, "entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
+            registry.AddOrUpdate(2, "entity:2", "Wood", new Vector2Int(2, 0), 2, AdventureMapRevealedKind.MapEntity);
+
+            Assert.AreEqual(1, registry.Entries(2).Count);
+            Assert.AreEqual("entity:2", registry.Entries(2)[0].Key);
+            Assert.IsFalse(registry.Contains(2, "entity:1"));
+            Assert.IsFalse(registry.Remove(2, "entity:1"));
+
+            Assert.AreEqual(1, registry.Entries(1).Count);
+            Assert.AreEqual("entity:1", registry.Entries(1)[0].Key);
+            Assert.AreEqual(0, registry.Entries(3).Count);
         }
 
         [TestMethod]
@@ -310,12 +329,12 @@ namespace SongsOfConquestAccess.Tests
         {
             AdventureMapScannerState state = new AdventureMapScannerState();
             AdventureMapRevealedRegistry registry = state.RevealedRegistry;
-            registry.AddOrUpdate("entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
+            registry.AddOrUpdate(1, "entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
 
             state.Clear();
 
             Assert.AreSame(registry, state.RevealedRegistry);
-            Assert.AreEqual(0, state.RevealedRegistry.Entries.Count);
+            Assert.AreEqual(0, state.RevealedRegistry.Entries(1).Count);
         }
 
         [TestMethod]
@@ -324,10 +343,10 @@ namespace SongsOfConquestAccess.Tests
             AdventureMapScannerState state = new AdventureMapScannerState();
             object adventureGame = new object();
             state.Rebind(adventureGame);
-            state.RevealedRegistry.AddOrUpdate("entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
+            state.RevealedRegistry.AddOrUpdate(1, "entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
 
             Assert.IsFalse(state.Rebind(adventureGame));
-            Assert.AreEqual(1, state.RevealedRegistry.Entries.Count);
+            Assert.AreEqual(1, state.RevealedRegistry.Entries(1).Count);
         }
 
         [TestMethod]
@@ -335,10 +354,10 @@ namespace SongsOfConquestAccess.Tests
         {
             AdventureMapScannerState state = new AdventureMapScannerState();
             state.Rebind(new object());
-            state.RevealedRegistry.AddOrUpdate("entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
+            state.RevealedRegistry.AddOrUpdate(1, "entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
 
             Assert.IsTrue(state.Rebind(new object()));
-            Assert.AreEqual(0, state.RevealedRegistry.Entries.Count);
+            Assert.AreEqual(0, state.RevealedRegistry.Entries(1).Count);
         }
 
         [TestMethod]
