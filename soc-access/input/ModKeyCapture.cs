@@ -14,8 +14,8 @@ namespace SongsOfConquestAccess.Input
     /// the binding, Escape included; the undo is a clear back to the default.
     ///
     /// A single armed action, held only while a capture is in flight. The mod options screen disarms
-    /// it when it closes, and a hot reload throws the whole static away with the assembly, so there
-    /// is no long-lived state to reset.
+    /// it when the screen goes, however it goes (its <c>OnPop</c>), and a hot reload throws the whole
+    /// static away with the assembly, so there is no long-lived state to reset.
     /// </summary>
     public static class ModKeyCapture
     {

@@ -126,11 +126,19 @@ namespace SongsOfConquestAccess.Screens
             return Close();
         }
 
+        /// <summary>Whatever took the window away - Escape, the close button, the page underneath
+        /// closing, a scene taking the canvas with it - disarms a capture armed on the Keybinds tab.
+        /// The player has no cancel, so the window going is the only way out of an armed-but-unwanted
+        /// capture, and a capture left armed has the router eat the next key pressed anywhere.
+        /// </summary>
+        public override void OnPop()
+        {
+            ModKeyCapture.Cancel();
+            base.OnPop();
+        }
+
         public bool Close()
         {
-            // A capture armed on the Keybinds tab must not outlive the window; the player has no
-            // cancel, so the window closing is the only way out of an armed-but-unwanted capture.
-            ModKeyCapture.Cancel();
             ModDialog dialog = _dialog;
             _dialog = null;
             if (dialog != null)
