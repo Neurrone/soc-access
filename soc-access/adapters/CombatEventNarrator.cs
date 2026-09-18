@@ -152,11 +152,33 @@ namespace SongsOfConquestAccess.Adapters
         [HookWritable]
         public static void Reset()
         {
+            ResetNarration();
+            _activeAdapter = null;
+        }
+
+        /// <summary>
+        /// The battle <paramref name="adapter"/> reads is over. What the narration holds was that
+        /// battle's - the turn it was on, the notifications it suppressed, the batch it was in the
+        /// middle of - so it is let go whichever battle is being read now. Only the slot naming the
+        /// battle being read is kept when another one has already taken it: <c>LiveScreen</c> builds
+        /// the next adapter, and so sets the slot, BEFORE disposing this one.
+        /// </summary>
+        public static void EndNarration(CombatAdapter adapter)
+        {
+            bool wasActive = IsActiveAdapter(adapter);
+            ResetNarration();
+            if (wasActive)
+            {
+                _activeAdapter = null;
+            }
+        }
+
+        private static void ResetNarration()
+        {
             Planner.Reset();
             SuppressedNativeNotifications.Clear();
             _currentTurnTroopId = -1;
             _flushPendingEventsScheduled = false;
-            _activeAdapter = null;
             _flushScheduleGeneration = 0;
             _abilityBatchActive = false;
             _wielderEssenceCaptureActive = false;

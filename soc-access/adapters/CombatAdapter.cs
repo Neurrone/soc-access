@@ -445,10 +445,7 @@ namespace SongsOfConquestAccess.Adapters
 
             _combatEnded = true;
             CombatEventNarrator.FlushPendingEventsForCombatEnd();
-            if (CombatEventNarrator.IsActiveAdapter(this))
-            {
-                CombatEventNarrator.Reset();
-            }
+            CombatEventNarrator.EndNarration(this);
         }
 
         public void Dispose()
