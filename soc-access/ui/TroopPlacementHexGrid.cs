@@ -88,6 +88,16 @@ namespace SongsOfConquestAccess.UI
             get { return IsOwnTroop(GetFocusedTile()); }
         }
 
+        /// <summary>Whether the game would take the troop lifted off <paramref name="source"/> on the
+        /// tile under the cursor - the adapter's answer, which is the game's own drop test.</summary>
+        public bool AcceptsDrop(Vector2Int source)
+        {
+            TroopPlacementSnapshot snapshot = Snapshot();
+            return snapshot != null
+                && _adapter != null
+                && _adapter.AcceptsTroop(snapshot.Get(source), snapshot.Get(_cursor));
+        }
+
         /// <summary>The game's own name for the troop under the cursor, captured when it is picked
         /// up.</summary>
         public string FocusedTroopLabel

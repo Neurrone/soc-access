@@ -371,10 +371,11 @@ namespace SongsOfConquestAccess.Screens
             vtable.OnFocusVisual = () => HexGrid().ShowOverlay();
             vtable.OnBlurVisual = () => HexGrid().HideOverlay();
 
-            // Only a troop of the player's own can be lifted, and every tile takes a drop: which
-            // destinations are legal is the GAME's answer, given when the drop replays its drag. The
-            // pick-up is DECLARED ON EVERY TILE and answers for itself with null where there is
-            // nothing to give, which is the engine's contract for a pure query - and here it is also
+            // Only a troop of the player's own can be lifted. The drop is declared on every tile, and
+            // which destinations are legal is the GAME's answer twice over: DropAccepts asks the
+            // game's own drop test for the "drop target" word, and the drop itself replays the
+            // game's drag. The pick-up is DECLARED ON EVERY TILE and answers for itself with null
+            // where there is nothing to give, which is the engine's contract for a pure query - and here it is also
             // what keeps the readout's part COUNT the same from tile to tile, so the live watch does
             // not read the whole node a second time every time the cursor steps off a troop.
             vtable.OnPickUp = () => HexGrid().CanPickUp
@@ -383,6 +384,9 @@ namespace SongsOfConquestAccess.Screens
 
             vtable.DropKind = TroopCargo;
             vtable.OnDrop = Drop;
+            vtable.DropAccepts = held => held != null
+                && held.Cargo is Vector2Int
+                && HexGrid().AcceptsDrop((Vector2Int)held.Cargo);
             builder.AddItem(new SyntheticNode(GridNodeId, vtable));
 
             builder.PopContext();

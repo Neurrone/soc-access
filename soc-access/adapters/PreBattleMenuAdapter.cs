@@ -71,6 +71,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo DefenderSpawnPointsField = AccessTools.Field(typeof(DeploymentMenu), "_defenderSpawnPoints");
         private static readonly MethodInfo GrabMethod = AccessTools.Method(typeof(DeploymentUIController), "Grab");
         private static readonly MethodInfo DropMethod = AccessTools.Method(typeof(DeploymentUIController), "Drop");
+        private static readonly FieldInfo SpawnpointValidatorField = AccessTools.Field(typeof(DeploymentUIController), "_spawnpointValidator");
+        private static readonly FieldInfo RendererTroopsField = AccessTools.Field(typeof(DeploymentRenderer), "_troops");
 
         // The delegate this adapter handed the deployment menu, held here rather than on the
         // screen: it is a subscription to THIS placement, so it lives as long as the adapter does
@@ -487,6 +489,57 @@ namespace SongsOfConquestAccess.Adapters
 
             string after = BuildPlacementSignature(deployment);
             return !string.Equals(before, after, StringComparison.Ordinal);
+        }
+
+        /// <summary>Whether the game would take the troop lifted off <paramref name="source"/> onto
+        /// <paramref name="destination"/>: the test <c>DeploymentUIController.Drop</c> runs before it
+        /// moves anything (decompiled ~:526-538). The tile holds a spawn point, another one than the
+        /// troop's own, the controller's own <c>_spawnpointValidator</c> - which the mouse's valid
+        /// entry marker asks every frame of a drag - passes it, and no locked troop stands on it.
+        /// </summary>
+        public bool AcceptsTroop(TroopPlacementTile source, TroopPlacementTile destination)
+        {
+            if (source == null
+                || destination == null
+                || source.TroopId < 0
+                || destination.GlobalSpawnPointId < 0
+                || destination.GlobalSpawnPointId == source.GlobalSpawnPointId)
+            {
+                return false;
+            }
+
+            DeploymentMenu deployment = GetDeploymentMenu();
+            object controller = deployment != null && DeploymentControllerField != null ? DeploymentControllerField.GetValue(deployment) : null;
+            Func<int, int, bool> validator = controller != null && SpawnpointValidatorField != null
+                ? SpawnpointValidatorField.GetValue(controller) as Func<int, int, bool>
+                : null;
+            if (validator == null || !validator(destination.GlobalSpawnPointId, source.TroopId))
+            {
+                return false;
+            }
+
+            return destination.TroopId < 0 || destination.TroopId == source.TroopId || !ProbeTroopLocked(destination);
+        }
+
+        /// <summary>Whether the game locks the troop on this tile in place (a faction's ballista),
+        /// read off the game's own puck the first time it is asked and kept on the tile, which lives
+        /// as long as the snapshot it belongs to.</summary>
+        private bool ProbeTroopLocked(TroopPlacementTile tile)
+        {
+            if (!tile.TroopLocked.HasValue)
+            {
+                DeploymentRenderer renderer = GetDeploymentRenderer();
+                Dictionary<int, GameObject> troops = renderer != null && RendererTroopsField != null
+                    ? RendererTroopsField.GetValue(renderer) as Dictionary<int, GameObject>
+                    : null;
+                GameObject puck;
+                DeploymentRendererTroopBehavior behavior = troops != null && troops.TryGetValue(tile.TroopId, out puck) && puck != null
+                    ? puck.GetComponentInChildren<DeploymentRendererTroopBehavior>()
+                    : null;
+                tile.TroopLocked = behavior != null && behavior.IsLocked;
+            }
+
+            return tile.TroopLocked.Value;
         }
 
         public void FocusTile(TroopPlacementTile tile)
@@ -1523,6 +1576,9 @@ namespace SongsOfConquestAccess.Adapters
         public ICommonTroopState Troop { get; set; }
 
         public bool TroopDetailsHidden { get; set; }
+
+        /// <summary>Whether the game locks the troop here in place; null until it has been asked.</summary>
+        public bool? TroopLocked { get; set; }
 
         public string TroopLabel { get; set; }
 
