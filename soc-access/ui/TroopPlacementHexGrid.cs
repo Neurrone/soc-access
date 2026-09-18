@@ -31,6 +31,11 @@ namespace SongsOfConquestAccess.UI
     {
         private readonly PreBattleMenuAdapter _adapter;
         private TroopPlacementSnapshot _snapshot;
+        // The menu's placement state the snapshot was taken under. Whose troops these are is part
+        // of the snapshot (OwnSide), and the hot-seat hand-over changes it silently - the deployment
+        // menu raises OnChanged only from a drop - so the state is read from the game again every
+        // time the snapshot is used, and a snapshot taken under another one is retaken.
+        private string _snapshotState;
         private Vector2Int _cursor;
         private readonly HexGridScanner _scanner;
 
@@ -54,7 +59,7 @@ namespace SongsOfConquestAccess.UI
                 (result, directions, index, count, includeItemName) => new TroopPlacementScannerSpeechContext(
                     result,
                     GetScannerTile(result),
-                    _snapshot,
+                    Snapshot(),
                     directions,
                     index,
                     count,
@@ -66,8 +71,8 @@ namespace SongsOfConquestAccess.UI
 
         public string GetLabel()
         {
-            TroopPlacementTile tile = GetFocusedTile();
-            return new TroopPlacementTileSpeechFormatter(_snapshot).DescribeTile(tile);
+            TroopPlacementSnapshot snapshot = Snapshot();
+            return new TroopPlacementTileSpeechFormatter(snapshot).DescribeTile(GetFocusedTile());
         }
 
         /// <summary>Where the cursor stands - the source of a carry, and what a drop lands on.</summary>
@@ -151,24 +156,52 @@ namespace SongsOfConquestAccess.UI
             return true;
         }
 
-        /// <summary>The board changed under the cursor - a troop was placed, moved or removed. The
-        /// cursor keeps its tile where that tile still exists, and the tile is read again only where
-        /// the player is standing on the board (<paramref name="announce"/>): a change made while the
-        /// cursor is on a side panel or on a button is not a landing.</summary>
+        /// <summary>The board changed under the cursor - a troop was placed, moved or removed, or
+        /// the menu handed the placement turn to the other side. The cursor keeps its tile where
+        /// that tile still exists AND the board is still the same side's; a hand-over starts it
+        /// again at this side's own placement, because the tile it was on belongs to the side whose
+        /// turn is over. The tile is read again only where the player is standing on the board
+        /// (<paramref name="announce"/>): a change made while the cursor is on a side panel or on a
+        /// button is not a landing.</summary>
         public void RebuildAfterPlacementChanged(bool announce)
         {
             Vector2Int previousCursor = _cursor;
+            TroopPlacementSnapshot previous = _snapshot;
             RefreshSnapshot();
-            if (_snapshot != null && _snapshot.IsValidTile(previousCursor))
+            // A refresh that found the turn handed over has already started the cursor again at the
+            // new side's placement; where the side is unchanged the cursor keeps its tile as long as
+            // that tile still exists.
+            if (_snapshot != null && KeepsSide(previous))
             {
-                _cursor = previousCursor;
-            }
-            else
-            {
-                _cursor = GetInitialCursor();
+                _cursor = _snapshot.IsValidTile(previousCursor) ? previousCursor : GetInitialCursor();
             }
 
             Land(announce);
+        }
+
+        /// <summary>The menu's placement state moved on. The board is taken again, and only a
+        /// hand-over is a landing: a state change that leaves the same side placing ("Waiting for
+        /// opponent") moves no cursor, so there is no tile to read out again.</summary>
+        public void RebuildAfterStateChanged(bool announce)
+        {
+            TroopPlacementSnapshot previous = _snapshot;
+            RefreshSnapshot();
+            if (!KeepsSide(previous))
+            {
+                Land(announce);
+            }
+        }
+
+        /// <summary>Whether the board is still the same side's as it was in
+        /// <paramref name="previous"/>. False only across a hand-over to a side that is now
+        /// placing: "both ready" leaves nobody placing and so no side to start again at, and the
+        /// cursor stays where the player left it.</summary>
+        private bool KeepsSide(TroopPlacementSnapshot previous)
+        {
+            return previous == null
+                || _snapshot == null
+                || !_snapshot.OwnSide.HasValue
+                || _snapshot.OwnSide.Equals(previous.OwnSide);
         }
 
         private void PlayTileCues()
@@ -178,7 +211,8 @@ namespace SongsOfConquestAccess.UI
 
         private void PlayTileCuesFor(Vector2Int point, float panOffset, float gainScale, float semitoneOffset)
         {
-            TroopPlacementTile tile = _snapshot != null ? _snapshot.Get(point) : null;
+            TroopPlacementSnapshot snapshot = Snapshot();
+            TroopPlacementTile tile = snapshot != null ? snapshot.Get(point) : null;
             if (tile == null)
             {
                 return;
@@ -228,7 +262,8 @@ namespace SongsOfConquestAccess.UI
 
         private bool SetCursor(Vector2Int point)
         {
-            if (_snapshot == null || !_snapshot.IsValidTile(point))
+            TroopPlacementSnapshot snapshot = Snapshot();
+            if (snapshot == null || !snapshot.IsValidTile(point))
             {
                 CueLibrary.PlayCue(CueLibrary.MoveDenied);
                 return true;
@@ -282,17 +317,37 @@ namespace SongsOfConquestAccess.UI
                 return null;
             }
 
-            if (_snapshot == null)
+            TroopPlacementSnapshot snapshot = Snapshot();
+            return snapshot != null ? snapshot.Get(result.Position) : null;
+        }
+
+        /// <summary>The board as it is now, retaken when the menu's placement state has moved on
+        /// since it was last taken: one property read off the game and one string comparison per
+        /// use, never a walk. The hot-seat hand-over and "both ready" change whose troops these are
+        /// without raising the deployment menu's OnChanged, so this is what catches them.</summary>
+        private TroopPlacementSnapshot Snapshot()
+        {
+            string state = _adapter != null ? _adapter.PlacementState : null;
+            if (_snapshot == null || !string.Equals(state, _snapshotState, StringComparison.Ordinal))
             {
                 RefreshSnapshot();
             }
 
-            return _snapshot != null ? _snapshot.Get(result.Position) : null;
+            return _snapshot;
         }
 
+        /// <summary>Take the board again, under the placement state the game is in NOW. A retake
+        /// that finds the turn handed to the other side starts the cursor again at that side's own
+        /// placement: the tile it was standing on belongs to the side whose turn is over.</summary>
         private void RefreshSnapshot()
         {
+            TroopPlacementSnapshot previous = _snapshot;
             _snapshot = _adapter != null ? _adapter.BuildSnapshot() : null;
+            _snapshotState = _adapter != null ? _adapter.PlacementState : null;
+            if (!KeepsSide(previous))
+            {
+                _cursor = GetInitialCursor();
+            }
         }
 
         private Vector2Int GetInitialCursor()
@@ -326,7 +381,8 @@ namespace SongsOfConquestAccess.UI
 
         private TroopPlacementTile GetFocusedTile()
         {
-            return _snapshot != null ? _snapshot.Get(_cursor) : null;
+            TroopPlacementSnapshot snapshot = Snapshot();
+            return snapshot != null ? snapshot.Get(_cursor) : null;
         }
 
         private bool IsOwnTroop(TroopPlacementTile tile)

@@ -100,6 +100,8 @@ namespace SongsOfConquestAccess.Adapters
         private CartographyManifest _battleManifest;
         private bool _battleManifestProbed;
         private bool _warnedUnknownRegion;
+        private PropertyInfo _currentStateProperty;
+        private bool _currentStateProbed;
 
         private enum BattleParticipantSide
         {
@@ -1054,6 +1056,17 @@ namespace SongsOfConquestAccess.Adapters
             return team != null && team.ScoutingDetail == ScoutingDetailLevel.Close;
         }
 
+        /// <summary>The name of the state the menu's own placement machine is in
+        /// ("HotSeatAttackerPlacement", "HotSeatDefenderPlacement", "HotSeatBothReady", ...), read
+        /// from the game on every call. It is what decides whose troops these are, and the hot-seat
+        /// hand-over changes it without raising an event: <c>HandleHotSeatDefenderPlacementEnter</c>
+        /// clears and re-places the troops, and the deployment menu raises <c>OnChanged</c> only
+        /// from a drop.</summary>
+        public string PlacementState
+        {
+            get { return GetCurrentStateName(); }
+        }
+
         private BattleSide? GetOwnSide()
         {
             string state = GetCurrentStateName();
@@ -1081,8 +1094,15 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            PropertyInfo property = AccessTools.Property(stateMachine.GetType(), "CurrentStateType");
-            object value = property != null ? property.GetValue(stateMachine, null) : null;
+            // The machine is one object per menu instance and its type never changes, so the
+            // property is resolved once per adapter - this is read every time the board is used.
+            if (!_currentStateProbed)
+            {
+                _currentStateProbed = true;
+                _currentStateProperty = AccessTools.Property(stateMachine.GetType(), "CurrentStateType");
+            }
+
+            object value = _currentStateProperty != null ? _currentStateProperty.GetValue(stateMachine, null) : null;
             return value != null ? value.ToString() : string.Empty;
         }
 

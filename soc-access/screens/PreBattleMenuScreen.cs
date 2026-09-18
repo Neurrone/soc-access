@@ -208,7 +208,12 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>The menu rewrites the instruction as the deployment changes hands ("Place
         /// attacker troops", "Waiting for opponent", "Ready to battle"). Nobody is standing on it -
-        /// it is the board's stop name - so it is watched and said, queued, when it changes.</summary>
+        /// it is the board's stop name - so it is watched and said, queued, when it changes.
+        ///
+        /// The instruction changes exactly when the placement state does, and a hot-seat hand-over
+        /// makes the board the OTHER side's without the deployment menu raising anything: the grid
+        /// is rebuilt here so the cursor starts again at the side that is now placing, and the tile
+        /// it lands on is read out behind the instruction where the player is on the board.</summary>
         private void WatchInstruction()
         {
             string text = Live != null ? Live.InstructionText : null;
@@ -222,6 +227,9 @@ namespace SongsOfConquestAccess.Screens
             {
                 SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
             }
+
+            _tooltipRead = false;
+            HexGrid()?.RebuildAfterStateChanged(IsGridFocused());
         }
 
         /// <summary>The board changed: a troop was placed or moved. The cursor keeps its tile, the
