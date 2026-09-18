@@ -72,10 +72,17 @@ namespace SongsOfConquestAccess.Adapters
         private SpellbookSpellEntry _hoveredEntry;
 
         // The quick bar's header mesh and the component the auto-fill box hangs its tooltip on: both
-        // are fixed for the window's life, and finding either walks a subtree. Cached on the miss too
-        // (the probed flags), so an absent one costs one walk and not one a frame.
+        // are fixed for the window's life, and finding either walks a subtree. The auto-fill box is
+        // cached on the miss too (the probed flag), so an absent one costs one walk and not one a
+        // frame. THE HEADER IS NOT: its walk matches on live text, so a miss means the bar had
+        // written none outside its entries yet, and keeping that would cost the quick bar its name
+        // and its region jump for the rest of the window's life (screens/SpellbookScreen.cs puts
+        // both inside the same test). A miss is remembered against what writes that text - the bar
+        // the walk ran over and the language it read - and re-probed when either moves, so a miss
+        // is still never a walk per frame (AGENTS.md, Performance).
         private UITextMesh _quickbarHeader;
-        private bool _quickbarHeaderProbed;
+        private SpellbookQuickbar _quickbarHeaderMissBar;
+        private ILanguageDefinition _quickbarHeaderMissLanguage;
         private Component _autoPopulateLabelled;
         private bool _autoPopulateLabelledProbed;
 
@@ -157,7 +164,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private UITextMesh GetQuickbarHeader()
         {
-            if (_quickbarHeaderProbed)
+            if (_quickbarHeader != null)
             {
                 return _quickbarHeader;
             }
@@ -168,7 +175,16 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            _quickbarHeaderProbed = true;
+            ILocalizationHandler localization = GetLocalization();
+            ILanguageDefinition language = localization != null ? localization.CurrentLanguage : null;
+            if (ReferenceEquals(quickbar, _quickbarHeaderMissBar)
+                && ReferenceEquals(language, _quickbarHeaderMissLanguage))
+            {
+                return null;
+            }
+
+            _quickbarHeaderMissBar = quickbar;
+            _quickbarHeaderMissLanguage = language;
             List<SpellbookQuickbarEntry> entries = QuickbarEntriesField != null
                 ? QuickbarEntriesField.GetValue(quickbar) as List<SpellbookQuickbarEntry>
                 : null;
