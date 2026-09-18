@@ -119,8 +119,12 @@ namespace SongsOfConquestAccess.Screens
             BuildStoredWielder(builder);
 
             builder.BeginStop(PageStop);
+            // A region with no caption, as on the settlement page: without one the region keys are
+            // not claimed on these two buttons and cannot land on them from the bands below.
+            builder.SetRegion("defences:troop-cards");
             BuildDraft(builder);
             BuildUpgrade(builder);
+            builder.SetRegion(null);
             SettlementNodes.WielderBand(builder, KeyPrefix, Live.DefendingWielder);
             BuildSettlementTroops(builder);
             BuildTowers(builder);

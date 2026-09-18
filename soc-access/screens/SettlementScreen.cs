@@ -52,6 +52,7 @@ namespace SongsOfConquestAccess.Screens
         private const string KeyPrefix = "settlement";
         private const string WielderKey = "settlement:wielder";
         private const string SettlementArmyKey = "settlement:army";
+        private const string TroopCardsKey = "settlement:troop-cards";
 
         /// <summary>The one settlement window the adventure scene holds for the whole game.</summary>
         private readonly ScreenSource<TownInteractionMenu> _source =
@@ -126,8 +127,12 @@ namespace SongsOfConquestAccess.Screens
             BuildStoredWielder(builder);
 
             builder.BeginStop(PageStop);
+            // A region with no caption: each card's header is its button's own name, and without a
+            // region the region keys are not claimed here and cannot land here from the bands below.
+            builder.SetRegion(TroopCardsKey);
             BuildDraft(builder);
             BuildUpgrade(builder);
+            builder.SetRegion(null);
             SettlementNodes.WielderBand(builder, KeyPrefix, Live.DefendingWielder);
             BuildSettlementTroops(builder);
             SettlementNodes.SlotBands(
