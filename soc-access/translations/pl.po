@@ -1090,6 +1090,11 @@ msgctxt "Screens.TownStatusRounds"
 msgid "{0}: {1} rounds complete, {2} rounds remaining"
 msgstr "{0}: ukończone rundy: {1}, pozostałe rundy: {2}"
 
+#. Screens.TownStatusRoundsAfterSiege
+msgctxt "Screens.TownStatusRoundsAfterSiege"
+msgid "{0} {1} rounds complete, {2} rounds remaining"
+msgstr "{0} ukończone rundy: {1}, pozostałe rundy: {2}"
+
 #. Screens.Tower
 msgctxt "Screens.Tower"
 msgid "Tower {0}"

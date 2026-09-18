@@ -947,6 +947,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Tier = new ModString("Screens.Tier", "Tier");
             public static readonly ModString TownStatus = new ModString("Screens.TownStatus", "Town status");
             public static readonly ModString TownStatusRounds = new ModString("Screens.TownStatusRounds", "{0}: {1} rounds complete, {2} rounds remaining");
+            public static readonly ModString TownStatusRoundsAfterSiege = new ModString("Screens.TownStatusRoundsAfterSiege", "{0} {1} rounds complete, {2} rounds remaining");
             public static readonly ModString Tower = new ModString("Screens.Tower", "Tower {0}");
             public static readonly ModString Towers = new ModString("Screens.Towers", "Towers");
             /// <summary>The adventure map's list of the towns the player owns.</summary>

@@ -133,14 +133,15 @@ namespace SongsOfConquestAccess.Screens
                 AddText(builder, "upgrades", Live.UpgradesComponent, UpgradeSummary);
             }
 
-            if (Live.IsSiegeStateVisible)
-            {
-                AddText(builder, "siege-state", Live.SiegeStateComponent, () => Live.SiegeState);
-            }
-
+            // The game draws the round dots inside the siege state's panel, so the two are one line:
+            // the town status carries the siege sentence, which stands alone only without the dots.
             if (Live.IsTownStatusVisible)
             {
                 AddText(builder, "town-status", Live.TownStatusComponent, TownStatusText);
+            }
+            else if (Live.IsSiegeStateVisible)
+            {
+                AddText(builder, "siege-state", Live.SiegeStateComponent, () => Live.SiegeState);
             }
         }
 
@@ -201,14 +202,22 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>How far a raze or a conversion has got, counted off the round dots the game draws
-        /// and named by the siege state it belongs to where there is one.</summary>
+        /// after the siege state's sentence where there is one.</summary>
         private string TownStatusText()
         {
             string siege = Live.SiegeState;
-            string prefix = string.IsNullOrWhiteSpace(siege) ? ModText.Get(ModStrings.Screens.TownStatus) : siege;
+            if (string.IsNullOrWhiteSpace(siege))
+            {
+                return ModText.Get(
+                    ModStrings.Screens.TownStatusRounds,
+                    ModText.Get(ModStrings.Screens.TownStatus),
+                    Live.TownStatusRoundsComplete,
+                    Live.TownStatusRoundsRemaining);
+            }
+
             return ModText.Get(
-                ModStrings.Screens.TownStatusRounds,
-                prefix,
+                ModStrings.Screens.TownStatusRoundsAfterSiege,
+                siege,
                 Live.TownStatusRoundsComplete,
                 Live.TownStatusRoundsRemaining);
         }
