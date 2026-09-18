@@ -81,14 +81,22 @@ namespace SongsOfConquestAccess.Adapters
         private AdventureBattleMenu.Settings _settings;
         private bool _settingsProbed;
         private readonly FocusedTileOverlay _cursorOverlay = new FocusedTileOverlay("SongsOfConquestAccess_TroopPlacementCursor");
-        // The layout this placement page is showing, composed once: an adapter lives exactly as
-        // long as the menu instance it wraps, and that instance is built over one map.
+        // The map the caches below were composed over. The adventure scene holds ONE
+        // PreBattleMenu and its Show(...) assigns a new MapFormat for every battle, so the adapter
+        // outlives the board it describes: a quick battle, an auto-resolve or a cancelled page all
+        // reuse this very instance. GetMap() compares this reference on every read and drops what
+        // was composed over the previous map.
+        private MapFormat _cachedMap;
+        // The layout this placement page is showing, composed once per map.
         private string _battlefieldKey;
-        // The ground of that map, read once for the same reason: the terrain of a battle is fixed
-        // before the placement page opens and nothing on the page changes it. The miss is kept too,
+        // The ground of that map, read once per map: the terrain of a battle is fixed before the
+        // placement page opens and nothing on the page changes it. The miss is kept too,
         // so a page whose map is not there yet costs one pass and not one per frame.
         private BattlefieldTerrain _terrain;
         private bool _terrainProbed;
+        // NOT keyed on the map: one manifest prices every battlefield, and it is loaded before the
+        // game leaves the boot scene (BootSceneBehavior waits on it), so a miss is a broken install
+        // and not an ordering accident.
         private CartographyManifest _battleManifest;
         private bool _battleManifestProbed;
         private bool _warnedUnknownRegion;
@@ -116,7 +124,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                return _battlefieldKey ?? (_battlefieldKey = BattlefieldKeys.For(GetMap()));
+                // GetMap FIRST: reading it is what drops a key composed over the previous battle.
+                MapFormat map = GetMap();
+                return _battlefieldKey ?? (_battlefieldKey = BattlefieldKeys.For(map));
             }
         }
 
@@ -762,11 +772,13 @@ namespace SongsOfConquestAccess.Adapters
 
 
         /// <summary>An authored description pointed at a cell no group of ground covers. Said once
-        /// for the life of this adapter - one menu, one battle - because a description is read
-        /// again every time the node is, and an authoring mistake is worth one line in the log and
-        /// not one a frame.</summary>
+        /// per battlefield, because a description is read again every time the node is, and an
+        /// authoring mistake is worth one line in the log and not one a frame.</summary>
         public void WarnUnknownRegion(string placeholder)
         {
+            // The key FIRST: reading it is what drops the flag when the menu has moved on to
+            // another battle, so the next layout's mistake is not swallowed by this one's.
+            string key = BattlefieldKey;
             if (_warnedUnknownRegion)
             {
                 return;
@@ -774,20 +786,21 @@ namespace SongsOfConquestAccess.Adapters
 
             _warnedUnknownRegion = true;
             SocAccessMod.Instance?.LogWarning(
-                "The description of " + BattlefieldKey + " points at " + placeholder + ", which is no group of ground");
+                "The description of " + key + " points at " + placeholder + ", which is no group of ground");
         }
 
-        /// <summary>The ground this layout is made of, analysed once for the adapter's lifetime: the
-        /// terrain of a battle is settled before the placement page opens and nothing on the page
-        /// changes it.</summary>
+        /// <summary>The ground this layout is made of, analysed once per map: the terrain of a
+        /// battle is settled before the placement page opens and nothing on the page changes it.</summary>
         public BattlefieldTerrain GetTerrain()
         {
+            // GetMap FIRST, before the probed flag is read: it is what drops terrain analysed over
+            // the previous battle's board.
+            MapFormat map = GetMap();
             if (_terrain != null || _terrainProbed)
             {
                 return _terrain;
             }
 
-            MapFormat map = GetMap();
             if (map == null)
             {
                 return null;
@@ -863,8 +876,10 @@ namespace SongsOfConquestAccess.Adapters
             return cells;
         }
 
-        /// <summary>The battle manifest that prices a cell, resolved once for this menu; a miss is
-        /// remembered too, so an unloaded manifest costs one lookup and not one per cell.</summary>
+        /// <summary>The battle manifest that prices a cell, resolved once for this menu and not per
+        /// map: one manifest prices every battlefield and it is loaded before the boot scene hands
+        /// over. A miss is remembered too, so an unloaded manifest costs one lookup and not one per
+        /// cell.</summary>
         private CartographyManifest GetBattleManifest()
         {
             if (!_battleManifestProbed)
@@ -1104,9 +1119,23 @@ namespace SongsOfConquestAccess.Adapters
             return Reflect.Get<IDeploymentMenu>(_menu, DeploymentMenuField) as DeploymentMenu;
         }
 
+        /// <summary>The board this page is showing, read from the menu every time, and the one place
+        /// what was composed over a map is dropped: the menu instance is reused for every battle the
+        /// adventure scene fights, so one reference comparison per read is what keeps the key, the
+        /// terrain and the unknown-region warning about the battle in front of the player.</summary>
         private MapFormat GetMap()
         {
-            return Reflect.Get<MapFormat>(_menu, MapFormatField);
+            MapFormat map = Reflect.Get<MapFormat>(_menu, MapFormatField);
+            if (!ReferenceEquals(map, _cachedMap))
+            {
+                _cachedMap = map;
+                _battlefieldKey = null;
+                _terrain = null;
+                _terrainProbed = false;
+                _warnedUnknownRegion = false;
+            }
+
+            return map;
         }
 
         private RawImage GetDeploymentRawImage()
