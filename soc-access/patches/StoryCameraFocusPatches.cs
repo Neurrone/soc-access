@@ -29,6 +29,13 @@ namespace SongsOfConquestAccess
 
         private static StoryCameraFocusKey LastEmittedFocus;
 
+        // The adventure game the key above was set in, held weakly as the scanner state holds it:
+        // the client's adventure facade IS the running game (AdventureMapAdapter.AdventureGame),
+        // bound AsSingle per game session. Quitting, loading a save or leaving a mission mid-series
+        // never runs the completion postfix, and a replay's first story camera focus computes the
+        // same key as the one the abandoned run announced, so it was swallowed.
+        private static readonly WeakReference LastEmittedFocusGame = new WeakReference(null);
+
         private static readonly FieldInfo DialogueFacadeField =
             AccessTools.Field(typeof(AdventureDialogueCameraManager), "_facade");
 
@@ -110,14 +117,14 @@ namespace SongsOfConquestAccess
             {
                 ICommanderState commander = ResolveInteractingCommander(facade, __instance);
                 StoryCameraFocusTarget target = StoryCameraFocusResolver.ResolveWielderTarget(facade, commander);
-                PublishIfTarget(StoryCameraFocusKind.Wielder, target, entry.Camera.reference);
+                PublishIfTarget(StoryCameraFocusKind.Wielder, target, entry.Camera.reference, facade);
                 return;
             }
 
             ConversationTargets targets;
             if (DialogueTargets.TryGetValue(__instance, out targets) && targets != null && targets.Targets.Count > 0)
             {
-                PublishIfTargets(StoryCameraFocusKind.ConversationArea, targets.Targets, entry.Camera.reference);
+                PublishIfTargets(StoryCameraFocusKind.ConversationArea, targets.Targets, entry.Camera.reference, facade);
             }
         }
 
@@ -133,28 +140,36 @@ namespace SongsOfConquestAccess
                     facade,
                     localizationHandler,
                     camera);
-                PublishIfTarget(StoryCameraFocusKind.Point, target, camera.reference);
+                PublishIfTarget(StoryCameraFocusKind.Point, target, camera.reference, facade);
                 return;
             }
 
             if (camera.TargetType == CameraFocusPointTargetType.Wielder)
             {
                 StoryCameraFocusTarget target = StoryCameraFocusResolver.ResolveWielderTarget(facade, interactingCommanderState);
-                PublishIfTarget(StoryCameraFocusKind.Wielder, target, camera.reference);
+                PublishIfTarget(StoryCameraFocusKind.Wielder, target, camera.reference, facade);
             }
         }
 
-        private static void PublishIfTarget(StoryCameraFocusKind kind, StoryCameraFocusTarget target, string reference)
+        private static void PublishIfTarget(
+            StoryCameraFocusKind kind,
+            StoryCameraFocusTarget target,
+            string reference,
+            IClientAdventureFacade facade)
         {
             if (target == null)
             {
                 return;
             }
 
-            PublishIfTargets(kind, new[] { target }, reference);
+            PublishIfTargets(kind, new[] { target }, reference, facade);
         }
 
-        private static void PublishIfTargets(StoryCameraFocusKind kind, IEnumerable<StoryCameraFocusTarget> targets, string reference)
+        private static void PublishIfTargets(
+            StoryCameraFocusKind kind,
+            IEnumerable<StoryCameraFocusTarget> targets,
+            string reference,
+            IClientAdventureFacade facade)
         {
             if (!ModSettings.ReadStoryCameraFocusChanges)
             {
@@ -167,6 +182,15 @@ namespace SongsOfConquestAccess
             if (targetList.Count == 0)
             {
                 return;
+            }
+
+            // The dedupe key describes ONE adventure game: another game is another run of the same
+            // story, whose first focus computes the same key. An unknown game (null) leaves the key
+            // alone, as the scanner state's Rebind does.
+            if (facade != null && !ReferenceEquals(facade, LastEmittedFocusGame.Target))
+            {
+                LastEmittedFocus = null;
+                LastEmittedFocusGame.Target = facade;
             }
 
             StoryCameraFocusKey key = StoryCameraFocusKey.Create(kind, reference, targetList);
@@ -186,11 +210,12 @@ namespace SongsOfConquestAccess
         public static void ResetDedupe()
         {
             LastEmittedFocus = null;
+            LastEmittedFocusGame.Target = null;
         }
 
-        /// <summary>The teardown <c>SocAccessMod.Stop</c> calls. The dedupe key is the one thing
-        /// this class keeps between calls, and the next load's first focus must not be swallowed as
-        /// a repeat of one the previous load announced.</summary>
+        /// <summary>The teardown <c>SocAccessMod.Stop</c> calls. The dedupe key and the game it was
+        /// set in are the only things this class keeps between calls, and the next load's first
+        /// focus must not be swallowed as a repeat of one the previous load announced.</summary>
         public static void Reset()
         {
             ResetDedupe();
