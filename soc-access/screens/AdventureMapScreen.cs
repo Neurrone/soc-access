@@ -812,15 +812,21 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                GraphNodes.SyntheticButton(
-                    builder,
-                    WielderKeyPrefix + index,
-                    true,
+                // KEYED ON THE COMMANDER, not on the place in the list: selecting a wielder removes
+                // their row and re-sorts the rest under the cursor, so a row keyed on its index
+                // would hand the cursor a different wielder without a word, and the next Enter would
+                // select somebody who was never announced. The index is captured fresh on every
+                // build, so the row's own click, focus and tooltip are always this frame's place.
+                NodeVtable vtable = GraphNodes.Button(
                     () => hud.GetWielderListEntryLabel(index),
                     () => hud.ClickWielderListEntry(index),
                     null,
-                    hud.GetWielderListEntryTooltip(index),
-                    () => hud.FocusWielderListEntry(index));
+                    hud.GetWielderListEntryTooltip(index));
+                vtable.Announcements[0].Live = true;
+                vtable.OnFocusVisual = () => hud.FocusWielderListEntry(index);
+                builder.AddItem(new SyntheticNode(
+                    ControlId.Structural(ListRowKey(WielderKeyPrefix, hud.GetWielderListEntryCommanderId(index), index)),
+                    vtable));
             }
 
             builder.PopContext();
@@ -847,18 +853,31 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                GraphNodes.SyntheticButton(
-                    builder,
-                    TownKeyPrefix + index,
-                    true,
+                // KEYED ON THE TOWN, not on the place in the list: the game respawns every row of
+                // this list whenever a settlement changes hands, and the rows are sorted by level and
+                // by build sites, so the place a row sits in is not what it is about.
+                NodeVtable vtable = GraphNodes.Button(
                     () => hud.GetTownListEntryLabel(index),
                     () => hud.ClickTownListEntry(index),
                     null,
-                    hud.GetTownListEntryTooltip(index),
-                    () => hud.FocusTownListEntry(index));
+                    hud.GetTownListEntryTooltip(index));
+                vtable.Announcements[0].Live = true;
+                vtable.OnFocusVisual = () => hud.FocusTownListEntry(index);
+                builder.AddItem(new SyntheticNode(
+                    ControlId.Structural(ListRowKey(TownKeyPrefix, hud.GetTownListEntryId(index), index)),
+                    vtable));
             }
 
             builder.PopContext();
+        }
+
+        /// <summary>A HUD list row's key: the entity the row is about, so the cursor follows the
+        /// subject when the game re-sorts or respawns the list; the place it sits in where the game
+        /// has spawned a row it has not yet given an entity, so two such rows cannot share a key.
+        /// </summary>
+        private static string ListRowKey(string prefix, int entityId, int index)
+        {
+            return entityId >= 0 ? prefix + entityId : prefix + "slot-" + index;
         }
 
         // ---- the objectives ----
@@ -884,6 +903,7 @@ namespace SongsOfConquestAccess.Screens
                     () => ObjectiveLabel(hud, index),
                     null,
                     hud.GetObjectiveTooltip(index));
+                vtable.Announcements[0].Live = true;
                 vtable.OnFocusVisual = () => hud.FocusObjective(index);
                 vtable.OnBlurVisual = hud.UnfocusObjective;
                 builder.AddItem(new SyntheticNode(ControlId.Structural(ObjectiveKeyPrefix + index), vtable));
@@ -1022,13 +1042,21 @@ namespace SongsOfConquestAccess.Screens
                     () => hud.ClickNotification(index),
                     null,
                     hud.GetNotificationTooltip(index));
+                vtable.Announcements[0].Live = true;
                 vtable.OnFocusVisual = () => hud.FocusNotification(index);
                 vtable.OnContextual = () => hud.DismissNotification(index);
                 NodeHints.Add(
                     vtable,
                     ModStrings.Screens.NotificationDismissHint,
                     AccessibilityActions.UiRightClick.Key);
-                builder.AddItem(new SyntheticNode(ControlId.Structural(NotificationKeyPrefix + index), vtable));
+                // The notification itself is the SUBJECT, so the cursor follows it when the list
+                // drops its oldest entry to make room for a sixth and everything below shifts up:
+                // the dismiss would otherwise throw away a notification the player never read. The
+                // place in the list stays the structural key, because that is what the drawn order
+                // is, and the index the row works through is this frame's.
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(hud.GetNotificationInformation(index), NotificationKeyPrefix + index),
+                    vtable));
             }
 
             builder.PopContext();

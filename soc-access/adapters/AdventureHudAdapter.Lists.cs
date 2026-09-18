@@ -46,6 +46,17 @@ namespace SongsOfConquestAccess.Adapters
             return GetNotificationEntry(index) != null;
         }
 
+        /// <summary>The registry's information object behind the drawn notification - what the game
+        /// registered when the notification happened, and what it keeps until it is dismissed
+        /// (<c>NotificationHUDRegistry</c>). The drawn ENTRY is pooled and says nothing about which
+        /// notification it is showing; this is not, so it is the notification's own identity. Null
+        /// where nothing is drawn at that place.</summary>
+        public object GetNotificationInformation(int index)
+        {
+            NotificationHUDEntry entry = GetNotificationEntry(index);
+            return entry != null ? entry.Information : null;
+        }
+
         public string GetNotificationLabel(int index)
         {
             NotificationHUDEntry entry = GetNotificationEntry(index);
@@ -104,6 +115,16 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsTownListEntryVisible(int index)
         {
             return GetTownListEntry(index) != null;
+        }
+
+        /// <summary>The map entity the drawn town row is about, by the id the game gives it
+        /// (<c>IMapEntity.Id</c>), or -1 where nothing is drawn at that place. The list respawns
+        /// every row whenever a town changes hands (<c>TownListUI.CreateNewTownList</c>), so the
+        /// place a row sits in is not what it is about.</summary>
+        public int GetTownListEntryId(int index)
+        {
+            ITownListHUDEntry entry = GetTownListEntry(index);
+            return entry != null && entry.Town != null ? entry.Town.Id : -1;
         }
 
         public string GetTownListEntryLabel(int index)
@@ -176,6 +197,17 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsWielderListEntryVisible(int index)
         {
             return GetWielderListEntry(index) != null;
+        }
+
+        /// <summary>The commander the drawn wielder row is about, by the id the game gives them
+        /// (<c>ICommanderState.Id</c>), or -1 where nothing is drawn at that place. The list drops
+        /// the row of the commander it has just selected, spawns one for the deselected commander and
+        /// re-sorts the rest by that same id (<c>WielderListHUD.HandleCommanderChanged</c>), so the
+        /// place a row sits in is not what it is about.</summary>
+        public int GetWielderListEntryCommanderId(int index)
+        {
+            WielderListHUDEntry entry = GetWielderListEntry(index);
+            return entry != null && entry.Commander != null ? entry.Commander.Id : -1;
         }
 
         public string GetWielderListEntryLabel(int index)
