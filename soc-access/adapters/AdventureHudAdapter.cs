@@ -153,6 +153,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly HashSet<string> _loggedFailures = new HashSet<string>(StringComparer.Ordinal);
         // The canvas group each HUD container carries, resolved once. See HudGroupVisible.
         private readonly Dictionary<GameObject, CanvasGroup> _canvasGroups = new Dictionary<GameObject, CanvasGroup>();
+        // The army of the wielder the HUD has selected, kept on the bar it reads. See Troops.
+        private TroopHudAdapter _troops;
         private List<ObjectiveEntrySnapshot> _objectiveSnapshots;
         private int _objectiveSnapshotsFrame = -1;
         private List<WielderListHUDEntry> _wielderListEntries;

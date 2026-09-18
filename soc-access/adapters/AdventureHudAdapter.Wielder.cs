@@ -190,14 +190,28 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
+        /// <summary>The selected wielder's army, or null before the HUD has a bar to read.
+        ///
+        /// KEPT on the bar it was made for. A fresh adapter per read defeats every memo hung off one:
+        /// the slot list the adapter answers with is the identity <c>TroopHudRows</c> keeps a bar's
+        /// nine rows on, and the map's build asks for the army twice a frame, so an adapter per read
+        /// rebuilt nine vtables, their closures, hints and native tooltips on every frame.</summary>
         public TroopHudAdapter Troops
         {
             get
             {
-                return new TroopHudAdapter(
-                    CommanderSettings != null ? CommanderSettings.TroopHUD : null,
-                    Facade,
-                    LocalizationHandler);
+                TroopHUD hud = CommanderSettings != null ? CommanderSettings.TroopHUD : null;
+                if (hud == null)
+                {
+                    return null;
+                }
+
+                if (_troops == null || !ReferenceEquals(_troops.Hud, hud))
+                {
+                    _troops = new TroopHudAdapter(hud, Facade, LocalizationHandler);
+                }
+
+                return _troops;
             }
         }
 
