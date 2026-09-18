@@ -240,6 +240,7 @@ namespace SongsOfConquestAccess.UI
 
         public void DisposeAudio()
         {
+            SweepPlayer.Cancel();
             _beacons.Dispose();
         }
 
@@ -272,6 +273,9 @@ namespace SongsOfConquestAccess.UI
         /// player went there themselves - the tile read out with its cues.</summary>
         private void Land(bool announce)
         {
+            // A sweep describes the tile it was fired from and can run for a second or more, so a
+            // cursor that has moved on leaves a schedule that is pinging somewhere the player is not.
+            SweepPlayer.Cancel();
             _adapter.SetFocusedTileOverlay(_cursorTile);
             _beacons.UpdateListener(_cursorTile);
             if (!announce)

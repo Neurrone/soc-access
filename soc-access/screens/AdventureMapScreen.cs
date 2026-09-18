@@ -10,6 +10,7 @@ using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Grid;
 using SongsOfConquest.Client.InputManagement;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Input;
@@ -335,6 +336,9 @@ namespace SongsOfConquestAccess.Screens
             // Destroying them belongs to the adapter swap in Grid() and to the mod's Stop path.
             Grid()?.SetBeaconAudible(false);
             Grid()?.HideOverlay();
+            // The sweep is scheduling, not a sound already made: a cutscene, a popup or a battle
+            // taking the map away must not go on being pinged at from under it.
+            SweepPlayer.Cancel();
             base.OnPop();
         }
 
