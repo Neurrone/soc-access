@@ -211,9 +211,12 @@ namespace SongsOfConquestAccess.Screens
         /// it is the board's stop name - so it is watched and said, queued, when it changes.
         ///
         /// The instruction changes exactly when the placement state does, and a hot-seat hand-over
-        /// makes the board the OTHER side's without the deployment menu raising anything: the grid
-        /// is rebuilt here so the cursor starts again at the side that is now placing, and the tile
-        /// it lands on is read out behind the instruction where the player is on the board.</summary>
+        /// makes the board the OTHER side's without the deployment menu raising anything
+        /// (<c>HandleHotSeatDefenderPlacementEnter</c> clears the troops and lays out the other
+        /// side's directly): the grid is rebuilt here so the cursor starts again at the side that is
+        /// now placing, the tile it lands on is read out behind the instruction where the player is
+        /// on the board, and anything the player who is leaving picked up is let go, as
+        /// <see cref="HandleDeploymentChanged"/> lets it go there.</summary>
         private void WatchInstruction()
         {
             string text = Live != null ? Live.InstructionText : null;
@@ -223,6 +226,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _instruction = text;
+            ReleaseCarry();
             if (!string.IsNullOrWhiteSpace(text))
             {
                 SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
@@ -237,14 +241,19 @@ namespace SongsOfConquestAccess.Screens
         /// is let go - the tile it came from no longer holds what was picked up.</summary>
         private void HandleDeploymentChanged(OnChangedPayload payload)
         {
+            ReleaseCarry();
+            _tooltipRead = false;
+            HexGrid()?.RebuildAfterPlacementChanged(IsGridFocused());
+        }
+
+        /// <summary>Let go of a troop being carried: the tile it was lifted off no longer holds it.</summary>
+        private void ReleaseCarry()
+        {
             GraphNavigator navigator = Navigator;
             if (navigator != null && navigator.Carry != null)
             {
                 navigator.Carry.Clear();
             }
-
-            _tooltipRead = false;
-            HexGrid()?.RebuildAfterPlacementChanged(IsGridFocused());
         }
 
         // ---- the graph ----
