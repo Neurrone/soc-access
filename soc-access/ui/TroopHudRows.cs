@@ -588,7 +588,14 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>The drop, through the game's own drag. A merge onto an empty slot or onto the same
         /// troop opens the game's split popup, which the detector pushes as its own screen and which
-        /// says what it is itself.</summary>
+        /// says what it is itself.
+        ///
+        /// THE CARRY IS GIVEN UP where the source slot no longer holds what was picked up. A carry
+        /// survives an ordinary activation, so a player can pick a troop up, press Enter on "Move
+        /// all" and then drop - and the game's drag moves whatever the SOURCE SLOT holds now, which
+        /// by then is another troop or nothing at all, while the announcement would name the troop
+        /// that was picked up. The slot's occupant as it was at pick-up is what the carry's own name
+        /// records, so the name the slot answers with now is the comparison.</summary>
         private static DropResult Drop(
             TroopHudAdapter troops,
             CarryItem held,
@@ -600,6 +607,11 @@ namespace SongsOfConquestAccess.UI
                 return DropResult.Refused();
             }
 
+            if (!string.Equals(Label(SlotOf(troops, source)), held.Name, StringComparison.Ordinal))
+            {
+                return DropResult.Done(ModText.Get(ModStrings.Graph.DragCancelled));
+            }
+
             NativeDropResult result = troops.DropOn(source, target.Entry);
             return result == NativeDropResult.Completed || result == NativeDropResult.MoveAmountPopupOpened
                 ? DropResult.Done()
@@ -609,6 +621,23 @@ namespace SongsOfConquestAccess.UI
         private static TroopHUDEntry Cargo(CarryItem held)
         {
             return held == null ? null : held.Cargo as TroopHUDEntry;
+        }
+
+        /// <summary>The slot the bar draws for this entry now, or null where it draws it no longer.
+        /// The adapter's own list - the one the rows were built from, so asking for it costs the memo
+        /// nothing - walked for the one entry.</summary>
+        private static TroopHudAdapter.SlotItem SlotOf(TroopHudAdapter troops, TroopHUDEntry entry)
+        {
+            IReadOnlyList<TroopHudAdapter.SlotItem> slots = troops.GetSlots();
+            for (int i = 0; i < slots.Count; i++)
+            {
+                if (ReferenceEquals(slots[i].Entry, entry))
+                {
+                    return slots[i];
+                }
+            }
+
+            return null;
         }
 
         /// <summary>Whether a troop is being carried right now - the gate on the hint for the gesture
