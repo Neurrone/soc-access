@@ -142,6 +142,19 @@ namespace SongsOfConquestAccess.Adapters
         // no reset: the adapter dies with the adventure.
         private readonly HashSet<string> _loggedFailures = new HashSet<string>(StringComparer.Ordinal);
 
+        /// <summary>THE OBJECT THAT IS THE ADVENTURE GAME this installer's scene is showing: the
+        /// client's own adventure facade. <c>GlobalSceneInstaller</c> binds the one the network
+        /// game's client context holds, and that context is installed once per game session
+        /// (<c>ClientInstaller.Install</c> is the only caller of
+        /// <c>AdventureClientInstaller.Install</c>), so a manual battle - which unloads the
+        /// adventure scene and loads it again afterwards - answers with the SAME instance, while a
+        /// new game, a loaded save, a restart and the next campaign mission all disband the game
+        /// first and answer with a new one. The screen keys the revealed registry on it.</summary>
+        public static object AdventureGame(AdventureViewInstaller installer)
+        {
+            return Reflect.Resolve<IClientAdventureFacade>(Reflect.InstallerContainer(installer));
+        }
+
         public AdventureMapAdapter(AdventureViewInstaller installer, AdventureMapRevealedRegistry revealedRegistry = null)
             : this(
                 installer,

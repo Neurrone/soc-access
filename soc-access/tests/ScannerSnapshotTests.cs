@@ -319,6 +319,29 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void AdventureMapScannerStateKeepsTheRegistryForTheSameAdventureGame()
+        {
+            AdventureMapScannerState state = new AdventureMapScannerState();
+            object adventureGame = new object();
+            state.Rebind(adventureGame);
+            state.RevealedRegistry.AddOrUpdate("entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
+
+            Assert.IsFalse(state.Rebind(adventureGame));
+            Assert.AreEqual(1, state.RevealedRegistry.Entries.Count);
+        }
+
+        [TestMethod]
+        public void AdventureMapScannerStateEmptiesTheRegistryForAnotherAdventureGame()
+        {
+            AdventureMapScannerState state = new AdventureMapScannerState();
+            state.Rebind(new object());
+            state.RevealedRegistry.AddOrUpdate("entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
+
+            Assert.IsTrue(state.Rebind(new object()));
+            Assert.AreEqual(0, state.RevealedRegistry.Entries.Count);
+        }
+
+        [TestMethod]
         public void PruneEmptyRemovesEmptySubcategoriesAndCategories()
         {
             ScannerSnapshot snapshot = new ScannerSnapshot();

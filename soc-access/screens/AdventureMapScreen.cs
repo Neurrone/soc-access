@@ -182,7 +182,8 @@ namespace SongsOfConquestAccess.Screens
         {
             // The adapter is built as soon as the scene's installer exists, which is while the
             // loading screen is still up; its events are attached in OnPush, once the map is up.
-            return new AdventureMapAdapter((AdventureViewInstaller)menu, GetAdventureMapRevealedRegistry());
+            AdventureViewInstaller installer = (AdventureViewInstaller)menu;
+            return new AdventureMapAdapter(installer, GetAdventureMapRevealedRegistry(installer));
         }
 
         /// <summary>The cursor is built over one adventure: a new one gets a new grid, and the audio
@@ -1494,10 +1495,16 @@ namespace SongsOfConquestAccess.Screens
             return true;
         }
 
-        private static AdventureMapRevealedRegistry GetAdventureMapRevealedRegistry()
+        /// <summary>The revealed registry this adventure records its discoveries in. A NEW ADAPTER
+        /// IS NOT A NEW GAME: a manual battle unloads the adventure scene and loads it again
+        /// afterwards, and the registry must survive that, so the mod keys it on the object the
+        /// running adventure is rather than on the adapter or the menu scene passed through
+        /// (<see cref="AdventureMapAdapter.AdventureGame"/>).</summary>
+        private static AdventureMapRevealedRegistry GetAdventureMapRevealedRegistry(AdventureViewInstaller installer)
         {
-            AdventureMapScannerState scannerState = SocAccessMod.Instance?.AdventureMapScannerState;
-            return scannerState != null ? scannerState.RevealedRegistry : new AdventureMapRevealedRegistry();
+            AdventureMapRevealedRegistry registry = SocAccessMod.Instance
+                ?.AdventureRevealedRegistry(AdventureMapAdapter.AdventureGame(installer));
+            return registry ?? new AdventureMapRevealedRegistry();
         }
 
     }

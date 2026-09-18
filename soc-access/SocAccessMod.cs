@@ -311,9 +311,36 @@ namespace SongsOfConquestAccess
             _inputRouter?.Update();
         }
 
+        /// <summary>
+        /// The revealed registry for the adventure game the map is being built over, emptied - along
+        /// with that game's notifications - when it is a DIFFERENT game from the one the state
+        /// describes. <paramref name="adventureGame"/> is the object the running adventure IS
+        /// (<see cref="Adapters.AdventureMapAdapter.AdventureGame"/>), so a battle, which unloads
+        /// and reloads the adventure scene, keeps the registry, while a new game, a loaded save, a
+        /// restart and the next campaign mission each start an empty one. Answers null only where
+        /// the mod is being torn down.
+        /// </summary>
+        public AdventureMapRevealedRegistry AdventureRevealedRegistry(object adventureGame)
+        {
+            if (_adventureMapScannerState == null)
+            {
+                return null;
+            }
+
+            if (_adventureMapScannerState.Rebind(adventureGame))
+            {
+                _reviewBufferManager?.Clear(ReviewBufferKind.AdventureMapNotifications);
+            }
+
+            return _adventureMapScannerState.RevealedRegistry;
+        }
+
         /// <summary>The adventure map's notification review buffer and the scanner's state describe
         /// a game that is over once the main menu is up, and nothing in the game clears them. The
-        /// arrival is read from the game's own scene loader rather than from a hook.</summary>
+        /// arrival is read from the game's own scene loader rather than from a hook. It is not the
+        /// only way out of an adventure - see <see cref="AdventureRevealedRegistry"/>, which is what
+        /// keeps the state to one game - but it is the earliest one on the way to the main menu.
+        /// </summary>
         private void ClearAdventureStateOnMainMenuArrival()
         {
             if (!_mainMenuArrival.Arrived())
