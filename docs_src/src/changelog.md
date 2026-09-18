@@ -1,92 +1,89 @@
 # Changelog
 
-## Unreleased
+## V1.0.0
 
 ### UI
 
-Rewrote the UI to modern mod standards to provide the following features:
+The UI was rewritten and now provides the following:
 
-- Screens are modelled as panels that can be navigated with the arrow keys. Panels may be divided into regions, use `Alt+Up` and `Alt+Down` to move between regions. Use `Tab` and `Shift+tab` to move between tab stops. The redesign reduces the number of tab stops significantly especially for screens like the options dialog
-- Some elements are now groups and can be expanded with `Right` to show child controls. This should make recruitment and upgrade of troops more intuitive
-- Where possible, all screens support typeahead to move focus to the next thing in the tab stop that matches the typed search term. This is disabled in the battlefield deployment grid, adventure map and combat screens due to conflicts with game or other mod keys
-- The tooltip actions menu has been replaced with usage hints that read what hotkey performs the corresponding action. These hints are also available at the bottom of the buffer. Reading of usage hints can be disabled in mod settings
-- Tooltips are now automatically read. A new mod setting controls automatic reading of long tooltips such as troop and wielder information
-- The inventory, equipment, trade and army exchange widgets have been simplified by using multiple tab stops. Drag and drop still works in the same way. As a convenience for existing players, `Left` and `Right` moveds between armies like it did before
-- Tables now support `Ctrl+Alt` with the arrow keys to move to the first or last column of the current row, or to the first or last row in the current column
-- The mod's own options dialog is now a real visible game window accessed from the main or pause menus. The `Ctrl+m` hotkey that previously opened an invisible mod options dialog has been removed
+- Screens are panels navigated with the arrow keys. `Tab` and `Shift+Tab` move between tab stops, and `Alt+Up` and `Alt+Down` move between the regions of a panel. Screens have far fewer tab stops, especially large ones like the options dialog
+- Some elements are groups that expand with `Right` to show child controls, for example when recruiting and upgrading troops or conquest map filters
+- Typing moves focus to the next thing in the tab stop that matches the typed search term. This is not available on the adventure map, troop deployment grid and combat screens due to conflicts with existing keys
+- Usage hints read which hotkey performs each action on the focused control. They are also at the bottom of the UI buffer and can be disabled in mod settings
+- Tooltips are read automatically. A new mod setting controls automatic reading of long tooltips such as troop and wielder information
+- The inventory, equipment, trade and army exchange widgets use multiple tab stops. Drag and drop works the same way, and `Left` and `Right` still move between armies
+- In tables, `Ctrl+Alt` with the arrow keys moves to the first or last column of the current row, or to the first or last row of the current column
+- The mod's options dialog is a visible game window opened from the main or pause menus. Mod commands can be rebound there
+- Commands respond to both the normal and numpad variants of the number keys and `Enter`
 
 ### Game Screens
 
-- Fix being stuck on the post-combat screen when attacked while your wielder was defending a settlement
-- The loading screen now reads Tips and progress information
-- Technologies in the research screen are now buttons that when activated, perform the research action
-- The marketplace screen was rewritten to use a table which more accurately matches what the game draws
-- In game options, adjusting keybinds is now supported
-- Fixed the adventure map speaking the current tile when transitioning between the troop placement and combat screens or quitting a game
-
-### Controls
-
-- Added support for rebinding mod commands in the new mod options dialog
-- Fixed long-standing bug where `Shift+Tab` would activate multiple times even when only pressed once
-- Commands now respond to either the normal or numpad variants for numeric keys (0-9) and enter
+- The loading screen reads tips and progress information
+- Technologies in the research screen are buttons that perform the research when activated
+- The marketplace screen is a table
+- Adjusting of built-in game keybinds is now supported
 
 ### Adventure map
 
-Changes by Rashad:
+Route, road and movement cost changes contributed by Rashad Naqeeb.
 
-- Road tiles now name the neighbouring tiles the road carries on into, so a road reads as `Dirt road, e w` and can be followed a step at a time. This can be disabled in mod settings.
-- Route preview turn counts now say how long the wait is instead of numbering the turn. A tile you arrive at on the next turn reads as `next turn` rather than `in 2 turns`, and the counts beyond that drop by one to match
-- Setting a wielder's destination now reads the route that will be taken and its cost, for example `Cost: 5 this turn, 12 next turn. Aurelia will move 2n, ne, 2e.`, instead of only naming the destination tile.
-- Setting a destination on something the wielder acts on now names the action after the route, for example `Cost: 5.5 this turn. Aurelia will move 2n, ne and Claim Gold Mine.`
-- Movement costs are now read to two decimal places wherever they are spoken. A cost of 15.5 used to be read as `16` on the adventure map cursor and in the scanner. A tile costing less than half a point is also no longer read as costing nothing
-
-Other changes:
-
-- Tiles no longer say "blocked". This was confusing and didn't provide meaningful information
-- The mod now considers decorative terrain such as ruins, Tombstones or Birch Forest as the tile's terrain. This helps with orientation and ambience
-- Additional decorative effects on tiles like fog, burn marks or fireflies are now read after terrain. This can be disabled in mod settings
-- Changed the default binding of the describe map command from `D` to `Ctrl+D` so that the same hotkey works across the adventure map and combat screens
-
-### Bookmarks
-
-- Added bookmarks tab to the mod settings screen to manage, import or export bookmarks
-- Swapped commands for setting and jumping to bookmarks: `Ctrl+1` through `0` now goes to a bookmark, `Shift+1` through `0` sets a bookmark
+- Setting a wielder's destination reads the route, its cost per turn, and the action at the end if there is one, for example `Cost: 5.5 this turn. Aurelia will move 2n, ne and Claim Gold Mine.`
+- Route preview turn counts say how long the wait is for clarity. A tile you arrive at on the next turn reads as `next turn` and not `in 2 turns`
+- Road tiles name the neighbouring tiles the road carries on into, so a road reads as `Dirt road, e w` and can be followed a step at a time. This can be disabled in mod settings
+- Movement costs are read to two decimal places
+- Decorative terrain such as ruins, tombstones or birch forest is read as the tile's terrain
+- Decorative effects such as fog, burn marks or fireflies are read after the terrain. This can be disabled in mod settings
+- Tiles no longer say "blocked"
 
 ### Scanner
 
-Changes by Rashad:
+Most changes in this section were contributed by Rashad Naqeeb.
 
-- Scanner results are now grouped into items and copies of an item. `Page Up` and `Page Down` step between different things, and the new `Alt+Page Up` and `Alt+Page Down` commands walk the copies of the thing you are on, so a map with a few chests costs one stop in the list
-- Scanner readouts now describe the thing that was scanned instead of everything else on its tile. On the adventure map they still say whether the selected wielder can reach it, which you can turn off like any other announcement element
-- Removed the `End` refresh. Scanner results were already being refreshed on every scanner key press. `End` now reads the distance of the result from the cursor, replacing `Shift+Home`
-- `Backspace` now returns the accessibility cursor to the tile it was on before the last scanner or bookmark jump
-- Scanner and road directions are now spoken in a short form such as `3ne`. The new `Long directions` mod setting restores the full wording
-- Added custom scanner categories, defined from the scanner tab of the mod settings screen and built from subcategories you pick and keywords you type. The adventure map and battle keep separate sets
-- Added `J` as a second key for jumping the accessibility cursor to the current scanner result, mirroring `Home` so that it and the `,`, `.`, and `/` category keys can be worked with one hand
+- Results are grouped into items and instances of an item. `Page Up` and `Page Down` move between different items, and `Alt+Page Up` and `Alt+Page Down` move between the instances of an item
+- Results describe the thing that was scanned and not everything else on its tile. On the adventure map, they also indicate whether the selected wielder can reach it
+- Added custom categories, defined from the scanner tab of the mod settings screen and built from subcategories you pick and keywords you type. See the documentation for details
+- A new sort setting chooses between straight line distance (the default) and walkable path cost
+- If the path from the cursor to a result is blocked, the blocker is named if visible
+- `Backspace` returns the accessibility cursor to the tile it was on before the last scanner or bookmark jump
+- `J` jumps the accessibility cursor to the current result like `Home` does
+- Scanner and road directions are spoken in a short form such as `3ne`. The new `Long directions` mod setting restores the full wording
 - Added merchants to the adventure map scanner
-
-Other changes:
-
-- A new sort setting controls whether straight line distance (the current default) or walkable path cost is used for sorting scanner results
-- If the path from the cursor to a scanner result is blocked, the name of the blocker is now read if visible
 
 ### Sounds
 
-- Added a procedural sound system: moving the cursor now plays a short cue for an empty tile's terrain or a cue for the entity occupying a tile
-- Added a sonar sweep on `P` for the adventure map: every entity the scanner can see within the look around radius plays its sound
-- Moving through scanner results now plays each result's sound positioned relative to the cursor. This replaces the "Scanner plays directional beep" setting
+- Moving the cursor plays a sound cue for an empty tile's terrain, or for the entity occupying the tile
+- `P` on the adventure map plays a sonar sweep: every entity the scanner can see within the look around radius plays its sound
+- Moving through scanner results plays each result's sound positioned relative to the cursor
 - Added an audio glossary, reachable from the new Audio tab in mod settings
 
 ### Combat
 
-- All 69 possible Battlefields in troop deployment and combat now have AI written descriptions with information about important terrain features, choke points and spawn points. These descriptions are available in the troop deployment screen and can be read with `Ctrl+D`
-- Buffs, debuffs and restrictions (invulnerable, reloading, magic immunity) are now indicated for troops on the combat grid and in scanner results
-- Improve reliability for reading and display of attack previews and troop tooltips
-- Removed confusing "blocked" indicator which was shown on occupied tiles because they had an infinite travel cost. Impassable terrain is still indicated
-- Decorations on battlefield tiles are now read, so a tile that previously just read as "impassable" could read as "gatepost, impassable". This helps with orientation and adds to the ambience of the game.
-- An impassable tile no longer speaks a height. This fixes bugs like "Elevated ground, height 3, impassable" which now reads as "Gatepost, impassable"
-- Choke points are now indicated and can be found in the scanner
+- All 69 battlefields have AI written descriptions of important terrain features, choke points and spawn points. Read them with `Ctrl+D` in troop deployment or combat, or from the description tab stop in troop deployment
+- Buffs, debuffs and restrictions (invulnerable, reloading, magic immunity) are indicated for troops on the combat grid and in scanner results
+- Choke points are indicated and can be found in the scanner
+- Decorations on tiles are read, so a tile can read as `Gatepost, impassable`. Impassable tiles no longer speak a height
+- Occupied tiles no longer say "blocked". Impassable terrain is still indicated
+
+### Bookmarks
+
+- Added a bookmarks tab to the mod settings screen to import or export bookmarks
+
+### Breaking Changes
+
+- Swapped the bookmark commands: `Ctrl+1` through `0` goes to a bookmark, `Shift+1` through `0` sets one
+- The default key for describe map changed from `D` to `Ctrl+D`, so the same key works on the adventure map and in combat
+- `End` reads the distance from the cursor to the current scanner result, replacing `Shift+Home`. The `End` refresh was removed because results already refresh on every scanner key press
+- Removed `Ctrl+M`. Open mod options from the main or pause menus
+- Removed the tooltip actions menu, replaced by usage hints
+- Removed the "Scanner plays directional beep" setting, replaced by scanner result sounds
+
+### Fixes
+
+- Fixed being stuck on the post-combat screen when attacked while your wielder was defending a settlement
+- Fixed `Shift+Tab` activating several times when pressed once
+- Fixed the adventure map speaking the current tile when transitioning between the troop placement and combat screens or quitting a game
 - Fixed "blocked" being spoken 6 times when a ranged unit's attack is obstructed by elevated terrain
+- Improved reliability of reading and displaying attack previews and troop tooltips
 
 ## V0.7.4
 
