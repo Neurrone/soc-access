@@ -97,7 +97,8 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The stage is read off the game every frame rather than waited for: the menu swaps
         /// one whole page for the other in place, and the cursor is given up when it does. The graph
         /// is declared afresh on every operation, so there is nothing else to do. The stage last seen
-        /// lives on the adapter, which lasts exactly as long as the encounter does.</summary>
+        /// lives on the adapter, which outlives the encounter - the adventure scene binds one menu
+        /// and reuses it - and the adapter clears that baseline when it sees the window down.</summary>
         public override void OnUpdate()
         {
             base.OnUpdate();

@@ -94,10 +94,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPresent()
         {
-            return _menu != null
+            bool present = _menu != null
                 && _settings != null
                 && Reflect.Get<object>(_menu, AsyncField) != null
                 && Stage != HostileJoinMenuStage.None;
+            if (!present)
+            {
+                // The window being down is what ends an encounter for the adapter, and this is where
+                // the game is asked: every registered screen is polled through IsActive every frame
+                // (ScreenManager.Resolve), the window included while it is closed, so the baseline
+                // below belongs to one encounter with nothing having to reset it.
+                _seenStage = HostileJoinMenuStage.None;
+            }
+
+            return present;
         }
 
         /// <summary>Which of the menu's two shapes is drawn, read off the game's own stage and the
@@ -129,9 +139,12 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        // The stage this encounter was last seen in. It belongs to the adapter because it is about
-        // THIS menu instance: a new encounter gets a new adapter and so starts at None, which is why
-        // nothing has to reset it (AGENTS.md, "Screen Resolution").
+        // The stage this encounter was last seen in. A new encounter does NOT get a new adapter: the
+        // adventure scene binds one HostileJoinMenu for the whole game and ShowMenu puts that same
+        // instance back up for the next encounter - new commanders, _stage back to Choice
+        // (HostileJoinMenu.ShowMenu ~:145-152) - and a Reward or Necromancy offer goes straight on
+        // into the Join stage inside that same call (~:194). So the baseline is cleared by the one
+        // thing that is read from the game between encounters: IsPresent seeing the window down.
         private HostileJoinMenuStage _seenStage;
 
         /// <summary>Whether the menu has swapped one of its two shapes for the other since this was
