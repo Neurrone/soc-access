@@ -151,7 +151,7 @@ namespace SongsOfConquestAccess.Adapters
         private bool _optionsButtonProbed;
         // What LogFailureOnce has already said, so it says each thing once.
         private readonly HashSet<string> _loggedFailures = new HashSet<string>(StringComparer.Ordinal);
-        // The canvas group each HUD container carries, resolved once. See HudGroupVisible.
+        // The canvas group each HUD container carries, resolved once it has one. See HudGroupVisible.
         private readonly Dictionary<GameObject, CanvasGroup> _canvasGroups = new Dictionary<GameObject, CanvasGroup>();
         // The army of the wielder the HUD has selected, kept on the bar it reads. See Troops.
         private TroopHudAdapter _troops;
@@ -459,8 +459,15 @@ namespace SongsOfConquestAccess.Adapters
         /// Every stop of the map's build asks this, up to twelve times a frame between them, and
         /// always of the same fixed containers the HUD's settings object holds for as long as the HUD
         /// lives - which is as long as this adapter does, so the component a container carries cannot
-        /// change under the memo. The MISS is remembered too: a container with no canvas group is the
-        /// common case and would otherwise cost a GetComponent on every read.
+        /// change under the memo.
+        ///
+        /// Only a HIT is remembered. The game ADDS the canvas group on the container's first toggle
+        /// (<c>AdventureHUDStateHandler.SetHudObjectState</c>) and hides the container by fading that
+        /// group rather than by deactivating it, so a container probed before the HUD's first state
+        /// change has no group YET, and a remembered miss would answer "visible" for a panel faded to
+        /// nothing for the rest of the adventure - through a cutscene, through the AI's turn. A miss
+        /// costs one <c>GetComponent</c> on one object per read, which is what a container that has
+        /// never been toggled is worth.
         /// </summary>
         private bool HudGroupVisible(GameObject container)
         {
@@ -473,7 +480,10 @@ namespace SongsOfConquestAccess.Adapters
             if (!_canvasGroups.TryGetValue(container, out canvasGroup))
             {
                 canvasGroup = container.GetComponent<CanvasGroup>();
-                _canvasGroups.Add(container, canvasGroup);
+                if (canvasGroup != null)
+                {
+                    _canvasGroups.Add(container, canvasGroup);
+                }
             }
 
             return GameObjects.IsGroupVisible(container, canvasGroup);
