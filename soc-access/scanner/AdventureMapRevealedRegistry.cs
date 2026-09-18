@@ -14,14 +14,12 @@ namespace SongsOfConquestAccess.Scanner
         public AdventureMapRevealedEntry(
             long sequence,
             string key,
-            string label,
             Vector2Int position,
             int stableReference,
             AdventureMapRevealedKind kind)
         {
             Sequence = sequence;
             Key = key ?? string.Empty;
-            Label = label ?? string.Empty;
             Position = position;
             StableReference = stableReference;
             Kind = kind;
@@ -31,8 +29,9 @@ namespace SongsOfConquestAccess.Scanner
 
         public string Key { get; private set; }
 
-        public string Label { get; private set; }
-
+        /// <summary>Where the find was made. Only what cannot be resolved again is kept: the object
+        /// itself is looked up by <see cref="StableReference"/> when the list is read, and named and
+        /// placed from the game then, so the list follows a language switch and a wielder's walk.</summary>
         public Vector2Int Position { get; private set; }
 
         public int StableReference { get; private set; }
@@ -77,12 +76,11 @@ namespace SongsOfConquestAccess.Scanner
         public void AddOrUpdate(
             int teamId,
             string key,
-            string label,
             Vector2Int position,
             int stableReference,
             AdventureMapRevealedKind kind)
         {
-            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(label))
+            if (string.IsNullOrWhiteSpace(key))
             {
                 return;
             }
@@ -100,7 +98,6 @@ namespace SongsOfConquestAccess.Scanner
                 team.EntriesByKey[key] = new AdventureMapRevealedEntry(
                     existing.Sequence,
                     key,
-                    label,
                     position,
                     stableReference,
                     kind);
@@ -110,7 +107,6 @@ namespace SongsOfConquestAccess.Scanner
             team.EntriesByKey[key] = new AdventureMapRevealedEntry(
                 team.NextSequence++,
                 key,
-                label,
                 position,
                 stableReference,
                 kind);

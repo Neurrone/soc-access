@@ -348,6 +348,16 @@ namespace SongsOfConquestAccess.Adapters
                     return true;
                 }
 
+                // A wielder the team cannot see now is remembered where it was last seen, as a map
+                // entity under remembered fog is: the tile does not stop standing for it because it
+                // has walked somewhere the player cannot watch. Commanders and map entities draw
+                // their ids from one generator, so a commander id never names an entity.
+                ICommanderState commander = FindCommanderById(stableId);
+                if (commander != null)
+                {
+                    return commander.IsAlive && !IsCommanderVisibleNow(commander);
+                }
+
                 IMapEntity entity = TryGetMapEntity(stableId);
                 AdventureMapTile identityTile;
                 return entity != null && TryGetMapEntityIdentityTile(entity, null, out identityTile);
@@ -752,6 +762,12 @@ namespace SongsOfConquestAccess.Adapters
             });
         }
 
+        /// <summary>
+        /// The finds of the team holding the map now, which in hot seat is not the whole game's. The
+        /// registry remembers only WHICH object was found and where; each one is named and placed
+        /// from the game here, so the list follows a language switch, a scouting detail that has
+        /// improved since, and a wielder that has walked.
+        /// </summary>
         private void AddRevealedScannerResults(ScannerSnapshot snapshot, int localTeamId)
         {
             if (_revealedRegistry == null || snapshot == null)
@@ -759,7 +775,6 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            // The finds of the team holding the map now, which in hot seat is not the whole game's.
             IReadOnlyList<AdventureMapRevealedEntry> entries = _revealedRegistry.Entries(localTeamId);
             if (entries == null || entries.Count == 0)
             {
@@ -771,38 +786,78 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < entries.Count; i++)
             {
                 AdventureMapRevealedEntry entry = entries[i];
-                if (entry == null || string.IsNullOrWhiteSpace(entry.Key) || string.IsNullOrWhiteSpace(entry.Label))
+                if (entry == null || string.IsNullOrWhiteSpace(entry.Key))
                 {
                     continue;
                 }
 
-                AdventureMapTile tile = IsWithinMap(entry.Position) ? GetTile(entry.Position) : null;
-                Vector2Int position = entry.Position;
-                if (entry.Kind == AdventureMapRevealedKind.MapEntity)
+                string label;
+                Vector2Int position;
+                AdventureMapTile tile;
+                if (!TryResolveRevealedEntry(localTeamId, entry, out label, out position, out tile))
                 {
-                    IMapEntity entity = TryGetMapEntity(entry.StableReference);
-                    if (entity == null)
-                    {
-                        RemoveStaleRevealedMapEntityEntry(localTeamId, entry);
-                        continue;
-                    }
-
-                    if (!TryGetMapEntityIdentityTile(entity, null, out tile))
-                    {
-                        RemoveStaleRevealedMapEntityEntry(localTeamId, entry);
-                        continue;
-                    }
-
-                    position = tile.Position;
+                    continue;
                 }
 
-                all.Add(new ScannerResult(entry.Key, entry.Label, position)
+                all.Add(new ScannerResult(entry.Key, label, position)
                 {
                     NotVisible = tile != null && !tile.IsVisible,
                     StableReference = entry.StableReference,
                     EntityCategory = tile != null ? tile.EntityCategory : AdventureEntityCategory.None
                 });
             }
+        }
+
+        /// <summary>
+        /// Names one find and says which tile it speaks through, or answers false for one the game no
+        /// longer has - taking that one off the team's list as it goes. A map entity is read through
+        /// the tile it can be identified on, remembered fog included. A wielder is only WHERE THE TEAM
+        /// CAN SEE IT: out of sight, the tile it was found on is the last the player knows of, and
+        /// where it has walked since is not theirs to hear.
+        /// </summary>
+        private bool TryResolveRevealedEntry(
+            int localTeamId,
+            AdventureMapRevealedEntry entry,
+            out string label,
+            out Vector2Int position,
+            out AdventureMapTile tile)
+        {
+            label = string.Empty;
+            position = entry.Position;
+            tile = IsWithinMap(entry.Position) ? GetTile(entry.Position) : null;
+            if (entry.Kind == AdventureMapRevealedKind.MapEntity)
+            {
+                IMapEntity entity = TryGetMapEntity(entry.StableReference);
+                AdventureMapTile identityTile;
+                if (entity == null || !TryGetMapEntityIdentityTile(entity, null, out identityTile))
+                {
+                    RemoveStaleRevealedEntry(localTeamId, entry);
+                    return false;
+                }
+
+                tile = identityTile;
+                position = identityTile.Position;
+                label = FirstNonEmpty(identityTile.MapEntityName, GetMapEntityName(entity));
+                return !string.IsNullOrWhiteSpace(label);
+            }
+
+            ICommanderState commander = FindCommanderById(entry.StableReference);
+            if (commander == null || !commander.IsAlive)
+            {
+                RemoveStaleRevealedEntry(localTeamId, entry);
+                return false;
+            }
+
+            if (IsCommanderVisibleNow(commander))
+            {
+                position = commander.Position;
+                tile = GetTile(position);
+            }
+
+            label = FirstNonEmpty(
+                AdventureMapEntityLabel.GetCommanderName(_facade, commander),
+                ModText.Get(ModStrings.Events.Wielder));
+            return !string.IsNullOrWhiteSpace(label);
         }
 
         private void AddObstacleScannerResults(ScannerSnapshot snapshot, int localTeamId, Vector2Int origin, Dictionary<Vector2Int, AdventureMapTile> tileCache)
@@ -1048,6 +1103,15 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
+        /// <summary>Whether the team in control can see this commander where it stands NOW. Where it
+        /// cannot, the player knows only where they last saw it.</summary>
+        private bool IsCommanderVisibleNow(ICommanderState commander)
+        {
+            return commander != null
+                && IsWithinMap(commander.Position)
+                && IsPointVisible(GetFog(commander.Position), commander.Position);
+        }
+
         private ICommanderState FindCommanderById(int commanderId)
         {
             IEnumerable<ICommanderState> commanders = _facade != null && _facade.Commanders != null ? _facade.Commanders.All : null;
@@ -1258,7 +1322,7 @@ namespace SongsOfConquestAccess.Adapters
                     || entity.HasComponent<IUnlockWithArtifactComponent>());
         }
 
-        private void RemoveStaleRevealedMapEntityEntry(int localTeamId, AdventureMapRevealedEntry entry)
+        private void RemoveStaleRevealedEntry(int localTeamId, AdventureMapRevealedEntry entry)
         {
             if (entry != null && _revealedRegistry != null)
             {

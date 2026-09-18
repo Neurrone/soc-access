@@ -961,7 +961,6 @@ namespace SongsOfConquestAccess.Events
                 _revealedRegistry.AddOrUpdate(
                     teamId,
                     entry.Key,
-                    entry.Label,
                     entry.Position,
                     entry.StableReference,
                     entry.Kind);
