@@ -1287,32 +1287,32 @@ msgstr "Гекс-сетка запад"
 
 #. Actions.HexGridSkipEast
 msgctxt "Actions.HexGridSkipEast"
-msgid "Move to next interesting tile east"
+msgid "Move To Next Interesting Tile East"
 msgstr "Перейти к следующей интересной клетке на восток"
 
 #. Actions.HexGridSkipNorthEast
 msgctxt "Actions.HexGridSkipNorthEast"
-msgid "Move to next interesting tile north east"
+msgid "Move To Next Interesting Tile North East"
 msgstr "Перейти к следующей интересной клетке на северо-восток"
 
 #. Actions.HexGridSkipNorthWest
 msgctxt "Actions.HexGridSkipNorthWest"
-msgid "Move to next interesting tile north west"
+msgid "Move To Next Interesting Tile North West"
 msgstr "Перейти к следующей интересной клетке на северо-запад"
 
 #. Actions.HexGridSkipSouthEast
 msgctxt "Actions.HexGridSkipSouthEast"
-msgid "Move to next interesting tile south east"
+msgid "Move To Next Interesting Tile South East"
 msgstr "Перейти к следующей интересной клетке на юго-восток"
 
 #. Actions.HexGridSkipSouthWest
 msgctxt "Actions.HexGridSkipSouthWest"
-msgid "Move to next interesting tile south west"
+msgid "Move To Next Interesting Tile South West"
 msgstr "Перейти к следующей интересной клетке на юго-запад"
 
 #. Actions.HexGridSkipWest
 msgctxt "Actions.HexGridSkipWest"
-msgid "Move to next interesting tile west"
+msgid "Move To Next Interesting Tile West"
 msgstr "Перейти к следующей интересной клетке на запад"
 
 #. Actions.JumpToBookmark
@@ -1347,22 +1347,22 @@ msgstr "Сдвинуть карту на запад"
 
 #. Actions.MapSkipEast
 msgctxt "Actions.MapSkipEast"
-msgid "Move to next interesting tile east"
+msgid "Move To Next Interesting Tile East"
 msgstr "Перейти к следующей интересной клетке на восток"
 
 #. Actions.MapSkipNorth
 msgctxt "Actions.MapSkipNorth"
-msgid "Move to next interesting tile north"
+msgid "Move To Next Interesting Tile North"
 msgstr "Перейти к следующей интересной клетке на север"
 
 #. Actions.MapSkipSouth
 msgctxt "Actions.MapSkipSouth"
-msgid "Move to next interesting tile south"
+msgid "Move To Next Interesting Tile South"
 msgstr "Перейти к следующей интересной клетке на юг"
 
 #. Actions.MapSkipWest
 msgctxt "Actions.MapSkipWest"
-msgid "Move to next interesting tile west"
+msgid "Move To Next Interesting Tile West"
 msgstr "Перейти к следующей интересной клетке на запад"
 
 #. Actions.NextBuffer
@@ -1420,6 +1420,11 @@ msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
 msgstr "Перейти к результату сканера"
 
+#. Actions.ScannerJumpToResultAlternate
+msgctxt "Actions.ScannerJumpToResultAlternate"
+msgid "Jump To Scanner Result (Alternate)"
+msgstr "Перейти к результату сканера (альтернативная клавиша)"
+
 #. Actions.ScannerLookAround
 msgctxt "Actions.ScannerLookAround"
 msgid "Look Around"
@@ -1472,7 +1477,7 @@ msgstr "Вернуться к клетке до перехода"
 
 #. Actions.ScannerSpeakDistanceAndDirection
 msgctxt "Actions.ScannerSpeakDistanceAndDirection"
-msgid "Scanner Result Distance and Direction"
+msgid "Scanner Result Distance And Direction"
 msgstr "Расстояние и направление результата сканера"
 
 #. Actions.SonarSweep
@@ -1482,7 +1487,7 @@ msgstr "Воспроизвести сонарный обзор"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize enemy essence"
+msgid "Summarize Enemy Essence"
 msgstr "Сводка вражеской эссенции"
 
 #. Actions.SummarizeResources
@@ -1512,8 +1517,8 @@ msgstr "Отделить {0} отрядов"
 
 #. Actions.ToggleBookmarkBeacon
 msgctxt "Actions.ToggleBookmarkBeacon"
-msgid "Toggle Beacon For Bookmark {0}"
-msgstr "Переключить маяк закладки {0}"
+msgid "Toggle Audio Beacon For Bookmark {0}"
+msgstr "Переключить звуковой маяк закладки {0}"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -1527,17 +1532,17 @@ msgstr "Возвращает фокус на карту приключений �
 
 #. Actions.UiCarry
 msgctxt "Actions.UiCarry"
-msgid "Start drag"
+msgid "Start Drag"
 msgstr "Начать перетаскивание"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Decrease slider by 10%"
+msgid "Decrease Slider By 10%"
 msgstr "Уменьшить ползунок на 10%"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Increase slider by 10%"
+msgid "Increase Slider By 10%"
 msgstr "Увеличить ползунок на 10%"
 
 #. Actions.UiDown
@@ -1582,7 +1587,7 @@ msgstr "Влево"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click or complete drag"
+msgid "Left Click Or Complete Drag"
 msgstr "Левый клик или завершить перетаскивание"
 
 #. Actions.UiNext
@@ -1612,12 +1617,12 @@ msgstr "Вправо"
 
 #. Actions.UiRightClick
 msgctxt "Actions.UiRightClick"
-msgid "Right click"
+msgid "Right Click"
 msgstr "Правый щелчок"
 
 #. Actions.UiClearSearch
 msgctxt "Actions.UiClearSearch"
-msgid "Clear typeahead"
+msgid "Clear Typeahead"
 msgstr "Очистить быстрый поиск"
 
 #. Actions.UiUp
@@ -3298,7 +3303,7 @@ msgstr "Купить"
 
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"
-msgid "Describe map"
+msgid "Describe Map"
 msgstr "Описать карту"
 
 #. Actions.Dismiss
@@ -3898,12 +3903,12 @@ msgstr "{0} выбрано"
 
 #. Actions.ScannerNextCustomEntry
 msgctxt "Actions.ScannerNextCustomEntry"
-msgid "Move to next result in custom category {0}"
+msgid "Move To Next Result In Custom Category {0}"
 msgstr "К следующему результату в своей категории {0}"
 
 #. Actions.ScannerPreviousCustomEntry
 msgctxt "Actions.ScannerPreviousCustomEntry"
-msgid "Move to previous result in custom category {0}"
+msgid "Move To Previous Result In Custom Category {0}"
 msgstr "К предыдущему результату в своей категории {0}"
 
 #. Screens.CustomCategoryName
@@ -4319,7 +4324,7 @@ msgstr "Разместить героя в гарнизоне"
 
 #. Actions.DescribeBattlefield
 msgctxt "Actions.DescribeBattlefield"
-msgid "Describe battlefield"
+msgid "Describe Battlefield"
 msgstr "Описать поле боя"
 
 #. Screens.Description

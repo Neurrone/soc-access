@@ -62,6 +62,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.ScannerPreviousInstance.Key
                 || actionKey == AccessibilityActions.ScannerNextInstance.Key
                 || actionKey == AccessibilityActions.ScannerJumpToResult.Key
+                || actionKey == AccessibilityActions.ScannerJumpToResultAlternate.Key
                 || actionKey == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key
                 || actionKey == AccessibilityActions.ScannerReturnFromJump.Key;
         }
@@ -109,7 +110,8 @@ namespace SongsOfConquestAccess.UI
                 return HandleNavigationResult(_scanner.ExecuteMoveInstance(1));
             }
 
-            if (action.Key == AccessibilityActions.ScannerJumpToResult.Key)
+            if (action.Key == AccessibilityActions.ScannerJumpToResult.Key
+                || action.Key == AccessibilityActions.ScannerJumpToResultAlternate.Key)
             {
                 return _scanner.JumpToCurrent();
             }

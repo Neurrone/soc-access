@@ -1267,32 +1267,32 @@ msgstr "육각 격자 서쪽"
 
 #. Actions.HexGridSkipEast
 msgctxt "Actions.HexGridSkipEast"
-msgid "Move to next interesting tile east"
+msgid "Move To Next Interesting Tile East"
 msgstr "동쪽의 다음 주목할 타일로 이동"
 
 #. Actions.HexGridSkipNorthEast
 msgctxt "Actions.HexGridSkipNorthEast"
-msgid "Move to next interesting tile north east"
+msgid "Move To Next Interesting Tile North East"
 msgstr "북동쪽의 다음 주목할 타일로 이동"
 
 #. Actions.HexGridSkipNorthWest
 msgctxt "Actions.HexGridSkipNorthWest"
-msgid "Move to next interesting tile north west"
+msgid "Move To Next Interesting Tile North West"
 msgstr "북서쪽의 다음 주목할 타일로 이동"
 
 #. Actions.HexGridSkipSouthEast
 msgctxt "Actions.HexGridSkipSouthEast"
-msgid "Move to next interesting tile south east"
+msgid "Move To Next Interesting Tile South East"
 msgstr "남동쪽의 다음 주목할 타일로 이동"
 
 #. Actions.HexGridSkipSouthWest
 msgctxt "Actions.HexGridSkipSouthWest"
-msgid "Move to next interesting tile south west"
+msgid "Move To Next Interesting Tile South West"
 msgstr "남서쪽의 다음 주목할 타일로 이동"
 
 #. Actions.HexGridSkipWest
 msgctxt "Actions.HexGridSkipWest"
-msgid "Move to next interesting tile west"
+msgid "Move To Next Interesting Tile West"
 msgstr "서쪽의 다음 주목할 타일로 이동"
 
 #. Actions.JumpToBookmark
@@ -1327,22 +1327,22 @@ msgstr "지도를 서쪽으로 이동"
 
 #. Actions.MapSkipEast
 msgctxt "Actions.MapSkipEast"
-msgid "Move to next interesting tile east"
+msgid "Move To Next Interesting Tile East"
 msgstr "동쪽의 다음 주목할 타일로 이동"
 
 #. Actions.MapSkipNorth
 msgctxt "Actions.MapSkipNorth"
-msgid "Move to next interesting tile north"
+msgid "Move To Next Interesting Tile North"
 msgstr "북쪽의 다음 주목할 타일로 이동"
 
 #. Actions.MapSkipSouth
 msgctxt "Actions.MapSkipSouth"
-msgid "Move to next interesting tile south"
+msgid "Move To Next Interesting Tile South"
 msgstr "남쪽의 다음 주목할 타일로 이동"
 
 #. Actions.MapSkipWest
 msgctxt "Actions.MapSkipWest"
-msgid "Move to next interesting tile west"
+msgid "Move To Next Interesting Tile West"
 msgstr "서쪽의 다음 주목할 타일로 이동"
 
 #. Actions.NextBuffer
@@ -1400,6 +1400,11 @@ msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
 msgstr "스캐너 결과로 이동"
 
+#. Actions.ScannerJumpToResultAlternate
+msgctxt "Actions.ScannerJumpToResultAlternate"
+msgid "Jump To Scanner Result (Alternate)"
+msgstr "스캐너 결과로 이동 (대체)"
+
 #. Actions.ScannerLookAround
 msgctxt "Actions.ScannerLookAround"
 msgid "Look Around"
@@ -1452,7 +1457,7 @@ msgstr "이동 전 칸으로 돌아가기"
 
 #. Actions.ScannerSpeakDistanceAndDirection
 msgctxt "Actions.ScannerSpeakDistanceAndDirection"
-msgid "Scanner Result Distance and Direction"
+msgid "Scanner Result Distance And Direction"
 msgstr "스캐너 결과 거리 및 방향"
 
 #. Actions.SonarSweep
@@ -1462,7 +1467,7 @@ msgstr "소나 스윕 재생"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize enemy essence"
+msgid "Summarize Enemy Essence"
 msgstr "적 에센스 요약"
 
 #. Actions.SummarizeResources
@@ -1482,8 +1487,8 @@ msgstr "{0} 부대 분리"
 
 #. Actions.ToggleBookmarkBeacon
 msgctxt "Actions.ToggleBookmarkBeacon"
-msgid "Toggle Beacon For Bookmark {0}"
-msgstr "북마크 {0} 비컴 전환"
+msgid "Toggle Audio Beacon For Bookmark {0}"
+msgstr "북마크 {0} 오디오 비컨 전환"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -1497,17 +1502,17 @@ msgstr "해당 화면의 다른 곳에 있을 때 포커스를 모험 지도나 
 
 #. Actions.UiCarry
 msgctxt "Actions.UiCarry"
-msgid "Start drag"
+msgid "Start Drag"
 msgstr "끌기 시작"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Decrease slider by 10%"
+msgid "Decrease Slider By 10%"
 msgstr "슬라이더 10% 감소"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Increase slider by 10%"
+msgid "Increase Slider By 10%"
 msgstr "슬라이더 10% 증가"
 
 #. Actions.UiDown
@@ -1552,7 +1557,7 @@ msgstr "왼쪽으로 이동"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click or complete drag"
+msgid "Left Click Or Complete Drag"
 msgstr "왼쪽 클릭 또는 끌기 완료"
 
 #. Actions.UiNext
@@ -1582,12 +1587,12 @@ msgstr "오른쪽으로 이동"
 
 #. Actions.UiRightClick
 msgctxt "Actions.UiRightClick"
-msgid "Right click"
+msgid "Right Click"
 msgstr "오른쪽 클릭"
 
 #. Actions.UiClearSearch
 msgctxt "Actions.UiClearSearch"
-msgid "Clear typeahead"
+msgid "Clear Typeahead"
 msgstr "미리 입력 지우기"
 
 #. Actions.UiUp
@@ -3248,7 +3253,7 @@ msgstr "구매"
 
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"
-msgid "Describe map"
+msgid "Describe Map"
 msgstr "지도 설명"
 
 #. Actions.Dismiss
@@ -3838,12 +3843,12 @@ msgstr "{0}개 선택됨"
 
 #. Actions.ScannerNextCustomEntry
 msgctxt "Actions.ScannerNextCustomEntry"
-msgid "Move to next result in custom category {0}"
+msgid "Move To Next Result In Custom Category {0}"
 msgstr "사용자 지정 범주 {0}의 다음 결과로 이동"
 
 #. Actions.ScannerPreviousCustomEntry
 msgctxt "Actions.ScannerPreviousCustomEntry"
-msgid "Move to previous result in custom category {0}"
+msgid "Move To Previous Result In Custom Category {0}"
 msgstr "사용자 지정 범주 {0}의 이전 결과로 이동"
 
 #. Screens.CustomCategoryName
@@ -4229,7 +4234,7 @@ msgstr "위더 주둔시키기"
 
 #. Actions.DescribeBattlefield
 msgctxt "Actions.DescribeBattlefield"
-msgid "Describe battlefield"
+msgid "Describe Battlefield"
 msgstr "전장 설명"
 
 #. Screens.Description

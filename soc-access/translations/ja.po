@@ -1267,32 +1267,32 @@ msgstr "ヘックスグリッド西"
 
 #. Actions.HexGridSkipEast
 msgctxt "Actions.HexGridSkipEast"
-msgid "Move to next interesting tile east"
+msgid "Move To Next Interesting Tile East"
 msgstr "東の次の注目マスへ移動"
 
 #. Actions.HexGridSkipNorthEast
 msgctxt "Actions.HexGridSkipNorthEast"
-msgid "Move to next interesting tile north east"
+msgid "Move To Next Interesting Tile North East"
 msgstr "北東の次の注目マスへ移動"
 
 #. Actions.HexGridSkipNorthWest
 msgctxt "Actions.HexGridSkipNorthWest"
-msgid "Move to next interesting tile north west"
+msgid "Move To Next Interesting Tile North West"
 msgstr "北西の次の注目マスへ移動"
 
 #. Actions.HexGridSkipSouthEast
 msgctxt "Actions.HexGridSkipSouthEast"
-msgid "Move to next interesting tile south east"
+msgid "Move To Next Interesting Tile South East"
 msgstr "南東の次の注目マスへ移動"
 
 #. Actions.HexGridSkipSouthWest
 msgctxt "Actions.HexGridSkipSouthWest"
-msgid "Move to next interesting tile south west"
+msgid "Move To Next Interesting Tile South West"
 msgstr "南西の次の注目マスへ移動"
 
 #. Actions.HexGridSkipWest
 msgctxt "Actions.HexGridSkipWest"
-msgid "Move to next interesting tile west"
+msgid "Move To Next Interesting Tile West"
 msgstr "西の次の注目マスへ移動"
 
 #. Actions.JumpToBookmark
@@ -1327,22 +1327,22 @@ msgstr "マップを西へ移動"
 
 #. Actions.MapSkipEast
 msgctxt "Actions.MapSkipEast"
-msgid "Move to next interesting tile east"
+msgid "Move To Next Interesting Tile East"
 msgstr "東の次の注目マスへ移動"
 
 #. Actions.MapSkipNorth
 msgctxt "Actions.MapSkipNorth"
-msgid "Move to next interesting tile north"
+msgid "Move To Next Interesting Tile North"
 msgstr "北の次の注目マスへ移動"
 
 #. Actions.MapSkipSouth
 msgctxt "Actions.MapSkipSouth"
-msgid "Move to next interesting tile south"
+msgid "Move To Next Interesting Tile South"
 msgstr "南の次の注目マスへ移動"
 
 #. Actions.MapSkipWest
 msgctxt "Actions.MapSkipWest"
-msgid "Move to next interesting tile west"
+msgid "Move To Next Interesting Tile West"
 msgstr "西の次の注目マスへ移動"
 
 #. Actions.NextBuffer
@@ -1400,6 +1400,11 @@ msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
 msgstr "スキャナー結果へ移動"
 
+#. Actions.ScannerJumpToResultAlternate
+msgctxt "Actions.ScannerJumpToResultAlternate"
+msgid "Jump To Scanner Result (Alternate)"
+msgstr "スキャナー結果へ移動（代替）"
+
 #. Actions.ScannerLookAround
 msgctxt "Actions.ScannerLookAround"
 msgid "Look Around"
@@ -1452,7 +1457,7 @@ msgstr "移動前のタイルへ戻る"
 
 #. Actions.ScannerSpeakDistanceAndDirection
 msgctxt "Actions.ScannerSpeakDistanceAndDirection"
-msgid "Scanner Result Distance and Direction"
+msgid "Scanner Result Distance And Direction"
 msgstr "スキャナー結果の距離と方角"
 
 #. Actions.SonarSweep
@@ -1462,7 +1467,7 @@ msgstr "ソナースイープを再生"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize enemy essence"
+msgid "Summarize Enemy Essence"
 msgstr "敵のエッセンスを要約"
 
 #. Actions.SummarizeResources
@@ -1482,8 +1487,8 @@ msgstr "{0} 部隊を分割"
 
 #. Actions.ToggleBookmarkBeacon
 msgctxt "Actions.ToggleBookmarkBeacon"
-msgid "Toggle Beacon For Bookmark {0}"
-msgstr "ブックマーク{0}のビーコンを切り替え"
+msgid "Toggle Audio Beacon For Bookmark {0}"
+msgstr "ブックマーク{0}のオーディオビーコンを切り替え"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -1497,17 +1502,17 @@ msgstr "それらの画面で他の場所にいるとき、フォーカスを冒
 
 #. Actions.UiCarry
 msgctxt "Actions.UiCarry"
-msgid "Start drag"
+msgid "Start Drag"
 msgstr "ドラッグ開始"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Decrease slider by 10%"
+msgid "Decrease Slider By 10%"
 msgstr "スライダーを10%下げる"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Increase slider by 10%"
+msgid "Increase Slider By 10%"
 msgstr "スライダーを10%上げる"
 
 #. Actions.UiDown
@@ -1552,7 +1557,7 @@ msgstr "左へ移動"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click or complete drag"
+msgid "Left Click Or Complete Drag"
 msgstr "左クリックまたはドラッグ完了"
 
 #. Actions.UiNext
@@ -1582,12 +1587,12 @@ msgstr "右へ移動"
 
 #. Actions.UiRightClick
 msgctxt "Actions.UiRightClick"
-msgid "Right click"
+msgid "Right Click"
 msgstr "右クリック"
 
 #. Actions.UiClearSearch
 msgctxt "Actions.UiClearSearch"
-msgid "Clear typeahead"
+msgid "Clear Typeahead"
 msgstr "先行入力をクリア"
 
 #. Actions.UiUp
@@ -3248,7 +3253,7 @@ msgstr "購入"
 
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"
-msgid "Describe map"
+msgid "Describe Map"
 msgstr "マップの説明"
 
 #. Actions.Dismiss
@@ -3838,12 +3843,12 @@ msgstr "{0}件選択中"
 
 #. Actions.ScannerNextCustomEntry
 msgctxt "Actions.ScannerNextCustomEntry"
-msgid "Move to next result in custom category {0}"
+msgid "Move To Next Result In Custom Category {0}"
 msgstr "カスタムカテゴリ{0}の次の結果へ移動"
 
 #. Actions.ScannerPreviousCustomEntry
 msgctxt "Actions.ScannerPreviousCustomEntry"
-msgid "Move to previous result in custom category {0}"
+msgid "Move To Previous Result In Custom Category {0}"
 msgstr "カスタムカテゴリ{0}の前の結果へ移動"
 
 #. Screens.CustomCategoryName
@@ -4229,7 +4234,7 @@ msgstr "ウィールダーを駐留させる"
 
 #. Actions.DescribeBattlefield
 msgctxt "Actions.DescribeBattlefield"
-msgid "Describe battlefield"
+msgid "Describe Battlefield"
 msgstr "戦場の説明"
 
 #. Screens.Description

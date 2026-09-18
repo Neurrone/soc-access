@@ -1277,32 +1277,32 @@ msgstr "Hexraster Westen"
 
 #. Actions.HexGridSkipEast
 msgctxt "Actions.HexGridSkipEast"
-msgid "Move to next interesting tile east"
+msgid "Move To Next Interesting Tile East"
 msgstr "Zum nächsten interessanten Feld im Osten bewegen"
 
 #. Actions.HexGridSkipNorthEast
 msgctxt "Actions.HexGridSkipNorthEast"
-msgid "Move to next interesting tile north east"
+msgid "Move To Next Interesting Tile North East"
 msgstr "Zum nächsten interessanten Feld im Nordosten bewegen"
 
 #. Actions.HexGridSkipNorthWest
 msgctxt "Actions.HexGridSkipNorthWest"
-msgid "Move to next interesting tile north west"
+msgid "Move To Next Interesting Tile North West"
 msgstr "Zum nächsten interessanten Feld im Nordwesten bewegen"
 
 #. Actions.HexGridSkipSouthEast
 msgctxt "Actions.HexGridSkipSouthEast"
-msgid "Move to next interesting tile south east"
+msgid "Move To Next Interesting Tile South East"
 msgstr "Zum nächsten interessanten Feld im Südosten bewegen"
 
 #. Actions.HexGridSkipSouthWest
 msgctxt "Actions.HexGridSkipSouthWest"
-msgid "Move to next interesting tile south west"
+msgid "Move To Next Interesting Tile South West"
 msgstr "Zum nächsten interessanten Feld im Südwesten bewegen"
 
 #. Actions.HexGridSkipWest
 msgctxt "Actions.HexGridSkipWest"
-msgid "Move to next interesting tile west"
+msgid "Move To Next Interesting Tile West"
 msgstr "Zum nächsten interessanten Feld im Westen bewegen"
 
 #. Actions.JumpToBookmark
@@ -1337,22 +1337,22 @@ msgstr "Karte nach Westen bewegen"
 
 #. Actions.MapSkipEast
 msgctxt "Actions.MapSkipEast"
-msgid "Move to next interesting tile east"
+msgid "Move To Next Interesting Tile East"
 msgstr "Zum nächsten interessanten Feld im Osten bewegen"
 
 #. Actions.MapSkipNorth
 msgctxt "Actions.MapSkipNorth"
-msgid "Move to next interesting tile north"
+msgid "Move To Next Interesting Tile North"
 msgstr "Zum nächsten interessanten Feld im Norden bewegen"
 
 #. Actions.MapSkipSouth
 msgctxt "Actions.MapSkipSouth"
-msgid "Move to next interesting tile south"
+msgid "Move To Next Interesting Tile South"
 msgstr "Zum nächsten interessanten Feld im Süden bewegen"
 
 #. Actions.MapSkipWest
 msgctxt "Actions.MapSkipWest"
-msgid "Move to next interesting tile west"
+msgid "Move To Next Interesting Tile West"
 msgstr "Zum nächsten interessanten Feld im Westen bewegen"
 
 #. Actions.NextBuffer
@@ -1410,6 +1410,11 @@ msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
 msgstr "Zum Scannerergebnis springen"
 
+#. Actions.ScannerJumpToResultAlternate
+msgctxt "Actions.ScannerJumpToResultAlternate"
+msgid "Jump To Scanner Result (Alternate)"
+msgstr "Zum Scannerergebnis springen (alternativ)"
+
 #. Actions.ScannerLookAround
 msgctxt "Actions.ScannerLookAround"
 msgid "Look Around"
@@ -1462,7 +1467,7 @@ msgstr "Zum Feld vor dem Sprung zurückkehren"
 
 #. Actions.ScannerSpeakDistanceAndDirection
 msgctxt "Actions.ScannerSpeakDistanceAndDirection"
-msgid "Scanner Result Distance and Direction"
+msgid "Scanner Result Distance And Direction"
 msgstr "Entfernung und Richtung des Scannerergebnisses"
 
 #. Actions.SonarSweep
@@ -1472,7 +1477,7 @@ msgstr "Sonar-Sweep abspielen"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
-msgid "Summarize enemy essence"
+msgid "Summarize Enemy Essence"
 msgstr "Feindliche Essenz zusammenfassen"
 
 #. Actions.SummarizeResources
@@ -1497,8 +1502,8 @@ msgstr "{0} Truppen abspalten"
 
 #. Actions.ToggleBookmarkBeacon
 msgctxt "Actions.ToggleBookmarkBeacon"
-msgid "Toggle Beacon For Bookmark {0}"
-msgstr "Beacon für Lesezeichen {0} umschalten"
+msgid "Toggle Audio Beacon For Bookmark {0}"
+msgstr "Audio-Beacon für Lesezeichen {0} umschalten"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -1512,17 +1517,17 @@ msgstr "Bringt den Fokus zurück zur Abenteuerkarte oder zum Kampfraster, wenn e
 
 #. Actions.UiCarry
 msgctxt "Actions.UiCarry"
-msgid "Start drag"
+msgid "Start Drag"
 msgstr "Ziehen beginnen"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
-msgid "Decrease slider by 10%"
+msgid "Decrease Slider By 10%"
 msgstr "Regler um 10 % verringern"
 
 #. Actions.UiCoarseIncrease
 msgctxt "Actions.UiCoarseIncrease"
-msgid "Increase slider by 10%"
+msgid "Increase Slider By 10%"
 msgstr "Regler um 10 % erhöhen"
 
 #. Actions.UiDown
@@ -1567,7 +1572,7 @@ msgstr "Nach links"
 
 #. Actions.UiLeftClick
 msgctxt "Actions.UiLeftClick"
-msgid "Left click or complete drag"
+msgid "Left Click Or Complete Drag"
 msgstr "Linksklick oder Ziehen abschließen"
 
 #. Actions.UiNext
@@ -1597,12 +1602,12 @@ msgstr "Nach rechts"
 
 #. Actions.UiRightClick
 msgctxt "Actions.UiRightClick"
-msgid "Right click"
+msgid "Right Click"
 msgstr "Rechtsklick"
 
 #. Actions.UiClearSearch
 msgctxt "Actions.UiClearSearch"
-msgid "Clear typeahead"
+msgid "Clear Typeahead"
 msgstr "Schnellsuche löschen"
 
 #. Actions.UiUp
@@ -3273,7 +3278,7 @@ msgstr "Kaufen"
 
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"
-msgid "Describe map"
+msgid "Describe Map"
 msgstr "Karte beschreiben"
 
 #. Actions.Dismiss
@@ -3868,12 +3873,12 @@ msgstr "{0} ausgewählt"
 
 #. Actions.ScannerNextCustomEntry
 msgctxt "Actions.ScannerNextCustomEntry"
-msgid "Move to next result in custom category {0}"
+msgid "Move To Next Result In Custom Category {0}"
 msgstr "Zum nächsten Ergebnis in eigener Kategorie {0}"
 
 #. Actions.ScannerPreviousCustomEntry
 msgctxt "Actions.ScannerPreviousCustomEntry"
-msgid "Move to previous result in custom category {0}"
+msgid "Move To Previous Result In Custom Category {0}"
 msgstr "Zum vorherigen Ergebnis in eigener Kategorie {0}"
 
 #. Screens.CustomCategoryName
@@ -4274,7 +4279,7 @@ msgstr "Machtträger einquartieren"
 
 #. Actions.DescribeBattlefield
 msgctxt "Actions.DescribeBattlefield"
-msgid "Describe battlefield"
+msgid "Describe Battlefield"
 msgstr "Schlachtfeld beschreiben"
 
 #. Screens.Description

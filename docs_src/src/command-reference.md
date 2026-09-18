@@ -73,7 +73,7 @@ These four keys never leave the table the cursor is in, and do nothing outside o
 | `Enter`             | Primary tile action                 |
 | `Backslash`         | Secondary tile action               |
 | `A`                 | Summarize reachable entities        |
-| `D`                 | Describe cursor position and map size |
+| `Ctrl+D`            | Describe cursor position and map size |
 | `P`                 | Play a [sonar sweep](audio.md#sonar-sweep) of nearby entities |
 | `W`                 | Select next wielder                 |
 | `S`                 | Select next settlement              |

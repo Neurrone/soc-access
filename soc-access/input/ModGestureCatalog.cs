@@ -159,6 +159,7 @@ namespace SongsOfConquestAccess.Input
                 AccessibilityActions.ScannerPreviousInstance,
                 AccessibilityActions.ScannerNextInstance,
                 AccessibilityActions.ScannerJumpToResult,
+                AccessibilityActions.ScannerJumpToResultAlternate,
                 AccessibilityActions.ScannerSpeakDistanceAndDirection,
                 AccessibilityActions.ScannerReturnFromJump,
                 AccessibilityActions.ScannerNextCustomEntryComma,
@@ -200,10 +201,10 @@ namespace SongsOfConquestAccess.Input
                 AccessibilityActions.SummarizeEnemyResources,
             }));
 
-            // Last, and forty rows long: four gestures per bookmark slot.
+            // Last, and forty rows long: four gestures per bookmark slot, the jumps first.
             List<InputAction> bookmarks = new List<InputAction>();
-            bookmarks.AddRange(AccessibilityActions.SaveBookmarks);
             bookmarks.AddRange(AccessibilityActions.JumpToBookmarks);
+            bookmarks.AddRange(AccessibilityActions.SaveBookmarks);
             bookmarks.AddRange(AccessibilityActions.SpeakBookmarkDirections);
             bookmarks.AddRange(AccessibilityActions.ToggleBookmarkBeacons);
             groups.Add(new Group(ModStrings.Screens.Bookmarks, bookmarks.ToArray()));

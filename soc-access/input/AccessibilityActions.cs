@@ -120,8 +120,9 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction SummarizeReachableEntities = OneShot("summarize_reachable_entities", ModStrings.Actions.SummarizeReachableEntities, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.A));
 
+        /// <summary>Ctrl+D, the chord <see cref="DescribeBattlefield"/> has in combat.</summary>
         public static readonly InputAction DescribePosition = OneShot("describe_position", ModStrings.Actions.DescribePosition, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.D));
+            .AddBinding(new KeyboardBinding(Key.D, ctrl: true));
 
         public static readonly InputAction SonarSweep = OneShot("sonar_sweep", ModStrings.Actions.SonarSweep, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.P));
@@ -166,9 +167,12 @@ namespace SongsOfConquestAccess.Input
             .AddBinding(new KeyboardBinding(Key.PageDown, alt: true));
 
         public static readonly InputAction ScannerJumpToResult = OneShot("scanner_jump_to_result", ModStrings.Actions.ScannerJumpToResult, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.Home))
-            // J mirrors Home so the jump sits next to the comma, period, and
-            // slash category keys and the pair can be worked with one hand.
+            .AddBinding(new KeyboardBinding(Key.Home));
+
+        /// <summary>J mirrors Home so the jump sits next to the comma, period, and slash category
+        /// keys and the pair can be worked with one hand. An action of its own because a Keybinds
+        /// row shows and captures one chord.</summary>
+        public static readonly InputAction ScannerJumpToResultAlternate = OneShot("scanner_jump_to_result_alternate", ModStrings.Actions.ScannerJumpToResultAlternate, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.J));
 
         public static readonly InputAction ScannerSpeakDistanceAndDirection = OneShot("scanner_speak_distance_and_direction", ModStrings.Actions.ScannerSpeakDistanceAndDirection, InputClaimScope.FocusedWidget)
@@ -557,6 +561,7 @@ namespace SongsOfConquestAccess.Input
                 ScannerPreviousInstance,
                 ScannerNextInstance,
                 ScannerJumpToResult,
+                ScannerJumpToResultAlternate,
                 ScannerSpeakDistanceAndDirection,
                 ScannerReturnFromJump,
                 ScannerLookAround,
