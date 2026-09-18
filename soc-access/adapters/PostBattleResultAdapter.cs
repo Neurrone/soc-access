@@ -39,6 +39,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo LootEntryMainTransformField = AccessTools.Field(typeof(PostBattleLootEntry), "_mainTransform");
         private static readonly FieldInfo TroopInstancesField = AccessTools.Field(typeof(PostBattleMenu), "_troopInstances");
         private static readonly FieldInfo LootContainerActiveEntriesField = AccessTools.Field(typeof(PostBattleLootContainer), "_activeEntries");
+        private static readonly FieldInfo PortraitWielderContainerField = AccessTools.Field(typeof(CommanderHUDPortrait), "_wielderPortraitContainer");
 
         private readonly AdventureBattleMenu _battleMenu;
         private readonly PostBattleMenu _menu;
@@ -52,12 +53,27 @@ namespace SongsOfConquestAccess.Adapters
         // its _activeEntries, so counting them is a field read a frame and no walk. Read from the
         // game rather than from a hook saying the animation has ended, which a hot reload in the
         // middle of the page would never send (AGENTS.md, "Screen Resolution").
+        //
+        // A COUNT CANNOT TELL ONE BATTLE FROM THE NEXT, and the adventure scene shows every battle
+        // on the same PostBattleMenu, so the battle's own result object is held beside it: Show
+        // assigns _result per battle (PostBattleMenu ~:298) and Hide leaves it there, so two pages
+        // presenting equal counts are still two results. The loot entries are POOLED rather than
+        // destroyed (PostBattleLootContainer.Despawn/Spawn ~:65-88), so without this a page that
+        // opened with the previous page's counts would speak the previous battle's loot names over
+        // this battle's entries.
         private ResultEntry[] _attackerTroopsLost;
         private ResultEntry[] _defenderTroopsLost;
+        private IBattleResult _troopResult;
         private int _troopInstanceCount = -1;
         private ResultEntry[] _loot;
+        private IBattleResult _lootResult;
         private int _attackerLootCount = -1;
         private int _defenderLootCount = -1;
+
+        // Both lists hold the names the game's own tooltips gave, so they are also let go of when the
+        // language the names were read in is no longer the one the game is in.
+        private ILanguageDefinition _troopLanguage;
+        private ILanguageDefinition _lootLanguage;
 
         // The caption over each troop column is the menu's own "Title" text two levels above the
         // column; it is found once per side, MISS INCLUDED, so a menu that draws none costs one walk
@@ -102,27 +118,34 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(DefenderNameField); }
         }
 
-        // Resolving a portrait walks the menu's parents and the scene root, so each side is looked
-        // for ONCE per menu, hit or miss: a defender without a commander has no portrait to find,
-        // and the search would otherwise run again every frame.
-        private CommanderHudPortraitAdapter _attackerPortrait;
+        // Each side's portrait OBJECT is read off the battle menu's settings once per menu, hit or
+        // miss; the battle menu holds the same two portraits for the whole adventure scene. WHOSE
+        // portrait each one is changes with every battle on those same objects, so the wrapper over it is keyed on the commander the portrait is drawing, read
+        // each time: SetCommander assigns _commander and turns the wielder container on
+        // (CommanderHUDPortrait ~:194-197), while SetEmptyCommander - what AdventureBattleMenu uses
+        // for a neutral defender (~:288) - leaves _commander as the PREVIOUS battle's wielder and
+        // turns that container off (CommanderHUDPortrait ~:245-247). A miss kept for the adapter's
+        // life would cost the defender's portrait in every battle after a neutral one, and the
+        // identity alone would offer the last wielder's portrait for a neutral stack.
+        private CommanderHUDPortrait _attackerPortraitObject;
         private bool _attackerPortraitProbed;
-        private CommanderHudPortraitAdapter _defenderPortrait;
+        private CommanderHudPortraitAdapter _attackerPortrait;
+        private int _attackerPortraitCommanderId = -1;
+        private CommanderHUDPortrait _defenderPortraitObject;
         private bool _defenderPortraitProbed;
+        private CommanderHudPortraitAdapter _defenderPortrait;
+        private int _defenderPortraitCommanderId = -1;
 
         public CommanderHudPortraitAdapter AttackerCommanderPortrait
         {
             get
             {
-                if (!_attackerPortraitProbed)
-                {
-                    _attackerPortraitProbed = true;
-                    _attackerPortrait = BuildCommanderPortrait(
-                        () => AttackerCommanderText,
-                        "AttackerCommanderHudPortrait");
-                }
-
-                return _attackerPortrait;
+                return SyncCommanderPortrait(
+                    ref _attackerPortraitObject,
+                    ref _attackerPortraitProbed,
+                    ref _attackerPortrait,
+                    ref _attackerPortraitCommanderId,
+                    attacker: true);
             }
         }
 
@@ -130,15 +153,12 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (!_defenderPortraitProbed)
-                {
-                    _defenderPortraitProbed = true;
-                    _defenderPortrait = BuildCommanderPortrait(
-                        () => DefenderCommanderText,
-                        "DefenderCommanderHudPortrait");
-                }
-
-                return _defenderPortrait;
+                return SyncCommanderPortrait(
+                    ref _defenderPortraitObject,
+                    ref _defenderPortraitProbed,
+                    ref _defenderPortrait,
+                    ref _defenderPortraitCommanderId,
+                    attacker: false);
             }
         }
 
@@ -251,35 +271,49 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        /// <summary>Let go of both troop columns when the menu has made another entry. The menu keeps
-        /// ONE list for the two sides - <c>ShowTroop</c> adds to <c>_troopInstances</c> whichever
-        /// parent it draws into - so a stack appearing on either side rebuilds both, which is the
-        /// animation running; once it has stopped adding, neither is walked again.</summary>
+        /// <summary>Let go of both troop columns when the menu has made another entry, or when it is
+        /// showing another battle. The menu keeps ONE list for the two sides - <c>ShowTroop</c> adds
+        /// to <c>_troopInstances</c> whichever parent it draws into - so a stack appearing on either
+        /// side rebuilds both, which is the animation running; once it has stopped adding and the
+        /// result is still the same one, neither is walked again.</summary>
         private void SyncTroopEntries()
         {
+            IBattleResult result = GetResult();
             int count = TroopInstanceCount;
-            if (count == _troopInstanceCount)
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
+            if (count == _troopInstanceCount
+                && ReferenceEquals(result, _troopResult)
+                && ReferenceEquals(language, _troopLanguage))
             {
                 return;
             }
 
+            _troopResult = result;
             _troopInstanceCount = count;
+            _troopLanguage = language;
             _attackerTroopsLost = null;
             _defenderTroopsLost = null;
         }
 
         /// <summary>Let go of the loot when either container's own list of active entries has changed
-        /// length: the menu shows the loot in one of the two and hides the other, and each keeps the
-        /// entries it has spawned.</summary>
+        /// length, or when the menu is showing another battle: the menu shows the loot in one of the
+        /// two and hides the other, and each keeps the entries it has spawned.</summary>
         private void SyncLootEntries()
         {
+            IBattleResult result = GetResult();
             int attacker = ActiveLootCount(Reflect.Get<PostBattleLootContainer>(_menu, AttackerLootContainerField));
             int defender = ActiveLootCount(Reflect.Get<PostBattleLootContainer>(_menu, DefenderLootContainerField));
-            if (attacker == _attackerLootCount && defender == _defenderLootCount)
+            ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
+            if (attacker == _attackerLootCount
+                && defender == _defenderLootCount
+                && ReferenceEquals(result, _lootResult)
+                && ReferenceEquals(language, _lootLanguage))
             {
                 return;
             }
 
+            _lootResult = result;
+            _lootLanguage = language;
             _attackerLootCount = attacker;
             _defenderLootCount = defender;
             _loot = null;
@@ -390,23 +424,74 @@ namespace SongsOfConquestAccess.Adapters
             return Reflect.Get<IBattleResult>(_menu, PostBattleMenuResultField);
         }
 
-        private CommanderHudPortraitAdapter BuildCommanderPortrait(Func<string> getName, string settingsFieldName)
+        /// <summary>The wrapper over one side's portrait, made afresh whenever the portrait has been
+        /// handed a different commander - or none - since it was last asked. The walk that finds the
+        /// portrait object stays behind <paramref name="probed"/>; what runs every frame is one field
+        /// read and one active flag.</summary>
+        private CommanderHudPortraitAdapter SyncCommanderPortrait(
+            ref CommanderHUDPortrait portrait,
+            ref bool probed,
+            ref CommanderHudPortraitAdapter adapter,
+            ref int seenCommanderId,
+            bool attacker)
         {
-            CommanderHUDPortrait portrait = GetBattleMenuSettingsField<CommanderHUDPortrait>(settingsFieldName);
-            if (portrait == null)
+            if (!probed)
             {
-                portrait = ResolveCommanderPortraitByName(settingsFieldName);
+                probed = true;
+                string settingsFieldName = attacker
+                    ? "AttackerCommanderHudPortrait"
+                    : "DefenderCommanderHudPortrait";
+                portrait = GetBattleMenuSettingsField<CommanderHUDPortrait>(settingsFieldName);
+                if (portrait == null)
+                {
+                    // No portrait node rather than a guessed one: nothing else in the scene says
+                    // which side a CommanderHUDPortrait belongs to. Once per menu, behind the probe.
+                    SocAccessMod.Instance?.LogWarning(
+                        "The battle menu's settings hold no " + settingsFieldName + "; the post-battle page has no portrait for that side");
+                }
             }
 
+            int commanderId = ShownCommanderId(portrait);
+            if (commanderId != seenCommanderId)
+            {
+                seenCommanderId = commanderId;
+                adapter = commanderId < 0 ? null : BuildCommanderPortrait(portrait, attacker);
+            }
+
+            return adapter;
+        }
+
+        /// <summary>The commander the portrait is DRAWING, or -1 where it draws none. The game keeps
+        /// whatever commander it was last given in <c>_commander</c> and says "no commander" by
+        /// switching the wielder container off instead, which is all <c>SetEmptyCommander</c> does
+        /// about it.</summary>
+        private static int ShownCommanderId(CommanderHUDPortrait portrait)
+        {
             if (portrait == null || portrait.Commander == null)
             {
-                return null;
+                return -1;
             }
 
+            GameObject container = Reflect.Get<GameObject>(portrait, PortraitWielderContainerField);
+            return container != null && !container.activeSelf ? -1 : portrait.Commander.Id;
+        }
+
+        private CommanderHudPortraitAdapter BuildCommanderPortrait(CommanderHUDPortrait portrait, bool attacker)
+        {
             UIButton button = CommanderHudPortraitAdapter.GetButton(portrait);
             if (button == null)
             {
                 return null;
+            }
+
+            Func<string> getName;
+            if (attacker)
+            {
+                getName = () => AttackerCommanderText;
+            }
+            else
+            {
+                getName = () => DefenderCommanderText;
             }
 
             return new CommanderHudPortraitAdapter(
@@ -415,39 +500,6 @@ namespace SongsOfConquestAccess.Adapters
                 button,
                 _localization,
                 () => IsPresent());
-        }
-
-        private CommanderHUDPortrait ResolveCommanderPortraitByName(string settingsFieldName)
-        {
-            if (_menu == null)
-            {
-                return null;
-            }
-
-            CommanderHUDPortrait[] portraits = _menu.GetComponentsInParent<CommanderHUDPortrait>(true);
-            if (portraits != null && portraits.Length > 0)
-            {
-                return portraits[0];
-            }
-
-            Transform root = _menu.transform != null ? _menu.transform.root : null;
-            if (root == null)
-            {
-                return null;
-            }
-
-            CommanderHUDPortrait[] candidates = root.GetComponentsInChildren<CommanderHUDPortrait>(true);
-            if (candidates == null || candidates.Length == 0)
-            {
-                return null;
-            }
-
-            if (settingsFieldName.IndexOf("Defender", StringComparison.OrdinalIgnoreCase) >= 0 && candidates.Length > 1)
-            {
-                return candidates[1];
-            }
-
-            return candidates[0];
         }
 
         private ResultEntry[] BuildTroopEntries(FieldInfo parentField)
