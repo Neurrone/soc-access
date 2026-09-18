@@ -33,8 +33,8 @@ namespace SongsOfConquestAccess.UI
     /// </summary>
     public sealed class AdventureMapGrid
     {
-        private const int DefaultLookAroundRadius = 15;
         private const int MinimumLookAroundRadius = 5;
+        private const int DefaultLookAroundRadius = MinimumLookAroundRadius;
         private const int MaximumLookAroundRadius = 30;
         private const int LookAroundRadiusStep = 5;
 
