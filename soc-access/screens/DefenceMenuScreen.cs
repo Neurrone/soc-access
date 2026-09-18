@@ -95,10 +95,17 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>A dialog or a sub-page covers the defence menu rather than closing it, and the cursor comes back to the control that opened it.</summary>
+        /// <summary>A sub-page covers the defence menu rather than closing it, and the cursor comes
+        /// back to the control that opened it - but only then. Read from the game at the pop, which is
+        /// the same tick the defence panel went away: the two places that deactivate it
+        /// (<c>DefenceMenu.HandlePurchaseTroopsClicked</c>, <c>HandleUpgradeTroopsClicked</c>) show
+        /// the sub-page in the same call, so the menu still standing with one of its own pages drawn
+        /// is what tells a cover apart from a close. The menu closing takes the cursor with it, so the
+        /// next settlement starts at the top rather than on the slot the last one was left on.
+        /// </summary>
         public override bool KeepStateOnPop
         {
-            get { return true; }
+            get { return Live != null && (Live.IsDraftPresent() || Live.IsUpgradePresent()); }
         }
 
         public override void Build(GraphBuilder builder)
