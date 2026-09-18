@@ -882,7 +882,7 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the objectives ----
 
-        private static void BuildObjectives(GraphBuilder builder, AdventureHudAdapter hud)
+        private void BuildObjectives(GraphBuilder builder, AdventureHudAdapter hud)
         {
             if (!hud.IsObjectivesMenuVisible())
             {
@@ -905,7 +905,17 @@ namespace SongsOfConquestAccess.Screens
                     hud.GetObjectiveTooltip(index));
                 vtable.Announcements[0].Live = true;
                 vtable.OnFocusVisual = () => hud.FocusObjective(index);
-                vtable.OnBlurVisual = hud.UnfocusObjective;
+                // Resolved through Live rather than over the captured adapter: the navigator runs a
+                // blur off the node it was holding, which after a manual battle has reloaded the
+                // scene is a node over the adapter that went with it.
+                vtable.OnBlurVisual = () =>
+                {
+                    AdventureHudAdapter live = Live != null ? Live.Hud : null;
+                    if (live != null)
+                    {
+                        live.UnfocusObjective();
+                    }
+                };
                 builder.AddItem(new SyntheticNode(ControlId.Structural(ObjectiveKeyPrefix + index), vtable));
             }
 

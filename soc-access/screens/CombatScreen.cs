@@ -853,7 +853,7 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the battle log ----
 
-        private static void BuildBattleLog(GraphBuilder builder, BattleHudAdapter hud)
+        private void BuildBattleLog(GraphBuilder builder, BattleHudAdapter hud)
         {
             IReadOnlyList<string> entries = hud.GetBattleLogEntries();
             if (entries.Count == 0)
@@ -868,7 +868,17 @@ namespace SongsOfConquestAccess.Screens
                 string entry = entries[i];
                 NodeVtable vtable = GraphNodes.Text(() => entry);
                 vtable.OnFocusVisual = hud.FocusBattleLog;
-                vtable.OnBlurVisual = hud.UnfocusBattleLog;
+                // Resolved through Live rather than over the captured adapter: the navigator runs a
+                // blur off the node it was holding, and the battle's adapter is replaced with the
+                // battle.
+                vtable.OnBlurVisual = () =>
+                {
+                    BattleHudAdapter live = Live != null ? Live.Hud : null;
+                    if (live != null)
+                    {
+                        live.UnfocusBattleLog();
+                    }
+                };
                 builder.AddItem(new SyntheticNode(ControlId.Structural(BattleLogKeyPrefix + i), vtable));
             }
 
