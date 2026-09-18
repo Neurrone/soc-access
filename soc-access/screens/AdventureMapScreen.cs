@@ -336,6 +336,10 @@ namespace SongsOfConquestAccess.Screens
         {
             base.OnUpdate();
             Live?.UpdateEvents();
+            // The map changes hands in hot seat without the scene or the adapter changing, so the
+            // cursor's beacons are asked to follow the team in control here, where the listener is
+            // already reading it for the same reason.
+            Grid()?.SyncBeaconTeam();
             WatchTeleportMode();
         }
 

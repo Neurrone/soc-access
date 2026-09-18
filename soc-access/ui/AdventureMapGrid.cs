@@ -46,6 +46,14 @@ namespace SongsOfConquestAccess.UI
         private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
         private int _lookAroundRadius = DefaultLookAroundRadius;
 
+        // The team whose bookmarks the beacons are sounding for. A bookmark file belongs to one team
+        // (AdventureBookmarkGameIdentity.FileName), and in hot seat the map is handed from one player
+        // to the next without the scene, the adapter or this grid being rebuilt, so a beacon the
+        // outgoing player left pinging would go on pointing the incoming one at a tile that is not
+        // theirs - and their own slot key, finding no bookmark of that number, could not silence it.
+        // The team is read from the game and every beacon stopped when it changes (SyncBeaconTeam).
+        private int _beaconTeamId = -1;
+
         // How a landing is read out: the screen hands the readout to the navigator, which composes
         // the map node exactly as it composes a landing on it from the HUD. Never speech of this
         // class's own - see ReadTile.
@@ -690,7 +698,31 @@ namespace SongsOfConquestAccess.UI
 
         private void HydrateBookmarks()
         {
+            SyncBeaconTeam();
             _bookmarks.EnsureLoaded(_adapter != null ? _adapter.GetBookmarkGameIdentity() : null);
+        }
+
+        /// <summary>
+        /// Silence every beacon when the map has changed hands: what they point at is the outgoing
+        /// player's bookmarks, which the incoming one neither owns nor can switch off. The team in
+        /// control is read from the game, never reported by a hook, and the read is one property off
+        /// the facade, so the screen's update asks every frame and a hand-over is silent at the
+        /// moment it happens rather than at the next bookmark gesture.
+        ///
+        /// Handing control BACK leaves the beacons off: a bookmark is a position and nothing else,
+        /// so the file records no beacon of its own to restore, and re-starting them would be the
+        /// mod deciding what the player last wanted rather than reading it.
+        /// </summary>
+        public void SyncBeaconTeam()
+        {
+            int teamId = _adapter != null ? _adapter.LocalTeamId : -1;
+            if (teamId == _beaconTeamId)
+            {
+                return;
+            }
+
+            _beaconTeamId = teamId;
+            _beacons.StopAll();
         }
 
         private static void SpeakNoBookmark()
