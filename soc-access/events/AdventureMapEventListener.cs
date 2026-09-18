@@ -31,7 +31,11 @@ namespace SongsOfConquestAccess.Events
         private readonly PendingAnnouncementLedger _pendingDiscoveries = new PendingAnnouncementLedger();
         private readonly PendingAnnouncementLedger _pendingHiddenWielders = new PendingAnnouncementLedger();
         private readonly HashSet<int> _discoveredMapEntityIds = new HashSet<int>();
-        private readonly Dictionary<int, string> _discoveredMapEntityLabelsById = new Dictionary<int, string>();
+        // What each found entity's NAME IS MADE OF, never the name itself: the game changes language
+        // without a restart, and remembering the words meant every already-found object read
+        // differently after a switch, counted as changed, and was announced again as a new find.
+        // See AdventureMapEntityLabel.GetMapEntityNameSignature.
+        private readonly Dictionary<int, string> _discoveredMapEntityNameSignaturesById = new Dictionary<int, string>();
         private readonly HashSet<int> _knownLocalCommanderIds = new HashSet<int>();
         private readonly HashSet<int> _seenNonLocalCommanderIds = new HashSet<int>();
         private readonly List<int> _staleNonLocalCommanderIds = new List<int>();
@@ -189,7 +193,7 @@ namespace SongsOfConquestAccess.Events
             _lastVisibleNonLocalCommanders.Clear();
             _announcedVisibleNonLocalCommanders.Clear();
             _discoveredMapEntityIds.Clear();
-            _discoveredMapEntityLabelsById.Clear();
+            _discoveredMapEntityNameSignaturesById.Clear();
             _knownLocalCommanderIds.Clear();
             OnMapChanged = null;
             _attached = false;
@@ -480,7 +484,7 @@ namespace SongsOfConquestAccess.Events
 
             ClearPendingDiscoveries();
             _discoveredMapEntityIds.Clear();
-            _discoveredMapEntityLabelsById.Clear();
+            _discoveredMapEntityNameSignaturesById.Clear();
             _lastVisibleNonLocalCommanders.Clear();
             _announcedVisibleNonLocalCommanders.Clear();
             CaptureDiscoveryBaseline();
@@ -509,7 +513,7 @@ namespace SongsOfConquestAccess.Events
                 if (IsMapEntityKnown(entity))
                 {
                     _discoveredMapEntityIds.Add(entity.Id);
-                    _discoveredMapEntityLabelsById[entity.Id] = GetMapEntityName(entity);
+                    _discoveredMapEntityNameSignaturesById[entity.Id] = GetMapEntityNameSignature(entity);
                 }
             }
         }
@@ -583,23 +587,27 @@ namespace SongsOfConquestAccess.Events
                 return false;
             }
 
+            // What the entity is NAMED FROM, asked before the name itself: an entity already found
+            // and still named from the same things is not news, whatever language the words are in,
+            // and reading the name is the expensive half.
+            string signature = GetMapEntityNameSignature(entity);
+            bool alreadyDiscovered = _discoveredMapEntityIds.Contains(entity.Id);
+            string previousSignature;
+            if (alreadyDiscovered
+                && _discoveredMapEntityNameSignaturesById.TryGetValue(entity.Id, out previousSignature)
+                && string.Equals(previousSignature, signature, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
             string label = GetMapEntityName(entity);
             if (string.IsNullOrWhiteSpace(label))
             {
                 return false;
             }
 
-            bool alreadyDiscovered = _discoveredMapEntityIds.Contains(entity.Id);
-            string previousLabel;
-            if (alreadyDiscovered
-                && _discoveredMapEntityLabelsById.TryGetValue(entity.Id, out previousLabel)
-                && LabelsMatch(previousLabel, label))
-            {
-                return false;
-            }
-
             _discoveredMapEntityIds.Add(entity.Id);
-            _discoveredMapEntityLabelsById[entity.Id] = label;
+            _discoveredMapEntityNameSignaturesById[entity.Id] = signature;
             string discoveryKey = EntityDiscoveryKey(entity.Id);
             if (alreadyDiscovered)
             {
@@ -898,7 +906,7 @@ namespace SongsOfConquestAccess.Events
                 {
                     RemovePendingDiscovery(key);
                     _discoveredMapEntityIds.Remove(entry.StableReference);
-                    _discoveredMapEntityLabelsById.Remove(entry.StableReference);
+                    _discoveredMapEntityNameSignaturesById.Remove(entry.StableReference);
                     continue;
                 }
 
@@ -917,7 +925,10 @@ namespace SongsOfConquestAccess.Events
                 if (labelChanged)
                 {
                     _pendingDiscoveries.ReplaceLabel(key, label);
-                    _discoveredMapEntityLabelsById[entry.StableReference] = label;
+                    // The queued find is spoken with the name as it reads now, so what it is named
+                    // from now is what the next sweep must compare against.
+                    _discoveredMapEntityNameSignaturesById[entry.StableReference] =
+                        GetMapEntityNameSignature(entity);
                 }
             }
         }
@@ -1109,6 +1120,11 @@ namespace SongsOfConquestAccess.Events
         private string GetMapEntityName(IMapEntity entity)
         {
             return AdventureMapEntityLabel.GetMapEntityName(_facade, _selectionHandler, _localizationHandler, entity);
+        }
+
+        private string GetMapEntityNameSignature(IMapEntity entity)
+        {
+            return AdventureMapEntityLabel.GetMapEntityNameSignature(_facade, entity);
         }
 
         /// <summary>

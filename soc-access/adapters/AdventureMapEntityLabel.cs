@@ -59,6 +59,43 @@ namespace SongsOfConquestAccess.Adapters
             return AddEssenceVariant(localization, entity, entity.NameKey);
         }
 
+        /// <summary>
+        /// Everything <see cref="GetMapEntityName"/> reads for the name EXCEPT the language: the
+        /// keys it can name the entity from, the essence variant it appends and the scouting detail
+        /// the game answers for the entity's tile, which is what turns "battle loot" into the
+        /// artifacts themselves. Two reads that agree here name the entity the same thing in
+        /// whatever language is current, so a caller that remembers a name can tell a real change
+        /// from a translated one. The scouting PROVIDER is deliberately left out: it names whichever
+        /// friendly unit happens to be nearest and changes with nearly every step, while what the
+        /// entity is called does not turn on it.
+        /// </summary>
+        public static string GetMapEntityNameSignature(IClientAdventureFacade facade, IMapEntity entity)
+        {
+            if (entity == null)
+            {
+                return string.Empty;
+            }
+
+            string customNameKey;
+            if (!entity.TryGetCustomNameKey(out customNameKey))
+            {
+                customNameKey = string.Empty;
+            }
+
+            EssenceType essence;
+            int essenceVariant = TryGetSelectedEssenceVariant(entity, out essence) ? (int)essence : -1;
+            return string.Concat(
+                customNameKey ?? string.Empty,
+                "|",
+                entity.NameKey ?? string.Empty,
+                "|",
+                entity.Name ?? string.Empty,
+                "|",
+                (int)GetScouting(facade, entity).DetailLevel,
+                "|",
+                essenceVariant);
+        }
+
         public static bool TryGetPreVisitLabel(
             IClientAdventureFacade facade,
             ISelectionHandler selectionHandler,
