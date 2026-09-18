@@ -27,8 +27,13 @@ namespace SongsOfConquestAccess.Adapters
     {
         private const int CombatNarrationBatchFrames = 15;
 
+        /// <summary>How many bacteria texts may wait to be matched. The game shows nothing for a
+        /// troop whose view or head node has gone, so an entry can be left standing; the oldest is
+        /// dropped rather than letting a battle's worth of them pile up.</summary>
+        private const int MaxSuppressedNativeNotifications = 16;
+
         private static readonly CombatNarrationPlanner Planner = new CombatNarrationPlanner();
-        private static readonly Queue<string> SuppressedNativeNotifications = new Queue<string>();
+        private static readonly List<string> SuppressedNativeNotifications = new List<string>();
         private static int _currentTurnTroopId = -1;
         private static bool _flushPendingEventsScheduled;
         private static CombatAdapter _activeAdapter;
@@ -143,9 +148,15 @@ namespace SongsOfConquestAccess.Adapters
         public static void NotifyBacteriaAddedStarted(int troopId, string localizedText)
         {
             string text = SpokenLines.Clean(localizedText);
-            if (!string.IsNullOrWhiteSpace(text))
+            if (string.IsNullOrWhiteSpace(text))
             {
-                SuppressedNativeNotifications.Enqueue(text);
+                return;
+            }
+
+            SuppressedNativeNotifications.Add(text);
+            if (SuppressedNativeNotifications.Count > MaxSuppressedNativeNotifications)
+            {
+                SuppressedNativeNotifications.RemoveAt(0);
             }
         }
 
@@ -1243,18 +1254,24 @@ namespace SongsOfConquestAccess.Adapters
             return points;
         }
 
+        /// <summary>
+        /// Take the notification's own text out of what is waiting to be suppressed, and only that:
+        /// the bacteria prefix queues a text before the game decides whether to draw it, and the
+        /// game draws nothing for a troop whose view or head node is gone (a stack killed by the
+        /// same effect). Draining everything ahead of the match fed that orphan to the next
+        /// unrelated HUD notification, which was silenced, and left a genuine bacteria panel later
+        /// on to be announced twice - the very duplicate this queue exists to prevent.
+        /// </summary>
         private static bool ConsumeSuppressedNativeNotification(string text)
         {
-            while (SuppressedNativeNotifications.Count > 0)
+            int at = SuppressedNativeNotifications.IndexOf(text);
+            if (at < 0)
             {
-                string suppressed = SuppressedNativeNotifications.Dequeue();
-                if (string.Equals(suppressed, text, StringComparison.Ordinal))
-                {
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            SuppressedNativeNotifications.RemoveAt(at);
+            return true;
         }
 
         private static void PublishEvent(IAccessibilityEvent accessibilityEvent)
