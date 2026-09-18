@@ -56,14 +56,22 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     TroopDeploymentAnnouncementDefinitions.TileKeys.Impassable,
                     ModText.Get(ModStrings.Spatial.Impassable));
             }
-
-            if (!tile.IsImpassable && (tile.Elevation > 0 || tile.Kind == BattlefieldCellKind.Unreachable))
+            else if (tile.Kind == BattlefieldCellKind.Cliff)
             {
-                // A cliff, a wall, a tower or a flight of stairs is named by what it is; ordinary
-                // raised ground is named by its height alone. Unreachable ground is named at any
-                // height, since the pocket it belongs to is mostly at height 0. A cell nothing can
-                // enter says no height at all: how high a blocked hex stands is no use to a player
-                // who can never put a troop on it.
+                yield return new AnnouncementPart(
+                    TroopDeploymentAnnouncementDefinitions.TileKeys.Impassable,
+                    BattlefieldText.CellCliff());
+            }
+
+            if (!tile.IsImpassable
+                && tile.Kind != BattlefieldCellKind.Cliff
+                && (tile.Elevation > 0 || tile.Kind == BattlefieldCellKind.Unreachable))
+            {
+                // A wall, a tower or a flight of stairs is named by what it is; ordinary raised
+                // ground is named by its height alone. Unreachable ground is named at any height,
+                // since the pocket it belongs to is mostly at height 0. A cell nothing can enter
+                // says no height at all, a cliff included: how high a blocked hex stands is no use
+                // to a player who can never put a troop on it.
                 string ground = BattlefieldText.CellGround(tile.Kind, tile.Elevation);
                 yield return new AnnouncementPart(
                     TroopDeploymentAnnouncementDefinitions.TileKeys.Elevation,

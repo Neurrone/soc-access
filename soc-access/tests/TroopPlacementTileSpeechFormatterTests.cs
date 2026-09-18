@@ -69,7 +69,7 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void DescribeTileNamesACliffAndTheSiegeStructuresInsteadOfElevatedGround()
         {
-            Assert.AreEqual("cliff, height 2, 1, 0", Describe(null, Ground(BattlefieldCellKind.Cliff, 2)));
+            Assert.AreEqual("cliff, impassable, 1, 0", Describe(null, Ground(BattlefieldCellKind.Cliff, 2)));
             Assert.AreEqual("wall, height 2, 1, 0", Describe(null, Ground(BattlefieldCellKind.Wall, 2)));
             Assert.AreEqual("tower, height 3, 1, 0", Describe(null, Ground(BattlefieldCellKind.Tower, 3)));
             Assert.AreEqual("stairs, height 1, 1, 0", Describe(null, Ground(BattlefieldCellKind.Stairs, 1)));

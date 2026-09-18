@@ -4312,11 +4312,6 @@ msgctxt "Screens.NoBattlefieldDescription"
 msgid "No description for this battlefield"
 msgstr "Sem descrição para este campo de batalha"
 
-#. Spatial.CliffHeight
-msgctxt "Spatial.CliffHeight"
-msgid "cliff, height {0}"
-msgstr "penhasco, altura {0}"
-
 #. Spatial.StairsHeight
 msgctxt "Spatial.StairsHeight"
 msgid "stairs, height {0}"

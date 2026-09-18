@@ -419,6 +419,16 @@ namespace SongsOfConquestAccess.UI
                 : ModText.Get(ModStrings.Spatial.ImpassableObstacle, word);
         }
 
+        /// <summary>What the cursor says about a cliff cell, worded the way a named obstacle is:
+        /// "cliff, impassable", with no height. The game calls the cell walkable, and no walk,
+        /// teleport, push or summon can put a troop on it, so how high it stands is no use.</summary>
+        public static string CellCliff()
+        {
+            return ModText.Get(
+                ModStrings.Spatial.ImpassableObstacle,
+                ModText.Get(ModStrings.Scanner.TerrainCliff));
+        }
+
         /// <summary>What a whole cell of one obstacle is called: the plural where a cell holds many
         /// of them - boulders, bushes - and the singular where it holds one, a statue, a torch or a
         /// gatepost. The cursor is a label rather than a sentence, so the noun is bare: "gatepost,
@@ -621,16 +631,15 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>What the cursor says about the ground of one cell, where the kind alone answers
-        /// it: a cliff, unreachable ground, a wall, a tower, stairs. Ordinary raised ground and flat
-        /// ground are not here - the tile formatters say those from the elevation itself. The one
-        /// answer with no height in it is unreachable ground, which no troop will ever be standing
-        /// on, and which is the only one of these a cell at height 0 can be.</summary>
+        /// it: unreachable ground, a wall, a tower, stairs. Ordinary raised ground and flat ground
+        /// are not here - the tile formatters say those from the elevation itself - and neither is
+        /// a cliff, which is said as blocked ground (<see cref="CellCliff"/>). The one answer with
+        /// no height in it is unreachable ground, which no troop will ever be standing on, and
+        /// which is the only one of these a cell at height 0 can be.</summary>
         public static string CellGround(BattlefieldCellKind kind, int elevation)
         {
             switch (kind)
             {
-                case BattlefieldCellKind.Cliff:
-                    return ModText.Get(ModStrings.Spatial.CliffHeight, elevation);
                 case BattlefieldCellKind.Unreachable:
                     return ModText.Get(ModStrings.Spatial.Unreachable);
                 case BattlefieldCellKind.Wall:

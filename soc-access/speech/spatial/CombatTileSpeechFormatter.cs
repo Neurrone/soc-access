@@ -220,6 +220,12 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     CombatAnnouncementDefinitions.TileKeys.Impassable,
                     string.IsNullOrEmpty(impassable) ? ModText.Get(ModStrings.Spatial.Impassable) : impassable);
             }
+            else if (tile.Kind == BattlefieldCellKind.Cliff)
+            {
+                yield return new AnnouncementPart(
+                    CombatAnnouncementDefinitions.TileKeys.Impassable,
+                    BattlefieldText.CellCliff());
+            }
 
             string tileEffects = DescribeTileEffects(tile);
             if (!string.IsNullOrWhiteSpace(tileEffects))
@@ -227,13 +233,15 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 yield return new AnnouncementPart(CombatAnnouncementDefinitions.TileKeys.TileEffects, tileEffects);
             }
 
-            if (!tile.IsImpassable && (tile.Elevation > 0 || tile.Kind == BattlefieldCellKind.Unreachable))
+            if (!tile.IsImpassable
+                && tile.Kind != BattlefieldCellKind.Cliff
+                && (tile.Elevation > 0 || tile.Kind == BattlefieldCellKind.Unreachable))
             {
-                // A cliff, a wall, a tower or a flight of stairs is named by what it is; ordinary
-                // raised ground is named by its height alone. Unreachable ground is named at any
-                // height, since the pocket it belongs to is mostly at height 0. A cell nothing can
-                // enter says no height at all: how high a gatepost or a boulder stands is no use to
-                // a player who can never put a troop on it.
+                // A wall, a tower or a flight of stairs is named by what it is; ordinary raised
+                // ground is named by its height alone. Unreachable ground is named at any height,
+                // since the pocket it belongs to is mostly at height 0. A cell nothing can enter
+                // says no height at all, a cliff included: how high a gatepost or a boulder stands
+                // is no use to a player who can never put a troop on it.
                 string ground = BattlefieldText.CellGround(tile.Kind, tile.Elevation);
                 yield return new AnnouncementPart(
                     CombatAnnouncementDefinitions.TileKeys.Elevation,

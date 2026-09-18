@@ -799,11 +799,6 @@ msgctxt "Spatial.Campfire"
 msgid "Campfire"
 msgstr ""
 
-#. Spatial.CliffHeight
-msgctxt "Spatial.CliffHeight"
-msgid "cliff, height {0}"
-msgstr ""
-
 #. Spatial.Commander
 msgctxt "Spatial.Commander"
 msgid "Commander"

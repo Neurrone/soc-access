@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Audio;
+using SongsOfConquestAccess.Battlefields;
 using SongsOfConquestAccess.Scanner;
 using UnityEngine;
 
@@ -351,15 +352,35 @@ namespace SongsOfConquestAccess.Tests
             CollectionAssert.AreEqual(new[] { 0f, 0f }, ToSemitones(cues));
         }
 
+        /// <summary>Ground no troop will ever stand on thuds and never sounds its height, on either
+        /// board: a raised obstacle, a cliff, unreachable ground. How high it is tells the player
+        /// nothing, and the readout says no height for it either.</summary>
         [TestMethod]
-        public void ObstacleOnElevatedCombatTileStacksTheElevationCue()
+        public void GroundNoTroopCanStandOnThudsWithoutTheElevationCue()
         {
-            CombatTile tile = new CombatTile(new Vector2Int(1, 1)) { IsImpassable = true, Elevation = 3 };
+            CombatTile[] combat =
+            {
+                new CombatTile(new Vector2Int(1, 1)) { IsImpassable = true, Elevation = 3 },
+                new CombatTile(new Vector2Int(1, 2)) { Kind = BattlefieldCellKind.Cliff, Elevation = 2 },
+                new CombatTile(new Vector2Int(1, 3)) { Kind = BattlefieldCellKind.Unreachable, Elevation = 1 }
+            };
+            TroopPlacementTile[] placement =
+            {
+                new TroopPlacementTile(new Vector2Int(1, 1)) { IsImpassable = true, Elevation = 3 },
+                new TroopPlacementTile(new Vector2Int(1, 2)) { Kind = BattlefieldCellKind.Cliff, Elevation = 2 },
+                new TroopPlacementTile(new Vector2Int(1, 3)) { Kind = BattlefieldCellKind.Unreachable, Elevation = 1 }
+            };
 
-            IReadOnlyList<TileCue> cues = TileCueSelector.ForCombatTile(tile, isEnemyTroop: false, isActingTroop: false, isThreatened: false);
+            for (int i = 0; i < combat.Length; i++)
+            {
+                IReadOnlyList<TileCue> combatCues = TileCueSelector.ForCombatTile(combat[i], isEnemyTroop: false, isActingTroop: false, isThreatened: false);
+                IReadOnlyList<TileCue> placementCues = TileCueSelector.ForTroopPlacementTile(placement[i], isOwnTroop: false);
 
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexElevation3, CueLibrary.TerrainImpassable }, ToArray(cues));
-            CollectionAssert.AreEqual(new[] { 0f, 0f }, ToSemitones(cues));
+                CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(combatCues));
+                Assert.IsFalse(combatCues[0].FollowsPrevious);
+                CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(placementCues));
+                Assert.IsFalse(placementCues[0].FollowsPrevious);
+            }
         }
 
         [TestMethod]
@@ -412,10 +433,10 @@ namespace SongsOfConquestAccess.Tests
                 isActingTroop: false,
                 isThreatened: true);
             CollectionAssert.AreEqual(
-                new[] { CueLibrary.HexElevation1, CueLibrary.TerrainImpassable },
+                new[] { CueLibrary.TerrainImpassable },
                 ToArray(obstacleCues),
-                "nothing can stand on an obstacle, so the threat over it is not warned");
-            Assert.IsTrue(obstacleCues[1].FollowsPrevious, "the obstacle still waits for the elevation tick");
+                "nothing can stand on an obstacle, so neither the threat over it nor its height is sounded");
+            Assert.IsFalse(obstacleCues[0].FollowsPrevious);
         }
 
         [TestMethod]

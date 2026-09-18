@@ -113,7 +113,8 @@ namespace SongsOfConquestAccess.Audio
             }
 
             List<TileCue> cues = new List<TileCue>(4);
-            string elevation = ElevationCueKey(tile.Elevation);
+            bool enterable = !tile.IsImpassable && !IsOutOfReach(tile.Kind);
+            string elevation = GroundElevationCueKey(enterable, tile.Elevation);
             if (tile.Troop != null || tile.TroopId >= 0)
             {
                 // Occupied tiles never warn, matching the speech formatter.
@@ -134,11 +135,11 @@ namespace SongsOfConquestAccess.Audio
             // nothing can step onto it, which is the whole of what the thud means, and unreachable
             // ground thuds for the same reason - it is walkable and no troop will ever be on it. A
             // wall, a tower and a flight of stairs are walked on and keep their elevation cue.
-            if (tile.IsImpassable || IsOutOfReach(tile.Kind))
+            if (!enterable)
             {
-                // Nothing will ever stand here, so the threat over it is moot: the thud alone.
-                AddElevatedGround(cues, elevation);
-                cues.Add(new TileCue(CueLibrary.TerrainImpassable, 0f, followsPrevious: elevation != null));
+                // Nothing will ever stand here, so the threat over it and the height of it are
+                // both moot: the thud alone.
+                cues.Add(new TileCue(CueLibrary.TerrainImpassable, 0f));
                 return cues;
             }
 
@@ -154,7 +155,7 @@ namespace SongsOfConquestAccess.Audio
             }
 
             List<TileCue> cues = new List<TileCue>(2);
-            string elevation = ElevationCueKey(tile.Elevation);
+            string elevation = GroundElevationCueKey(!tile.IsImpassable && !IsOutOfReach(tile.Kind), tile.Elevation);
             if (tile.Troop != null || tile.TroopId >= 0)
             {
                 AddElevatedGround(cues, elevation);
@@ -187,6 +188,14 @@ namespace SongsOfConquestAccess.Audio
                 default:
                     return CueLibrary.HexElevation3;
             }
+        }
+
+        /// <summary>The elevation cue for a cell's ground. Ground no troop can ever stand on - an
+        /// impassable cell, a cliff, unreachable ground - has none: its height is never said, so it
+        /// is never sounded either, and the thud alone marks it.</summary>
+        private static string GroundElevationCueKey(bool enterable, byte elevation)
+        {
+            return enterable ? ElevationCueKey(elevation) : null;
         }
 
         /// <summary>Ground a troop can walk on and can never be standing on: a cliff, which every

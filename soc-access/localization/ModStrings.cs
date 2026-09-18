@@ -294,7 +294,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Bones = new ModString("Spatial.Bones", "Bones");
             public static readonly ModString Bridge = new ModString("Spatial.Bridge", "Bridge");
             public static readonly ModString Campfire = new ModString("Spatial.Campfire", "Campfire");
-            public static readonly ModString CliffHeight = new ModString("Spatial.CliffHeight", "cliff, height {0}");
             public static readonly ModString Commander = new ModString("Spatial.Commander", "Commander");
             public static readonly ModString CommanderPossessive = new ModString("Spatial.CommanderPossessive", "commander's");
             public static readonly ModString CobblestoneRoad = new ModString("Spatial.CobblestoneRoad", "Cobblestone road");
