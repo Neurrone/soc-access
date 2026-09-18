@@ -62,6 +62,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _actionsFrame = frame;
+            SweepDestroyed();
             List<ActionItem> items = new List<ActionItem>();
             List<PlatformUserButtonEntry> entries = GetUserButtons();
             for (int i = 0; i < entries.Count; i++)
@@ -90,6 +91,38 @@ namespace SongsOfConquestAccess.Adapters
             new Dictionary<PlatformUserButtonEntry, ActionItem>();
         private IReadOnlyList<ActionItem> _actions;
         private int _actionsFrame = -1;
+
+        // The menu destroys every entry it drew each time it opens (decompiled PlatformUserMenu.Show
+        // calls Clear, which destroys them and starts a new list), and this adapter is over the
+        // project container's one menu, so an entry whose object has gone would sit in the table for
+        // the rest of the session. Dead keys go whenever the table has grown by another SweepStep,
+        // which costs one walk per that many new entries.
+        private const int SweepStep = 64;
+        private int _sweepAt = SweepStep;
+
+        private void SweepDestroyed()
+        {
+            if (_actionsByEntry.Count < _sweepAt)
+            {
+                return;
+            }
+
+            List<PlatformUserButtonEntry> destroyed = new List<PlatformUserButtonEntry>();
+            foreach (KeyValuePair<PlatformUserButtonEntry, ActionItem> pair in _actionsByEntry)
+            {
+                if (pair.Key == null)
+                {
+                    destroyed.Add(pair.Key);
+                }
+            }
+
+            for (int i = 0; i < destroyed.Count; i++)
+            {
+                _actionsByEntry.Remove(destroyed[i]);
+            }
+
+            _sweepAt = _actionsByEntry.Count + SweepStep;
+        }
 
         public void HideNativeTooltip()
         {
