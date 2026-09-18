@@ -36,6 +36,11 @@ namespace SongsOfConquestAccess.Events
         private readonly HashSet<int> _seenNonLocalCommanderIds = new HashSet<int>();
         private readonly List<int> _staleNonLocalCommanderIds = new List<int>();
         private int _lastExplorationLength = -1;
+        // The team the memory above belongs to. Every discovery decision is the TEAM IN CONTROL's -
+        // the exploration, the fog and the scouting detail all come from it - and in hot seat the
+        // map changes hands without the listener being rebuilt, so the team is read from the game
+        // and the baseline retaken whenever it changes (SyncDiscoveryTeam).
+        private int _discoveryTeamId = -1;
         private long _lastDiscoverySweepKey;
         private bool _hasDiscoverySweepKey;
         private bool _attached;
@@ -179,6 +184,7 @@ namespace SongsOfConquestAccess.Events
 
             ClearPendingDiscoveries();
             _lastExplorationLength = -1;
+            _discoveryTeamId = -1;
             _hasDiscoverySweepKey = false;
             _lastVisibleNonLocalCommanders.Clear();
             _announcedVisibleNonLocalCommanders.Clear();
@@ -191,6 +197,7 @@ namespace SongsOfConquestAccess.Events
 
         public void Update()
         {
+            SyncDiscoveryTeam();
             FlushPendingDiscoveriesIfReady();
         }
 
@@ -410,6 +417,7 @@ namespace SongsOfConquestAccess.Events
         private void HandleMapEntityCreated(int entityId)
         {
             RaiseMapChanged();
+            SyncDiscoveryTeam();
             IMapEntity entity = _facade != null && _facade.MapEntities != null
                 ? _facade.MapEntities.Get(entityId)
                 : null;
@@ -422,6 +430,7 @@ namespace SongsOfConquestAccess.Events
         private void HandleFogUpdated()
         {
             RaiseMapChanged();
+            SyncDiscoveryTeam();
             int explorationLength = GetLocalExplorationLength();
             if (explorationLength <= 0 || _lastExplorationLength != explorationLength)
             {
@@ -441,9 +450,40 @@ namespace SongsOfConquestAccess.Events
 
         private void CaptureDiscoveryBaseline()
         {
+            _discoveryTeamId = GetLocalTeamId();
             _lastExplorationLength = GetLocalExplorationLength();
             RefreshMapEntityDiscoveryBaseline();
             RefreshNonLocalCommanderVisibilityBaseline();
+        }
+
+        /// <summary>
+        /// THE MEMORY OF WHAT HAS BEEN FOUND BELONGS TO THE TEAM IN CONTROL, not to the listener. In
+        /// hot seat the map is handed from one player to the next without the listener being
+        /// rebuilt, and everything a discovery is decided from - the exploration array, the fog, the
+        /// scouting detail an entity's name comes from - is read for whichever team is in control.
+        /// Carrying one player's memory into the other's turn told the incoming player about every
+        /// object the outgoing one had not yet found, and silenced the ones they had.
+        ///
+        /// So the team is read from the game and, when it changes, the memory is emptied and taken
+        /// again from the new player's own fog - the same baseline <see cref="Attach"/> takes, whose
+        /// meaning is "what is known now is not news". What the incoming player already sees is
+        /// silent, what they find afterwards is announced, and handing the map back takes their
+        /// predecessor's baseline again in exactly the same way.
+        /// </summary>
+        private void SyncDiscoveryTeam()
+        {
+            int teamId = GetLocalTeamId();
+            if (teamId == _discoveryTeamId)
+            {
+                return;
+            }
+
+            ClearPendingDiscoveries();
+            _discoveredMapEntityIds.Clear();
+            _discoveredMapEntityLabelsById.Clear();
+            _lastVisibleNonLocalCommanders.Clear();
+            _announcedVisibleNonLocalCommanders.Clear();
+            CaptureDiscoveryBaseline();
         }
 
         private void RefreshMapEntityDiscoveryBaseline()
