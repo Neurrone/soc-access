@@ -9,11 +9,13 @@ using UnityEngine.UI;
 namespace SongsOfConquestAccess.Adapters
 {
     /// <summary>
-    /// The read the two kingdom overview menus share. Both are a page the game fills once in Show
-    /// and leaves alone until Hide: a title outside the entries, a list of drawn entries, and a list
+    /// The read the two kingdom overview menus share. Both are a page the game fills in Show and
+    /// leaves alone until Hide: a title outside the entries, a list of drawn entries, and a list
     /// of drawn rows under each entry, every text of which is a <see cref="UITextMesh"/> behind a
-    /// private field. Each adapter keeps its own field table and its own item types; only the
-    /// reading is here.
+    /// private field. Hide only deactivates the menu object, and the next Show fills the SAME
+    /// instance again out of the same entry pool, so a read of a page belongs to one opening and
+    /// each adapter keys its snapshot on the menu's own per-opening token. Each adapter keeps its
+    /// own field table and its own item types; only the reading is here.
     /// </summary>
     public static class KingdomOverviewRead
     {

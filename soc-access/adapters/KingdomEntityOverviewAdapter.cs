@@ -6,6 +6,7 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Entities;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -35,6 +36,11 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo CategoryClickMethod =
             AccessTools.Method(typeof(KingdomEntityOverviewCategoryEntry), "HandleCategoryTextClicked");
 
+        /// <summary>The menu's own per-opening token: <c>Show</c> assigns a fresh <c>Async</c> to
+        /// <c>_async</c> before it respawns the entries, and <c>Hide</c> clears it.</summary>
+        private static readonly FieldInfo AsyncField =
+            AccessTools.Field(typeof(KingdomEntityOverviewMenu), "_async");
+
         /// <summary>The six income figures a category draws, in the order
         /// <c>KingdomEntityOverviewCategoryEntry.SetIncomeTexts</c> fills them.</summary>
         private static readonly ResourceType[] IncomeResources =
@@ -62,9 +68,14 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly KingdomEntityOverviewMenu _menu;
 
-        // What the menu drew, read once. The game fills the whole page inside
-        // KingdomEntityOverviewMenu.Show and never touches it again until Hide, which ends this
-        // adapter, so reading the entries every frame re-read a page that cannot change.
+        // What the menu drew, read once PER OPENING. The game fills the whole page inside
+        // KingdomEntityOverviewMenu.Show and never touches it again until Hide, so reading the
+        // entries every frame would re-read a page that cannot change; but Hide only deactivates
+        // the object, and the next Show reuses this same menu instance and respawns the entries
+        // from its pool (so entry identities repeat), which is why the snapshot is keyed on the
+        // opening rather than on the adapter's lifetime.
+        private object _opening;
+        private ILanguageDefinition _language;
         private List<CategoryItem> _categories;
         private string _title;
 
@@ -83,6 +94,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
+                SyncOpening();
                 if (_title == null)
                 {
                     _title = KingdomOverviewRead.FindTitle<
@@ -94,15 +106,40 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>The categories in hierarchy order, which is the order the menu draws them. Read
-        /// off the page once: the game builds it in Show and leaves it alone until Hide.</summary>
+        /// off the page once per opening: the game builds it in Show and leaves it alone until
+        /// Hide.</summary>
         public IReadOnlyList<CategoryItem> GetCategories()
         {
+            SyncOpening();
             if (_categories == null && IsPresent())
             {
                 _categories = ReadCategories();
             }
 
             return (IReadOnlyList<CategoryItem>)_categories ?? NoCategories;
+        }
+
+        /// <summary>Drop what the last opening drew. One field read a frame: the menu's <c>_async</c>
+        /// is the object <c>Show</c> makes for the opening it is about to draw and <c>Hide</c> clears,
+        /// so it differs whenever the page's content can - a close and a reopen, another team's
+        /// kingdom in hot-seat, a Hide and a Show inside one frame. Show refuses to redraw while that
+        /// object is still uncompleted, so there is no refresh in place to key on as well. The
+        /// language is read beside it, because the game re-localizes the drawn page where it stands
+        /// and leaves that object alone.</summary>
+        private void SyncOpening()
+        {
+            object opening = Reflect.Get<object>(_menu, AsyncField);
+            ILocalizationHandler localization = GlobalLocalizationVariables.LocalizationHandler;
+            ILanguageDefinition language = localization != null ? localization.CurrentLanguage : null;
+            if (ReferenceEquals(opening, _opening) && ReferenceEquals(language, _language))
+            {
+                return;
+            }
+
+            _opening = opening;
+            _language = language;
+            _categories = null;
+            _title = null;
         }
 
         private List<CategoryItem> ReadCategories()
@@ -136,7 +173,7 @@ namespace SongsOfConquestAccess.Adapters
                     text != null && text.gameObject.activeInHierarchy));
             }
 
-            // Under ReadCategories, once per menu: the game builds these rows in Show and leaves
+            // Under ReadCategories, once per opening: the game builds these rows in Show and leaves
             // them alone until Hide.
             List<RowItem> rows =
                 KingdomOverviewRead.FindEntries<KingdomEntityOverviewClaimedEntry, RowItem>(entry, BuildRow);
