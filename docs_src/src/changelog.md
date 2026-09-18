@@ -26,7 +26,7 @@ Rewrote the UI to modern mod standards to provide the following features:
 
 ### Controls
 
-- Added support for rebinding mod actions in the new mod options dialog
+- Added support for rebinding mod commands in the new mod options dialog
 - Fixed long-standing bug where `Shift+Tab` would activate multiple times even when only pressed once
 - Commands now respond to either the normal or numpad variants for numeric keys (0-9) and enter
 
@@ -38,7 +38,7 @@ Changes by Rashad:
 - Route preview turn counts now say how long the wait is instead of numbering the turn. A tile you arrive at on the next turn reads as `next turn` rather than `in 2 turns`, and the counts beyond that drop by one to match
 - Setting a wielder's destination now reads the route that will be taken and its cost, for example `Cost: 5 this turn, 12 next turn. Aurelia will move 2n, ne, 2e.`, instead of only naming the destination tile.
 - Setting a destination on something the wielder acts on now names the action after the route, for example `Cost: 5.5 this turn. Aurelia will move 2n, ne and Claim Gold Mine.`
-- Movement costs are now read to two decimal places wherever they are spoken. A cost of 15.5 used to be read as `16` on the adventure map cursor and in the scanner, and anything above 100 was read in exponential form such as `1.2e+02`. A tile costing less than half a point is also no longer read as costing nothing
+- Movement costs are now read to two decimal places wherever they are spoken. A cost of 15.5 used to be read as `16` on the adventure map cursor and in the scanner. A tile costing less than half a point is also no longer read as costing nothing
 
 Other changes:
 
@@ -60,16 +60,10 @@ Changes by Rashad:
 - Scanner readouts now describe the thing that was scanned instead of everything else on its tile. On the adventure map they still say whether the selected wielder can reach it, which you can turn off like any other announcement element
 - Removed the `End` refresh. Scanner results were already being refreshed on every scanner key press. `End` now reads the distance of the result from the cursor, replacing `Shift+Home`
 - `Backspace` now returns the accessibility cursor to the tile it was on before the last scanner or bookmark jump
-- Jumping to a scanner result now reads the tile you land on instead of repeating the result you jumped to first
-- A scanner or bookmark jump to the tile you are already standing on now says `here` instead of falling silent, and it no longer overwrites the tile `Backspace` returns you to
 - Scanner and road directions are now spoken in a short form such as `3ne`. The new `Long directions` mod setting restores the full wording
 - Added custom scanner categories, defined from the scanner tab of the mod settings screen and built from subcategories you pick and keywords you type. The adventure map and battle keep separate sets
 - Added `J` as a second key for jumping the accessibility cursor to the current scanner result, mirroring `Home` so that it and the `,`, `.`, and `/` category keys can be worked with one hand
-- Adventure map terrain is now split into four subcategories with a separate entry per kind of terrain, and decoration blockers are now named rather than being read as `Rough ground`
 - Added merchants to the adventure map scanner
-- Wielders, and other things that belong to a side, now get a separate entry per side instead of being mixed together
-- Battle troops are now grouped by what they are rather than by how much they are worth, and combat results say which troops the acting troop can hit
-- Battle spawn points are now read as a side and whatever stands on them
 
 Other changes:
 
@@ -78,24 +72,20 @@ Other changes:
 
 ### Sounds
 
-- Added a procedural sound system: moving the cursor now plays a short cue for every tile, on the adventure map (roads, open ground, sand, water, trees, impassable and unexplored tiles) and on the battlefield and troop deployment grids (elevation levels 1 to 3, obstacles, troops and threatened tiles)
-- Things on the map play a two-part chord instead of their terrain sound: a category sound for wielders, settlements, resource deposits, and pickups, followed by an `Ally` or `Enemy` marker. Neutral things only play the category sound
-- Added a sonar sweep on `P`: every entity the scanner can see within the look around radius plays its gesture from west to east, positioned by direction and quieter with distance, giving the shape of your surroundings in a few seconds
-- Moving through scanner results now plays each result's sound positioned relative to the cursor. This replaces the "Scanner plays directional beep" setting and its sound file
-- Added an audio glossary, reachable from the new Audio tab in mod settings: play any cue on demand to learn it, and tune each cue's volume, pitch, and duration or disable it
-- A refused move, such as bumping the map edge or a skip that finds nothing, now plays a falling bonk sound
-- Added an [Audio chapter](audio.md) to the documentation consolidating all sound features in one place
+- Added a procedural sound system: moving the cursor now plays a short cue for an empty tile's terrain or a cue for the entity occupying a tile
+- Added a sonar sweep on `P` for the adventure map: every entity the scanner can see within the look around radius plays its sound
+- Moving through scanner results now plays each result's sound positioned relative to the cursor. This replaces the "Scanner plays directional beep" setting
+- Added an audio glossary, reachable from the new Audio tab in mod settings
 
 ### Combat
 
+- All 69 possible Battlefields in troop deployment and combat now have AI written descriptions with information about important terrain features, choke points and spawn points. These descriptions are available in the troop deployment screen and can be read with `Ctrl+D`
 - Buffs, debuffs and restrictions (invulnerable, reloading, magic immunity) are now indicated for troops on the combat grid and in scanner results
 - Improve reliability for reading and display of attack previews and troop tooltips
 - Removed confusing "blocked" indicator which was shown on occupied tiles because they had an infinite travel cost. Impassable terrain is still indicated
-- All 69 possible Battlefields in troop deployment and combat now have AI written descriptions with information about important terrain features, choke points and spawn points. These descriptions are available in the troop deployment screen and can be read with `Ctrl+D`
 - Decorations on battlefield tiles are now read, so a tile that previously just read as "impassable" could read as "gatepost, impassable". This helps with orientation and adds to the ambience of the game.
 - An impassable tile no longer speaks a height. This fixes bugs like "Elevated ground, height 3, impassable" which now reads as "Gatepost, impassable"
 - Choke points are now indicated and can be found in the scanner
-- Updated the scanner to take advantage of this new information. The terrain category lists one item per feature - diagonal ridge of 7 cells, height 1, patch of 12 cells, height 2, cliff of 3 cells
 - Fixed "blocked" being spoken 6 times when a ranged unit's attack is obstructed by elevated terrain
 
 ## V0.7.4
