@@ -23,7 +23,9 @@ namespace SongsOfConquestAccess
         // A weak table keyed on the game's own camera manager: an entry dies with the manager it is
         // keyed on, so nothing here survives a scene change or a hot reload and there is nothing for
         // a Reset to drop. It is on patch-statics.allow for the collection it is, not for what it
-        // holds.
+        // holds - which is the personas' name KEYS and world positions, never their names: the game
+        // changes language without a restart, so a conversation opened in one language is spoken in
+        // whichever is current when a focus is read.
         private static readonly ConditionalWeakTable<AdventureDialogueCameraManager, ConversationTargets> DialogueTargets =
             new ConditionalWeakTable<AdventureDialogueCameraManager, ConversationTargets>();
 
@@ -87,7 +89,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            ConversationTargets targets = BuildConversationTargets(__instance, allPersonas);
+            ConversationTargets targets = BuildConversationTargets(allPersonas);
             DialogueTargets.Remove(__instance);
             DialogueTargets.Add(__instance, targets);
         }
@@ -122,9 +124,15 @@ namespace SongsOfConquestAccess
             }
 
             ConversationTargets targets;
-            if (DialogueTargets.TryGetValue(__instance, out targets) && targets != null && targets.Targets.Count > 0)
+            if (!DialogueTargets.TryGetValue(__instance, out targets) || targets == null)
             {
-                PublishIfTargets(StoryCameraFocusKind.ConversationArea, targets.Targets, entry.Camera.reference, facade);
+                return;
+            }
+
+            List<StoryCameraFocusTarget> resolved = ResolveConversationTargets(__instance, targets);
+            if (resolved.Count > 0)
+            {
+                PublishIfTargets(StoryCameraFocusKind.ConversationArea, resolved, entry.Camera.reference, facade);
             }
         }
 
@@ -221,22 +229,10 @@ namespace SongsOfConquestAccess
             ResetDedupe();
         }
 
-        private static ConversationTargets BuildConversationTargets(
-            AdventureDialogueCameraManager cameraManager,
-            DialogueMenu.PersonaInformation[] personas)
+        private static ConversationTargets BuildConversationTargets(DialogueMenu.PersonaInformation[] personas)
         {
-            List<StoryCameraFocusTarget> targets = new List<StoryCameraFocusTarget>();
-            if (cameraManager == null || personas == null || personas.Length == 0)
-            {
-                return new ConversationTargets(targets);
-            }
-
-            IClientAdventureFacade facade = GetDialogueFacade(cameraManager);
-            object converter = GetDialogueConverter(cameraManager);
-            ILocalizationHandler localizationHandler = GlobalLocalizationVariables.LocalizationHandler;
-            HashSet<string> seen = new HashSet<string>();
-
-            for (int i = 0; i < personas.Length; i++)
+            List<ConversationPersona> conversants = new List<ConversationPersona>();
+            for (int i = 0; personas != null && i < personas.Length; i++)
             {
                 DialogueMenu.PersonaInformation persona = personas[i];
                 if (persona == null || !StoryCameraFocusResolver.IsValidWorldPosition(persona.WorldPosition))
@@ -244,6 +240,35 @@ namespace SongsOfConquestAccess
                     continue;
                 }
 
+                conversants.Add(new ConversationPersona(
+                    persona.NameKey,
+                    persona.NameKeyPluralCount,
+                    persona.WorldPosition));
+            }
+
+            return new ConversationTargets(conversants);
+        }
+
+        /// <summary>Names the conversation's personas in the language that is current now, and the
+        /// tiles they stand on as they are now.</summary>
+        private static List<StoryCameraFocusTarget> ResolveConversationTargets(
+            AdventureDialogueCameraManager cameraManager,
+            ConversationTargets conversation)
+        {
+            List<StoryCameraFocusTarget> targets = new List<StoryCameraFocusTarget>();
+            if (cameraManager == null || conversation == null || conversation.Personas.Count == 0)
+            {
+                return targets;
+            }
+
+            IClientAdventureFacade facade = GetDialogueFacade(cameraManager);
+            object converter = GetDialogueConverter(cameraManager);
+            ILocalizationHandler localizationHandler = GlobalLocalizationVariables.LocalizationHandler;
+            HashSet<string> seen = new HashSet<string>();
+
+            for (int i = 0; i < conversation.Personas.Count; i++)
+            {
+                ConversationPersona persona = conversation.Personas[i];
                 string label = StoryCameraFocusResolver.LocalizeName(
                     localizationHandler,
                     persona.NameKey,
@@ -266,7 +291,7 @@ namespace SongsOfConquestAccess
                 }
             }
 
-            return new ConversationTargets(targets);
+            return targets;
         }
 
         private static IClientAdventureFacade GetDialogueFacade(AdventureDialogueCameraManager manager)
@@ -322,23 +347,48 @@ namespace SongsOfConquestAccess
 
         private sealed class ConversationTargets
         {
-            public ConversationTargets(List<StoryCameraFocusTarget> targets)
+            public ConversationTargets(List<ConversationPersona> personas)
             {
-                Targets = targets ?? new List<StoryCameraFocusTarget>();
+                Personas = personas ?? new List<ConversationPersona>();
             }
 
-            public List<StoryCameraFocusTarget> Targets { get; private set; }
+            public List<ConversationPersona> Personas { get; private set; }
         }
 
+        /// <summary>One persona of a conversation, as the game gave it: a name KEY and where the
+        /// persona stands, nothing localized.</summary>
+        private struct ConversationPersona
+        {
+            public ConversationPersona(string nameKey, int nameKeyPluralCount, Vector3 worldPosition)
+            {
+                NameKey = nameKey ?? string.Empty;
+                NameKeyPluralCount = nameKeyPluralCount;
+                WorldPosition = worldPosition;
+            }
+
+            public string NameKey;
+            public int NameKeyPluralCount;
+            public Vector3 WorldPosition;
+        }
+
+        /// <summary>
+        /// What one focus IS, in terms nothing but the game owns: the kind, the camera point the
+        /// story names and the tiles focused. The names spoken are deliberately not part of it -
+        /// the game changes language without a restart, and a key built from the words would stop
+        /// matching the one the same focus set a moment earlier, announcing it a second time.
+        /// </summary>
         private sealed class StoryCameraFocusKey
         {
-            private StoryCameraFocusKey(StoryCameraFocusKind kind, List<string> targets)
+            private StoryCameraFocusKey(StoryCameraFocusKind kind, string reference, List<string> targets)
             {
                 Kind = kind;
+                Reference = reference ?? string.Empty;
                 Targets = targets ?? new List<string>();
             }
 
             private StoryCameraFocusKind Kind { get; set; }
+
+            private string Reference { get; set; }
 
             private List<string> Targets { get; set; }
 
@@ -352,19 +402,22 @@ namespace SongsOfConquestAccess
                         StoryCameraFocusTarget target = targets[i];
                         if (target != null)
                         {
-                            targetKeys.Add((target.Label ?? string.Empty) + "@" + target.Tile.x + "," + target.Tile.y);
+                            targetKeys.Add(target.Tile.x + "," + target.Tile.y);
                         }
                     }
                 }
 
                 targetKeys.Sort(StringComparer.Ordinal);
-                return new StoryCameraFocusKey(kind, targetKeys);
+                return new StoryCameraFocusKey(kind, reference, targetKeys);
             }
 
             public override bool Equals(object obj)
             {
                 StoryCameraFocusKey other = obj as StoryCameraFocusKey;
-                if (other == null || Kind != other.Kind || Targets.Count != other.Targets.Count)
+                if (other == null
+                    || Kind != other.Kind
+                    || !string.Equals(Reference, other.Reference, StringComparison.Ordinal)
+                    || Targets.Count != other.Targets.Count)
                 {
                     return false;
                 }
