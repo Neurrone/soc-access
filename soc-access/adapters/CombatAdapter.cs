@@ -222,18 +222,23 @@ namespace SongsOfConquestAccess.Adapters
         private Action<bool> _endAbilityTargetingHandler;
         private bool _hasBeenPresent;
         private bool _combatEnded;
-        // The layout this battle is fought on, composed once: an adapter lives exactly as long as
-        // the battle it wraps, and that battle is fought on one map.
+        // The layout this battle is fought on, composed once per map. An adapter lives exactly as
+        // long as the battle it wraps, but the map itself is replaced under it mid-battle by a forced
+        // state (ClientBattleFacade.ReplaceState calls Level.ReplaceMap, which keeps the LEVEL object
+        // and swaps the MapFormat), so the map object the game hands over is what all three of these
+        // are keyed on.
         private string _battlefieldKey;
-        // The ground of that map, analysed once and keyed on the level object the game handed over,
-        // so a level replaced under the adapter is read again. Terrain does not change during a
-        // fight; obstacles an ability creates are entities and are not this.
+        private MapFormat _battlefieldKeyMap;
+        // The ground of that map, analysed once and keyed on it, so a map replaced under the adapter
+        // is read again. Terrain does not change during a fight; obstacles an ability creates are
+        // entities and are not this.
         private BattlefieldTerrain _terrain;
-        private object _terrainLevel;
+        private MapFormat _terrainMap;
         private bool _warnedUnknownRegion;
-        // The three adventure tiles this battle's scenery was built from, read once: a battle is
-        // fought in one place, and the miss is kept too so a battle without them costs one look.
+        // The three adventure tiles this battle's scenery was built from, read once per map: a battle
+        // is fought in one place, and the miss is kept too so a battle without them costs one look.
         private BattlefieldSurroundings _surroundings;
+        private MapFormat _surroundingsMap;
         private bool _surroundingsProbed;
         // This frame's answer to "which enemies reach that tile", for the one tile it was asked
         // about. See BuildEnemyInfluenceSources.
@@ -354,18 +359,33 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The layout this battle is fought on, as
         /// <see cref="Battlefields.BattlefieldDescriptions"/> names it. <c>GetMap</c> is on
         /// <c>IMapProvider</c>, which the level facade implements, so it is a plain call and not a
-        /// reflected one; composed once, since a battle is fought on one map.</summary>
+        /// reflected one - a field read (<c>BattleMapProvider.GetMap</c>), which is why the map it
+        /// answers is the key rather than the battle.</summary>
         public string BattlefieldKey
         {
             get
             {
-                if (_battlefieldKey == null && _facade != null && _facade.Level != null)
+                MapFormat map = CurrentMap();
+                if (map == null)
                 {
-                    _battlefieldKey = BattlefieldKeys.For(_facade.Level.GetMap());
+                    return _battlefieldKey;
+                }
+
+                if (_battlefieldKey == null || !ReferenceEquals(map, _battlefieldKeyMap))
+                {
+                    _battlefieldKeyMap = map;
+                    _battlefieldKey = BattlefieldKeys.For(map);
                 }
 
                 return _battlefieldKey;
             }
+        }
+
+        /// <summary>The map this battle is being fought on right now: one property read and one field
+        /// read, and the identity everything read off the layout is keyed on.</summary>
+        private MapFormat CurrentMap()
+        {
+            return _facade != null && _facade.Level != null ? _facade.Level.GetMap() : null;
         }
 
         private static object ResolveByTypeName(DiContainer container, string typeName)
@@ -599,8 +619,8 @@ namespace SongsOfConquestAccess.Adapters
                 "The description of " + BattlefieldKey + " points at " + placeholder + ", which is no group of ground");
         }
 
-        /// <summary>The ground this battle is fought on, analysed once per level: terrain does not
-        /// change during a fight, so the answer is kept against the level object the game gave and
+        /// <summary>The ground this battle is fought on, analysed once per map: terrain does not
+        /// change during a fight, so the answer is kept against the map object the game gave and
         /// read again only if that object is replaced.</summary>
         public BattlefieldTerrain GetTerrain()
         {
@@ -609,15 +629,15 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            if (_terrain != null && ReferenceEquals(_terrainLevel, _facade.Level))
+            MapFormat map = CurrentMap();
+            if (_terrain != null && ReferenceEquals(_terrainMap, map))
             {
                 return _terrain;
             }
 
             try
             {
-                MapFormat map = _facade.Level.GetMap();
-                _terrainLevel = _facade.Level;
+                _terrainMap = map;
                 _terrain = BattlefieldTerrain.Analyse(
                     _facade.Level.Size,
                     ReadTerrainCells(),
@@ -628,7 +648,6 @@ namespace SongsOfConquestAccess.Adapters
             catch (Exception exception)
             {
                 _faults.Report("GetTerrain", exception);
-                _terrainLevel = _facade.Level;
                 _terrain = BattlefieldTerrain.Analyse(new Vector2Int(0, 0), null, false);
             }
 
@@ -640,12 +659,15 @@ namespace SongsOfConquestAccess.Adapters
         /// battle carries none - a skirmish built from a seed rather than from a map.</summary>
         public BattlefieldSurroundings GetSurroundings()
         {
-            if (_surroundingsProbed)
+            MapFormat map = CurrentMap();
+            if (_surroundingsProbed && ReferenceEquals(_surroundingsMap, map))
             {
                 return _surroundings;
             }
 
             _surroundingsProbed = true;
+            _surroundingsMap = map;
+            _surroundings = null;
             try
             {
                 BattleSurroundings surroundings = _facade != null && _facade.Level != null
