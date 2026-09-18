@@ -30,8 +30,6 @@ soc-access/adapters/CodexMenuAdapter.cs | 1 | WielderCodexContent content = cont
 
 soc-access/adapters/CommunityMapsDetailsAdapter.cs | 1 | Selectable selectable = _details.GetComponentInChildren<Selectable>(false);
 
-soc-access/adapters/CommunityMapsModalAdapter.cs | 1 | Button button = child.GetComponentInChildren<Button>(false);
-
 soc-access/adapters/CommunityMapsSearchFilterAdapter.cs | 2 | Toggle toggle = item != null ? item.GetComponentInChildren<Toggle>(false) : null;
 
 soc-access/adapters/CommunityMapsSearchResultsAdapter.cs | 1 | Button[] buttons = component.GetComponentsInChildren<Button>(false);

@@ -120,15 +120,12 @@ namespace SongsOfConquestAccess.Adapters
                 return confirmUninstall;
             }
 
-            object contextMenuComponent = CommunityMapsSources.ContextMenu;
-            GameObject contextMenu = GetActiveContextMenuPanel(contextMenuComponent);
+            GameObject contextMenu = GetActiveContextMenuPanel(CommunityMapsSources.ContextMenu);
             if (contextMenu != null)
             {
-                IReadOnlyList<ActionItem> actions = GetContextMenuActions(contextMenuComponent);
                 return new CommunityMapsModalAdapter(
                     contextMenu,
-                    cachedState: CommunityMapsModalState.ContextMenu,
-                    cachedActions: actions);
+                    cachedState: CommunityMapsModalState.ContextMenu);
             }
 
             GameObject downloadQueue = GetActiveDownloadQueuePanel();
@@ -338,7 +335,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (State == CommunityMapsModalState.ContextMenu)
             {
-                return new ActionItem[0];
+                return GetContextMenuActions(CommunityMapsSources.ContextMenu);
             }
 
             if (State == CommunityMapsModalState.DownloadQueue)
@@ -733,6 +730,14 @@ namespace SongsOfConquestAccess.Adapters
             return null;
         }
 
+        /// <summary>The rows the context menu is showing NOW. They are read on every build and not
+        /// cached with the adapter: <c>ModioContextMenu.Open</c> never closes the menu first
+        /// (decompiled, lines 23 to 95) - it hides the pooled <c>ContextMenuListItem</c>s, switches
+        /// the same object back on and re-<c>Setup</c>s those same rows with another map's labels and
+        /// actions - so the popup the adapter is keyed on does not change under a second "more
+        /// options" and a list taken once would name the first map's options over the second map's
+        /// buttons. The list holds a handful of rows and both walks below are the shared per-frame
+        /// sweeps, so reading it live costs a bounded loop (AGENTS.md, Performance).</summary>
         private static IReadOnlyList<ActionItem> GetContextMenuActions(object contextMenu)
         {
             List<ActionItem> result = new List<ActionItem>();
@@ -751,10 +756,8 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 string label = GetFirstText(child);
-                // CONSTRUCTION: the context menu's rows are read once, when TryCreate builds the
-                // adapter for the popup, never on a build path.
-                Button button = child.GetComponentInChildren<Button>(false);
-                if (button == null || !button.gameObject.activeInHierarchy || string.IsNullOrWhiteSpace(label))
+                Button button = FirstDrawnButton(child);
+                if (button == null || string.IsNullOrWhiteSpace(label))
                 {
                     continue;
                 }
@@ -763,6 +766,20 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return result;
+        }
+
+        private static Button FirstDrawnButton(Transform row)
+        {
+            Button[] buttons = PanelButtons.Under(row);
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                if (buttons[i] != null && buttons[i].gameObject.activeInHierarchy)
+                {
+                    return buttons[i];
+                }
+            }
+
+            return null;
         }
 
         private IReadOnlyList<TextItem> GetAuthenticationTexts()
