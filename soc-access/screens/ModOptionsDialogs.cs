@@ -95,8 +95,8 @@ namespace SongsOfConquestAccess.Screens
             dialog.AddText(ModText.Get(ModStrings.UI.ColumnElement));
             dialog.AddText(ModText.Get(ModStrings.Screens.Enabled));
             dialog.AddText(ModText.Get(ModStrings.Screens.Suffix));
-            dialog.AddText(string.Empty);
-            dialog.AddText(string.Empty);
+            dialog.AddEmptyCell();
+            dialog.AddEmptyCell();
             dialog.EndRow();
 
             for (int i = 0; i < order.Count; i++)
@@ -197,10 +197,10 @@ namespace SongsOfConquestAccess.Screens
                 ModText.Get(ModStrings.Screens.Cues));
 
             dialog.StartHeaderRow();
-            dialog.AddText(string.Empty);
-            dialog.AddText(string.Empty);
+            dialog.AddEmptyCell();
+            dialog.AddEmptyCell();
             dialog.AddText(ModText.Get(ModStrings.Screens.Enabled));
-            dialog.AddText(string.Empty);
+            dialog.AddEmptyCell();
             dialog.EndRow();
 
             for (int i = 0; i < cues.Count; i++)

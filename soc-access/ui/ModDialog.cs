@@ -514,8 +514,8 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>A cell with nothing in it, which keeps the column aligned under the cells above
         /// and below it and is not a control: the reader skips it rather than landing on a cell it
-        /// has nothing to say about. The glossary's beacon row has no enabled flag to tick.
-        /// </summary>
+        /// has nothing to say about. The glossary's beacon row has no enabled flag to tick, and a
+        /// header band's unnamed columns are drawn with it too.</summary>
         public void AddEmptyCell()
         {
             IUITextMesh mesh = _controller.AddSimpleText(string.Empty);
