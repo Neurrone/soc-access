@@ -162,8 +162,9 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The drawn categories and the articles under them. Read once per redraw: pulling
         /// each article's label off its text mesh allocates a string per article, and the list only
         /// changes when the window re-spawns its category sections. The key is what the game's own
-        /// section pool is drawing - how many sections, which the first and last are, and how many
-        /// buttons they draw between them - read from the game on every call (AGENTS.md,
+        /// section pool is drawing - how many sections, which the first and last are, how many
+        /// buttons they draw between them and which tab they belong to - read from the game on every
+        /// call (AGENTS.md,
         /// Performance). Which article is SELECTED is not part of it: each item answers that from
         /// the event system when it is asked. The language is, because the options menu re-localizes
         /// every drawn mesh where it stands and the pool is left alone.</summary>
@@ -197,12 +198,20 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             ILanguageDefinition language = _localization != null ? _localization.CurrentLanguage : null;
+            // Which tab the window is showing, off its own current provider. The rest of this key
+            // cannot tell two tabs apart where each draws ONE section with as many buttons: the pool
+            // hands its entries back in reverse on a respawn, so the first and the last section are
+            // the same object when there is only one of them.
+            object provider = CurrentProviderField != null && _menu != null
+                ? CurrentProviderField.GetValue(_menu)
+                : null;
             if (_articleGroups != null
                 && drawnSections == _articleSectionCount
                 && drawnButtons == _articleButtonCount
                 && ReferenceEquals(first, _firstArticleSection)
                 && ReferenceEquals(last, _lastArticleSection)
-                && ReferenceEquals(language, _articleLanguage))
+                && ReferenceEquals(language, _articleLanguage)
+                && ReferenceEquals(provider, _articleProvider))
             {
                 return _articleGroups;
             }
@@ -212,6 +221,7 @@ namespace SongsOfConquestAccess.Adapters
             _firstArticleSection = first;
             _lastArticleSection = last;
             _articleLanguage = language;
+            _articleProvider = provider;
             _articleGroups = ReadArticleGroups(sections);
             return _articleGroups;
         }
@@ -273,6 +283,7 @@ namespace SongsOfConquestAccess.Adapters
         private object _firstArticleSection;
         private object _lastArticleSection;
         private ILanguageDefinition _articleLanguage;
+        private object _articleProvider;
 
         public bool FocusArticle(ArticleItem item)
         {
