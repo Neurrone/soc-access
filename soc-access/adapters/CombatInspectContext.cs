@@ -65,6 +65,11 @@ namespace SongsOfConquestAccess.Adapters
         /// for the player's troops (Mother's Embrace).</summary>
         public List<string> FriendlyRootEffects { get; private set; } = new List<string>();
 
+        /// <summary>The game's names for what roots do to the troop STANDING on this tile, asked
+        /// from that troop's side as the game's troop details ask it: the Scorn of the other
+        /// team's spreaders, the Embrace of its own. Empty on a tile no troop stands on.</summary>
+        public List<string> OccupantRootEffects { get; private set; } = new List<string>();
+
         public string DecorativeFeature { get; set; }
     }
 

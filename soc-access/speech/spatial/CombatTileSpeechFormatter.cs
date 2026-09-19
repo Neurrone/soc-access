@@ -304,9 +304,18 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 }
             }
 
-            // What a root spreader's roots do on this tile, hostile first: the one that hurts.
-            parts.AddRange(tile.HostileRootEffects);
-            parts.AddRange(tile.FriendlyRootEffects);
+            // What a root spreader's roots do on this tile, hostile first: the one that hurts. With
+            // a troop standing on it the words are heard as that troop's, so they are the roots
+            // that act on it, not the ones that would act on the player's troops there.
+            if (tile.Troop != null)
+            {
+                parts.AddRange(tile.OccupantRootEffects);
+            }
+            else
+            {
+                parts.AddRange(tile.HostileRootEffects);
+                parts.AddRange(tile.FriendlyRootEffects);
+            }
             return ModText.JoinListWithCommas(parts);
         }
 

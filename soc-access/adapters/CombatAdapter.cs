@@ -1260,33 +1260,52 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                IBattleTroopState[] hostile = _facade.Troops.GetRootSpreadersForTile(
-                    point,
-                    _facade.Teams.GetOtherTeamId(localTeamId));
-                for (int i = 0; i < hostile.Length; i++)
-                {
-                    if (hostile[i].IsHatingMother())
-                    {
-                        AddRootEffect(
-                            tile.HostileRootEffects,
-                            hostile[i].HasBacteria(BacteriaTypes.TraitMothersHateUpgraded)
-                                ? BacteriaTypes.TraitMothersHateUpgraded
-                                : BacteriaTypes.TraitMothersHate);
-                    }
-                }
+                AddScornEffects(point, _facade.Teams.GetOtherTeamId(localTeamId), tile.HostileRootEffects);
+                AddEmbraceEffects(point, localTeamId, tile.FriendlyRootEffects);
 
-                IBattleTroopState[] friendly = _facade.Troops.GetRootSpreadersForTile(point, localTeamId);
-                for (int i = 0; i < friendly.Length; i++)
+                // A troop on the tile is under the roots its OWN side decides, which is the question
+                // the game's troop details ask (BattleTroopDetails.RegisterRootSpreadSidePanels): an
+                // enemy troop on its own Seed's roots is embraced, not scorned.
+                if (tile.Troop != null)
                 {
-                    if (friendly[i].HasBacteria(BacteriaTypes.TraitMothersLoveProvider))
+                    AddScornEffects(point, _facade.Teams.GetOtherTeamId(tile.Troop.TeamId), tile.OccupantRootEffects);
+                    if (tile.Troop.Reference.CanBeAffectedByMothersLove())
                     {
-                        AddRootEffect(tile.FriendlyRootEffects, BacteriaTypes.TraitMothersLoveProvider);
+                        AddEmbraceEffects(point, tile.Troop.TeamId, tile.OccupantRootEffects);
                     }
                 }
             }
             catch (Exception exception)
             {
                 _faults.Report("AddRootEffects", exception);
+            }
+        }
+
+        private void AddScornEffects(Vector2Int point, int spreaderTeamId, List<string> into)
+        {
+            IBattleTroopState[] spreaders = _facade.Troops.GetRootSpreadersForTile(point, spreaderTeamId);
+            for (int i = 0; i < spreaders.Length; i++)
+            {
+                if (spreaders[i].IsHatingMother())
+                {
+                    AddRootEffect(
+                        into,
+                        spreaders[i].HasBacteria(BacteriaTypes.TraitMothersHateUpgraded)
+                            ? BacteriaTypes.TraitMothersHateUpgraded
+                            : BacteriaTypes.TraitMothersHate);
+                }
+            }
+        }
+
+        private void AddEmbraceEffects(Vector2Int point, int spreaderTeamId, List<string> into)
+        {
+            IBattleTroopState[] spreaders = _facade.Troops.GetRootSpreadersForTile(point, spreaderTeamId);
+            for (int i = 0; i < spreaders.Length; i++)
+            {
+                if (spreaders[i].HasBacteria(BacteriaTypes.TraitMothersLoveProvider))
+                {
+                    AddRootEffect(into, BacteriaTypes.TraitMothersLoveProvider);
+                }
             }
         }
 
