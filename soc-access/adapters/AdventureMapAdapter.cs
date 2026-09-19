@@ -576,11 +576,11 @@ namespace SongsOfConquestAccess.Adapters
                 return "missing local team";
             }
 
-            if (!HumanAdventureController.CanLocalTeamUseHUD(_facade))
-            {
-                return "local team cannot use HUD";
-            }
-
+            // Whose turn it is is NOT asked. The game keeps the map on screen through another
+            // player's turn and the camera follows what moves in sight, so the map stays up and its
+            // listener with it; the game's own input handlers refuse a click made while waiting
+            // (CanUseScreenInput, and the NotYourTurn denial in HandleSecondaryInputEnded), and the
+            // HUD's buttons report the state the game gives them.
             if (!IsFogReady())
             {
                 return "fog not ready";
