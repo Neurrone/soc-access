@@ -55,7 +55,7 @@ namespace SongsOfConquestAccess.Tests
             AssertTerrainCue(CueLibrary.TerrainWater, AdventureTerrainKind.Water, AdventureTerrainKind.ShallowWater, AdventureTerrainKind.DeepWater, AdventureTerrainKind.WaterEdge);
             AssertTerrainCue(CueLibrary.TerrainTrees, AdventureTerrainKind.AridTrees, AdventureTerrainKind.TemperateTrees, AdventureTerrainKind.FaeyForest, AdventureTerrainKind.BirchForest, AdventureTerrainKind.Magnolia, AdventureTerrainKind.Bamboo);
             AssertTerrainCue(CueLibrary.TerrainImpassable, AdventureTerrainKind.Mountain, AdventureTerrainKind.Wall, AdventureTerrainKind.Torch, AdventureTerrainKind.Palisade, AdventureTerrainKind.FortifiedGate, AdventureTerrainKind.Barricade);
-            AssertTerrainCue(CueLibrary.TerrainImpassable, AdventureTerrainKind.Tombstones, AdventureTerrainKind.Ruins, AdventureTerrainKind.WinterDecorations, AdventureTerrainKind.MidsummerDecorations);
+            AssertTerrainCue(CueLibrary.TerrainImpassable, AdventureTerrainKind.Tombstones, AdventureTerrainKind.Ruins, AdventureTerrainKind.WinterDecorations, AdventureTerrainKind.MidsummerDecorations, AdventureTerrainKind.Obstruction);
         }
 
         [TestMethod]
@@ -87,6 +87,18 @@ namespace SongsOfConquestAccess.Tests
 
             CollectionAssert.AreEqual(new[] { CueLibrary.TerrainWater }, ToArray(TileCueSelector.ForAdventureTile(water)));
             CollectionAssert.AreEqual(new[] { CueLibrary.TerrainTrees }, ToArray(TileCueSelector.ForAdventureTile(trees)));
+        }
+
+        [TestMethod]
+        public void AWalkableDecorationSoundsAsWhatLiesBeneathIt()
+        {
+            AdventureMapTile bodiesOnSand = ExploredTile(AdventureTerrainKind.DeadBodies);
+            bodiesOnSand.TerrainBeneath = AdventureTerrainKind.Sand;
+            AdventureMapTile stumpsOnRoad = ExploredTile(AdventureTerrainKind.Deforestation);
+            stumpsOnRoad.TerrainBeneath = AdventureTerrainKind.CobblestoneRoad;
+
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainSand }, ToArray(TileCueSelector.ForAdventureTile(bodiesOnSand)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainRoad }, ToArray(TileCueSelector.ForAdventureTile(stumpsOnRoad)));
         }
 
         [TestMethod]

@@ -97,6 +97,10 @@ namespace SongsOfConquestAccess.Adapters
 
         public AdventureTerrainKind Terrain { get; set; }
 
+        /// <summary>What lies under the tile's decoration layers: the bridge or road, else the water
+        /// or the ground. The same as <see cref="Terrain"/> on a tile with no decoration.</summary>
+        public AdventureTerrainKind TerrainBeneath { get; set; }
+
         /// <summary>What the effect layer paints over this tile, <see cref="AdventureEffectKind.Unknown"/>
         /// when it paints nothing.</summary>
         public AdventureEffectKind Effect { get; set; }

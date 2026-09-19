@@ -41,7 +41,7 @@ namespace SongsOfConquestAccess.Audio
             // Water and trees keep their own voice: both are impassable on every tile the game
             // has, so the thud would leave their cues unheard and the two sounds already mean
             // "nothing walks here".
-            string terrain = ForTerrain(tile.Terrain);
+            string terrain = TerrainCueKey(tile);
             bool thuds = !HasOccupant(tile)
                 && IsAdventureTileImpassable(tile)
                 && terrain != CueLibrary.TerrainWater
@@ -233,6 +233,15 @@ namespace SongsOfConquestAccess.Audio
             }
         }
 
+        /// <summary>A kind with no sound of its own sounds as what it is painted over: dead bodies
+        /// on sand are still sand underfoot, and a campfire on a road is still the road. Only the
+        /// walkable decorations differ from what lies beneath them; ground is ground either way.</summary>
+        private static string TerrainCueKey(AdventureMapTile tile)
+        {
+            string own = ForTerrain(tile.Terrain);
+            return own == CueLibrary.TerrainGround ? ForTerrain(tile.TerrainBeneath) : own;
+        }
+
         public static string ForTerrain(AdventureTerrainKind terrain)
         {
             switch (terrain)
@@ -258,6 +267,7 @@ namespace SongsOfConquestAccess.Audio
                     return CueLibrary.TerrainTrees;
                 case AdventureTerrainKind.Mountain:
                 case AdventureTerrainKind.Wall:
+                case AdventureTerrainKind.Obstruction:
                 case AdventureTerrainKind.Palisade:
                 case AdventureTerrainKind.FortifiedGate:
                 case AdventureTerrainKind.Barricade:

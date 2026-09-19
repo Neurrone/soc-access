@@ -74,11 +74,22 @@ namespace SongsOfConquestAccess.Adapters
         private AdventureTerrainKind GetTerrain(Vector2Int position)
         {
             AdventureTerrainKind surface = GetSurfaceTerrain(position);
-            if (surface != AdventureTerrainKind.Unknown)
-            {
-                return surface;
-            }
+            return surface != AdventureTerrainKind.Unknown ? surface : GetWaterOrGroundTerrain(position);
+        }
 
+        /// <summary>
+        /// What a decoration is painted over: the bridge or road under it, else the water or the
+        /// ground. A walkable decoration (dead bodies, a campfire, farmland) names the tile, and
+        /// this is what the tile is still walked on as, so it is what the tile sounds as.
+        /// </summary>
+        private AdventureTerrainKind GetTerrainBeneathDecorations(Vector2Int position)
+        {
+            AdventureTerrainKind paved = GetPavedTerrain(position);
+            return paved != AdventureTerrainKind.Unknown ? paved : GetWaterOrGroundTerrain(position);
+        }
+
+        private AdventureTerrainKind GetWaterOrGroundTerrain(Vector2Int position)
+        {
             byte water = GetLayerValue(position, LayerKind.Water);
             switch (water)
             {
@@ -173,6 +184,12 @@ namespace SongsOfConquestAccess.Adapters
                 return decorationTerrain;
             }
 
+            return GetPavedTerrain(position);
+        }
+
+        /// <summary>The bridge or the road on a tile, a bridge hiding the road; Unknown for neither.</summary>
+        private AdventureTerrainKind GetPavedTerrain(Vector2Int position)
+        {
             if (GetLayerValue(position, LayerKind.Bridge) > 0)
             {
                 return AdventureTerrainKind.Bridge;

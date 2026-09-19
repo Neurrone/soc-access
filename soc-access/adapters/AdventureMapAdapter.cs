@@ -709,6 +709,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             tile.Terrain = GetTerrain(clamped);
+            tile.TerrainBeneath = GetTerrainBeneathDecorations(clamped);
             tile.Effect = GetEffect(clamped);
             if (IsRoadTerrain(tile.Terrain))
             {
