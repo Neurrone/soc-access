@@ -616,13 +616,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            /// <summary>The entry's own left click, delivered as the pointer delivers it. The game
-            /// starts its drag on button DOWN, so a click on a troop does nothing.</summary>
-            public bool Click()
-            {
-                return NativeSelectionUtility.Click(_adapter.GetEntryButton(Entry));
-            }
-
             /// <summary>The entry's own right click, which the game answers with its disband confirm
             /// dialog where <c>CanDisband</c> allows.</summary>
             public bool RightClick()

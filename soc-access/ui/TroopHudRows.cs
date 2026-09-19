@@ -24,8 +24,9 @@ namespace SongsOfConquestAccess.UI
     /// EVERY GESTURE IS THE GAME'S OWN, delivered into the game's own handlers so its rules decide
     /// what happens:
     ///
-    /// - Enter is the entry's left click, which does nothing: the game begins its drag on button DOWN
-    ///   (<c>TroopHUDEntry.HandleButtonDown</c>), so a click on a troop is inert, and that is faithful.
+    /// - Enter does nothing, as the entry's left click does nothing: the game begins its drag on
+    ///   button DOWN (<c>TroopHUDEntry.HandleButtonDown</c>), so a click on a troop is inert. A slot
+    ///   is therefore a line and not a button, occupied or empty.
     /// - Backslash is the entry's right click, which the game answers with its own disband confirm
     ///   dialog - and only where its own <c>CanDisband()</c> allows, which is where the hint is said.
     /// - Space picks a troop up. A drop is the game's whole drag replayed in one call
@@ -508,9 +509,9 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>One drawn slot: what is in it, and every gesture the game gives the troop there.
         /// The name is watched live - a split, a merge and a disband all happen under a cursor standing
-        /// right here. An EMPTY slot is a line and not a button (owner ruling 2026-09-08): the game
-        /// wires the entry's click to the troop in it, so there is nothing to press, only somewhere a
-        /// carried troop can be dropped.
+        /// right here. A slot is a line and not a button, EMPTY (owner ruling 2026-09-08) or OCCUPIED
+        /// (owner ruling 2026-09-19): the game's click on an entry is inert, so there is nothing to
+        /// press, only a troop to pick up and somewhere a carried troop can be dropped.
         ///
         /// THE ROW IS BUILT ONCE PER SLOT LIST, not once per frame (<see cref="Bar"/>), so everything
         /// written here is either a closure that reads the game when it is read - which the label,
@@ -528,14 +529,8 @@ namespace SongsOfConquestAccess.UI
             TroopHudAdapter.SlotItem it = slot;
             Func<bool> workable = available;
             Func<bool> enabled = () => it.IsUnlocked && (workable == null || workable());
-            NodeVtable vtable = it.IsOccupied
-                ? GraphNodes.Button(() => Label(it), () => it.Click(), enabled, it.Details)
-                : GraphNodes.Text(() => Label(it));
-            if (!it.IsOccupied)
-            {
-                vtable.Announcements.Add(GraphNodes.DisabledPart(enabled));
-            }
-
+            NodeVtable vtable = GraphNodes.Text(() => Label(it), null, it.IsOccupied ? it.Details : null);
+            vtable.Announcements.Add(GraphNodes.DisabledPart(enabled));
             vtable.Announcements[0].Live = true;
             // Selecting the entry is what makes the game draw the troop's details for it.
             vtable.OnFocusVisual = () => it.Focus();
