@@ -8,7 +8,7 @@ namespace SongsOfConquestAccess.Tests.Lint
     /// <summary>
     /// THE ROSTER OF WHAT A SCREEN IS ALLOWED TO REMEMBER. Like the patch inventory and unlike the
     /// other lists, this one is not an exception list: every mutable instance field of every
-    /// <c>LiveScreen</c> subclass is on it, and every entry says which of two things it is.
+    /// <c>LiveScreen</c> subclass is on it, and every entry says which of three things it is.
     ///
     /// <c>cursor</c> - a cursor, a cursor intent, or a memo keyed on that cursor: the tile the player
     /// is standing on, the grid built over the adapter it walks, the page the screen means to focus
@@ -16,7 +16,16 @@ namespace SongsOfConquestAccess.Tests.Lint
     /// <c>baseline</c> - what was last said, so that only a CHANGE is spoken: an instruction line, a
     /// heading, the code echoed back as it is typed.
     ///
-    /// Both outlive the menu, which is the whole test: a screen object lives for the whole mod load
+    /// <c>memo</c> - a <c>SheetSnapshot</c>: what one build of a table declared, kept so the table is
+    /// not minted again sixty times a second. It is the one holder the roster lists although its
+    /// FIELD is <c>readonly</c>, because what it holds is not: it is derived from the menu, and it
+    /// is on a screen only because it keys itself on identities the game owns, so a new menu
+    /// instance misses it and nothing has to reset it (<c>ui/SheetSnapshot.cs</c>). A field that
+    /// merely looks immutable slipped the roster once (04fce370 took the two fields it replaced off
+    /// the list and put nothing back), which is how seven screens came to hold menu-derived state
+    /// nothing was watching; a memo that is NOT self-keyed is a cache, and is refused like one.
+    ///
+    /// The first two outlive the menu, which is the whole test: a screen object lives for the whole mod load
     /// and an adapter lives exactly as long as the menu instance it wraps, so anything that is
     /// "about this menu" is an adapter field and needs no reset (AGENTS.md, Screen Resolution).
     /// <c>subscription</c> and <c>cache</c> are therefore REFUSED rather than listed: a handler the
@@ -32,8 +41,8 @@ namespace SongsOfConquestAccess.Tests.Lint
         private const string Allowlist = "screen-state.allow";
 
         private const string Rule =
-            "Every mutable instance field of a LiveScreen is on this roster, and every entry names its kind: cursor (a cursor, a cursor intent, or a memo keyed on it) or baseline (what was last said, so only a change is spoken).\n"
-            + "Both outlive the menu. Per-menu state - a subscription, a cache of what the menu said - lives on the adapter, which lives exactly as long as the menu instance and releases in Dispose whatever it attached to the game (AGENTS.md, Screen Resolution).\n"
+            "Every mutable instance field of a LiveScreen is on this roster, and every entry names its kind: cursor (a cursor, a cursor intent, or a memo keyed on it), baseline (what was last said, so only a change is spoken) or memo (a SheetSnapshot, readonly as a field but not in what it holds: what a table's build declared, keyed on identities the game owns so a new menu instance misses it).\n"
+            + "The first two outlive the menu. Per-menu state - a subscription, a cache of what the menu said - lives on the adapter, which lives exactly as long as the menu instance and releases in Dispose whatever it attached to the game (AGENTS.md, Screen Resolution).\n"
             + "Format: path | count | source line | kind.";
 
         private const string Refused =
@@ -50,10 +59,16 @@ namespace SongsOfConquestAccess.Tests.Lint
 
         private static readonly Regex Immutable = new Regex(@"\b(readonly|const|static|event|delegate)\b");
 
+        /// <summary>A holder whose FIELD is readonly and whose contents are menu-derived state all the
+        /// same, so <c>readonly</c> does not take it off the roster. One type so far; a new holder of
+        /// the kind is added here, with its kind below, rather than passing as immutable.</summary>
+        private static readonly Regex StateHolder = new Regex(@"^(?!.*\b(const|static)\b).*\breadonly\s+SheetSnapshot\b");
+
         private static readonly HashSet<string> Kinds = new HashSet<string>(StringComparer.Ordinal)
         {
             "cursor",
             "baseline",
+            "memo",
         };
 
         [TestMethod]
@@ -67,7 +82,7 @@ namespace SongsOfConquestAccess.Tests.Lint
                 if (string.IsNullOrEmpty(entry.Kind))
                 {
                     problems.Add("No kind on " + entry.Site.File + ": " + entry.Site.Text
-                        + " - every entry is cursor or baseline.");
+                        + " - every entry is cursor, baseline or memo.");
                 }
                 else if (!Kinds.Contains(entry.Kind))
                 {
@@ -171,7 +186,7 @@ namespace SongsOfConquestAccess.Tests.Lint
                     }
 
                     string code = LintSources.Code(lines[i]);
-                    if (Field.IsMatch(code) && !Immutable.IsMatch(code))
+                    if (Field.IsMatch(code) && (!Immutable.IsMatch(code) || StateHolder.IsMatch(code)))
                     {
                         onField(file, lines, i);
                     }
