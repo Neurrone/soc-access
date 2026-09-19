@@ -37,7 +37,7 @@ soc-access/adapters/CommunityMapsSearchResultsAdapter.cs | 1 | TMP_Text text = b
 soc-access/adapters/CommunityMapsSearchResultsAdapter.cs | 1 | TMP_Text text = selectable != null ? selectable.GetComponentInChildren<TMP_Text>(false) : null;
 soc-access/adapters/CommunityMapsSearchResultsAdapter.cs | 1 | TMP_Text[] texts = parent.GetComponentsInChildren<TMP_Text>(false);
 
-soc-access/adapters/DefencePanelWielderAdapter.cs | 1 | : root.GetComponentsInChildren<UITextMesh>(includeInactive: true);
+soc-access/adapters/DefencePanelWielderAdapter.cs | 1 | : OutsideOf(root.GetComponentsInChildren<UITextMesh>(includeInactive: true), GetStoreButton() as Component);
 
 soc-access/adapters/DetailsTextUtility.cs | 1 | public T GetComponentInChildren<T>()
 
