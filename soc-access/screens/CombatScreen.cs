@@ -733,9 +733,14 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the turn order ----
 
-        /// <summary>The queue the game draws along the bottom, in its drawn order, with the round
-        /// separators as lines of their own. Enter on a troop walks the cursor to it, so a troop is a
-        /// button; a separator does nothing and is a line.</summary>
+        /// <summary>The queue the game draws along the bottom, in its drawn order. Enter on a troop
+        /// walks the cursor to it, so a troop is a button.
+        ///
+        /// A ROUND SEPARATOR IS A REGION, not a row (owner ruling 2026-09-19): the troops after it
+        /// stand under its "Round N", said on the way in, and the troops before the first separator
+        /// are a region with no name of their own - what is left of the round being played. So the
+        /// region jump steps from one round's troops to the next's. A region is keyed on its round's
+        /// number, which does not change as the queue moves up under the cursor.</summary>
         private void BuildTurnOrder(GraphBuilder builder, BattleHudAdapter hud)
         {
             IReadOnlyList<BattleHudAdapter.QueueItem> items = hud.GetQueueItems();
@@ -744,8 +749,12 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            object regionBefore = builder.Region;
             builder.BeginStop(TurnOrderStop);
             builder.PushContext(ModText.Get(ModStrings.Screens.TurnOrder));
+            builder.SetRegion(TurnOrderStop + ":this-round");
+            bool inRound = false;
+            bool landed = false;
             for (int i = 0; i < items.Count; i++)
             {
                 BattleHudAdapter.QueueItem item = items[i];
@@ -754,28 +763,42 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                ControlId id = QueueNodeId(i);
-                NodeVtable vtable = item.IsRoundMarker
-                    ? GraphNodes.Text(() => BuildQueueItemLabel(item))
-                    : GraphNodes.Button(
-                        () => BuildQueueItemLabel(item),
-                        () => MoveCursorToTroop(item.TroopId, requireLocalCurrentTurn: false),
-                        null,
-                        item.Tooltip);
-                if (!item.IsRoundMarker)
+                if (item.IsRoundMarker)
                 {
-                    vtable.OnFocusVisual = item.Focus;
-                    vtable.OnBlurVisual = item.Unfocus;
+                    if (inRound)
+                    {
+                        builder.PopContext();
+                    }
+
+                    builder.SetRegion(TurnOrderStop + ":round:" + item.RoundNumber);
+                    builder.PushContext(BuildQueueItemLabel(item));
+                    inRound = true;
+                    continue;
                 }
 
+                ControlId id = QueueNodeId(i);
+                NodeVtable vtable = GraphNodes.Button(
+                    () => BuildQueueItemLabel(item),
+                    () => MoveCursorToTroop(item.TroopId, requireLocalCurrentTurn: false),
+                    null,
+                    item.Tooltip);
+                vtable.OnFocusVisual = item.Focus;
+                vtable.OnBlurVisual = item.Unfocus;
                 builder.AddItem(new SyntheticNode(id, vtable));
-                if (i == 0)
+                if (!landed)
                 {
+                    landed = true;
                     builder.LandStopOn(id);
                 }
             }
 
+            if (inRound)
+            {
+                builder.PopContext();
+            }
+
             builder.PopContext();
+            builder.SetRegion(regionBefore);
         }
 
         private static ControlId QueueNodeId(int index)
