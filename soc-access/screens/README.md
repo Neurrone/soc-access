@@ -11,6 +11,13 @@ game has made ready, or clears it.
 `IsActive()` runs once per screen per frame: it must never scan the scene, walk a subtree or ask the
 game to refresh anything (AGENTS.md, Performance).
 
+One gate is the manager's and not any screen's: while the game's project-wide UI blocker is showing
+(`adapters/ProjectUiBlocker`, read every frame) NOTHING is on the stack. The game fades it in when
+the player loads a save, quits to the main menu or restarts from the pause menu, or starts a game
+from a menu, and the menu that asked closes before the scene goes; without the gate whatever was
+underneath (the map, the battlefield, the troop placement page) was the top screen for that stretch
+and was announced on the way out. Quit to Desktop does not show the blocker and is not covered.
+
 ## Layers
 
 Layers are STATIC: a screen's number never depends on what is showing. They are numbered with gaps,

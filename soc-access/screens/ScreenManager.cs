@@ -37,15 +37,21 @@ namespace SongsOfConquestAccess.Screens
         private HashSet<Screen> _stacked = new HashSet<Screen>();
         private HashSet<Screen> _wanted = new HashSet<Screen>();
         private Screen _focused;
+        private readonly Func<bool> _uiBlocked;
+        private bool _uiBlockedFailed;
 
+        /// <param name="uiBlocked">Whether the game is blocking its whole UI on the way to somewhere
+        /// else (<see cref="Adapters.ProjectUiBlocker"/>), asked every frame; null for never.</param>
         public ScreenManager(
             GraphNavigator navigator,
             ReviewBufferManager reviewBuffers,
-            ReviewBufferController reviewBufferController)
+            ReviewBufferController reviewBufferController,
+            Func<bool> uiBlocked = null)
         {
             _navigator = navigator;
             _reviewBuffers = reviewBuffers;
             _reviewBufferController = reviewBufferController;
+            _uiBlocked = uiBlocked;
             ApplyVisibleReviewBuffers();
         }
 
@@ -234,16 +240,24 @@ namespace SongsOfConquestAccess.Screens
         // Active screens, bottom layer first. Insertion-sorted rather than List.Sort, which is not
         // stable: two screens on the same layer must stay in registration order, which is how combat
         // sits above the map.
+        //
+        // While the game blocks its whole UI NOTHING is on the stack. The game fades that blocker in
+        // when the player loads a save, quits or restarts from the pause menu, or starts a game from
+        // a menu, and the menu that asked closes before the scene goes; whatever was underneath it
+        // (the map, the battlefield, the troop placement page) was the top screen for that stretch
+        // and was announced on the way out. Every predicate is still asked, because some keep their
+        // slot in step with the game there (CombatScreen); only the answers are set aside.
         private List<Screen> Resolve(List<Screen> active, HashSet<Screen> into)
         {
             active.Clear();
             into.Clear();
+            bool blocked = IsUiBlocked();
             for (int i = 0; i < _registered.Count; i++)
             {
                 Screen screen = _registered[i];
                 // A screen opened as a CHILD is its parent's, not the poll's: it is reached through
                 // Deepest and must not also stand on the stack in its own right.
-                if (screen.ParentScreen != null || !IsActive(screen))
+                if (screen.ParentScreen != null || !IsActive(screen) || blocked)
                 {
                     continue;
                 }
@@ -348,6 +362,24 @@ namespace SongsOfConquestAccess.Screens
             {
                 // Queued, not interrupting: the focused control's readout follows it.
                 Safe(graph.SayName, graph, "SayName");
+            }
+        }
+
+        private bool IsUiBlocked()
+        {
+            try
+            {
+                return _uiBlocked != null && _uiBlocked();
+            }
+            catch (Exception exception)
+            {
+                if (!_uiBlockedFailed)
+                {
+                    _uiBlockedFailed = true;
+                    SocAccessMod.Instance?.LogWarning("ScreenManager could not read the UI blocker: " + exception);
+                }
+
+                return false;
             }
         }
 

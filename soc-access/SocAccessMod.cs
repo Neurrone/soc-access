@@ -83,7 +83,21 @@ namespace SongsOfConquestAccess
             _bufferEventRecorder.Attach();
             GraphNavigator.InstallWiring();
             _navigator = new GraphNavigator();
-            _screenManager = new ScreenManager(_navigator, _reviewBufferManager, _reviewBufferController);
+            // The blocker is bound in the project container, which outlives every scene; the source
+            // finds it once the container exists and the adapter is built once for it.
+            AdaptedSource<SongsOfConquest.Client.Menu.IProjectUIBlocker, Adapters.ProjectUiBlocker> uiBlocker =
+                new AdaptedSource<SongsOfConquest.Client.Menu.IProjectUIBlocker, Adapters.ProjectUiBlocker>(
+                    ScreenSource<SongsOfConquest.Client.Menu.IProjectUIBlocker>.FromProject(),
+                    blocker => new Adapters.ProjectUiBlocker(blocker));
+            _screenManager = new ScreenManager(
+                _navigator,
+                _reviewBufferManager,
+                _reviewBufferController,
+                () =>
+                {
+                    Adapters.ProjectUiBlocker current = uiBlocker.Current;
+                    return current != null && current.IsShowing;
+                });
             RegisterScreens(_screenManager);
             // One door for every drawn entry; the manager itself gains nothing.
             Adapters.ModOptionsEntries.Open = OpenModOptions;

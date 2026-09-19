@@ -244,19 +244,18 @@ namespace SongsOfConquestAccess.Screens
             get { return false; }
         }
 
-        /// <summary>The adventure view installed and ready, and none of the four things that take
+        /// <summary>The adventure view installed and ready, and none of the three things that take
         /// the map AWAY: a story sequence running (the camera and the keyboard are the story's), a
-        /// claimed battle, the game's UI blocker fading in over a session being abandoned, and the
-        /// loading screen. A popup does NOT deactivate the map - it covers it by layer, so the HUD
+        /// claimed battle, and the loading screen. (The fourth, the game's UI blocker fading in over
+        /// a session being abandoned, takes EVERY screen away and is the screen manager's gate.) A
+        /// popup does NOT deactivate the map - it covers it by layer, so the HUD
         /// stays drawn underneath and the event listener and its audio are not torn down and
         /// rebuilt for every dialog.
         ///
         /// The battle gate is what keeps the map quiet from the attack until the battle is over. The
         /// game hides the troop placement page the moment Quick Battle or Manual Battle is pressed
         /// and the result page or the combat screen only arrives some frames later; without this the
-        /// map is the top screen in between and is announced. The blocker gate is the same story on
-        /// the way out: Quit to Main Menu closes the pause menu first and the scene loader only goes
-        /// busy once the blocker has faded in, and the map was announced in between.</summary>
+        /// map is the top screen in between and is announced.</summary>
         public override bool IsActive()
         {
             if (!base.IsActive())
@@ -264,7 +263,7 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            if (Live.IsStoryTriggerRunning() || Live.IsBattleClaimed() || Live.IsProjectUiBlockerShowing())
+            if (Live.IsStoryTriggerRunning() || Live.IsBattleClaimed())
             {
                 return false;
             }

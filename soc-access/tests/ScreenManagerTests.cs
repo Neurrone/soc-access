@@ -100,6 +100,32 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void NothingIsOnTheStackWhileTheGameBlocksItsUi()
+        {
+            List<string> log = new List<string>();
+            bool blocked = false;
+            ScreenManager manager = new ScreenManager(null, null, null, () => blocked);
+            Fake battlefield = new Fake("battlefield", 10, log) { Active = true };
+            Fake pause = new Fake("pause", 40, log) { Active = true };
+            manager.Register(battlefield);
+            manager.Register(pause);
+            manager.Tick();
+            log.Clear();
+
+            // The pause menu closes behind the blocker: the battlefield must not become the top.
+            blocked = true;
+            pause.Active = false;
+            manager.Tick();
+
+            CollectionAssert.AreEqual(new List<string> { "pop pause", "pop battlefield" }, log);
+            Assert.IsNull(manager.Current);
+
+            blocked = false;
+            manager.Tick();
+            Assert.AreSame(battlefield, manager.Current);
+        }
+
+        [TestMethod]
         public void ClosuresRunTopDownAndOpeningsBottomUp()
         {
             List<string> log = new List<string>();
