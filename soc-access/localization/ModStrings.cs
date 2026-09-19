@@ -808,6 +808,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Kingdom = new ModString("Screens.Kingdom", "Kingdom");
             public static readonly ModString MissingBuilding = new ModString("Screens.MissingBuilding", "missing building");
             public static readonly ModString ModOptions = new ModString("Screens.ModOptions", "Mod options");
+            public static readonly ModString ModVolume = new ModString("Screens.ModVolume", "Volume of all mod sounds");
             public static readonly ModString Modifiers = new ModString("Screens.Modifiers", "Modifiers");
             public static readonly ModString MoveDown = new ModString("Screens.MoveDown", "Move down");
             public static readonly ModString MoveUp = new ModString("Screens.MoveUp", "Move up");

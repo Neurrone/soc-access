@@ -352,6 +352,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void DrawAudio()
         {
+            ModOptionsDialogs.AddModVolume(_dialog);
             _dialog.AddToggle(
                 ModText.Get(ModStrings.Screens.PlayTileSoundCues),
                 ModSettings.TileCuesEnabled,

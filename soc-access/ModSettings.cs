@@ -43,6 +43,8 @@ namespace SongsOfConquestAccess
         public const int CueVolumeDefault = 30;
         /// <summary>Full: the loudness a beacon had before it had a volume setting.</summary>
         public const int BeaconVolumeDefault = 100;
+        /// <summary>Full: the loudness every mod sound had before there was a setting over them all.</summary>
+        public const int ModVolumeDefault = 100;
         public const int CuePitchSemitonesMinimum = -12;
         public const int CuePitchSemitonesMaximum = 12;
         public const int CuePitchSemitonesDefault = 0;
@@ -57,6 +59,7 @@ namespace SongsOfConquestAccess
         private static ConfigEntry<bool> _readStoryCameraFocusChanges;
         private static ConfigEntry<bool> _tileCuesEnabled;
         private static ConfigEntry<int> _beaconVolume;
+        private static ConfigEntry<int> _modVolume;
         private static ConfigEntry<bool> _scannerUsesLongDirections;
         private static ConfigEntry<string> _scannerResultOrder;
         private static ConfigEntry<bool> _adventureMapUsesLongRoadDirections;
@@ -154,6 +157,11 @@ namespace SongsOfConquestAccess
                 "TileCuesEnabled",
                 true,
                 "Whether cursor movement plays synthesised tile sound cues.");
+            _modVolume = config.Bind(
+                AudioSection,
+                "ModVolume",
+                ModVolumeDefault,
+                "Volume of every sound the mod plays, from 0 to 100, on the scale of the game's own volume sliders. A cue or the beacon at 100 plays at this volume.");
             _beaconVolume = config.Bind(
                 AudioSection,
                 "BeaconVolume",
@@ -290,6 +298,7 @@ namespace SongsOfConquestAccess
             _readStoryCameraFocusChanges = null;
             _tileCuesEnabled = null;
             _beaconVolume = null;
+            _modVolume = null;
             _scannerUsesLongDirections = null;
             _scannerResultOrder = null;
             _adventureMapUsesLongRoadDirections = null;

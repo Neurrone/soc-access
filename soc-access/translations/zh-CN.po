@@ -875,6 +875,11 @@ msgctxt "Screens.ModOptions"
 msgid "Mod options"
 msgstr "模组选项"
 
+#. Screens.ModVolume
+msgctxt "Screens.ModVolume"
+msgid "Volume of all mod sounds"
+msgstr "模组所有声音的音量"
+
 #. Screens.Modifiers
 msgctxt "Screens.Modifiers"
 msgid "Modifiers"

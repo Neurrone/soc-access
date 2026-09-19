@@ -875,6 +875,11 @@ msgctxt "Screens.ModOptions"
 msgid "Mod options"
 msgstr "Options du mod"
 
+#. Screens.ModVolume
+msgctxt "Screens.ModVolume"
+msgid "Volume of all mod sounds"
+msgstr "Volume de tous les sons du mod"
+
 #. Screens.Modifiers
 msgctxt "Screens.Modifiers"
 msgid "Modifiers"

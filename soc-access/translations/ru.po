@@ -895,6 +895,11 @@ msgctxt "Screens.ModOptions"
 msgid "Mod options"
 msgstr "Параметры мода"
 
+#. Screens.ModVolume
+msgctxt "Screens.ModVolume"
+msgid "Volume of all mod sounds"
+msgstr "Громкость всех звуков мода"
+
 #. Screens.Modifiers
 msgctxt "Screens.Modifiers"
 msgid "Modifiers"

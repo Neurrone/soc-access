@@ -202,7 +202,7 @@ namespace SongsOfConquestAccess.Audio
             voice.Source.loop = false;
             voice.Source.panStereo = 0f;
             voice.Source.pitch = 1f;
-            voice.Source.volume = ModSettings.GetBeaconVolume() / 100f;
+            voice.Source.volume = ModSettings.GetBeaconVolume() / 100f * ModSettings.ModGain;
             voice.Source.Play();
         }
 
@@ -295,7 +295,8 @@ namespace SongsOfConquestAccess.Audio
             float pitch = Mathf.Pow(2f, semitones / 12f);
             float distance = Mathf.Sqrt(dx * dx + dy * dy);
             float volume = Mathf.Clamp(1f - distance / AudibleDistanceTiles, 0f, 1f)
-                * (ModSettings.GetBeaconVolume() / 100f);
+                * (ModSettings.GetBeaconVolume() / 100f)
+                * ModSettings.ModGain;
 
             voice.Source.panStereo = pan;
             voice.Source.pitch = pitch;

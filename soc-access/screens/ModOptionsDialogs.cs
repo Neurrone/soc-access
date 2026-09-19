@@ -238,6 +238,28 @@ namespace SongsOfConquestAccess.Screens
             dialog.EndRow();
         }
 
+        // ---- the volume over every mod sound ----
+
+        /// <summary>The Audio tab's volume slider: what a cue or the beacon at 100% plays at, on
+        /// the scale of the game's own volume sliders (<see cref="ModSettings.GetModVolume"/>). It
+        /// applies as it moves, as the tab's checkbox does, and plays the beacon's sample so the
+        /// new level is heard.</summary>
+        public static void AddModVolume(ModDialog dialog)
+        {
+            Percent(
+                dialog.AddSlider(
+                    ModText.Get(ModStrings.Screens.ModVolume),
+                    ModSettings.GetModVolume() / 100f,
+                    ModSettings.CueVolumeMinimum / 100f,
+                    ModSettings.CueVolumeMaximum / 100f,
+                    value =>
+                    {
+                        ModSettings.SetModVolume(Whole(value));
+                        AdventureBeaconAudio.PlayPreview();
+                    }),
+                VolumeStep);
+        }
+
         // ---- the beacon ----
 
         /// <summary>The beacon has one setting, and it is not a cue: its pitch carries north and

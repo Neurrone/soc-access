@@ -109,6 +109,28 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(ModSettings.BeaconVolumeDefault, ModSettings.GetBeaconVolume());
         }
 
+        /// <summary>The volume over every mod sound: full until set, clamped to the slider's range,
+        /// and handed to the audio sources as the game's linear gain (50 is half).</summary>
+        [TestMethod]
+        public void ModVolumeStartsFullClampsAndIsLinearGain()
+        {
+            Assert.AreEqual(ModSettings.ModVolumeDefault, ModSettings.GetModVolume());
+            Assert.AreEqual(1f, ModSettings.ModGain, 0.0001f);
+
+            ModSettings.SetModVolume(50);
+            Assert.AreEqual(50, ModSettings.GetModVolume());
+            Assert.AreEqual(0.5f, ModSettings.ModGain, 0.0001f);
+
+            ModSettings.SetModVolume(400);
+            Assert.AreEqual(ModSettings.CueVolumeMaximum, ModSettings.GetModVolume());
+
+            ModSettings.SetModVolume(-10);
+            Assert.AreEqual(ModSettings.CueVolumeMinimum, ModSettings.GetModVolume());
+
+            ModSettings.SetModVolume(ModSettings.ModVolumeDefault);
+            Assert.AreEqual(ModSettings.ModVolumeDefault, ModSettings.GetModVolume());
+        }
+
         [TestMethod]
         public void EffectiveSpecFollowsTheDurationSetting()
         {

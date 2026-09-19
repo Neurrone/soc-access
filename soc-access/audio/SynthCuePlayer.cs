@@ -59,7 +59,9 @@ namespace SongsOfConquestAccess.Audio
                 }
 
                 source.clip = clip;
-                source.volume = 1f;
+                // The one thing not baked into the clip: the volume over every mod sound, so moving
+                // that slider does not re-render the cache.
+                source.volume = ModSettings.ModGain;
                 source.pitch = 1f;
                 source.panStereo = 0f;
                 source.time = 0f;

@@ -154,6 +154,34 @@ namespace SongsOfConquestAccess
             _config?.Save();
         }
 
+        /// <summary>The volume over every sound the mod plays, cues and beacon alike: what a cue or
+        /// the beacon at 100 plays at. On the scale of the game's own sliders, which is linear gain -
+        /// the game's Init.bnk drives bus volume from MasterVolume, MusicVolume and SFXVolume with a
+        /// two-point linear curve in Wwise's dB scaling, gain = slider, and <c>SoundManager</c> sets
+        /// <c>AudioSource.volume</c> to the same product for its own Unity clips - so 50 here is as
+        /// much quieter than full as the game's SFX slider at 50%.</summary>
+        public static int GetModVolume()
+        {
+            return _modVolume != null ? _modVolume.Value : ModVolumeDefault;
+        }
+
+        /// <summary><see cref="GetModVolume"/> as the gain an <c>AudioSource.volume</c> takes.</summary>
+        public static float ModGain
+        {
+            get { return GetModVolume() / 100f; }
+        }
+
+        public static void SetModVolume(int value)
+        {
+            if (_modVolume == null)
+            {
+                return;
+            }
+
+            _modVolume.Value = Clamp(value, CueVolumeMinimum, CueVolumeMaximum);
+            _config?.Save();
+        }
+
         private static void BindAudioCues(ConfigFile config)
         {
             _audioCues.Clear();
