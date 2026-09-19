@@ -419,6 +419,23 @@ namespace SongsOfConquestAccess.Adapters
             return !IsInAdventure();
         }
 
+        /// <summary>Whether a click on a filled quick bar slot CASTS right now, which is what makes
+        /// the slot a button. The game passes the click on only while the local team is the one
+        /// acting and the auto-fill toggle is off (<c>SpellbookQuickbar.HandleClickedSpell</c>), and
+        /// on the map nothing listens at all; with auto-fill on a click, the pointer's included,
+        /// does nothing. Read for the slot's role word only: the click itself is still delivered
+        /// to the game and the game still decides.</summary>
+        public bool QuickbarClickCasts()
+        {
+            if (!CanActivateQuickbar() || IsAutoPopulateChecked())
+            {
+                return false;
+            }
+
+            IClientBattleFacade battle = GetBattleFacade();
+            return battle != null && battle.Teams != null && battle.Teams.IsCurrentLocal;
+        }
+
         /// <summary>The slot's own main button, clicked the way the pointer clicks it, so the game's
         /// own dispatch decides what a click on a quick bar spell means. Only where
         /// <see cref="CanActivateQuickbar"/> says the game has a listener that can take it.</summary>
@@ -1115,6 +1132,8 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public bool CanActivate { get { return _adapter.CanActivateQuickbar(); } }
+
+            public bool ClickCasts { get { return _adapter.QuickbarClickCasts(); } }
 
             public bool Activate() { return _entry != null && _adapter.ActivateQuickbar(_entry); }
 

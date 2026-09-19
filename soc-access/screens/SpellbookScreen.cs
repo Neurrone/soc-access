@@ -243,7 +243,10 @@ namespace SongsOfConquestAccess.Screens
         /// every gesture the game gives a spell there.
         ///
         /// A FILLED slot is a group, because the game hides a command under it: the delete button it
-        /// draws when the pointer rests on the slot. Right opens the group and lands on it.
+        /// draws when the pointer rests on the slot. Right opens the group and lands on it. While a
+        /// click on it casts - in battle, on the player's own turn, with auto-fill off - it says
+        /// "button" in place of "group" (owner ruling 2026-09-19): Enter does something there, and
+        /// with auto-fill on the game throws the click away, the pointer's included.
         ///
         /// An EMPTY one is no control at all (owner ruling): it is a place a spell can be dropped,
         /// so it says the mod's word for empty and nothing about a role, and it takes no click.
@@ -266,6 +269,14 @@ namespace SongsOfConquestAccess.Screens
             NodeVtable vtable = it.HasSpell
                 ? GraphNodes.Group(label, activate, null, it.Tooltip)
                 : GraphNodes.Text(label, null, it.Tooltip);
+            if (it.HasSpell)
+            {
+                // A role part of the node's own takes the place of the type's.
+                vtable.Announcements.Add(new NodeAnnouncement(
+                    () => ModText.Get(it.ClickCasts ? ModStrings.UI.RoleButton : ModStrings.UI.RoleGroup),
+                    kind: AnnouncementKinds.Role));
+            }
+
             // What the slot holds changes under a cursor standing right here: a drop lands on it, the
             // game's own animation fills it a fifth of a second after the drop was reported.
             vtable.Announcements[0].Live = true;
