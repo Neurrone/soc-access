@@ -304,6 +304,9 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 }
             }
 
+            // What a root spreader's roots do on this tile, hostile first: the one that hurts.
+            parts.AddRange(tile.HostileRootEffects);
+            parts.AddRange(tile.FriendlyRootEffects);
             return ModText.JoinListWithCommas(parts);
         }
 

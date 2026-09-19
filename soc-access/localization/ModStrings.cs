@@ -564,6 +564,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString MapEntityDamage = new ModString("Combat.MapEntityDamage", "map entity");
             public static readonly ModString MeleeDamage = new ModString("Combat.MeleeDamage", "melee");
             public static readonly ModString MothersLove = new ModString("Combat.MothersLove", "mother's love");
+            public static readonly ModString RootsCover = new ModString("Combat.RootsCover", "{0} covers {1} around {2}");
             public static readonly ModString NewTurn = new ModString("Combat.NewTurn", "It is {0}'s turn");
             public static readonly ModString OpportunityAttack = new ModString("Combat.OpportunityAttack", "opportunity attack");
             public static readonly ModString OrderEssence = new ModString("Combat.OrderEssence", "order");

@@ -57,6 +57,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public List<int> DangerousMapEffectEntityIds { get; private set; } = new List<int>();
 
+        /// <summary>The game's names for what an ENEMY root spreader's roots do on this tile to the
+        /// player's troops (Mother's Scorn). Empty where no such roots reach it.</summary>
+        public List<string> HostileRootEffects { get; private set; } = new List<string>();
+
+        /// <summary>The game's names for what the player's OWN root spreader's roots do on this tile
+        /// for the player's troops (Mother's Embrace).</summary>
+        public List<string> FriendlyRootEffects { get; private set; } = new List<string>();
+
         public string DecorativeFeature { get; set; }
     }
 

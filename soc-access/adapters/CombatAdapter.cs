@@ -600,6 +600,7 @@ namespace SongsOfConquestAccess.Adapters
             tile.EntityId = tile.Entity != null ? tile.Entity.Id : -1;
             tile.IsEntityAttackable = IsAttackable(tile.Entity);
             AddDangerousMapEffects(point, tile);
+            AddRootEffects(point, tile);
             tile.DecorativeFeature = GetDecorativeFeatureAt(point, tile.Entity);
             BattlefieldTerrain terrain = GetTerrain();
             tile.Kind = terrain != null ? terrain.GetKind(point) : BattlefieldCellKind.OffGrid;
@@ -1229,6 +1230,127 @@ namespace SongsOfConquestAccess.Adapters
             catch (Exception exception)
             {
                 _faults.Report("HasDangerousMapEntityEffect", exception);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// The roots a Seed or a Root of the Mother spreads over the tiles around it, which the game
+        /// DRAWS on the ground and says in words only in the move tooltip of a reachable empty tile
+        /// (<c>BattleGridManager.HandleInspectTileEnter</c>): an unreachable root tile, and one with a
+        /// troop standing on it, said nothing at all. The same two questions the game asks there are
+        /// asked here for every tile, from the local player's side rather than the acting team's,
+        /// because the roots are there on the enemy's turn too: an enemy spreader that carries
+        /// Mother's Scorn damages the player's troops standing on its roots at the start of its
+        /// turn, and the player's own spreader with Mother's Embrace absorbs damage for them. Named
+        /// by the game's own names for those two traits.
+        /// </summary>
+        private void AddRootEffects(Vector2Int point, CombatTile tile)
+        {
+            if (tile == null || _facade == null || _facade.Troops == null || _facade.Teams == null)
+            {
+                return;
+            }
+
+            try
+            {
+                int localTeamId = GetLocalTeamId();
+                if (localTeamId < 0)
+                {
+                    return;
+                }
+
+                IBattleTroopState[] hostile = _facade.Troops.GetRootSpreadersForTile(
+                    point,
+                    _facade.Teams.GetOtherTeamId(localTeamId));
+                for (int i = 0; i < hostile.Length; i++)
+                {
+                    if (hostile[i].IsHatingMother())
+                    {
+                        AddRootEffect(
+                            tile.HostileRootEffects,
+                            hostile[i].HasBacteria(BacteriaTypes.TraitMothersHateUpgraded)
+                                ? BacteriaTypes.TraitMothersHateUpgraded
+                                : BacteriaTypes.TraitMothersHate);
+                    }
+                }
+
+                IBattleTroopState[] friendly = _facade.Troops.GetRootSpreadersForTile(point, localTeamId);
+                for (int i = 0; i < friendly.Length; i++)
+                {
+                    if (friendly[i].HasBacteria(BacteriaTypes.TraitMothersLoveProvider))
+                    {
+                        AddRootEffect(tile.FriendlyRootEffects, BacteriaTypes.TraitMothersLoveProvider);
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                _faults.Report("AddRootEffects", exception);
+            }
+        }
+
+        private void AddRootEffect(List<string> into, BacteriaTypes trait)
+        {
+            string name = RootEffectName(trait);
+            if (!string.IsNullOrWhiteSpace(name) && !into.Contains(name))
+            {
+                into.Add(name);
+            }
+        }
+
+        private string RootEffectName(BacteriaTypes trait)
+        {
+            return SpokenLines.Clean(LocalizeText(BacteriaReferenceUtility.GetLocalizationNameKey(trait)));
+        }
+
+        /// <summary>
+        /// What the roots of <paramref name="troop"/> do for or against the local player, under the
+        /// game's name for it, and how many tiles they cover with the troop standing at
+        /// <paramref name="position"/>. The roots are no growth: they are every tile within the
+        /// troop's root spread of where it stands (<c>GetRootSpreadFromTroop</c>), so when the troop
+        /// moves the whole patch moves with it, and the game shows that only by redrawing the
+        /// ground. False for a troop with no roots, and for roots that do nothing to the player
+        /// (an enemy's Embrace, the player's own Scorn).
+        /// </summary>
+        public bool TryGetRootCoverage(IBattleTroopState troop, Vector2Int position, out string effectName, out int tileCount)
+        {
+            effectName = string.Empty;
+            tileCount = 0;
+            try
+            {
+                if (troop == null || _facade == null || _facade.Troops == null || troop.Stats.RootSpread.GetValue() <= 0)
+                {
+                    return false;
+                }
+
+                if (IsEnemyTroop(troop))
+                {
+                    if (!troop.IsHatingMother())
+                    {
+                        return false;
+                    }
+
+                    effectName = RootEffectName(troop.HasBacteria(BacteriaTypes.TraitMothersHateUpgraded)
+                        ? BacteriaTypes.TraitMothersHateUpgraded
+                        : BacteriaTypes.TraitMothersHate);
+                }
+                else
+                {
+                    if (!troop.HasBacteria(BacteriaTypes.TraitMothersLoveProvider))
+                    {
+                        return false;
+                    }
+
+                    effectName = RootEffectName(BacteriaTypes.TraitMothersLoveProvider);
+                }
+
+                tileCount = _facade.Troops.GetRootSpreadFromTroop(troop, position).Count();
+                return tileCount > 0 && !string.IsNullOrWhiteSpace(effectName);
+            }
+            catch (Exception exception)
+            {
+                _faults.Report("TryGetRootCoverage", exception);
                 return false;
             }
         }

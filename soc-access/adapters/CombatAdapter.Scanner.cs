@@ -87,6 +87,19 @@ namespace SongsOfConquestAccess.Adapters
                         continue;
                     }
 
+                    // A tile under an enemy's scorning roots is dangerous ground whatever stands on
+                    // it, so it is listed beside the dangerous map effects, under the game's name
+                    // for what the roots do.
+                    if (tile.HostileRootEffects.Count > 0)
+                    {
+                        ScannerResult roots = new ScannerResult(
+                            ScannerTileKeys.For("roots:hostile", point),
+                            tile.HostileRootEffects[0],
+                            point);
+                        snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, roots.Clone());
+                        snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.Dangerous, roots);
+                    }
+
                     IMapEntity mapEntity = _facade.MapEntities != null ? _facade.MapEntities.GetAtIncludingNonBlockers(point) : null;
                     if (mapEntity != null && mapEntity.IsEnabled && mapEntity.IsVisibleInGame)
                     {

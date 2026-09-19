@@ -568,7 +568,38 @@ namespace SongsOfConquestAccess.Events.Combat
         public Vector2Int From { get; private set; }
         public Vector2Int To { get; private set; }
         public IReadOnlyList<Vector2Int> Path { get; private set; }
-        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.TroopMoved, Actor.Format(), FormatPoint(To)); }
+
+        /// <summary>The game's name for what the mover's roots do to the player, where it is a root
+        /// spreader whose roots do anything to them, and how many tiles they cover from where it
+        /// stopped. Empty and zero otherwise.</summary>
+        public string RootEffect { get; private set; }
+        public int RootTiles { get; private set; }
+
+        public void SetRoots(string effect, int tiles)
+        {
+            RootEffect = effect;
+            RootTiles = tiles;
+        }
+
+        public string GetSpeechText()
+        {
+            string moved = ModText.Get(ModStrings.Combat.TroopMoved, Actor.Format(), FormatPoint(To));
+            if (string.IsNullOrWhiteSpace(RootEffect) || RootTiles <= 0)
+            {
+                return moved;
+            }
+
+            // "Mother's Scorn covers 7 tiles around 9.5, 3": the roots are every tile within the
+            // spreader's reach of where it stands, so the centre and the count are the whole of it.
+            return ModText.Get(
+                ModStrings.Common.SentenceSeparator,
+                moved,
+                ModText.Get(
+                    ModStrings.Combat.RootsCover,
+                    RootEffect,
+                    ModText.Plural(ModStrings.Common.TileCount, RootTiles, RootTiles),
+                    FormatPoint(To)));
+        }
     }
 
     public sealed class AttackEvent : IAccessibilityEvent

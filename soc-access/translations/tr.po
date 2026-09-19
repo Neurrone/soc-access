@@ -1830,6 +1830,11 @@ msgctxt "Combat.MothersLove"
 msgid "mother's love"
 msgstr "anne sevgisi"
 
+#. Combat.RootsCover
+msgctxt "Combat.RootsCover"
+msgid "{0} covers {1} around {2}"
+msgstr "{0}, {2} çevresinde {1} kaplıyor"
+
 #. Combat.NewTurn
 msgctxt "Combat.NewTurn"
 msgid "It is {0}'s turn"

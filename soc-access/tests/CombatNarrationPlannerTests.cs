@@ -1151,6 +1151,20 @@ namespace SongsOfConquestAccess.Tests
             return new TroopRef(troopId, teamId, 1, name, count, Vector2Int.zero);
         }
 
+        /// <summary>A root spreader takes its roots with it, and the game only redraws the ground:
+        /// the move says what the roots do and how many tiles they cover from where it stopped.</summary>
+        [TestMethod]
+        public void ARootSpreadersMoveSaysWhereItsRootsAreNow()
+        {
+            TroopRef seed = TroopAt(40, 8, "Seed of the Mother", 1, new Vector2Int(9, 2));
+            TroopMovedEvent moved = new TroopMovedEvent(new ActorRef(seed, true), new Vector2Int(9, 2), new Vector2Int(9, 3), null);
+            string plain = moved.GetSpeechText();
+
+            moved.SetRoots("Mother's Scorn", 7);
+
+            Assert.AreEqual(plain + ". Mother's Scorn covers 7 tiles around 9.5, 3", moved.GetSpeechText());
+        }
+
         private static TroopRef TroopAt(int troopId, int teamId, string name, int count, Vector2Int position)
         {
             return new TroopRef(troopId, teamId, 1, name, count, position);

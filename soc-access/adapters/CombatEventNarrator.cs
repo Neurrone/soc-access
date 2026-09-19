@@ -261,9 +261,18 @@ namespace SongsOfConquestAccess.Adapters
                     List<Vector2Int> path = ConvertPath(move.Path);
                     Vector2Int start = path[0];
                     Vector2Int end = path[path.Count - 1];
+                    TroopMovedEvent moved = new TroopMovedEvent(CreateActor(adapter, troop, troop.Stats.Size, start), start, end, path);
+                    // A root spreader takes its roots with it, and the game only redraws the ground.
+                    string rootEffect;
+                    int rootTiles;
+                    if (adapter.TryGetRootCoverage(troop, end, out rootEffect, out rootTiles))
+                    {
+                        moved.SetRoots(rootEffect, rootTiles);
+                    }
+
                     Enqueue(CombatNarrationItem.Create(
                         CombatNarrationItemKind.Move,
-                        new TroopMovedEvent(CreateActor(adapter, troop, troop.Stats.Size, start), start, end, path),
+                        moved,
                         troop.Id,
                         path));
                 }
