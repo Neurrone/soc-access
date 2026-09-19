@@ -53,6 +53,14 @@ namespace SongsOfConquestAccess.Adapters
             typeof(ReactiveAdventureMenuSystem).Name + "_MessageTrigger";
         private static readonly string DialogueTriggerWait =
             typeof(ReactiveAdventureMenuSystem).Name + "_DialogueTrigger";
+        // The name PauseCommand waits under. Its one source is a Pause step in a map's trigger
+        // series (PauseTriggerData), which is how a mission holds the map for a moment before its
+        // opening message: mission 1 of the first song starts with one.
+        private const string PauseTriggerWait = "Pause Command";
+        // The name AOSyncAdventureState waits under (its own type name) from before the adventure
+        // scene loads until the scene loader's Load has returned.
+        private static readonly string StateSyncWait =
+            typeof(SongsOfConquest.Client.Adventure.AsyncOperations.AOSyncAdventureState).Name;
 
         private readonly DiContainer _container;
         private readonly IClientAdventureFacade _facade;
@@ -410,7 +418,9 @@ namespace SongsOfConquestAccess.Adapters
         /// and what it does show, it holds the command stream open for through
         /// <c>ICommandWaiter</c> under a name of its own, until the page is dismissed. So the
         /// waiter's identifiers ARE the answer, and losing sight of one is impossible: the game
-        /// drops it itself when the story ends.</summary>
+        /// drops it itself when the story ends. A Pause step of the same series waits the same way
+        /// (<c>PauseCommand</c>, sent only to the clients the trigger is for) and counts too, or the
+        /// map is announced in the pause a mission puts before its opening message.</summary>
         public bool IsStoryTriggerRunning()
         {
             if (_commandWaiter == null || !_commandWaiter.IsWaiting)
@@ -420,7 +430,7 @@ namespace SongsOfConquestAccess.Adapters
 
             foreach (string identifier in _commandWaiter.WaitDebugIdentifiers)
             {
-                if (identifier == MessageTriggerWait || identifier == DialogueTriggerWait)
+                if (identifier == MessageTriggerWait || identifier == DialogueTriggerWait || identifier == PauseTriggerWait)
                 {
                     return true;
                 }
@@ -599,7 +609,33 @@ namespace SongsOfConquestAccess.Adapters
                     : "scene loader is elsewhere";
             }
 
+            // The load holds the command stream for a frame after the scene loader goes idle, and
+            // what the server queued meanwhile - a mission's opening story triggers - only runs when
+            // it lets go. Ready before that, the map was announced and then taken away by the story.
+            if (IsWaitingUnder(StateSyncWait))
+            {
+                return "command stream held for the state sync";
+            }
+
             return null;
+        }
+
+        private bool IsWaitingUnder(string name)
+        {
+            if (_commandWaiter == null || !_commandWaiter.IsWaiting)
+            {
+                return false;
+            }
+
+            foreach (string identifier in _commandWaiter.WaitDebugIdentifiers)
+            {
+                if (identifier == name)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
