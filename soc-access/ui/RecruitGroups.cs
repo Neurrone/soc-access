@@ -32,8 +32,9 @@ namespace SongsOfConquestAccess.UI
     public static class RecruitGroups
     {
         /// <summary>How far Shift and an arrow move the amount slider, which the game gives no coarse
-        /// step of its own.</summary>
-        public const int CoarseStep = 5;
+        /// step of its own: ten fine steps, as on every other slider (owner ruling 2026-09-19; it
+        /// was 5).</summary>
+        public const int CoarseStep = 10;
 
         /// <summary>The whole grid, under the mod's own word for it, declared into whatever stop the
         /// caller has opened. <paramref name="lead"/> is whatever the page draws over the grid and

@@ -34,10 +34,12 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public static class ModOptionsDialogs
     {
-        /// <summary>Volume moves five percent at a time, duration ten, pitch a semitone - the steps
-        /// the menus these replace used.</summary>
-        private const float VolumeStep = 0.05f;
-        private const float DurationStep = 0.10f;
+        /// <summary>Every percentage here moves one percent at a time and pitch a semitone, which is
+        /// what the game's own volume sliders do (no rounding value, so a hundredth of the range) and
+        /// makes Shift with an arrow - ten fine steps on every menu slider, MenuFormNodes.Adjust -
+        /// ten percent. At five percent a step, Shift moved a volume by half its range.</summary>
+        private const float VolumeStep = 0.01f;
+        private const float DurationStep = 0.01f;
 
         // ---- the order of one announcement group ----
 
