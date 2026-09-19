@@ -59,10 +59,12 @@ Most changes in this section were contributed by Rashad Naqeeb.
 ### Combat
 
 - All 69 battlefields have AI written descriptions of important terrain features, choke points and spawn points. Read them with `Ctrl+D` in troop deployment or combat, or from the description tab stop in troop deployment
-- Buffs, debuffs and restrictions (invulnerable, reloading, magic immunity) are indicated for troops on the combat grid and in scanner results
+- Active abilities, buffs, debuffs and restrictions (invulnerable, reloading, magic immunity) are indicated for troops on the combat grid and in scanner results. This information was already in the buffer
 - Choke points are indicated and can be found in the scanner
 - Decorations on tiles are read, so a tile can read as `Gatepost, impassable`. Impassable tiles no longer speak a height
 - Occupied tiles no longer say "blocked". Impassable terrain is still indicated
+- Tiles and troops affected by Mother's scorn and Mother's Embrace are now read
+- The spread of roots for seeds and roots of the mother are now read
 
 ### Bookmarks
 
@@ -82,8 +84,10 @@ Most changes in this section were contributed by Rashad Naqeeb.
 - Fixed being stuck on the post-combat screen when attacked while your wielder was defending a settlement
 - Fixed `Shift+Tab` activating several times when pressed once
 - Fixed the adventure map speaking the current tile when transitioning between the troop placement and combat screens or quitting a game
+- Fixed the adventure map speaking before story dialog when starting campaigns
+- Fixed combat screen speaking when loading or quitting a game
 - Fixed "blocked" being spoken 6 times when a ranged unit's attack is obstructed by elevated terrain
-- Improved reliability of reading and displaying attack previews and troop tooltips
+- Improved reliability of reading and displaying attack previews and troop tooltips in combat
 
 ## V0.7.4
 
