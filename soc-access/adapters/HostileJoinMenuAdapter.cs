@@ -149,7 +149,10 @@ namespace SongsOfConquestAccess.Adapters
 
         /// <summary>Whether the menu has swapped one of its two shapes for the other since this was
         /// last asked, which is the moment a page built over the old shape stops meaning anything.
-        /// </summary>
+        /// The window ARRIVING is not a swap: the baseline is no stage then (<see cref="IsPresent"/>
+        /// clears it while the window is down), and a first page read as a change gave the cursor
+        /// up on a page nobody had been on - an offer that opens straight in the join stage
+        /// included. Nor is the window going away.</summary>
         public bool TakeStageChange()
         {
             HostileJoinMenuStage stage = Stage;
@@ -158,8 +161,9 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
+            HostileJoinMenuStage previous = _seenStage;
             _seenStage = stage;
-            return true;
+            return previous != HostileJoinMenuStage.None && stage != HostileJoinMenuStage.None;
         }
 
         /// <summary>The title the menu writes over the window, the same in both stages.</summary>

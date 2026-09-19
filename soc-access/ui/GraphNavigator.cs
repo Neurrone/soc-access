@@ -1060,6 +1060,8 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
+            // Nothing is carried any more, and a carried thing changes what rows say.
+            _graph.Invalidate();
             Say(outcome.Speech, true);
             return true;
         }

@@ -290,7 +290,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             MapFormat map = GetMap();
             DeploymentMenu deployment = GetDeploymentMenu();
-            TroopPlacementSnapshot snapshot = new TroopPlacementSnapshot(map != null ? map.Metadata.Size : Vector2Int.zero, GetOwnSide(), this);
+            TroopPlacementSnapshot snapshot = new TroopPlacementSnapshot(map != null ? map.Metadata.Size : Vector2Int.zero, GetBoardSide(), this);
             if (map == null || deployment == null)
             {
                 return snapshot;
@@ -1118,6 +1118,26 @@ namespace SongsOfConquestAccess.Adapters
         public string PlacementState
         {
             get { return GetCurrentStateName(); }
+        }
+
+        /// <summary>
+        /// Whose board a snapshot is: the side that is placing, and while both hot-seat players are
+        /// ready the DEFENDER's. Nobody is placing then, so <see cref="GetOwnSide"/> answers no side
+        /// and both armies are drawn in full, but a board with no side at all called every troop an
+        /// enemy's and no spawn point anybody's. The game only enters that state from the
+        /// defender's placement (<c>PreBattleMenu.HandleReadyButton</c>), so the player at the
+        /// keyboard is the one who just pressed Ready, and the board stays theirs. What is shown
+        /// and hidden still turns on <see cref="GetOwnSide"/> alone.
+        /// </summary>
+        private BattleSide? GetBoardSide()
+        {
+            BattleSide? own = GetOwnSide();
+            if (own.HasValue)
+            {
+                return own;
+            }
+
+            return GetCurrentStateName() == "HotSeatBothReady" ? BattleSide.Right_Defender : (BattleSide?)null;
         }
 
         private BattleSide? GetOwnSide()
