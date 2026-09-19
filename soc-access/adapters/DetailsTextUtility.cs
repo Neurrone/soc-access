@@ -342,7 +342,13 @@ namespace SongsOfConquestAccess.Adapters
             string right = SongsOfConquestAccess.UI.SpokenLines.Clean(value);
             string resourceName = GetResourceName(resourceType, amount);
             string row = amount;
-            if (!string.IsNullOrWhiteSpace(resourceName) && !ContainsResourceName(amount, resourceName))
+            // The icon is the row's only name for the resource when the text beside it is a bare
+            // amount (a troop's, an artifact's or a building's cost). A row that is a sentence - the
+            // resource strip's "+300 from buildings", under a header that already says Gold - is
+            // read as drawn.
+            int bareAmount;
+            bool iconNamesResource = string.IsNullOrWhiteSpace(amount) || int.TryParse(amount, out bareAmount);
+            if (iconNamesResource && !string.IsNullOrWhiteSpace(resourceName) && !ContainsResourceName(amount, resourceName))
             {
                 row = string.IsNullOrWhiteSpace(amount) ? resourceName : amount + " " + resourceName;
             }
