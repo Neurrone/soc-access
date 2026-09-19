@@ -24,6 +24,18 @@ namespace SongsOfConquestAccess.Adapters
             ILocalizationHandler localization,
             IMapEntity entity)
         {
+            return GetMapEntityName(facade, selectionHandler, localization, entity, null);
+        }
+
+        /// <param name="scoutedAt">The scouting detail level to name the entity at, or null for the
+        /// one the game answers for its tile now.</param>
+        private static string GetMapEntityName(
+            IClientAdventureFacade facade,
+            ISelectionHandler selectionHandler,
+            ILocalizationHandler localization,
+            IMapEntity entity,
+            ScoutingDetailLevel? scoutedAt)
+        {
             if (entity == null)
             {
                 return string.Empty;
@@ -40,7 +52,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             string preVisitName;
-            if (TryGetPreVisitLabel(facade, selectionHandler, localization, entity, out preVisitName))
+            if (TryGetPreVisitLabel(facade, selectionHandler, localization, entity, scoutedAt, out preVisitName))
             {
                 return AddEssenceVariant(localization, entity, preVisitName);
             }
@@ -96,11 +108,85 @@ namespace SongsOfConquestAccess.Adapters
                 essenceVariant);
         }
 
+        /// <summary>
+        /// Whether an entity read under <paramref name="previousSignature"/> is still CALLED the same
+        /// under <paramref name="signature"/>. A signature says what the name is read from, and one
+        /// of those things is the scouting detail level, which the game buckets from how far the
+        /// nearest friendly unit stands: it changes as a wielder walks past, and for most entities
+        /// the name does not turn on it at all (it is what turns "battle loot" into the artifacts
+        /// themselves, and little else). So where the level is the ONLY thing that moved, the name
+        /// is read at the level it was read at before and at the level it is read at now, and the
+        /// two are compared. Anything else moving is a different name by definition.
+        /// </summary>
+        public static bool NamesTheSame(
+            IClientAdventureFacade facade,
+            ISelectionHandler selectionHandler,
+            ILocalizationHandler localization,
+            IMapEntity entity,
+            string previousSignature,
+            string signature)
+        {
+            string previousRest;
+            string rest;
+            int previousLevel;
+            int level;
+            if (!TrySplitScoutingLevel(previousSignature, out previousRest, out previousLevel)
+                || !TrySplitScoutingLevel(signature, out rest, out level)
+                || !string.Equals(previousRest, rest, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            if (previousLevel == level)
+            {
+                return true;
+            }
+
+            string before = GetMapEntityName(
+                facade, selectionHandler, localization, entity, (ScoutingDetailLevel)previousLevel);
+            string now = GetMapEntityName(facade, selectionHandler, localization, entity, null);
+            return string.Equals(before, now, StringComparison.Ordinal);
+        }
+
+        /// <summary>A signature with its scouting level taken out: the level is the last field but
+        /// one (<see cref="GetMapEntityNameSignature"/>), and the two fields after the names are
+        /// numbers, so they are found from the end whatever the names hold.</summary>
+        private static bool TrySplitScoutingLevel(string signature, out string rest, out int level)
+        {
+            rest = string.Empty;
+            level = 0;
+            int essenceAt = signature != null ? signature.LastIndexOf('|') : -1;
+            int levelAt = essenceAt > 0 ? signature.LastIndexOf('|', essenceAt - 1) : -1;
+            if (levelAt < 0
+                || !int.TryParse(
+                    signature.Substring(levelAt + 1, essenceAt - levelAt - 1),
+                    System.Globalization.NumberStyles.Integer,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out level))
+            {
+                return false;
+            }
+
+            rest = signature.Substring(0, levelAt) + signature.Substring(essenceAt);
+            return true;
+        }
+
         public static bool TryGetPreVisitLabel(
             IClientAdventureFacade facade,
             ISelectionHandler selectionHandler,
             ILocalizationHandler localization,
             IMapEntity entity,
+            out string label)
+        {
+            return TryGetPreVisitLabel(facade, selectionHandler, localization, entity, null, out label);
+        }
+
+        private static bool TryGetPreVisitLabel(
+            IClientAdventureFacade facade,
+            ISelectionHandler selectionHandler,
+            ILocalizationHandler localization,
+            IMapEntity entity,
+            ScoutingDetailLevel? scoutedAt,
             out string label)
         {
             label = string.Empty;
@@ -116,7 +202,7 @@ namespace SongsOfConquestAccess.Adapters
                 IDetails details = entity.GetPreVisitDetails(
                     selectedCommander != null ? selectedCommander.Id : -1,
                     false,
-                    scouting.DetailLevel,
+                    scoutedAt ?? scouting.DetailLevel,
                     scouting.ProviderKey,
                     selectedCommander != null && selectedCommander.IsAlive);
 

@@ -594,10 +594,23 @@ namespace SongsOfConquestAccess.Events
             bool alreadyDiscovered = _discoveredMapEntityIds.Contains(entity.Id);
             string previousSignature;
             if (alreadyDiscovered
-                && _discoveredMapEntityNameSignaturesById.TryGetValue(entity.Id, out previousSignature)
-                && string.Equals(previousSignature, signature, StringComparison.Ordinal))
+                && _discoveredMapEntityNameSignaturesById.TryGetValue(entity.Id, out previousSignature))
             {
-                return false;
+                if (string.Equals(previousSignature, signature, StringComparison.Ordinal))
+                {
+                    return false;
+                }
+
+                // Named from something else now, which for nearly every entity is only the scouting
+                // level moving as a wielder walks past - and "Revealed Essencecaps" for a mushroom
+                // patch found long ago was the result. It is news only if it is CALLED something
+                // else: the name is read twice here, and only when the signature moved.
+                if (AdventureMapEntityLabel.NamesTheSame(
+                    _facade, _selectionHandler, _localizationHandler, entity, previousSignature, signature))
+                {
+                    _discoveredMapEntityNameSignaturesById[entity.Id] = signature;
+                    return false;
+                }
             }
 
             string label = GetMapEntityName(entity);
