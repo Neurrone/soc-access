@@ -38,11 +38,15 @@ namespace SongsOfConquestAccess.Audio
             // Occupied tiles are flagged impassable by the game; the thud is reserved for
             // impassable terrain itself, so occupants fall through to their terrain family.
             // Occupancy drives that, not the overlay, because neutral occupants play no cue.
-            cues.Add(new TileCue(
-                !HasOccupant(tile) && IsAdventureTileImpassable(tile)
-                    ? CueLibrary.TerrainImpassable
-                    : ForTerrain(tile.Terrain),
-                0f));
+            // Water and trees keep their own voice: both are impassable on every tile the game
+            // has, so the thud would leave their cues unheard and the two sounds already mean
+            // "nothing walks here".
+            string terrain = ForTerrain(tile.Terrain);
+            bool thuds = !HasOccupant(tile)
+                && IsAdventureTileImpassable(tile)
+                && terrain != CueLibrary.TerrainWater
+                && terrain != CueLibrary.TerrainTrees;
+            cues.Add(new TileCue(thuds ? CueLibrary.TerrainImpassable : terrain, 0f));
 
             string affiliation = AffiliationCueKey(tile);
             if (affiliation != null)

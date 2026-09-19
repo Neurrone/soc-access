@@ -78,6 +78,18 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void ImpassableWaterAndTreesKeepTheirOwnCue()
+        {
+            AdventureMapTile water = ExploredTile(AdventureTerrainKind.WaterEdge);
+            water.IsImpassable = true;
+            AdventureMapTile trees = ExploredTile(AdventureTerrainKind.TemperateTrees);
+            trees.IsImpassable = true;
+
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainWater }, ToArray(TileCueSelector.ForAdventureTile(water)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainTrees }, ToArray(TileCueSelector.ForAdventureTile(trees)));
+        }
+
+        [TestMethod]
         public void BlockedFlagKeepsTheTerrainCue()
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Sand);
