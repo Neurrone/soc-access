@@ -104,6 +104,28 @@ namespace SongsOfConquestAccess.Tests
                 CombatTileSpeechFormatter.ComposeTroop(troop, attackable: false, facing: null));
         }
 
+        /// <summary>The ability a stack has active is said under the game's name for it, after the
+        /// stack's name and before what it cannot do.</summary>
+        [TestMethod]
+        public void TroopReadsItsActiveAbilityBeforeItsRestrictions()
+        {
+            CombatTroopFacts troop = new CombatTroopFacts(
+                "Footmen",
+                19,
+                18,
+                18,
+                isEnemy: false,
+                isActing: false,
+                isReloading: false,
+                restrictionNames: new[] { "Invulnerable" },
+                effectNames: null,
+                activeAbilityName: "Spearwall");
+
+            Assert.AreEqual(
+                "19 Footmen, Spearwall active, Invulnerable, 18 / 18 health",
+                CombatTileSpeechFormatter.ComposeTroop(troop, attackable: false, facing: null));
+        }
+
         /// <summary>A blocked tile is every tile a troop or an attackable thing stands on, so saying
         /// so said nothing the readout had not already said. Statically unwalkable ground still says
         /// it, because nothing else does.</summary>

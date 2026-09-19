@@ -284,6 +284,7 @@ namespace SongsOfConquestAccess.Localization
 
         public static class Spatial
         {
+            public static readonly ModString AbilityActive = new ModString("Spatial.AbilityActive", "{0} active");
             public static readonly ModString Acting = new ModString("Spatial.Acting", "acting");
             public static readonly ModString Attack = new ModString("Spatial.Attack", "attack");
             public static readonly ModString AttackRange = new ModString("Spatial.AttackRange", "Attack range");
@@ -972,6 +973,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Wielders = new ModString("Screens.Wielders", "Wielders");
             public static readonly ModString MapEntityAnnouncements = new ModString("Screens.MapEntityAnnouncements", "Map entity announcements");
 
+            public static readonly ModString AnnouncementActiveAbility = new ModString("Screens.AnnouncementActiveAbility", "Active ability");
             public static readonly ModString AnnouncementActing = new ModString("Screens.AnnouncementActing", "Acting");
             public static readonly ModString AnnouncementAffiliation = new ModString("Screens.AnnouncementAffiliation", "Affiliation");
             public static readonly ModString AnnouncementAttackable = new ModString("Screens.AnnouncementAttackable", "Attackable");

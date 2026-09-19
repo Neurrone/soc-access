@@ -134,7 +134,7 @@ namespace SongsOfConquestAccess.Tests
                 "name,owner,status,reachability_or_route_preview,movement_cost",
                 AdventureMapAnnouncementDefinitions.ScannerContent.DefaultOrderCsv);
             Assert.AreEqual(
-                "attackable,name,restrictions,effects,owner,status,reachable,elevation",
+                "attackable,name,active_ability,restrictions,effects,owner,status,reachable,elevation",
                 CombatAnnouncementDefinitions.ScannerContent.DefaultOrderCsv);
             Assert.AreEqual(
                 "name,owner,status,elevation",

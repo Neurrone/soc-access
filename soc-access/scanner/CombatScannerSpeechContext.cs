@@ -53,6 +53,14 @@ namespace SongsOfConquestAccess.Scanner
             if (tile.Troop != null && adapter != null && result != null && result.Kind != ScannerResultKind.TerrainPoint)
             {
                 CombatTroopFacts troop = adapter.GetTroopFacts(tile.Troop);
+                string activeAbility = CombatTileSpeechFormatter.DescribeActiveAbility(troop);
+                if (!string.IsNullOrWhiteSpace(activeAbility))
+                {
+                    yield return new AnnouncementPart(
+                        CombatAnnouncementDefinitions.TroopKeys.ActiveAbility,
+                        activeAbility);
+                }
+
                 string restrictions = CombatTileSpeechFormatter.DescribeRestrictions(troop);
                 if (!string.IsNullOrWhiteSpace(restrictions))
                 {

@@ -29,6 +29,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             new AnnouncementElementDefinition(TroopKeys.StackSize, ModStrings.Screens.AnnouncementStackSize, defaultSuffix: false),
             new AnnouncementElementDefinition(TroopKeys.Affiliation, ModStrings.Screens.AnnouncementAffiliation, defaultSuffix: false),
             new AnnouncementElementDefinition(TroopKeys.TroopName, ModStrings.Screens.AnnouncementTroopName),
+            new AnnouncementElementDefinition(TroopKeys.ActiveAbility, ModStrings.Screens.AnnouncementActiveAbility),
             new AnnouncementElementDefinition(TroopKeys.Restrictions, ModStrings.Screens.AnnouncementRestrictions),
             new AnnouncementElementDefinition(TroopKeys.Effects, ModStrings.Screens.AnnouncementEffects),
             new AnnouncementElementDefinition(TroopKeys.Health, ModStrings.Screens.AnnouncementHealth),
@@ -53,6 +54,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             // and health of everything they cannot.
             new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Attackable, ModStrings.Screens.AnnouncementAttackable),
             new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Name, ModStrings.Screens.AnnouncementName),
+            new AnnouncementElementDefinition(TroopKeys.ActiveAbility, ModStrings.Screens.AnnouncementActiveAbility),
             new AnnouncementElementDefinition(TroopKeys.Restrictions, ModStrings.Screens.AnnouncementRestrictions),
             new AnnouncementElementDefinition(TroopKeys.Effects, ModStrings.Screens.AnnouncementEffects),
             new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Owner, ModStrings.Screens.AnnouncementOwner),
@@ -90,6 +92,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             public const string StackSize = "stack_size";
             public const string Affiliation = "affiliation";
             public const string TroopName = "troop_name";
+            public const string ActiveAbility = "active_ability";
             public const string Restrictions = "restrictions";
             public const string Effects = "effects";
             public const string Health = "health";

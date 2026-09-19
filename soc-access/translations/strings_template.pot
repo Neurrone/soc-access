@@ -749,6 +749,11 @@ msgctxt "Keys.UpArrow"
 msgid "Up arrow"
 msgstr ""
 
+#. Spatial.AbilityActive
+msgctxt "Spatial.AbilityActive"
+msgid "{0} active"
+msgstr ""
+
 #. Spatial.Acting
 msgctxt "Spatial.Acting"
 msgid "acting"
@@ -3742,6 +3747,11 @@ msgstr ""
 #. Screens.MapEntityAnnouncements
 msgctxt "Screens.MapEntityAnnouncements"
 msgid "Map entity announcements"
+msgstr ""
+
+#. Screens.AnnouncementActiveAbility
+msgctxt "Screens.AnnouncementActiveAbility"
+msgid "Active ability"
 msgstr ""
 
 #. Screens.AnnouncementActing

@@ -2160,6 +2160,11 @@ msgctxt "Spatial.Acting"
 msgid "acting"
 msgstr "actuando"
 
+#. Spatial.AbilityActive
+msgctxt "Spatial.AbilityActive"
+msgid "{0} active"
+msgstr "{0} en curso"
+
 #. Spatial.Attack
 msgctxt "Spatial.Attack"
 msgid "attack"
@@ -3425,6 +3430,11 @@ msgstr "Anuncios de tropas"
 msgctxt "Screens.AnnouncementActing"
 msgid "Acting"
 msgstr "En acción"
+
+#. Screens.AnnouncementActiveAbility
+msgctxt "Screens.AnnouncementActiveAbility"
+msgid "Active ability"
+msgstr "Habilidad activa"
 
 #. Screens.AnnouncementAffiliation
 msgctxt "Screens.AnnouncementAffiliation"

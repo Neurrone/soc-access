@@ -2140,6 +2140,11 @@ msgctxt "Spatial.Acting"
 msgid "acting"
 msgstr "行動中"
 
+#. Spatial.AbilityActive
+msgctxt "Spatial.AbilityActive"
+msgid "{0} active"
+msgstr "{0} 已啟動"
+
 #. Spatial.Attack
 msgctxt "Spatial.Attack"
 msgid "attack"
@@ -3400,6 +3405,11 @@ msgstr "部隊播報"
 msgctxt "Screens.AnnouncementActing"
 msgid "Acting"
 msgstr "正在行動"
+
+#. Screens.AnnouncementActiveAbility
+msgctxt "Screens.AnnouncementActiveAbility"
+msgid "Active ability"
+msgstr "啟動的能力"
 
 #. Screens.AnnouncementAffiliation
 msgctxt "Screens.AnnouncementAffiliation"

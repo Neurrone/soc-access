@@ -2180,6 +2180,11 @@ msgctxt "Spatial.Acting"
 msgid "acting"
 msgstr "діє"
 
+#. Spatial.AbilityActive
+msgctxt "Spatial.AbilityActive"
+msgid "{0} active"
+msgstr "{0}: діє"
+
 #. Spatial.Attack
 msgctxt "Spatial.Attack"
 msgid "attack"
@@ -3450,6 +3455,11 @@ msgstr "Оголошення загонів"
 msgctxt "Screens.AnnouncementActing"
 msgid "Acting"
 msgstr "Діючий"
+
+#. Screens.AnnouncementActiveAbility
+msgctxt "Screens.AnnouncementActiveAbility"
+msgid "Active ability"
+msgstr "Активна здібність"
 
 #. Screens.AnnouncementAffiliation
 msgctxt "Screens.AnnouncementAffiliation"

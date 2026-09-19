@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SongsOfConquest;
 using SongsOfConquest.Client.Battle;
 using SongsOfConquest.Client.Battle.View;
 using SongsOfConquest.Common;
+using SongsOfConquest.Common.Bacterias;
 using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
@@ -40,7 +42,67 @@ namespace SongsOfConquestAccess.Adapters
                 IsActingTroop(troop),
                 reloading,
                 restrictions,
-                Hud != null ? Hud.GetTroopEffectNames(troop.Id) : null);
+                Hud != null ? Hud.GetTroopEffectNames(troop.Id) : null,
+                GetActiveAbilityName(troop));
+        }
+
+        /// <summary>The name of the ability the stack has active, read off the troop's own state:
+        /// <c>HasActivatedAbility</c> is set by <c>TroopAbilityActivationBeginCommand</c> and cleared
+        /// by <c>TroopAbilityDeactivatedCommand</c>, which the server's ability systems send the
+        /// moment a one-shot ability completes and, for the lasting ones, when the ability fires,
+        /// runs out or is aborted.
+        ///
+        /// Said for exactly the abilities the game keeps an icon on the troop's status panel for
+        /// (owner ruling 2026-09-19), by the panel's own rule (<c>BattleTroopStatusPanel</c>, where
+        /// the ability activates): one of the ability's status effects has a duration the panel
+        /// shows, or the ability is Overwatch (the game's "Ambush"), Spearwall or Burrow, which apply
+        /// none. The rule is asked of the game's definitions rather than read off the icon, whose
+        /// fade is a tween. It leaves out Switch, Leap and Teleport, which keep the flag to the end
+        /// of their turn, where "active" would only mean "used". Where the ability's effect lands on
+        /// the stack itself its name is said again among the effects, and that is wanted; often it
+        /// does not - Protect puts "Protected" on the neighbours and nothing on the protector.
+        /// </summary>
+        private string GetActiveAbilityName(IBattleTroopState troop)
+        {
+            try
+            {
+                if (!troop.HasActivatedAbility || _abilityUtility == null)
+                {
+                    return string.Empty;
+                }
+
+                ITroopAbilityDefinition ability = _abilityUtility.GetAbilityDefinition(troop);
+                return ability != null && ShowsOnStatusPanel(ability)
+                    ? SpokenLines.Clean(GameText.Get(_localization, ability.NameKey, string.Empty))
+                    : string.Empty;
+            }
+            catch (Exception exception)
+            {
+                _faults.Report("GetActiveAbilityName", exception);
+                return string.Empty;
+            }
+        }
+
+        private static bool ShowsOnStatusPanel(ITroopAbilityDefinition ability)
+        {
+            TroopAbilityType type = (TroopAbilityType)ability.Id;
+            if (type == TroopAbilityType.Overwatch
+                || type == TroopAbilityType.Spearwall
+                || type == TroopAbilityType.Burrow)
+            {
+                return true;
+            }
+
+            SerializableBacteriaDef[] effects = ability.Bacterias;
+            for (int i = 0; effects != null && i < effects.Length; i++)
+            {
+                if (effects[i].GetDuration().ShowsOnBattleTroopStatusPanel)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>The game's own names for the restrictions the stack itself carries, and whether

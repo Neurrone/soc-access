@@ -68,7 +68,8 @@ namespace SongsOfConquestAccess.Adapters
             bool isActing,
             bool isReloading = false,
             IReadOnlyList<string> restrictionNames = null,
-            IReadOnlyList<string> effectNames = null)
+            IReadOnlyList<string> effectNames = null,
+            string activeAbilityName = null)
         {
             Name = name ?? string.Empty;
             Size = size;
@@ -79,6 +80,7 @@ namespace SongsOfConquestAccess.Adapters
             IsReloading = isReloading;
             RestrictionNames = restrictionNames ?? EmptyNames;
             EffectNames = effectNames ?? EmptyNames;
+            ActiveAbilityName = activeAbilityName ?? string.Empty;
         }
 
         private static readonly string[] EmptyNames = new string[0];
@@ -111,6 +113,11 @@ namespace SongsOfConquestAccess.Adapters
         /// first, exactly as the icons' details head them - the game's "x2" for a doubled effect
         /// included.</summary>
         public IReadOnlyList<string> EffectNames { get; private set; }
+
+        /// <summary>The game's own name for the ability the stack has active now - a Spearwall set,
+        /// an Ambush waiting, a song being sung - and empty where it has none. That it is active is
+        /// the row's to word.</summary>
+        public string ActiveAbilityName { get; private set; }
     }
 
     /// <summary>A thing on the battlefield that can be attacked, as the facts a spoken row is made

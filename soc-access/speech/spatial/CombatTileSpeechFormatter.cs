@@ -107,6 +107,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.TroopName, CombatTroopText.Name(troop));
+            AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.ActiveAbility, DescribeActiveAbility(troop));
             AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.Restrictions, DescribeRestrictions(troop));
             AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.Effects, DescribeEffects(troop));
             AnnouncementPart.AddIfPresent(parts, CombatAnnouncementDefinitions.TroopKeys.Health, CombatTroopText.Health(troop.CurrentHealth, troop.MaxHealth));
@@ -119,6 +120,15 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             return ConfigurableAnnouncementComposer.Compose(CombatAnnouncementDefinitions.Troop, parts);
+        }
+
+        /// <summary>The ability the stack has active, under the game's name for it: "Spearwall
+        /// active". Empty where it has none.</summary>
+        public static string DescribeActiveAbility(CombatTroopFacts troop)
+        {
+            return string.IsNullOrWhiteSpace(troop.ActiveAbilityName)
+                ? string.Empty
+                : ModText.Get(ModStrings.Spatial.AbilityActive, troop.ActiveAbilityName);
         }
 
         /// <summary>What the stack cannot do or cannot be done to, in the game's own words except for
