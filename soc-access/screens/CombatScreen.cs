@@ -680,9 +680,10 @@ namespace SongsOfConquestAccess.Screens
 
             if (troopDrawn)
             {
-                NodeVtable vtable = GraphNodes.Text(
-                    () => ModText.Get(ModStrings.Screens.CurrentTroop, BuildTroopLabel(hud.GetCurrentTroopInfo())));
-                vtable.OnActivate = () => MoveCursorToTroop(hud.GetCurrentTroopId(), requireLocalCurrentTurn: false);
+                // A button, because Enter does something here: it walks the cursor to the troop.
+                NodeVtable vtable = GraphNodes.Button(
+                    () => ModText.Get(ModStrings.Screens.CurrentTroop, BuildTroopLabel(hud.GetCurrentTroopInfo())),
+                    () => MoveCursorToTroop(hud.GetCurrentTroopId(), requireLocalCurrentTurn: false));
                 builder.AddItem(new SyntheticNode(ControlId.Structural("combat:current-troop"), vtable));
             }
 
@@ -733,7 +734,8 @@ namespace SongsOfConquestAccess.Screens
         // ---- the turn order ----
 
         /// <summary>The queue the game draws along the bottom, in its drawn order, with the round
-        /// separators as lines of their own. Enter on a troop walks the cursor to it.</summary>
+        /// separators as lines of their own. Enter on a troop walks the cursor to it, so a troop is a
+        /// button; a separator does nothing and is a line.</summary>
         private void BuildTurnOrder(GraphBuilder builder, BattleHudAdapter hud)
         {
             IReadOnlyList<BattleHudAdapter.QueueItem> items = hud.GetQueueItems();
@@ -753,13 +755,15 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 ControlId id = QueueNodeId(i);
-                NodeVtable vtable = GraphNodes.Text(
-                    () => BuildQueueItemLabel(item),
-                    null,
-                    item.IsRoundMarker ? null : item.Tooltip);
+                NodeVtable vtable = item.IsRoundMarker
+                    ? GraphNodes.Text(() => BuildQueueItemLabel(item))
+                    : GraphNodes.Button(
+                        () => BuildQueueItemLabel(item),
+                        () => MoveCursorToTroop(item.TroopId, requireLocalCurrentTurn: false),
+                        null,
+                        item.Tooltip);
                 if (!item.IsRoundMarker)
                 {
-                    vtable.OnActivate = () => MoveCursorToTroop(item.TroopId, requireLocalCurrentTurn: false);
                     vtable.OnFocusVisual = item.Focus;
                     vtable.OnBlurVisual = item.Unfocus;
                 }
