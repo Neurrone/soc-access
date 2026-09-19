@@ -281,9 +281,13 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>The rows the page is drawing, the visible ones only and in DRAWN order: topmost
-        /// first (Unity's y grows upwards, so that is the largest y). Rows the layout has not placed
-        /// yet - every row on the frame the list is built, where they all sit at one y - fall back to
-        /// the newest save first, which is the order the page settles into a frame later.
+        /// first, which is the lowest sibling index - the pool puts every row it spawns first among
+        /// its siblings and the list lays them out in sibling order (decompiled,
+        /// <c>SaveLoadGameMenuEntry.Pool.Reinitialize</c>). Never by where a row sits: on the frame
+        /// the list is built the layout has not run, and a row taken back from the pool still sits
+        /// where the previous list left it, which is the final order upside down (measured
+        /// 2026-09-19), so the landing went to the oldest save. Rows that share an index - none
+        /// should - fall back to the newest save first.
         ///
         /// Built when the list the page holds changes rather than every frame, stamped with how many
         /// rows it holds and which row is first, both read from the game. The adapter lives exactly
@@ -292,23 +296,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             IReadOnlyList<SaveEntry> all = GetEntries();
             Component first = all.Count > 0 && all[0] != null ? all[0].Entry : null;
-            // Where the rows are drawn, summed: the layout settles a frame after the rows are spawned,
-            // and rows taken back from the game's pool still sit where the previous list left them,
-            // so the count and the first row alone would freeze the order read before the layout ran.
-            float layout = 0f;
-            for (int i = 0; i < all.Count; i++)
-            {
-                Component entry = all[i] != null ? all[i].Entry : null;
-                if (entry != null)
-                {
-                    layout += entry.transform.position.y;
-                }
-            }
-
             if (_visibleEntries != null
                 && _visibleEntriesCount == all.Count
-                && ReferenceEquals(_visibleEntriesFirst, first)
-                && Mathf.Abs(_visibleEntriesLayout - layout) <= 0.5f)
+                && ReferenceEquals(_visibleEntriesFirst, first))
             {
                 return _visibleEntries;
             }
@@ -325,47 +315,46 @@ namespace SongsOfConquestAccess.Adapters
             SortByDrawnTop(visible);
             _visibleEntriesCount = all.Count;
             _visibleEntriesFirst = first;
-            _visibleEntriesLayout = layout;
             _visibleEntries = visible;
             return _visibleEntries;
         }
 
         private static void SortByDrawnTop(List<SaveEntry> items)
         {
-            List<float> tops = new List<float>(items.Count);
+            List<int> siblings = new List<int>(items.Count);
             List<long> times = new List<long>(items.Count);
             for (int i = 0; i < items.Count; i++)
             {
                 Component component = items[i].Entry;
-                tops.Add(component != null ? component.transform.position.y : 0f);
+                siblings.Add(component != null ? component.transform.GetSiblingIndex() : int.MaxValue);
                 times.Add(items[i].LastWriteTime.Ticks);
             }
 
             for (int i = 1; i < items.Count; i++)
             {
                 SaveEntry moving = items[i];
-                float top = tops[i];
+                int sibling = siblings[i];
                 long time = times[i];
                 int j = i - 1;
-                while (j >= 0 && IsAbove(top, time, tops[j], times[j]))
+                while (j >= 0 && IsAbove(sibling, time, siblings[j], times[j]))
                 {
                     items[j + 1] = items[j];
-                    tops[j + 1] = tops[j];
+                    siblings[j + 1] = siblings[j];
                     times[j + 1] = times[j];
                     j--;
                 }
 
                 items[j + 1] = moving;
-                tops[j + 1] = top;
+                siblings[j + 1] = sibling;
                 times[j + 1] = time;
             }
         }
 
-        private static bool IsAbove(float top, long time, float otherTop, long otherTime)
+        private static bool IsAbove(int sibling, long time, int otherSibling, long otherTime)
         {
-            if (Mathf.Abs(top - otherTop) > 0.5f)
+            if (sibling != otherSibling)
             {
-                return top > otherTop;
+                return sibling < otherSibling;
             }
 
             return time > otherTime;
@@ -478,7 +467,6 @@ namespace SongsOfConquestAccess.Adapters
         private IReadOnlyList<SaveEntry> _visibleEntries;
         private int _visibleEntriesCount = -1;
         private Component _visibleEntriesFirst;
-        private float _visibleEntriesLayout;
 
         private SaveLoadGameMenu.Settings Settings
         {
