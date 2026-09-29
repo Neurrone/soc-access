@@ -163,7 +163,7 @@ namespace SongsOfConquestAccess.Adapters
 
         /// <summary>The tile's dossier: the game's own details block, and nothing the mod composed.
         /// The damage preview used to be prepended here and is now the board node's own section
-        /// (<see cref="ReadAttackPreviewLines"/>), which is what lets it be spoken while this - a
+        /// (<see cref="ReadAttackPreviews"/>), which is what lets it be spoken while this - a
         /// long tooltip - is only reviewed.</summary>
         private Tooltip CreateDetailsTooltip(IDetails details, Vector2Int tile)
         {

@@ -1,4 +1,4 @@
-namespace SongsOfConquestAccess.Localization
+﻿namespace SongsOfConquestAccess.Localization
 {
     public static class ModStrings
     {
@@ -299,7 +299,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString CommanderPossessive = new ModString("Spatial.CommanderPossessive", "commander's");
             public static readonly ModString CobblestoneRoad = new ModString("Spatial.CobblestoneRoad", "Cobblestone road");
             public static readonly ModString Cost = new ModString("Spatial.Cost", "cost {0}");
-            public static readonly ModString DamagePreview = new ModString("Spatial.DamagePreview", "{0}damage {1}");
+            public static readonly ModString DamagePreview = new ModString("Spatial.DamagePreview", "damage {0}");
             public static readonly ModString DeadlyRange = new ModString("Spatial.DeadlyRange", "Deadly range");
             public static readonly ModString Deadly = new ModString("Spatial.Deadly", "deadly");
             public static readonly ModString DeadBodies = new ModString("Spatial.DeadBodies", "Dead bodies");
@@ -328,7 +328,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString FaeyForest = new ModString("Spatial.FaeyForest", "Faey forest");
             public static readonly ModString Farmland = new ModString("Spatial.Farmland", "Farmland");
             public static readonly ModString Excavation = new ModString("Spatial.Excavation", "Excavation");
-            public static readonly ModString ExtraTargetPrefix = new ModString("Spatial.ExtraTargetPrefix", "extra target ");
             public static readonly ModString FishingSpot = new ModString("Spatial.FishingSpot", "Fishing spot");
             public static readonly ModString FortifiedGate = new ModString("Spatial.FortifiedGate", "Fortified gate");
             public static readonly ModString Friendly = new ModString("Spatial.Friendly", "friendly");
@@ -361,7 +360,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString OnRoute = new ModString("Spatial.OnRoute", "On route");
             public static readonly ModString Palisade = new ModString("Spatial.Palisade", "Palisade");
             public static readonly ModString PositionAndMapSize = new ModString("Spatial.PositionAndMapSize", "Position {0}, {1}. Map is {2} by {3}.");
-            public static readonly ModString PrimaryPrefix = new ModString("Spatial.PrimaryPrefix", "primary ");
             public static readonly ModString RangeAndMovement = new ModString("Spatial.RangeAndMovement", "{0} and movement range");
             public static readonly ModString Reachable = new ModString("Spatial.Reachable", "reachable");
             public static readonly ModString Reloading = new ModString("Spatial.Reloading", "reloading");
@@ -556,6 +554,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString EssenceAmounts = new ModString("Combat.EssenceAmounts", "{0} essence");
             public static readonly ModString ExplosiveBarrel = new ModString("Combat.ExplosiveBarrel", "explosive barrel");
             public static readonly ModString FailedBurrow = new ModString("Combat.FailedBurrow", "{0}, failed burrow");
+            public static readonly ModString FriendlyTroop = new ModString("Combat.FriendlyTroop", "{0} friendly {1}");
             public static readonly ModString FaeyFire = new ModString("Combat.FaeyFire", "Faey Fire");
             public static readonly ModString FaeyFireWithBolts = new ModString("Combat.FaeyFireWithBolts", "{0} casts {1}, {2}");
             public static readonly ModString FacingLeft = new ModString("Combat.FacingLeft", "facing left");

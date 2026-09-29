@@ -1765,6 +1765,11 @@ msgctxt "Combat.EnemyTroop"
 msgid "{0} enemy {1}"
 msgstr "{0} 적 {1}"
 
+#. Combat.FriendlyTroop
+msgctxt "Combat.FriendlyTroop"
+msgid "{0} friendly {1}"
+msgstr "{0} 아군 {1}"
+
 #. Combat.EnemyTroops
 msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
@@ -2177,8 +2182,8 @@ msgstr "비용 {0}"
 
 #. Spatial.DamagePreview
 msgctxt "Spatial.DamagePreview"
-msgid "{0}damage {1}"
-msgstr "{0}피해 {1}"
+msgid "damage {0}"
+msgstr "피해 {0}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
@@ -2244,11 +2249,6 @@ msgstr "적"
 msgctxt "Spatial.FaeyForest"
 msgid "Faey forest"
 msgstr "페이 숲"
-
-#. Spatial.ExtraTargetPrefix
-msgctxt "Spatial.ExtraTargetPrefix"
-msgid "extra target "
-msgstr "추가 대상 "
 
 #. Spatial.FishingSpot
 msgctxt "Spatial.FishingSpot"
@@ -2384,11 +2384,6 @@ msgstr "목책"
 msgctxt "Spatial.PositionAndMapSize"
 msgid "Position {0}, {1}. Map is {2} by {3}."
 msgstr "위치 {0}, {1}. 지도는 가로 {2}, 세로 {3}입니다."
-
-#. Spatial.PrimaryPrefix
-msgctxt "Spatial.PrimaryPrefix"
-msgid "primary "
-msgstr "주 대상 "
 
 #. Spatial.RangeAndMovement
 msgctxt "Spatial.RangeAndMovement"

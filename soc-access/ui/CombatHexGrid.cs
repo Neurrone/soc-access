@@ -110,7 +110,7 @@ namespace SongsOfConquestAccess.UI
         /// </summary>
         public IList<string> GetAttackPreviewLines()
         {
-            return _adapter != null ? _adapter.ReadAttackPreviewLines(InspectContext(), _cursor) : null;
+            return _adapter != null ? CombatAttackPreviewText.Compose(_adapter.ReadAttackPreviews(InspectContext(), _cursor)) : null;
         }
 
         /// <summary>What the game's buff and nerf indicators over the stack on this tile say, read

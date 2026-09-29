@@ -27,6 +27,7 @@ soc-access/patches/AdventureNotificationPatches.cs | 1 | [HarmonyPatch(typeof(Si
 soc-access/patches/ChatPatches.cs | 1 | [HarmonyPatch(typeof(ChatWindowBehavior), "HandleNewMessage")] | event
 
 soc-access/patches/CombatPatches.cs | 1 | [HarmonyPatch(typeof(BattleAttackPreview), "AddAdditionalText")] | event
+soc-access/patches/CombatPatches.cs | 1 | [HarmonyPatch(typeof(BattleAttackPreview), "AnimateContainerAtTroop")] | event
 soc-access/patches/CombatPatches.cs | 1 | [HarmonyPatch(typeof(BattleAttackPreview), "Hide")] | event
 soc-access/patches/CombatPatches.cs | 1 | [HarmonyPatch(typeof(BattleHUDNotificationManager), "Show", new[] { typeof(bool), typeof(string) })] | event
 soc-access/patches/CombatPatches.cs | 1 | [HarmonyPatch(typeof(BattleHUDNotificationManager), "Show", new[] { typeof(string), typeof(UnityEngine.Vector2Int) })] | event

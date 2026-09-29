@@ -2,11 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Battle.View;
+using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -18,6 +19,32 @@ namespace SongsOfConquestAccess.Adapters
     // passes to AddAdditionalText and then keeps nowhere a reader can reach, which is why a hook
     // captures that one here. Reading it back is the only way the board node can say what the mouse
     // player can see.
+
+    /// <summary>One attack preview the game is drawing, as the facts on it. The damage and kills
+    /// are the game's own text, null where the game hides that part; the sentence is the one it
+    /// adds under them. The troop is the stack the preview is drawn over, null when the mod did not
+    /// see it placed. <see cref="UI.CombatAttackPreviewText"/> does the wording.</summary>
+    public sealed class CombatAttackPreviewFacts
+    {
+        public CombatAttackPreviewFacts(string damage, string kills, string additional, bool targetIsEntity, TroopRef troop, bool isOnTargetTroop)
+        {
+            Damage = damage;
+            Kills = kills;
+            Additional = additional;
+            TargetIsEntity = targetIsEntity;
+            Troop = troop;
+            IsOnTargetTroop = isOnTargetTroop;
+        }
+
+        public string Damage { get; private set; }
+        public string Kills { get; private set; }
+        public string Additional { get; private set; }
+        /// <summary>The tile aimed at holds a map entity, not a troop.</summary>
+        public bool TargetIsEntity { get; private set; }
+        public TroopRef Troop { get; private set; }
+        /// <summary>The preview is on the troop standing on the tile aimed at.</summary>
+        public bool IsOnTargetTroop { get; private set; }
+    }
 
     public sealed partial class CombatAdapter
     {
@@ -46,12 +73,40 @@ namespace SongsOfConquestAccess.Adapters
             AttackPreviewAdditionalTexts[preview] = text;
         }
 
+        // The troop each preview is drawn over, by id. The game hands the troop to
+        // AnimateContainerAtTroop to place the preview and keeps no reference to it, so this hook is
+        // the only place the pairing exists; without it an area's numbers could not be told apart.
+        // A preview missing here (drawn before a hot reload) is read without a name, never a wrong
+        // one. An owner-approved exception to "no patch for UI state", 2026-09-29.
+        private static readonly Dictionary<BattleAttackPreview, int> AttackPreviewTroopIds =
+            new Dictionary<BattleAttackPreview, int>();
+
         [HookWritable]
-        public static void ClearAttackPreviewAdditionalText(BattleAttackPreview preview)
+        public static void CaptureAttackPreviewTroop(BattleAttackPreview preview, IBattleTroopState troop)
+        {
+            if (preview == null)
+            {
+                return;
+            }
+
+            if (troop == null)
+            {
+                AttackPreviewTroopIds.Remove(preview);
+                return;
+            }
+
+            AttackPreviewTroopIds[preview] = troop.Id;
+        }
+
+        /// <summary>The game hides every preview before its pool hands it out again, so a hidden
+        /// preview lets go of both captures and an entity preview never carries a troop's.</summary>
+        [HookWritable]
+        public static void ClearAttackPreviewCaptures(BattleAttackPreview preview)
         {
             if (preview != null)
             {
                 AttackPreviewAdditionalTexts.Remove(preview);
+                AttackPreviewTroopIds.Remove(preview);
             }
         }
 
@@ -61,6 +116,7 @@ namespace SongsOfConquestAccess.Adapters
         public static void Reset()
         {
             AttackPreviewAdditionalTexts.Clear();
+            AttackPreviewTroopIds.Clear();
             _hoverOwner = null;
         }
 
@@ -74,7 +130,7 @@ namespace SongsOfConquestAccess.Adapters
         // spell changes the damage without taking any health, and the acting troop's position is
         // because the preview is worked out FROM it - its range and its high ground - and a troop with
         // movement left repositions without the turn moving on.
-        private IList<string> _previewLines;
+        private IList<CombatAttackPreviewFacts> _previews;
         private bool _previewRead;
         private Vector2Int _previewPoint;
         private bool _previewPinned;
@@ -100,7 +156,7 @@ namespace SongsOfConquestAccess.Adapters
         /// While an inspection is pinned the preview is the pinned tile's alone, as the tooltip is:
         /// the cursor walking the inspected ranges reads no preview.
         /// </summary>
-        public IList<string> ReadAttackPreviewLines(CombatInspectContext context, Vector2Int focusedTile)
+        public IList<CombatAttackPreviewFacts> ReadAttackPreviews(CombatInspectContext context, Vector2Int focusedTile)
         {
             if (context != null && focusedTile != context.PinnedTile)
             {
@@ -128,7 +184,7 @@ namespace SongsOfConquestAccess.Adapters
                 && currentTroopPoint == _previewCurrentTroopPoint
                 && waiting == _previewWaiting)
             {
-                return _previewLines;
+                return _previews;
             }
 
             _previewPoint = point;
@@ -141,16 +197,22 @@ namespace SongsOfConquestAccess.Adapters
             _previewCurrentTroopPoint = currentTroopPoint;
             _previewWaiting = waiting;
             _previewRead = true;
-            // Split where the game drew a line: an additional sentence it wrote over two lines is
-            // two lines to read, exactly as a tooltip's are.
-            _previewLines = SpokenLines.Of(CapturePreviewFor(point));
-            return _previewLines;
+            _previews = CapturePreviewFor(point);
+            return _previews;
         }
 
-        private IList<string> CapturePreviewFor(Vector2Int point)
+        private IList<CombatAttackPreviewFacts> CapturePreviewFor(Vector2Int point)
         {
             CombatTile tile = GetTile(point);
-            if (tile == null || (tile.Troop == null && tile.Entity == null))
+            if (tile == null)
+            {
+                return null;
+            }
+
+            // An area ability may be aimed at an empty hex, and the game draws a preview on every
+            // stack it would hit; anything else on an empty hex has no preview to read.
+            bool aimingAbility = GetTargetingMode() == CombatTargetingMode.Ability;
+            if (tile.Troop == null && tile.Entity == null && !aimingAbility)
             {
                 return null;
             }
@@ -159,8 +221,14 @@ namespace SongsOfConquestAccess.Adapters
             {
                 SynchronizeNativeHoverForPreview(point, tile, GetPathTo(point));
             }
+            else if (aimingAbility && _humanBattleController != null && _humanBattleController.CurrentHoverTile == point)
+            {
+                // The aim already drew these (FocusTargetTile); drawn again so every preview passes
+                // the troop hook in this load, a hot reload having emptied it.
+                UpdateNativeAttackPreviews();
+            }
 
-            return CaptureAttackPreviewLines(tile.Troop == null && tile.Entity != null);
+            return CaptureAttackPreviews(tile);
         }
 
         /// <summary>Whether the game is waiting on a command to play out, which is one of the two
@@ -178,13 +246,15 @@ namespace SongsOfConquestAccess.Adapters
             return _commandWaiter != null && _commandWaiter.IsWaiting;
         }
 
-        private List<string> CaptureAttackPreviewLines(bool targetIsEntity)
+        /// <summary>Every preview the game is drawing, in the order it drew them, as the facts on
+        /// it: its numbers and sentence as the game wrote them (null where the game hides them), the
+        /// troop the hook saw it placed over, and whether that is the troop on the tile.</summary>
+        private List<CombatAttackPreviewFacts> CaptureAttackPreviews(CombatTile tile)
         {
-            List<string> lines = new List<string>();
-            List<BattleAttackPreview> previews = GetActiveAttackPreviews();
-            for (int i = 0; i < previews.Count; i++)
+            bool targetIsEntity = tile.Troop == null && tile.Entity != null;
+            List<CombatAttackPreviewFacts> facts = new List<CombatAttackPreviewFacts>();
+            foreach (BattleAttackPreview preview in GetActiveAttackPreviews())
             {
-                BattleAttackPreview preview = previews[i];
                 string damage = GetPreviewText(preview, _attackPreviewDamageTextField);
                 string kills = GetPreviewText(preview, _attackPreviewKillsTextField);
                 string additional = GetCapturedAdditionalText(preview);
@@ -192,37 +262,38 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     additional = GetPreviewText(preview, _attackPreviewAdditionalTextField);
                 }
-                bool hasDamage = IsPreviewContainerVisible(preview, _attackPreviewDamageContainerField)
-                    && !string.IsNullOrWhiteSpace(damage);
-                bool hasKills = IsPreviewContainerVisible(preview, _attackPreviewKillsContainerField)
-                    && !string.IsNullOrWhiteSpace(kills);
 
-                List<string> parts = new List<string>();
-                string prefix = previews.Count > 1
-                    ? (i == 0 ? ModText.Get(ModStrings.Spatial.PrimaryPrefix) : ModText.Get(ModStrings.Spatial.ExtraTargetPrefix))
-                    : string.Empty;
-                if (hasDamage)
-                {
-                    parts.Add(ModText.Get(ModStrings.Spatial.DamagePreview, prefix, damage));
-                }
-
-                if (hasKills)
-                {
-                    parts.Add(targetIsEntity ? FormatEntityDestruction(kills) : ModText.Get(ModStrings.Spatial.Kills, kills));
-                }
-
-                if (parts.Count > 0)
-                {
-                    lines.Add(string.Join(", ", parts.ToArray()) + ".");
-                }
-
-                if (!string.IsNullOrWhiteSpace(additional))
-                {
-                    lines.Add(additional + ".");
-                }
+                IBattleTroopState troop = GetAttackPreviewTroop(preview);
+                facts.Add(new CombatAttackPreviewFacts(
+                    IsPreviewContainerVisible(preview, _attackPreviewDamageContainerField) ? damage : null,
+                    IsPreviewContainerVisible(preview, _attackPreviewKillsContainerField) ? kills : null,
+                    additional,
+                    targetIsEntity,
+                    troop != null ? CreateTroopRef(troop) : null,
+                    troop != null && tile.Troop != null && troop.Id == tile.Troop.Id));
             }
 
-            return lines;
+            return facts;
+        }
+
+        /// <summary>The troop the troop hook saw this preview placed over, as it stands now.</summary>
+        private IBattleTroopState GetAttackPreviewTroop(BattleAttackPreview preview)
+        {
+            int troopId;
+            if (preview == null || _facade == null || !AttackPreviewTroopIds.TryGetValue(preview, out troopId))
+            {
+                return null;
+            }
+
+            try
+            {
+                return _facade.Troops.Get(troopId);
+            }
+            catch (Exception exception)
+            {
+                SocAccessMod.Instance?.LogWarning("CombatAdapter could not read an attack preview's troop: " + exception.Message);
+                return null;
+            }
         }
 
         private List<BattleAttackPreview> GetActiveAttackPreviews()
@@ -283,35 +354,6 @@ namespace SongsOfConquestAccess.Adapters
             return preview != null && AttackPreviewAdditionalTexts.TryGetValue(preview, out text)
                 ? TrimSentence(text)
                 : string.Empty;
-        }
-
-        private static string FormatEntityDestruction(string killsText)
-        {
-            int min;
-            int max;
-            if (TryParseRange(killsText, out min, out max))
-            {
-            return min <= 0 && max > 0
-                ? ModText.Get(ModStrings.Spatial.MayDestroy)
-                : ModText.Get(ModStrings.Spatial.Destroys);
-            }
-
-            return ModText.Get(ModStrings.Spatial.Destroys);
-        }
-
-        private static bool TryParseRange(string text, out int min, out int max)
-        {
-            min = 0;
-            max = 0;
-            MatchCollection matches = Regex.Matches(text ?? string.Empty, "\\d+");
-            if (matches.Count == 0)
-            {
-                return false;
-            }
-
-            min = int.Parse(matches[0].Value);
-            max = matches.Count > 1 ? int.Parse(matches[1].Value) : min;
-            return true;
         }
 
         private static string TrimSentence(string text)

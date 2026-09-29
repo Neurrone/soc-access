@@ -1,6 +1,7 @@
-using HarmonyLib;
+﻿using HarmonyLib;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Gamestate.Facade;
+using SongsOfConquest.Common.Battle;
 using Lavapotion.Networking;
 using SongsOfConquest.Client;
 using SongsOfConquest;
@@ -81,7 +82,14 @@ namespace SongsOfConquestAccess
         [HarmonyPrefix]
         private static void BattleAttackPreviewHidePrefix(BattleAttackPreview __instance)
         {
-            CombatAdapter.ClearAttackPreviewAdditionalText(__instance);
+            CombatAdapter.ClearAttackPreviewCaptures(__instance);
+        }
+
+        [HarmonyPatch(typeof(BattleAttackPreview), "AnimateContainerAtTroop")]
+        [HarmonyPrefix]
+        private static void BattleAttackPreviewAnimateContainerAtTroopPrefix(BattleAttackPreview __instance, IBattleTroopState troopAtPosition)
+        {
+            CombatAdapter.CaptureAttackPreviewTroop(__instance, troopAtPosition);
         }
 
         [HarmonyPatch(typeof(BattleHUDNotificationManager), "ShowTroopBacteriaNotification")]

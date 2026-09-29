@@ -1795,6 +1795,11 @@ msgctxt "Combat.EnemyTroop"
 msgid "{0} enemy {1}"
 msgstr "{0} вражеский {1}"
 
+#. Combat.FriendlyTroop
+msgctxt "Combat.FriendlyTroop"
+msgid "{0} friendly {1}"
+msgstr "{0} союзный {1}"
+
 #. Combat.EnemyTroops
 msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
@@ -2217,8 +2222,8 @@ msgstr "стоимость {0}"
 
 #. Spatial.DamagePreview
 msgctxt "Spatial.DamagePreview"
-msgid "{0}damage {1}"
-msgstr "{0}урон {1}"
+msgid "damage {0}"
+msgstr "урон {0}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
@@ -2284,11 +2289,6 @@ msgstr "вражеский"
 msgctxt "Spatial.FaeyForest"
 msgid "Faey forest"
 msgstr "Лес фей"
-
-#. Spatial.ExtraTargetPrefix
-msgctxt "Spatial.ExtraTargetPrefix"
-msgid "extra target "
-msgstr "дополнительная цель "
 
 #. Spatial.FishingSpot
 msgctxt "Spatial.FishingSpot"
@@ -2424,11 +2424,6 @@ msgstr "Частокол"
 msgctxt "Spatial.PositionAndMapSize"
 msgid "Position {0}, {1}. Map is {2} by {3}."
 msgstr "Позиция {0}, {1}. Размер карты {2} на {3}."
-
-#. Spatial.PrimaryPrefix
-msgctxt "Spatial.PrimaryPrefix"
-msgid "primary "
-msgstr "основная "
 
 #. Spatial.RangeAndMovement
 msgctxt "Spatial.RangeAndMovement"

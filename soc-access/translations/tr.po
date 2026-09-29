@@ -1765,6 +1765,11 @@ msgctxt "Combat.EnemyTroop"
 msgid "{0} enemy {1}"
 msgstr "{0} düşman {1}"
 
+#. Combat.FriendlyTroop
+msgctxt "Combat.FriendlyTroop"
+msgid "{0} friendly {1}"
+msgstr "{0} dost {1}"
+
 #. Combat.EnemyTroops
 msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
@@ -2177,8 +2182,8 @@ msgstr "maliyet {0}"
 
 #. Spatial.DamagePreview
 msgctxt "Spatial.DamagePreview"
-msgid "{0}damage {1}"
-msgstr "{0}hasar {1}"
+msgid "damage {0}"
+msgstr "hasar {0}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
@@ -2244,11 +2249,6 @@ msgstr "düşman"
 msgctxt "Spatial.FaeyForest"
 msgid "Faey forest"
 msgstr "Faey ormanı"
-
-#. Spatial.ExtraTargetPrefix
-msgctxt "Spatial.ExtraTargetPrefix"
-msgid "extra target "
-msgstr "ek hedef "
 
 #. Spatial.FishingSpot
 msgctxt "Spatial.FishingSpot"
@@ -2384,11 +2384,6 @@ msgstr "Palisat"
 msgctxt "Spatial.PositionAndMapSize"
 msgid "Position {0}, {1}. Map is {2} by {3}."
 msgstr "Konum {0}, {1}. Harita boyutu {2} çarpı {3}."
-
-#. Spatial.PrimaryPrefix
-msgctxt "Spatial.PrimaryPrefix"
-msgid "primary "
-msgstr "birincil "
 
 #. Spatial.RangeAndMovement
 msgctxt "Spatial.RangeAndMovement"

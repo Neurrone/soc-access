@@ -1780,6 +1780,11 @@ msgctxt "Combat.EnemyTroop"
 msgid "{0} enemy {1}"
 msgstr "{0} {1} enemiga"
 
+#. Combat.FriendlyTroop
+msgctxt "Combat.FriendlyTroop"
+msgid "{0} friendly {1}"
+msgstr "{0} {1} aliada"
+
 #. Combat.EnemyTroops
 msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
@@ -2197,8 +2202,8 @@ msgstr "coste {0}"
 
 #. Spatial.DamagePreview
 msgctxt "Spatial.DamagePreview"
-msgid "{0}damage {1}"
-msgstr "{0}daño {1}"
+msgid "damage {0}"
+msgstr "daño {0}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
@@ -2264,11 +2269,6 @@ msgstr "enemigo"
 msgctxt "Spatial.FaeyForest"
 msgid "Faey forest"
 msgstr "Bosque faey"
-
-#. Spatial.ExtraTargetPrefix
-msgctxt "Spatial.ExtraTargetPrefix"
-msgid "extra target "
-msgstr "objetivo adicional "
 
 #. Spatial.FishingSpot
 msgctxt "Spatial.FishingSpot"
@@ -2404,11 +2404,6 @@ msgstr "Empalizada"
 msgctxt "Spatial.PositionAndMapSize"
 msgid "Position {0}, {1}. Map is {2} by {3}."
 msgstr "Posición {0}, {1}. El mapa es de {2} por {3}."
-
-#. Spatial.PrimaryPrefix
-msgctxt "Spatial.PrimaryPrefix"
-msgid "primary "
-msgstr "principal "
 
 #. Spatial.RangeAndMovement
 msgctxt "Spatial.RangeAndMovement"
