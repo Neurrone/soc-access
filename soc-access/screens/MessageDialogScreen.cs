@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
+using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
@@ -18,7 +19,7 @@ namespace SongsOfConquestAccess.Screens
     /// Every message dialog the game puts up, made navigable as a graph: one stop holding the
     /// heading, the body, the field where the source has one, and the buttons.
     ///
-    /// Six native sources share this class, and the shape is read off each of them every build
+    /// Seven native sources share this class, and the shape is read off each of them every build
     /// rather than assumed. Measured 2026-09-06 at 1280x800 on the quit popup: the heading ("Quit to
     /// Desktop") is drawn above the body ("Are you sure?"), and the buttons are drawn No at x 508 then
     /// Yes at x 647. The delete-save popup draws No then Yes as well, and the options confirm draws a
@@ -57,6 +58,10 @@ namespace SongsOfConquestAccess.Screens
             AccessTools.FieldRefAccess<PopupMenu, PopupMenu.Settings>("_settings");
         private static readonly AccessTools.FieldRef<SystemPopupManager, ISystemPopup> SystemPopupRef =
             AccessTools.FieldRefAccess<SystemPopupManager, ISystemPopup>("_popup");
+        private static readonly AccessTools.FieldRef<MapEntityMiniMenu, MiniMenuActions> MiniMenuActionsRef =
+            AccessTools.FieldRefAccess<MapEntityMiniMenu, MiniMenuActions>("_actions");
+        private static readonly AccessTools.FieldRef<MiniMenuActions, ConfirmPopup> MiniMenuConfirmPopupRef =
+            AccessTools.FieldRefAccess<MiniMenuActions, ConfirmPopup>("_confirmPopup");
 
         private readonly GameTextEditor _editor = new GameTextEditor();
 
@@ -70,7 +75,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _positiveKey = new object();
         private readonly object _negativeKey = new object();
 
-        // THE SIX SOURCES, each resolved from the game and adapted once per object it answers with.
+        // THE SEVEN SOURCES, each resolved from the game and adapted once per object it answers with.
         // The map message, the random event and the custom message are bound in the adventure
         // scene's container; the popup menu, the confirm popup and the system popup are bound in the
         // project's, the system popup only into its manager (WhenInjectedInto), so it comes off that
@@ -107,6 +112,21 @@ namespace SongsOfConquestAccess.Screens
                 ScreenSource<ConfirmPopup>.FromProject(),
                 popup => new ConfirmPopupAdapter(popup));
 
+        // The map entity mini menu owns a ConfirmPopup of its own, off the project container: its
+        // action row shows it for an action that RequiresConfirmation (selling a building,
+        // MiniMenuActions.HandleActionClicked). A serialized field of a serialized field, so the
+        // owner's memo covers it.
+        private readonly AdaptedSource<ConfirmPopup, IMessageDialogAdapter> _miniMenuConfirmPopup =
+            new AdaptedSource<ConfirmPopup, IMessageDialogAdapter>(
+                ScreenSource<ConfirmPopup>.FromOwner(
+                    ScreenSource<MapEntityMiniMenu>.FromScene(LoadedScenes.AdventureScene),
+                    menu =>
+                    {
+                        MiniMenuActions actions = MiniMenuActionsRef(menu);
+                        return actions != null ? MiniMenuConfirmPopupRef(actions) : null;
+                    }),
+                popup => new ConfirmPopupAdapter(popup));
+
         private readonly AdaptedSource<ISystemPopup, IMessageDialogAdapter> _systemPopup =
             new AdaptedSource<ISystemPopup, IMessageDialogAdapter>(
                 // BindInterfacesTo, so the manager answers only to ISystemPopups; the popup itself is
@@ -123,14 +143,14 @@ namespace SongsOfConquestAccess.Screens
         private readonly ScreenSource<IUISelectionLayerStack> _layerStack =
             ScreenSource<IUISelectionLayerStack>.FromProject();
 
-        /// <summary>The adapter itself is what the slot holds here: six unrelated objects draw the
+        /// <summary>The adapter itself is what the slot holds here: seven unrelated objects draw the
         /// one page, so the "menu" a source answers with IS the adapter over it, built once per
         /// object.
         ///
         /// MORE THAN ONE CAN BE SHOWING: a system popup raised over a map message or a popup menu
         /// leaves the covered one Active - <c>PopupMenu.Active</c> is its container's Active and
         /// the caller alone turns it off - so a fixed order would read the covered dialog and press
-        /// its buttons. Which is on top is asked of the game: five of the six push a selection layer
+        /// its buttons. Which is on top is asked of the game: six of the seven push a selection layer
         /// while they show (<c>Push</c> on Show, <c>Pop</c> on Hide, and the popup menu pops and
         /// pushes again on every show), and the stack's top is therefore the last one raised. The
         /// fixed order stays as the answer where the top layer is none of theirs, which is every
@@ -163,9 +183,9 @@ namespace SongsOfConquestAccess.Screens
             return first;
         }
 
-        private const int SourceCount = 6;
+        private const int SourceCount = 7;
 
-        /// <summary>The six sources in the order they are tried, which is the order the detector's
+        /// <summary>The seven sources in the order they are tried, which is the order the detector's
         /// own handlers used to be tried in.</summary>
         private IMessageDialogAdapter SourceAt(int index)
         {
@@ -176,6 +196,7 @@ namespace SongsOfConquestAccess.Screens
                 case 2: return _customMessage.Current;
                 case 3: return _popupMenu.Current;
                 case 4: return _confirmPopup.Current;
+                case 5: return _miniMenuConfirmPopup.Current;
                 default: return _systemPopup.Current;
             }
         }
