@@ -73,7 +73,6 @@ namespace SongsOfConquestAccess.Adapters
         // Every recovery below says so the first time it happens; see FaultLog.
         private readonly FaultLog _faults = new FaultLog("BattleHudAdapter");
         private string _spellTargetInstructionText;
-        private string _abilityTargetInstructionText;
 
         // The three child lookups the HUD's own containers answer once for the life of a battle, and
         // the queue pool's ActiveItems property: resolved on demand and remembered, MISSES INCLUDED
@@ -230,16 +229,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return Tooltip.ForComponent(GetOptionsButton(), _localization); }
         }
 
-        public void SetAbilityTargetInstructionText(string text)
-        {
-            _abilityTargetInstructionText = SpokenLines.Clean(text);
-        }
-
-        public void ClearAbilityTargetInstructionText()
-        {
-            _abilityTargetInstructionText = null;
-        }
-
         public void SetSpellTargetInstructionText(string text)
         {
             _spellTargetInstructionText = SpokenLines.Clean(text);
@@ -250,20 +239,12 @@ namespace SongsOfConquestAccess.Adapters
             _spellTargetInstructionText = null;
         }
 
-        /// <summary>What the game is asking the player to aim at. Both instructions arrive as signals
-        /// and the ability's end signal is not the only way an ability aim ENDS - the controller
-        /// leaves its ChoosingAbilityTarget state on a new turn, on a menu opening and on a spell
-        /// beginning without any of the three invokes that raise it - so the captured ability line
-        /// would otherwise outlive its aim and name itself over the next spell. The mode the game is
-        /// in decides which capture is the live one; neither capture is trusted to say so itself.
-        /// </summary>
-        public string GetTargetingInstructionText(CombatTargetingMode mode)
+        /// <summary>What the game is asking the player to aim a spell at: the line its narration
+        /// captured, or the instruction the HUD is drawing. An ability's instruction is not here; it
+        /// is read off the acting troop's ability (CombatAdapter.GetCurrentAbilityTargetInstruction),
+        /// because neither of the ability signals reliably marks the aim's start or end.</summary>
+        public string GetSpellTargetingInstructionText()
         {
-            if (mode == CombatTargetingMode.Ability)
-            {
-                return _abilityTargetInstructionText;
-            }
-
             if (!string.IsNullOrWhiteSpace(_spellTargetInstructionText))
             {
                 return _spellTargetInstructionText;

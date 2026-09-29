@@ -262,7 +262,6 @@ namespace SongsOfConquestAccess.Screens
             Live?.DetachAbilityTargetingBegin();
             Live?.DetachAbilityTargetingEnd();
             Live?.Hud.ClearSpellTargetInstructionText();
-            Live?.Hud.ClearAbilityTargetInstructionText();
             Live?.ClearNativeTooltip();
             Live?.ClearFocusedTileOverlay();
             base.OnPop();
@@ -1049,9 +1048,17 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                return Live != null && Live.Hud != null
-                    ? Live.Hud.GetTargetingInstructionText(Live.GetTargetingMode())
-                    : null;
+                if (Live == null)
+                {
+                    return null;
+                }
+
+                if (Live.GetTargetingMode() == CombatTargetingMode.Ability)
+                {
+                    return NameAndInstruction(Live.GetCurrentAbilityName(), Live.GetCurrentAbilityTargetInstruction());
+                }
+
+                return Live.Hud != null ? Live.Hud.GetSpellTargetingInstructionText() : null;
             }
         }
 
@@ -1304,16 +1311,21 @@ namespace SongsOfConquestAccess.Screens
 
         private void HandleAbilityTargetingBegin(TroopAbilityTargeting targeting)
         {
+            BeginAbilityAim(Live != null
+                ? NameAndInstruction(Live.GetCurrentAbilityName(), Live.GetAbilityTargetInstruction(targeting))
+                : string.Empty);
+        }
+
+        /// <summary>An ability aim has begun, from its signal or, for an off-screen troop's Blaze of
+        /// Fire, found by <see cref="WatchInstruction"/>: the cursor goes to the board and the
+        /// instruction is said once. The instruction becomes the watched baseline, so the other of
+        /// the two routes does not begin the same aim again.</summary>
+        private void BeginAbilityAim(string instruction)
+        {
             Navigator?.FocusNode(BoardNodeId, announce: false);
             Grid()?.HandleTargetingBegin();
-
-            string instruction = Live != null
-                ? NameAndInstruction(Live.GetCurrentAbilityName(), Live.GetAbilityTargetInstruction(targeting))
-                : string.Empty;
-            Live?.Hud.SetAbilityTargetInstructionText(instruction);
             Speak(instruction);
-
-            _instruction = InstructionText;
+            _instruction = instruction;
         }
 
         /// <summary>The game asked for a spell's target: the spell's name and what it wants aimed at,
@@ -1351,7 +1363,6 @@ namespace SongsOfConquestAccess.Screens
 
         private void HandleAbilityTargetingEnd(bool usedAbility)
         {
-            Live?.Hud.ClearAbilityTargetInstructionText();
             if (!usedAbility)
             {
                 Speak(ModText.Get(ModStrings.Combat.AbilityCancelled));
@@ -1372,12 +1383,20 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>The instruction the board's stop is named by, watched passively. The first
         /// instruction of an aim is spoken by whoever began it, so only a REPLACEMENT - a spell that
-        /// asks for a second target - is announced here.</summary>
+        /// asks for a second target - is announced here, and an ability aim nothing began: the
+        /// controller puts an off-screen troop's Blaze of Fire in ChoosingAbilityTarget without
+        /// raising the begin signal.</summary>
         private void WatchInstruction()
         {
             string text = InstructionText;
             if (string.Equals(text, _instruction, StringComparison.Ordinal))
             {
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(text) && Live.GetTargetingMode() == CombatTargetingMode.Ability)
+            {
+                BeginAbilityAim(text);
                 return;
             }
 

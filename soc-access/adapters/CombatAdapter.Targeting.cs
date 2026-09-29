@@ -165,6 +165,19 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(GameText.Get(_localization, "Battle/AbilityTargeting/" + targeting, string.Empty));
         }
 
+        /// <summary>The instruction for what the acting troop's ability wants aimed at, read from the
+        /// ability itself as the game's AbilityTargetInstruction panel reads it. The begin signal is
+        /// not the only way into an ability aim: an off-screen troop's Blaze of Fire is put in
+        /// ChoosingAbilityTarget by the controller's update with no signal raised.</summary>
+        public string GetCurrentAbilityTargetInstruction()
+        {
+            IBattleTroopState current = GetCurrentTroop();
+            ITroopAbilityDefinition ability = current != null && _abilityUtility != null
+                ? _abilityUtility.GetAbilityDefinition(current)
+                : null;
+            return ability != null ? GetAbilityTargetInstruction(ability.Targeting) : string.Empty;
+        }
+
         public CombatTargetingMode GetTargetingMode()
         {
             if (_battleSpellController != null)
