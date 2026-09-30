@@ -679,10 +679,14 @@ namespace SongsOfConquestAccess.Screens
 
             if (troopDrawn)
             {
-                // A button, because Enter does something here: it walks the cursor to the troop.
-                NodeVtable vtable = GraphNodes.Button(
-                    () => ModText.Get(ModStrings.Screens.CurrentTroop, BuildTroopLabel(hud.GetCurrentTroopInfo())),
-                    () => MoveCursorToTroop(hud.GetCurrentTroopId(), requireLocalCurrentTurn: false));
+                // A button, because Enter does something here: it walks the cursor to the troop. A
+                // troop off the board has no tile to walk to, so it is text and reads no position.
+                Func<string> label = () => ModText.Get(
+                    ModStrings.Screens.CurrentTroop,
+                    BuildTroopLabel(hud.GetCurrentTroopInfo(), hud.IsTroopOnBoard(hud.GetCurrentTroopId())));
+                NodeVtable vtable = hud.IsTroopOnBoard(hud.GetCurrentTroopId())
+                    ? GraphNodes.Button(label, () => MoveCursorToTroop(hud.GetCurrentTroopId(), requireLocalCurrentTurn: false))
+                    : GraphNodes.Text(label);
                 builder.AddItem(new SyntheticNode(ControlId.Structural("combat:current-troop"), vtable));
             }
 
@@ -733,7 +737,7 @@ namespace SongsOfConquestAccess.Screens
         // ---- the turn order ----
 
         /// <summary>The queue the game draws along the bottom, in its drawn order. Enter on a troop
-        /// walks the cursor to it, so a troop is a button.
+        /// walks the cursor to it, so a troop on the board is a button; one off the board is text.
         ///
         /// A ROUND SEPARATOR IS A REGION, not a row (owner ruling 2026-09-19): the troops after it
         /// stand under its "Round N", said on the way in, and the troops before the first separator
@@ -776,11 +780,15 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 ControlId id = QueueNodeId(i);
-                NodeVtable vtable = GraphNodes.Button(
-                    () => BuildQueueItemLabel(item),
-                    () => MoveCursorToTroop(item.TroopId, requireLocalCurrentTurn: false),
-                    null,
-                    item.Tooltip);
+                // A troop off the board has no tile for Enter to walk the cursor to, so it is a line
+                // to read rather than a button.
+                NodeVtable vtable = item.IsOnBoard
+                    ? GraphNodes.Button(
+                        () => BuildQueueItemLabel(item),
+                        () => MoveCursorToTroop(item.TroopId, requireLocalCurrentTurn: false),
+                        null,
+                        item.Tooltip)
+                    : GraphNodes.Text(() => BuildQueueItemLabel(item), null, item.Tooltip);
                 vtable.OnFocusVisual = item.Focus;
                 vtable.OnBlurVisual = item.Unfocus;
                 builder.AddItem(new SyntheticNode(id, vtable));
@@ -812,10 +820,13 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            return item.IsRoundMarker ? ModText.Get(ModStrings.Screens.Round, item.RoundNumber) : BuildTroopLabel(item.Troop);
+            // No position for a troop off the board: the one it has is outside the map.
+            return item.IsRoundMarker
+                ? ModText.Get(ModStrings.Screens.Round, item.RoundNumber)
+                : BuildTroopLabel(item.Troop, item.IsOnBoard);
         }
 
-        private static string BuildTroopLabel(BattleHudAdapter.TroopInfo troop)
+        private static string BuildTroopLabel(BattleHudAdapter.TroopInfo troop, bool withPosition)
         {
             if (troop == null || !troop.IsKnown || string.IsNullOrWhiteSpace(troop.Name))
             {
@@ -834,7 +845,7 @@ namespace SongsOfConquestAccess.Screens
                 label = troop.Name;
             }
 
-            return troop.HasPosition
+            return troop.HasPosition && withPosition
                 ? ModText.Get(ModStrings.Combat.TroopAt, label, CombatText.FormatPoint(troop.Position))
                 : label;
         }

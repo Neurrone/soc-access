@@ -956,6 +956,22 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>Whether the troop stands on a tile of the battlefield. A troop the game has moved
+        /// off the board (an off-screen Fenghuang) has a position outside the map.</summary>
+        public bool IsTroopOnBoard(int troopId)
+        {
+            try
+            {
+                IBattleTroopState troop = _facade != null && _facade.Troops != null ? _facade.Troops.Get(troopId) : null;
+                return troop != null && _facade.Level != null && _facade.Level.IsPointWithinMap(troop.Position);
+            }
+            catch (Exception exception)
+            {
+                _faults.Report("IsTroopOnBoard", exception);
+                return false;
+            }
+        }
+
         private int GetLocalTeamId()
         {
             return BattleFacadeState.LocalTeamId(_facade);
@@ -1303,6 +1319,11 @@ namespace SongsOfConquestAccess.Adapters
             public TroopInfo Troop
             {
                 get { return IsRoundMarker ? TroopInfo.Unknown() : _adapter.GetTroopInfo(TroopId); }
+            }
+
+            public bool IsOnBoard
+            {
+                get { return !IsRoundMarker && _adapter.IsTroopOnBoard(TroopId); }
             }
 
             public bool IsVisible
