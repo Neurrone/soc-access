@@ -15,6 +15,31 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly System.Reflection.FieldInfo StringBuilderField =
             AccessTools.Field(typeof(UITextMesh), "_stringBuilder");
 
+        // How TMP last had its text set. UITextMesh writes every text through its string builder and
+        // TMP's SetText(StringBuilder), which records SetTextArray; TMP's own text property is then
+        // rebuilt lazily and, once the text has been drawn, can still answer an older string - after
+        // an empty write, the prefab placeholder ("SkillChoiceHeaderRight"). So while SetTextArray is
+        // the source, the builder is what is drawn, empty included.
+        private static readonly System.Reflection.FieldInfo InputSourceField =
+            AccessTools.Field(typeof(TMPro.TMP_Text), "m_inputSource");
+
+        private static readonly object SetTextArraySource = FindSetTextArraySource();
+
+        /// <summary>Null where the field or the value is missing (a TMP update), which leaves every
+        /// read as it was before this check: the builder when it holds text, TMP's text otherwise.
+        /// </summary>
+        private static object FindSetTextArraySource()
+        {
+            if (InputSourceField == null
+                || !InputSourceField.FieldType.IsEnum
+                || !System.Enum.IsDefined(InputSourceField.FieldType, "SetTextArray"))
+            {
+                return null;
+            }
+
+            return System.Enum.Parse(InputSourceField.FieldType, "SetTextArray");
+        }
+
         [HookWritable]
         public static string GetEffectiveText(IUITextMesh textMesh)
         {
@@ -22,7 +47,7 @@ namespace SongsOfConquestAccess.Adapters
             if (concreteTextMesh != null)
             {
                 string builderText = GetStringBuilderText(concreteTextMesh);
-                if (!string.IsNullOrEmpty(builderText))
+                if (!string.IsNullOrEmpty(builderText) || IsSetThroughBuilder(concreteTextMesh))
                 {
                     return builderText;
                 }
@@ -60,6 +85,15 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return button != null ? button.Text ?? string.Empty : string.Empty;
+        }
+
+        /// <summary>Whether TMP's text was last set through the UITextMesh's builder, so an empty
+        /// builder means the game wrote nothing rather than that the text lives in TMP alone.</summary>
+        private static bool IsSetThroughBuilder(UITextMesh textMesh)
+        {
+            return InputSourceField != null
+                && SetTextArraySource != null
+                && SetTextArraySource.Equals(InputSourceField.GetValue(textMesh));
         }
 
         /// <summary>What the game last WROTE into the text, read off its string builder; empty when the
