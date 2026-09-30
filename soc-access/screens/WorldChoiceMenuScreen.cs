@@ -16,8 +16,8 @@ namespace SongsOfConquestAccess.Screens
     /// THE CARDS ARE A RADIO GROUP that never chooses on arrival: walking onto a card must not commit
     /// the player to it, and the game's own model is select-then-confirm - a click on a card selects
     /// it and turns the Confirm button on, and only Confirm closes the menu. So Enter is the card's
-    /// own pointer click and arriving on it only draws it (the widget screen selected on focus, which
-    /// this replaces). A card the game will not take is unavailable and says the game's own red
+    /// own pointer click and arriving on it only draws it, as the pointer resting on it would - never
+    /// by native selection, which the menu takes as choosing the card. A card the game will not take is unavailable and says the game's own red
     /// reason, which the card draws as part of its text.
     ///
     /// The wielder band comes from the shared contributor (<c>ui/TroopHudRows.cs</c>), because the
@@ -103,6 +103,18 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>The game's Ctrl+digit quick splits, on the band's troop rows.</summary>
+        public override void OnUnfocus()
+        {
+            PointerHover.Release();
+            base.OnUnfocus();
+        }
+
+        public override void OnPop()
+        {
+            PointerHover.Release();
+            base.OnPop();
+        }
+
         public override bool ClaimsAction(string actionKey)
         {
             return TroopHudRows.ClaimsAction(actionKey, Navigator, Troops, WielderKey);
@@ -154,7 +166,11 @@ namespace SongsOfConquestAccess.Screens
                     () => it.Choose(),
                     () => it.IsEnabled,
                     it.Tooltip);
-                vtable.OnFocusVisual = () => it.Select();
+                // Drawn as the pointer resting on it: the card's native selection is what a gamepad
+                // highlight fires, and the menu takes that as choosing the card (SelectionProxy.OnSelect
+                // -> HandleRewardButtonSelected), which is exactly what arriving must not do.
+                Component card = it.Button;
+                vtable.OnFocusVisual = () => PointerHover.MoveTo(card);
                 builder.AddItem(new DrawnNode(
                     ControlId.For(it.Button, "world-choice:card/" + i),
                     vtable,

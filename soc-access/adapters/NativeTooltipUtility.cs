@@ -226,6 +226,20 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
+            if (!metadata.SelectsComponent)
+            {
+                // Drawn where the game draws it, without the selection: for this control the game
+                // takes being selected as being chosen.
+                if (metadata.Component == null)
+                {
+                    HideTooltip();
+                    return;
+                }
+
+                TooltipPatches.ShowAccessibilityTooltip(metadata.Component.gameObject, metadata.Anchor, metadata.Anchors);
+                return;
+            }
+
             if (metadata.Anchor != null)
             {
                 ShowTooltipForComponent(metadata.Component, metadata.Anchor, metadata.Anchors);

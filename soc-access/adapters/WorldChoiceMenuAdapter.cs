@@ -150,7 +150,6 @@ namespace SongsOfConquestAccess.Adapters
                     () => BuildChoiceLabel(GetChoiceButton(penalty, index)),
                     () => IsChoiceEnabled(penalty, index),
                     () => IsChoiceSelected(penalty, index),
-                    () => SelectChoice(penalty, index),
                     () => ChooseChoice(penalty, index),
                     () => GetChoiceTooltip(GetChoiceButton(penalty, index)),
                     GetChoiceComponent(penalty, index),
@@ -198,16 +197,6 @@ namespace SongsOfConquestAccess.Adapters
             return selected is int && (int)selected == index;
         }
 
-        /// <summary>Draw the card as the pointer resting on it would: the game's own selection, which
-        /// is what raises its tooltip. It does NOT choose.</summary>
-        private bool SelectChoice(bool isPenalty, int index)
-        {
-            IWorldMapChoiceButton choice = GetChoiceButton(isPenalty, index);
-            return choice != null
-                && choice.Button != null
-                && NativeSelectionUtility.Select(choice.Button.GetSelectable());
-        }
-
         /// <summary>
         /// Choose the card, as a pointer click does: the game's own click handler takes it as the
         /// selection and turns its Confirm button on.
@@ -235,11 +224,15 @@ namespace SongsOfConquestAccess.Adapters
 
         private Tooltip GetChoiceTooltip(IWorldMapChoiceButton button)
         {
+            // Drawn without the native selection: the menu wires each card's selection proxy to
+            // choosing it (WorldChoiceMenu.SetupRewards / SetupPenalties -> HandleRewardButtonSelected),
+            // so selecting a card to draw its tooltip would choose whichever card focus rests on.
             Selectable selectable = button != null && button.Button != null ? button.Button.GetSelectable() : null;
-            return Tooltip.ForComponent(
+            Tooltip tooltip = Tooltip.ForComponent(
                 selectable,
                 selectable != null ? selectable.GetComponent<RectTransform>() : null,
                 _localization);
+            return tooltip != null ? tooltip.ShownWithoutSelecting() : null;
         }
 
         private bool TryGetArtifactChoiceLabel(IWorldMapChoiceButton button, out string artifactName)
@@ -365,7 +358,6 @@ namespace SongsOfConquestAccess.Adapters
             private readonly Func<string> _getLabel;
             private readonly Func<bool> _isEnabled;
             private readonly Func<bool> _isSelected;
-            private readonly Func<bool> _select;
             private readonly Func<bool> _choose;
             private readonly Func<Tooltip> _getTooltip;
 
@@ -374,7 +366,6 @@ namespace SongsOfConquestAccess.Adapters
                 Func<string> getLabel,
                 Func<bool> isEnabled,
                 Func<bool> isSelected,
-                Func<bool> select,
                 Func<bool> choose,
                 Func<Tooltip> getTooltip,
                 Component button,
@@ -386,7 +377,6 @@ namespace SongsOfConquestAccess.Adapters
                 _getLabel = getLabel;
                 _isEnabled = isEnabled;
                 _isSelected = isSelected;
-                _select = select;
                 _choose = choose;
                 _getTooltip = getTooltip;
             }
@@ -418,11 +408,6 @@ namespace SongsOfConquestAccess.Adapters
             public Tooltip Tooltip
             {
                 get { return _getTooltip != null ? _getTooltip() : null; }
-            }
-
-            public bool Select()
-            {
-                return _select != null && _select();
             }
 
             public bool Choose()

@@ -65,6 +65,19 @@ namespace SongsOfConquestAccess.Adapters
 
         public TileInstruction SecondaryInstruction { get; private set; }
 
+        /// <summary>This tooltip, drawn without natively selecting its control first (see
+        /// <see cref="VisualTooltipMetadata.SelectsComponent"/>), for a control the game treats being
+        /// selected as being chosen.</summary>
+        public Tooltip ShownWithoutSelecting()
+        {
+            return new Tooltip(
+                _getTextLines,
+                VisualMetadata != null ? VisualMetadata.WithoutSelecting() : null,
+                PrimaryInstruction,
+                SecondaryInstruction,
+                _getIsLong);
+        }
+
         public static Tooltip ForComponent(Component component, ILocalizationHandler localization)
         {
             if (component == null)
@@ -129,6 +142,26 @@ namespace SongsOfConquestAccess.Adapters
         public IDetails MapDetails { get; private set; }
 
         public bool IsMapTooltip { get; private set; }
+
+        /// <summary>Whether drawing the tooltip natively selects its component first, which gives
+        /// the control the game's own highlight. False where the game takes the selection as a
+        /// choice: a world choice card's selection proxy chooses the card.</summary>
+        public bool SelectsComponent { get; private set; } = true;
+
+        public VisualTooltipMetadata WithoutSelecting()
+        {
+            return new VisualTooltipMetadata
+            {
+                Component = Component,
+                Anchor = Anchor,
+                Anchors = Anchors,
+                MapTooltipable = MapTooltipable,
+                ScreenPoint = ScreenPoint,
+                MapDetails = MapDetails,
+                IsMapTooltip = IsMapTooltip,
+                SelectsComponent = false
+            };
+        }
 
         public static VisualTooltipMetadata ForComponent(Component component)
         {
