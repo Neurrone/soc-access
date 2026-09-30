@@ -54,6 +54,44 @@ namespace SongsOfConquestAccess.Tests
             }, (System.Collections.ICollection)lines);
         }
 
+        [TestMethod]
+        public void ComposeReadsTheAimedEntityFirstAndNamesAnEntityElsewhere()
+        {
+            var lines = CombatAttackPreviewText.Compose(new[]
+            {
+                CombatAttackPreviewFacts.ForEntity("150", null, "Explosive barrel", new Vector2Int(4, 2), false),
+                CombatAttackPreviewFacts.ForEntity("150", "1", null, new Vector2Int(3, 2), true)
+            });
+
+            CollectionAssert.AreEqual(new[]
+            {
+                "damage 150, destroys.",
+                "Explosive barrel at 4, 2: damage 150."
+            }, (System.Collections.ICollection)lines);
+        }
+
+        [TestMethod]
+        public void ComposeReadsEachLineTheGameAddsAsItsOwnSentence()
+        {
+            var lines = CombatAttackPreviewText.Compose(new[]
+            {
+                new CombatAttackPreviewFacts(
+                    "10",
+                    "0",
+                    "Spell Damage Resistance: -40% Damage\nMother's Embrace: -50% Damage",
+                    false,
+                    Troop(1, 2, "Terrors", 3, new Vector2Int(10, 5)),
+                    true)
+            });
+
+            CollectionAssert.AreEqual(new[]
+            {
+                "damage 10, kills 0.",
+                "Spell Damage Resistance: -40% Damage.",
+                "Mother's Embrace: -50% Damage."
+            }, (System.Collections.ICollection)lines);
+        }
+
         private static CombatAttackPreviewFacts Preview(string damage, string kills, TroopRef troop, bool onTarget)
         {
             return new CombatAttackPreviewFacts(damage, kills, null, false, troop, onTarget);

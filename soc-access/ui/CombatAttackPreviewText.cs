@@ -11,7 +11,9 @@ namespace SongsOfConquestAccess.UI
     /// and without a name, since the tile has just said it; the game draws it last when an attack
     /// also hits other stacks. Every other preview is headed by its stack ("5 Roots of the Mother
     /// at 3.5, 1: damage 119–149, kills 1."), friendly stacks marked as such, so an attack that
-    /// hits several stacks, or an area aimed at an empty hex, says whose numbers are whose.
+    /// hits several stacks, or an area aimed at an empty hex, says whose numbers are whose. A
+    /// spell's previews read the same way, and a map entity it would hit off the tile aimed at is
+    /// headed by its name and position.
     /// </summary>
     public static class CombatAttackPreviewText
     {
@@ -25,7 +27,7 @@ namespace SongsOfConquestAccess.UI
 
             foreach (CombatAttackPreviewFacts preview in previews)
             {
-                if (preview.IsOnTargetTroop)
+                if (preview.IsOnTargetTroop || preview.IsOnTargetEntity)
                 {
                     AddLines(lines, preview, named: false);
                 }
@@ -33,9 +35,9 @@ namespace SongsOfConquestAccess.UI
 
             foreach (CombatAttackPreviewFacts preview in previews)
             {
-                if (!preview.IsOnTargetTroop)
+                if (!preview.IsOnTargetTroop && !preview.IsOnTargetEntity)
                 {
-                    AddLines(lines, preview, named: preview.Troop != null);
+                    AddLines(lines, preview, named: preview.Troop != null || preview.IsEntity);
                 }
             }
 
@@ -54,7 +56,7 @@ namespace SongsOfConquestAccess.UI
 
             if (!string.IsNullOrWhiteSpace(preview.Kills))
             {
-                parts.Add(preview.TargetIsEntity && !named
+                parts.Add(preview.IsEntity || (preview.TargetIsEntity && !named)
                     ? FormatEntityDestruction(preview.Kills)
                     : ModText.Get(ModStrings.Spatial.Kills, preview.Kills));
             }
@@ -67,12 +69,18 @@ namespace SongsOfConquestAccess.UI
 
             if (!string.IsNullOrWhiteSpace(preview.Additional))
             {
-                previewLines.Add(ModText.Get(ModStrings.Common.Sentence, preview.Additional));
+                // A sentence per line the game drew, so "Spell Damage Resistance: -40% Damage" and
+                // the Mother's Embrace line under it do not run together.
+                foreach (string line in SpokenLines.Of(new[] { preview.Additional }))
+                {
+                    previewLines.Add(ModText.Get(ModStrings.Common.Sentence, line));
+                }
             }
 
             if (named && previewLines.Count > 0)
             {
-                previewLines[0] = ModText.Get(ModStrings.UI.LabelValue, FormatStack(preview.Troop), previewLines[0]);
+                string heading = preview.IsEntity ? FormatEntity(preview) : FormatStack(preview.Troop);
+                previewLines[0] = ModText.Get(ModStrings.UI.LabelValue, heading, previewLines[0]);
             }
 
             lines.AddRange(previewLines);
@@ -86,6 +94,16 @@ namespace SongsOfConquestAccess.UI
                 ? ModText.Get(ModStrings.Combat.FriendlyTroop, troop.Count, troop.Name)
                 : ModText.Get(ModStrings.Combat.TroopQuantity, troop.Count, troop.Name);
             return ModText.Get(ModStrings.Combat.TroopAt, label, CombatText.FormatPoint(troop.Position));
+        }
+
+        /// <summary>"Explosive barrel at 4, 2" for a map entity a spell would hit off the tile
+        /// aimed at.</summary>
+        private static string FormatEntity(CombatAttackPreviewFacts preview)
+        {
+            string name = string.IsNullOrWhiteSpace(preview.EntityName)
+                ? ModText.Get(ModStrings.Combat.AttackableEntity)
+                : preview.EntityName;
+            return ModText.Get(ModStrings.Combat.TroopAt, name, CombatText.FormatPoint(preview.EntityPoint));
         }
 
         private static string FormatEntityDestruction(string killsText)

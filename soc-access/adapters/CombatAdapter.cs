@@ -210,6 +210,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly MethodInfo _updateAttackPreviewsMethod;
         private readonly FieldInfo _tooltipBehaviorField;
         private readonly FieldInfo _attackPreviewPoolField;
+        private readonly FieldInfo _attackPreviewContainerField;
         private readonly FieldInfo _attackPreviewDamageContainerField;
         private readonly FieldInfo _attackPreviewDamageTextField;
         private readonly FieldInfo _attackPreviewKillsContainerField;
@@ -350,6 +351,7 @@ namespace SongsOfConquestAccess.Adapters
             _attackPreviewPoolField = attackPreviewHandler != null
                 ? AccessTools.Field(attackPreviewHandler.GetType(), "_attackPreviewPool")
                 : null;
+            _attackPreviewContainerField = AccessTools.Field(typeof(BattleAttackPreview), "_container");
             _attackPreviewDamageContainerField = AccessTools.Field(typeof(BattleAttackPreview), "_damageContainer");
             _attackPreviewDamageTextField = AccessTools.Field(typeof(BattleAttackPreview), "_damageText");
             _attackPreviewKillsContainerField = AccessTools.Field(typeof(BattleAttackPreview), "_killsContainer");

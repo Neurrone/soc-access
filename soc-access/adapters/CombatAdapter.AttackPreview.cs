@@ -6,6 +6,7 @@ using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Battle.View;
 using SongsOfConquest.Common.Battle;
+using SongsOfConquest.Common.Spells;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Localization;
@@ -44,6 +45,25 @@ namespace SongsOfConquestAccess.Adapters
         public TroopRef Troop { get; private set; }
         /// <summary>The preview is on the troop standing on the tile aimed at.</summary>
         public bool IsOnTargetTroop { get; private set; }
+
+        /// <summary>A spell's preview on a map entity, which the mod knows the entity of. The name is
+        /// null for the entity on the tile aimed at, which the tile has just named.</summary>
+        public static CombatAttackPreviewFacts ForEntity(string damage, string kills, string entityName, Vector2Int entityPoint, bool isOnTarget)
+        {
+            CombatAttackPreviewFacts facts = new CombatAttackPreviewFacts(damage, kills, null, isOnTarget, null, false);
+            facts.IsEntity = true;
+            facts.EntityName = entityName;
+            facts.EntityPoint = entityPoint;
+            facts.IsOnTargetEntity = isOnTarget;
+            return facts;
+        }
+
+        /// <summary>The preview is on a map entity the mod knows (<see cref="ForEntity"/>).</summary>
+        public bool IsEntity { get; private set; }
+        public string EntityName { get; private set; }
+        public Vector2Int EntityPoint { get; private set; }
+        /// <summary>The preview is on the map entity on the tile aimed at.</summary>
+        public bool IsOnTargetEntity { get; private set; }
     }
 
     public sealed partial class CombatAdapter
@@ -141,6 +161,11 @@ namespace SongsOfConquestAccess.Adapters
         private int _previewTurn;
         private Vector2Int _previewCurrentTroopPoint;
         private bool _previewWaiting;
+        // The spell being aimed and the game's damage preview setting: a spell cancelled and another
+        // aimed at the same tile, or the setting turned off, reads anew.
+        private ISpellDefinition _previewSpell;
+        private SpellTier _previewSpellTier;
+        private bool _previewDamagePreview;
         private ICommandWaiter _commandWaiter;
         private bool _commandWaiterProbed;
 
@@ -173,7 +198,14 @@ namespace SongsOfConquestAccess.Adapters
             int turn = GetCurrentTurn();
             Vector2Int currentTroopPoint = GetCurrentTroopPosition();
             bool waiting = IsCommandWaiting();
+            ISpellDefinition spell;
+            SpellTier spellTier;
+            GetAimedSpell(out spell, out spellTier);
+            bool damagePreview = IsDamagePreviewEnabled();
             if (_previewRead
+                && spell == _previewSpell
+                && spellTier == _previewSpellTier
+                && damagePreview == _previewDamagePreview
                 && point == _previewPoint
                 && pinned == _previewPinned
                 && targeting == _previewTargeting
@@ -196,6 +228,9 @@ namespace SongsOfConquestAccess.Adapters
             _previewTurn = turn;
             _previewCurrentTroopPoint = currentTroopPoint;
             _previewWaiting = waiting;
+            _previewSpell = spell;
+            _previewSpellTier = spellTier;
+            _previewDamagePreview = damagePreview;
             _previewRead = true;
             _previews = CapturePreviewFor(point);
             return _previews;
@@ -207,6 +242,13 @@ namespace SongsOfConquestAccess.Adapters
             if (tile == null)
             {
                 return null;
+            }
+
+            // A spell's preview is asked of the game for the tile, empty or not: an area spell aimed
+            // at an empty hex previews every stack it would hit.
+            if (GetTargetingMode() == CombatTargetingMode.Spell)
+            {
+                return CaptureSpellPreviews(tile, point);
             }
 
             // An area ability may be aimed at an empty hex, and the game draws a preview on every
@@ -255,6 +297,13 @@ namespace SongsOfConquestAccess.Adapters
             List<CombatAttackPreviewFacts> facts = new List<CombatAttackPreviewFacts>();
             foreach (BattleAttackPreview preview in GetActiveAttackPreviews())
             {
+                // Handed out by the pool but not drawn: the game's damage preview setting is off,
+                // or it is waiting on a command. Its text is whatever it last showed.
+                if (!IsPreviewShown(preview))
+                {
+                    continue;
+                }
+
                 string damage = GetPreviewText(preview, _attackPreviewDamageTextField);
                 string kills = GetPreviewText(preview, _attackPreviewKillsTextField);
                 string additional = GetCapturedAdditionalText(preview);
@@ -334,6 +383,17 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return previews;
+        }
+
+        /// <summary>Whether the game is showing this preview: every show places it through
+        /// AnimateContainer, which activates its container, and Hide fades the container out and
+        /// deactivates it.</summary>
+        private bool IsPreviewShown(BattleAttackPreview preview)
+        {
+            CanvasGroup container = preview != null && _attackPreviewContainerField != null
+                ? _attackPreviewContainerField.GetValue(preview) as CanvasGroup
+                : null;
+            return container != null && container.gameObject.activeSelf;
         }
 
         private bool IsPreviewContainerVisible(BattleAttackPreview preview, FieldInfo field)
