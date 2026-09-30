@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Fixed regression that broke reding of the sell building confirmation dialog
+- Fixed Blaze of Fire's ability input state not being properly recognized
+- Attack previews for abilities that affect tiles other than the target are now read properly
+
 ## V1.0.0
 
 ### UI
