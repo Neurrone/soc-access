@@ -141,6 +141,28 @@ namespace SongsOfConquestAccess
 
         public static void Bind(ConfigFile config)
         {
+            // BepInEx saves the whole file after every entry a ConfigFile has not seen, which for
+            // the ~380 entries below is ~380 rewrites of a growing file and about seven seconds.
+            // The file is written once at the end instead, with the same content.
+            bool saveOnConfigSet = config.SaveOnConfigSet;
+            config.SaveOnConfigSet = false;
+            try
+            {
+                BindEntries(config);
+            }
+            finally
+            {
+                config.SaveOnConfigSet = saveOnConfigSet;
+            }
+
+            if (saveOnConfigSet)
+            {
+                config.Save();
+            }
+        }
+
+        private static void BindEntries(ConfigFile config)
+        {
             _config = config;
             _readEnemyInfluence = config.Bind(
                 "Combat",
