@@ -533,10 +533,12 @@ namespace SongsOfConquestAccess.Events.Combat
 
     public sealed class NewTurnEvent : IAccessibilityEvent
     {
-        public NewTurnEvent(TroopRef troop) { Troop = troop; }
+        public NewTurnEvent(TroopRef troop, bool isOnBoard) { Troop = troop; IsOnBoard = isOnBoard; }
         public string Kind { get { return AccessibilityEvents.Combat.NewTurn; } }
         public TroopRef Troop { get; private set; }
-        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.NewTurn, Troop.Format(includePosition: true)); }
+        // A troop off the board (an off-screen Fenghuang) has a position outside the map, not one to say.
+        public bool IsOnBoard { get; private set; }
+        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.NewTurn, Troop.Format(includePosition: IsOnBoard)); }
     }
 
     public sealed class NewRoundEvent : IAccessibilityEvent

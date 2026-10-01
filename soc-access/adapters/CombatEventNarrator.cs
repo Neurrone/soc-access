@@ -289,7 +289,7 @@ namespace SongsOfConquestAccess.Adapters
                     _currentTurnTroopId = troop.Id;
                     Enqueue(CombatNarrationItem.Create(
                         CombatNarrationItemKind.NewTurn,
-                        new NewTurnEvent(adapter.CreateTroopRef(troop)),
+                        new NewTurnEvent(adapter.CreateTroopRef(troop), adapter.IsValidTile(troop.Position)),
                         troop.Id));
                 }
 
@@ -493,6 +493,14 @@ namespace SongsOfConquestAccess.Adapters
             if (ability != null)
             {
                 IBattleTroopState troop = adapter.GetTroop(ability.BattleTroopId);
+                // An off-screen troop's Blaze of Fire is begun by the server at the troop's turn with
+                // no position, to have the player choose where it lands; it is used when that tile is
+                // chosen, which begins it again with the position.
+                if (troop != null && troop.IsOffScreen && ability.Position == Constants.Battle.NoPosition)
+                {
+                    return;
+                }
+
                 Enqueue(CombatNarrationItem.Create(
                     CombatNarrationItemKind.Ability,
                     new AbilityUsedEvent(CreateActor(adapter, troop), adapter.CreateAbilityRef(ability.TroopAbility), null, null),
