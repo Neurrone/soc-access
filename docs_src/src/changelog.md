@@ -1,10 +1,14 @@
 # Changelog
 
-## Unreleased
+## V1.0.1
 
 - Fixed regression that broke reding of the sell building confirmation dialog
 - Fixed Blaze of Fire's ability input state not being properly recognized
 - Attack previews for abilities that affect tiles other than the target are now read properly
+- Damage previews for spells are now read
+- Troops not on the battlefield due to abilities like Blaze of Fire no longer read an invalid position on the battle timeline or at the start of their turn
+- On the level up screen When command is already at max level, extraneous text like "SkillChoiceHeaderRight" or "Skill name. level 8" is no longer read
+- The world choice screen no longer selects rewards on focus
 
 ## V1.0.0
 
